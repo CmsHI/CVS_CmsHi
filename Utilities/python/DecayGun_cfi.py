@@ -6,6 +6,8 @@ signal = cms.EDProducer("PythiaProducer",
                     pythiaHepMCVerbosity = cms.untracked.bool(False),
                     pythiaPylistVerbosity = cms.untracked.int32(0),
                     
+                        pythiaFrame = cms.string("cms"),
+
                     ParticleID = cms.untracked.int32(443),
                     DoubleParticle = cms.untracked.bool(False),
                     kinematicsFile = cms.untracked.string('HeavyIonsAnalysis/Configuration/data/jpsipbpb.root'),
