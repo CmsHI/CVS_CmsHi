@@ -1,6 +1,6 @@
 // File: BaseHiGenJetProducer.cc
 // Author: Y.Yilmaz, 2008
-// $Id: BaseHiGenJetProducer.cc,v 1.5 2009/01/14 11:09:11 yilmaz Exp $
+// $Id: BaseHiGenJetProducer.cc,v 1.1 2009/04/27 21:24:37 yilmaz Exp $
 //--------------------------------------------
 #include <memory>
 
@@ -73,7 +73,7 @@ namespace {
   template <class T>  
   void dumpJets (const T& fJets) {
     for (unsigned i = 0; i < fJets.size(); ++i) {
-      std::cout << "Jet # " << i << std::endl << fJets[i].print();
+      std::cout<< "Jet # " << i << std::endl << fJets[i].print();
     }
   }
 
@@ -101,7 +101,8 @@ namespace cms
       mVerbose (conf.getUntrackedParameter<bool>("verbose", false)),
       mEtInputCut (conf.getParameter<double>("inputEtMin")),
       mEInputCut (conf.getParameter<double>("inputEMin")),
-      skipLastSubEvent_ (conf.getUntrackedParameter<bool>("skipLastSubEvent", true))
+      skipLastSubEvent_ (conf.getUntrackedParameter<bool>("skipLastSubEvent", true)),
+      nHydro_(conf.getUntrackedParameter<double>("maxParticles", 2000))
   {
     std::string alias = conf.getUntrackedParameter<string>( "alias", conf.getParameter<std::string>("@module_label"));
     if (makeCaloJet (mJetType)) {
@@ -135,26 +136,40 @@ namespace cms
      vector <ProtoJet> output;
      vector<JetReco::InputCollection> inputs;
 
+     int hydroEvent = -1;
+     vector<int> nsubparticle;
+
      for (unsigned i = 0; i < inputHandle->size(); ++i) {
 
 	const GenParticle & p = (*inputHandle)[i];
         if(!selectForJet(p)) continue;
 	int subevent = (*subs)[GenParticleRef(inputHandle,i)];
-        cout<<"inputs size "<<inputs.size()<<" subevent "<<subevent<<endl;
+        LogDebug("SubEventJets")<<"inputs size "<<inputs.size()<<" subevent "<<subevent;
 
-	if(subevent >= inputs.size()) inputs.resize(subevent+1);
-
+	if(subevent >= inputs.size()){ 
+	   inputs.resize(subevent+1);
+	   nsubparticle.resize(subevent+1);
+	}
 	//	cout<<"inputs size "<<inputs.size()<<" subevent "<<subevent<<endl;
-
-	(inputs[subevent]).push_back(JetReco::InputItem(&p,i));
+	if(nsubparticle[subevent]< nHydro_){
+	   (inputs[subevent]).push_back(JetReco::InputItem(&p,i));	
+	   nsubparticle[subevent]++;
+	}else{
+	   LogDebug("JetsInHydro")<<"More particles than hydro cut, Sub-Event :  "<<subevent;
+	   if(subevent != hydroEvent && hydroEvent != -1){
+	      edm::LogError("JetsInHydro")<<"More than one hydro event identified, Sub-Event :  "<<subevent;
+	   }
+           hydroEvent = subevent;
+	}
      }
 
      int nsub = inputs.size();
      for(int isub = 0; isub < nsub; ++isub){
 	cout<<"Processing Sub-Event : "<<isub<<endl;
 	JetReco::InputCollection & input = inputs[isub];
-	if(skipLastSubEvent_ && isub == nsub-1){
-	   cout<<"Sub-Event number "<<isub<<" with "<<input.size()<<" particles, skipped as background event."<<endl;
+	//	if(skipLastSubEvent_ && isub == nsub-1){
+	if(isub == hydroEvent){
+	   cout<<"Sub-Event number "<<isub<<" with more than "<<input.size()<<" particles, skipped as background event."<<endl;
 	}else{
 
 	   if (mVerbose) {

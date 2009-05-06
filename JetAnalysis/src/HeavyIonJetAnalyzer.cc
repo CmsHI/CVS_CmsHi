@@ -306,6 +306,8 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    if(hi){
       b = hi->impact_parameter();
       npart = hi->Npart_proj()+hi->Npart_targ();
+      ncoll = hi->Ncoll();
+      nhard = hi->Ncoll_hard();
 
       if(printLists_){
 	 out_b<<b<<endl;
@@ -334,13 +336,13 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       
    }
    
-   /*
-     edm::Handle<edm::SimVertexContainer> simVertices;
+   
+   edm::Handle<edm::SimVertexContainer> simVertices;
    iEvent.getByType<edm::SimVertexContainer>(simVertices);
-
+   
    if (! simVertices.isValid() ) throw cms::Exception("FatalError") << "No vertices found\n";
    int inum = 0;
-
+   
    edm::SimVertexContainer::const_iterator it=simVertices->begin();
    SimVertex vertex = (*it);
    cout<<" Vertex position "<< inum <<" " << vertex.position().rho()<<" "<<vertex.position().z()<<endl;
@@ -348,12 +350,14 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    vy = vertex.position().y();
    vz = vertex.position().z();
    vr = vertex.position().rho();
+   
 
-   for(int i = 0; i<3; ++i){
-      hev_.ptav[i] = hev_.ptav[i]/hev_.n[i];
-   }
-   */
-
+      /*
+	for(int i = 0; i<3; ++i){
+	hev_.ptav[i] = hev_.ptav[i]/hev_.n[i];
+	}
+      */
+   
    hev_.b = b;
    hev_.npart = npart;
    hev_.ncoll = ncoll;

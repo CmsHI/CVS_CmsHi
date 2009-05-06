@@ -9,13 +9,15 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/01/12 10:46:40 $
+ * $Date: 2009/04/27 21:22:29 $
  * $Revision: 1.1 $
  * \author Philip Allfrey, University of Auckland
+ * edited by Yetkin Yilmaz, MIT
  *
  */
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include <vector>
@@ -156,6 +158,8 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
   //Loop over all GenEvents
   for (cfhepmc_iter=cfhepmcprod->begin(); cfhepmc_iter!=cfhepmcprod->end();cfhepmc_iter++) {
     const GenEvent * mc = cfhepmc_iter->GetEvent();
+
+    //    LogDebug("SubEventType")<<"The sub event's type is : "<<cfhepmc_iter.getSourceType();
     size_t num_particles = mc->particles_size();
     map<int, size_t> barcodes;
 
@@ -195,20 +199,20 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
       }
       cand.resetDaughters( ref.id() );
     }
-
     // fill references to daughters
     for( size_t d = offset; d < offset + num_particles; ++ d ) {
       const HepMC::GenParticle * part = particles[ d ];
       const GenVertex * productionVertex = part->production_vertex();
+      int sub_id = 0;
       if ( productionVertex != 0 ) {
-	 cout<<"Production Vertex Id : "<<productionVertex->id()<<endl;
-	 int subid = productionVertex->id() + suboffset;
-	 GenParticleRef dref( ref, d );
-	 subs.insert(dref,subid);
-	size_t numberOfMothers = productionVertex->particles_in_size();
-	if ( numberOfMothers > 0 ) {
-	  GenVertex::particles_in_const_iterator motherIt = productionVertex->particles_in_const_begin();
+	 sub_id = productionVertex->id();
+         LogDebug("VertexId")<<"SubEvent offset 1 : "<<suboffset;
+	 LogDebug("VertexId")<<"Production Vertex Id : "<<sub_id;
+	 if(sub_id < 0) sub_id = 0;
 
+	 size_t numberOfMothers = productionVertex->particles_in_size();
+	 if ( numberOfMothers > 0 ) {
+	  GenVertex::particles_in_const_iterator motherIt = productionVertex->particles_in_const_begin();
 	  for( ; motherIt != productionVertex->particles_in_const_end(); motherIt++) {
 	    const HepMC::GenParticle * mother = * motherIt;
 	    size_t m = barcodes.find( mother->barcode() )->second;
@@ -217,14 +221,42 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
 	  }
 	}
       }
+      LogDebug("VertexId")<<"SubEvent offset 2 : "<<suboffset;
+      LogDebug("VertexId")<<"Found Production Vertex Id : "<<sub_id;
+      if(sub_id < 0) sub_id = 0;
+      int new_id = sub_id + suboffset;
+      GenParticleRef dref( ref, d );
+      subs.insert(dref,new_id);
+      LogDebug("VertexId")<<"SubEvent offset 3 : "<<suboffset;
+      LogDebug("VertexId")<<"New Production Vertex Id : "<<new_id;
     }
 
     HepMC::HeavyIon * hi = mc->heavy_ion();
-    if(hi) suboffset += hi->Ncoll_hard();
-    else suboffset += 1;
+    int nsub = -2;
+    if(hi && hi->Ncoll_hard()+1 > 0){
+       nsub = hi->Ncoll_hard()+1;
+       LogDebug("Offset")<<"hi exists, nsub : "<<nsub;
+
+       LogDebug("VertexId")<<"SubEvent offset 4 : "<<suboffset;
+       suboffset += nsub;
+       LogDebug("VertexId")<<"SubEvent offset 5 : "<<suboffset;
+
+    }else{
+       LogDebug("Offset")<<"signal event, nsub : "<<nsub;
+       LogDebug("VertexId")<<"SubEvent offset 6 : "<<suboffset;
+
+       suboffset += 1;
+       LogDebug("VertexId")<<"SubEvent offset 7 : "<<suboffset;
+
+    }    
+    LogDebug("VertexId")<<"SubEvent offset 8 : "<<suboffset;
 
     offset += num_particles;
+    LogDebug("VertexId")<<"SubEvent offset 9 : "<<suboffset;
+
   }
+  
+  LogDebug("VertexId")<<"SubEvent offset 10 : "<<suboffset;
 
   evt.put( candsPtr );
   evt.put( subsPtr );
