@@ -93,7 +93,7 @@ process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full h
 # Output EDM File
 process.load("CmsHi.Utilities.HiAnalysisEventContent_cff") #load keep/drop output commands
 process.output = cms.OutputModule("PoolOutputModule",
-                                  process.HIEcalHcalTrackerDigiObjects,
+                                  process.HITrackAnalysisObjects,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
                                   fileName = cms.untracked.string('outputDijetEmbeddingTest_DIGI.root')
