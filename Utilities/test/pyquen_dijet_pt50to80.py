@@ -1,27 +1,53 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("MIX")
-
-from GeneratorInterface.PyquenInterface.pyquenPythiaDefault_cff import *
+process = cms.Process("DIGI")
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("Configuration.StandardSequences.Services_cff")
+process.load("Configuration.StandardSequences.MagneticField_cff")
+process.load("Configuration.StandardSequences.Geometry_cff")
+process.load("Configuration.StandardSequences.Generator_cff")
+
+#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMSSWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
+
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.GlobalTag.globaltag = 'IDEAL_V12::All'
+
+##################################################################################
+# Some services
+
 process.load("FWCore.MessageService.MessageLogger_cfi")
-
-process.load("RecoHI.Configuration.Reconstruction_HI_cff")
-
-
 process.MessageLogger.debugModules = cms.untracked.vstring("mix")
-                             
 
+process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
+                                        ignoreTotal=cms.untracked.int32(0),
+                                        oncePerEventMode = cms.untracked.bool(False)
+                                        )
+
+##################################################################################
+# Make sure the random number generator types are consistent with standard
+
+# process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
+process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.theSource)
+process.RandomNumberGeneratorService.signalSIM = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
+
+process.RandomNumberGeneratorService.signal.initialSeed = 4
+process.RandomNumberGeneratorService.signalSIM.initialSeed = 5
+
+
+##################################################################################
+# Pb+Pb Background Source
 process.source = cms.Source('PoolSource',
-                            fileNames = cms.untracked.vstring('dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/unmerged/mc/Summer08/Pyquen_ON_GammaJet_pt10/GEN-SIM/IDEAL_V9_FixedVtx_OldPhysicsList/0000/FE75CAB2-0CCD-DD11-B9F4-001EC94B4F59.root')
+                            fileNames = cms.untracked.vstring('file:///d00/yjlee/sample/hydjet_mb_2_2_4/1EA7C31D-83FB-DD11-8218-001C23BED6CA.root')
                             )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1)
-)
+                       input = cms.untracked.int32(1)
+                       )
 
+##################################################################################
+# Generate Pyquen Signal
+from GeneratorInterface.PyquenInterface.pyquenPythiaDefault_cff import *
 process.signal = cms.EDProducer('PyquenProducer',
                                 doQuench = cms.bool(True),
                                 doIsospin = cms.bool(True),
@@ -42,65 +68,74 @@ process.signal = cms.EDProducer('PyquenProducer',
                                 bMin = cms.double(0.0), ## min impact param (fm); valid only if cflag_!=0
                                 bMax = cms.double(0.0), ## max impact param (fm); valid only if cflag_!=0
                                 maxEventsToPrint = cms.untracked.int32(0), ## events to print if pythiaPylistVerbosit
-                                aBeamTarget = cms.double(208.0), ## beam/target atomic number
+                                aBeamTarget = cms.double(207.0), ## beam/target atomic number
                                 doCollisionalEnLoss = cms.bool(True), ## if true, perform partonic collisional en loss
                                 embeddingMode = cms.bool(True)
                                 )
 
-
-process.RandomNumberGeneratorService.signal = cms.PSet(
-    initialSeed = cms.untracked.uint32(5)
+# my modifications to the default pyquen sourceabove (unquenched 100 GeV dijets)
+process.signal.PythiaParameters.parameterSets = cms.vstring('pythiaDefault','pythiaJets','kinematics')
+process.signal.PythiaParameters.kinematics = cms.vstring (
+    "CKIN(3)=100",  #min pthat
+    "CKIN(4)=9999", #max pthat
+    "CKIN(7)=-2.",  #min rapidity
+    "CKIN(8)=2."    #max rapidity
     )
+process.signal.doQuench = False
 
-process.RandomNumberGeneratorService.signalSIM = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
 
+##################################################################################
+# Match vertex of the signal event to the background event
+process.load("CmsHi.Utilities.MatchVtx_cfi")
+
+##################################################################################
+# Run SIM on Pyquen signal
+from Configuration.StandardSequences.Simulation_cff import *
+process.signalSIM = g4SimHits
+process.signalSIM.Generator.HepMCProductLabel = 'signal' # By default it's "source" in 2_x_y
+
+##################################################################################
+# Embed Pyquen signal into Background source at SIM level
 from CmsHi.Utilities.EventEmbedding_cff import *
 process.mix=cms.EDProducer('HiEventEmbedder',
                            simEventEmbeddingMixParameters,
                            signalTag = cms.vstring("signal","signalSIM")
                            )
 
-process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
-                                        ignoreTotal=cms.untracked.int32(0),
-                                        oncePerEventMode = cms.untracked.bool(False)
-                                        )
+##################################################################################
+# Digi + Reconstruction
+process.load("CmsHi.Utilities.HiGenParticles_cfi")                      # hiGenParticles (sub-events)
+process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")# trackingParticles (sim tracks)
+process.load("Configuration.StandardSequences.Digi_cff")# doAllDigi
+process.load("Configuration.StandardSequences.L1Emulator_cff")          # L1Emulator
+process.load("Configuration.StandardSequences.DigiToRaw_cff")# DigiToRaw
+process.load("Configuration.StandardSequences.RawToDigi_cff")# RawToDigi
+process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
 
-process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.Generator_cff")
-process.load("Configuration.StandardSequences.Digi_cff")
-process.load("Configuration.StandardSequences.L1Emulator_cff")
-process.load("Configuration.StandardSequences.DigiToRaw_cff")
-process.load("Configuration.StandardSequences.RawToDigi_cff")
-
-process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
-
-process.load("CmsHi.Utilities.HiGenParticles_cfi")
-process.load("CmsHi.Utilities.HiAnalysisEventContent_cff")
-
-from Configuration.StandardSequences.Simulation_cff import *
-
-process.signalSIM = g4SimHits
-process.signalSIM.Generator.HepMCProductLabel = 'signal'
-
+##############################################################################
+# Output EDM File
+process.load("CmsHi.Utilities.HiAnalysisEventContent_cff") #load keep/drop output commands
 process.output = cms.OutputModule("PoolOutputModule",
-                                  process.HIRecoObjects,
+                                  process.HIEcalHcalTrackerDigiObjects,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
-                                  fileName = cms.untracked.string('pyquen_dijet_pt50to80_hydjet_mb_d20090428.root')
+                                  fileName = cms.untracked.string('outputDijetEmbeddingTest_DIGI.root')
                                   )
 
-process.sim = cms.Path(process.signal*process.signalSIM*process.mix)
-process.gen = cms.Path(process.hiGenParticles)
-process.digi = cms.Path(process.doAllDigi*process.L1Emulator*process.DigiToRaw*process.RawToDigi)
+##################################################################################
+# Paths
+process.sim = cms.Sequence(process.signal*process.matchVtx*process.signalSIM*process.mix)
+process.gen = cms.Sequence(process.hiGenParticles * process.trackingParticles)
+process.digi = cms.Sequence(process.doAllDigi*process.L1Emulator*process.DigiToRaw*process.RawToDigi)
 
-process.reco = cms.Path(process.caloReco*process.hiEcalClusters+process.runjets+process.hiCentrality+process.hiEvtPlane)
+#process.trkreco = cms.Sequence(process.offlineBeamSpot*process.trackerlocalreco*process.heavyIonTracking)
+#process.reco = cms.Sequence(process.reconstruct_PbPb)
 
-#process.reco = cms.Path(process.reconstruct_PbPb)
-process.end = cms.EndPath(process.output)
+process.p = cms.Path(process.sim * process.gen * process.digi)
+process.save = cms.EndPath(process.output)
 
 
 
 
+
+               
