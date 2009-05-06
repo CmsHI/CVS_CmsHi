@@ -5,7 +5,11 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-cvs co RecoHI/HiTracking/python
+cvs co RecoHI/Configuration
+
+cvs co -r V01-00-02 RecoHI/HiTracking/python
+cvs co -r V02-02-06 RecoPixelVertexing/PixelLowPtUtilities
+
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 
