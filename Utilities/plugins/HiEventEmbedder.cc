@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Feb 17 17:32:06 EST 2009
-// $Id: HiEventEmbedder.cc,v 1.1 2009/02/19 02:23:59 yilmaz Exp $
+// $Id: HiEventEmbedder.cc,v 1.1 2009/04/27 21:22:21 yilmaz Exp $
 //
 //
 
@@ -295,6 +295,6 @@ bool HiEventEmbedder::verifyRegistry(std::string object, std::string subdet, Inp
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(HiEventEmbedder);
+DEFINE_ANOTHER_FWK_MODULE(HiEventEmbedder);                                                                               
 
 }

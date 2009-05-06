@@ -1,9 +1,11 @@
 #ifndef HI_MixEvtVtxGenerator_H
 #define HI_MixEvtVtxGenerator_H
 /*
-*   $Date: 2009/04/27 16:40:45 $
-*   $Revision: 0. $
+*   $Date: 2009/04/27 21:22:22 $
+*   $Revision: 1.1 $
 */
+#include "FWCore/PluginManager/interface/ModuleDef.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/ParameterSet/interface/InputTag.h"
@@ -21,9 +23,11 @@
 using namespace edm;
 using namespace std;
 
+
 namespace HepMC {
    class FourVector ;
 }
+
 
 class MixEvtVtxGenerator : public edm::EDProducer
 {
@@ -36,8 +40,6 @@ class MixEvtVtxGenerator : public edm::EDProducer
    virtual void produce( edm::Event&, const edm::EventSetup& );
       
    virtual HepMC::FourVector* getVertex(edm::Event&);
-   
-   virtual TMatrixD* GetInvLorentzBoost() = 0;
    
    protected:
 
@@ -112,8 +114,8 @@ void MixEvtVtxGenerator::produce( Event& evt, const EventSetup& )
    //
    HepMCEvt->applyVtxGen( getVertex(evt) ) ;
 
-   HepMCEvt->boostToLab( GetInvLorentzBoost(), "vertex" );
-   HepMCEvt->boostToLab( GetInvLorentzBoost(), "momentum" );
+   //   HepMCEvt->boostToLab( GetInvLorentzBoost(), "vertex" );
+   //   HepMCEvt->boostToLab( GetInvLorentzBoost(), "momentum" );
    
    // OK, create a (pseudo)product and put in into edm::Event
    //
@@ -121,6 +123,9 @@ void MixEvtVtxGenerator::produce( Event& evt, const EventSetup& )
    evt.put( NewProduct ,"matchedVertex") ;
       
    return ;
+
 }
+
+DEFINE_ANOTHER_FWK_MODULE(MixEvtVtxGenerator);
 
 #endif
