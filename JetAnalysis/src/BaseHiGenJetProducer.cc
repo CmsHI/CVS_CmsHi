@@ -1,6 +1,6 @@
 // File: BaseHiGenJetProducer.cc
 // Author: Y.Yilmaz, 2008
-// $Id: BaseHiGenJetProducer.cc,v 1.1 2009/04/27 21:24:37 yilmaz Exp $
+// $Id: BaseHiGenJetProducer.cc,v 1.2 2009/05/06 19:09:22 yilmaz Exp $
 //--------------------------------------------
 #include <memory>
 
@@ -83,13 +83,22 @@ namespace {
     fJet->setNPasses (fProtojet.nPasses ());
   }
 
+ /*
   void copyConstituents (const JetReco::InputCollection& fConstituents, const reco::GenParticleCollection& fInput, reco::Jet* fJet) {
     // put constituents
     for (unsigned iConstituent = 0; iConstituent < fConstituents.size (); ++iConstituent) {
        fJet->addDaughter (fInput[fConstituents[iConstituent].index ()].sourceCandidatePtr(0));
     }
   }
+*/
 
+   void copyConstituents (const JetReco::InputCollection& fConstituents, const edm::View <Candidate>& fInput, reco::Jet* fJet) {
+      // put constituents
+      for (unsigned iConstituent = 0; iConstituent < fConstituents.size (); ++iConstituent) {
+	 fJet->addDaughter (fInput.ptrAt (fConstituents[iConstituent].index ()));
+      }
+   }
+   
 }
 
 namespace cms
@@ -97,6 +106,7 @@ namespace cms
   // Constructor takes input parameters now: to be replaced with parameter set.
   BaseHiGenJetProducer::BaseHiGenJetProducer(const edm::ParameterSet& conf)
     : mSrc(conf.getParameter<edm::InputTag>( "src")),
+      mapSrc(conf.getParameter<edm::InputTag>( "srcMap")),
       mJetType (conf.getParameter<string>( "jetType")),
       mVerbose (conf.getUntrackedParameter<bool>("verbose", false)),
       mEtInputCut (conf.getParameter<double>("inputEtMin")),
@@ -127,11 +137,15 @@ namespace cms
   {
      using namespace reco;
 
-     edm::Handle<GenParticleCollection> inputHandle;
+     //     edm::Handle<GenParticleCollection> inputHandle;
+     edm::Handle< edm::View<Candidate> > inputHandle;
      e.getByLabel(mSrc,inputHandle);
 
+     edm::Handle<GenParticleCollection> genparts; 
+     e.getByLabel(mapSrc,genparts);
+
      edm::Handle<edm::SubEventMap> subs;
-     e.getByLabel(mSrc,subs);
+     e.getByLabel(mapSrc,subs);
 
      vector <ProtoJet> output;
      vector<JetReco::InputCollection> inputs;
@@ -141,9 +155,19 @@ namespace cms
 
      for (unsigned i = 0; i < inputHandle->size(); ++i) {
 
-	const GenParticle & p = (*inputHandle)[i];
-        if(!selectForJet(p)) continue;
-	int subevent = (*subs)[GenParticleRef(inputHandle,i)];
+	//	const GenParticle & p = (*inputHandle)[i];
+	//	const  & p = (*inputHandle)[i];
+	//        if(!selectForJet(p)) continue;
+	//	int subevent = (*subs)[GenParticleRef(inputHandle,i)];
+	//	int subevent = (*subs)[((*inputHandle)[i])]
+	//	CandidateRef pref(inputHandle.id(),i);
+	//	GenParticleRef pref(inputHandle->id(),i,inputHandle->productGetter());
+	//	GenParticleRef pref(genparts,);
+
+	GenParticleRef pref = inputHandle->refAt(i).castTo<GenParticleRef>();
+
+	//	int subevent = (*subs)[CandidateRef(inputHandle.id(),i)]
+	int subevent = (*subs)[pref];
         LogDebug("SubEventJets")<<"inputs size "<<inputs.size()<<" subevent "<<subevent;
 
 	if(subevent >= inputs.size()){ 
@@ -152,7 +176,8 @@ namespace cms
 	}
 	//	cout<<"inputs size "<<inputs.size()<<" subevent "<<subevent<<endl;
 	if(nsubparticle[subevent]< nHydro_){
-	   (inputs[subevent]).push_back(JetReco::InputItem(&p,i));	
+	   //	   (inputs[subevent]).push_back(JetReco::InputItem(&p,i));	
+	   (inputs[subevent]).push_back(JetReco::InputItem(&((*inputHandle)[i]),i));
 	   nsubparticle[subevent]++;
 	}else{
 	   LogDebug("JetsInHydro")<<"More particles than hydro cut, Sub-Event :  "<<subevent;

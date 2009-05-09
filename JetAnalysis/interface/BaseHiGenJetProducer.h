@@ -7,7 +7,7 @@
  * It handles generic manipulations of input and output collections
  *
  * \author Fedor Ratnikov (UMd) Aug. 22, 2006
- * $Id: BaseHiGenJetProducer.h,v 1.1 2009/04/27 21:24:34 yilmaz Exp $
+ * $Id: BaseHiGenJetProducer.h,v 1.2 2009/05/06 20:18:03 yilmaz Exp $
  *
  ************************************************************/
 
@@ -40,6 +40,7 @@ namespace cms
 
   private:
     edm::InputTag mSrc;
+    edm::InputTag mapSrc;
     std::string mJetType;
     bool mVerbose;
     double mEtInputCut;
