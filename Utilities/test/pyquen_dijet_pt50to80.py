@@ -106,6 +106,8 @@ process.mix=cms.EDProducer('HiEventEmbedder',
 # Digi + Reconstruction
 process.load("CmsHi.Utilities.HiGenParticles_cfi")                      # hiGenParticles (sub-events)
 process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")# trackingParticles (sim tracks)
+process.mergedtruth.HepMCDataLabels = ['signal']
+
 process.load("Configuration.StandardSequences.Digi_cff")# doAllDigi
 process.load("Configuration.StandardSequences.L1Emulator_cff")          # L1Emulator
 process.load("Configuration.StandardSequences.DigiToRaw_cff")# DigiToRaw
