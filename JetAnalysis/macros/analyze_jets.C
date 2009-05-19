@@ -2,11 +2,15 @@
 #include <vector>
 #include "TFile.h"
 #include "TTree.h"
+#include "TChain.h"
+
 #include "TH1D.h"
 #include "TH2F.h"
 #include "TH3F.h"
 #include "TNtuple.h"
-#include "TGraphErrors.h"
+#include "TLegend.h"
+
+#include "TGraphAsymmErrors.h"
 #include "CmsHiFunctions.h"
 
 #define MAXPARTICLES 50000
@@ -17,55 +21,137 @@
 
 using namespace std;
 
-struct HydjetEvent{
-
-   int event;
-   float b;
-   float npart;
-   float ncoll;
-   float nhard;
-
-   int n[ETABINS];
+struct Event{
+  
+  int event;
+  float b;
+  float npart;
+  float ncoll;
+  float nhard;
+  
+  int n[ETABINS];
    float ptav[ETABINS];
+  
+  int algos;
 
-   int np;
-   float par_pt[MAXPARTICLES];
-   float par_eta[MAXPARTICLES];
-   float par_phi[MAXPARTICLES];
-   int pdg[MAXPARTICLES];
-   int chg[MAXPARTICLES];
+  float vx;
+  float vy;
+  float vz;
+  float vr;
 
-   int algos;
-   int njet;
 
-   float et[MAXJETS];
-   float eta[MAXJETS];
-   float phi[MAXJETS];
-   float area[MAXJETS];
-
-   float vx;
-   float vy;
-   float vz;
-   float vr;
 
 };
 
-double analyze_with_cut(TTree* tsub, TTree* treco, double jetEtCut = 20);
+struct Particles{
 
-void analyze_jets(char * infile = "jets_q_pt50to80_mb_d0428.root", char * outfile = "output.root"){
+  int np;
+  float pt[MAXPARTICLES];
+  float eta[MAXPARTICLES];
+  float phi[MAXPARTICLES];
+  int pdg[MAXPARTICLES];
+  int chg[MAXPARTICLES];
+  
+};
+
+struct Jets{
+  
+  int njet;
+
+  float et[MAXJETS];
+  float eta[MAXJETS];
+  float phi[MAXJETS];
+  float area[MAXJETS];
+  
+};
+
+double analyze_with_cut(int version, TTree* tsub, TTree* treco, double match = 0.25, double jetEtMin = 0, double jetEtMax = 999999, double bMin = 0, double bMax = 500, double genJetEt = 0);
+
+void analyze_jets(char * infile = "/home/yilmaz/analysis/jets/4TeV/pythia_mixed_d20090513.root", char * outfile = "output.root"){
 
   TH1::SetDefaultSumw2();
 
   TFile* inf = new TFile(infile);
-  TTree* tsub = dynamic_cast<TTree*>(inf->Get("allevent/hi"));
+  TTree* tsub = dynamic_cast<TTree*>(inf->Get("genevent/hi"));
   TTree* treco = dynamic_cast<TTree*>(inf->Get("recoevent/hi"));
+
+  /*
+  TChain * treco = new TChain("recoevent/hi");
+  TChain * tsub = new TChain("genevent/hi");
+  TChain * tsig = new TChain("signalevent/hi");
+
+  treco->Add(infile);
+  tsub->Add(infile);
+  tsig->Add(infile);
+  */
 
   TFile* outf = new TFile(outfile,"recreate");
 
   double x[6];
   double y[6];
 
-  analyze_with_cut(tsub,treco,0);
+  double etMax = 400000;
+
+  //  analyze_with_cut(102,tsub,treco,0.25,0,700,0,20,30);
+  //  analyze_with_cut(102,tsig,treco,0.125,0,700,0,200,20);
+
+  if(1){
+    analyze_with_cut(201,tsub,treco,0.15,0,400,0,7.145,20);
+    analyze_with_cut(203,tsub,treco,0.15,0,400,10.105,12.373,20);
+    analyze_with_cut(205,tsub,treco,0.15,0,400,14.283,30,20);
+  }
+
+  if(1){
+    analyze_with_cut(101,tsub,treco,0.15,35,40,0,20,20);    
+    analyze_with_cut(102,tsub,treco,0.15,40,45,0,20,20);    
+    analyze_with_cut(103,tsub,treco,0.15,45,50,0,20,20);
+    analyze_with_cut(104,tsub,treco,0.15,55,60,0,20,20);
+    analyze_with_cut(105,tsub,treco,0.15,65,70,0,20,20);
+    analyze_with_cut(106,tsub,treco,0.15,75,80,0,20,20);
+    analyze_with_cut(107,tsub,treco,0.15,80,200,0,20,20);
+  }
+
+
+  if(0){
+    analyze_with_cut(4501,tsub,treco,0.15,45,50,0,7.145,20);
+    analyze_with_cut(4502,tsub,treco,0.15,45,50,7.145,10.105,20);
+    analyze_with_cut(4503,tsub,treco,0.15,45,50,10.105,12.373,20);
+    analyze_with_cut(4504,tsub,treco,0.15,45,50,12.373,14.283,20);
+    analyze_with_cut(4505,tsub,treco,0.15,45,50,14.283,20,20);
+  }
+
+
+  if(0){
+    analyze_with_cut(1,tsub,treco,0.15,50,55,0,7.145,20);
+    analyze_with_cut(1,tsub,treco,0.15,50,55,7.145,10.105,20);
+    analyze_with_cut(1,tsub,treco,0.15,50,55,10.105,12.373,20);
+    analyze_with_cut(1,tsub,treco,0.15,50,55,12.373,14.283,20);
+    analyze_with_cut(1,tsub,treco,0.15,50,55,14.283,20,20);
+  }
+
+  if(1){
+    analyze_with_cut(5501,tsub,treco,0.15,55,60,0,7.145,20);
+    analyze_with_cut(5502,tsub,treco,0.15,55,60,7.145,10.105,20);
+    analyze_with_cut(5503,tsub,treco,0.15,55,60,10.105,12.373,20);
+    analyze_with_cut(5504,tsub,treco,0.15,55,60,12.373,14.283,20);
+    analyze_with_cut(5505,tsub,treco,0.15,55,60,14.283,20,20);
+  }
+
+  if(0){
+    analyze_with_cut(1,tsub,treco,0.15,55,60,0,7.145,20);
+    analyze_with_cut(1,tsub,treco,0.15,55,60,7.145,10.105,20);
+    analyze_with_cut(1,tsub,treco,0.15,55,60,10.105,12.373,20);
+    analyze_with_cut(1,tsub,treco,0.15,55,60,12.373,14.283,20);
+    analyze_with_cut(1,tsub,treco,0.15,55,60,14.283,20,20);
+  }
+
+
+  if(0){
+    analyze_with_cut(21,tsub,treco,0.3,0,500,0,20,20);
+    analyze_with_cut(22,tsub,treco,0.3,0,500,20,100,20);
+    analyze_with_cut(23,tsub,treco,0.3,0,500,100,250,20);
+    analyze_with_cut(24,tsub,treco,0.3,0,500,250,600,20);
+  }
 
   /*
 
@@ -98,96 +184,125 @@ void analyze_jets(char * infile = "jets_q_pt50to80_mb_d0428.root", char * outfil
 
 }
 
-double analyze_with_cut(TTree* tsub, TTree* treco, double jetEtCut){
+double analyze_with_cut(int version, TTree* tsub, TTree* treco, double match, double jetEtMin, double jetEtMax, double bMin, double bMax, double genJetEt){
   cout<<"Begin"<<endl;
 
+  double jetEtCutMax = 9999999;
+  double jetEtCutMin = 0;
 
-  double etMax = 100;
+  double bBins[6] = {0,7.145,10.105,12.373,14.283,17};
+
+  double cone = 0.5;
+
+  int maxEvents = 100000;
+
+  double etaMax = 3; //2.5;
+  double etaMin = 2; //1.5;
+
+  double etMax = 150;
   double binEt = 5;
 
-  double jetEtMax = 0;
+  int nsize[3] = {20,10,5}; 
 
-  int nsize[3] = {2000,200,50};
+   TH1F* h1 = new TH1F(Form("h1_et%02d",(int)(version)),"Di-Jet Correlation;#Delta R;jets",200,0,6);
+   TH1F* h2 = new TH1F(Form("h2_et%02d",(int)(version)),"#Delta R between RecoJets and GenJets;#Delta R;jet pairs",100,0,1);
 
-   TH1F* h1 = new TH1F(Form("h1_et%02d",(int)jetEtCut),"Self Correlation;#Delta R;jets",200,0,6);
-   TH1F* h2 = new TH1F(Form("h2_et%02d",(int)jetEtCut),"Relation between Globally reconstructed and Sub-Event based Jets;#Delta R;jets",200,0,6);
+   TH2F* hEtR = new TH2F(Form("hEtR%02d",(int)(version)),"#Delta E_{T} vs #Delta R between RecoJets and GenJets;#Delta R;(E_{T}^{GenJet} - E_{T}^{RecoJet})/E_{T}^{GenJet}",100,0,0.5,100,-2.5,2.5);//-etMax/1.2,etMax/1.2);
 
-   TH1F* hres = new TH1F(Form("hres_et%02d",(int)jetEtCut),"Jet Energy Resolution;E_{T}^{CaloJet}-E_{T}^{GenJet} [GeV];jets",200,-etMax,etMax);
+   TH1F* hres = new TH1F(Form("hres_et%02d",(int)(version)),"Jet Energy Resolution;E_{T}^{CaloJet}-E_{T}^{GenJet}/E_{T}^{GenJet};jets",200,-2.5,2.5);
 
-   //   TH2F* het = new TH2F(Form("het_et%02d",(int)jetEtCut),";E_{T}^{GenJet};E_{T}^{CaloJet} [GeV]",50,0,200,50,0,200);
-   TH2F* het = new TH2F(Form("het_et%02d",(int)jetEtCut),";E_{T}^{GenJet};E_{T}^{CaloJet} [GeV]",100,0,etMax,100,0,etMax);
-   TH2F* hnjet = new TH2F(Form("hnjet_et%02d",(int)jetEtCut),";#_{GenJet};#_{CaloJet} [GeV]",100,0,nsize[(int)(jetEtCut/5.)],100,0,50);
+   TH1F* hVtx = new TH1F(Form("Vertex",(int)(version)),"Vertex;v_{z}[cm];events",40,-20,20);
+   TH1F* hB = new TH1F(Form("ImpactParameter",(int)(version)),"Impact Parameter;b[fm];events",50,0,20);
 
-   TH1F* heff1 = new TH1F(Form("heff1_et%02d",(int)jetEtCut),"Jet Finding Efficiency;GenJet E_{T} [GeV];efficiency",(int)(etMax/binEt),0,etMax);
-   TH1F* heff2 = new TH1F(Form("heff2_et%02d",(int)jetEtCut),"Jet Finding Efficiency;GenJet E_{T} [GeV];efficiency 2",(int)(etMax/binEt),0,etMax);
-   TH1F* heff3 = new TH1F(Form("heff2_et%02d",(int)jetEtCut),";GenJet E_{T} [GeV];efficiency",(int)(etMax/binEt),0,etMax);
+   //   TH2F* het = new TH2F(Form("het_et%02d",(int)(version)),";E_{T}^{GenJet};E_{T}^{CaloJet} [GeV]",50,0,200,50,0,200);
+   TH2F* het = new TH2F(Form("het_et%02d",(int)(version)),";E_{T}^{GenJet};E_{T}^{CaloJet} [GeV]",100,0,etMax,100,0,etMax);
+   TH2F* hnjet = new TH2F(Form("hnjet_et%02d",(int)(version)),";#_{GenJet};#_{CaloJet} [GeV]",100,0,50,100,0,50);
 
-   TH1F* hfake1 = new TH1F(Form("hfake1_et%02d",(int)jetEtCut),"Fake Jets;CaloJet E_{T} [GeV];fake",(int)(etMax/binEt),0,etMax);
+   TH1F* heff1 = new TH1F(Form("heff1_et%02d",(int)(version)),"Jet Finding Efficiency;GenJet E_{T} [GeV];efficiency",(int)(etMax/binEt),0,etMax);
+   TH1F* heff2 = new TH1F(Form("heff2_et%02d",(int)(version)),"Jet Finding Efficiency;GenJet E_{T} [GeV];efficiency",(int)(etMax/binEt),0,etMax);
+   TH1F* heff3 = new TH1F(Form("heff3_et%02d",(int)(version)),"Ratio of efficiencies;GenJet E_{T} [GeV];ratio",(int)(etMax/binEt),0,etMax);
 
-   TH1F* hcaloet = new TH1F(Form("hcaloet_et%02d",(int)jetEtCut),";E_{T} [GeV];jets",(int)(etMax/binEt),0,etMax);
-   TH1F* hgenet = new TH1F(Form("hgenet_et%02d",(int)jetEtCut),";E_{T} [GeV];jets",(int)(etMax/binEt),0,etMax);
+   TH1F* hEffPad = new TH1F(Form("hEffPad_et%02d",(int)(version)),"Jet Finding Efficiency;GenJet E_{T} [GeV];efficiency",(int)(etMax/binEt),0,etMax);
+   TH1F* hFakePad = new TH1F(Form("hFakePad_et%02d",(int)(version)),"Fake Jets;CaloJet E_{T} [GeV];N_{Fake Jets}/N_{CaloJets}",(int)(etMax/binEt),0,etMax);
 
-   TH1F* bMatched = new TH1F(Form("hbMatched_et%02d",(int)jetEtCut),";b [fm];jets",10,0,20);
-   TH1F* bAll = new TH1F(Form("hbAll_et%02d",(int)jetEtCut),";b [fm];jets",10,0,20);
 
-   TH1F* nPartMatched = new TH1F(Form("hNpartMatched_et%02d",(int)jetEtCut),";N_{part};efficiency",16,0,400);
-   TH1F* nPartAll = new TH1F(Form("hNpartAll_et%02d",(int)jetEtCut),";N_{part};efficiency",16,0,400);
+   TH1F* hfake1 = new TH1F(Form("hfake1_et%02d",(int)(version)),"N_{Fake Jets}/N_{CaloJets};CaloJet E_{T} [GeV];fake",(int)(etMax/binEt),0,etMax);
 
-   TH2F* hEff2D = new TH2F(Form("hEff2D_et%02d",(int)jetEtCut),";Npart;E_{T}^{CaloJet} [GeV]",10,0,400,10,0,etMax);
-   TH2F* hAll2D = new TH2F(Form("hEff2D_et%02d",(int)jetEtCut),";Npart;E_{T}^{CaloJet} [GeV]",10,0,400,10,0,etMax);
+   TH1F* hcaloet = new TH1F(Form("hcaloet_et%02d",(int)(version)),";E_{T} [GeV];jets",(int)(etMax/binEt),0,etMax);
+   TH1F* hgenet = new TH1F(Form("hgenet_et%02d",(int)(version)),";E_{T} [GeV];jets",(int)(etMax/binEt),0,etMax);
 
-   double cone = 0.5;
-   double match = cone/4.;
+   TH1F* bMatched = new TH1F(Form("hbMatched_et%02d",(int)(version)),";b [fm];jets",10,0,20);
+   TH1F* bAll = new TH1F(Form("hbAll_et%02d",(int)(version)),";b [fm];jets",10,0,20);
 
-   int maxEvents = 100000;
+   TH1F* nPartMatched = new TH1F(Form("hNpartMatched_et%02d",(int)(version)),";N_{part};efficiency",10,0,400);
+   TH1F* nPartAll = new TH1F(Form("hNpartAll_et%02d",(int)(version)),";N_{part};efficiency",10,0,400);
 
-   cout<<"A"<<endl;
 
-   HydjetEvent jet; //RecoJets
-   HydjetEvent jet2; //GenJets
+   TH1F* bPad = new TH1F(Form("hbPad_et%02d",(int)(version)),";b [fm];efficiency",10,0,20);
+   TH1F* nPartPad = new TH1F(Form("hNpartPad_et%02d",(int)(version)),";N_{part};efficiency",10,0,400);
+
+   bMatched->SetBins(5,bBins);
+   bAll->SetBins(5,bBins);
+   bPad->SetBins(5,bBins);
+
+
+   TH2F* hEff2D = new TH2F(Form("hEff2D_et%02d",(int)(version)),";Npart;E_{T}^{GenJet} [GeV]",10,0,400,10,0,etMax);
+   TH2F* hAll2D = new TH2F(Form("hAll2D_et%02d",(int)(version)),";Npart;E_{T}^{GenJet} [GeV]",10,0,400,10,0,etMax);
+
+   TH2F* hFake2D = new TH2F(Form("hFake2D_et%02d",(int)(version)),";Npart;E_{T}^{CaloJet} [GeV]",10,0,400,10,0,etMax);
+   TH2F* hCalo2D = new TH2F(Form("hCalo2D_et%02d",(int)(version)),";Npart;E_{T}^{CaloJet} [GeV]",10,0,400,10,0,etMax);
+
+   Jets recojet; //RecoJets
+   Jets genjet; //GenJets
+
+   Particles par;
+
+   Event event;
 
    // Event Info - Same for both jet collections
-   tsub->SetBranchAddress("b",&jet.b);
+   treco->SetBranchAddress("b",&event.b);
  
-   tsub->SetBranchAddress("npart",&jet.npart);
-   tsub->SetBranchAddress("ncoll",&jet.ncoll);
-   tsub->SetBranchAddress("nhard",&jet.nhard);
+   treco->SetBranchAddress("npart",&event.npart);
+   treco->SetBranchAddress("ncoll",&event.ncoll);
+   treco->SetBranchAddress("nhard",&event.nhard);
 
-   tsub->SetBranchAddress("vx",&jet.vx);
-   tsub->SetBranchAddress("vy",&jet.vy);
-   tsub->SetBranchAddress("vz",&jet.vz);
-   tsub->SetBranchAddress("vr",&jet.vr);
+   treco->SetBranchAddress("vx",&event.vx);
+   treco->SetBranchAddress("vy",&event.vy);
+   treco->SetBranchAddress("vz",&event.vz);
+   treco->SetBranchAddress("vr",&event.vr);
 
-   // MC Info - Same for both jet collections                                                                                              
+   treco->SetBranchAddress("n",event.n);
+   treco->SetBranchAddress("ptav",event.ptav);
 
-   tsub->SetBranchAddress("n",jet.n);
-   tsub->SetBranchAddress("ptav",jet.ptav);
-   tsub->SetBranchAddress("np",&jet.np);
-   tsub->SetBranchAddress("par_pt",jet.par_pt);
-   tsub->SetBranchAddress("par_eta",jet.par_eta);
-   tsub->SetBranchAddress("par_phi",jet.par_phi);
-   tsub->SetBranchAddress("pdg",jet.pdg);
-   tsub->SetBranchAddress("chg",jet.chg);
+
+   // MC Info - Same for both jet collections 
+
+   treco->SetBranchAddress("np",&par.np);
+   treco->SetBranchAddress("par_pt",par.pt);
+   treco->SetBranchAddress("par_eta",par.eta);
+   treco->SetBranchAddress("par_phi",par.phi);
+   treco->SetBranchAddress("pdg",par.pdg);
+   treco->SetBranchAddress("chg",par.chg);
 
    // Reconstructed Jets
-   treco->SetBranchAddress("njet",&jet.njet);
-   treco->SetBranchAddress("et",jet.et);
-   treco->SetBranchAddress("eta",jet.eta);
-   treco->SetBranchAddress("phi",jet.phi);
-   treco->SetBranchAddress("area",jet.area);
+   treco->SetBranchAddress("njet",&recojet.njet);
+   treco->SetBranchAddress("et",recojet.et);
+   treco->SetBranchAddress("eta",recojet.eta);
+   treco->SetBranchAddress("phi",recojet.phi);
+   treco->SetBranchAddress("area",recojet.area);
 
    // Gen Jets
-   tsub->SetBranchAddress("njet",&jet2.njet);
-   tsub->SetBranchAddress("et",jet2.et);
-   tsub->SetBranchAddress("eta",jet2.eta);
-   tsub->SetBranchAddress("phi",jet2.phi);
-   tsub->SetBranchAddress("area",jet2.area);
+   tsub->SetBranchAddress("njet",&genjet.njet);
+   tsub->SetBranchAddress("et",genjet.et);
+   tsub->SetBranchAddress("eta",genjet.eta);
+   tsub->SetBranchAddress("phi",genjet.phi);
+   tsub->SetBranchAddress("area",genjet.area);
 
-
-   cout<<"B"<<endl;
 
    // Event Loop
-   for(int i = 0; i< tsub->GetEntries() && i < maxEvents; ++i){    
+   int nevents = tsub->GetEntries();
+   cout<<"Number of Events : "<<nevents<<endl;
+      for(int i = 0; i< nevents && i < maxEvents; ++i){    
      tsub->GetEntry(i);
      treco->GetEntry(i);
      int ngenjet = 0;
@@ -198,15 +313,22 @@ double analyze_with_cut(TTree* tsub, TTree* treco, double jetEtCut){
      if (i % 1000 == 0) cout <<"Event "<<i<<endl;    
      // Selection on Events
 
+     if(event.b > bMax || event.b < bMin ) continue;
+     hVtx->Fill(event.vz);
+     hB->Fill(event.b);
+
      // Loop over RecoJets
-     for(int j = 0; j < jet.njet; ++j){
-       if(jet.et[j] < jetEtCut) continue;
-       hcaloet->Fill(jet.et[j]);
+     for(int j = 0; j < recojet.njet; ++j){
+       //       if(recojet.et[j] < jetEtCutMin) continue;
+       //       if(recojet.et[j] < jetEtCutMax) continue;
+
+       hcaloet->Fill(recojet.et[j]);
+       hCalo2D->Fill(event.npart,recojet.et[j]);
+
        nrecojet++;
   
-       for(int j1 = 0; j1< jet.njet; ++j1){
-         if(jet.et[j1] < jetEtCut) continue;
-         double dR = deltaR(jet.eta[j],jet.phi[j],jet.eta[j1],jet.phi[j1]);
+       for(int j1 = 0; j1< recojet.njet; ++j1){
+         double dR = deltaR(recojet.eta[j],recojet.phi[j],recojet.eta[j1],recojet.phi[j1]);
 
 	 if(dR != 0) 
 	   h1->Fill(dR);
@@ -216,66 +338,81 @@ double analyze_with_cut(TTree* tsub, TTree* treco, double jetEtCut){
        }
        int j2match = -99;
        double etmatch = 0;
-       for(int j2 = 0; j2< jet2.njet; ++j2){
-	 if(jet2.et[j2] < jetEtCut) continue;
-	 double dR = deltaR(jet.eta[j],jet.phi[j],jet2.eta[j2],jet2.phi[j2]);
+       for(int j2 = 0; j2< genjet.njet; ++j2){
+
+	 // Ignore genjets below et cut
+	 if( genjet.et[j2] < genJetEt ) continue;
+
+	 double dR = deltaR(recojet.eta[j],recojet.phi[j],genjet.eta[j2],genjet.phi[j2]);
          h2->Fill(dR);
-	 if(dR < match && jet2.et[j2] > etmatch){ 
+         double dET = genjet.et[j2] - recojet.et[j];
+
+	 if((genjet.et[j2] > jetEtMin) && (genjet.et[j2] < jetEtMax)){
+	   hEtR->Fill(dR,dET/genjet.et[j2]);
+	 }
+
+	 if(dR < match && genjet.et[j2] > etmatch){ 
 	   j2match = j2;	 
-	   etmatch = jet2.et[j2match];
+	   etmatch = genjet.et[j2match];
 	 }
        }
        jetmatch[j] = j2match;
        if(j2match > -99){
-	 het->Fill(jet2.et[j2match],jet.et[j]);
-	 hres->Fill(jet.et[j]-jet2.et[j2match]);
+	 het->Fill(genjet.et[j2match],recojet.et[j]);
+	 hres->Fill((recojet.et[j]-genjet.et[j2match])/genjet.et[j2match]);
        }else{
 	 //Jet is a fake
-	 hfake1->Fill(jet.et[j]);
+	 hfake1->Fill(recojet.et[j]);
+	 hFake2D->Fill(event.npart,recojet.et[j]);
        }      
      }
  
-     //Loop over GenJets
-     for(int j2 = 0; j2< jet2.njet; ++j2){
-       if(jet2.et[j2] < jetEtCut) continue;
-       hAll2D->Fill(jet.npart,jet2.et[j2]);
+     //Second Loop over GenJets
+     for(int j2 = 0; j2< genjet.njet; ++j2){
+       if(genjet.et[j2] < genJetEt) continue;
 
-       if(jet2.et[j2] > jetEtMax){
-	 bAll->Fill(jet.b);
-	 nPartAll->Fill(jet.npart); 
-       }
+       if(genjet.et[j2] < jetEtMin) continue;
+       if(genjet.et[j2] > jetEtMax) continue;
 
-       hgenet->Fill(jet2.et[j2]);
+       if(fabs(genjet.eta[j2]) > etaMax) continue;
+       if(fabs(genjet.eta[j2]) < etaMin) continue;
+
+       hAll2D->Fill(event.npart,genjet.et[j2]);
+       bAll->Fill(event.b);
+       nPartAll->Fill(event.npart); 
+
+       hgenet->Fill(genjet.et[j2]);
        ngenjet++;
        int counter  = 0;       
        int j1match = -99;
        double etmatch = 0;
-       for(int j1 = 0; j1< jet.njet; ++j1){
-	 if(jet.et[j1] < jetEtCut) continue;       
-	 double dR = deltaR(jet.eta[j1],jet.phi[j1],jet2.eta[j2],jet2.phi[j2]);
-	 if(dR < match && jet2.et[j2] > etmatch){
+       for(int j1 = 0; j1< recojet.njet; ++j1){
+	 //	 if(recojet.et[j1] < jetEtCutMin) continue;       
+	 double dR = deltaR(recojet.eta[j1],recojet.phi[j1],genjet.eta[j2],genjet.phi[j2]);
+	 if(dR < match && genjet.et[j2] > etmatch){
 	   j1match = j1;
-	   etmatch = jet.et[j1match];
+	   etmatch = recojet.et[j1match];
 	 }
-	 if(jetmatch[j1] == j2){
-	   heff2->Fill(jet2.et[j2]);
-	   hEff2D->Fill(jet.npart,jet2.et[j2]);
-	   if(jet2.et[j2] > jetEtMax){
-	     bMatched->Fill(jet.b);
-	     nPartMatched->Fill(jet.npart);
-	   }
+
+	 // If RecoJet and GenJet match correctly and energy is reasonable                 
+	 //         if(jetmatch[j1] == j2 && recojet.et[j1] < genjet.et[j2] ){
+	 if(jetmatch[j1] == j2 ){ 
+	   heff2->Fill(genjet.et[j2]);
+	   hEff2D->Fill(event.npart,genjet.et[j2]);
+	     bMatched->Fill(event.b);
+	     nPartMatched->Fill(event.npart);
 
 	   counter++;
 	   if(counter > 1){
 	   cout<<"j2 is "<<j2<<endl;
-	   cout<<" Jet Energy is "<<jet2.et[j2]<<endl;
+	   cout<<" Jet Energy is "<<genjet.et[j2]<<endl;
 	   }
 	   break;
 	 }
        }     
        if(j1match > -99){
 	 //	 cout<<"j2 matched is "<<j2<<endl;
-         heff1->Fill(jet2.et[j2]);
+         heff1->Fill(genjet.et[j2]);
        }else{
 
        }
@@ -284,69 +421,154 @@ double analyze_with_cut(TTree* tsub, TTree* treco, double jetEtCut){
      hnjet->Fill(ngenjet,nrecojet);
    }
 
-   hfake1->Divide(hfake1,hcaloet,1,1,"B");
-   heff1->Divide(heff1,hgenet,1,1,"B");
-   heff2->Divide(heff2,hgenet,1,1,"B");
+      hEffPad->SetMaximum(1.1);
+      hFakePad->SetMaximum(1.1);
 
-   bMatched->Divide(bMatched,bAll,1,1,"B");
-   nPartMatched->Divide(nPartMatched,nPartAll,1,1,"B");
+      nPartPad->SetMaximum(1.1);
+      bPad->SetMaximum(1.1);
 
-   hEff2D->Divide(hAll2D);
+      TGraphAsymmErrors *gEff = new TGraphAsymmErrors();
+      TGraphAsymmErrors *gFake = new TGraphAsymmErrors();
+      TGraphAsymmErrors *gB = new TGraphAsymmErrors();
+      TGraphAsymmErrors *gNpart = new TGraphAsymmErrors();
 
-   heff3->Divide(heff2,heff1,1,1,"B");
+      gFake->BayesDivide(hfake1,hcaloet);
+      gEff->BayesDivide(heff2,hgenet);
+      gB->BayesDivide(bMatched,bAll);
+      gNpart->BayesDivide(nPartMatched,nPartAll);
 
-   
+      hEff2D->Divide(hAll2D);
+      hFake2D->Divide(hCalo2D);
+      
+      heff3->Divide(heff2,heff1,1,1,"B");
+
+      
    cout<<"End."<<endl;
+
+   TLegend *etLeg = new TLegend(0.43,0.24,0.90,0.36,NULL,"brNDC");
+   etLeg->AddEntry(heff2,Form("%d<E_{T}^{GenJet}<%d [GeV]",(int)jetEtMin,(int)jetEtMax),"");
+   etLeg->AddEntry(heff2,Form("%0.01f<b<%0.01f [fm]",bMin,bMax),"");
+   etLeg->SetFillColor(0);
+   etLeg->SetTextSize(0.04);
+   etLeg->SetBorderSize(0);
+   //   etLeg->Draw("");
+
+
+   TLegend *bLeg = new TLegend(0.45,0.43,0.92,0.55,NULL,"brNDC");
+   bLeg->AddEntry(heff2,Form("%0.01f<b<%0.01f [fm]",bMin,bMax),"");
+   bLeg->SetFillColor(0);
+   bLeg->SetTextSize(0.04);
+   bLeg->SetBorderSize(0);
+   //   bLeg->Draw("");
+
+
+
+   if(0){
+     TCanvas* e1 = new TCanvas(Form("Event Vertex",(int)(version)),Form("Event Vertex",(int)(version)),400,400);
+     hVtx->Draw();
+     TCanvas* e2 = new TCanvas(Form("Impact Parameter",(int)(version)),Form("Impact Parameter",(int)(version)),400,400);
+     hB->Draw();
+   }
+
+   if(0){
+
+   TCanvas* c1 = new TCanvas(Form("c1_et%02d",(int)(version)),Form("c1_et%02d",(int)(version)),400,400);
+   h1->Draw();
+
+   TCanvas* c2 = new TCanvas(Form("c2_et%02d",(int)(version)),Form("c2_et%02d",(int)(version)),400,400);
+   h2->Draw();
+   }
 
    if(1){
 
-   TCanvas* c1 = new TCanvas(Form("c1_et%02d",(int)jetEtCut),Form("c1_et%02d",(int)jetEtCut),400,400);
-   h1->Draw();
 
-   TCanvas* c2 = new TCanvas(Form("c2_et%02d",(int)jetEtCut),Form("c2_et%02d",(int)jetEtCut),400,400);
-   h2->Draw();
+   TCanvas* c1_1 = new TCanvas(Form("DeltaR_deltaET_v%02d",(int)(version)),Form("DeltaR_deltaET_v%02d",(int)(version)),400,400);
+   hEtR->Draw("colz");
+   c1_1->Print(Form("DeltaR_deltaET_b%02dto%02d_Et%02dto%02dforGen%02d.gif",(int)(bMin),(int)(bMax),(int)(jetEtMin),(int)(jetEtMax),(int)(genJetEt)));
 
-   TCanvas* c3 = new TCanvas(Form("c3_et%02d",(int)jetEtCut),Form("c3_et%02d",(int)jetEtCut),400,400);
+   }
+
+   if(1){
+
+   TCanvas* c3 = new TCanvas(Form("c3_et%02d",(int)(version)),Form("c3_et%02d",(int)(version)),400,400);
    het->Draw("colz");
-   c3->Print(Form("EnergyScatter_et%02d.gif",(int)jetEtCut));
+   c3->Print(Form("EnergyScatter_et%02d.gif",(int)(version)));
 
-   TCanvas* c4 = new TCanvas(Form("c4_et%02d",(int)jetEtCut),Form("c4_et%02d",(int)jetEtCut),400,400);
+   }
+
+   if(0){
+
+   TCanvas* c4 = new TCanvas(Form("c4_et%02d",(int)(version)),Form("c4_et%02d",(int)(version)),400,400);
    hres->Draw("");
-   c4->Print(Form("EnergyResolution_et%02d.gif",(int)jetEtCut));
+   c4->Print(Form("EnergyResolution_et%02d.gif",(int)(version)));
 
-   TCanvas* c5 = new TCanvas(Form("c5_et%02d",(int)jetEtCut),Form("NumberOfJets_et%02d",(int)jetEtCut),400,400);
+   TCanvas* c5 = new TCanvas(Form("c5_et%02d",(int)(version)),Form("NumberOfJets_et%02d",(int)(version)),400,400);
    hnjet->Draw("colz");
-   c5->Print(Form("NumberOfJets_et%02d.gif",(int)jetEtCut));
+   c5->Print(Form("NumberOfJets_et%02d.gif",(int)(version)));
 
-   TCanvas* c6 = new TCanvas(Form("Efficiency1_et%02d",(int)jetEtCut),Form("Efficiency1_et%02d",(int)jetEtCut),400,400);
+   TCanvas* c6 = new TCanvas(Form("Efficiency1_et%02d",(int)(version)),Form("Efficiency1_et%02d",(int)(version)),400,400);
    heff1->Draw("");
-   c6->Print(Form("JetEfficiency_et%02d.gif",(int)jetEtCut));
+   c6->Print(Form("JetEfficiency_et%02d.gif",(int)(version)));
 
-   TCanvas* c7 = new TCanvas(Form("Fake1_et%02d",(int)jetEtCut),Form("Fake1_et%02d",(int)jetEtCut),400,400);
-   hfake1->Draw("");
-   c7->Print(Form("JetFakes_et%02d.gif",(int)jetEtCut));
+   }
 
-   TCanvas* c8 = new TCanvas(Form("Efficiency2_et%02d",(int)jetEtCut),Form("Efficiency2_et%02d",(int)jetEtCut),400,400);
-   heff2->Draw("");
-   c8->Print(Form("JetEfficiency2_et%02d.gif",(int)jetEtCut));
+   if(1){
 
-   TCanvas* c9 = new TCanvas(Form("Efficiency3_et%02d",(int)jetEtCut),Form("Efficiency3_et%02d",(int)jetEtCut),400,400);
+   TCanvas* c7 = new TCanvas(Form("Fake1_et%02d",(int)(version)),Form("Fake1_et%02d",(int)(version)),400,400);
+   hFakePad->Draw();
+   gFake->Draw("P same");
+   bLeg->Draw();
+   c7->Print(Form("JetFakes_et%02d.gif",(int)(version)));
+
+   TCanvas* c8 = new TCanvas(Form("Efficiency2_et%02d",(int)(version)),Form("Efficiency2_et%02d",(int)(version)),400,400);
+
+   hEffPad->Draw();
+   gEff->Draw("P same");
+   bLeg->Draw();
+   c8->Print(Form("JetEfficiency_v%02d.gif",(int)(version)));
+
+   }
+
+   if(0){
+
+   TCanvas* c9 = new TCanvas(Form("Ratio_et%02d",(int)(version)),Form("Ratio_et%02d",(int)(version)),400,400);
    heff3->Draw("");
-   c9->Print(Form("JetEfficiencyComparison_et%02d.gif",(int)jetEtCut));
+   c9->Print(Form("JetEfficiencyComparison_et%02d.gif",(int)(version)));
 
-   TCanvas* c10 = new TCanvas(Form("Efficiency_vs_b",(int)jetEtCut),Form("Efficiency_vs_b",(int)jetEtCut),400,400);
-   bMatched->Draw("");
-   c10->Print(Form("Efficiency_vs_b_v%02d.gif",(int)jetEtCut));
+   }
 
-   TCanvas* c11 = new TCanvas(Form("Efficiency_vs_Npart",(int)jetEtCut),Form("Efficiency_vs_Npart",(int)jetEtCut),400,400);
-   nPartMatched->Draw("");
-   c11->Print(Form("Efficiency_vs_Npart_v%02d.gif",(int)jetEtCut));
+   if(1){
 
-   TCanvas* c12 = new TCanvas(Form("ImpactParameter_et%02d",(int)jetEtCut),Form("ImpactParameter",(int)jetEtCut),400,400);
+   TCanvas* c10 = new TCanvas(Form("Efficiency_vs_b_v%02d",(int)(version)),Form("Efficiency_vs_b",(int)(version)),400,400);
+   bPad->Draw();
+   gB->Draw("P");
+   etLeg->Draw();
+   c10->Print(Form("Efficiency_vs_b_v%02d.gif",(int)(version)));
+
+   TCanvas* c11 = new TCanvas(Form("Efficiency_vs_Npart_v%02d",(int)(version)),Form("Efficiency_vs_Npart",(int)(version)),400,400);
+   nPartPad->Draw();
+   gNpart->Draw("P same");
+   etLeg->Draw();
+   c11->Print(Form("Efficiency_vs_Npart_v%02d.gif",(int)(version)));
+
+   }
+   if(0){
+
+
+   TCanvas* c12 = new TCanvas(Form("ImpactParameter_et%02d",(int)(version)),Form("ImpactParameter",(int)(version)),400,400);
    bAll->Draw("");
+   }
 
-   TCanvas* c13 = new TCanvas(Form("Efficiency2D_et%02d",(int)jetEtCut),Form("Efficiency2D",(int)jetEtCut),400,400);
+   if(1){
+
+   TCanvas* c13 = new TCanvas(Form("Efficiency2D_et%02d",(int)(version)),Form("Efficiency2D",(int)(version)),400,400);
    hEff2D->Draw("colz");
+   c13->Print(Form("Efficiency_2D_v%02d.gif",(int)(version)));
+
+   TCanvas* c14 = new TCanvas(Form("Fakes2D_et%02d",(int)(version)),Form("Fake2D",(int)(version)),400,400);
+   hFake2D->Draw("colz");
+   c14->Print(Form("Fakes_2D_v%02d.gif",(int)(version)));
+
 
    }
 
