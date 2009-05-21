@@ -7,14 +7,14 @@ eval `scramv1 ru -sh`
 
 cvs co RecoHI/Configuration
 
-cvs co -r BRANCH22X RecoHI/HiTracking
-cvs co -r V02-02-06 RecoPixelVertexing/PixelLowPtUtilities
+cvs co RecoHI/HiTracking                        # Good tag?
+cvs co RecoPixelVertexing/PixelLowPtUtilities   # ?
 
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 
-cvs co GeneratorInterface/HydjetInterface
-cvs co GeneratorInterface/PyquenInterface
+cvs co -r V02-02-02 GeneratorInterface/HydjetInterface
+cvs co -r V02-02-02  GeneratorInterface/PyquenInterface
 
 cvs co SimDataFormats/HiGenData
 cvs co SimDataFormats/HepMCProduct

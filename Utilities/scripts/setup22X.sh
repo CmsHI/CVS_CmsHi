@@ -13,8 +13,8 @@ cvs co -r V02-02-06 RecoPixelVertexing/PixelLowPtUtilities
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 
-cvs co GeneratorInterface/HydjetInterface
-cvs co GeneratorInterface/PyquenInterface
+cvs co -r V01-02-16 GeneratorInterface/HydjetInterface
+cvs co -r V00-02-12  GeneratorInterface/PyquenInterface
 
 cvs co SimDataFormats/HiGenData
 cvs co SimDataFormats/HepMCProduct
