@@ -95,6 +95,7 @@ private:
 	TrackerHitAssociator * theHitAssociator;
 	
 	vector<string> trackCollectionLabels;
+	string truthCollectionLabel;
 	string resultFileLabel;
 	bool useAbsoluteNumberOfHits, keepLowPtSimTracks, infoHiEventTopology;
 	int proc;
@@ -119,6 +120,7 @@ private:
 HighPtTrackAnalyzer::HighPtTrackAnalyzer(const edm::ParameterSet& pset)
 {
 	trackCollectionLabels = pset.getParameter<vector<string> >("trackCollection");
+	truthCollectionLabel  = pset.getParameter<string>("truthCollection");
 	resultFileLabel       = pset.getParameter<string>("resultFile");
 	useAbsoluteNumberOfHits = pset.getUntrackedParameter<bool>("useAbsoluteNumberOfHits",false);
 	keepLowPtSimTracks = pset.getUntrackedParameter<bool>("keepLowPtSimTracks",false);
@@ -942,7 +944,8 @@ void HighPtTrackAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& e
 	// Get simulated tracks
 	edm::Handle<TrackingParticleCollection> simCollection;
 	//ev.getByLabel("trackingtruthprod",simCollection); //name changed in trackingParticles_cfi between 2_0_5 and 2_1_7
-	ev.getByLabel("mergedtruth",simCollection);
+	//ev.getByLabel("mergedtruth",simCollection);
+	ev.getByLabel(truthCollectionLabel,simCollection);
 	//  ev.getByType(simCollection);
 	
 	LogVerbatim("TrackAnalyzer")<<"[HighPtTrackAnalyzer] simTracks = "<<simCollection.product()->size();
@@ -963,6 +966,7 @@ void HighPtTrackAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& e
 	iTrkSim=simCollection.product()->size();
 	iVtx = vertexCollection.product()->size();
 	if (iVtx>0) RecVtx = vertices->begin()->position().z();
+	else RecVtx=-999; //for events with ten or fewer prototracks the median vertex is not reconstructed
 	iEvent=ev.id().event();
 	iRun=ev.id().run();
 	
