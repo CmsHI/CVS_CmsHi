@@ -15,7 +15,7 @@
 <use name="TrackingTools/Records"/>
 <use name="RecoVertex/KalmanVertexFit"/>
 
-<library file="HighPtTrackAnalyzer.cc" name="HighPtTrackAnalyzer">
+<library file="*.cc" name="TrackAnalysisPlugins">
 	<lib name="CmsHiTrackAnalysis"/>
 	<flags EdmPlugin="1"/>
 </library>

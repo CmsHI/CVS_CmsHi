@@ -1,0 +1,17 @@
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "PhysicsTools/UtilAlgos/interface/ObjectSelector.h"
+#include "CmsHi/TrackAnalysis/plugins/HitPixelLayersTPSelector.h"
+
+namespace reco
+{
+namespace modules
+{
+
+// define your producer name
+typedef ObjectSelector<HitPixelLayersTPSelector> HitPixelLayersTPSelection;
+
+// declare the module as plugin
+DEFINE_FWK_MODULE( HitPixelLayersTPSelection );
+}
+}
