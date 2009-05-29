@@ -14,6 +14,7 @@
 <use name="TrackingTools/TransientTrack"/>
 <use name="TrackingTools/Records"/>
 <use name="RecoVertex/KalmanVertexFit"/>
+<use name="PhysicsTools/UtilAlgos"/>
 <flags EdmPlugin="1"/>
 
 <export>
@@ -34,5 +35,6 @@
 	<use name="TrackingTools/Records"/>
 	<use name="edwenger/MatchedTrack"/>
 	<use name="RecoVertex/KalmanVertexFit"/>
-	<use name="root"/>
+    <use name="PhysicsTools/UtilAlgos"/>
+    <use name="root"/>
 </export>
