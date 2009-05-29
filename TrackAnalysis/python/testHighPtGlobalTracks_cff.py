@@ -8,6 +8,7 @@ TrackAssociatorByHits.UseGrouped = cms.bool(False)                   # grouping 
 # high pt track analyzer settings
 testHighPtGlobalTracks = cms.EDAnalyzer("HighPtTrackAnalyzer",
 										trackCollection = cms.vstring("globalPrimTracks"),
+										truthCollection = cms.string("mergedtruth"),
 										resultFile      = cms.string("TrkStudyOutput.root"),
 										useAbsoluteNumberOfHits = cms.untracked.bool(False),  # in SimToReco associator
 										keepLowPtSimTracks = cms.untracked.bool(False),  # keep pt<2 GeV/c simtracks
