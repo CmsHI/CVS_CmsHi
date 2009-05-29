@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import os 
 
-process = cms.Process("RECO")
+process = cms.Process("TEST")
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("Configuration.StandardSequences.Services_cff")
