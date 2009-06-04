@@ -14,7 +14,7 @@ eventEmbeddingMixParameters = cms.PSet(
     minBunch = cms.int32(0),
     Label = cms.string(''),
     bunchspace = cms.int32(125),
-    checktof = cms.untracked.bool(False)
+    checktof = cms.bool(False)
 )
 simEventEmbeddingMixParameters = cms.PSet(
     eventEmbeddingMixParameters,
@@ -40,7 +40,7 @@ genEventEmbeddingMixParameters = cms.PSet(
     eventEmbeddingMixParameters,
     mixObjects = cms.PSet(
         mySet = cms.PSet(
-            input = cms.VInputTag(cms.InputTag("source"), cms.InputTag("secsource")),
+            input = cms.VInputTag(cms.InputTag("generator"), cms.InputTag("secsource")),
             type = cms.string('HepMCProduct')
         )
     )
@@ -63,3 +63,7 @@ mixGen = cms.EDProducer("MixingModule",
                                               )
                         )
 
+
+
+mixGenNoPU = cms.EDProducer("MixingModule",
+                            genEventEmbeddingMixParameters)

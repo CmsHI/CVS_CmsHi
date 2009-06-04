@@ -9,8 +9,8 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/04/27 21:22:29 $
- * $Revision: 1.1 $
+ * $Date: 2009/05/06 19:09:30 $
+ * $Revision: 1.2 $
  * \author Philip Allfrey, University of Auckland
  * edited by Yetkin Yilmaz, MIT
  *
@@ -56,7 +56,7 @@ class HiGenParticleProducer : public edm::EDProducer {
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "SimDataFormats/CrossingFrame/interface/CrossingFrame.h"
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/Event.h"
@@ -77,7 +77,7 @@ static const int PDGCacheMax = 32768;
 static const double mmToCm = 0.1;
 
 HiGenParticleProducer::HiGenParticleProducer( const ParameterSet & cfg ) :
-  src_( cfg.getUntrackedParameter<edm::InputTag>( "src",edm::InputTag("mix","source") ) ),
+  src_( cfg.getUntrackedParameter<edm::InputTag>( "src",edm::InputTag("mix","generator") ) ),
   abortOnUnknownPDGCode_( cfg.getUntrackedParameter<bool>( "abortOnUnknownPDGCode", true ) ),
   saveBarCodes_( cfg.getUntrackedParameter<bool>( "saveBarCodes", false ) ),
   chargeP_( PDGCacheMax, 0 ), chargeM_( PDGCacheMax, 0 ) {
