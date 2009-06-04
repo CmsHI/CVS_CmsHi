@@ -25,6 +25,7 @@ cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc | re
 mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc
 
 cvs co UserCode/CmsHi
+cvs co -r cmshi_22X UserCode/CmsHi
 mv UserCode/CmsHi .
 
 scramv1 b
