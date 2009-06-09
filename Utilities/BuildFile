@@ -20,6 +20,10 @@
 <use name=DataFormats/WrappedStdDictionaries>
 <use name=DataFormats/Common>
 <use name=DataFormats/Provenance>
+<use name=DataFormats/EgammaReco>
+<use name=DataFormats/HepMCCandidate>
+<use name=Geometry/Records>
+<use name=root>
 <use name=clhep>
 <flags EDM_PLUGIN=1>
 <export>
@@ -27,5 +31,3 @@
    <use name=FWCore/PluginManager>
    <use name=FWCore/ParameterSet>
 </export>
-
-

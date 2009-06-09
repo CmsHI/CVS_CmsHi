@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+# Bins of impact parameter in generator level (Hydjet)
+# in units of fm
 #10.00% 5.045
 #20.00% 7.145
 #30.00% 8.755
