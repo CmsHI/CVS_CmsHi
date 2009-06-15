@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Feb 17 17:32:06 EST 2009
-// $Id: HiEventEmbedder.cc,v 1.2 2009/05/06 03:46:52 yilmaz Exp $
+// $Id: HiEventEmbedder.cc,v 1.1 2009/04/27 21:22:21 yilmaz Exp $
 //
 //
 
@@ -40,7 +40,7 @@
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 
 #include "DataFormats/Provenance/interface/ProductID.h"
 #include "DataFormats/Common/interface/Handle.h"
@@ -107,7 +107,7 @@ public:
 	    std::auto_ptr<CrossingFrame<T> > crFrame(new CrossingFrame<T>() );	    
 	    // Following should be reconsidered, what should be the bkg, is bcr useful?
 	    crFrame->addSignals(handle2.product(),e.id());
-	    crFrame->addPileups(0,const_cast< std::vector<T> * >(handle1.product()),e.id().event());	 
+	    crFrame->addPileups(0,handle1.product(),e.id().event());	 
 	    e.put(crFrame,label_);
 	 }else if(get1 || get2){
 	    LogError("Product inconsistency")<<"One of the sub-events is missing the product with type "
