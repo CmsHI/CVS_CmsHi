@@ -10,7 +10,8 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 
 #global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_V12::All' 
+#process.GlobalTag.globaltag = 'IDEAL_V12::All' #2_2_9 
+process.GlobalTag.globaltag = 'IDEAL_31X::All'  #3_1_0
 
 ##################################################################################
 

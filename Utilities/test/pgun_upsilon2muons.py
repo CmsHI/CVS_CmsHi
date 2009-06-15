@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.Generator_cff")
 #global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMSSWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
+process.GlobalTag.globaltag = 'IDEAL_31X::All'
 
 ##################################################################################
 # Some services

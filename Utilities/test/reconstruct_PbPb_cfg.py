@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.DigiToRaw_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_V12::All'
+process.GlobalTag.globaltag = 'IDEAL_31X::All'
 
 # For including Standard Reco + Heavy Ion Objects
 process.load("RecoHI.Configuration.Reconstruction_HI_cff")
