@@ -718,14 +718,14 @@ pair<float,float> HighPtTrackAnalyzer::refitWithVertex(const reco::Track & recTr
 		} else {
 			// Refit track with vertex constraint
 			SingleTrackVertexConstraint stvc;
-			pair<TransientTrack, float> result =
+			SingleTrackVertexConstraint::BTFtuple result =
 			stvc.constrain(theTransientTrack, vertexPosition, vertexError);
 			
 			//LogDebug("TrackAnalyzer") << "Track refitted with vertex constraint: pT = " << result.first.impactPointTSCP().pt();
 			//LogDebug("TrackAnalyzer") << ", chi2 = " << result.second;
 			
-			return pair<float,float>(result.first.impactPointTSCP().pt(),
-									 result.second);
+			return pair<float,float>(result.get<1>().impactPointTSCP().pt(),
+									 result.get<2>());
 		}
 	}
 	else
