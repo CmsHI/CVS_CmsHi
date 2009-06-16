@@ -13,16 +13,16 @@ cvs co RecoPixelVertexing/PixelLowPtUtilities   # ?
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 
-cvs co -r V02-02-02 GeneratorInterface/HydjetInterface
-cvs co -r V02-02-02  GeneratorInterface/PyquenInterface
+cvs co GeneratorInterface/HydjetInterface
+cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
 
 cvs co SimDataFormats/HiGenData
 cvs co SimDataFormats/HepMCProduct
 cvs co SimDataFormats/GeneratorProducts
 
-cvs co -r $CMSSW_VERSION SimCalorimetry/HcalSimProducers
-cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc | replace "doZDC(true)" "doZDC(false)" | replace "e.getByLabel(\"mix\", zdcHitsName , zdccf)" "// e.getByLabel(\"mix\", zdcHitsName , zdccf)" | replace "colzdc(new MixCollection<PCaloHit>(zdccf.product()))" "colzdc(new MixCollection<PCaloHit>(new CrossingFrame<PCaloHit>))" | replace "theHitCorrection->fillChargeSums(*colzdc)" "// zdc correction" > tmp.cc
-mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc
+#cvs co -r $CMSSW_VERSION SimCalorimetry/HcalSimProducers
+#cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc | replace "doZDC(true)" "doZDC(false)" | replace "e.getByLabel(\"mix\", zdcHitsName , zdccf)" "// e.getByLabel(\"mix\", zdcHitsName , zdccf)" | replace "colzdc(new MixCollection<PCaloHit>(zdccf.product()))" "colzdc(new MixCollection<PCaloHit>(new CrossingFrame<PCaloHit>))" | replace "theHitCorrection->fillChargeSums(*colzdc)" "// zdc correction" > tmp.cc
+#mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc
 
 cvs co UserCode/CmsHi
 mv UserCode/CmsHi .
