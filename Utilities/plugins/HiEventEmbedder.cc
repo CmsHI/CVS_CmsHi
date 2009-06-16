@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Feb 17 17:32:06 EST 2009
-// $Id: HiEventEmbedder.cc,v 1.2 2009/05/06 03:46:52 yilmaz Exp $
+// $Id: HiEventEmbedder.cc,v 1.3 2009/06/04 18:25:02 yilmaz Exp $
 //
 //
 
@@ -128,14 +128,21 @@ void MixingWorker<HepMCProduct>::addSignals(edm::Event &e){
 
    if(get1 && get2){
       std::auto_ptr<CrossingFrame<HepMCProduct> > crFrame(new CrossingFrame<HepMCProduct>() );
-      // Following should be reconsidered, what should be the bkg, is bcr useful?                                                                                                   
-      std::vector<HepMCProduct> vec1;
-      std::vector<HepMCProduct> vec2;
-      vec1.push_back(*(handle1.product()));
-      vec2.push_back(*(handle2.product()));
 
-      crFrame->addSignals(&vec2,e.id());
-      crFrame->addPileups(0,&vec1,e.id().event());
+      // Following should be reconsidered, what should be the bkg, is bcr useful? 
+
+      /*
+	std::vector<HepMCProduct> vec1;
+	std::vector<HepMCProduct> vec2;
+	vec1.push_back(*(handle1.product()));
+	vec2.push_back(*(handle2.product()));
+	crFrame->addSignals(&vec2,e.id());
+	crFrame->addPileups(0,&vec1,e.id().event());
+      */
+
+      crFrame->addSignals(handle2.product(),e.id());
+      crFrame->addPileups(0, const_cast<HepMCProduct *>(handle1.product()),e.id().event());
+
       e.put(crFrame,label_);
    }else if(get1 || get2){
       LogError("Product inconsistency")<<"One of the sub-events is missing the product with type "
