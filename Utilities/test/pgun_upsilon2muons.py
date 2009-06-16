@@ -8,8 +8,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.Generator_cff")
 
-#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMSSWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
-
+#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#31X_pre_releases_and_integration
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'IDEAL_31X::All'
 
@@ -27,8 +26,8 @@ process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
 ##################################################################################
 # Make sure the random number generator types are consistent with standard
 
-# process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
-process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.theSource)
+process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
+#process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.theSource)
 process.RandomNumberGeneratorService.signalSIM = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
 
 process.RandomNumberGeneratorService.signal.initialSeed = 4
@@ -69,7 +68,7 @@ process.load("CmsHi.Utilities.MatchVtx_cfi")
 # Run SIM on Pyquen signal
 from Configuration.StandardSequences.Simulation_cff import *
 process.signalSIM = g4SimHits
-process.signalSIM.Generator.HepMCProductLabel = 'signal' # By default it's "source" in 2_x_y
+process.signalSIM.Generator.HepMCProductLabel = 'signal' # By default it's "generator" in 3_1_x
 
 ##################################################################################
 # Embed Pyquen signal into Background source at SIM level
