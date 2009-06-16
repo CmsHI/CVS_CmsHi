@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.3 2009/05/06 19:09:22 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.4 2009/06/16 12:34:34 yilmaz Exp $
 //
 //
 
@@ -41,7 +41,7 @@
 
 #include "PhysicsTools/UtilAlgos/interface/TFileService.h"
 
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 #include "SimDataFormats/Vertex/interface/SimVertex.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"

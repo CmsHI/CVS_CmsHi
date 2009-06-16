@@ -1,6 +1,6 @@
 // File: BaseHiGenJetProducer.cc
 // Author: Y.Yilmaz, 2008
-// $Id: BaseHiGenJetProducer.cc,v 1.3 2009/05/09 00:24:20 yilmaz Exp $
+// $Id: BaseHiGenJetProducer.cc,v 1.5 2009/06/16 12:34:34 yilmaz Exp $
 //--------------------------------------------
 #include <memory>
 
@@ -26,7 +26,6 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "SimDataFormats/HiGenData/interface/SubEventMap.h"
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
