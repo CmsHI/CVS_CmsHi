@@ -10,22 +10,22 @@ cvs co RecoHI/Configuration
 cvs co -r BRANCH22X RecoHI/HiTracking
 cvs co -r V02-02-06 RecoPixelVertexing/PixelLowPtUtilities
 
-cvs co RecoHI/HiJetAlgos
-cvs co RecoHI/HiEgammaAlgos
+cvs co -r cmshi_22X RecoHI/HiJetAlgos
+cvs co -r cmshi_22X RecoHI/HiEgammaAlgos
 
 cvs co -r V01-02-16 GeneratorInterface/HydjetInterface
-cvs co -r V00-02-12  GeneratorInterface/PyquenInterface
+cvs co -r V00-02-12 GeneratorInterface/PyquenInterface
 
-cvs co SimDataFormats/HiGenData
-cvs co SimDataFormats/HepMCProduct
-cvs co SimDataFormats/GeneratorProducts
+cvs co -r cmshi_22X SimDataFormats/HiGenData
+cvs co -r V01-00-01 SimDataFormats/HepMCProduct
+cvs co -r V01-00-04 SimDataFormats/GeneratorProducts
 
 cvs co -r $CMSSW_VERSION SimCalorimetry/HcalSimProducers
 cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc | replace "doZDC(true)" "doZDC(false)" | replace "e.getByLabel(\"mix\", zdcHitsName , zdccf)" "// e.getByLabel(\"mix\", zdcHitsName , zdccf)" | replace "colzdc(new MixCollection<PCaloHit>(zdccf.product()))" "colzdc(new MixCollection<PCaloHit>(new CrossingFrame<PCaloHit>))" | replace "theHitCorrection->fillChargeSums(*colzdc)" "// zdc correction" > tmp.cc
 mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigiProducer.cc
 
-cvs co UserCode/CmsHi
-cvs co -r cmshi_22X UserCode/CmsHi/Utilities/plugins/HiEventEmbedder.cc
+cvs co -r cmshi_22X UserCode/CmsHi/Utilities
+cvs co -r cmshi_22X UserCode/CmsHi/JetAnalysis
 mv UserCode/CmsHi .
 
 scramv1 b
