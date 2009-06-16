@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.2 2008/12/19 19:04:12 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.3 2009/05/06 19:09:22 yilmaz Exp $
 //
 //
 
@@ -61,21 +61,63 @@
 #include "TFile.h"
 #include "TNtuple.h"
 
+#include "CmsHi/JetAnalysis/macros/CmsHiFunctions.h"
+
 using namespace std;
 
+//static const int PI = 3.14159265358979;
 
-#define PI 3.14159265358979
+static const int MAXPARTICLES = 5000000;
+static const int MAXJETS = 500000;
+static const int MAXCONS = 200;
 
-#define MAXPARTICLES 5000000
-#define MAXJETS 500000
-
-#define MAXHITS 50000
-#define MAXVTX 1000
-#define ETABINS 3 // Fix also in branch string
+static const int MAXHITS = 50000;
+static const int MAXVTX = 1000;
+static const int ETABINS = 3; // Fix also in branch string
 
 //
 // class decleration
 //
+
+struct JetAxis{
+  const reco::Jet* axis_;
+  bool operator() (const reco::Candidate * cand1,const reco::Candidate * cand2){ 
+    double dr1 = deltaR(axis_->eta(),axis_->phi(),cand1->eta(),cand1->phi());
+    double dr2 = deltaR(axis_->eta(),axis_->phi(),cand2->eta(),cand2->phi());
+
+    return dr1 < dr2;
+  }
+};
+
+struct MyJet{
+
+  float etjet;
+  float etajet;
+  float phijet;
+  float area;
+  int ncons;
+
+  float r20;
+  float r50;
+  float r90;
+
+  float e01;
+  float e02;
+  float e03;
+  float e04;
+  float e05;
+
+  float et[MAXCONS];
+  float eta[MAXCONS];
+  float phi[MAXCONS];
+
+  float dr[MAXCONS];
+
+  int event;
+  float b;
+
+};
+
 
 struct HydjetEvent{
 
@@ -84,6 +126,7 @@ struct HydjetEvent{
    float npart;
    float ncoll;
    float nhard;
+   float phi0;
 
    int n[ETABINS];
    float ptav[ETABINS];
@@ -102,7 +145,19 @@ struct HydjetEvent{
    float eta[MAXJETS];
    float phi[MAXJETS];
    float area[MAXJETS];
-   
+
+  int ncons[MAXJETS];
+
+  float r20[MAXJETS];
+  float r50[MAXJETS];
+  float r90[MAXJETS];
+
+  float e01[MAXJETS];
+  float e02[MAXJETS];
+  float e03[MAXJETS];
+  float e04[MAXJETS];
+  float e05[MAXJETS];
+ 
    float vx;
    float vy;
    float vz;
@@ -114,7 +169,7 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    public:
       explicit HeavyIonJetAnalyzer(const edm::ParameterSet&);
       ~HeavyIonJetAnalyzer();
-
+    bool sortDeltaR(const reco::Candidate * cand1,const reco::Candidate * cand2);
 
    private:
       virtual void beginJob(const edm::EventSetup&) ;
@@ -134,7 +189,10 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
 
   
    TTree* hydjetTree_;
+  TTree* jetTree_;
+
    HydjetEvent hev_;
+  MyJet yet_;
 
    TNtuple *ntpart;
 
@@ -144,6 +202,7 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    bool doParticles_;
    bool printLists_;
    bool doCF_;
+   bool doVertices_;
    double etaMax_;
    double ptMin_;
 
@@ -151,7 +210,6 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
 
    edm::ESHandle < ParticleDataTable > pdt;
    edm::Service<TFileService> f;
-
 
 };
 
@@ -176,6 +234,7 @@ HeavyIonJetAnalyzer::HeavyIonJetAnalyzer(const edm::ParameterSet& iConfig)
    doParticles_ = iConfig.getUntrackedParameter<bool>("doParticles", true);
    printLists_ = iConfig.getUntrackedParameter<bool>("printLists", false);
    doCF_ = iConfig.getUntrackedParameter<bool>("doMixed", false);
+   doVertices_ = iConfig.getUntrackedParameter<bool>("doVertices", false);
    jetSrc_ = iConfig.getParameter<vector<string> >("jetSrc");
 
    etaMax_ = iConfig.getUntrackedParameter<double>("etaMax", 2);
@@ -193,7 +252,6 @@ HeavyIonJetAnalyzer::~HeavyIonJetAnalyzer()
 
 }
 
-
 //
 // member functions
 //
@@ -202,6 +260,9 @@ HeavyIonJetAnalyzer::~HeavyIonJetAnalyzer()
 void
 HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
+  cout<<"Analyze"<<endl;
+
    using namespace edm;
    using namespace HepMC;
   
@@ -218,6 +279,8 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    int npart = -1;
    int ncoll = -1;
    int nhard = -1;
+   double phi0 = -99;
+
    double vx = -99;
    double vy = -99;
    double vz = -99;
@@ -308,6 +371,7 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       npart = hi->Npart_proj()+hi->Npart_targ();
       ncoll = hi->Ncoll();
       nhard = hi->Ncoll_hard();
+      phi0 = hi->event_plane_angle();
 
       if(printLists_){
 	 out_b<<b<<endl;
@@ -325,18 +389,103 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       const reco::Jet* jet = &((*genjets)[ijet]);
       //	 const reco::GenJet* jet = dynamic_cast<const reco::GenJet*>(&((*genjets)[ijet]));
 
-      cout<<"Jet Quantities : "<<jet->pt()<<" "<<jet->eta()<<" "<<jet->phi()<<" "<<jet->jetArea()<<endl;
+      cout<<"Jet Quantities : "<<jet->et()<<" "<<jet->eta()<<" "<<jet->phi()<<" "<<jet->jetArea()<<endl;
+
+      double phi = jet->phi()-phi0;
+      if(phi > PI) phi = phi - 2*PI;
+      if(phi < -PI) phi = phi + 2*PI;
       
-      hev_.et[hev_.njet] = jet->pt();
+      hev_.et[hev_.njet] = jet->et();
       hev_.eta[hev_.njet] = jet->eta();
-      hev_.phi[hev_.njet] = jet->phi();
-      //      hev_.area[hev_.njet] = jet->jetArea();
+      hev_.phi[hev_.njet] = phi;
+
+      hev_.area[hev_.njet] = jet->jetArea();
+
+      // Constituents
+      std::vector<const reco::Candidate*> members = jet->getJetConstituentsQuick();
+
+      int nm = members.size();
+
+      hev_.ncons[hev_.njet] = nm;
+      yet_.ncons = nm;
+
+      cout<<"Jet has "<<nm<<" constituents."<<endl;
+      
+      JetAxis jaxis;
+      jaxis.axis_ = jet;
+      
+      //      cout<<"Jet axis is at : "<<jaxis.axis_->eta()<<"  "<<jaxis.axis_->phi()<<endl;
+
+      sort(members.begin(),members.end(),jaxis);
+
+      double sum = 0;
+      double et = jet->et();
+      double r20 = -99;
+      double r50 = -99;
+      double r90 = -99;
+
+      double e0[6] = {0,0,0,0,0,0};
+
+      for(int im = 0; im < nm; ++im){
+	const reco::Candidate* candi = members[im];
+	double dr = deltaR(jet->eta(),jet->phi(),candi->eta(),candi->phi());
+	cout<<"Constiutuent's Delta R = "<<dr<<endl;
+
+	double phicon = candi->phi()-phi0;
+	if(phicon > PI) phicon = phicon - 2*PI;
+	if(phicon < -PI) phicon = phicon + 2*PI;
+
+
+        yet_.et[im] = candi->et();
+        yet_.eta[im] = candi->eta();
+	yet_.phi[im] = phicon;	
+	yet_.dr[im] = dr;
+
+	for(int ir = 1; ir <6; ++ir){
+	  if(dr < 0.1*ir){
+	    e0[ir] += candi->et();	  
+	  }
+	}
+	
+	sum += candi->et();
+	
+	if(sum > et*0.2 && r20 == -99) r20 = dr;
+	if(sum > et*0.5 && r50 == -99) r50 = dr;
+        if(sum > et*0.9 && r90 == -99) r90 = dr;
+	
+      }
+
+      hev_.r20[hev_.njet] = r20;
+      hev_.r50[hev_.njet] = r50;
+      hev_.r90[hev_.njet] = r90;
+
+      hev_.e01[hev_.njet] = e0[1]/et;
+      hev_.e02[hev_.njet] = e0[2]/et;
+      hev_.e03[hev_.njet] = e0[3]/et;
+      hev_.e04[hev_.njet] = e0[4]/et;
+      hev_.e05[hev_.njet] = e0[5]/et;
+
+      yet_.e01 = e0[1]/et;
+      yet_.e02 = e0[2]/et;
+      yet_.e03 = e0[3]/et;
+      yet_.e04 = e0[4]/et;
+      yet_.e05 = e0[5]/et;
+
+      yet_.etjet = jet->et();
+      yet_.etajet = jet->eta();
+      yet_.phijet = phi;
+      yet_.area = jet->jetArea();
+
+      yet_.event = hev_.event;
+      yet_.b = hev_.b;
+
+      jetTree_->Fill();
 
       ++(hev_.njet);
       
    }
    
-   
+   if(doVertices_){   
    edm::Handle<edm::SimVertexContainer> simVertices;
    iEvent.getByType<edm::SimVertexContainer>(simVertices);
    
@@ -350,7 +499,7 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    vy = vertex.position().y();
    vz = vertex.position().z();
    vr = vertex.position().rho();
-   
+   }
 
       /*
 	for(int i = 0; i<3; ++i){
@@ -362,6 +511,8 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    hev_.npart = npart;
    hev_.ncoll = ncoll;
    hev_.nhard = nhard;
+   hev_.phi0 = phi0;
+
    hev_.vx = vx;
    hev_.vy = vy;
    hev_.vz = vz;
@@ -376,6 +527,8 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 void 
 HeavyIonJetAnalyzer::beginJob(const edm::EventSetup& iSetup)
 {
+  cout<<"Begin"<<endl;
+
    iSetup.getData(pdt);
 
    if(printLists_){
@@ -392,12 +545,14 @@ HeavyIonJetAnalyzer::beginJob(const edm::EventSetup& iSetup)
    
    if(doAnalysis_){
       hydjetTree_ = f->make<TTree>("hi","Tree of Hydjet Events");
+      jetTree_ = f->make<TTree>("jet","Tree of Jet Constituents");
 
       hydjetTree_->Branch("event",&hev_.event,"event/I");
       hydjetTree_->Branch("b",&hev_.b,"b/F");
       hydjetTree_->Branch("npart",&hev_.npart,"npart/F");
       hydjetTree_->Branch("ncoll",&hev_.ncoll,"ncoll/F");
       hydjetTree_->Branch("nhard",&hev_.nhard,"nhard/F");
+      hydjetTree_->Branch("phi0",&hev_.phi0,"phi0/F");
 
       if(doParticles_){
 	 hydjetTree_->Branch("n",hev_.n,"n[3]/I");
@@ -420,6 +575,44 @@ HeavyIonJetAnalyzer::beginJob(const edm::EventSetup& iSetup)
       hydjetTree_->Branch("eta",hev_.eta,"eta[njet]/F");
       hydjetTree_->Branch("phi",hev_.phi,"phi[njet]/F");
       hydjetTree_->Branch("area",hev_.area,"area[njet]/F");
+
+      hydjetTree_->Branch("r20",hev_.r20,"r20[njet]/F");
+      hydjetTree_->Branch("r50",hev_.r50,"r50[njet]/F");
+      hydjetTree_->Branch("r90",hev_.r90,"r90[njet]/F");
+
+      hydjetTree_->Branch("e01",hev_.e01,"e01[njet]/F");
+      hydjetTree_->Branch("e02",hev_.e02,"e02[njet]/F");
+      hydjetTree_->Branch("e03",hev_.e03,"e03[njet]/F");
+      hydjetTree_->Branch("e04",hev_.e04,"e04[njet]/F");
+      hydjetTree_->Branch("e05",hev_.e05,"e05[njet]/F");
+
+      hydjetTree_->Branch("ncons",hev_.ncons,"ncons[njet]/I");
+
+      jetTree_->Branch("event",&hev_.event,"event/I");
+      jetTree_->Branch("b",&hev_.b,"b/F");
+
+      jetTree_->Branch("ncons",&yet_.ncons,"ncons/I");
+      jetTree_->Branch("et",yet_.et,"et[ncons]/F");
+      jetTree_->Branch("eta",yet_.eta,"eta[ncons]/F");
+      jetTree_->Branch("phi",yet_.phi,"phi[ncons]/F");
+      jetTree_->Branch("dr",yet_.dr,"dr[ncons]/F");
+
+      jetTree_->Branch("etjet",&yet_.etjet,"etjet/F");
+      jetTree_->Branch("etajet",&yet_.etajet,"etajet/F");
+      jetTree_->Branch("phijet",&yet_.phijet,"phijet/F");
+
+      jetTree_->Branch("area",&yet_.area,"area/F");
+      jetTree_->Branch("r20",&yet_.r20,"r20/F");
+      jetTree_->Branch("r50",&yet_.r50,"r50/F");
+      jetTree_->Branch("r90",&yet_.r90,"r90/F");
+
+      jetTree_->Branch("e01",&yet_.e01,"e01/F");
+      jetTree_->Branch("e02",&yet_.e02,"e02/F");
+      jetTree_->Branch("e03",&yet_.e03,"e03/F");
+      jetTree_->Branch("e04",&yet_.e04,"e04/F");
+      jetTree_->Branch("e05",&yet_.e05,"e05/F");
+
+
 
    }
   

@@ -26,7 +26,7 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "SimDataFormats/HiGenData/interface/SubEventMap.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
@@ -111,7 +111,7 @@ namespace cms
       mVerbose (conf.getUntrackedParameter<bool>("verbose", false)),
       mEtInputCut (conf.getParameter<double>("inputEtMin")),
       mEInputCut (conf.getParameter<double>("inputEMin")),
-      skipLastSubEvent_ (conf.getUntrackedParameter<bool>("skipLastSubEvent", true)),
+      ignoreHydro_ (conf.getUntrackedParameter<bool>("ignoreHydro", true)),
       nHydro_(conf.getUntrackedParameter<double>("maxParticles", 2000))
   {
     std::string alias = conf.getUntrackedParameter<string>( "alias", conf.getParameter<std::string>("@module_label"));
@@ -189,10 +189,21 @@ namespace cms
      }
 
      int nsub = inputs.size();
+
+     if(ignoreHydro_ && hydroEvent == -1){
+       int nbig = -1;
+       for(int isub = 0; isub < nsub; ++isub){
+	 int subsize = inputs[isub].size();
+	 if(subsize>nbig){
+	   nbig = subsize;
+	   hydroEvent = isub;
+	 }
+       }
+     }
+
      for(int isub = 0; isub < nsub; ++isub){
 	cout<<"Processing Sub-Event : "<<isub<<endl;
 	JetReco::InputCollection & input = inputs[isub];
-	//	if(skipLastSubEvent_ && isub == nsub-1){
 	if(isub == hydroEvent){
 	   cout<<"Sub-Event number "<<isub<<" with more than "<<input.size()<<" particles, skipped as background event."<<endl;
 	}else{
