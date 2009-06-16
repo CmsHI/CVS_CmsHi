@@ -6,7 +6,7 @@ cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
 # Fix for 3_1_0_pre10
-if echo "$CMSSW_BASE" | grep "CMSSW_3_1_0_pre10" >/dev/null 2>&1
+if echo "$CMSSW_VERSION" | grep "CMSSW_3_1_0_pre10" >/dev/null 2>&1
 then
   echo You are using CMSSW_3_1_0_pre10.  Must patch pyqt.xml...
   cat $CMSSW_BASE/config/toolbox/slc4_ia32_gcc345/tools/selected/pyqt.xml | sed -e '/environment.*PYTHONPATH/d' > temp.xml
