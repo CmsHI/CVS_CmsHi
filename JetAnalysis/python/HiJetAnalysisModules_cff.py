@@ -32,4 +32,5 @@ genevent = cms.EDAnalyzer('HeavyIonJetAnalyzer',
                                   doParticles = cms.untracked.bool(False)
                                   )
 
+jetAnalysis = cms.Sequence(recoevent+corrected+genevent)
 
