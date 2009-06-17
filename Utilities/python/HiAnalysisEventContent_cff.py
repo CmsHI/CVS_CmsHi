@@ -32,9 +32,7 @@ HIEcalHcalSimDigiObjects = cms.PSet(
                                            'keep *_hcalDigis_*_*')
     )
 
-
-
-HITrackAnalysisObjects = HIAnalysisObjects
+HITrackAnalysisObjects = HIAnalysisObjects.clone()
 HITrackAnalysisObjects.outputCommands.extend(HITrackerSimDigiObjects.outputCommands)
 HITrackAnalysisObjects.outputCommands.extend(HIEcalHcalSimDigiObjects.outputCommands)
 
