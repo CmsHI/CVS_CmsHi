@@ -13,7 +13,7 @@
 //
 // Original Author:  Yongsun Kim
 //         Created:  Fri May 22 12:57:09 EDT 2009
-// $Id$
+// $Id: CentFilter.cc,v 1.1 2009/05/29 13:46:17 edwenger Exp $
 //
 //
 
@@ -100,7 +100,7 @@ CentFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    const GenEvent *evt;
 
    Handle<HepMCProduct> mc;
-   iEvent.getByLabel("source",mc);
+   iEvent.getByLabel("generator",mc);
    evt = mc->GetEvent();
 
    const HeavyIon* hi = evt->heavy_ion();
