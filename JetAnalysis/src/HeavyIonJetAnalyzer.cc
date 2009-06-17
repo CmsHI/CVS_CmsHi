@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.4 2009/06/16 12:34:34 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.5 2009/06/16 12:38:21 yilmaz Exp $
 //
 //
 
@@ -43,8 +43,6 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
-#include "SimDataFormats/Vertex/interface/SimVertex.h"
-#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 
 #include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/Jet.h"
@@ -486,27 +484,27 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    }
    
    if(doVertices_){   
-   edm::Handle<edm::SimVertexContainer> simVertices;
-   iEvent.getByType<edm::SimVertexContainer>(simVertices);
-   
-   if (! simVertices.isValid() ) throw cms::Exception("FatalError") << "No vertices found\n";
-   int inum = 0;
-   
-   edm::SimVertexContainer::const_iterator it=simVertices->begin();
-   SimVertex vertex = (*it);
-   cout<<" Vertex position "<< inum <<" " << vertex.position().rho()<<" "<<vertex.position().z()<<endl;
-   vx = vertex.position().x();
-   vy = vertex.position().y();
-   vz = vertex.position().z();
-   vr = vertex.position().rho();
+
+     HepMC::GenVertex* genvtx = evt->signal_process_vertex();
+     if(!genvtx){
+       cout<<"No Signal Process Vertex!"<<endl;
+       HepMC::GenEvent::particle_const_iterator pit=evt->particles_begin();
+       HepMC::GenEvent::particle_const_iterator ptend=evt->particles_end();
+       while(!genvtx || ( genvtx->particles_in_size() == 1 && pit != ptend ) ){
+	 if(!genvtx) cout<<"No Gen Vertex!"<<endl;
+	 ++pit;
+	 if(pit == ptend) cout<<"End reached!"<<endl;
+	 genvtx = (*pit)->production_vertex();
+       }
+     }
+
+   vx = genvtx->position().x()/10;
+   vy = genvtx->position().y()/10;
+   vz = genvtx->position().z()/10;
+   vr = genvtx->position().rho()/10;
+
    }
 
-      /*
-	for(int i = 0; i<3; ++i){
-	hev_.ptav[i] = hev_.ptav[i]/hev_.n[i];
-	}
-      */
-   
    hev_.b = b;
    hev_.npart = npart;
    hev_.ncoll = ncoll;
