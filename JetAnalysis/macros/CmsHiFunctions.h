@@ -61,8 +61,8 @@ TH1D* myDivide(TH1* a,TH1* b)
 double deltaPhi(double phi1, double phi2){
   double phi = fabs(phi1-phi2);
   if(phi > 2*PI) phi =  phi - 2*PI;
-  if(phi > PI ) phi = PI - phi;
-  return phi;
+  if(phi > PI ) phi = 2*PI - phi;
+  return fabs(phi);
 
 }
 
