@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.5 2009/06/16 12:38:21 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.6 2009/06/17 15:38:16 yilmaz Exp $
 //
 //
 
@@ -205,7 +205,7 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    double ptMin_;
 
    vector<string> jetSrc_;
-
+   string hepmcSrc_;
    edm::ESHandle < ParticleDataTable > pdt;
    edm::Service<TFileService> f;
 
@@ -234,6 +234,7 @@ HeavyIonJetAnalyzer::HeavyIonJetAnalyzer(const edm::ParameterSet& iConfig)
    doCF_ = iConfig.getUntrackedParameter<bool>("doMixed", false);
    doVertices_ = iConfig.getUntrackedParameter<bool>("doVertices", false);
    jetSrc_ = iConfig.getParameter<vector<string> >("jetSrc");
+   hepmcSrc_ = iConfig.getUntrackedParameter<string>("hepmcSrc","generator");
 
    etaMax_ = iConfig.getUntrackedParameter<double>("etaMax", 2);
    ptMin_ = iConfig.getUntrackedParameter<double>("ptMin", 0);
@@ -326,7 +327,7 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    }else{
       
       Handle<HepMCProduct> mc;
-      iEvent.getByLabel("source",mc);
+      iEvent.getByLabel(hepmcSrc_,mc);
       evt = mc->GetEvent();
 
       if(doParticles_){
