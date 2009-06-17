@@ -20,7 +20,6 @@
 <use name=DataFormats/Common>
 <use name=DataFormats/Provenance>
 <use name=DataFormats/EgammaReco>
-<use name=DataFormats/HepMCCandidate>
 <use name=Geometry/Records>
 <use name=root>
 <use name=clhep>
