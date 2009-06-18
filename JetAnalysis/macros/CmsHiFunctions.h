@@ -83,3 +83,16 @@ double deltaR(double eta1, double phi1, double eta2, double phi2){
   double d = deltaR2(eta1,phi1,eta2,phi2);
   return sqrt(d);
 }
+
+double etaVertex(double eta, double vz){
+  
+  if(fabs(eta) > 1.3) return eta; 
+
+  double rho = 228;  
+  double z1 = rho/tan(2*atan(exp(-eta)));
+  double z2 = z1 - vz;
+  double etav = -log(tan(atan(rho/z2)/2));
+
+}
+
+
