@@ -48,7 +48,7 @@ ecaltrig100 = cms.EDFilter("MCSingleParticleFilter",
                                                                      )
                                    )
 
-process.partontrig70 = cms.EDFilter("MCSingleParticleFilter",
+partontrig70 = cms.EDFilter("MCSingleParticleFilter",
                                     moduleLabel = cms.untracked.string("signal"),
                                     Status = cms.untracked.vint32(2,2,2,2,2,2,2,1),
                                     MaxEta = cms.untracked.vdouble(3,3,3,3,3,3,3,3),
@@ -57,7 +57,7 @@ process.partontrig70 = cms.EDFilter("MCSingleParticleFilter",
                                     ParticleID = cms.untracked.vint32(1,2,3,4,5,6,21,22)
                                     )
 
-process.ecaltrig70 = cms.EDFilter("MCSingleParticleFilter",
+ecaltrig70 = cms.EDFilter("MCSingleParticleFilter",
                                   moduleLabel = cms.untracked.string("signal"),
                                   Status = cms.untracked.vint32(2, 2, 2, 2, 2,
                                                                 2, 1, 1, 2, 2,
@@ -91,7 +91,7 @@ process.ecaltrig70 = cms.EDFilter("MCSingleParticleFilter",
 
 
 
-process.partontrig40 = cms.EDFilter("MCSingleParticleFilter",
+partontrig40 = cms.EDFilter("MCSingleParticleFilter",
                                     moduleLabel = cms.untracked.string("signal"),
                                     Status = cms.untracked.vint32(2,2,2,2,2,2,2,1),
                                     MaxEta = cms.untracked.vdouble(3,3,3,3,3,3,3,3),
@@ -100,7 +100,7 @@ process.partontrig40 = cms.EDFilter("MCSingleParticleFilter",
                                     ParticleID = cms.untracked.vint32(1,2,3,4,5,6,21,22)
                                     )
 
-process.ecaltrig40 = cms.EDFilter("MCSingleParticleFilter",
+ecaltrig40 = cms.EDFilter("MCSingleParticleFilter",
                                   moduleLabel = cms.untracked.string("signal"),
                                   Status = cms.untracked.vint32(2, 2, 2, 2, 2,
                                                                 2, 1, 1, 2, 2,
@@ -133,7 +133,7 @@ process.ecaltrig40 = cms.EDFilter("MCSingleParticleFilter",
                                 )
 
 
-process.partontrig20 = cms.EDFilter("MCSingleParticleFilter",
+partontrig20 = cms.EDFilter("MCSingleParticleFilter",
                                     moduleLabel = cms.untracked.string("signal"),
                                     Status = cms.untracked.vint32(2,2,2,2,2,2,2,1),
                                     MaxEta = cms.untracked.vdouble(3,3,3,3,3,3,3,3),
@@ -142,7 +142,7 @@ process.partontrig20 = cms.EDFilter("MCSingleParticleFilter",
                                     ParticleID = cms.untracked.vint32(1,2,3,4,5,6,21,22)
                                     )
 
-process.ecaltrig20 = cms.EDFilter("MCSingleParticleFilter",
+ecaltrig20 = cms.EDFilter("MCSingleParticleFilter",
                                 moduleLabel = cms.untracked.string("signal"),
                                 Status = cms.untracked.vint32(2, 2, 2, 2, 2,
                                                               2, 1, 1, 2, 2,
