@@ -1,6 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
-process.partontrig100 = cms.EDFilter("MCSingleParticleFilter",
+
+kinematics20 = cms.vstring('CKIN(3) = 20','CKIN(4) = 40')
+kinematics40 = cms.vstring('CKIN(3) = 40','CKIN(4) = 70')
+kinematics70 = cms.vstring('CKIN(3) = 70','CKIN(4) = 100')
+kinematics100 = cms.vstring('CKIN(3) = 100','CKIN(4) = 2000')
+
+
+partontrig100 = cms.EDFilter("MCSingleParticleFilter",
                                      moduleLabel = cms.untracked.string("signal"),
                                      Status = cms.untracked.vint32(2,2,2,2,2,2,2,1),
                                      MaxEta = cms.untracked.vdouble(3,3,3,3,3,3,3,3),
@@ -9,9 +16,7 @@ process.partontrig100 = cms.EDFilter("MCSingleParticleFilter",
                                      ParticleID = cms.untracked.vint32(1,2,3,4,5,6,21,22)
                                      )
 
-
-
-process.ecaltrig100 = cms.EDFilter("MCSingleParticleFilter",
+ecaltrig100 = cms.EDFilter("MCSingleParticleFilter",
                                    moduleLabel = cms.untracked.string("signal"),
                                    Status = cms.untracked.vint32(2, 2, 2, 2, 2,
                                                                  2, 1, 1, 2, 2,
