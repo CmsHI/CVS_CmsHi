@@ -1,11 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
-
-kinematics20 = cms.vstring('CKIN(3) = 20','CKIN(4) = 40')
-kinematics40 = cms.vstring('CKIN(3) = 40','CKIN(4) = 70')
-kinematics70 = cms.vstring('CKIN(3) = 70','CKIN(4) = 100')
+pythiaCuts = cms.PSet(
+kinematics20 = cms.vstring('CKIN(3) = 20','CKIN(4) = 40'),
+kinematics40 = cms.vstring('CKIN(3) = 40','CKIN(4) = 70'),
+kinematics70 = cms.vstring('CKIN(3) = 70','CKIN(4) = 100'),
 kinematics100 = cms.vstring('CKIN(3) = 100','CKIN(4) = 2000')
-
+)
 
 partontrig100 = cms.EDFilter("MCSingleParticleFilter",
                                      moduleLabel = cms.untracked.string("signal"),
