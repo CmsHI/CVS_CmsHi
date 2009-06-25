@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 HIAnalysisObjects = cms.PSet(
         outputCommands = cms.untracked.vstring('keep *',
-                                               'keep *_source_*_*',
+                                               'keep *_generator_*_*',
                                                'keep *_signal_*_*',
                                                'drop *CrossingFrame*_*_*_*',
                                                'keep *HepMCProduct*_*_*_*',
@@ -37,7 +37,7 @@ HITrackAnalysisObjects.outputCommands.extend(HIEcalHcalSimDigiObjects.outputComm
 
 HIRecoObjects = cms.PSet(
     outputCommands = cms.untracked.vstring('keep *', 
-        'keep *_source_*_*', 
+        'keep *_generator_*_*', 
         'keep *_signal_*_*',                                           
         'drop *CrossingFrame*_*_*_*', 
         'keep *HepMCProduct*_*_*_*',                                           
