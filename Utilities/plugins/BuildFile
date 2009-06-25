@@ -3,6 +3,7 @@
 <use name=FWCore/PluginManager>
 <use name=FWCore/ParameterSet>
 <use name=CmsHi/Utilities>
+<use name=DataFormats/HeavyIonEvent>
 <library file="*.cc" name=CmsHiUtilitiesPlugins>
 <flags EDM_PLUGIN=1>
 </library>
