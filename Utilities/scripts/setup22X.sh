@@ -16,7 +16,7 @@ cvs co -r BRANCH22X RecoHI/HiEgammaAlgos
 cvs co -r V01-02-16 GeneratorInterface/HydjetInterface
 cvs co -r V00-02-12 GeneratorInterface/PyquenInterface
 
-cvs co -r cmshi_22X SimDataFormats/HiGenData
+cvs co -r V00-00-04 SimDataFormats/HiGenData
 cvs co -r V01-00-01 SimDataFormats/HepMCProduct
 cvs co -r V01-00-04 SimDataFormats/GeneratorProducts
 
