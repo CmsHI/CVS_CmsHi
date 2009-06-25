@@ -14,8 +14,6 @@ HIAnalysisObjects = cms.PSet(
                                                'drop *_pixelTracks_*_*',
                                                'drop *_*TrackCandidates_*_*',
                                                'drop *_*TrackSeeds_*_*',
-                                               'drop *_hybridSuperClusters_*_*',
-                                               'drop *_islandSuperClusters_*_*',
                                                'drop *_pixelTracksWithVertices_*_*',
                                                'keep *Jets*_*_*_*')
         )
@@ -32,9 +30,7 @@ HIEcalHcalSimDigiObjects = cms.PSet(
                                            'keep *_hcalDigis_*_*')
     )
 
-
-
-HITrackAnalysisObjects = HIAnalysisObjects
+HITrackAnalysisObjects = HIAnalysisObjects.clone()
 HITrackAnalysisObjects.outputCommands.extend(HITrackerSimDigiObjects.outputCommands)
 HITrackAnalysisObjects.outputCommands.extend(HIEcalHcalSimDigiObjects.outputCommands)
 
