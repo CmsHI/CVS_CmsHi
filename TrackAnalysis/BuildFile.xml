@@ -15,6 +15,8 @@
 <use name="TrackingTools/Records"/>
 <use name="RecoVertex/KalmanVertexFit"/>
 <use name="PhysicsTools/UtilAlgos"/>
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="SimDataFormats/Vertex"/>
 <flags EdmPlugin="1"/>
 
 <export>
@@ -36,5 +38,7 @@
 	<use name="edwenger/MatchedTrack"/>
 	<use name="RecoVertex/KalmanVertexFit"/>
     <use name="PhysicsTools/UtilAlgos"/>
+	<use name="SimDataFormats/GeneratorProducts"/>
+	<use name="SimDataFormats/Vertex"/>
     <use name="root"/>
 </export>
