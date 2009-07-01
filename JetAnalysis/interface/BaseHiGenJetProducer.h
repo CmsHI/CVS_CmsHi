@@ -7,7 +7,7 @@
  * It handles generic manipulations of input and output collections
  *
  * \author Fedor Ratnikov (UMd) Aug. 22, 2006
- * $Id: BaseHiGenJetProducer.h,v 1.3 2009/05/09 00:24:20 yilmaz Exp $
+ * $Id: BaseHiGenJetProducer.h,v 1.4 2009/06/16 12:36:11 yilmaz Exp $
  *
  ************************************************************/
 
@@ -46,7 +46,7 @@ namespace cms
     double mEtInputCut;
     double mEInputCut;
     double mJetPtMin;
-    double nHydro_;
+    double nMax_;
     bool ignoreHydro_;
     edm::ESHandle < ParticleDataTable > mPdt;
 
