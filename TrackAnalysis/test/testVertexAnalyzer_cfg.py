@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 import os 
 
 process = cms.Process("TEST")
@@ -14,10 +15,17 @@ process.GlobalTag.globaltag = 'IDEAL_31X::All'
 
 ##################################################################################
 
-indir="/pnfs/cmsaf.mit.edu/hibat/cms/users/edwenger/vtx/mb" #dcache
-firstfile=1
-nfiles=1
-maxevents=-1
+# setup 'standard'  options
+options = VarParsing.VarParsing ('standard')
+
+# setup any defaults you want
+options.output = 'output_testVertex.root'
+options.secondaryOutput = 'edmFile_testVertex.root'
+options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/edwenger/vtx/mb/out2_numEvent1.root', 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/edwenger/vtx/mb/out3_numEvent1.root'
+options.maxEvents = -1 
+
+# get and parse the command line arguments
+options.parseArguments()
 
 ##################################################################################
 # Some Services
@@ -38,16 +46,14 @@ process.MessageLogger.cerr.threshold = "DEBUG"
 ##################################################################################
 # Input Source
 process.source = cms.Source('PoolSource',
-	fileNames = cms.untracked.vstring() 
+	noEventSort = cms.untracked.bool(True),
+	duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+	fileNames = cms.untracked.vstring(options.files) 
 )
 							
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(maxevents)
+    input = cms.untracked.int32(options.maxEvents)
 )
-
-# add specified files to fileNames
-for i in range(firstfile,firstfile+nfiles):
-	process.source.fileNames.append('dcache:%s/out%d_numEvent1.root' % (indir, i)) #dcache
 
 ##################################################################################
 #Reconstruction			
@@ -64,7 +70,7 @@ process.load("RecoHI.HiTracking.HeavyIonPrimaryVertices_cfi")
 # Vtx Analyzer
 process.vtxAnalyzer = cms.EDAnalyzer("VtxAnalyzer")
 # output file service
-process.TFileService = cms.Service("TFileService", fileName = cms.string('output_VtxAnalyzer_%d.root' % (firstfile)) 
+process.TFileService = cms.Service("TFileService", fileName = cms.string(options.output) 
 )
 
 
@@ -75,7 +81,7 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   process.HIRecoObjects,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
-                                  fileName = cms.untracked.string('edmFile_testVertex.root')
+                                  fileName = cms.untracked.string(options.secondaryOutput)
                                   )
 
 ##################################################################################
