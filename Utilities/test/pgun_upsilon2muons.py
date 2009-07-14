@@ -90,6 +90,12 @@ process.load("Configuration.StandardSequences.DigiToRaw_cff")# DigiToRaw
 process.load("Configuration.StandardSequences.RawToDigi_cff")# RawToDigi
 process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
 
+##################################################################################
+# Digi + Reconstruction of Signal-Only
+
+process.noMix = noMix
+
+
 ##############################################################################
 # Output EDM File
 process.load("CmsHi.Utilities.HiAnalysisEventContent_cff") #load keep/drop output commands
