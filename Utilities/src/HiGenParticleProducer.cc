@@ -9,8 +9,8 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/05/06 19:09:30 $
- * $Revision: 1.2 $
+ * $Date: 2009/06/04 18:25:02 $
+ * $Revision: 1.3 $
  * \author Philip Allfrey, University of Auckland
  * edited by Yetkin Yilmaz, MIT
  *
@@ -40,7 +40,7 @@ class HiGenParticleProducer : public edm::EDProducer {
   /// process one event
   void produce( edm::Event& e, const edm::EventSetup& );
   /// source collection name
-  edm::InputTag src_;
+  std::vector<std::string> src_;
   /// unknown code treatment flag
   bool abortOnUnknownPDGCode_;
   /// save bar-codes
@@ -77,7 +77,7 @@ static const int PDGCacheMax = 32768;
 static const double mmToCm = 0.1;
 
 HiGenParticleProducer::HiGenParticleProducer( const ParameterSet & cfg ) :
-  src_( cfg.getUntrackedParameter<edm::InputTag>( "src",edm::InputTag("mix","generator") ) ),
+  src_( cfg.getParameter<std::vector<std::string> >( "src" )),
   abortOnUnknownPDGCode_( cfg.getUntrackedParameter<bool>( "abortOnUnknownPDGCode", true ) ),
   saveBarCodes_( cfg.getUntrackedParameter<bool>( "saveBarCodes", false ) ),
   chargeP_( PDGCacheMax, 0 ), chargeM_( PDGCacheMax, 0 ) {
@@ -128,25 +128,37 @@ void HiGenParticleProducer::beginJob( const EventSetup & es ) {
 }
 
 void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
-  Handle< CrossingFrame<HepMCProduct> > mcp;
-  evt.getByLabel( src_, mcp );
 
-  //Create MixCollection of HepMCProduct, iterator runs over all signal and pileup events
-  //in CrossingFrame
-  auto_ptr<MixCollection<HepMCProduct> > cfhepmcprod(new MixCollection<HepMCProduct>(mcp.product()));
-  MixCollection<HepMCProduct>::iterator cfhepmc_iter;
+std::vector<Handle<HepMCProduct> > heps;
 
-  //Get total number of particles
+  //Get total number of particles 
   size_t totalSize = 0;
-  for (cfhepmc_iter=cfhepmcprod->begin(); cfhepmc_iter!=cfhepmcprod->end();cfhepmc_iter++) {
-    totalSize += cfhepmc_iter->GetEvent()->particles_size();
+
+  //Get Number of signal + pile ups
+  size_t npiles = src_.size();
+  cout<<"Npiles " << npiles<<endl;
+
+  cout<<"heps size "<<heps.size()<<endl;
+
+  for(size_t i = 0; i < npiles; ++i){
+     cout<<"Tag "<<src_[i]<<endl;
+     Handle<HepMCProduct> handle;
+     heps.push_back(handle);
+     cout<<"A"<<endl;
+     evt.getByLabel( src_[i], heps[i] );
+     cout<<"B"<<endl;
+     totalSize += heps[i]->GetEvent()->particles_size();
   }
+
+  cout<<"C"<<endl;
 
   //Initialise containers
   const size_t size = totalSize;
   vector<const HepMC::GenParticle *> particles( size );
   auto_ptr<GenParticleCollection> candsPtr( new GenParticleCollection( size ) );
   auto_ptr<SubEventMap> subsPtr( new SubEventMap() );
+
+  cout<<"D"<<endl;
 
   auto_ptr<vector<int> > barCodeVector( new vector<int>( size ) );
   const GenParticleRefProd ref = evt.getRefBeforePut<GenParticleCollection>();
@@ -155,9 +167,16 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
   size_t offset = 0;
   size_t suboffset = 0;
 
+  cout<<"E"<<endl;
+
   //Loop over all GenEvents
-  for (cfhepmc_iter=cfhepmcprod->begin(); cfhepmc_iter!=cfhepmcprod->end();cfhepmc_iter++) {
-    const GenEvent * mc = cfhepmc_iter->GetEvent();
+for(size_t i = 0; i < npiles; ++i){
+     const GenEvent * mc = heps[i]->GetEvent();
+
+    //Look whether heavy ion/signal event
+     bool isHI = false;
+    HepMC::HeavyIon * hi = mc->heavy_ion();
+    if(hi && hi->Ncoll_hard() > 1) isHI = true;
 
     //    LogDebug("SubEventType")<<"The sub event's type is : "<<cfhepmc_iter.getSourceType();
     size_t num_particles = mc->particles_size();
@@ -208,7 +227,7 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
 	 sub_id = productionVertex->id();
          LogDebug("VertexId")<<"SubEvent offset 1 : "<<suboffset;
 	 LogDebug("VertexId")<<"Production Vertex Id : "<<sub_id;
-	 if(sub_id < 0) sub_id = 0;
+	 if(!isHI) sub_id = 0;
 
 	 size_t numberOfMothers = productionVertex->particles_in_size();
 	 if ( numberOfMothers > 0 ) {
@@ -229,12 +248,10 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
       subs.insert(dref,new_id);
       LogDebug("VertexId")<<"SubEvent offset 3 : "<<suboffset;
       LogDebug("VertexId")<<"New Production Vertex Id : "<<new_id;
-    }
-
-    HepMC::HeavyIon * hi = mc->heavy_ion();
-    int nsub = -2;
-    if(hi && hi->Ncoll_hard()+1 > 0){
-       nsub = hi->Ncoll_hard()+1;
+}
+int nsub = -2;
+    if(isHI){
+nsub = hi->Ncoll_hard()+1;
        LogDebug("Offset")<<"hi exists, nsub : "<<nsub;
 
        LogDebug("VertexId")<<"SubEvent offset 4 : "<<suboffset;
