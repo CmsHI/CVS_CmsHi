@@ -27,7 +27,8 @@ cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
 cvs co SimDataFormats/HiGenData
 
 # Turn off ZDC digitization
-cvs co -r $CMSSW_VERSION SimCalorimetry/HcalSimProducers
+checkOutVersion=`echo $CMSSW_VERSION | sed "s/_patch1//g"`
+cvs co -r $checkOutVersion SimCalorimetry/HcalSimProducers
 cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigitizer.cc | replace "doZDC(true)" "doZDC(false)" | replace "e.getByLabel(\"mix\", zdcHitsName , zdccf)" "// e.getByLabel(\"mix\", zdcHitsName , zdccf)" | replace "colzdc(new MixCollection<PCaloHit>(zdccf.product()))" "colzdc(new MixCollection<PCaloHit>(new CrossingFrame<PCaloHit>))" | replace "theHitCorrection->fillChargeSums(*colzdc)" "// zdc correction" > tmp.cc
 mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigitizer.cc
 
