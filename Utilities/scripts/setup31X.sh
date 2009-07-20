@@ -20,6 +20,7 @@ cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 cvs co RecoHI/HiCentralityAlgos
 
+cvs co Configuration/Generator
 cvs co GeneratorInterface/HydjetInterface
 cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
 
