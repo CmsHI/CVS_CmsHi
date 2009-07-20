@@ -9,8 +9,8 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/06/04 18:25:02 $
- * $Revision: 1.3 $
+ * $Date: 2009/07/16 11:21:18 $
+ * $Revision: 1.4 $
  * \author Philip Allfrey, University of Auckland
  * edited by Yetkin Yilmaz, MIT
  *
@@ -48,6 +48,7 @@ class HiGenParticleProducer : public edm::EDProducer {
   /// charge indices
   std::vector<int> chargeP_, chargeM_;
   std::map<int, int> chargeMap_;
+   bool useCF_;
   int chargeTimesThree( int ) const;
 };
 
@@ -80,7 +81,8 @@ HiGenParticleProducer::HiGenParticleProducer( const ParameterSet & cfg ) :
   src_( cfg.getParameter<std::vector<std::string> >( "src" )),
   abortOnUnknownPDGCode_( cfg.getUntrackedParameter<bool>( "abortOnUnknownPDGCode", true ) ),
   saveBarCodes_( cfg.getUntrackedParameter<bool>( "saveBarCodes", false ) ),
-  chargeP_( PDGCacheMax, 0 ), chargeM_( PDGCacheMax, 0 ) {
+  chargeP_( PDGCacheMax, 0 ), chargeM_( PDGCacheMax, 0 ),
+  useCF_(cfg.getUntrackedParameter<bool>( "useCrossingFrame", false ) ) {
   produces<GenParticleCollection>();
   produces<SubEventMap>();
   if( saveBarCodes_ ) {
@@ -88,6 +90,10 @@ HiGenParticleProducer::HiGenParticleProducer( const ParameterSet & cfg ) :
     //The following line copied from GenParticleProducer doesn't actually append BarCodes
     produces<vector<int> >().setBranchAlias( alias + "BarCodes" );
   }				  
+
+  if(useCF_){
+     cout<<"HiGenParticleProducer is using the Crossing Frame as the input."<<endl;
+  }
 }
 
 HiGenParticleProducer::~HiGenParticleProducer() { 
@@ -129,7 +135,9 @@ void HiGenParticleProducer::beginJob( const EventSetup & es ) {
 
 void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
 
-std::vector<Handle<HepMCProduct> > heps;
+   Handle<CrossingFrame<HepMCProduct> > cf;
+   std::vector<Handle<HepMCProduct> > heps;
+   MixCollection<HepMCProduct>* cfhepmcprod;
 
   //Get total number of particles 
   size_t totalSize = 0;
@@ -140,26 +148,28 @@ std::vector<Handle<HepMCProduct> > heps;
 
   cout<<"heps size "<<heps.size()<<endl;
 
-  for(size_t i = 0; i < npiles; ++i){
-     cout<<"Tag "<<src_[i]<<endl;
-     Handle<HepMCProduct> handle;
-     heps.push_back(handle);
-     cout<<"A"<<endl;
-     evt.getByLabel( src_[i], heps[i] );
-     cout<<"B"<<endl;
-     totalSize += heps[i]->GetEvent()->particles_size();
+  if(useCF_){
+     evt.getByLabel(InputTag("mix","generator"),cf);
+     cfhepmcprod = new MixCollection<HepMCProduct>(cf.product());
+     npiles = cfhepmcprod->size();
+     for(int icf = 0; icf < npiles; ++icf){
+	totalSize += cfhepmcprod->getObject(icf).GetEvent()->particles_size();
+     }
+  }else{
+     for(size_t i = 0; i < npiles; ++i){
+	cout<<"Tag "<<src_[i]<<endl;
+	Handle<HepMCProduct> handle;
+	heps.push_back(handle);
+	evt.getByLabel( src_[i], heps[i] );
+	totalSize += heps[i]->GetEvent()->particles_size();
+     }
   }
-
-  cout<<"C"<<endl;
 
   //Initialise containers
   const size_t size = totalSize;
   vector<const HepMC::GenParticle *> particles( size );
   auto_ptr<GenParticleCollection> candsPtr( new GenParticleCollection( size ) );
   auto_ptr<SubEventMap> subsPtr( new SubEventMap() );
-
-  cout<<"D"<<endl;
-
   auto_ptr<vector<int> > barCodeVector( new vector<int>( size ) );
   const GenParticleRefProd ref = evt.getRefBeforePut<GenParticleCollection>();
   GenParticleCollection & cands = * candsPtr;
@@ -167,12 +177,14 @@ std::vector<Handle<HepMCProduct> > heps;
   size_t offset = 0;
   size_t suboffset = 0;
 
-  cout<<"E"<<endl;
-
   //Loop over all GenEvents
-for(size_t i = 0; i < npiles; ++i){
-     const GenEvent * mc = heps[i]->GetEvent();
+  for(size_t i = 0; i < npiles; ++i){
 
+     const GenEvent * mc;  
+
+     if(useCF_) mc = cfhepmcprod->getObject(i).GetEvent();
+     else mc = heps[i]->GetEvent();
+     
     //Look whether heavy ion/signal event
      bool isHI = false;
     HepMC::HeavyIon * hi = mc->heavy_ion();
@@ -279,6 +291,8 @@ nsub = hi->Ncoll_hard()+1;
   evt.put( subsPtr );
 
   if(saveBarCodes_) evt.put( barCodeVector );
+
+  if(cfhepmcprod) delete cfhepmcprod;
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
