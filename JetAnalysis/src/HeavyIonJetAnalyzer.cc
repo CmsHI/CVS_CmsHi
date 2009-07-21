@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.6 2009/06/17 15:38:16 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.7 2009/06/17 16:08:19 yilmaz Exp $
 //
 //
 
@@ -204,7 +204,7 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    double etaMax_;
    double ptMin_;
 
-   vector<string> jetSrc_;
+   edm::InputTag jetSrc_;
    string hepmcSrc_;
    edm::ESHandle < ParticleDataTable > pdt;
    edm::Service<TFileService> f;
@@ -233,7 +233,7 @@ HeavyIonJetAnalyzer::HeavyIonJetAnalyzer(const edm::ParameterSet& iConfig)
    printLists_ = iConfig.getUntrackedParameter<bool>("printLists", false);
    doCF_ = iConfig.getUntrackedParameter<bool>("doMixed", false);
    doVertices_ = iConfig.getUntrackedParameter<bool>("doVertices", false);
-   jetSrc_ = iConfig.getParameter<vector<string> >("jetSrc");
+   jetSrc_ = iConfig.getParameter<edm::InputTag>("jetSrc");
    hepmcSrc_ = iConfig.getUntrackedParameter<string>("hepmcSrc","generator");
 
    etaMax_ = iConfig.getUntrackedParameter<double>("etaMax", 2);
@@ -382,7 +382,7 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    //   edm::Handle<reco::GenJetCollection> genjets;
    edm::Handle<reco::JetView> genjets;
    //   edm::Handle<vector<reco::Jet> > genjets;
-   iEvent.getByLabel(jetSrc_[0],genjets);
+   iEvent.getByLabel(jetSrc_,genjets);
    for(int ijet = 0; ijet < genjets->size(); ++ijet){
 
       const reco::Jet* jet = &((*genjets)[ijet]);
