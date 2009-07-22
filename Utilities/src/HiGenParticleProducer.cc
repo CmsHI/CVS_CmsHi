@@ -9,8 +9,8 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/07/16 11:21:18 $
- * $Revision: 1.4 $
+ * $Date: 2009/07/20 18:17:25 $
+ * $Revision: 1.5 $
  * \author Philip Allfrey, University of Auckland
  * edited by Yetkin Yilmaz, MIT
  *
@@ -137,7 +137,7 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
 
    Handle<CrossingFrame<HepMCProduct> > cf;
    std::vector<Handle<HepMCProduct> > heps;
-   MixCollection<HepMCProduct>* cfhepmcprod;
+   MixCollection<HepMCProduct>* cfhepmcprod = 0;
 
   //Get total number of particles 
   size_t totalSize = 0;
