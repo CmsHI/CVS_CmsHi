@@ -34,6 +34,9 @@
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/GeometryVector/interface/VectorUtil.h"
 
+#include "DataFormats/Math/interface/Point3D.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
+
 using namespace std;
 using namespace edm;
 
@@ -57,6 +60,7 @@ class HiGenJetCleaner : public edm::EDProducer {
    string jetSrc_;
    double deltaR_;
    bool makeNew_;
+   bool fillDummy_;
 
 };
 
@@ -76,8 +80,8 @@ class HiGenJetCleaner : public edm::EDProducer {
 HiGenJetCleaner::HiGenJetCleaner(const edm::ParameterSet& iConfig) :
    jetSrc_(iConfig.getUntrackedParameter<string>( "src","iterativeCone5HiGenJets")),
    deltaR_(iConfig.getUntrackedParameter<double>("deltaR",0.125)),
-   makeNew_(iConfig.getUntrackedParameter<bool>("createNewCollection",false))
-
+   makeNew_(iConfig.getUntrackedParameter<bool>("createNewCollection",true)),
+   fillDummy_(iConfig.getUntrackedParameter<bool>("fillDummyEntries",true))
 {
    std::string alias = jetSrc_;
 
@@ -86,7 +90,6 @@ HiGenJetCleaner::HiGenJetCleaner(const edm::ParameterSet& iConfig) :
    else
       produces<reco::GenJetRefVector>().setBranchAlias (alias);
 }
-
 
 HiGenJetCleaner::~HiGenJetCleaner()
 {
@@ -133,43 +136,45 @@ HiGenJetCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       const reco::GenJet* jet1 = &((*genjets)[ijet]);
 
-      for(int ijet2 = 0; ijet2 < jetsize; ++ijet2){
+      if(selection[ijet] == -1){
+	 selection[ijet] = 1;
+	 for(int ijet2 = 0; ijet2 < jetsize; ++ijet2){
 
-	 const reco::GenJet* jet2 = &((*genjets)[ijet2]);
-
-	 if(Geom::deltaR(jet1->momentum(),jet2->momentum()) < deltaR_){
-	    if(jet1->et() < jet2->et()){
-	       selection[ijet] = 0;
-               removedIndices.push_back(ijet);
-	       break;
-	    }else{
-	       selection[ijet2] = 0;
-	       removedIndices.push_back(ijet2);
+	    if(ijet2 == ijet) continue;
+	    
+	    const reco::GenJet* jet2 = &((*genjets)[ijet2]);
+	    
+	    if(Geom::deltaR(jet1->momentum(),jet2->momentum()) < deltaR_){
+	       if(jet1->et() < jet2->et()){
+		  selection[ijet] = 0;
+		  removedIndices.push_back(ijet);
+		  break;
+	       }else{
+		  selection[ijet2] = 0;
+		  removedIndices.push_back(ijet2);
+	       }
 	    }
 	 }
       }
       
-      selection[ijet] = 1;
-      selectedIndices.push_back(ijet);
+      if(selection[ijet] == 1){ 
+	 selectedIndices.push_back(ijet);
+	 GenJetRef ref(genjets,ijet);
 
-      GenJetRef ref(genjets,ijet);
-
-      if(makeNew_)
-	 jets->push_back(*jet1);
-      else
-	 jetrefs->push_back(ref);
+	 if(makeNew_)
+	    jets->push_back(*jet1);
+	 else
+	    jetrefs->push_back(ref);
+	 
+      }else if(fillDummy_){
+	 reco::GenJet dummy(math::XYZTLorentzVector(-0.19,-0.19,-499,99),math::XYZPoint(-99,-99,-99),reco::GenJet::Specific());
+	 if(makeNew_)
+	    jets->push_back(dummy);
+      }
+      
+      
       
    }
-
-   /*
-
-   for(int ijet = 0; ijet < jetsize; ++ijet){
-
-   //   jets->push_back();
-
-   }
-
-   */
 
    if(makeNew_)
       iEvent.put(jets);

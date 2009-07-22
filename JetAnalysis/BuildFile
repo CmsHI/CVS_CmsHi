@@ -18,6 +18,7 @@
 <use name=DataFormats/DetId>
 <use name=DataFormats/GeometryVector>
 <use name=DataFormats/JetReco>
+<use name=DataFormats/PatCandidates>
 <use name=RecoJets/JetAlgorithms>
 
 <flags EDM_PLUGIN=1>
