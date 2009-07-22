@@ -3,6 +3,8 @@ from RecoHI.HiEgammaAlgos.HiEgammaIsolation_cff import *
 
 # PAT sequence
 from PhysicsTools.PatAlgos.producersLayer1.photonProducer_cff import *
+from PhysicsTools.PatAlgos.mcMatchLayer0.photonMatch_cfi import *
+from PhysicsTools.PatAlgos.recoLayer0.photonIsolation_cff import *
 from RecoEgamma.EgammaIsolationAlgos.gamIsolationSequence_cff import *
 from RecoEgamma.PhotonIdentification.photonId_cff import *
 
