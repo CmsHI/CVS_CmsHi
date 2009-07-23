@@ -1,0 +1,12 @@
+<use name=DataFormats/PatCandidates>
+<use name=DataFormats/RecoJets>
+<use name=DataFormats/HepMCCandidates>
+<use name=DataFormats/FWLite>
+<use name=FWCore/Framework>
+<use name=FWCore/FWLite>
+<use name=rootcintex>
+<use name=root> 
+
+<environment>
+ <bin file="HiPatBasicFWLiteAnalyzer.cc"> </bin>
+</environment>
