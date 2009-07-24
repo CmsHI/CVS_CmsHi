@@ -44,6 +44,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 
+#include "DataFormats/Common/interface/Association.h"
 #include "DataFormats/JetReco/interface/JetCollection.h"
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
@@ -144,6 +145,8 @@ struct HydjetEvent{
    float phi[MAXJETS];
    float area[MAXJETS];
 
+   int match[MAXJETS];
+
   int ncons[MAXJETS];
 
   float r20[MAXJETS];
@@ -165,6 +168,9 @@ struct HydjetEvent{
 
 class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    public:
+
+   typedef edm::Association<reco::GenJetCollection> MatchMap;
+
       explicit HeavyIonJetAnalyzer(const edm::ParameterSet&);
       ~HeavyIonJetAnalyzer();
     bool sortDeltaR(const reco::Candidate * cand1,const reco::Candidate * cand2);
@@ -185,12 +191,11 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    std::ofstream out_m;
    std::string fMFileName;
 
-  
    TTree* hydjetTree_;
-  TTree* jetTree_;
+   TTree* jetTree_;
 
    HydjetEvent hev_;
-  MyJet yet_;
+   MyJet yet_;
 
    TNtuple *ntpart;
 
@@ -201,6 +206,10 @@ class HeavyIonJetAnalyzer : public edm::EDAnalyzer {
    bool printLists_;
    bool doCF_;
    bool doVertices_;
+
+   bool matchGenJets_;
+   edm::InputTag genJetSrc_;
+
    double etaMax_;
    double ptMin_;
 
@@ -238,6 +247,9 @@ HeavyIonJetAnalyzer::HeavyIonJetAnalyzer(const edm::ParameterSet& iConfig)
 
    etaMax_ = iConfig.getUntrackedParameter<double>("etaMax", 2);
    ptMin_ = iConfig.getUntrackedParameter<double>("ptMin", 0);
+
+   matchGenJets_  = iConfig.getUntrackedParameter<bool>("matchGenJets", false);
+   if(matchGenJets_) genJetSrc_ = iConfig.getParameter<edm::InputTag>("genJetSrc");
 
    // Output
 
@@ -285,6 +297,13 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    double vz = -99;
    double vr = -99;
    const GenEvent* evt;
+
+   Handle<MatchMap> matches;
+
+   if(matchGenJets_){
+      iEvent.getByLabel(genJetSrc_,matches);
+   }
+
    
    if(doCF_){
 
@@ -399,6 +418,13 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       hev_.phi[hev_.njet] = phi;
 
       hev_.area[hev_.njet] = jet->jetArea();
+
+      if(matchGenJets_){
+	 edm::RefToBase<reco::Jet> jetRef = genjets->refAt(ijet);
+	 reco::GenJetRef genjetref = (*matches)[jetRef];
+	 
+	 hev_.match[hev_.njet] = genjetref.key();
+      }
 
       // Constituents
       std::vector<const reco::Candidate*> members = jet->getJetConstituentsQuick();
@@ -574,6 +600,7 @@ HeavyIonJetAnalyzer::beginJob(const edm::EventSetup& iSetup)
       hydjetTree_->Branch("eta",hev_.eta,"eta[njet]/F");
       hydjetTree_->Branch("phi",hev_.phi,"phi[njet]/F");
       hydjetTree_->Branch("area",hev_.area,"area[njet]/F");
+      hydjetTree_->Branch("match",hev_.match,"match[njet]/I");
 
       hydjetTree_->Branch("r20",hev_.r20,"r20[njet]/F");
       hydjetTree_->Branch("r50",hev_.r50,"r50[njet]/F");
