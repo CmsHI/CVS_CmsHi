@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from GeneratorInterface.Pythia6Interface.pythiaDefault_cff import *
 
-signal = cms.EDProducer("PythiaProducer",
+signal = cms.EDProducer("Pythia6PtYDistGun",
                     pythiaHepMCVerbosity = cms.untracked.bool(False),
                     pythiaPylistVerbosity = cms.untracked.int32(0),
                     
@@ -20,7 +20,7 @@ signal = cms.EDProducer("PythiaProducer",
                     ymin = cms.untracked.double(-10.0),
                     ymax = cms.untracked.double(10.0),
                     
-                    PythiaParameters = cms.PSet(pythiaDefaultBlock,
+                    PGunParameters = cms.PSet(pythiaDefaultBlock,
                                                 parameterSets = cms.vstring('pythiaDefault','jpsiDecay'),
                                                 jpsiDecay = cms.vstring('BRAT(858) = 0 ! switch off',
                                                                         'BRAT(859) = 1 ! switch on',
