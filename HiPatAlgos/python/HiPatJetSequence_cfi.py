@@ -1,5 +1,5 @@
 
-from PhysicsTools.PatAlgos.jetProducer_cff import *
+from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import *
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *
 from PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi import *
 
