@@ -118,17 +118,14 @@ process.muonRecoTemp = cms.Path(
 #
 # PAT Track Production
 #
-#
-# For now, the track collection globalPrimTracks is copied into generalTracks
+# For now, selection is run on the track collection globalPrimTracks and renamed generalTracks
 # which most high level reconstruction algorithms look for by default. The other track
 # collections are dropped in the EventContent to avoid confusion when looking for
 # the correct collection of tracks to analyze.
 #
 
-process.generalTracks = cms.EDFilter("TrackSelector",
-                                        src = cms.InputTag("globalPrimTracks"),
-                                        cut = cms.string('')
-                                      )
+import RecoHI.HiTracking.SelectHITracks_cfi
+process.generalTracks =  RecoHI.HiTracking.SelectHITracks_cfi.selectHiTracks.clone()
 
 process.hiTracks = cms.Path( process.generalTracks )
 
