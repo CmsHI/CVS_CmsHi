@@ -7,6 +7,7 @@
 #include "math.h"
 
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TROOT.h>
 #include <TFile.h>
 #include <TSystem.h>
@@ -38,9 +39,9 @@ int main(int argc, char* argv[])
   TH1F* muonEta_ = new TH1F("muonEta","muon eta",   100, -3.,  3.);
   TH1F* muonPhi_ = new TH1F("muonPhi","muon phi",   100, -5.,  5.);  
 
-  TH1F* muonGenPtPercentErr_ = new TH1F("muonGenPtPercentErr",
-                                        "percent error in reco muon and associated MC muon pt",
-                                         100, 0.,100.);
+  TH2F* muonPtGenPt_ = new TH2F("muonPtGenPt",
+                                        "matched MC muon pt vs reco muon pt",
+                                         100, 0.,100.,100,0.,100.);
 
   TH1F* photonPt_  = new TH1F("photonPt", "photon pt",    100,  0.,100.);
   TH1F* photonEta_ = new TH1F("photonEta","photon eta",   100, -3.,  3.);
@@ -54,9 +55,9 @@ int main(int argc, char* argv[])
   TH1F* jetEta_ = new TH1F("jetEta","jet eta",   100, -3.,  3.);
   TH1F* jetPhi_ = new TH1F("jetPhi","jet phi",   100, -5.,  5.);
 
-  TH1F* jetGenPtPercentErr_ = new TH1F("jetGenPtPercentErr", 
-                                       "percent error in jet and associated genJet pt",
-                                        100, 0.,100.);
+  TH2F* jetPtGenPt_ = new TH2F("jetPtGenPt", 
+                                       "genJet pt vs matched IC5 jet pt",
+                                        100, 0.,100.,100,0.,100);
 
   // open input file (can be located on castor)
   TFile* inFile = TFile::Open( "HIPAT_output_full.root" );
@@ -101,11 +102,9 @@ int main(int argc, char* argv[])
       muonPhi_->Fill( (*muons)[i].phi() );
 
       // If there is a matched genParticle to the muon, 
-      // get the pt error
+      // get the pt 
       if( (*muons)[i].genLepton() != NULL )
-        muonGenPtPercentErr_->Fill( fabs( (*muons)[i].pt() - 
-          (*muons)[i].genLepton()->pt() ) / 
-          (*muons)[i].pt() * 100. );
+        muonPtGenPt_->Fill( (*muons)[i].genLepton()->pt(), (*muons)[i].pt() );
     }
 
     // loop photon collection and fill histograms
@@ -122,12 +121,10 @@ int main(int argc, char* argv[])
       jetEta_->Fill( (*jets)[i].eta() );
       jetPhi_->Fill( (*jets)[i].phi() );
 
-      // If there is a matched genParticle to the muon, 
-      // get the pt error
+      // If there is a matched genJet to the jet, 
+      // get the pt 
       if( (*jets)[i].genJet() != NULL )
-        jetGenPtPercentErr_->Fill( fabs( (*jets)[i].pt() - 
-          (*jets)[i].genJet()->pt() ) / 
-          (*jets)[i].pt() * 100. );
+        jetPtGenPt_->Fill( (*jets)[i].genJet()->pt(), (*jets)[i].pt() );
     }
 
 
@@ -151,7 +148,7 @@ int main(int argc, char* argv[])
   muonPt_ ->Write( );
   muonEta_->Write( );
   muonPhi_->Write( );
-  muonGenPtPercentErr_->Write( );
+  muonPtGenPt_->Write( );
   photonPt_ ->Write( );
   photonEta_->Write( );
   photonPhi_->Write( );
@@ -159,7 +156,7 @@ int main(int argc, char* argv[])
   jetPt_ ->Write( );
   jetEta_->Write( );
   jetPhi_->Write( );
-  jetGenPtPercentErr_->Write( );
+  jetPtGenPt_->Write( );
   outFile.Close();
   
   // ----------------------------------------------------------------------
@@ -172,7 +169,7 @@ int main(int argc, char* argv[])
   delete muonPt_;
   delete muonEta_;
   delete muonPhi_;
-  delete muonGenPtPercentErr_;
+  delete muonPtGenPt_;
   delete photonPt_;
   delete photonEta_;
   delete photonPhi_;
@@ -180,7 +177,7 @@ int main(int argc, char* argv[])
   delete jetPt_;
   delete jetEta_;
   delete jetPhi_;
-  delete jetGenPtPercentErr_;
+  delete jetPtGenPt_;
   
   // that's it!
   return 0;
