@@ -9,4 +9,5 @@
 
 <environment>
  <bin file="HiPatBasicFWLiteAnalyzer.cc"> </bin>
+ <bin file="HiPatBasicJetAnalyzer.cc"> </bin>
 </environment>
