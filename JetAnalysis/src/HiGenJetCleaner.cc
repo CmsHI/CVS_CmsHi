@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Jul 21 04:26:01 EDT 2009
-// $Id: HiGenJetCleaner.cc,v 1.2 2009/07/22 16:07:31 yilmaz Exp $
+// $Id: HiGenJetCleaner.cc,v 1.3 2009/08/03 12:56:20 yilmaz Exp $
 //
 //
 
@@ -159,7 +159,7 @@ HiGenJetCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 }
       }
       
-      double etjet = &((*genjets)[ijet])->et();
+      double etjet = ((*genjets)[ijet]).et();
       
       if(selection[ijet] == 1 && etjet > ptCut_){ 
 	 selectedIndices.push_back(ijet);
