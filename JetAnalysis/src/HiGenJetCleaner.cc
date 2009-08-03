@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Jul 21 04:26:01 EDT 2009
-// $Id$
+// $Id: HiGenJetCleaner.cc,v 1.2 2009/07/22 16:07:31 yilmaz Exp $
 //
 //
 
@@ -59,6 +59,7 @@ class HiGenJetCleaner : public edm::EDProducer {
 
    string jetSrc_;
    double deltaR_;
+   double ptCut_;
    bool makeNew_;
    bool fillDummy_;
 
@@ -80,6 +81,7 @@ class HiGenJetCleaner : public edm::EDProducer {
 HiGenJetCleaner::HiGenJetCleaner(const edm::ParameterSet& iConfig) :
    jetSrc_(iConfig.getUntrackedParameter<string>( "src","iterativeCone5HiGenJets")),
    deltaR_(iConfig.getUntrackedParameter<double>("deltaR",0.125)),
+   ptCut_(iConfig.getUntrackedParameter<double>("ptCut",20)),
    makeNew_(iConfig.getUntrackedParameter<bool>("createNewCollection",true)),
    fillDummy_(iConfig.getUntrackedParameter<bool>("fillDummyEntries",true))
 {
@@ -157,10 +159,12 @@ HiGenJetCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	 }
       }
       
-      if(selection[ijet] == 1){ 
+      double etjet = &((*genjets)[ijet])->et();
+      
+      if(selection[ijet] == 1 && etjet > ptCut_){ 
 	 selectedIndices.push_back(ijet);
 	 GenJetRef ref(genjets,ijet);
-
+	 
 	 if(makeNew_)
 	    jets->push_back(*jet1);
 	 else
