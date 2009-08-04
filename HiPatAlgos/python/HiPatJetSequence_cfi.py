@@ -8,7 +8,13 @@ from PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi import *
 
 from CmsHi.JetAnalysis.IterativeCone5HiGenJets_cff import *
 from SimGeneral.HepPDTESSource.pythiapdt_cfi import *
-hiGenJetCleaner = cms.EDProducer('HiGenJetCleaner')
+hiGenJetCleaner = cms.EDProducer('HiGenJetCleaner',
+                                 src = cms.untracked.string('iterativeCone5HiGenJets'),
+                                 deltaR = cms.untracked.double(0.25),
+                                 ptCut = cms.untracked.double(20),
+                                 createNewCollection = cms.untracked.bool(True),
+                                 fillDummyEntries = cms.untracked.bool(True)
+                                 )
 
 #####################################################
 # Pat Jet Options
@@ -38,4 +44,11 @@ hiPatJetSequence = cms.Sequence(hiGenParticlesForJets *
                                 jetGenJetMatch *
                                 jetCorrFactors *
                                 allLayer1Jets)
+
+
+#####################################################
+# Cleaning
+
+from PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi import *
+selectedLayer1Jets.cut = cms.string('pt > 20.')
 
