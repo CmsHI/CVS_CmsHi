@@ -33,3 +33,13 @@ allLayer1Photons.userData.userFloats.src  = cms.VInputTag(
 allLayer1Photons.photonIDSource = cms.InputTag("PhotonIDProd","PhotonCutBasedIDLoose")
 
 hiPatPhotonSequence = cms.Sequence(hiEgammaIsolationSequence*photonIDSequence*gamIsolationSequence*patPhotonIsolation*photonMatch*allLayer1Photons)
+
+############################################
+#
+# HI PAT Photon - Selection
+#
+
+from PhysicsTools.PatAlgos.selectionLayer1.photonSelector_cfi import *
+selectedLayer1Photons.cut = cms.string('pt > 0. & abs(eta) < 12.')
+
+
