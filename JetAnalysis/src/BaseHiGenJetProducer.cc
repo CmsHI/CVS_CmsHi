@@ -1,6 +1,6 @@
 // File: BaseHiGenJetProducer.cc
 // Author: Y.Yilmaz, 2008
-// $Id: BaseHiGenJetProducer.cc,v 1.6 2009/06/16 12:38:21 yilmaz Exp $
+// $Id: BaseHiGenJetProducer.cc,v 1.7 2009/06/27 18:23:43 yilmaz Exp $
 //--------------------------------------------
 #include <memory>
 
@@ -43,13 +43,18 @@ namespace {
       const Candidate* m1 = p->mother();
       while(m1){
 	 int pdg = abs(m1->pdgId());
+	 int st = m1->status();
 	 LogDebug("SubEventMothers")<<"Pdg ID : "<<pdg<<endl;
-	 if(pdg < 9 || pdg == 21){
-	    LogDebug("SubEventMothers")<<"Parton Found! Pdg ID : "<<pdg<<endl;
+
+	 if(st == 3 || pdg < 9 || pdg == 21){
+	    LogDebug("SubEventMothers")<<"Sub-Collision  Found! Pdg ID : "<<pdg<<endl;
 	    return false;
 	 }
          const Candidate* m = m1->mother();
 	 m1 = m;
+
+	 if(!m1) LogDebug("SubEventMothers")<<"No Mother, particle is : "<<pdg<<" with status "<<st<<endl;
+
       }
       return true;
    }
@@ -157,7 +162,7 @@ namespace cms
 	   nsubparticle.resize(subevent+1);
 	}
 	
-	if(hydroTag[subevent]<0) hydroTag[subevent] = (int)checkHydro(pref);
+	if(hydroTag[subevent] != 0) hydroTag[subevent] = (int)checkHydro(pref);
 
 	if(nsubparticle[subevent]> nMax_ && hydroTag[subevent] != 1){
            LogDebug("JetsInHydro")<<"More particles than maximum particles cut, although not previously identified as sub-event, Sub-Event :  "<<subevent;
@@ -174,11 +179,16 @@ namespace cms
      
      int nsub = inputs.size();
 
+     bool hydroDone = false;
      for(int isub = 0; isub < nsub; ++isub){
 	cout<<"Processing Sub-Event : "<<isub<<endl;
 	JetReco::InputCollection & input = inputs[isub];
 	if(hydroTag[isub] == 1){
+	   if(hydroDone){
+	      throw cms::Exception("HeavyIonHydroEvent")<<"More than one Hydro sub-event found for the input, please check your MC! Second hydro id : "<<isub<<endl;
+	   }
 	   cout<<"Sub-Event number "<<isub<<" with more than "<<input.size()<<" particles, skipped as background event. Number of total sub-events: "<<nsub<<endl;
+	   hydroDone = true;
 	}else{
 
 	   if (mVerbose) {
