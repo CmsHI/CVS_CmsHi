@@ -1,3 +1,5 @@
+import FWCore.ParameterSet.Config as cms
+
 from PhysicsTools.PatAlgos.producersLayer1.muonProducer_cff import *
 from PhysicsTools.PatAlgos.mcMatchLayer0.muonMatch_cfi import *
 from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *

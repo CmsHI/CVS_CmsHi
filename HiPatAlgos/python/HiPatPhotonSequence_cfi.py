@@ -1,3 +1,5 @@
+import FWCore.ParameterSet.Config as cms
+
 # HIEgammaIsolationSequence
 from RecoHI.HiEgammaAlgos.HiEgammaIsolation_cff import *
 

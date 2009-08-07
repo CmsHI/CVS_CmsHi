@@ -1,3 +1,4 @@
+import FWCore.ParameterSet.Config as cms
 
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import *
 from PhysicsTools.PatAlgos.recoLayer0.jetCorrFactors_cfi import *

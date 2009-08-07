@@ -28,7 +28,7 @@ hiPatEventContent = cms.PSet(
                                            'keep patJets_selected*_*_*',
                                            'keep recoCentrality_*_*_*',
                                            'keep recoEvtPlane_*_*_*',
-                                           'keep recoTracks_hiTracks_*_*'
+                                           'keep recoTracks_hiGeneralTracks_*_*'
                                            )
             )
 
