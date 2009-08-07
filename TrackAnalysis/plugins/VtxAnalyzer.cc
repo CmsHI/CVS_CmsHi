@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.1 2009/06/23 13:26:13 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.1 2009/06/30 16:18:49 edwenger Exp $
 //
 //
 
@@ -43,6 +43,9 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
+
 // root include file
 #include "TFile.h"  
 #include "TNtuple.h"
@@ -71,12 +74,18 @@ class VtxAnalyzer : public edm::EDAnalyzer {
 	edm::Service<TFileService> f;
 	
 	int evtno;
-	float b;       // impact parameter
-	float vzr_avf; // reco z-vertex (adaptive vertex finder)
-	float vzr_med; // reco z-vertex (median vertex finder)
-	float vz_true; // true simulated z-vertex
-	int vs_avf;    // vertex collection sizes
+	float b;           // impact parameter
+	float vzr_avf;     // reco z-vertex (adaptive vertex finder)
+	float vzErr_avf;   // reco z-vertex error (adaptive vertex finder)
+	float vzr_med;     // reco z-vertex (median vertex finder)
+	float vzErr_med;   // reco z-vertex error (med vertex finder)
+	float vz_true;     // true simulated z-vertex
+	int vs_avf;        // vertex collection sizes
 	int vs_med;
+	int nProtoTracks;  // number of proto-tracks
+	int nProtoTracks1000; // above 1 GeV
+	int nProtoTracks700; // above 700 MeV
+	int nProtoTracks500; // above 500 MeV
 	
 };
 
@@ -129,20 +138,43 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	HepMC::HeavyIon* hi = inev->heavy_ion();
 	b=hi->impact_parameter();
 	
+	// Get pixel prototracks
+	edm::Handle<reco::TrackCollection> protoTracks;
+	iEvent.getByLabel("hiProtoTracks",protoTracks);
+	nProtoTracks=protoTracks.product()->size();
+	nProtoTracks1000=0;
+	nProtoTracks700=0;
+	nProtoTracks500=0;
+	float trackpt = -999.9;
+
+	for( TrackCollection::const_iterator track = protoTracks->begin(); 
+		track != protoTracks->end(); ++ track ) {
+		trackpt=track->pt();
+		if(trackpt>1.0) nProtoTracks1000++;
+		if(trackpt>0.7) nProtoTracks700++;
+		if(trackpt>0.5) nProtoTracks500++;
+	}
+	
 	// Get reconstructed vertices
 	edm::Handle<reco::VertexCollection> vertexCollection;
 	iEvent.getByLabel("pixel3Vertices",vertexCollection);
 	const reco::VertexCollection * vertices = vertexCollection.product();
 	vs_med=vertices->size();
-	if(vs_med>0) vzr_med=vertices->begin()->position().z();
-	else vzr_med=-999.9;
+	if(vs_med>0) {
+		vzr_med=vertices->begin()->z();
+		vzErr_med=vertices->begin()->zError();
+	} else 
+		vzr_med=-999.9;
 	
 	edm::Handle<reco::VertexCollection> vertexCollection2;
 	iEvent.getByLabel("heavyIonPrimaryVertices",vertexCollection2);
 	const reco::VertexCollection * vertices2 = vertexCollection2.product();
 	vs_avf=vertices2->size();
-	if(vs_avf>0) vzr_avf=vertices2->begin()->position().z();
-	else vzr_avf=-999.9;
+	if(vs_avf>0) {
+		vzr_avf=vertices2->begin()->z();
+		vzErr_avf=vertices2->begin()->zError();
+	} else 
+		vzr_avf=-999.9;
 	
 	// Get signal process vertex
 	HepMC::GenVertex* genvtx = inev->signal_process_vertex();
@@ -160,7 +192,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	vtx_ = &(genvtx->position());
 	vz_true = 0.1 * vtx_->z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
 	
-	nt->Fill(evtno,b,vzr_avf,vzr_med,vz_true,vs_avf,vs_med);
+	nt->Fill(evtno,b,vzr_avf,vzErr_avf,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nProtoTracks,nProtoTracks1000,nProtoTracks700,nProtoTracks500);
 
    
 }
@@ -171,7 +203,7 @@ void
 VtxAnalyzer::beginJob(const edm::EventSetup&)
 {
 	
-	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_avf:vzr_med:vz_true:vs_avf:vs_med");
+	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_avf:vzErr_avf:vzr_med:vzErr_med:vz_true:vs_avf:vs_med:nProtoTracks:nProtoTracks1000:nProtoTracks700:nProtoTracks500");
 	
 }
 
