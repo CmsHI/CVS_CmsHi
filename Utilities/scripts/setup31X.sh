@@ -5,17 +5,8 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-# Fix for 3_1_0_pre10
-if echo "$CMSSW_VERSION" | grep "CMSSW_3_1_0_pre10" >/dev/null 2>&1
-then
-  echo You are using CMSSW_3_1_0_pre10.  Must patch pyqt.xml...
-  cat $CMSSW_BASE/config/toolbox/slc4_ia32_gcc345/tools/selected/pyqt.xml | sed -e '/environment.*PYTHONPATH/d' > temp.xml
-  mv temp.xml $CMSSW_BASE/config/toolbox/slc4_ia32_gcc345/tools/selected/pyqt.xml 
-  scramv1 setup pyqt; scramv1 b clean
-fi
-
 cvs co RecoHI/Configuration
-cvs co RecoHI/HiTracking                        
+cvs co -r V01-00-04 RecoHI/HiTracking                        
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 cvs co RecoHI/HiCentralityAlgos
