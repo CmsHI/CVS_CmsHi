@@ -19,9 +19,12 @@ cvs co SimDataFormats/HiGenData
 
 # Turn off ZDC digitization
 checkOutVersion=`echo $CMSSW_VERSION | sed "s/_patch1//g"`
+ver=`echo $checkOutVersion | sed "s/CMSSW//g" | sed "s/_//g"`
+if [ $ver -lt 324 ]; then
 cvs co -r $checkOutVersion SimCalorimetry/HcalSimProducers
 cat $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigitizer.cc | replace "doZDC(true)" "doZDC(false)" | replace "e.getByLabel(\"mix\", zdcHitsName , zdccf)" "// e.getByLabel(\"mix\", zdcHitsName , zdccf)" | replace "colzdc(new MixCollection<PCaloHit>(zdccf.product()))" "colzdc(new MixCollection<PCaloHit>(new CrossingFrame<PCaloHit>))" | replace "theHitCorrection->fillChargeSums(*colzdc)" "// zdc correction" > tmp.cc
 mv tmp.cc $CMSSW_BASE/src/SimCalorimetry/HcalSimProducers/src/HcalDigitizer.cc
+fi
 
 cvs co UserCode/CmsHi
 mv UserCode/CmsHi .
