@@ -1,0 +1,9 @@
+<use name=hepmc>
+<use name=FWCore/Framework>
+<use name=DataFormats/PatCandidates>
+<use name=DataFormats/HeavyIonEvent>
+<use name=SimDataFormats/HepMCProduct>
+<flags EDM_PLUGIN=1>
+<library file=*.cc name=HiPatAlgosPlugins>
+</library>
+
