@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from GeneratorInterface.Pythia6Interface.pythiaDefault_cff import *
+from Configuration.Generator.PyquenDefaultSettings_cff import *
 
 signal = cms.EDProducer("Pythia6PtYDistGun",
                     pythiaHepMCVerbosity = cms.untracked.bool(False),
