@@ -9,8 +9,8 @@
  *
  * Based on PhysicsTools/HepMCCandAlgos/plugins/GenParticleProducer
  * 
- * $Date: 2009/07/20 18:17:25 $
- * $Revision: 1.5 $
+ * $Date: 2009/07/22 13:04:28 $
+ * $Revision: 1.6 $
  * \author Philip Allfrey, University of Auckland
  * edited by Yetkin Yilmaz, MIT
  *
@@ -66,6 +66,7 @@ class HiGenParticleProducer : public edm::EDProducer {
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 #include "SimDataFormats/HiGenData/interface/SubEventMap.h"
+#include "SimGeneral/TrackingAnalysis/interface/EncodedTruthId.h"
 
 #include <fstream>
 #include <algorithm>
@@ -89,6 +90,7 @@ HiGenParticleProducer::HiGenParticleProducer( const ParameterSet & cfg ) :
     std::string alias( cfg.getParameter<std::string>( "@module_label" ) );
     //The following line copied from GenParticleProducer doesn't actually append BarCodes
     produces<vector<int> >().setBranchAlias( alias + "BarCodes" );
+    produces<map<EncodedTruthId, unsigned int> >().setBranchAlias( alias + "BarCodes" );
   }				  
 
   if(useCF_){
@@ -171,6 +173,7 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
   auto_ptr<GenParticleCollection> candsPtr( new GenParticleCollection( size ) );
   auto_ptr<SubEventMap> subsPtr( new SubEventMap() );
   auto_ptr<vector<int> > barCodeVector( new vector<int>( size ) );
+  auto_ptr<map<EncodedTruthId, unsigned int> > truthIdToBarCodeMap( new map<EncodedTruthId, unsigned int>( ) );
   const GenParticleRefProd ref = evt.getRefBeforePut<GenParticleCollection>();
   GenParticleCollection & cands = * candsPtr;
   SubEventMap & subs = *subsPtr;
@@ -207,6 +210,7 @@ void HiGenParticleProducer::produce( Event& evt, const EventSetup& es ) {
 	  << "barcodes are duplicated! " << endl;
       particles[idx] = particle;
       (*barCodeVector)[idx] = barCode;
+      (*truthIdToBarCodeMap).insert( make_pair(EncodedTruthId(EncodedEventId(i),barCode_this_event), idx ) );
       barcodes.insert( make_pair(barCode_this_event, idx ++) );
     }
 
@@ -290,7 +294,10 @@ nsub = hi->Ncoll_hard()+1;
   evt.put( candsPtr );
   evt.put( subsPtr );
 
-  if(saveBarCodes_) evt.put( barCodeVector );
+  if(saveBarCodes_){
+    evt.put( barCodeVector );
+    evt.put( truthIdToBarCodeMap );
+  }
 
   if(cfhepmcprod) delete cfhepmcprod;
 }
