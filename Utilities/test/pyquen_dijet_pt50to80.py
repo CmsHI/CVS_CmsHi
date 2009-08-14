@@ -26,12 +26,12 @@ process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
 ##################################################################################
 # Make sure the random number generator types are consistent with standard
 
-process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
-#process.RandomNumberGeneratorService.signal = cms.PSet(process.RandomNumberGeneratorService.theSource)
-process.RandomNumberGeneratorService.signalSIM = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
+process.RandomNumberGeneratorService.hiSignal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
+#process.RandomNumberGeneratorService.hiSignal = cms.PSet(process.RandomNumberGeneratorService.theSource)
+process.RandomNumberGeneratorService.hiSignalG4SimHits = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
 
-process.RandomNumberGeneratorService.signal.initialSeed = 4
-process.RandomNumberGeneratorService.signalSIM.initialSeed = 5
+process.RandomNumberGeneratorService.hiSignal.initialSeed = 4
+process.RandomNumberGeneratorService.hiSignalG4SimHits.initialSeed = 5
 
 
 ##################################################################################
@@ -47,45 +47,45 @@ process.maxEvents = cms.untracked.PSet(
 
 ##################################################################################
 # Generate Pyquen Signal
-from GeneratorInterface.PyquenInterface.pyquenPythiaDefault_cff import *
+from Configuration.Generator.PyquenDefaultSettings_cff import *
 import GeneratorInterface.PyquenInterface.pyquenDefault_cfi
-process.signal = GeneratorInterface.PyquenInterface.pyquenDefault_cfi.generator.clone()
-process.signal.embeddingMode = cms.bool(True)
+process.hiSignal = GeneratorInterface.PyquenInterface.pyquenDefault_cfi.generator.clone()
+process.hiSignal.embeddingMode = cms.bool(True)
 
 # modifications to the default pyquen source (unquenched 100 GeV dijets)
-process.signal.PythiaParameters.parameterSets = cms.vstring('pythiaDefault','pythiaJets','kinematics')
-process.signal.PythiaParameters.kinematics = cms.vstring (
+process.hiSignal.PythiaParameters.parameterSets = cms.vstring('pythiaDefault','pythiaJets','kinematics')
+process.hiSignal.PythiaParameters.kinematics = cms.vstring (
     "CKIN(3)=100",  #min pthat
     "CKIN(4)=9999", #max pthat
     "CKIN(7)=-2.",  #min rapidity
     "CKIN(8)=2."    #max rapidity
     )	
-process.signal.doQuench = False
+process.hiSignal.doQuench = False
 
 
 ##################################################################################
-# Match vertex of the signal event to the background event
-process.load("CmsHi.Utilities.MatchVtx_cfi")
+# Match vertex of the hiSignal event to the background event
+process.load("SimGeneral.MixingModule.MatchVtx_cfi")
 
 ##################################################################################
-# Run SIM on Pyquen signal
+# Run SIM on Pyquen hiSignal
 from Configuration.StandardSequences.Simulation_cff import *
-process.signalSIM = g4SimHits
-process.signalSIM.Generator.HepMCProductLabel = 'signal' # By default it's "generator" in 3_1_x
+process.hiSignalG4SimHits = g4SimHits
+process.hiSignalG4SimHits.Generator.HepMCProductLabel = 'hiSignal' # By default it's "generator" in 3_1_x
 
 ##################################################################################
-# Embed Pyquen signal into Background source at SIM level
-from CmsHi.Utilities.EventEmbedding_cff import *
-process.mix=cms.EDProducer('HiEventEmbedder',
+# Embed Pyquen hiSignal into Background source at SIM level
+from SimGeneral.MixingModule.HiEventMixing_cff import *
+process.mix=cms.EDProducer('HiMixingModule',
                            simEventEmbeddingMixParameters,
-                           signalTag = cms.vstring("signal","signalSIM")
+                           signalTag = cms.vstring("hiSignal","hiSignalG4SimHits")
                            )
 
 ##################################################################################
 # Digi + Reconstruction
 process.load("CmsHi.Utilities.HiGenParticles_cfi")                      # hiGenParticles (sub-events)
 process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")# trackingParticles (sim tracks)
-process.mergedtruth.HepMCDataLabels = ['signal']
+process.mergedtruth.HepMCDataLabels = ['hiSignal']
 
 process.load("Configuration.StandardSequences.Digi_cff")# doAllDigi
 process.load("Configuration.StandardSequences.L1Emulator_cff")          # L1Emulator
@@ -105,7 +105,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 ##################################################################################
 # Paths
-process.sim = cms.Sequence(process.signal*process.matchVtx*process.signalSIM*process.mix)
+process.sim = cms.Sequence(process.hiSignal*process.matchVtx*process.hiSignalG4SimHits*process.mix)
 process.gen = cms.Sequence(process.hiGenParticles * process.trackingParticles)
 process.digi = cms.Sequence(process.doAllDigi*process.L1Emulator*process.DigiToRaw*process.RawToDigi)
 
