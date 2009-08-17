@@ -20,6 +20,8 @@ cvs co SimDataFormats/HiGenData
 cvs co SimGeneral/MixingModule
 cvs co SimGeneral/CrossingFrame
 
+cvs co DataFormats/HeavyIonEvent
+
 # Turn off ZDC digitization
 checkOutVersion=`echo $CMSSW_VERSION | sed "s/_patch1//g"`
 ver=`echo $checkOutVersion | sed "s/CMSSW//g" | sed "s/_//g"`
@@ -31,6 +33,15 @@ fi
 
 cvs co UserCode/yetkin/DataFormats
 mv UserCode/yetkin/DataFormats .
+
+### Do this if you need gen-level filter for signal-mixing
+### Warning: Not compatible with consistent b generation pyquen
+
+#rm -r GeneratorInterface/PyquenInterface
+#cvs co UserCode/yetkin/GeneratorInterface
+#mv UserCode/yetkin/GeneratorInterface/* GeneratorInterface/
+
+################################
 
 cvs co UserCode/CmsHi
 mv UserCode/CmsHi .
