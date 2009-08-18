@@ -44,7 +44,13 @@ mv UserCode/yetkin/DataFormats .
 ################################
 
 cvs co UserCode/CmsHi
+cvs co -r V00-01-00 UserCode/CmsHi/Utilities
 mv UserCode/CmsHi .
+
+# Not needed anymore, these are in SimGeneral
+rm CmsHi/Utilities/plugins/HiEventEmbedder.cc
+rm CmsHi/Utilities/plugins/MixEvtVtxGenerator.cc
+
 
 scramv1 b
 
