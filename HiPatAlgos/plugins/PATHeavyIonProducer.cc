@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.1 2009/08/14 11:19:11 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.2 2009/08/18 08:05:19 yilmaz Exp $
 //
 //
 
@@ -107,10 +107,10 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
-   Handle<reco::Centrality> cent;
+   Handle<reco::CentralityCollection> cent;
    iEvent.getByLabel(centSrc_,cent);   
 
-   Handle<reco::EvtPlane> evtplane;
+   Handle<reco::EvtPlaneCollection> evtplane;
    iEvent.getByLabel(evtPlaneSrc_,evtplane);
    
    double b = 0;
