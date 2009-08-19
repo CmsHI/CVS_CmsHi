@@ -14,7 +14,6 @@
 <use name=SimDataFormats/GeneratorProducts>
 <use name=SimDataFormats/CrossingFrame>
 <use name=SimDataFormats/HiGenData>
-<use name=SimGeneral/TrackingAnalysis>
 <use name=DataFormats/HepMCCandidate>
 <use name=DataFormats/JetReco>
 <use name=DataFormats/WrappedStdDictionaries>
