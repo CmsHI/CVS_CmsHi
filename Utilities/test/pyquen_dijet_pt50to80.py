@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 
-process = cms.Process("DIGI")
+process = cms.Process("RECO")
 
 process.load("SimGeneral.HepPDTESSource.pythiapdt_cfi")
 process.load("Configuration.StandardSequences.Services_cff")
@@ -8,9 +9,9 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.Generator_cff")
 
-#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#31X_pre_releases_and_integration
+#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#3XY_Releases_MC
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_31X::All'
+process.GlobalTag.globaltag = 'MC_31X_V5::All'
 
 ##################################################################################
 # Some services
@@ -27,23 +28,35 @@ process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
 # Make sure the random number generator types are consistent with standard
 
 process.RandomNumberGeneratorService.hiSignal = cms.PSet(process.RandomNumberGeneratorService.generator) # For 3_1_X
-#process.RandomNumberGeneratorService.hiSignal = cms.PSet(process.RandomNumberGeneratorService.theSource)
 process.RandomNumberGeneratorService.hiSignalG4SimHits = cms.PSet(process.RandomNumberGeneratorService.g4SimHits)
 
 process.RandomNumberGeneratorService.hiSignal.initialSeed = 4
 process.RandomNumberGeneratorService.hiSignalG4SimHits.initialSeed = 5
 
+##################################################################################
+
+# setup 'standard'  options
+options = VarParsing.VarParsing ('standard')
+
+# setup any defaults you want
+options.output = 'outputDijetEmbeddingTest_RECODEBUG.root'
+#options.files= 'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/mc/Summer09/Hydjet_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V3-GaussianVtx_312_ver1/0005/FECC5F18-1982-DE11-ACF9-001EC94BA3AE.root'
+#options.files= 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_2_4/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V3-v1/0010/D62F586C-4E84-DE11-80D3-000423D98E54.root'
+options.files= 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_2_4/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V3-v1/0010/FC70A0E1-6A84-DE11-AE66-000423D98DB4.root'
+options.maxEvents = 1 
+
+# get and parse the command line arguments
+options.parseArguments()
 
 ##################################################################################
 # Pb+Pb Background Source
 process.source = cms.Source('PoolSource',
-                            #fileNames = cms.untracked.vstring('file:///d00/yjlee/sample/hydjet_mb_2_2_4/1EA7C31D-83FB-DD11-8218-001C23BED6CA.root')
-                            fileNames = cms.untracked.vstring('dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/davidlw/HYDJET_Minbias_4TeV_31X/sim/HYDJET_Minbias_4TeV_seq11_31X.root')
-							)
-
+	fileNames = cms.untracked.vstring(options.files)
+)
+							
 process.maxEvents = cms.untracked.PSet(
-                       input = cms.untracked.int32(1)
-                       )
+    input = cms.untracked.int32(options.maxEvents)
+)
 
 ##################################################################################
 # Generate Pyquen Signal
@@ -70,8 +83,9 @@ process.load("SimGeneral.MixingModule.MatchVtx_cfi")
 ##################################################################################
 # Run SIM on Pyquen hiSignal
 from Configuration.StandardSequences.Simulation_cff import *
+
 process.hiSignalG4SimHits = g4SimHits
-process.hiSignalG4SimHits.Generator.HepMCProductLabel = 'hiSignal' # By default it's "generator" in 3_1_x
+process.hiSignalG4SimHits.Generator.HepMCProductLabel = 'hiSignal' # By default it's "generator" in 3_x_y
 
 ##################################################################################
 # Embed Pyquen hiSignal into Background source at SIM level
@@ -87,20 +101,20 @@ process.load("CmsHi.Utilities.HiGenParticles_cfi")                      # hiGenP
 process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")# trackingParticles (sim tracks)
 process.mergedtruth.HepMCDataLabels = ['hiSignal']
 
-process.load("Configuration.StandardSequences.Digi_cff")# doAllDigi
+process.load("Configuration.StandardSequences.Digi_cff")				# doAllDigi
 process.load("Configuration.StandardSequences.L1Emulator_cff")          # L1Emulator
-process.load("Configuration.StandardSequences.DigiToRaw_cff")# DigiToRaw
-process.load("Configuration.StandardSequences.RawToDigi_cff")# RawToDigi
+process.load("Configuration.StandardSequences.DigiToRaw_cff")			# DigiToRaw
+process.load("Configuration.StandardSequences.RawToDigi_cff")			# RawToDigi
 process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
 
 ##############################################################################
 # Output EDM File
-process.load("CmsHi.Utilities.HiAnalysisEventContent_cff") #load keep/drop output commands
+process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
 process.output = cms.OutputModule("PoolOutputModule",
-                                  process.HITrackAnalysisObjects,
+                                  process.RECODEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
-                                  fileName = cms.untracked.string('outputDijetEmbeddingTest_DIGI.root')
+                                  fileName = cms.untracked.string(options.output)
                                   )
 
 ##################################################################################
@@ -110,9 +124,9 @@ process.gen = cms.Sequence(process.hiGenParticles * process.trackingParticles)
 process.digi = cms.Sequence(process.doAllDigi*process.L1Emulator*process.DigiToRaw*process.RawToDigi)
 
 #process.trkreco = cms.Sequence(process.offlineBeamSpot*process.trackerlocalreco*process.heavyIonTracking)
-#process.reco = cms.Sequence(process.reconstruct_PbPb)
+process.reco = cms.Sequence(process.reconstruct_PbPb)
 
-process.p = cms.Path(process.sim * process.gen * process.digi)
+process.p = cms.Path(process.sim * process.gen * process.digi * process.reco)
 process.save = cms.EndPath(process.output)
 
 
