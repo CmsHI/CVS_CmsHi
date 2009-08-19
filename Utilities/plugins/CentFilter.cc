@@ -13,7 +13,7 @@
 //
 // Original Author:  Yongsun Kim
 //         Created:  Fri May 22 12:57:09 EDT 2009
-// $Id: CentFilter.cc,v 1.2 2009/06/25 11:53:43 yilmaz Exp $
+// $Id: CentFilter.cc,v 1.3 2009/06/25 12:21:42 yilmaz Exp $
 //
 //
 
@@ -161,14 +161,14 @@ CentFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       bin = getBin(npart,nPartCuts_);
    
    }else{
-      Handle<Centrality> cent;
+      Handle<CentralityCollection> cent;
       if(cutBase_ == "gen"){
 	 iEvent.getByLabel(InputTag("hiCentrality","genBased"),cent);
-	 bin = getBin(cent->HFEnergy(),hfGenCuts_);
+	 bin = getBin((*cent)[0].raw(),hfGenCuts_);
       }
       if(cutBase_ == "hf"){
 	 iEvent.getByLabel(InputTag("hiCentrality","recoBased"),cent);
-      bin = getBin(cent->HFEnergy(),hfCuts_);
+      bin = getBin((*cent)[0].raw(),hfCuts_);
       }
    }
    
