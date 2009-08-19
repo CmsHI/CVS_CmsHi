@@ -20,7 +20,7 @@ cvs co GeneratorInterface/HydjetInterface
 cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
 # heavy ion event mixing tools
 cvs co SimGeneral/MixingModule
-cvs co SimGeneral/CrossingFrame
+cvs co SimDataFormats/CrossingFrame
 
 # latest centrality and event plane formats
 cvs co DataFormats/HeavyIonEvent
@@ -55,7 +55,7 @@ mv UserCode/yetkin/DataFormats .
 ################################
 
 cvs co UserCode/CmsHi
-cvs co -r V00-01-00 UserCode/CmsHi/Utilities
+cvs co -r V00-01-02 UserCode/CmsHi/Utilities #HEAD as of Aug 19 without Philip's hiGenParticle modifications
 mv UserCode/CmsHi .
 
 scramv1 b
