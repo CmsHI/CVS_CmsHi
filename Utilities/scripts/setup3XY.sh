@@ -9,7 +9,7 @@ eval `scramv1 ru -sh`
 cvs co RecoHI/Configuration
 cvs co -r V01-00-04 RecoHI/HiTracking                        
 cvs co RecoHI/HiJetAlgos
-cvs co RecoHI/HiEgammaAlgos
+cvs co -r V00-00-02 RecoHI/HiEgammaAlgos
 cvs co RecoHI/HiCentralityAlgos
 cvs co -r V00-00-04 RecoHI/HiMuonAlgos
 
