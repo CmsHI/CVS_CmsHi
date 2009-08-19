@@ -11,7 +11,7 @@ cvs co -r V01-00-04 RecoHI/HiTracking
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiEgammaAlgos
 cvs co RecoHI/HiCentralityAlgos
-cvs co RecoHI/HiMuonAlgos
+cvs co -r V00-00-04 RecoHI/HiMuonAlgos
 
 # latest generator configurations
 cvs co Configuration/Generator
