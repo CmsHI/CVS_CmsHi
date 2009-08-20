@@ -17,8 +17,9 @@ cvs co -r V00-00-04 RecoHI/HiMuonAlgos
 # latest generator configurations
 cvs co Configuration/Generator
 # latest generator interfaces (consistent impact parameter generation)
+cvs co GeneratorInterface/Core
 cvs co GeneratorInterface/HydjetInterface
-cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
+cvs co GeneratorInterface/PyquenInterface
 # heavy ion event mixing tools
 cvs co SimGeneral/MixingModule
 cvs co SimDataFormats/CrossingFrame
