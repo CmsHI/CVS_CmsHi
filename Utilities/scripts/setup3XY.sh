@@ -6,13 +6,13 @@ cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
 # latest reconstruction code
-cvs co RecoHI/Configuration
-cvs co -r V01-00-04 RecoHI/HiTracking                        
-cvs co RecoHI/HiJetAlgos
-cvs co -r V00-00-02 RecoHI/HiEgammaAlgos
+cvs co -r V00-00-00 RecoHI/Configuration
+cvs co -r V01-00-05 RecoHI/HiTracking                        
+cvs co -r V00-00-01 RecoHI/HiJetAlgos
+cvs co -r V00-00-03 RecoHI/HiEgammaAlgos
+cvs co -r V00-00-05 RecoHI/HiMuonAlgos
 cvs co RecoHI/HiCentralityAlgos
 cvs co RecoHI/HiEvtPlaneAlgos
-cvs co -r V00-00-04 RecoHI/HiMuonAlgos
 
 # latest generator configurations
 cvs co Configuration/Generator
