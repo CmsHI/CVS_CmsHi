@@ -19,7 +19,7 @@ cvs co Configuration/Generator
 # latest generator interfaces (consistent impact parameter generation)
 cvs co GeneratorInterface/Core
 cvs co GeneratorInterface/HydjetInterface
-#cvs co GeneratorInterface/PyquenInterface # From UserCode for filtering. See below.
+cvs co -r embedding_v01 GeneratorInterface/PyquenInterface # genfiltering in branch
 # heavy ion event mixing tools
 cvs co SimGeneral/MixingModule
 cvs co SimDataFormats/CrossingFrame
@@ -46,12 +46,6 @@ mv tmp3 $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile
 # for heavy ion PAT candidates
 cvs co UserCode/yetkin/DataFormats
 mv UserCode/yetkin/DataFormats .
-
-### Use the code below if you need gen-level filter for signal-mixing
-### Warning: Not compatible with consistent b generation pyquen
-
-cvs co UserCode/yetkin/GeneratorInterface
-mv UserCode/yetkin/GeneratorInterface/* GeneratorInterface/
 
 ################################
 
