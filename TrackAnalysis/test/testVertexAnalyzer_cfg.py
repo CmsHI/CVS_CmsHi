@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 
 #global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'IDEAL_31X::All' 
+process.GlobalTag.globaltag = 'MC_31X_V5::All'
 
 ##################################################################################
 
@@ -21,7 +21,7 @@ options = VarParsing.VarParsing ('standard')
 # setup any defaults you want
 options.output = 'output_testVertex.root'
 options.secondaryOutput = 'edmFile_testVertex.root'
-options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/edwenger/vtx/mb/out2_numEvent1.root', 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/edwenger/vtx/mb/out3_numEvent1.root'
+options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310/HYDJET_MC31XV3_pt11_RECO_7.root'
 options.maxEvents = -1 
 
 # get and parse the command line arguments
@@ -31,7 +31,7 @@ options.parseArguments()
 # Some Services
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.debugModules = ['hiProtoTracks','pixel3Vertices']  
+process.MessageLogger.debugModules = ['hiPixel3ProtoTracks','hiPixelMedianVertex','hiPixelAdaptiveVertex']  
 process.MessageLogger.categories = ['MinBiasTracking','heavyIonHLTVertexing']
 process.MessageLogger.cerr.threshold = "DEBUG" 
 
@@ -59,13 +59,6 @@ process.maxEvents = cms.untracked.PSet(
 #Reconstruction			
 process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
 
-#HI HLT implementation of proto-tracks
-process.load("RecoHI.HiTracking.PixelProtoTracks_cfi") #hiProtoTracks
-process.pixel3Vertices.TrackCollection = 'hiProtoTracks'
-
-#Primary Vertex Producer modified for heavy ions
-process.load("RecoHI.HiTracking.HeavyIonPrimaryVertices_cfi")
-
 ##############################################################################
 # Vtx Analyzer
 process.vtxAnalyzer = cms.EDAnalyzer("VtxAnalyzer")
@@ -76,9 +69,9 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(options
 
 ##############################################################################
 # Output EDM File
-process.load("CmsHi.Utilities.HiAnalysisEventContent_cff") #load keep/drop output commands
+process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
 process.output = cms.OutputModule("PoolOutputModule",
-                                  process.HIRecoObjects,
+                                  process.RECODEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
                                   fileName = cms.untracked.string(options.secondaryOutput)
@@ -86,7 +79,6 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 ##################################################################################
 # Paths
-#process.pxlreco = cms.Path(process.offlineBeamSpot*process.trackerlocalreco*process.hiProtoTracks)
-process.vtxreco = cms.Path(process.pixel3Vertices + process.heavyIonPrimaryVertices)
+#process.vtxreco = cms.Path(process.hiPixelVertices)
 process.ana = cms.Path(process.vtxAnalyzer)
 #process.save = cms.EndPath(process.output)
