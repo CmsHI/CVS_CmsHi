@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.1 2009/06/30 16:18:49 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.2 2009/08/07 12:50:27 edwenger Exp $
 //
 //
 
@@ -135,12 +135,13 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<edm::HepMCProduct> hepEv;
 	iEvent.getByLabel("generator",hepEv);
 	const HepMC::GenEvent * inev = hepEv->GetEvent();
+	//evtno=inev->event_number();
 	HepMC::HeavyIon* hi = inev->heavy_ion();
 	b=hi->impact_parameter();
 	
 	// Get pixel prototracks
 	edm::Handle<reco::TrackCollection> protoTracks;
-	iEvent.getByLabel("hiProtoTracks",protoTracks);
+	iEvent.getByLabel("hiPixel3ProtoTracks",protoTracks);
 	nProtoTracks=protoTracks.product()->size();
 	nProtoTracks1000=0;
 	nProtoTracks700=0;
@@ -157,7 +158,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	// Get reconstructed vertices
 	edm::Handle<reco::VertexCollection> vertexCollection;
-	iEvent.getByLabel("pixel3Vertices",vertexCollection);
+	iEvent.getByLabel("hiPixelMedianVertex",vertexCollection);
 	const reco::VertexCollection * vertices = vertexCollection.product();
 	vs_med=vertices->size();
 	if(vs_med>0) {
@@ -167,7 +168,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		vzr_med=-999.9;
 	
 	edm::Handle<reco::VertexCollection> vertexCollection2;
-	iEvent.getByLabel("heavyIonPrimaryVertices",vertexCollection2);
+	iEvent.getByLabel("hiPixelAdaptiveVertex",vertexCollection2);
 	const reco::VertexCollection * vertices2 = vertexCollection2.product();
 	vs_avf=vertices2->size();
 	if(vs_avf>0) {
