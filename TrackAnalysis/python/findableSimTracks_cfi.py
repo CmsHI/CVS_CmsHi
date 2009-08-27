@@ -9,7 +9,7 @@ findableSimTracks = cms.EDFilter("HitPixelLayersTPSelection",
 	minHit = cms.int32(8),
 	minRapidity = cms.double(-2.5),
 	maxRapidity = cms.double(2.5),
-	tip = cms.double(3.5),
+	tip = cms.double(0.05), #was 3.5
 	lip = cms.double(30.0),
 	pdgId = cms.vint32()
 )
