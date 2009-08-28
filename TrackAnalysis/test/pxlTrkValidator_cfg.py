@@ -7,13 +7,29 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V2::All'
+process.GlobalTag.globaltag = 'MC_31X_V5::All'
 
-###################
+##################################################################################
 
-# message logging
-process.MessageLogger.categories = ['TrackAssociator', 'TrackValidator']
-process.MessageLogger.debugModules = ['*']
+# setup 'standard'  options
+options = VarParsing.VarParsing ('standard')
+
+# setup any defaults you want
+options.output = 'output_pxlVal.root'
+options.secondaryOutput = 'edmFile_pxlVal.root'
+#options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310/HYDJET_MC31XV3_pt11_RECO_7.root'
+options.files = '/store/relval/CMSSW_3_2_5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V5-v1/0011/FC711C9E-4F8E-DE11-8DE0-003048D2C0F4.root'
+options.maxEvents = 1 
+
+# get and parse the command line arguments
+options.parseArguments()
+
+##################################################################################
+# Some Services
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.debugModules = ['hiPixel3ProtoTracks','hiPixelMedianVertex','hiPixelAdaptiveVertex']  
+process.MessageLogger.categories = ['MinBiasTracking','heavyIonHLTVertexing']
 process.MessageLogger.cout = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
@@ -22,59 +38,49 @@ process.MessageLogger.cout = cms.untracked.PSet(
 	INFO = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
     ),
-    TrackAssociator = cms.untracked.PSet(
-        limit = cms.untracked.int32(0)
+    MinBiasTracking = cms.untracked.PSet(
+        limit = cms.untracked.int32(-1)
     ),
-    TrackValidator = cms.untracked.PSet(
+    heavyIonHLTVertexing = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
     )
 )
-process.MessageLogger.cerr = cms.untracked.PSet(
-    placeholder = cms.untracked.bool(True)
-)
 
-# memory check
+			   
 process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
                                         ignoreTotal=cms.untracked.int32(0),
                                         oncePerEventMode = cms.untracked.bool(False)
                                         )
 
-# timing service
 process.Timing = cms.Service("Timing")
 
-###################
-
-# setup 'standard'  options
-options = VarParsing.VarParsing ('standard')
-
-# register custom variables
-options.register('skipEv', 0, options.multiplicity.singleton, options.varType.int, "Number of events to skip (default=0)")		
-
-# setup any defaults you want
-options.maxEvents = -1 
-options.output = 'pxlTrkVal.root'
-inDir = "/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310"
-for seqNo in range(0,20):
-	options.files.append( 'dcache:%s/HYDJET_MC31XV3_HighPtCleaner_adaptiveVtx_RECO_%d.root' % (inDir,seqNo) )
-
-# get and parse the command line arguments
-options.parseArguments()
-
-# setup pool source
+##################################################################################
+# Input Source
+process.source = cms.Source('PoolSource',
+	noEventSort = cms.untracked.bool(True),
+	duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+	fileNames = cms.untracked.vstring(options.files) 
+)
+							
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(options.maxEvents)
 )
-process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring(options.files), 
-	skipEvents = cms.untracked.uint32(options.skipEv)
-)
+
+##################################################################################
+#Reconstruction			
+#process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
+process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff")
+process.load("Configuration.StandardSequences.RawToDigi_cff")
 
 ###################
 
+#test with slightly wider region
+#process.hiPixel3PrimTracks.RegionFactoryPSet.RegionPSet.originRadius = 0.2
+
 # reco pxl track quality cuts
 process.selectHiPxlTracks = cms.EDFilter("TrackSelector",
-  src = cms.InputTag("pixel3PrimTracks"),
-  cut = cms.string('pt > 2.0')
+  src = cms.InputTag("hiPixel3PrimTracks"),
+  cut = cms.string('pt > 1.0 && abs(eta) < 1.0')
 )
 
 # quality cuts on tracking particles
@@ -82,6 +88,10 @@ process.load("Validation.RecoTrack.cuts_cff")
 process.load("CmsHi.TrackAnalysis.findableSimTracks_cfi")
 process.findableSimTracks.minHit = 3
 process.findableSimTracks.signalOnly = True
+process.findableSimTracks.ptMin = 1.0
+process.findableSimTracks.tip = 0.05
+process.findableSimTracks.minRapidity=-1.
+process.findableSimTracks.maxRapidity=1.
 
 # track associator settings
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
@@ -97,12 +107,25 @@ process.multiTrackValidator.label_tp_effic = cms.InputTag("findableSimTracks") #
 process.multiTrackValidator.label_tp_fake  = cms.InputTag("cutsTPFake")
 process.multiTrackValidator.outputFile = options.output
 
+##############################################################################
+# Output EDM File
+process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
+process.output = cms.OutputModule("PoolOutputModule",
+                                  process.FEVTDEBUGEventContent,
+                                  compressionLevel = cms.untracked.int32(2),
+                                  commitInterval = cms.untracked.uint32(1),
+                                  fileName = cms.untracked.string(options.secondaryOutput)
+                                  )
 
 ###################
 
 # paths
+process.localreco = cms.Path(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
+process.pxlreco = cms.Path(process.hiPixelVertices*process.hiPixel3PrimTracks)
+#process.trkreco = cms.Path(process.heavyIonTracking)
 process.pcut  = cms.Path(process.selectHiPxlTracks * process.findableSimTracks * process.cutsTPFake)
 process.pval  = cms.Path(process.multiTrackValidator)
+#process.save = cms.EndPath(process.output)
 
 
 

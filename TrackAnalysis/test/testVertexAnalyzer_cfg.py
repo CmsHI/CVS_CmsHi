@@ -21,8 +21,9 @@ options = VarParsing.VarParsing ('standard')
 # setup any defaults you want
 options.output = 'output_testVertex.root'
 options.secondaryOutput = 'edmFile_testVertex.root'
-options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310/HYDJET_MC31XV3_pt11_RECO_7.root'
-options.maxEvents = -1 
+#options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310/HYDJET_MC31XV3_pt11_RECO_7.root'
+options.files = '/store/relval/CMSSW_3_2_5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V5-v1/0011/FC711C9E-4F8E-DE11-8DE0-003048D2C0F4.root'
+options.maxEvents = 1 
 
 # get and parse the command line arguments
 options.parseArguments()
@@ -33,15 +34,29 @@ options.parseArguments()
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.debugModules = ['hiPixel3ProtoTracks','hiPixelMedianVertex','hiPixelAdaptiveVertex']  
 process.MessageLogger.categories = ['MinBiasTracking','heavyIonHLTVertexing']
-process.MessageLogger.cerr.threshold = "DEBUG" 
+process.MessageLogger.cout = cms.untracked.PSet(
+    threshold = cms.untracked.string('DEBUG'),
+    DEBUG = cms.untracked.PSet(
+        limit = cms.untracked.int32(0)
+    ),
+	INFO = cms.untracked.PSet(
+        limit = cms.untracked.int32(0)
+    ),
+    MinBiasTracking = cms.untracked.PSet(
+        limit = cms.untracked.int32(-1)
+    ),
+    heavyIonHLTVertexing = cms.untracked.PSet(
+        limit = cms.untracked.int32(-1)
+    )
+)
 
 			   
-#process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
-#                                        ignoreTotal=cms.untracked.int32(0),
-#                                        oncePerEventMode = cms.untracked.bool(False)
-#                                        )
+process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
+                                        ignoreTotal=cms.untracked.int32(0),
+                                        oncePerEventMode = cms.untracked.bool(False)
+                                        )
 
-#process.Timing = cms.Service("Timing")
+process.Timing = cms.Service("Timing")
 
 ##################################################################################
 # Input Source
@@ -57,7 +72,9 @@ process.maxEvents = cms.untracked.PSet(
 
 ##################################################################################
 #Reconstruction			
-process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
+#process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
+process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff")
+process.load("Configuration.StandardSequences.RawToDigi_cff")
 
 ##############################################################################
 # Vtx Analyzer
@@ -70,6 +87,10 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(options
 ##############################################################################
 # Output EDM File
 process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
+process.moreOutputCommands = cms.PSet(
+			outputCommands=cms.untracked.vstring('keep *_hiPixel3ProtoTracks_*_*')
+			)
+process.RECODEBUGEventContent.outputCommands.extend(process.moreOutputCommands.outputCommands)
 process.output = cms.OutputModule("PoolOutputModule",
                                   process.RECODEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
@@ -79,6 +100,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 ##################################################################################
 # Paths
-#process.vtxreco = cms.Path(process.hiPixelVertices)
+process.localreco = cms.Path(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
+process.vtxreco = cms.Path(process.hiPixelVertices)
 process.ana = cms.Path(process.vtxAnalyzer)
-#process.save = cms.EndPath(process.output)
+process.save = cms.EndPath(process.output)
