@@ -4,16 +4,16 @@
 // Class:      VtxAnalyzer
 // 
 /**\class VtxAnalyzer VtxAnalyzer.cc RecoHI/VtxAnalyzer/src/VtxAnalyzer.cc
-
+ 
  Description: <one line class summary>
-
+ 
  Implementation:
-     <Notes on implementation>
-*/
+ <Notes on implementation>
+ */
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.3 2009/08/26 09:57:45 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.4 2009/08/28 07:35:23 edwenger Exp $
 //
 //
 
@@ -57,19 +57,19 @@
 //
 
 class VtxAnalyzer : public edm::EDAnalyzer {
-   public:
-      explicit VtxAnalyzer(const edm::ParameterSet&);
-      ~VtxAnalyzer();
-
-
-   private:
-      virtual void beginJob(const edm::EventSetup&) ;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&);
-      virtual void endJob() ;
-
-      // ----------member data ---------------------------
+public:
+	explicit VtxAnalyzer(const edm::ParameterSet&);
+	~VtxAnalyzer();
 	
-
+	
+private:
+	virtual void beginJob(const edm::EventSetup&) ;
+	virtual void analyze(const edm::Event&, const edm::EventSetup&);
+	virtual void endJob() ;
+	
+	// ----------member data ---------------------------
+	
+	
 	TNtuple *nt;
 	edm::Service<TFileService> f;
 	
@@ -82,10 +82,15 @@ class VtxAnalyzer : public edm::EDAnalyzer {
 	float vz_true;     // true simulated z-vertex
 	int vs_avf;        // vertex collection sizes
 	int vs_med;
+	int vs_sel;
 	int nProtoTracks;  // number of proto-tracks
 	int nProtoTracks1000; // above 1 GeV
 	int nProtoTracks700; // above 700 MeV
 	int nProtoTracks500; // above 500 MeV
+	int nProtoTracksSelect; // selected prototracks
+	
+	Float_t vzr_sel;     // reco z-vertex (best adaptive vertex found)
+	Float_t vzErr_sel;   // reco z-vertex error (best adaptive vertex found)
 	
 };
 
@@ -103,17 +108,17 @@ class VtxAnalyzer : public edm::EDAnalyzer {
 VtxAnalyzer::VtxAnalyzer(const edm::ParameterSet& iConfig)
 
 {
-   //now do what ever initialization is needed
-
+	//now do what ever initialization is needed
+	
 }
 
 
 VtxAnalyzer::~VtxAnalyzer()
 {
- 
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
-
+	
+	// do anything here that needs to be done at desctruction time
+	// (e.g. close files, deallocate resources etc.)
+	
 }
 
 
@@ -128,7 +133,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	using namespace edm;
 	using namespace HepMC;
 	using namespace reco;
-
+	
 	evtno=iEvent.id().event();
 	
 	// Get generated info
@@ -147,7 +152,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	nProtoTracks700=0;
 	nProtoTracks500=0;
 	float trackpt = -999.9;
-
+	
 	for( TrackCollection::const_iterator track = protoTracks->begin(); 
 		track != protoTracks->end(); ++ track ) {
 		trackpt=track->pt();
@@ -155,6 +160,12 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		if(trackpt>0.7) nProtoTracks700++;
 		if(trackpt>0.5) nProtoTracks500++;
 	}
+	
+	// Get selected prototracks
+	nProtoTracksSelect=0;
+	edm::Handle<reco::TrackCollection> selectedProtoTracks;
+	iEvent.getByLabel("hiSelectedProtoTracks",selectedProtoTracks);
+	nProtoTracksSelect=selectedProtoTracks.product()->size();
 	
 	// Get reconstructed vertices
 	edm::Handle<reco::VertexCollection> vertexCollection;
@@ -177,6 +188,17 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	} else 
 		vzr_avf=-999.9;
 	
+	edm::Handle<reco::VertexCollection> vertexCollection3;
+	iEvent.getByLabel("hiPixelAdaptiveVertex",vertexCollection3);
+	const reco::VertexCollection * vertices3 = vertexCollection3.product();
+	vs_sel=vertices3->size();
+	if(vs_sel>0) {
+		vzr_sel=vertices3->begin()->z();
+		vzErr_sel=vertices3->begin()->zError();
+	} else 
+		vzr_sel=-999.9;
+
+	
 	// Get signal process vertex
 	HepMC::GenVertex* genvtx = inev->signal_process_vertex();
 	
@@ -191,9 +213,9 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	vz_true = 0.1 * genvtx->position().z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
 	
-	nt->Fill(evtno,b,vzr_avf,vzErr_avf,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nProtoTracks,nProtoTracks1000,nProtoTracks700,nProtoTracks500);
-
-   
+	nt->Fill(evtno,b,vzr_sel,vzErr_sel,vzr_avf,vzErr_avf,vzr_med,vzErr_med,vz_true,vs_sel,vs_avf,vs_med,nProtoTracks,nProtoTracksSelect);
+	
+	
 }
 
 
@@ -202,7 +224,7 @@ void
 VtxAnalyzer::beginJob(const edm::EventSetup&)
 {
 	
-	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_avf:vzErr_avf:vzr_med:vzErr_med:vz_true:vs_avf:vs_med:nProtoTracks:nProtoTracks1000:nProtoTracks700:nProtoTracks500");
+	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_sel:vzErr_sel:vzr_avf:vzErr_avf:vzr_med:vzErr_med:vz_true:vs_sel:vs_avf:vs_med:nProtoTracks:nProtoTracksSelect");
 	
 }
 
