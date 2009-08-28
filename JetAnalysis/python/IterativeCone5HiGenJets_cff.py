@@ -1,25 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
-from RecoJets.Configuration.RecoGenJets_cff import *
+from RecoJets.JetProducers.ic5GenJets_cfi import iterativeCone5GenJets
 from RecoJets.Configuration.GenJetParticles_cff import *
-from RecoJets.JetProducers.IconeJetParameters_cfi import *
+from RecoJets.JetProducers.GenJetParameters_cfi import *
+from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 
 hiGenParticlesForJets = genParticlesForJets.clone()
 hiGenParticlesForJets.src = cms.InputTag("hiGenParticles")
 
-iterativeCone5HiGenJets = cms.EDProducer("IterativeConeHiGenJetProducer",
-                                         IconeJetParameters,
-                                         jetPtMin = cms.double(5.0),
-                                         inputEtMin = cms.double(0.0),
-                                         inputEMin = cms.double(0.0),
-                                         src = cms.InputTag("hiGenParticlesForJets"),
+iterativeCone5HiGenJets = cms.EDProducer("SubEventGenJetProducer",
+                                         GenJetParameters,
+                                         AnomalousCellParameters,
+                                         jetAlgorithm = cms.string("IterativeCone"),
                                          srcMap = cms.InputTag("hiGenParticles"),
-                                         jetType = cms.string('GenJet'),
-                                         alias = cms.untracked.string('IC5HiGenJet'),
-                                         coneRadius = cms.double(0.5)
+                                         rParam = cms.double(0.5)
                                          )
 
-#iterativeCone5HiGenJets.src = cms.InputTag("hiGenParticlesForJets")
+iterativeCone5HiGenJets.src = cms.InputTag("hiGenParticlesForJets")
 
 signalJets = cms.Sequence(genJetParticles*iterativeCone5GenJets)
 
