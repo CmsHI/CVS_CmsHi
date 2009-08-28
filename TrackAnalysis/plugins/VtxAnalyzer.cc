@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.2 2009/08/07 12:50:27 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.3 2009/08/26 09:57:45 edwenger Exp $
 //
 //
 
@@ -179,7 +179,6 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	// Get signal process vertex
 	HepMC::GenVertex* genvtx = inev->signal_process_vertex();
-	HepMC::FourVector* vtx_;
 	
 	if(!genvtx){
 		HepMC::GenEvent::particle_const_iterator pt=inev->particles_begin();
@@ -190,8 +189,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 	}
 	
-	vtx_ = &(genvtx->position());
-	vz_true = 0.1 * vtx_->z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
+	vz_true = 0.1 * genvtx->position().z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
 	
 	nt->Fill(evtno,b,vzr_avf,vzErr_avf,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nProtoTracks,nProtoTracks1000,nProtoTracks700,nProtoTracks500);
 
