@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.4 2009/08/28 07:35:23 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.5 2009/08/28 11:57:50 edwenger Exp $
 //
 //
 
@@ -51,6 +51,7 @@
 #include "TNtuple.h"
 #include "TH1F.h"
 
+using namespace std;
 
 //
 // class declaration
@@ -75,22 +76,21 @@ private:
 	
 	int evtno;
 	float b;           // impact parameter
+	float vzr_sel;
+	float vzErr_sel;
 	float vzr_avf;     // reco z-vertex (adaptive vertex finder)
 	float vzErr_avf;   // reco z-vertex error (adaptive vertex finder)
 	float vzr_med;     // reco z-vertex (median vertex finder)
 	float vzErr_med;   // reco z-vertex error (med vertex finder)
 	float vz_true;     // true simulated z-vertex
+	int vs_sel;
 	int vs_avf;        // vertex collection sizes
 	int vs_med;
-	int vs_sel;
 	int nProtoTracks;  // number of proto-tracks
 	int nProtoTracks1000; // above 1 GeV
 	int nProtoTracks700; // above 700 MeV
 	int nProtoTracks500; // above 500 MeV
 	int nProtoTracksSelect; // selected prototracks
-	
-	Float_t vzr_sel;     // reco z-vertex (best adaptive vertex found)
-	Float_t vzErr_sel;   // reco z-vertex error (best adaptive vertex found)
 	
 };
 
@@ -148,6 +148,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<reco::TrackCollection> protoTracks;
 	iEvent.getByLabel("hiPixel3ProtoTracks",protoTracks);
 	nProtoTracks=protoTracks.product()->size();
+	
 	nProtoTracks1000=0;
 	nProtoTracks700=0;
 	nProtoTracks500=0;
@@ -166,17 +167,19 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<reco::TrackCollection> selectedProtoTracks;
 	iEvent.getByLabel("hiSelectedProtoTracks",selectedProtoTracks);
 	nProtoTracksSelect=selectedProtoTracks.product()->size();
+	cout << nProtoTracksSelect << " selected prototracks out of " << nProtoTracks << endl;
 	
 	// Get reconstructed vertices
-	edm::Handle<reco::VertexCollection> vertexCollection;
-	iEvent.getByLabel("hiPixelMedianVertex",vertexCollection);
-	const reco::VertexCollection * vertices = vertexCollection.product();
-	vs_med=vertices->size();
-	if(vs_med>0) {
-		vzr_med=vertices->begin()->z();
-		vzErr_med=vertices->begin()->zError();
+	
+	edm::Handle<reco::VertexCollection> vertexCollection3;
+	iEvent.getByLabel("hiSelectedVertex",vertexCollection3);
+	const reco::VertexCollection * vertices3 = vertexCollection3.product();
+	vs_sel=vertices3->size();
+	if(vs_sel>0) {
+		vzr_sel=vertices3->begin()->z();
+		vzErr_sel=vertices3->begin()->zError();
 	} else 
-		vzr_med=-999.9;
+		vzr_sel=-999.9;
 	
 	edm::Handle<reco::VertexCollection> vertexCollection2;
 	iEvent.getByLabel("hiPixelAdaptiveVertex",vertexCollection2);
@@ -188,15 +191,16 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	} else 
 		vzr_avf=-999.9;
 	
-	edm::Handle<reco::VertexCollection> vertexCollection3;
-	iEvent.getByLabel("hiPixelAdaptiveVertex",vertexCollection3);
-	const reco::VertexCollection * vertices3 = vertexCollection3.product();
-	vs_sel=vertices3->size();
-	if(vs_sel>0) {
-		vzr_sel=vertices3->begin()->z();
-		vzErr_sel=vertices3->begin()->zError();
+	edm::Handle<reco::VertexCollection> vertexCollection;
+	iEvent.getByLabel("hiPixelMedianVertex",vertexCollection);
+	const reco::VertexCollection * vertices = vertexCollection.product();
+	vs_med=vertices->size();
+	if(vs_med>0) {
+		vzr_med=vertices->begin()->z();
+		vzErr_med=vertices->begin()->zError();
 	} else 
-		vzr_sel=-999.9;
+		vzr_med=-999.9;
+
 
 	
 	// Get signal process vertex
