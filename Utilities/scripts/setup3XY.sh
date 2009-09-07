@@ -19,10 +19,12 @@ cvs co Configuration/Generator
 # latest generator interfaces (consistent impact parameter generation)
 cvs co GeneratorInterface/Core
 cvs co GeneratorInterface/HydjetInterface
-cvs co -r embedding_v01 GeneratorInterface/PyquenInterface # genfiltering in branch
+cvs co GeneratorInterface/PyquenInterface # genfiltering in branch
 # heavy ion event mixing tools
-cvs co SimGeneral/MixingModule
-cvs co SimDataFormats/CrossingFrame
+cvs co -r V05-00-00 SimGeneral/MixingModule
+cvs co -r V04-00-00 SimDataFormats/CrossingFrame
+cvs co -r V03-02-00 Mixing/Base
+cvs co -r V00-15-07 FWCore/Sources
 
 # latest centrality and event plane formats
 cvs co DataFormats/HeavyIonEvent
@@ -43,14 +45,16 @@ mv tmp2.cc $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/SealModule.cc
 cat $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile | replace "RecoHI/HiMuonAlgos" "RecoHIMuon/HiMuTracking" | replace "RecoHIHiMuonAlgos" "RecoHIMuonHiMuTracking" > tmp3
 mv tmp3 $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile
 
-# for heavy ion PAT candidates
-cvs co UserCode/yetkin/DataFormats
-mv UserCode/yetkin/DataFormats .
-
 ################################
 
-cvs co UserCode/CmsHi
-cvs co -r V00-01-02 UserCode/CmsHi/Utilities #HEAD as of Aug 19 without Philip's hiGenParticle modifications
+#cvs co -r V00-01-02 UserCode/CmsHi/Utilities #HEAD as of Aug 19 without Philip's hiGenParticle modifications
+
+cvs co -r Development_34x_HeavyIons PhysicsTools/HepMCCandAlgos
+cvs co -r Development_34x_HeavyIons DataFormats/HepMCCandidate
+
+
+cvs co -r UserCode/CmsHi/Utilities/python
+cvs co -r UserCode/CmsHi/Utilities/test
 mv UserCode/CmsHi .
 
 scramv1 b
