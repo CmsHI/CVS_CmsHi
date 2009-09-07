@@ -5,6 +5,8 @@
 <use name=FWCore/ParameterSet>
 <use name=CmsHi/Utilities>
 <use name=DataFormats/HeavyIonEvent>
+<use name=SimTracker/TrackAssociation>
+<use name=SimGeneral/TrackAnalysis>
 <library file="*.cc" name=CmsHiUtilitiesPlugins>
 <flags EDM_PLUGIN=1>
 </library>
