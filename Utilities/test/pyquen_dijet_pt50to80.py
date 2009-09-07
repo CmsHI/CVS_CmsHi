@@ -89,11 +89,7 @@ process.hiSignalG4SimHits.Generator.HepMCProductLabel = 'hiSignal' # By default 
 
 ##################################################################################
 # Embed Pyquen hiSignal into Background source at SIM level
-from SimGeneral.MixingModule.HiEventMixing_cff import *
-process.mix=cms.EDProducer('HiMixingModule',
-                           simEventEmbeddingMixParameters,
-                           signalTag = cms.vstring("hiSignal","hiSignalG4SimHits")
-                           )
+process.load("SimGeneral.MixingModule.HiEventMixing_cff")
 
 ##################################################################################
 # Digi + Reconstruction
