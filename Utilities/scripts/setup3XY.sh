@@ -21,7 +21,8 @@ cvs co GeneratorInterface/Core
 cvs co GeneratorInterface/HydjetInterface
 cvs co GeneratorInterface/PyquenInterface # genfiltering in branch
 # heavy ion event mixing tools
-cvs co -r V05-00-00 SimGeneral/MixingModule
+cvs co SimGeneral/MixingModule
+#cvs co -r V05-00-00 SimGeneral/MixingModule
 cvs co -r V04-00-00 SimDataFormats/CrossingFrame
 cvs co -r V03-02-00 Mixing/Base
 cvs co -r V00-15-07 FWCore/Sources
