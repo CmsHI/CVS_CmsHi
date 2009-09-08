@@ -54,8 +54,8 @@ cvs co -r Development_34x_HeavyIons PhysicsTools/HepMCCandAlgos
 cvs co -r Development_34x_HeavyIons DataFormats/HepMCCandidate
 
 
-cvs co -r UserCode/CmsHi/Utilities/python
-cvs co -r UserCode/CmsHi/Utilities/test
+cvs co UserCode/CmsHi/Utilities/python
+cvs co UserCode/CmsHi/Utilities/test
 mv UserCode/CmsHi .
 
 scramv1 b
