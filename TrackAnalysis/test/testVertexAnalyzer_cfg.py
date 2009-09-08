@@ -32,8 +32,8 @@ options.parseArguments()
 # Some Services
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.debugModules = ['hiPixel3ProtoTracks','hiPixelMedianVertex','hiPixelAdaptiveVertex']  
-process.MessageLogger.categories = ['MinBiasTracking','heavyIonHLTVertexing']
+process.MessageLogger.debugModules = ['*']  
+process.MessageLogger.categories = ['HeavyIonVertexing','heavyIonHLTVertexing']
 process.MessageLogger.cout = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
@@ -42,9 +42,9 @@ process.MessageLogger.cout = cms.untracked.PSet(
 	INFO = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
     ),
-    MinBiasTracking = cms.untracked.PSet(
+    HeavyIonVertexing = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
-    ),
+	),
     heavyIonHLTVertexing = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
     )
@@ -76,6 +76,9 @@ process.maxEvents = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 
+#test functionality of best vertex selector
+#process.hiPixelAdaptiveVertex.TrackLabel = cms.InputTag("hiPixel3ProtoTracks")
+
 ##############################################################################
 # Vtx Analyzer
 process.vtxAnalyzer = cms.EDAnalyzer("VtxAnalyzer")
@@ -87,12 +90,8 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(options
 ##############################################################################
 # Output EDM File
 process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
-process.moreOutputCommands = cms.PSet(
-			outputCommands=cms.untracked.vstring('keep *_hiPixel3ProtoTracks_*_*')
-			)
-process.RECODEBUGEventContent.outputCommands.extend(process.moreOutputCommands.outputCommands)
 process.output = cms.OutputModule("PoolOutputModule",
-                                  process.RECODEBUGEventContent,
+                                  process.FEVTDEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
                                   commitInterval = cms.untracked.uint32(1),
                                   fileName = cms.untracked.string(options.secondaryOutput)
