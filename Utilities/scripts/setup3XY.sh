@@ -5,6 +5,10 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
+checkOutVersion=`echo $CMSSW_VERSION | sed "s/_pre1//g" | sed "s/_pre2//g" | sed "s/_pre3//g"`
+ver=`echo $checkOutVersion | sed "s/CMSSW//g" | sed "s/_//g"`
+if [ $ver -lt 330 ]; then
+
 # latest reconstruction code
 cvs co -r V00-00-00 RecoHI/Configuration
 cvs co -r V01-00-05 RecoHI/HiTracking                        
@@ -60,4 +64,6 @@ mv UserCode/CmsHi .
 
 scramv1 b
 
-
+else
+echo "This script is for 3_1_X and 3_2_X only. Use setup33X.sh for 3_3_X please!"
+fi
