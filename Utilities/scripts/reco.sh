@@ -1,1 +1,1 @@
-cmsDriver.py hiReco -s RAW2DIGI,RECO --scenario HeavyIons --conditions FrontierConditions_GlobalTag,MC_31X_V5::All --filein=/store/relval/CMSSW_3_2_6/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0014/52946882-8A9B-DE11-A675-000423D990CC.root -n 10 --no_exec
+cmsDriver.py hiReco -s RAW2DIGI,RECO --scenario HeavyIons --conditions FrontierConditions_GlobalTag,MC_31X_V5::All --datatier 'GEN-SIM-RECO' --eventcontent=RECODEBUG --filein=/store/relval/CMSSW_3_2_6/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0014/52946882-8A9B-DE11-A675-000423D990CC.root -n 10 --no_exec
