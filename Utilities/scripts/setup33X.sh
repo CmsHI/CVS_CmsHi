@@ -21,10 +21,10 @@ cvs co -r V06-00-00 DataFormats/HepMCCandidate
 # HI Event Content
 cvs co -r V00-00-05 RecoHI/Configuration
 cvs co UserCode/edwenger/Misc
-mv UserCode/edwenger/Misc/EventContentHeavyIons_cff.py Configuration/EventContent
-mv UserCode/edwenger/Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration
-mv UserCode/edwenger/Misc/DigiHiMix_cff.py Configuration/StandardSequences
-mv UserCode/edwenger/Misc/ConfigBuilder.py Configuration/PyReleaseValidation
+mv UserCode/edwenger/Misc/EventContentHeavyIons_cff.py Configuration/EventContent/python
+mv UserCode/edwenger/Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration/python
+#mv UserCode/edwenger/Misc/DigiHiMix_cff.py Configuration/StandardSequences/python
+mv UserCode/edwenger/Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python
 
 # HI Utilities and Examples
 cvs co UserCode/CmsHi/Utilities/python
