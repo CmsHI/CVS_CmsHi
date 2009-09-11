@@ -5,13 +5,28 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-cvs co SimGeneral/MixingModule
-cvs co Configuration/Generator
-cvs co Configuration/StandardSequences
+# latest configurations
+cvs co SimGeneral/MixingModule/python           # HiMixing Configuration
+cvs co SimGeneral/Configuration                 # HiMixing Event Content
+cvs co Configuration/Generator                  # HiSignal Generation
+cvs co Configuration/StandardSequences          
+cvs co Configuration/EventContent
+cvs co Configuration/PyReleaseValidation
 
-# Needed for HiGenParticles - to be in release soon
-cvs co -r Development_34x_HeavyIons PhysicsTools/HepMCCandAlgos
-cvs co -r Development_34x_HeavyIons DataFormats/HepMCCandidate
+# 330_pre4 features
+cvs co -r V11-00-00 PhysicsTools/HepMCCandAlgos # HI GenParticles
+cvs co -r V06-00-00 DataFormats/HepMCCandidate
+#cvs co -r V04-00-00 SimGeneral/TrackingAnalysis # HI TrackingParticles
+
+# HI Event Content
+cvs co -r V00-00-05 RecoHI/Configuration
+cvs co UserCode/edwenger/Misc
+mv UserCode/edwenger/Misc/EventContentHeavyIons_cff.py Configuration/EventContent
+mv UserCode/edwenger/Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration
+mv UserCode/edwenger/Misc/DigiHiMix_cff.py Configuration/StandardSequences
+mv UserCode/edwenger/Misc/ConfigBuilder.py Configuration/PyReleaseValidation
+
+# HI Utilities and Examples
 cvs co UserCode/CmsHi/Utilities/python
 cvs co UserCode/CmsHi/Utilities/test
 
