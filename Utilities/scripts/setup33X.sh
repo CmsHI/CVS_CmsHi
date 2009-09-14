@@ -30,6 +30,9 @@ mv UserCode/edwenger/Misc/ConfigBuilder.py Configuration/PyReleaseValidation/pyt
 cvs co UserCode/CmsHi/Utilities/python
 cvs co UserCode/CmsHi/Utilities/test
 
+cp UserCode/CmsHi/Utilities/python/mixHiSignal_cff.py SimGeneral/MixingModule/python/
+cp UserCode/CmsHi/Utilities/python/HiGenParticles_cfi.py PhysicsTools/HepMCCandAlgos/python
+
 # Stuff needed for PAT and Jet Analysis
 cvs co UserCode/CmsHi/JetAnalysis
 cvs co UserCode/CmsHi/HiPatAlgos
