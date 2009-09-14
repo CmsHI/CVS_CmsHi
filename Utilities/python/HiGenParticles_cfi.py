@@ -1,7 +1,14 @@
 import FWCore.ParameterSet.Config as cms
 
 hiGenParticles = cms.EDProducer('HiGenParticleProducer',
-src = cms.vstring("hiSignal","generator"),
-saveBarCodes = cms.untracked.bool(True),
-useCrossingFrame = cms.untracked.bool(False)
-)
+                                srcVector = cms.vstring("hiSignal","generator"),
+                                doSubEvent = cms.untracked.bool(True),
+                                useCrossingFrame = cms.untracked.bool(False),
+                                saveBarCodes = cms.untracked.bool(True)
+                                )
+
+#hiGenParticles = cms.EDProducer('HiGenParticleProducer',
+#src = cms.vstring("hiSignal","generator"),
+#saveBarCodes = cms.untracked.bool(True),
+#useCrossingFrame = cms.untracked.bool(False)
+#)
