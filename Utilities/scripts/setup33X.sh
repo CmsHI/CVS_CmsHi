@@ -18,6 +18,10 @@ cvs co -r V11-00-00 PhysicsTools/HepMCCandAlgos  # HI GenParticleProducer
 cvs co -r V06-00-00 DataFormats/HepMCCandidate   # HI GenParticle format
 #cvs co -r V04-00-00 SimGeneral/TrackingAnalysis  # HI TrackingTruthProducer
 
+# 330_pre5
+cvs co -r V00-11-13 IOMC/RandomEngine
+
+
 # HI Event Content
 cvs co -r V00-00-05 RecoHI/Configuration        # for modified RecoHI_EventContent_cff
 cvs co UserCode/edwenger/Misc
