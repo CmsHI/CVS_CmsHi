@@ -26,7 +26,7 @@ process.load('Configuration.Generator.Pyquen_GammaJet_pt20_4TeV_cfi')
 process.load('SimGeneral.MixingModule.mixHiSignal_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.140 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('hiReco nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -38,7 +38,7 @@ process.options = cms.untracked.PSet(
 )
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/relval/CMSSW_3_3_0_pre1/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V5-v1/0012/ECD0FB45-6796-DE11-B075-001D09F28D54.root')
+    fileNames = cms.untracked.vstring('/store/relval/CMSSW_3_3_0_pre3/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0015/22EFEE98-4EA1-DE11-BEFC-001D09F2B30B.root')
 )
 
 # Output definition
@@ -55,7 +55,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 # Additional output definition
 
 # Other statements
-process.GlobalTag.globaltag = 'MC_31X_V5::All'
+process.GlobalTag.globaltag = 'MC_31X_V8::All'
 
 # Path and EndPath definitions
 process.signal_step = cms.Path(process.hiSignalSequence)
