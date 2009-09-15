@@ -26,7 +26,7 @@ process.load('Configuration.Generator.Pyquen_GammaJet_pt20_4TeV_cfi')
 process.load('SimGeneral.MixingModule.mixHiSignal_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('hiReco nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -38,7 +38,12 @@ process.options = cms.untracked.PSet(
 )
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/relval/CMSSW_3_3_0_pre3/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0015/22EFEE98-4EA1-DE11-BEFC-001D09F2B30B.root')
+    fileNames = cms.untracked.vstring('/store/relval/CMSSW_3_3_0_pre3/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0015/22EFEE98-4EA1-DE11-BEFC-001D09F2B30B.root'),
+    # Temporarily need to define by hand
+    inputCommands = cms.untracked.vstring('drop *',
+                                          'keep *_generator_*_*',
+                                          'keep *_g4SimHits_*_*'
+                                          )
 )
 
 # Output definition
