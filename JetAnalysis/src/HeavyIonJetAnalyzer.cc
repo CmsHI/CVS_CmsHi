@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Dec 18 09:44:41 EST 2007
-// $Id: HeavyIonJetAnalyzer.cc,v 1.7 2009/06/17 16:08:19 yilmaz Exp $
+// $Id: HeavyIonJetAnalyzer.cc,v 1.9 2009/07/24 12:39:14 yilmaz Exp $
 //
 //
 
@@ -454,7 +454,7 @@ HeavyIonJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       for(int im = 0; im < nm; ++im){
 	const reco::Candidate* candi = members[im];
 	double dr = deltaR(jet->eta(),jet->phi(),candi->eta(),candi->phi());
-	cout<<"Constiutuent's Delta R = "<<dr<<endl;
+	LogDebug("JetContent")<<"Constiutuent's Delta R = "<<dr<<endl;
 
 	double phicon = candi->phi()-phi0;
 	if(phicon > PI) phicon = phicon - 2*PI;
