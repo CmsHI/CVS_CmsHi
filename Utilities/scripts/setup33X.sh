@@ -16,27 +16,28 @@ cvs co Configuration/PyReleaseValidation        # for modified ConfigBuilder
 # 330_pre4 features
 cvs co -r V11-00-00 PhysicsTools/HepMCCandAlgos  # HI GenParticleProducer
 cvs co -r V06-00-00 DataFormats/HepMCCandidate   # HI GenParticle format
-#cvs co -r V04-00-00 SimGeneral/TrackingAnalysis  # HI TrackingTruthProducer
-
-# 330_pre5
-cvs co -r V00-11-13 IOMC/RandomEngine
-
 
 # HI Event Content
 cvs co -r V00-00-05 RecoHI/Configuration        # for modified RecoHI_EventContent_cff
-cvs co UserCode/edwenger/Misc
-mv UserCode/edwenger/Misc/EventContentHeavyIons_cff.py Configuration/EventContent/python
-mv UserCode/edwenger/Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration/python
-#mv UserCode/edwenger/Misc/DigiHiMix_cff.py Configuration/StandardSequences/python
-mv UserCode/edwenger/Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python
+cvs co -d Misc UserCode/edwenger/Misc
+mv Misc/EventContentHeavyIons_cff.py Configuration/EventContent/python
+mv Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration/python
+mv Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python
 
-# HI Utilities and Examples
-cvs co UserCode/CmsHi/Utilities/python
-cvs co UserCode/CmsHi/Utilities/test
+# HI Tracking Particles
+cvs co -r V04-00-00 SimGeneral/TrackingAnalysis                    # HI TrackingTruthProducer
+mv Misc/TrackerPSimHitSelector.cc SimGeneral/TrackingAnalysis/src  # fix for PSimHit pointer
+mv Misc/DigiHiMix_cff.py Configuration/StandardSequences/python    # Digi sequence using hiTrackingParticles
+rm -r Misc
 
-cp UserCode/CmsHi/Utilities/python/mixHiSignal_cff.py SimGeneral/MixingModule/python/
-cp UserCode/CmsHi/Utilities/python/HiGenParticles_cfi.py PhysicsTools/HepMCCandAlgos/python/
-cp UserCode/CmsHi/Utilities/python/IOMC_cff.py IOMC/RandomEngine/python/
+# HI GenParticle and Mixing configurations
+cvs co -d Utilities UserCode/CmsHi/Utilities
+cp Utilities/python/HiGenParticles_cfi.py PhysicsTools/HepMCCandAlgos/python/ # hiGenParticles
+cp Utilities/python/mixHiSignal_cff.py SimGeneral/MixingModule/python/        # with hiGenParticles 
+rm -r Utilities
+
+# Random numbers for HI Mixing
+cvs co -r V00-11-13 IOMC/RandomEngine           # hiSignal and hiSignalG4SimHits added 
 
 # Stuff needed for PAT and Jet Analysis
 cvs co UserCode/CmsHi/JetAnalysis
