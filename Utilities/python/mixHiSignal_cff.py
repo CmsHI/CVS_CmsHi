@@ -2,7 +2,6 @@ import FWCore.ParameterSet.Config as cms
 
 ##################################################################################
 # Run SIM on Pyquen hiSignal
-
 from Configuration.StandardSequences.Simulation_cff import *
 hiSignalG4SimHits = g4SimHits.clone()
 hiSignalG4SimHits.Generator.HepMCProductLabel = 'hiSignal' # By default it's "generator" in 3_x_y
@@ -21,3 +20,4 @@ from PhysicsTools.HepMCCandAlgos.HiGenParticles_cfi import *
 hiGenParticles.srcVector = ["hiSignal","generator"]
 
 hiSignalSequence = cms.Sequence(cms.SequencePlaceholder("hiSignal")*matchVtx*hiGenParticles*hiSignalG4SimHits)
+
