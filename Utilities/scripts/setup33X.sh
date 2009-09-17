@@ -23,10 +23,11 @@ cvs co -d Misc UserCode/edwenger/Misc
 mv Misc/EventContentHeavyIons_cff.py Configuration/EventContent/python
 mv Misc/HiMixing_EventContent_cff.py SimGeneral/Configuration/python
 mv Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python
+mv Misc/MixingHiSignal_cff.py Configuration/StandardSequences/python
 
 # HI Tracking Particles
-cvs co -r V04-00-00 SimGeneral/TrackingAnalysis                    # HI TrackingTruthProducer
-mv Misc/TrackerPSimHitSelector.cc SimGeneral/TrackingAnalysis/src  # fix for PSimHit pointer
+cvs co -r V04-00-01 SimGeneral/TrackingAnalysis                    # HI TrackingTruthProducer
+#mv Misc/TrackerPSimHitSelector.cc SimGeneral/TrackingAnalysis/src  # fix for PSimHit pointer (fixed in V04-00-01)
 mv Misc/DigiHiMix_cff.py Configuration/StandardSequences/python    # Digi sequence using hiTrackingParticles
 rm -r Misc
 
@@ -37,7 +38,7 @@ cp Utilities/python/mixHiSignal_cff.py SimGeneral/MixingModule/python/        # 
 rm -r Utilities
 
 # Random numbers for HI Mixing
-cvs co -r V00-11-13 IOMC/RandomEngine           # hiSignal and hiSignalG4SimHits added 
+cvs co -r V00-11-13 IOMC/RandomEngine/python           # hiSignal and hiSignalG4SimHits added 
 
 # Stuff needed for PAT and Jet Analysis
 cvs co UserCode/CmsHi/JetAnalysis
