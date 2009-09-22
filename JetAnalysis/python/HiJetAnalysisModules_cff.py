@@ -11,24 +11,24 @@ genParticles.src = cms.InputTag("signal")
 L2L3CorJetIC5Calo.src = cms.InputTag("iterativeConePu5CaloJets")
 
 recoevent = cms.EDAnalyzer('HeavyIonJetAnalyzer',
-                                   jetSrc = cms.vstring('iterativeConePu5CaloJets'),
+                                   jetSrc = cms.InputTag('iterativeConePu5CaloJets'),
                                    doParticles = cms.untracked.bool(True),
                                    doVertices = cms.untracked.bool(False)
                                    )
 
 corrected = cms.EDAnalyzer('HeavyIonJetAnalyzer',
-                                   jetSrc = cms.vstring('L2L3CorJetIC5Calo'),
+                                   jetSrc = cms.InputTag('L2L3CorJetIC5Calo'),
                                    doParticles = cms.untracked.bool(False),
                                    doVertices = cms.untracked.bool(False)
                                    )
 
 signalevent =  cms.EDAnalyzer('HeavyIonJetAnalyzer',
-                                      jetSrc = cms.vstring('iterativeCone5GenJets'),
+                                      jetSrc = cms.InputTag('iterativeCone5GenJets'),
                                       doParticles = cms.untracked.bool(False)
                                       )
 
 genevent = cms.EDAnalyzer('HeavyIonJetAnalyzer',
-                                  jetSrc = cms.vstring('iterativeCone5HiGenJets'),
+                                  jetSrc = cms.InputTag('iterativeCone5HiGenJets'),
                                   doParticles = cms.untracked.bool(False)
                                   )
 
