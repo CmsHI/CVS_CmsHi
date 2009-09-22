@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.2 2009/08/18 08:05:19 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.3 2009/08/19 14:20:49 yilmaz Exp $
 //
 //
 
@@ -55,6 +55,7 @@ class PATHeavyIonProducer : public edm::EDProducer {
       // ----------member data ---------------------------
 
    bool doMC_;
+   bool doReco_;
    std::vector<std::string> hepmcSrc_;
    edm::InputTag centSrc_;
    edm::InputTag evtPlaneSrc_;
@@ -79,8 +80,12 @@ PATHeavyIonProducer::PATHeavyIonProducer(const edm::ParameterSet& iConfig)
    produces<pat::HeavyIon>();
 
    //now do what ever other initialization is needed
-   centSrc_ = iConfig.getParameter<edm::InputTag>("centrality");
-   evtPlaneSrc_ = iConfig.getParameter<edm::InputTag>("evtPlane");
+   doReco_ = iConfig.getParameter<bool>("doReco");
+   if(doReco_){
+      centSrc_ = iConfig.getParameter<edm::InputTag>("centrality");
+      evtPlaneSrc_ = iConfig.getParameter<edm::InputTag>("evtPlane");
+   }
+
    doMC_ = iConfig.getParameter<bool>("doMC");
    if(doMC_) iConfig.getParameter<std::vector<std::string> >("generators");
 
@@ -108,11 +113,13 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace edm;
 
    Handle<reco::CentralityCollection> cent;
-   iEvent.getByLabel(centSrc_,cent);   
-
    Handle<reco::EvtPlaneCollection> evtplane;
-   iEvent.getByLabel(evtPlaneSrc_,evtplane);
-   
+
+   if(doReco_){
+      iEvent.getByLabel(centSrc_,cent);
+      iEvent.getByLabel(evtPlaneSrc_,evtplane);
+   }
+
    double b = 0;
    int npart = 0;
    int ncoll = 0;
@@ -137,10 +144,20 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
    }
    
+   const reco::CentralityCollection * pcent = 0;
+   const reco::EvtPlaneCollection * pevtp = 0;
+
+   if(doReco_){
+      pcent = cent.product();
+      pevtp = evtplane.product();
+   }else{
+      pcent = new reco::CentralityCollection();
+      pevtp = new reco::EvtPlaneCollection();
+   }
+   
    if(doMC_){
-      std::auto_ptr<pat::HeavyIon> pOut(new pat::HeavyIon(
-							  *(cent.product()),
-							  *(evtplane.product()),
+      std::auto_ptr<pat::HeavyIon> pOut(new pat::HeavyIon(*pcent,
+							  *pevtp,
 							  b,
 							  npart,
 							  ncoll,
@@ -150,12 +167,15 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       iEvent.put(pOut);
    }else{
-      std::auto_ptr<pat::HeavyIon> pOut(new pat::HeavyIon(
-							  *(cent.product()),
-							  *(evtplane.product())
+      std::auto_ptr<pat::HeavyIon> pOut(new pat::HeavyIon(*pcent,
+                                                          *pevtp
 							  ));
       iEvent.put(pOut);
    }
+
+   if(pcent) delete pcent;
+   if(pevtp) delete pevtp;
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
