@@ -19,6 +19,7 @@ cvs co -r V02-00-00 SimGeneral/Configuration    # for HiMixing_EventContent
 cvs co -d Misc UserCode/edwenger/Misc
 mv Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python  # with HISIGNAL step
 mv Misc/DigiHiMix_cff.py Configuration/StandardSequences/python    # hiTrackingParticles
+mv Misc/ReconstructionHeavyIons_cff.py Configuration/StandardSequences/python # use imported globalRecoPbPb sequence
 rm -r Misc
 
 # Stuff needed for PAT and Jet Analysis
