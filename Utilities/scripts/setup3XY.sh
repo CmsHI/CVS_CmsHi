@@ -52,16 +52,8 @@ mv tmp3 $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile
 
 ################################
 
-#cvs co -r V00-01-02 UserCode/CmsHi/Utilities #HEAD as of Aug 19 without Philip's hiGenParticle modifications
-
-cvs co -r Development_34x_HeavyIons PhysicsTools/HepMCCandAlgos
-cvs co -r Development_34x_HeavyIons DataFormats/HepMCCandidate
-
-
-cvs co UserCode/CmsHi/Utilities/python
-cvs co UserCode/CmsHi/Utilities/test
-mv UserCode/CmsHi .
-
+cvs co -r V00-01-02 -d CmsHi/Utilities UserCode/CmsHi/Utilities
+cvs co -r cmshi_32X -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 scramv1 b
 
 else
