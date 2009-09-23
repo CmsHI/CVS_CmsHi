@@ -20,7 +20,7 @@ cvs co RecoHI/HiMuonAlgos/python   # for muonRecoPbPb sequence
 
 cvs co -d Misc UserCode/edwenger/Misc
 #mv Misc/DigiHiMix_cff.py Configuration/StandardSequences/python    # hiTrackingParticles
-mv Misc/ConfigBuilder_cff.py Configuration/PyReleaseValidation/python  #hiTrackingParticles without DigiHiMix
+mv Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python  #hiTrackingParticles without DigiHiMix
 mv Misc/ReconstructionHeavyIons_cff.py Configuration/StandardSequences/python # use imported globalRecoPbPb sequence
 mv Misc/IOMC_cff.py IOMC/RandomEngine/python                       # with hiSignalLHCTransport for extended geometry
 rm -r Misc
