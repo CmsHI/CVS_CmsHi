@@ -6,10 +6,11 @@ cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
 cvs co -r ap33X-branch Configuration/PyReleaseValidation # for modified ConfigBuilder
-cvs co  RecoHI/Configuration                             # for modified RecoHI_EventContent_cff
+cvs co -r V00-00-06 RecoHI/Configuration                 # for latest reco and evt content
 cvs co -r V02-00-00 SimGeneral/Configuration             # for HiMixing_EventContent
 addpkg Configuration/StandardSequences                   # for modified ReconstructionHeavyIons_cff
-cvs co RecoHI/HiMuonAlgos/python                         # for muonRecoPbPb sequence
+cvs co -r V00-00-09 RecoHI/HiMuonAlgos/python            # for muonRecoPbPb sequence
+cvs co -r V00-00-04 RecoHI/HiEgammaAlgos                 # for proper isolation variables
 
 cvs co -d Misc UserCode/edwenger/Misc
 mv Misc/ReconstructionHeavyIons_cff.py Configuration/StandardSequences/python # use imported globalRecoPbPb sequence
