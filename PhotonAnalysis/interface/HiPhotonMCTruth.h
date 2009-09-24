@@ -28,6 +28,7 @@ class HiPhotonMCTruth
   HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle, edm::Handle<edm::SubEventMap> subs);
   bool indexMatch(const reco::Candidate &pp1);
   bool IsPrompt(const reco::GenParticle &pp);
+  bool IsPrompt(const reco::Candidate &pp);
   bool IsIsolated(const reco::Candidate &pp);
   
  private:

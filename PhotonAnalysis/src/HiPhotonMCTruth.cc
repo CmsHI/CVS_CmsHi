@@ -96,3 +96,28 @@ bool HiPhotonMCTruth::IsPrompt(const reco::GenParticle &pp)
   
   
 }
+
+bool HiPhotonMCTruth::IsPrompt(const reco::Candidate &pp)
+{
+  using namespace std;
+  if ( pp.pdgId() != 22)
+    return false;
+
+  if ( pp.mother() ==0 ) 
+    {
+      //      cout <<    "No mom for this particle.." << endl;
+      return false;
+    }
+  else 
+    {
+      if (pp.mother()->pdgId() == 22)
+	{
+	  cout << " found a prompt photon" << endl;
+	  return true;
+	}
+      else
+	return false;
+    }
+  
+  
+}
