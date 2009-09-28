@@ -1,17 +1,16 @@
 import FWCore.ParameterSet.Config as cms
 
-# HIEgammaIsolationSequence
-from RecoHI.HiEgammaAlgos.HiEgammaIsolation_cff import *
-
 # PAT sequence
 from PhysicsTools.PatAlgos.producersLayer1.photonProducer_cff import *
 from PhysicsTools.PatAlgos.mcMatchLayer0.photonMatch_cfi import *
 from PhysicsTools.PatAlgos.recoLayer0.photonIsolation_cff import *
-from RecoEgamma.EgammaIsolationAlgos.gamIsolationSequence_cff import *
-from RecoEgamma.PhotonIdentification.photonId_cff import *
+
+# HIEgammaIsolationSequence  (Must be decleared after PAT Sequence Yen-Jie)
+from RecoHI.HiEgammaAlgos.HiEgammaIsolation_cff import *
+
 
 # Use genParticles for the moment
-photonMatch.matched = cms.InputTag("genParticles")
+photonMatch.matched = cms.InputTag("hiGenParticles")
 
 allLayer1Photons.addPhotonID = cms.bool(True)
 allLayer1Photons.addGenMatch = cms.bool(True)
@@ -34,7 +33,7 @@ allLayer1Photons.userData.userFloats.src  = cms.VInputTag(
 # Use Loose ID for the moment (pp algo)
 allLayer1Photons.photonIDSource = cms.InputTag("PhotonIDProd","PhotonCutBasedIDLoose")
 
-hiPatPhotonSequence = cms.Sequence(hiEgammaIsolationSequence*photonIDSequence*gamIsolationSequence*patPhotonIsolation*photonMatch*allLayer1Photons)
+hiPatPhotonSequence = cms.Sequence(hiEgammaIsolationSequence*patPhotonIsolation*photonMatch*allLayer1Photons)
 
 ############################################
 #
