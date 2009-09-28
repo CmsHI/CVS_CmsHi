@@ -5,15 +5,9 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-cvs co -r ap33X-branch Configuration/PyReleaseValidation # for modified ConfigBuilder
-cvs co -r V00-00-06 RecoHI/Configuration                 # for latest reco and evt content
-cvs co -r V02-00-00 SimGeneral/Configuration             # for HiMixing_EventContent
-addpkg Configuration/StandardSequences                   # for modified ReconstructionHeavyIons_cff
-cvs co -r V00-00-09 RecoHI/HiMuonAlgos/python            # for muonRecoPbPb sequence
-cvs co -r V00-00-04 RecoHI/HiEgammaAlgos                 # for proper isolation variables
+# all reco stuff is in 330_pre5
 
-cvs co -d Misc UserCode/edwenger/Misc
-mv Misc/ReconstructionHeavyIons_cff.py Configuration/StandardSequences/python # use imported globalRecoPbPb sequence
-rm -r Misc
+# some code under development may be checked out:
+# cvs co -r hiTrkFilter_BRANCH RecoHI/HiTracking
 
 scramv1 b
