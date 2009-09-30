@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.4 2009/09/22 15:31:22 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.5 2009/09/30 09:22:55 yilmaz Exp $
 //
 //
 
@@ -175,9 +175,10 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(pOut);
    }
 
-   //   if(pcent) delete pcent;
-   //   if(pevtp) delete pevtp;
-
+   if(!doReco_){
+     if(pcent) delete pcent;
+     if(pevtp) delete pevtp;
+   }
 }
 
 // ------------ method called once each job just before starting event loop  ------------

@@ -4,6 +4,7 @@ from CmsHi.HiPatAlgos.HiPatPhotonSequence_cfi import *
 from CmsHi.HiPatAlgos.HiPatJetSequence_cfi import *
 from CmsHi.HiPatAlgos.HiPatMuonSequence_cfi import *
 from CmsHi.HiPatAlgos.heavyIon_cfi import *
+#from RecoHI.HiTracking.HISelectedTracks_cfi import *
 
 hiPatProductionSequence = cms.Sequence(
     heavyIon *
@@ -13,6 +14,7 @@ hiPatProductionSequence = cms.Sequence(
     )
 
 hiPatSelectionSequence = cms.Sequence(
+#    hiSelectedTracks +
     selectedLayer1Muons +
     selectedLayer1Photons +
     selectedLayer1Jets
@@ -28,14 +30,14 @@ hiPatEventContent = cms.PSet(
                                            'keep patPhotons_selected*_*_*',
                                            'keep patMuons_selected*_*_*',
                                            'keep patJets_selected*_*_*',
-#                                           'keep recoCentrality_*_*_*',
-#                                           'keep recoEvtPlane_*_*_*',
-                                           'keep patHeavyIon_heavyIon_*_*',
-                                           'keep recoTracks_hiGeneralTracks_*_*'
+                                           'keep patHeavyIon_heavyIon_*_*'
                                            )
-            )
+    )
 
-hiPatExtra = cms.PSet( outputCommands = cms.untracked.vstring('keep *_hiGenParticles_*_*'))
+hiPatExtra = cms.PSet( outputCommands = cms.untracked.vstring('keep *_hiGenParticles_*_*',
+                                                              'keep recoGenJets_*_*_*', # until a better solution
+                                                              'keep recoTracks_hiSelectedTracks_*_*'
+                                                              ))
 
 hiPatExtraEventContent = hiPatEventContent.clone()
 hiPatExtraEventContent.outputCommands.extend(hiPatExtra.outputCommands)
