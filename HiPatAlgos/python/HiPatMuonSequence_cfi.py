@@ -9,6 +9,7 @@ from PhysicsTools.PatAlgos.selectionLayer1.muonSelector_cfi import *
 # Heavy Ion pat::Muon Production
 #
 
+muonMatch.matched = cms.InputTag("hiGenParticles")
 allLayer1Muons.embedGenMatch = cms.bool(True)
 
 hiPatMuonSequence = cms.Sequence( muonMatch * allLayer1Muons )

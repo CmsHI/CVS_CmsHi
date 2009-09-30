@@ -27,6 +27,7 @@ allLayer1Jets.addJetCharge = cms.bool(False)
 allLayer1Jets.addBTagInfo = cms.bool(False)
 allLayer1Jets.addDiscriminators = cms.bool(False)
 allLayer1Jets.addTagInfos = cms.bool(False)
+allLayer1Jets.addJetID = cms.bool(False)
 allLayer1Jets.getJetMCFlavour = cms.bool(False)
 allLayer1Jets.addGenJetMatch = cms.bool(True)
 

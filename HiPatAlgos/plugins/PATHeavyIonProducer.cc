@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.3 2009/08/19 14:20:49 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.4 2009/09/22 15:31:22 yilmaz Exp $
 //
 //
 
@@ -37,6 +37,8 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 
 #include "HepMC/HeavyIon.h"
+
+using namespace std;
 
 //
 // class decleration
@@ -173,8 +175,8 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       iEvent.put(pOut);
    }
 
-   if(pcent) delete pcent;
-   if(pevtp) delete pevtp;
+   //   if(pcent) delete pcent;
+   //   if(pevtp) delete pevtp;
 
 }
 
