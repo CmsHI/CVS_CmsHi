@@ -5,13 +5,10 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-# latest configurations
-cvs co Configuration/Generator               # for hiSignal GEN configs
-addpkg Configuration/PyReleaseValidation     # for modified ConfigBuilder
+# all reco/mixing stuff is in 330_pre6
 
-cvs co -d Misc UserCode/edwenger/Misc
-mv Misc/ConfigBuilder.py Configuration/PyReleaseValidation/python  #hiTrackingParticles without DigiHiMix
-rm -r Misc
+# some code under development may be checked out:
+# cvs co -r hiTrkFilter_BRANCH RecoHI/HiTracking
 
 # Stuff needed for PAT and Jet Analysis
 #cvs co UserCode/CmsHi/JetAnalysis
