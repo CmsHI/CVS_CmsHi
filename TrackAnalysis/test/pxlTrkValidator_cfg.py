@@ -7,7 +7,7 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V5::All'
+process.GlobalTag.globaltag = 'MC_31X_V8::All'
 
 ##################################################################################
 
@@ -17,8 +17,8 @@ options = VarParsing.VarParsing ('standard')
 # setup any defaults you want
 options.output = 'output_pxlVal.root'
 options.secondaryOutput = 'edmFile_pxlVal.root'
-#options.files= 'dcache:/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310/HYDJET_MC31XV3_pt11_RECO_7.root'
-options.files = '/store/relval/CMSSW_3_2_5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V5-v1/0011/FC711C9E-4F8E-DE11-8DE0-003048D2C0F4.root'
+#options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/D2E41C64-41AB-DE11-890F-001D09F2932B.root'
+options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/E61657FD-9AAB-DE11-B79D-001D09F2437B.root'
 options.maxEvents = 1 
 
 # get and parse the command line arguments
@@ -30,7 +30,7 @@ options.parseArguments()
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.debugModules = ['hiPixel3ProtoTracks','hiPixelMedianVertex','hiPixelAdaptiveVertex']  
 process.MessageLogger.categories = ['MinBiasTracking','heavyIonHLTVertexing']
-process.MessageLogger.cout = cms.untracked.PSet(
+process.MessageLogger.cerr = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
@@ -68,14 +68,22 @@ process.maxEvents = cms.untracked.PSet(
 
 ##################################################################################
 #Reconstruction			
-#process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
 process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 
 ###################
 
-#test with slightly wider region
+#Modified parameters
 #process.hiPixel3PrimTracks.RegionFactoryPSet.RegionPSet.originRadius = 0.2
+
+#process.hiPixel3PrimTracks.FilterPSet.useClusterShape = False
+process.hiPixel3PrimTracks.FilterPSet.nSigmaTipMaxTolerance = 6.0
+process.hiPixel3PrimTracks.FilterPSet.tipMax = 0.3
+process.hiPixel3PrimTracks.FilterPSet.chi2 = 1000.
+
+process.hiPixel3PrimTracks.CleanerPSet.ComponentName="TrackCleaner"
+
+###################
 
 # reco pxl track quality cuts
 process.selectHiPxlTracks = cms.EDFilter("TrackSelector",
@@ -96,7 +104,7 @@ process.findableSimTracks.maxRapidity=1.
 # track associator settings
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
 process.TrackAssociatorByHits.SimToRecoDenominator = 'reco' #quality = purity i.e. (shared/reco)
-process.TrackAssociatorByHits.ThreeHitTracksAreSpecial = True #require all hits shared on 3-hit tracks
+process.TrackAssociatorByHits.ThreeHitTracksAreSpecial = True #require all hits shared on 3-hit tracks (default)
 
 # setup pxl track validator
 process.load("Validation.RecoTrack.MultiTrackValidator_cff")
@@ -109,7 +117,7 @@ process.multiTrackValidator.outputFile = options.output
 
 ##############################################################################
 # Output EDM File
-process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
+process.load("Configuration.EventContent.EventContentHeavyIons_cff") #load keep/drop output commands
 process.output = cms.OutputModule("PoolOutputModule",
                                   process.FEVTDEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),

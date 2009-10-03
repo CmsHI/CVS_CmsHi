@@ -7,14 +7,14 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V2::All'
+process.GlobalTag.globaltag = 'MC_31X_V8::All'
 
 ###################
 
 # message logging
 process.MessageLogger.categories = ['TrackAssociator', 'TrackValidator']
 process.MessageLogger.debugModules = ['*']
-process.MessageLogger.cout = cms.untracked.PSet(
+process.MessageLogger.cerr = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
@@ -66,14 +66,15 @@ process.maxEvents = cms.untracked.PSet(
 )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.files), 
-	skipEvents = cms.untracked.uint32(options.skipEv)
+    skipEvents = cms.untracked.uint32(options.skipEv),
+    inputCommands = cms.untracked.vstring("drop *_hiSelectedTracks_*_*"),
+    dropDescendantsOfDroppedBranches = cms.untracked.bool(False)
 )
 
 ###################
 
 # reco track quality cuts
-process.load("RecoHI.HiTracking.SelectHITracks_cfi")
-process.selectHiTracks.cut = cms.string('pt > 2.0 && d0/d0Error<3. && recHitsSize>12. && chi2prob(chi2,ndof)>0.01')
+process.load("RecoHI.HiTracking.HISelectedTracks_cfi")
 
 # sim track quality cuts: pt>2, nhit>8, # of hit pixel layers >=3, etc.
 process.load("Validation.RecoTrack.cuts_cff")
@@ -88,7 +89,7 @@ process.TrackAssociatorByHits.UseGrouped = cms.bool(False)               # group
 process.load("Validation.RecoTrack.MultiTrackValidator_cff")
 process.multiTrackValidator.associators = cms.vstring('TrackAssociatorByHits')
 process.multiTrackValidator.UseAssociators = True
-process.multiTrackValidator.label = ['selectHiTracks'] # selection on globalPrimTracks
+process.multiTrackValidator.label = ['hiSelectedTracks'] # selection on globalPrimTracks
 process.multiTrackValidator.label_tp_effic = cms.InputTag("findableSimTracks") # selection on mergedtruth
 process.multiTrackValidator.label_tp_fake  = cms.InputTag("cutsTPFake")
 process.multiTrackValidator.outputFile = options.output
@@ -97,7 +98,7 @@ process.multiTrackValidator.outputFile = options.output
 ###################
 
 # paths
-process.pcut  = cms.Path(process.selectHiTracks * process.findableSimTracks * process.cutsTPFake)
+process.pcut  = cms.Path(process.hiSelectedTracks * process.findableSimTracks * process.cutsTPFake)
 process.pval  = cms.Path(process.multiTrackValidator)
 
 

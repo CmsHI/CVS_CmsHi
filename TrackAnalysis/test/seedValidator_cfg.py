@@ -7,14 +7,14 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V2::All'
+process.GlobalTag.globaltag = 'MC_31X_V8::All'
 
 ###################
 
 # message logging
 process.MessageLogger.categories = ['TrackAssociator', 'TrackValidator']
 process.MessageLogger.debugModules = ['*']
-process.MessageLogger.cout = cms.untracked.PSet(
+process.MessageLogger.cerr = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
@@ -85,7 +85,7 @@ process.TrackAssociatorByHits.ThreeHitTracksAreSpecial = True #require all hits 
 # setup track seed validator
 process.load("Validation.RecoTrack.TrackerSeedValidator_cff")
 process.trackerSeedValidator.associators = cms.vstring('TrackAssociatorByHits')
-process.trackerSeedValidator.label = cms.VInputTag(cms.InputTag("primSeeds"))
+process.trackerSeedValidator.label = cms.VInputTag(cms.InputTag("hiPixelTrackSeeds"))
 process.trackerSeedValidator.label_tp_fake = cms.InputTag("cutsTPFake")
 process.trackerSeedValidator.label_tp_effic = cms.InputTag("findableSimTracks")
 process.trackerSeedValidator.outputFile = options.output
