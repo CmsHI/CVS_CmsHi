@@ -9,9 +9,10 @@ process.load("Configuration.StandardSequences.Services_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 
-#global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions#22X_Releases_starting_from_CMSSW
+#global tags for conditions data:
+#https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V5::All'
+process.GlobalTag.globaltag = 'MC_31X_V8::All'
 
 ##################################################################################
 
@@ -34,7 +35,7 @@ options.parseArguments()
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.debugModules = ['*']  
 process.MessageLogger.categories = ['HeavyIonVertexing','heavyIonHLTVertexing']
-process.MessageLogger.cout = cms.untracked.PSet(
+process.MessageLogger.cerr = cms.untracked.PSet(
     threshold = cms.untracked.string('DEBUG'),
     DEBUG = cms.untracked.PSet(
         limit = cms.untracked.int32(0)
@@ -71,8 +72,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 ##################################################################################
-#Reconstruction			
-#process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
+#Reconstruction		
 process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 
@@ -89,7 +89,7 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(options
 
 ##############################################################################
 # Output EDM File
-process.load("RecoHI.Configuration.RecoHI_EventContent_cff") #load keep/drop output commands
+process.load("Configuration.EventContent.EventContentHeavyIons_cff")
 process.output = cms.OutputModule("PoolOutputModule",
                                   process.FEVTDEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
