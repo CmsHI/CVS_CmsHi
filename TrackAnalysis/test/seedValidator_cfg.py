@@ -29,9 +29,6 @@ process.MessageLogger.cerr = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
     )
 )
-process.MessageLogger.cerr = cms.untracked.PSet(
-    placeholder = cms.untracked.bool(True)
-)
 
 # memory check
 process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',

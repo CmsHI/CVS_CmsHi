@@ -7,7 +7,7 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V8::All'
+process.GlobalTag.globaltag = 'MC_31X_V9::All'
 
 ###################
 
@@ -29,9 +29,6 @@ process.MessageLogger.cerr = cms.untracked.PSet(
         limit = cms.untracked.int32(-1)
     )
 )
-process.MessageLogger.cerr = cms.untracked.PSet(
-    placeholder = cms.untracked.bool(True)
-)
 
 # memory check
 process.SimpleMemoryCheck = cms.Service('SimpleMemoryCheck',
@@ -51,12 +48,13 @@ options = VarParsing.VarParsing ('standard')
 options.register('skipEv', 0, options.multiplicity.singleton, options.varType.int, "Number of events to skip (default=0)")		
 
 # setup any defaults you want
-options.maxEvents = -1 
+options.maxEvents = 2 
 options.output = 'trkVal.root'
-inDir = "/pnfs/cmsaf.mit.edu/hibat/cms/mc/hydjet_b4_310"
-for seqNo in range(0,20):
-	options.files.append( 'dcache:%s/HYDJET_MC31XV3_HighPtCleaner_adaptiveVtx_RECO_%d.root' % (inDir,seqNo) )
-
+options.secondaryOutput = 'edmFile.root'
+inDir = "/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/edwenger/HYDJET_B0_4.0TeV"
+for seqNo in range(1,10):
+	options.files.append( 'dcache:%s/dijet80_MIX_RECO_%d.root' % (inDir,seqNo) )
+	
 # get and parse the command line arguments
 options.parseArguments()
 
@@ -67,7 +65,7 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(options.files), 
     skipEvents = cms.untracked.uint32(options.skipEv),
-    inputCommands = cms.untracked.vstring("drop *_hiSelectedTracks_*_*"),
+    inputCommands = cms.untracked.vstring('keep *', 'drop *_hiSelectedTracks_*_*'),
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False)
 )
 
@@ -75,10 +73,11 @@ process.source = cms.Source("PoolSource",
 
 # reco track quality cuts
 process.load("RecoHI.HiTracking.HISelectedTracks_cfi")
+process.hiSelectedTracks.ptMin=2.0
 
 # sim track quality cuts: pt>2, nhit>8, # of hit pixel layers >=3, etc.
 process.load("Validation.RecoTrack.cuts_cff")
-process.load("CmsHi.TrackAnalysis.findableSimTracks_cfi") 
+process.load("CmsHi.TrackAnalysis.findableSimTracks_cfi")
 
 # track associator settings
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")	 # sim to reco associator
@@ -97,9 +96,25 @@ process.multiTrackValidator.outputFile = options.output
 
 ###################
 
+# Output EDM File
+process.load("Configuration.EventContent.EventContentHeavyIons_cff") #load keep/drop output commands
+process.output = cms.OutputModule("PoolOutputModule",
+                                  process.FEVTDEBUGEventContent,
+                                  compressionLevel = cms.untracked.int32(2),
+                                  commitInterval = cms.untracked.uint32(1),
+                                  fileName = cms.untracked.string(options.secondaryOutput)
+                                  )
+
+###################
+
 # paths
-process.pcut  = cms.Path(process.hiSelectedTracks * process.findableSimTracks * process.cutsTPFake)
+process.pcut  = cms.Path(process.hiSelectedTracks 
+			* process.findableSimTracks
+			* process.cutsTPFake
+			)
 process.pval  = cms.Path(process.multiTrackValidator)
+#process.save = cms.EndPath(process.output)
+
 
 
 
