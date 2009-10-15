@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.5 2009/09/30 09:22:55 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.6 2009/09/30 11:25:47 yilmaz Exp $
 //
 //
 
@@ -138,7 +138,7 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    nhard = nhard + hi->Ncoll_hard();
 	    int np = hi->Npart_proj() + hi->Npart_targ();
 	    if(np > 0){
-	       npart = hi->Npart_proj();
+	       npart = np;
 	       b = hi->impact_parameter();
 	       phi = hi->event_plane_angle();
 	    }
