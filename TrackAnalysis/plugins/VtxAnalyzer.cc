@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.5 2009/08/28 11:57:50 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.6 2009/08/28 12:14:54 edwenger Exp $
 //
 //
 
@@ -45,6 +45,13 @@
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+
+#include "Geometry/TrackerGeometryBuilder/interface/TrackerLayerIdAccessor.h" 	 
+#include "DataFormats/Common/interface/DetSetAlgorithm.h"
+
+#include "DataFormats/Common/interface/DetSetVector.h"    
+#include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHitCollection.h"
+#include "DataFormats/SiPixelDetId/interface/PXBDetId.h"
 
 // root include file
 #include "TFile.h"  
@@ -86,11 +93,13 @@ private:
 	int vs_sel;
 	int vs_avf;        // vertex collection sizes
 	int vs_med;
+        float nEstTracks; // estimated tracks from polynomial function
 	int nProtoTracks;  // number of proto-tracks
 	int nProtoTracks1000; // above 1 GeV
 	int nProtoTracks700; // above 700 MeV
 	int nProtoTracks500; // above 500 MeV
 	int nProtoTracksSelect; // selected prototracks
+        int nPixelHits; // first layer pixel hits
 	
 };
 
@@ -216,8 +225,25 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
 	
 	vz_true = 0.1 * genvtx->position().z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
+
+
+	// number of first layer pixel hits
+	edm::Handle<SiPixelRecHitCollection> recHitColl;
+	iEvent.getByLabel("siPixelRecHits", recHitColl);
 	
-	nt->Fill(evtno,b,vzr_sel,vzErr_sel,vzr_avf,vzErr_avf,vzr_med,vzErr_med,vz_true,vs_sel,vs_avf,vs_med,nProtoTracks,nProtoTracksSelect);
+	std::vector<const TrackingRecHit*> theChosenHits; 	 
+	TrackerLayerIdAccessor acc; 	 
+	edmNew::copyDetSetRange(*recHitColl,theChosenHits,acc.pixelBarrelLayer(1)); 	 
+	nPixelHits = theChosenHits.size(); 
+
+	// fit from MC information
+	float aa = 1.90935e-04;
+	float bb = -2.90167e-01;
+	float cc = 3.86125e+02;
+	nEstTracks = aa*nPixelHits*nPixelHits+bb*nPixelHits+cc;
+
+	
+	nt->Fill(evtno,b,vzr_sel,vzErr_sel,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nEstTracks,nProtoTracks,nProtoTracksSelect,nPixelHits);
 	
 	
 }
@@ -228,7 +254,7 @@ void
 VtxAnalyzer::beginJob(const edm::EventSetup&)
 {
 	
-	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_sel:vzErr_sel:vzr_avf:vzErr_avf:vzr_med:vzErr_med:vz_true:vs_sel:vs_avf:vs_med:nProtoTracks:nProtoTracksSelect");
+	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_sel:vzErr_sel:vzr_med:vzErr_med:vz_true:vs_avf:vs_med:nEstTracks:nProtoTracks:nProtoTracksSelect:nPixelHits");
 	
 }
 
