@@ -23,6 +23,7 @@ options = VarParsing.VarParsing ('standard')
 options.output = 'output_testVertex.root'
 options.secondaryOutput = 'edmFile_testVertex.root'
 options.files = [
+       
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/F8157400-F0B6-DE11-8940-001D09F29114.root',
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/E82BBD98-F4B6-DE11-B138-001D09F2A690.root',
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/E6F3BDBD-F9B6-DE11-BDAD-001D09F2437B.root',
@@ -36,7 +37,9 @@ options.files = [
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/60C0481F-EFB6-DE11-985C-000423D98634.root',
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/50A27EB5-E7B6-DE11-86F7-000423D9A2AE.root',
        '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/3C01DE3C-F2B6-DE11-BB35-001D09F2AD4D.root',
-       '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/2E0345BE-06B7-DE11-9DC3-001D09F291D7.root' ]
+       '/store/relval/CMSSW_3_3_0/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V9-v1/0008/2E0345BE-06B7-DE11-9DC3-001D09F291D7.root'
+    
+    ]
 options.maxEvents = 1 
 
 # get and parse the command line arguments
@@ -93,6 +96,11 @@ process.load("Configuration.StandardSequences.RawToDigi_cff")
 #process.hiPixelAdaptiveVertex.TrackLabel = cms.InputTag("hiPixel3ProtoTracks")
 
 ##############################################################################
+# Findable sim tracks
+process.load("CmsHi.TrackAnalysis.findableSimTracks_cfi")
+process.findableSimTracks.ptMin = 1.0
+process.findableSimTracks.minHit = 3
+
 # Vtx Analyzer
 process.vtxAnalyzer = cms.EDAnalyzer("VtxAnalyzer")
 # output file service
@@ -103,6 +111,8 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string(options
 ##############################################################################
 # Output EDM File
 process.load("Configuration.EventContent.EventContentHeavyIons_cff")
+testContent=cms.PSet(outputCommands=cms.untracked.vstring('keep *_*_*_TEST'))
+process.FEVTDEBUGEventContent.outputCommands.extend(testContent.outputCommands)
 process.output = cms.OutputModule("PoolOutputModule",
                                   process.FEVTDEBUGEventContent,
                                   compressionLevel = cms.untracked.int32(2),
@@ -114,5 +124,5 @@ process.output = cms.OutputModule("PoolOutputModule",
 # Paths
 process.localreco = cms.Path(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
 process.vtxreco = cms.Path(process.hiPixelVertices)
-process.ana = cms.Path(process.vtxAnalyzer)
+process.ana = cms.Path(process.findableSimTracks * process.vtxAnalyzer)
 process.save = cms.EndPath(process.output)

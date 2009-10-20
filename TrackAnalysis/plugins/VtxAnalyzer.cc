@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.6 2009/08/28 12:14:54 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.7 2009/10/16 15:40:27 edwenger Exp $
 //
 //
 
@@ -45,6 +45,9 @@
 
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticleFwd.h"
 
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerLayerIdAccessor.h" 	 
 #include "DataFormats/Common/interface/DetSetAlgorithm.h"
@@ -94,6 +97,7 @@ private:
 	int vs_avf;        // vertex collection sizes
 	int vs_med;
         float nEstTracks; // estimated tracks from polynomial function
+        int nSelectSimTracks; // sim tracks that pass selection (pt>1, primary)
 	int nProtoTracks;  // number of proto-tracks
 	int nProtoTracks1000; // above 1 GeV
 	int nProtoTracks700; // above 700 MeV
@@ -242,8 +246,14 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	float cc = 3.86125e+02;
 	nEstTracks = aa*nPixelHits*nPixelHits+bb*nPixelHits+cc;
 
+	// get the number of primary tracking particles with pt > 1 GeV
+	edm::Handle<TrackingParticleCollection> simCollection;
+	iEvent.getByLabel("findableSimTracks",simCollection);
+	nSelectSimTracks = simCollection.product()->size();
+
+
 	
-	nt->Fill(evtno,b,vzr_sel,vzErr_sel,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nEstTracks,nProtoTracks,nProtoTracksSelect,nPixelHits);
+	nt->Fill(evtno,b,vzr_sel,vzErr_sel,vzr_med,vzErr_med,vz_true,vs_avf,vs_med,nEstTracks,nSelectSimTracks,nProtoTracks,nProtoTracksSelect,nPixelHits);
 	
 	
 }
@@ -254,7 +264,7 @@ void
 VtxAnalyzer::beginJob(const edm::EventSetup&)
 {
 	
-	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_sel:vzErr_sel:vzr_med:vzErr_med:vz_true:vs_avf:vs_med:nEstTracks:nProtoTracks:nProtoTracksSelect:nPixelHits");
+	nt = f->make<TNtuple>("nt","Vertex Testing","evtno:b:vzr_sel:vzErr_sel:vzr_med:vzErr_med:vz_true:vs_avf:vs_med:nEstTracks:nSelectSimTracks:nProtoTracks:nProtoTracksSelect:nPixelHits");
 	
 }
 
