@@ -7,9 +7,7 @@ from PhysicsTools.PatAlgos.mcMatchLayer0.jetMatch_cfi import *
 #####################################################
 # Heavy Ion Specific Jet Modules
 
-from RecoHI.HiJetAlgos.IterativeCone5HiGenJets_cff import *
-from SimGeneral.HepPDTESSource.pythiapdt_cfi import *
-hiGenJetCleaner = cms.EDProducer('HiGenJetCleaner',
+hiCleanedGenJets = cms.EDProducer('HiGenJetCleaner',
                                  src = cms.untracked.string('iterativeCone5HiGenJets'),
                                  deltaR = cms.untracked.double(0.25),
                                  ptCut = cms.untracked.double(20),
@@ -38,15 +36,12 @@ allLayer1Jets.jetSource = cms.InputTag("iterativeConePu5CaloJets")
 # (Placeholder for validated corrections)
 jetCorrFactors.jetSource = cms.InputTag("iterativeConePu5CaloJets")
 jetGenJetMatch.src = cms.InputTag("iterativeConePu5CaloJets")
-jetGenJetMatch.matched = cms.InputTag("hiGenJetCleaner")
+jetGenJetMatch.matched = cms.InputTag("hiCleanedGenJets")
 
-hiPatJetSequence = cms.Sequence(hiGenParticlesForJets *
-                                iterativeCone5HiGenJets*
-                                hiGenJetCleaner *
+hiPatJetSequence = cms.Sequence(hiCleanedGenJets *
                                 jetGenJetMatch *
                                 jetCorrFactors *
                                 allLayer1Jets)
-
 
 #####################################################
 # Cleaning

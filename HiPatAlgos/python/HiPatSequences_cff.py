@@ -34,8 +34,8 @@ hiPatEventContent = cms.PSet(
                                            )
     )
 
-hiPatExtra = cms.PSet( outputCommands = cms.untracked.vstring('keep *_hiGenParticles_*_*',
-                                                              'keep recoGenJets_*_*_*', # until a better solution
+hiPatExtra = cms.PSet( outputCommands = cms.untracked.vstring('keep recoGenParticles_hiGenParticles_*_*',
+                                                              'keep recoGenJets_iterativeCone5HiGenJets_*_*', # until a better solution
                                                               'keep recoTracks_hiSelectedTracks_*_*'
                                                               ))
 

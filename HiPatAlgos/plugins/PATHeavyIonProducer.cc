@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Aug 13 08:39:51 EDT 2009
-// $Id: PATHeavyIonProducer.cc,v 1.6 2009/09/30 11:25:47 yilmaz Exp $
+// $Id: PATHeavyIonProducer.cc,v 1.7 2009/10/15 10:47:56 yilmaz Exp $
 //
 //
 
@@ -89,8 +89,9 @@ PATHeavyIonProducer::PATHeavyIonProducer(const edm::ParameterSet& iConfig)
    }
 
    doMC_ = iConfig.getParameter<bool>("doMC");
-   if(doMC_) iConfig.getParameter<std::vector<std::string> >("generators");
-
+   if(doMC_){
+      hepmcSrc_ = iConfig.getParameter<std::vector<std::string> >("generators");
+   }
   
 }
 
@@ -128,11 +129,11 @@ PATHeavyIonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    int nhard = 0;
    double phi = 0;
 
-   std::vector<Handle<edm::HepMCProduct> > hepmc;
    if(doMC_){
-      for(size_t ihep; ihep < hepmcSrc_.size(); ++ihep){
-	 iEvent.getByLabel(hepmcSrc_[ihep],hepmc[ihep]);
-	 const HepMC::HeavyIon* hi = hepmc[ihep]->GetEvent()->heavy_ion();
+      for(size_t ihep = 0; ihep < hepmcSrc_.size(); ++ihep){
+	 Handle<edm::HepMCProduct> hepmc;
+	 iEvent.getByLabel(hepmcSrc_[ihep],hepmc);
+	 const HepMC::HeavyIon* hi = hepmc->GetEvent()->heavy_ion();
 	 if(hi){
 	    ncoll = ncoll + hi->Ncoll();
 	    nhard = nhard + hi->Ncoll_hard();
