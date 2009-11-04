@@ -1,5 +1,5 @@
-#ifndef HiMCGammaJetSignalDef_h
-#define HiMCGammaJetSignalDef_h
+#ifndef HiPhotonMCTruth_h
+#define HiPhotonMCTruth_h
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -14,27 +14,25 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
+#include "CmsHi/PhotonAnalysis/interface/HiMCGammaJetSignalDef.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
+#include "DataFormats/Common/interface/Handle.h"
+
 #include <vector.h>
 
-class HiMCGammaJetSignalDef
+class HiPhotonMCTruth
 {
-  public:
-
-  HiMCGammaJetSignalDef();
-  HiMCGammaJetSignalDef(const reco::GenParticleCollection *sigPartic);
-  bool IsIsolated(const reco::GenParticle &pp)            ;  
-  //  bool IsSignal(const reco::Candidate &pp, double dPhi, bool isIso);
-  int getIndex(const reco::Candidate &pp);
-  double getDeltaR (const reco::Candidate &track1, const reco::Candidate &track2);
-  double getDeltaPhi(const reco::Candidate &track1, const reco::Candidate &track2);
-  
+ public:
+  HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle, edm::Handle<edm::SubEventMap> subs);
+  bool indexMatch(const reco::Candidate &pp1);
+  bool IsPrompt(const reco::GenParticle &pp);
+  bool IsPrompt(const reco::Candidate &pp);
+  bool IsIsolated(const reco::Candidate &pp);
   
  private:
-   const reco::GenParticleCollection        *fSigParticles;
-
+  HiMCGammaJetSignalDef mcisocut;
 };
 
 #endif
