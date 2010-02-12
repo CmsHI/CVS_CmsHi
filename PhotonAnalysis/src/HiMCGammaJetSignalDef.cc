@@ -6,7 +6,7 @@
 #include "DataFormats/EgammaReco/interface/BasicCluster.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
-#include <vector.h>
+#include <vector>
 
 using namespace edm;
 using namespace reco;
@@ -44,7 +44,7 @@ bool HiMCGammaJetSignalDef::IsIsolated(const reco::GenParticle &pp)
      
      if(p.status()!=1) 
        continue; 
-     if (p.collisionId() != p.collisionId())
+     if (p.collisionId() != pp.collisionId())
        continue;
 	     
      int apid= abs(p.pdgId());
@@ -64,7 +64,7 @@ bool HiMCGammaJetSignalDef::IsIsolated(const reco::GenParticle &pp)
       
       if(apid>100 && apid!=310 && pt>PtMaxHadron) 
 	{
-	  if ( (isHadron == true)  && (fabs(pp.pt()-pt)<0.001) && (pp.pdgId()==p.pdgId()) )
+	  if ( (isHadron == true) && (fabs(pp.pt()-pt)<0.001) && (pp.pdgId()==p.pdgId()) )
 	    continue;
 	  else
 	    PtMaxHadron=pt;
@@ -83,6 +83,67 @@ bool HiMCGammaJetSignalDef::IsIsolated(const reco::GenParticle &pp)
    return kTRUE; 
 
 }
+
+
+
+bool HiMCGammaJetSignalDef::IsIsolatedPp(const reco::GenParticle &pp)
+{
+  using namespace std;
+  using namespace edm;
+  using namespace reco;
+
+// Check if a given particle is isolated.                                                                                                                                                          
+
+  double  EtCone = 0;
+  double  EtPhoton = 0;
+  double  cone = 0.4;
+  
+  const int maxindex = (int)fSigParticles->size();
+  for(int i=0; i < maxindex ; ++i) {
+    
+    const GenParticle &p=(*fSigParticles)[i];
+    
+  if(p.status()!=1)
+    continue;
+  if (p.collisionId() != pp.collisionId())
+    continue;
+
+   int apid= abs(p.pdgId());
+   //  if(apid>11 &&  apid<20)
+   //  continue; //get rid of muons and neutrinos                                                                                                                                                     
+  if(getDeltaR(p,pp)>cone)
+    continue;
+
+  double et=p.et();
+  //  double pt = p.pt();
+  EtCone+=et;
+
+  //  bool isHadron = false;
+  //if ( fabs(pp.pdgId())>100 && fabs(pp.pdgId()) != 310)
+  //  isHadron = true;
+
+  //  if(apid>100 && apid!=310 && pt>PtMaxHadron)
+  //  {
+  //    if ( (isHadron == true)  && (fabs(pp.pt()-pt)<0.001) && (pp.pdgId()==p.pdgId()) )
+  //	continue;
+  //   else
+  //	PtMaxHadron=pt;
+  // }
+
+}
+
+  EtPhoton = pp.et();
+  
+  // isolation cuts                                                                                                                                                                                  
+  if(EtCone-EtPhoton > 2)
+    return kFALSE;
+  //if(PtMaxHadron > 4.5+EtPhoton/40)
+  //  return kFALSE;
+  
+  return kTRUE;
+  
+}
+
 
 
 
