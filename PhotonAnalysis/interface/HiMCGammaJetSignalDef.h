@@ -17,7 +17,7 @@
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "SimDataFormats/HiGenData/interface/SubEventMap.h"
-#include <vector.h>
+#include <vector>
 
 class HiMCGammaJetSignalDef
 {
@@ -26,6 +26,8 @@ class HiMCGammaJetSignalDef
   HiMCGammaJetSignalDef();
   HiMCGammaJetSignalDef(const reco::GenParticleCollection *sigPartic);
   bool IsIsolated(const reco::GenParticle &pp)            ;  
+  bool IsIsolatedPp(const reco::GenParticle &pp)            ;
+
   //  bool IsSignal(const reco::Candidate &pp, double dPhi, bool isIso);
   int getIndex(const reco::Candidate &pp);
   double getDeltaR (const reco::Candidate &track1, const reco::Candidate &track2);

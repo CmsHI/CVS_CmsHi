@@ -20,7 +20,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/Common/interface/Handle.h"
 
-#include <vector.h>
+#include <vector>
 
 class HiPhotonMCTruth
 {
@@ -28,6 +28,7 @@ class HiPhotonMCTruth
   HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle);
   bool IsPrompt(const reco::GenParticle &pp);
   bool IsIsolated(const reco::GenParticle &pp);
+  bool IsIsolatedPp(const reco::GenParticle &pp);
   
  private:
   HiMCGammaJetSignalDef mcisocut;
