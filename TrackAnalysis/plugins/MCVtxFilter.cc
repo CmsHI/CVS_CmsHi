@@ -13,7 +13,7 @@
 //
 // Original Author:  Andre Sungho Yoon
 //         Created:  Wed Aug 26 10:41:44 EDT 2009
-// $Id$
+// $Id: MCVtxFilter.cc,v 1.1 2009/08/27 15:00:58 sungho Exp $
 //
 //
 
@@ -134,7 +134,6 @@ MCVtxFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    // Get signal process vertex                                                                                   
    HepMC::GenVertex* genvtx = inev->signal_process_vertex();
-   HepMC::FourVector* vtx_;
 
    if(!genvtx){
       HepMC::GenEvent::particle_const_iterator pt=inev->particles_begin();
@@ -145,8 +144,7 @@ MCVtxFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
    }
 
-   vtx_ = &(genvtx->position());
-   vz_true = 0.1 * vtx_->z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)             
+   vz_true = 0.1 * genvtx->position().z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)             
 
    dvz = vz_true - vzr_med;
 

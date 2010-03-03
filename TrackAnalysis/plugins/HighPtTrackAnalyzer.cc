@@ -924,7 +924,6 @@ void HighPtTrackAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& e
 	
 	// Get signal process vertex
 	HepMC::GenVertex* genvtx = inev->signal_process_vertex();
-	HepMC::FourVector* vtx_;
 
 	if(!genvtx){
 		HepMC::GenEvent::particle_const_iterator pt=inev->particles_begin();
@@ -935,8 +934,7 @@ void HighPtTrackAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& e
 		}
 	}
 
-	vtx_ = &(genvtx->position());
-	SimVtx = 0.1 * vtx_->z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
+	SimVtx = 0.1 * genvtx->position().z(); // hepMC gen vtx is in mm.  everything else is cm so we divide by 10 ;)
 	LogVerbatim("TrackAnalyzer") << "[HighPtTrackAnalyzer] vz = " << SimVtx << " cm";
 	if(infoHiEventTopology) LogVerbatim("TrackAnalyzer") << "[HighPtTrackAnalyzer] b = " << ImpactPara << " fm\t Npart = " << Npart << "\t RP = " << Phi0;
 	
