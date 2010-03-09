@@ -11,14 +11,14 @@ StripTrackingRecHitsValid.trajectoryInput = hiTracks
 
 globalValidationHI = cms.Sequence(
     trackerHitsValidation      
-    #+ trackerDigisValidation   # tracker simDigis (not in RAWDEBUG)
+    #+ trackerDigisValidation   # simSiDigis not in RAWDEBUG
     + trackerRecHitsValidation 
     + trackingTruthValid        
     + trackingRecHitsValid        
     + hiTrackValidation         # validation of 'hiSelectedTracks'
 
     + ecalSimHitsValidationSequence 
-    + ecalDigisValidationSequence 
+    #+ ecalDigisValidationSequence  # simEcalDigis not in RAWDEBUG
     + ecalRecHitsValidationSequence 
     + ecalClustersValidationSequence
 
