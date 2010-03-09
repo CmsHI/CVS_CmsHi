@@ -20,7 +20,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContent_cff')
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.165 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('step3 nevts:1'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -44,10 +44,10 @@ process.GlobalTag.globaltag = 'MC_3XY_V25::All'
 
 # Path and EndPath definitions
 process.edmtome_step = cms.Path(process.EDMtoME)
-process.validationHarvestingTRK = cms.Path(process.postProcessorTrack)
+process.validationHarvesting = cms.Path(process.recoMuonPostProcessors+process.postProcessorTrack)
 process.dqmsave_step = cms.Path(process.DQMSaver)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.edmtome_step,
-                                process.validationHarvestingTRK,
+                                process.validationHarvesting,
                                 process.dqmsave_step)
