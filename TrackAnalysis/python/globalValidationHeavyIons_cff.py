@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from Validation.Configuration.globalValidation_cff import *
 from CmsHi.TrackAnalysis.TrackValidationHeavyIons_cff import *
+from CmsHi.TrackAnalysis.muonValidationHeavyIons_cff import *
 
 # change track label
 hiTracks = 'hiSelectedTracks'
@@ -28,6 +29,8 @@ globalValidationHI = cms.Sequence(
     + calotowersValidationSequence
 
     # add jet validation with HiGenJetCleaning?
+
+    + hiRecoMuonValidation
    
     )
 
