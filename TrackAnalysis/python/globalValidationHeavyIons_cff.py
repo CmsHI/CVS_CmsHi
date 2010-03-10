@@ -2,9 +2,10 @@ import FWCore.ParameterSet.Config as cms
 
 from Validation.Configuration.globalValidation_cff import *
 from CmsHi.TrackAnalysis.TrackValidationHeavyIons_cff import *
+from CmsHi.TrackAnalysis.JetValidationHeavyIons_cff import *
 from CmsHi.TrackAnalysis.muonValidationHeavyIons_cff import *
 
-# change track label
+# change track label for rechits
 hiTracks = 'hiSelectedTracks'
 PixelTrackingRecHitsValid.src = hiTracks
 StripTrackingRecHitsValid.trajectoryInput = hiTracks
@@ -16,21 +17,20 @@ globalValidationHI = cms.Sequence(
     + trackerRecHitsValidation 
     + trackingTruthValid        
     + trackingRecHitsValid        
-    + hiTrackValidation         # validation of 'hiSelectedTracks'
 
     + ecalSimHitsValidationSequence 
     #+ ecalDigisValidationSequence  # simEcalDigis not in RAWDEBUG
     + ecalRecHitsValidationSequence 
     + ecalClustersValidationSequence
 
-    #+ hcalSimHitStudy
-    #+ hcalDigisValidationSequence
+    + hcalSimHitStudy
+    #+ hcalDigisValidationSequence  # simHcalDigis not in RAWDEBUG
     + hcalRecHitsValidationSequence
     + calotowersValidationSequence
-
-    # add jet validation with HiGenJetCleaning?
-
-    + hiRecoMuonValidation
+    
+    + hiTrackValidation         # validation of 'hiSelectedTracks'
+    + hiJetValidation           # validation of pileup jet finders
+    + hiRecoMuonValidation      # validation of offline muon reco
    
     )
 
