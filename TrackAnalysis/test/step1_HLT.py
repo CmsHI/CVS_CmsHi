@@ -5,7 +5,7 @@
 # with command line options: step1 -s HLT:HIon -n 1 --filein file.root --eventcontent FEVTDEBUGHLT --conditions MC_3XY_V25::All --mc --scenario HeavyIons --no_exec
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('hiHLT')
+process = cms.Process('HLT')
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -21,7 +21,7 @@ process.load('Configuration.EventContent.EventContentHeavyIons_cff')
 process.Timing = cms.Service("Timing")
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('step2 nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
