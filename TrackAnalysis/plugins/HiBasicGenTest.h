@@ -3,6 +3,11 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/Run.h"
+
+// particle data table
+#include "SimGeneral/HepPDTRecord/interface/ParticleDataTable.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+
 //DQM services
 #include "DQMServices/Core/interface/DQMStore.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -30,5 +35,7 @@ class HiBasicGenTest : public edm::EDAnalyzer
   MonitorElement *b[3];
   MonitorElement *dnchdphi[3];
   MonitorElement *rp;
+
+  edm::ESHandle < ParticleDataTable > pdt;
 
 };

@@ -9,8 +9,10 @@
 #include "HepMC/HeavyIon.h"
 
 #include <TString.h>
+#include <TMath.h>
 
 using namespace edm;
+using namespace HepMC;
 
 HiBasicGenTest::HiBasicGenTest(const edm::ParameterSet& iPSet)
 {
@@ -47,9 +49,19 @@ void HiBasicGenTest::beginJob()
   return;
 }
 
-void HiBasicGenTest::endJob(){return;}
-void HiBasicGenTest::beginRun(const edm::Run& iRun,const edm::EventSetup& iSetup){return;}
+void HiBasicGenTest::endJob(){
+  // normalization of histograms can be done here (or in post-processor)
+  return;
+}
+
+void HiBasicGenTest::beginRun(const edm::Run& iRun,const edm::EventSetup& iSetup)
+{
+  iSetup.getData(pdt);
+  return;
+}
+
 void HiBasicGenTest::endRun(const edm::Run& iRun,const edm::EventSetup& iSetup){return;}
+
 void HiBasicGenTest::analyze(const edm::Event& iEvent,const edm::EventSetup& iSetup)
 { 
 
@@ -61,21 +73,49 @@ void HiBasicGenTest::analyze(const edm::Event& iEvent,const edm::EventSetup& iSe
   double ip = hi->impact_parameter();
   double phi0 = hi->event_plane_angle();
 
+  // fill reaction plane distribution
   rp->Fill(phi0);
   
+  // if the event is in one of the centrality bins of interest fill hists
   int cbin=-1;
-
   if(ip < 5.045) cbin=0;
   else if (ip < 7.145 && ip > 5.045) cbin=1;
   else if (ip < 15.202 && ip > 14.283) cbin=2;
+  if(cbin<0) return;
 
-  if(cbin>=0) {
+  // fill impact parameter distributions
+  b[cbin]->Fill(ip);
 
-    b[cbin]->Fill(ip);
+  // loop over particles
+  HepMC::GenEvent::particle_const_iterator begin = evt->particles_begin();
+  HepMC::GenEvent::particle_const_iterator end = evt->particles_end();
+  for(HepMC::GenEvent::particle_const_iterator it = begin; it != end; ++it){
+    
+    // only fill hists for status=1 particles
+    if((*it)->status() != 1) continue;
 
+    // only fill hists for charged particles
+    int pdg_id = (*it)->pdg_id();
+    const ParticleData * part = pdt->particle(pdg_id);
+    int charge = static_cast<int>(part->charge());
+    if(charge==0) continue;
+    
+    float eta = (*it)->momentum().eta();
+    float phi = (*it)->momentum().phi();
+    float pt = (*it)->momentum().perp();
+    
+    dnchdeta[cbin]->Fill(eta);
+    dnchdpt[cbin]->Fill(pt);
+    
+    double pi = TMath::Pi();
+    double p = phi-phi0;
+    if(p > pi) p = p - 2*pi;
+    if(p < -1*pi) p = p + 2*pi;
+    dnchdphi[cbin]->Fill(p);
 
-  }
+  } 
 
+  return;
 
 }
 
