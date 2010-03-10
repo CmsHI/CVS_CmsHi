@@ -11,8 +11,8 @@ process = cms.Process('RERECO')
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.load('Configuration.StandardSequences.MixingNoPileUp_cff')
-#process.load('Configuration.StandardSequences.HiEventMixing_cff')
+#process.load('Configuration.StandardSequences.MixingNoPileUp_cff')
+process.load('Configuration.StandardSequences.HiEventMixing_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
@@ -22,8 +22,10 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.EventContent.EventContentHeavyIons_cff')
 
+process.Timing = cms.Service("Timing")
+
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('step2 nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
