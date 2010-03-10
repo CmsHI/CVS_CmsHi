@@ -13,7 +13,7 @@
 //
 // Original Author:  Edward Wenger
 //         Created:  Fri May 22 08:11:00 EDT 2009
-// $Id: VtxAnalyzer.cc,v 1.7 2009/10/16 15:40:27 edwenger Exp $
+// $Id: VtxAnalyzer.cc,v 1.8 2009/10/20 12:06:35 edwenger Exp $
 //
 //
 
@@ -31,7 +31,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "HepMC/HeavyIon.h"
@@ -154,7 +154,7 @@ VtxAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.getByLabel("generator",hepEv);
 	const HepMC::GenEvent * inev = hepEv->GetEvent();
 	//evtno=inev->event_number();
-	HepMC::HeavyIon* hi = inev->heavy_ion();
+	const HepMC::HeavyIon* hi = inev->heavy_ion();
 	b=hi->impact_parameter();
 	
 	// Get pixel prototracks

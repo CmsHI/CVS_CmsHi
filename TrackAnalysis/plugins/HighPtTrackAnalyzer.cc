@@ -908,7 +908,7 @@ void HighPtTrackAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& e
 	edm::Handle<edm::HepMCProduct> hepEv;
 	ev.getByLabel("source",hepEv);
 	const HepMC::GenEvent * inev = hepEv->GetEvent();
-	HepMC::HeavyIon* hi = inev->heavy_ion();
+	const HepMC::HeavyIon* hi = inev->heavy_ion();
 	proc = inev->signal_process_id();
 
 	// the heavy ion event info

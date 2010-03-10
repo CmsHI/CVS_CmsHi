@@ -13,7 +13,7 @@
 //
 // Original Author:  Andre Sungho Yoon
 //         Created:  Wed Aug 26 10:41:44 EDT 2009
-// $Id: MCVtxFilter.cc,v 1.1 2009/08/27 15:00:58 sungho Exp $
+// $Id: MCVtxFilter.cc,v 1.2 2010/03/03 11:23:17 edwenger Exp $
 //
 //
 
@@ -118,7 +118,7 @@ MCVtxFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    edm::Handle<edm::HepMCProduct> hepEv;
    iEvent.getByLabel("generator",hepEv);
    const HepMC::GenEvent * inev = hepEv->GetEvent();
-   HepMC::HeavyIon* hi = inev->heavy_ion();
+   const HepMC::HeavyIon* hi = inev->heavy_ion();
    b=hi->impact_parameter();
 
    // Get reconstructed vertices                                                                                  
