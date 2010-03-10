@@ -22,7 +22,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.Timing = cms.Service("Timing")
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('step3 nevts:1'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -43,10 +43,13 @@ process.source = cms.Source("PoolSource",
 
 # Other statements
 process.GlobalTag.globaltag = 'MC_3XY_V25::All'
+process.recoMuonPostProcessors.remove(process.postProcessorRecoMuon) #until timing is fixed
+process.recoMuonPostProcessors.remove(process.postProcessorRecoMuonComp)
 
 # Path and EndPath definitions
 process.edmtome_step = cms.Path(process.EDMtoME)
-process.validationHarvesting = cms.Path(process.recoMuonPostProcessors+process.postProcessorTrack)
+process.validationHarvesting = cms.Path(process.recoMuonPostProcessors
+                                        +process.postProcessorTrack)
 process.dqmsave_step = cms.Path(process.DQMSaver)
 
 # Schedule definition
