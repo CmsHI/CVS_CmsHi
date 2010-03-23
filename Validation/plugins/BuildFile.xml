@@ -1,0 +1,6 @@
+<use name="DQMServices/Core"/>
+<use name="CmsHi/TrackAnalysis"/>
+<use name="SimGeneral/HepPDTRecord"/>
+<library file="*.cc" name="CmsHiValidationPlugins">
+   <flags EdmPlugin="1"/>
+</library>
