@@ -11,7 +11,7 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 
 #global tags for conditions data: https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideFrontierConditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_v8::All'
+process.GlobalTag.globaltag = 'MC_3XY_V21::All'
 
 ##################################################################################
 
@@ -21,9 +21,8 @@ options = VarParsing.VarParsing ('standard')
 # setup any defaults you want
 options.output = 'outputTree_testAnalyzer.root'
 options.secondaryOutput = 'edmFile_testAnalyzer.root'
-options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/D2E41C64-41AB-DE11-890F-001D09F2932B.root'
-#options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/E61657FD-9AAB-DE11-B79D-001D09F2437B.root'
-options.maxEvents = 1 
+options.files = '/store/relval/CMSSW_3_5_2/RelValPyquen_DiJet_pt80to120_4TeV/GEN-SIM-RECO/MC_3XY_V21-v1/0001/FA961928-A01F-DF11-85F6-0030487CD7C0.root'
+options.maxEvents=1
 
 # get and parse the command line arguments
 options.parseArguments()
@@ -71,19 +70,28 @@ process.maxEvents = cms.untracked.PSet(
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 process.load("Configuration.StandardSequences.ReconstructionHeavyIons_cff") 
 
-process.hiPixel3PrimTracks.FilterPSet.useClusterShape = False
-process.hiPixel3PrimTracks.FilterPSet.nSigmaTipMaxTolerance = 0.0
-process.hiPixel3PrimTracks.FilterPSet.nSigmaLipMaxTolerance = 0.0
-process.hiPixel3PrimTracks.FilterPSet.lipMax = 0.0
+process.hiPixel3PrimTracks.FilterPSet.ptMin = cms.double(0.2)
+process.hiPixel3PrimTracks.FilterPSet.nSigmaTipMaxTolerance = cms.double(4.0)
+process.hiPixel3PrimTracks.FilterPSet.tipMax = cms.double(0.2)
+process.hiPixel3PrimTracks.FilterPSet.nSigmaLipMaxTolerance = cms.double(4.0)
+process.hiPixel3PrimTracks.FilterPSet.lipmax = cms.double(0.2)
+#process.hiPixel3PrimTracks.FilterPSet.useClusterShape = cms.bool(True)
 
 ##############################################################################
-# Track Analyzer
-process.load("CmsHi.TrackAnalysis.testHighPtGlobalTracks_cff")   # track association and analyzer
-process.testHighPtGlobalTracks.trackCollection = ["hiPixel3PrimTracks"]
-process.testHighPtGlobalTracks.resultFile = options.output
-#process.testHighPtGlobalTracks.keepLowPtSimTracks = True
+# sim-reco track association
+process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
+process.TrackAssociatorByHits.SimToRecoDenominator = cms.string('reco')
+process.TrackAssociatorByHits.UseGrouped = cms.bool(False)  
 
-process.TrackAssociatorByHits.SimToRecoDenominator = 'reco' #quality = purity i.e. (shared/reco)
+# high pt track analyzer settings
+process.testHighPtGlobalTracks = cms.EDAnalyzer("HighPtTrackAnalyzer",
+                                                trackCollection = cms.vstring("hiPixel3PrimTracks"),
+                                                truthCollection = cms.string("mergedtruth"),
+                                                resultFile      = cms.string(options.output),
+                                                useAbsoluteNumberOfHits = cms.untracked.bool(False), 
+                                                keepLowPtSimTracks = cms.untracked.bool(True), 
+                                                infoHiEventTopology = cms.untracked.bool(True) 
+                                                )
 
 ##############################################################################
 # Output EDM File
@@ -97,9 +105,12 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 ##################################################################################
 # Paths
+process.rechits = cms.Sequence(process.siPixelRecHits*process.siStripMatchedRecHits)
 process.localreco = cms.Sequence(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
+process.vtxreco = cms.Sequence(process.offlineBeamSpot * process.trackerlocalreco * process.hiPixelVertices)
 process.pxlreco = cms.Sequence(process.hiPixelVertices*process.hiPixel3PrimTracks)
 process.trkreco = cms.Sequence(process.heavyIonTracking)
 
-process.p = cms.Path(process.localreco * process.pxlreco * process.testHighPtGlobalTracks)
+#process.reco = cms.Path(process.localreco * process.pxlreco * process.testHighPtGlobalTracks)
+process.rereco = cms.Path(process.rechits * process.hiPixel3PrimTracks * process.testHighPtGlobalTracks)
 #process.save = cms.EndPath(process.output)

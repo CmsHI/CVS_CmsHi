@@ -7,7 +7,7 @@ process.load("Configuration/StandardSequences/GeometryPilot2_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = 'MC_31X_V8::All'
+process.GlobalTag.globaltag = 'MC_3XY_V21::All'
 
 ##################################################################################
 
@@ -17,8 +17,7 @@ options = VarParsing.VarParsing ('standard')
 # setup any defaults you want
 options.output = 'output_pxlVal.root'
 options.secondaryOutput = 'edmFile_pxlVal.root'
-#options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_MinBias_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/D2E41C64-41AB-DE11-890F-001D09F2932B.root'
-options.files = '/store/relval/CMSSW_3_3_0_pre5/RelValHydjetQ_B0_4TeV/GEN-SIM-RAW/MC_31X_V8-v1/0004/E61657FD-9AAB-DE11-B79D-001D09F2437B.root'
+options.files = '/store/relval/CMSSW_3_5_2/RelValPyquen_DiJet_pt80to120_4TeV/GEN-SIM-RECO/MC_3XY_V21-v1/0001/FA961928-A01F-DF11-85F6-0030487CD7C0.root'
 options.maxEvents = 1 
 
 # get and parse the command line arguments
@@ -74,32 +73,36 @@ process.load("Configuration.StandardSequences.RawToDigi_cff")
 ###################
 
 #Modified parameters
-#process.hiPixel3PrimTracks.RegionFactoryPSet.RegionPSet.originRadius = 0.2
 
-#process.hiPixel3PrimTracks.FilterPSet.useClusterShape = False
-process.hiPixel3PrimTracks.FilterPSet.nSigmaTipMaxTolerance = 6.0
-process.hiPixel3PrimTracks.FilterPSet.tipMax = 0.3
-process.hiPixel3PrimTracks.FilterPSet.chi2 = 1000.
+process.hiPixel3PrimTracks.RegionFactoryPSet.RegionPSet.ptMin = cms.double(0.2)
+process.hiPixel3PrimTracks.OrderedHitsFactoryPSet.GeneratorPSet.maxTriplets = 1000000000
 
-process.hiPixel3PrimTracks.CleanerPSet.ComponentName="TrackCleaner"
+process.hiPixel3PrimTracks.FilterPSet.ptMin = cms.double(0.2)
+process.hiPixel3PrimTracks.FilterPSet.nSigmaTipMaxTolerance = cms.double(4.0)
+process.hiPixel3PrimTracks.FilterPSet.tipMax = cms.double(0.2)
+process.hiPixel3PrimTracks.FilterPSet.nSigmaLipMaxTolerance = cms.double(4.0)
+process.hiPixel3PrimTracks.FilterPSet.lipmax = cms.double(0.2)
+process.hiPixel3PrimTracks.FilterPSet.useClusterShape = cms.bool(True)
 
 ###################
 
 # reco pxl track quality cuts
 process.selectHiPxlTracks = cms.EDFilter("TrackSelector",
   src = cms.InputTag("hiPixel3PrimTracks"),
-  cut = cms.string('pt > 1.0 && abs(eta) < 1.0')
+  cut = cms.string('pt > 0.2 && abs(eta) < 1.0')
 )
 
 # quality cuts on tracking particles
 process.load("Validation.RecoTrack.cuts_cff")
 process.load("CmsHi.TrackAnalysis.findableSimTracks_cfi")
 process.findableSimTracks.minHit = 3
-process.findableSimTracks.signalOnly = True
-process.findableSimTracks.ptMin = 1.0
+process.findableSimTracks.signalOnly = False
+process.findableSimTracks.ptMin = 0.2
 process.findableSimTracks.tip = 0.05
 process.findableSimTracks.minRapidity=-1.
 process.findableSimTracks.maxRapidity=1.
+
+process.cutsTPFake.ptMin = 0.2
 
 # track associator settings
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
@@ -113,6 +116,13 @@ process.multiTrackValidator.UseAssociators = True
 process.multiTrackValidator.label = ['selectHiPxlTracks'] # selection on globalPrimTracks
 process.multiTrackValidator.label_tp_effic = cms.InputTag("findableSimTracks") # selection on mergedtruth
 process.multiTrackValidator.label_tp_fake  = cms.InputTag("cutsTPFake")
+process.multiTrackValidator.signalOnlyTP = cms.bool(False)
+process.multiTrackValidator.ptMinTP = cms.double(0.2)
+process.multiTrackValidator.skipHistoFit = cms.untracked.bool(False)
+process.multiTrackValidator.minpT = cms.double(0.1)
+process.multiTrackValidator.maxpT = cms.double(10.0)
+process.multiTrackValidator.nintpT = cms.int32(20)
+process.multiTrackValidator.useLogPt = cms.untracked.bool(True)
 process.multiTrackValidator.outputFile = options.output
 
 ##############################################################################
@@ -127,9 +137,13 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 ###################
 
+
+process.rechits = cms.Sequence(process.siPixelRecHits*process.siStripMatchedRecHits)
+
 # paths
-process.localreco = cms.Path(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
-process.pxlreco = cms.Path(process.hiPixelVertices*process.hiPixel3PrimTracks)
+process.rereco = cms.Path(process.rechits * process.hiPixel3PrimTracks)
+#process.localreco = cms.Path(process.RawToDigi*process.offlineBeamSpot*process.trackerlocalreco)
+#process.pxlreco = cms.Path(process.hiPixelVertices*process.hiPixel3PrimTracks)
 #process.trkreco = cms.Path(process.heavyIonTracking)
 process.pcut  = cms.Path(process.selectHiPxlTracks * process.findableSimTracks * process.cutsTPFake)
 process.pval  = cms.Path(process.multiTrackValidator)
