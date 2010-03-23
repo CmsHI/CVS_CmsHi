@@ -2,39 +2,71 @@ import FWCore.ParameterSet.Config as cms
 
 from Validation.RecoMuon.muonValidation_cff import *
 
-# MuonAssociation
-tpToTkMuonAssociation.tracksTag = 'hiSelectedTracks'
-tpToTkmuTrackAssociation.label_tr = 'hiSelectedTracks'
+# pt-selection of reco tracks
+import PhysicsTools.RecoAlgos.recoTrackSelector_cfi
+cutsRecoTrkMuons = PhysicsTools.RecoAlgos.recoTrackSelector_cfi.recoTrackSelector.clone()
+cutsRecoTrkMuons.src = "hiSelectedTracks"
+cutsRecoTrkMuons.quality = []
+cutsRecoTrkMuons.ptMin = 2.0
+
+# pt-selection of tracking particles
+import PhysicsTools.RecoAlgos.trackingParticleSelector_cfi
+cutsTpMuons = PhysicsTools.RecoAlgos.trackingParticleSelector_cfi.trackingParticleSelector.clone()
+cutsTpMuons.ptMin = 2.0
+
+#----------------------------------------
+
+# MuonAssociation labels
+tpToTkMuonAssociation.tracksTag = 'cutsRecoTrkMuons'
+tpToTkMuonAssociation.tpTag = 'cutsTpMuons'
+tpToStaMuonAssociation.tpTag = 'cutsTpMuons'
+tpToStaUpdMuonAssociation.tpTag = 'cutsTpMuons'
+tpToGlbMuonAssociation.tpTag = 'cutsTpMuons'
+
+tpToTkmuTrackAssociation.label_tr = 'cutsRecoTrkMuons'
+tpToTkmuTrackAssociation.label_tp = 'cutsTpMuons'
+tpToStaTrackAssociation.label_tp = 'cutsTpMuons'
+tpToStaUpdTrackAssociation.label_tp = 'cutsTpMuons'
+tpToGlbTrackAssociation.label_tp = 'cutsTpMuons'
+
 
 # Muon association sequences
 # (some are commented out until timing is addressed)
 hiMuonAssociation_seq = cms.Sequence(
-    #tpToTkMuonAssociation+
+    tpToTkMuonAssociation+
     tpToStaMuonAssociation+
     tpToStaUpdMuonAssociation+
     tpToGlbMuonAssociation+
-    #tpToTkmuTrackAssociation+
+    tpToTkmuTrackAssociation+
     tpToStaTrackAssociation+
     tpToStaUpdTrackAssociation+
     tpToGlbTrackAssociation
     )
 
-# RecoMuonValidators
-trkMuonTrackVTrackAssoc.label = ['hiSelectedTracks']
-recoMuonVMuAssoc.trkMuLabel = 'hiSelectedTracks'
-recoMuonVTrackAssoc.trkMuLabel = 'hiSelectedTracks'
+#----------------------------------------
+
+# RecoMuonValidators labels
+trkMuonTrackVTrackAssoc.label = ['cutsRecoTrkMuons']
+recoMuonVMuAssoc.trkMuLabel = 'cutsRecoTrkMuons'
+recoMuonVTrackAssoc.trkMuLabel = 'cutsRecoTrkMuons'
 
 # Muon validation sequences
 hiMuonValidation_seq = cms.Sequence(
-    #trkMuonTrackVTrackAssoc+
+    trkMuonTrackVTrackAssoc+
     staMuonTrackVTrackAssoc+
     staUpdMuonTrackVTrackAssoc+
     glbMuonTrackVTrackAssoc+
     staMuonTrackVMuonAssoc+
     staUpdMuonTrackVMuonAssoc+
-    glbMuonTrackVMuonAssoc
-    #+recoMuonVMuAssoc+
-    #recoMuonVTrackAssoc
+    glbMuonTrackVMuonAssoc+
+    recoMuonVMuAssoc+
+    recoMuonVTrackAssoc
     )
 
-hiRecoMuonValidation = cms.Sequence(hiMuonAssociation_seq * hiMuonValidation_seq)    
+#----------------------------------------
+
+# HI muon validation sequence
+hiRecoMuonValidation = cms.Sequence(cutsRecoTrkMuons *
+                                    cutsTpMuons *
+                                    hiMuonAssociation_seq *
+                                    hiMuonValidation_seq)    
