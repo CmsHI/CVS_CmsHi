@@ -86,7 +86,7 @@ bool HiMCGammaJetSignalDef::IsIsolated(const reco::GenParticle &pp)
 
 
 
-bool HiMCGammaJetSignalDef::IsIsolatedPp(const reco::GenParticle &pp)
+bool HiMCGammaJetSignalDef::IsIsolatedPP(const reco::GenParticle &pp)
 {
   using namespace std;
   using namespace edm;
@@ -118,31 +118,63 @@ bool HiMCGammaJetSignalDef::IsIsolatedPp(const reco::GenParticle &pp)
   //  double pt = p.pt();
   EtCone+=et;
 
-  //  bool isHadron = false;
-  //if ( fabs(pp.pdgId())>100 && fabs(pp.pdgId()) != 310)
-  //  isHadron = true;
-
-  //  if(apid>100 && apid!=310 && pt>PtMaxHadron)
-  //  {
-  //    if ( (isHadron == true)  && (fabs(pp.pt()-pt)<0.001) && (pp.pdgId()==p.pdgId()) )
-  //	continue;
-  //   else
-  //	PtMaxHadron=pt;
-  // }
-
-}
-
+  }
+  
   EtPhoton = pp.et();
   
   // isolation cuts                                                                                                                                                                                  
   if(EtCone-EtPhoton > 2)
-    return kFALSE;
+     return kFALSE;
   //if(PtMaxHadron > 4.5+EtPhoton/40)
   //  return kFALSE;
   
   return kTRUE;
   
 }
+
+bool HiMCGammaJetSignalDef::IsIsolatedJP(const reco::GenParticle &pp)
+{
+   using namespace std;
+   using namespace edm;
+   using namespace reco;
+
+   // Check if a given particle is isolated.                                                                                                                                                                    
+
+   double  EtCone = 0;
+   double  EtPhoton = 0;
+   double  cone = 0.4;
+
+   const int maxindex = (int)fSigParticles->size();
+   for(int i=0; i < maxindex ; ++i) {
+
+      const GenParticle &p=(*fSigParticles)[i];
+
+      if(p.status()!=1)
+	 continue;
+      if (p.collisionId() != pp.collisionId())
+	 continue;
+      
+      if(getDeltaR(p,pp)>cone)
+	 continue;
+
+      double et=p.et();
+      //  double pt = p.pt();                                                                                                                                                                                    
+      EtCone+=et;
+
+   }
+
+   EtPhoton = pp.et();
+
+   // isolation cuts                                                                                                                                                                                          
+   if(EtCone-EtPhoton > 2)
+      return kFALSE;
+   return kTRUE;
+
+}
+
+
+
+
 
 
 

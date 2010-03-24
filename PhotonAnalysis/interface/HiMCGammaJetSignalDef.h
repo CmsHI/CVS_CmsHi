@@ -26,10 +26,11 @@ class HiMCGammaJetSignalDef
   HiMCGammaJetSignalDef();
   HiMCGammaJetSignalDef(const reco::GenParticleCollection *sigPartic);
   bool IsIsolated(const reco::GenParticle &pp)            ;  
-  bool IsIsolatedPp(const reco::GenParticle &pp)            ;
+  bool IsIsolatedPP(const reco::GenParticle &pp)            ;
+  bool IsIsolatedJP(const reco::GenParticle &pp)            ;
 
   //  bool IsSignal(const reco::Candidate &pp, double dPhi, bool isIso);
-  int getIndex(const reco::Candidate &pp);
+  //  int getIndex(const reco::Candidate &pp);
   double getDeltaR (const reco::Candidate &track1, const reco::Candidate &track2);
   double getDeltaPhi(const reco::Candidate &track1, const reco::Candidate &track2);
   
