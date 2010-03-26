@@ -21,7 +21,7 @@ process.load('Configuration.EventContent.EventContentHeavyIons_cff')
 process.Timing = cms.Service("Timing")
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.4 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('step2 nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -54,7 +54,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 #process.mix.playback = True
-process.GlobalTag.globaltag = 'MC_3XY_V25::All'
+process.GlobalTag.globaltag = 'MC_36Y_V3::All'
 
 # Path and EndPath definitions
 process.endjob_step = cms.Path(process.endOfProcess)

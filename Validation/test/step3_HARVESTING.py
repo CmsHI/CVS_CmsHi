@@ -22,7 +22,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.Timing = cms.Service("Timing")
 
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('step3 nevts:1'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -42,7 +42,7 @@ process.source = cms.Source("PoolSource",
 # Additional output definition
 
 # Other statements
-process.GlobalTag.globaltag = 'MC_3XY_V25::All'
+process.GlobalTag.globaltag = 'MC_36Y_V3::All'
 
 # Path and EndPath definitions
 process.edmtome_step = cms.Path(process.EDMtoME)
