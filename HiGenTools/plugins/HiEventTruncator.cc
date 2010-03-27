@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz,32 4-A08,+41227673039,
 //         Created:  Sat Mar 27 18:18:33 CET 2010
-// $Id$
+// $Id: HiEventTruncator.cc,v 1.1 2010/03/27 17:38:06 yilmaz Exp $
 //
 //
 
@@ -34,6 +34,8 @@
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+
 using namespace edm;
 
 //
@@ -68,8 +70,11 @@ class HiEventTruncator : public edm::EDProducer {
 HiEventTruncator::HiEventTruncator(const edm::ParameterSet& iConfig)
 {
 
-   produces<SimTrackContainer>();
-   produces<SimVertexContainer>();
+
+  produces<HepMCProduct>();
+
+  produces<SimTrackContainer>();
+  produces<SimVertexContainer>();
 
    produces<PSimHitContainer>("TrackerHitsTOBHighTof");
    //... preferably not hardcoded
@@ -101,6 +106,9 @@ HiEventTruncator::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
+   Handle<HepMCProduct> hepmcHandle;
+   iEvent.getByLabel("generator",hepmcHandle);
+
    Handle<SimTrackContainer> simtrackHandle;
    iEvent.getByLabel("g4SimHits",simtrackHandle);
 
@@ -113,6 +121,7 @@ HiEventTruncator::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    Handle<PCaloHitContainer> calohitHandle;
    iEvent.getByLabel(InputTag("g4SimHits","EcalHitsES"),calohitHandle);
 
+   std::auto_ptr<HepMCProduct> hepmcOut(new HepMCProduct);
    std::auto_ptr<SimTrackContainer> simtrackOut(new SimTrackContainer);
    std::auto_ptr<SimVertexContainer> simvertexOut(new SimVertexContainer);
    std::auto_ptr<PSimHitContainer> simhitOut(new PSimHitContainer);
@@ -122,6 +131,21 @@ HiEventTruncator::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    // ...
    // ...
 
+   // Loop over particles to decide which ones survive
+
+   // Loop over simtrackHandle, fill simtrackOut for surviving tracks
+   // corresponding to the particles above
+
+   // Loop over simvertexHandle, fill simvertexOut for surviving vertices
+   // corresponding to the simtracks above
+
+   // Loop over simhitHandle, fill simhitOut for surviving hits
+   // corresponding to the simtracks above
+
+   // Loop over calohitHandle, fill calohitOut for surviving hits
+   // corresponding to the simtracks above
+
+   iEvent.put(hepmcOut);
    iEvent.put(simtrackOut);
    iEvent.put(simvertexOut);
    iEvent.put(simhitOut);
