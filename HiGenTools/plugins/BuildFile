@@ -5,11 +5,9 @@
 <use name=FWCore/Utilities>
 <use name=SimDataFormats/Track>
 <use name=SimDataFormats/Vertex>
-<use name=SimDataFormats/SimHit>
-<use name=SimDataFormats/CaloHit>
 <use name=SimDataFormats/GeneratorProducts>
 
 <use name=clhep>
-<library file="*.cc" name=GeneratorInterfaceHiGenCommonPlugins>
+<library file="*.cc" name=HiGenToolsPlugins>
         <flags EDM_PLUGIN=1>
 </library>
