@@ -1,3 +1,5 @@
+#ifndef HiEventTuner_h
+#define HiEventTuner_h
 
 #include <map>
 #include <memory>
@@ -19,33 +21,36 @@
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 
 //! Producer to reduce the number of charge in simulation
+template<typename Tune>
 class HiEventTuner : public edm::EDProducer
 {
 public:
-   
+
     //! Contructor
-    explicit HiEventTuner(const edm::ParameterSet&);
+    explicit HiEventTuner(edm::ParameterSet const &);
 
     //! Destructor
-    ~HiEventTuner(){};
+    ~HiEventTuner() {};
 
 private:
-  
+
     static std::string MessageCategory_;
-  
+
     virtual void produce(edm::Event&, const edm::EventSetup&);
+
+    Tune tune_;
 
     bool useMultipleHepMCLabels_;
     std::vector<std::string> hepMCLabels_;
     std::vector<edm::Handle<edm::HepMCProduct> > hepMCProducts_;
-    
+
     std::string simHitLabel_;
-    
+
     edm::Handle<edm::SimTrackContainer> simTracks_;
     edm::Handle<edm::SimVertexContainer> simVertexes_;
 
     std::auto_ptr<edm::SimTrackContainer> tunedSimTracks_;
-    std::auto_ptr<edm::SimVertexContainer> tunedSimVertexes_;   
+    std::auto_ptr<edm::SimVertexContainer> tunedSimVertexes_;
 
     typedef std::multimap<std::size_t, std::size_t> IndexToIndexes;
 
@@ -54,34 +59,36 @@ private:
     void mapTrackIdToDecayTrackIndexes();
 
     void createTunedCollections();
-    
+
     void addSimulatedHistory(SimTrack const &, int parentSimTrackIndex = -1);
-    
+
     bool selectSimulatedTrack(SimTrack const &);
- 
-    HepMC::GenParticle * getGeneratorParticle(SimTrack const &);
+
 };
 
 
-std::string HiEventTuner::MessageCategory_ = "HiEventTuner";
+template<typename Tune>
+std::string HiEventTuner<Tune>::MessageCategory_ = "HiEventTuner";
 
 
-HiEventTuner::HiEventTuner(const edm::ParameterSet& config)
+template<typename Tune>
+HiEventTuner<Tune>::HiEventTuner(const edm::ParameterSet& config) : tune_(config)
 {
-	// Initialize global parameters
+    // Initialize global parameters
     useMultipleHepMCLabels_ = config.getParameter<bool>("useMultipleHepMCLabels");
     hepMCLabels_ = config.getParameter<std::vector<std::string> >("hepMCLabels");
     simHitLabel_ = config.getParameter<std::string>("simHitLabel");
-    
+
     // Declaration of the products
     produces<edm::SimTrackContainer>();
     produces<edm::SimVertexContainer>();
 }
 
 
-void HiEventTuner::produce(edm::Event& event, const edm::EventSetup& setup)
+template<typename Tune>
+void HiEventTuner<Tune>::produce(edm::Event& event, const edm::EventSetup& setup)
 {
-	// Clean the list of hepmc products
+    // Clean the list of hepmc products
     hepMCProducts_.clear();
 
     // Collect all the HepMCProducts
@@ -110,7 +117,7 @@ void HiEventTuner::produce(edm::Event& event, const edm::EventSetup& setup)
         edm::LogInfo (MessageCategory_) << "or there are fewer labels than events in the crossing frame";
         edm::LogInfo (MessageCategory_) << MessageCategory_ << " may try to access data in the wrong HepMCProduct and crash.";
     }
-    
+
     // Collect all the SimTracks
     event.getByLabel("mix", simHitLabel_, simTracks_);
 
@@ -119,21 +126,22 @@ void HiEventTuner::produce(edm::Event& event, const edm::EventSetup& setup)
 
     // Create collections of things we will put in event
     tunedSimTracks_ = std::auto_ptr<edm::SimTrackContainer>( new edm::SimTrackContainer );
-    tunedSimVertexes_ = std::auto_ptr<edm::SimVertexContainer>( new edm::SimVertexContainer );    
-    
+    tunedSimVertexes_ = std::auto_ptr<edm::SimVertexContainer>( new edm::SimVertexContainer );
+
     // Create a map between trackId and vertex (decay) index
     mapTrackIdToDecayTrackIndexes();
 
-    // Create the actual tuned collection    
+    // Create the actual tuned collection
     createTunedCollections();
-    
+
     // Put TrackingParticles and TrackingVertices in event
     event.put(tunedSimTracks_);
     event.put(tunedSimVertexes_);
 }
 
 
-void HiEventTuner::mapTrackIdToDecayTrackIndexes()
+template<typename Tune>
+void HiEventTuner<Tune>::mapTrackIdToDecayTrackIndexes()
 {
     std::size_t index = 0;
 
@@ -144,24 +152,25 @@ void HiEventTuner::mapTrackIdToDecayTrackIndexes()
     for (edm::SimTrackContainer::const_iterator simTrack = simTracks_->begin(); simTrack != simTracks_->end(); ++simTrack, ++index)
     {
         // Check for a source vertex
-    	if (simTrack->noVertex()) continue;
-    	
-    	// Get the source vertex
-    	SimVertex const & sourceVertex = simVertexes_->at( simTrack->vertIndex() );
-    	
-    	// Check if the source vertex has a parent track
-    	if (sourceVertex.noParent()) continue;
+        if (simTrack->noVertex()) continue;
 
-    	// Get the source vertex
-    	SimTrack const & parentTrack = simTracks_->at( sourceVertex.parentIndex() );
-          
+        // Get the source vertex
+        SimVertex const & sourceVertex = simVertexes_->at( simTrack->vertIndex() );
+
+        // Check if the source vertex has a parent track
+        if (sourceVertex.noParent()) continue;
+
+        // Get the source vertex
+        SimTrack const & parentTrack = simTracks_->at( sourceVertex.parentIndex() );
+
         // Making the association between parentSimTrack and decay index
         trackIndexToDecayTrackIndexes_.insert( std::make_pair(parentTrack.trackId(), index) );
     }
 }
 
 
-void HiEventTuner::createTunedCollections()
+template<typename Tune>
+void HiEventTuner<Tune>::createTunedCollections()
 {
     // Loop over the tracks looking for the seeding tracks
     for (edm::SimTrackContainer::const_iterator simTrack = simTracks_->begin(); simTrack != simTracks_->end(); ++simTrack)
@@ -169,7 +178,8 @@ void HiEventTuner::createTunedCollections()
 }
 
 
-void HiEventTuner::addSimulatedHistory(SimTrack const & simTrack, int parentSimTrackIndex)
+template<typename Tune>
+void HiEventTuner<Tune>::addSimulatedHistory(SimTrack const & simTrack, int parentSimTrackIndex)
 {
     // Add the simTrack to the tuned collection
     tunedSimTracks_->push_back(simTrack);
@@ -179,41 +189,34 @@ void HiEventTuner::addSimulatedHistory(SimTrack const & simTrack, int parentSimT
 
     // Add the origin vertex of a selected track
     if ( !simTrack.noVertex() )
-    {        
-        // Add the parent simVertex to the tunedSimVertexes collection 
+    {
+        // Add the parent simVertex to the tunedSimVertexes collection
         tunedSimVertexes_->push_back(
             SimVertex(simVertexes_->at(simTrack.vertIndex()), parentSimTrackIndex)
         );
-        
+
         // Update the tunedSimTrack vertex index
-        tunedSimTrack.setVertexIndex((int)tunedSimVertexes_->size());       
+        tunedSimTrack.setVertexIndex((int)tunedSimVertexes_->size());
     }
-    
+
     // Define trackId
     std::size_t simTrackIndex = simTrack.trackId();
-    
+
     // Loop over the decay tracks
     for (
         IndexToIndexes::const_iterator decaySimTrackIndex = trackIndexToDecayTrackIndexes_.lower_bound(simTrackIndex);
         decaySimTrackIndex != trackIndexToDecayTrackIndexes_.upper_bound(simTrackIndex);
         ++decaySimTrackIndex
     )
-    	addSimulatedHistory(simTracks_->at(decaySimTrackIndex->second), (int)tunedSimTracks_->size());
+        addSimulatedHistory(simTracks_->at(decaySimTrackIndex->second), (int)tunedSimTracks_->size());
 }
 
 
-bool HiEventTuner::selectSimulatedTrack(SimTrack const & simTrack)
+template<typename Tune>
+bool HiEventTuner<Tune>::selectSimulatedTrack(SimTrack const & simTrack)
 {
-	// This is the basic rule, select SimTracks associate with a GenParticle
-   	if (getGeneratorParticle(simTrack)) return true;
-   	return false;
-}
-
-
-HepMC::GenParticle * HiEventTuner::getGeneratorParticle(SimTrack const & simTrack)
-{
-	// HepMC holder
-    edm::Handle<edm::HepMCProduct> hepmc;    
+    // HepMC holder
+    edm::Handle<edm::HepMCProduct> hepmc;
 
     // Index to the generator particle
     int genParticleIndex = simTrack.genpartIndex();
@@ -225,12 +228,10 @@ HepMC::GenParticle * HiEventTuner::getGeneratorParticle(SimTrack const & simTrac
         hepmc = (useMultipleHepMCLabels_) ? hepMCProducts_.at(simTrack.eventId().rawId()) : hepmc = hepMCProducts_.at(0);
 
         // Return the pointer to the GenParticle if there is any
-        return hepmc->GetEvent()->barcode_to_particle(genParticleIndex);
+        return tune_.select(*(hepmc->GetEvent()->barcode_to_particle(genParticleIndex)));
     }
-    
-    return 0;
+
+    return false;
 }
 
-
-//define this as a plug-in
-DEFINE_FWK_MODULE(HiEventTuner);
+#endif
