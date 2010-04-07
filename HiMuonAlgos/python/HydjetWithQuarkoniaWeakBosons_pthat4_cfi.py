@@ -7,7 +7,7 @@ myPars = cms.vstring(#'pythiaJets','pythiaZjets'
                      'pythiaQuarkoniaSettings',
                      'pythiaWeakBosons')
 generator.PythiaParameters.parameterSets.extend(myPars)
-generator.PythiaParameters.ppDefault = cms.vstring('MSEL=1   ! QCD hight pT processes',
+generator.PythiaParameters.ppDefault = cms.vstring('MSEL=0   ! QCD hight pT processes',
                             'CKIN(3)=4.',# ! ptMin
                             'MSTP(81)=0')
 
