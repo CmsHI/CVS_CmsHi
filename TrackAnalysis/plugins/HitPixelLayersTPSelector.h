@@ -39,6 +39,8 @@ class HitPixelLayersTPSelector
     minHit_(iConfig.getParameter<int>("minHit")), 
     signalOnly_(iConfig.getParameter<bool>("signalOnly")), 
     chargedOnly_(iConfig.getParameter<bool>("chargedOnly")), 
+    primaryOnly_(iConfig.getParameter<bool>("primaryOnly")),
+    tpStatusBased_(iConfig.getParameter<bool>("tpStatusBased")),
     pdgId_(iConfig.getParameter< std::vector<int> >("pdgId"))				   
       {};
     
@@ -48,6 +50,7 @@ class HitPixelLayersTPSelector
     {
       selected_.clear();
       
+
       const collection & tpc = *(TPCH.product());
       
       for (TrackingParticleCollection::size_type i=0; i<tpc.size(); i++)
@@ -57,7 +60,9 @@ class HitPixelLayersTPSelector
 	  // quickly reject if it is from pile-up
 	  if (signalOnly_ && !(tpr->eventId().bunchCrossing()==0 && tpr->eventId().event()==0) ) continue;
 	  if (chargedOnly_ && tpr->charge()==0) continue; //select only if charge!=0
-	  
+	  if (tpStatusBased_ && primaryOnly_ && tpr->status()!=1 ) continue; // TP status based sel primary
+	  if ((!tpStatusBased_) && primaryOnly_ && tpr->parentVertex()->nSourceTracks()!=0 ) continue; // vertex based sel for primary
+
 	  // loop over specified PID values 
 	  bool testId = false;
 	  unsigned int idSize = pdgId_.size();
@@ -146,6 +151,8 @@ class HitPixelLayersTPSelector
     int    minHit_;
     bool signalOnly_;
     bool chargedOnly_;
+    bool primaryOnly_;
+    bool tpStatusBased_;
     std::vector<int> pdgId_;
     
     
