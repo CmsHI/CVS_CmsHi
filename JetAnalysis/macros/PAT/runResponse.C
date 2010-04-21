@@ -53,16 +53,49 @@ void runResponseForAlgo(const char* algo, TFile* infile, TFile* outFile, float w
 
 void runResponse(){
 
-  TFile* infile = new TFile("./test1/pat_jets_120to170.root","read");
-  TFile* outFile = new TFile("./test1/jra_120to170.root","recreate");
-  runResponseForAlgo("ic5",infile,outFile);
-  runResponseForAlgo("ic7",infile,outFile);
-  runResponseForAlgo("akPu5",infile,outFile);
-  runResponseForAlgo("akPu7",infile,outFile);
-  runResponseForAlgo("ak5",infile,outFile);
-  runResponseForAlgo("ak7",infile,outFile);
+  TFile* infile = new TFile("./test1/pat_jets_50to80.root","read");
+  TFile* outFile = new TFile("./test1/jra_50to80.root","recreate");
+
+  float weight = 2096.;
+  runResponseForAlgo("ic5",infile,outFile,weight);
+  runResponseForAlgo("ic7",infile,outFile,weight);
+  runResponseForAlgo("akPu5",infile,outFile,weight);
+  runResponseForAlgo("akPu7",infile,outFile,weight);
+  runResponseForAlgo("ak5",infile,outFile,weight);
+  runResponseForAlgo("ak7",infile,outFile,weight);
+  outFile->Close();
+
+  weight = 224.0;
+  infile = new TFile("./test1/pat_jets_80to120.root","read");
+  outFile = new TFile("./test1/jra_80to120.root","recreate");
+  runResponseForAlgo("ic5",infile,outFile,weight);
+  runResponseForAlgo("ic7",infile,outFile,weight);
+  runResponseForAlgo("akPu5",infile,outFile,weight);
+  runResponseForAlgo("akPu7",infile,outFile,weight);
+  runResponseForAlgo("ak5",infile,outFile,weight);
+  runResponseForAlgo("ak7",infile,outFile,weight);
+  outFile->Close();
+
+  weight = 28.46;
+  infile = new TFile("./test1/pat_jets_120to170.root","read");
+  outFile = new TFile("./test1/jra_120to170.root","recreate");
+  runResponseForAlgo("ic5",infile,outFile,weight);
+  runResponseForAlgo("ic7",infile,outFile,weight);
+  runResponseForAlgo("akPu5",infile,outFile,weight);
+  runResponseForAlgo("akPu7",infile,outFile,weight);
+  runResponseForAlgo("ak5",infile,outFile,weight);
+  runResponseForAlgo("ak7",infile,outFile,weight);
+  outFile->Close();
 
 }
+
+
+
+
+
+
+
+
 
 void runResponseForAlgo(const char* algo, TFile* infile, TFile* outFile, float weight){
 
