@@ -124,9 +124,6 @@ void runResponseForAlgo(const char* algo, TFile* infile, TFile* outFile, float w
   double etaMin[nEtaBins] = {0.,0.,1.,2.};
   double etaMax[nEtaBins] = {5.,1.,2.,3.};
 
-  double phiMin[4] = {0,0,PI/3.,2*PI/3};
-  double phiMax[4] = {5,PI/3.,2*PI/3,5};
-
   TFile * centFile = new TFile("/home/yilmaz/CMSSW_3_5_4/src/RecoHI/HiCentralityAlgos/data/CentralityTables.root");
 
   infile->cd();
