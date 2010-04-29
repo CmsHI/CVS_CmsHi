@@ -7,6 +7,8 @@
 #include <TSystem.h>
 #include <TTree.h>
 
+#include "DataFormats/Math/interface/deltaR.h"
+
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 
 #include "DataFormats/Common/interface/Handle.h"
@@ -45,7 +47,7 @@ struct JRA{
    float refphi[MAXJETS];
   float jty[MAXJETS];
   float refy[MAXJETS];
-
+  float refdrjt[MAXJETS];
 
    float weight;
 };
@@ -119,9 +121,9 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
    t->Branch("refeta",jets_.refeta,"refeta[nref]/F");
    t->Branch("jty",jets_.jty,"jty[nref]/F");
    t->Branch("refy",jets_.refy,"refy[nref]/F");
-
    t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
    t->Branch("refphi",jets_.refphi,"refphi[nref]/F");
+   t->Branch("refdrjt",jets_.refdrjt,"refdrjt[nref]/F");
    t->Branch("weight",&jets_.weight,"weight/F");
    t->Branch("bin",&jets_.bin,"bin/I");
 
@@ -191,6 +193,7 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
 	    jets_.jteta[jets_.nref] = jet.eta();
 	    jets_.jtphi[jets_.nref] = jet.phi();
             jets_.jty[jets_.nref] = jet.eta();
+            jets_.refdrjt[jets_.nref] = reco::deltaR(jet,*(jet.genJet()));
 	     
 	    jets_.nref++;
 	      
