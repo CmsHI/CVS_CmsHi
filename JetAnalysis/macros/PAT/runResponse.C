@@ -33,7 +33,7 @@ struct etdr{
 
 struct JRA{
 
-   int nref;
+  unsigned char nref;
    int bin;
    float b;
    float hf;
@@ -43,6 +43,9 @@ struct JRA{
    float refeta[MAXJETS];
    float jtphi[MAXJETS];
    float refphi[MAXJETS];
+  float jty[MAXJETS];
+  float refy[MAXJETS];
+
 
    float weight;
 };
@@ -109,11 +112,14 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
    TTree* t= new TTree("t","Jet Response Analyzer");
    t->Branch("b",&jets_.b,"b/F");
    t->Branch("hf",&jets_.hf,"hf/F");
-   t->Branch("nref",&jets_.nref,"nref/I");
+   t->Branch("nref",&jets_.nref,"nref/b");
    t->Branch("jtpt",jets_.jtpt,"jtpt[nref]/F");
    t->Branch("refpt",jets_.refpt,"refpt[nref]/F");
    t->Branch("jteta",jets_.jteta,"jteta[nref]/F");
    t->Branch("refeta",jets_.refeta,"refeta[nref]/F");
+   t->Branch("jty",jets_.jty,"jty[nref]/F");
+   t->Branch("refy",jets_.refy,"refy[nref]/F");
+
    t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
    t->Branch("refphi",jets_.refphi,"refphi[nref]/F");
    t->Branch("weight",&jets_.weight,"weight/F");
@@ -170,6 +176,7 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
 	    jets_.refpt[jets_.nref] = jet.genJet()->pt();
 	    jets_.refeta[jets_.nref] = jet.genJet()->eta();
 	    jets_.refphi[jets_.nref] = jet.genJet()->phi();
+            jets_.refy[jets_.nref] = jet.genJet()->eta();
 	      
 	    jets_.jtpt[jets_.nref] = jet.pt();
 
@@ -183,6 +190,7 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
 	    
 	    jets_.jteta[jets_.nref] = jet.eta();
 	    jets_.jtphi[jets_.nref] = jet.phi();
+            jets_.jty[jets_.nref] = jet.eta();
 	     
 	    jets_.nref++;
 	      
