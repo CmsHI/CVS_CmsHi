@@ -18,7 +18,8 @@ jet_response_analyzer_x \
 -useweight true \
 -centrality $bin
 
-jet_response_fitter_x -input $output1 -output $output2
+#jet_response_fitter_x -input $output1 -output $output2
+mv $output1 $output2
 
 jet_response_and_resolution_x -input $output2 -output $output3 
 #-variables "RelRsp_Barrel:RefPt,RelRes_Barrel:RefPt" deprecated - how to choose barrel?
