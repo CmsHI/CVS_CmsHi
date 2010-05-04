@@ -25,9 +25,10 @@ void plotAll(){
 
   bool barrel = false;
   static const int nb = 6;
-  static const int nAlgos = 3;
+  static const int nAlgos = 2;
 
-  string algos[nAlgos] = {"icPu5calo","ak5calo","kt4calo"};
+  string algos[3] = {"akPu5calo","akPu7calo",""};
+  //  string algos[nAlgos] = {"icPu5calo","akPu5calo","ktPu6calo"};
   string bbins[6] = {"0-10","10-20","20-30","60-70","70-80","80-90"};
   int b[6] = {0,1,2,6,7,8};
 
