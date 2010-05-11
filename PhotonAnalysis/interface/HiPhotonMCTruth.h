@@ -14,7 +14,6 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
-#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
 #include "CmsHi/PhotonAnalysis/interface/HiMCGammaJetSignalDef.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
