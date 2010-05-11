@@ -16,7 +16,6 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
-#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
 #include <vector>
 
 class HiMCGammaJetSignalDef
