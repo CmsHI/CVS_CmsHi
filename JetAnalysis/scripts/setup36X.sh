@@ -2,9 +2,9 @@
 
 cd $CMSSW_BASE/src
 
-cvs co -r V07-13-19 PhysicsTools/PatAlgos # B3_6_X ?
-cvs co -r V05-09-14-00  DataFormats/PatCandidates # B3_6_X ?
-cvs co -r V03-01-14 RecoMET/METAlgorithms/python
+cvs co -r B3_6_X PhysicsTools/PatAlgos # B3_6_X ?
+cvs co -r B3_6_X DataFormats/PatCandidates # B3_6_X ?
+#cvs co -r V03-01-14 RecoMET/METAlgorithms/python
 
 cvs co -r V00-00-09 RecoHI/HiJetAlgos
 cvs co HeavyIonsAnalysis/Configuration
