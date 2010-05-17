@@ -4,7 +4,7 @@ cd $CMSSW_BASE/src
 
 cvs co -r V07-13-13 PhysicsTools/PatAlgos # B3_6_X ?
 cvs co -r V09-05-17 DataFormats/PatCandidates # B3_6_X ?
-cvs co RecoHI/HiJetAlgos
+cvs co -r V00-00-09 RecoHI/HiJetAlgos
 cvs co HeavyIonsAnalysis/Configuration
 cvs co GeneratorInterface/HiGenCommon
 
@@ -20,6 +20,7 @@ mv CondFormats/JetMETObjects/data/L5Flavor_IC5Calo.txt CondFormats/JetMETObjects
 
 cvs co UserCode/CmsHi/JetAnalysis
 mv UserCode/CmsHi/JetAnalysis/bin/jet_response_analyzer_x.cc JetMETAnalysis/JetAnalyzers/bin/
+rm JetMETAnalysis/JetAnalyzers/python/JPTReconstruction_cff.py
 scram b
 `pwd`
 
