@@ -5,6 +5,8 @@
    gSystem->Load("libDataFormatsCaloTowers");
    gSystem->Load("libDataFormatsHeavyIonEvent");
    gSystem->Load("libDataFormatsPatCandidates");
+   gSystem->Load("libDataFormatsRecoCandidate");
+
    gSystem->Load("libSimDataFormatsHiGenData");
    gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
    gSystem->AddIncludePath("-I$CMSSW_RELEASE_BASE/src/");
