@@ -30,10 +30,9 @@ using namespace std;
 
 static const int MAXJETS = 500;
 
-void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_6_0/UnquenchedDijet120to170_runs1to500.root", const char* outf = "output.root", double weight = 1){
+void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_6_0/UnquenchedDijet80to120_runs1to500.root", const char* outf = "output.root", double weight = 1){
 
-  TFile* infile = TFile::Open(inf);
-   TFile* outFile = new TFile(outf,"recreate");
+  int maxEvents = 1000;
 
    bool doFastJet = false;
 
@@ -50,6 +49,8 @@ void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/
    double etaMax[nEtaBins] = {5.,1.,2.,3.};
 
    TFile * centFile = new TFile("$CMSSW_BASE/src/RecoHI/HiCentralityAlgos/data/CentralityTables.root");
+   TFile* infile = TFile::Open(inf);
+   TFile* outFile = new TFile(outf,"recreate");
 
    infile->cd();
    fwlite::Event event(infile);
@@ -71,7 +72,7 @@ void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/
 
    // loop the events
    unsigned int iEvent=0;
-   for(event.toBegin(); !event.atEnd(); ++event, ++iEvent){
+   for(event.toBegin(); !event.atEnd() && (maxEvents < 0 || iEvent < maxEvents); ++event, ++iEvent){
       edm::EventBase const & ev = event;
       if( iEvent % 100 == 0 ) cout<<"Processing event : "<<iEvent<<endl;
 
