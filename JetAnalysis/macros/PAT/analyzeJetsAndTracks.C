@@ -4,6 +4,8 @@
 #include <TH2D.h>
 #include <TH1D.h>
 #include <TFile.h>
+#include <TFileCacheRead.h>
+
 #include <TSystem.h>
 #include <TTree.h>
 
@@ -13,6 +15,8 @@
 
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/FWLite/interface/Event.h"
+#include "DataFormats/FWLite/interface/ChainEvent.h"
+
 #include "FWCore/ParameterSet/interface/InputTag.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityBins.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
@@ -30,9 +34,10 @@ using namespace std;
 
 static const int MAXJETS = 500;
 
-void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_6_0/UnquenchedDijet80to120_runs1to500.root", const char* outf = "output.root", double weight = 1){
-
-  int maxEvents = 1000;
+void analyzeJetsAndTracks(char* inf = "root://castorcms//castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_6_0/UnquenchedDijet80to120_runs1to500.root", const char* outf = "output.root", double weight = 1){
+  
+  // If negative, all events are analyzed
+  int maxEvents = -1000;
 
    bool doFastJet = false;
 
@@ -51,7 +56,6 @@ void analyzeJetsAndTracks(const char* inf = "rfio:/castor/cern.ch/user/y/yilmaz/
    TFile * centFile = new TFile("$CMSSW_BASE/src/RecoHI/HiCentralityAlgos/data/CentralityTables.root");
    TFile* infile = TFile::Open(inf);
    TFile* outFile = new TFile(outf,"recreate");
-
    infile->cd();
    fwlite::Event event(infile);
    outFile->cd();
