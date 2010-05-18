@@ -1,6 +1,7 @@
 #!/bin/sh
 
 cd $CMSSW_BASE/src
+cvs co RecoHI/HiCentralityAlgos/data
 cvs co -r V00-07-04 JetMETAnalysis/JetUtilities
 cvs co -r V00-08-06 JetMETAnalysis/JetAnalyzers
 cvs co RecoHI/HiJetAlgos

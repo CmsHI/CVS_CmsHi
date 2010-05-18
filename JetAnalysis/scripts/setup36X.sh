@@ -2,6 +2,8 @@
 
 cd $CMSSW_BASE/src
 
+cvs co RecoHI/HiCentralityAlgos/data
+
 cvs co -r B3_6_X PhysicsTools/PatAlgos # B3_6_X ?
 cvs co -r B3_6_X DataFormats/PatCandidates # B3_6_X ?
 #cvs co -r V03-01-14 RecoMET/METAlgorithms/python
@@ -24,6 +26,6 @@ cvs co UserCode/CmsHi/JetAnalysis
 mv UserCode/CmsHi/JetAnalysis/bin/jet_response_analyzer_x.cc JetMETAnalysis/JetAnalyzers/bin/
 rm JetMETAnalysis/JetAnalyzers/python/JPTReconstruction_cff.py
 scram b
-`pwd`
+pwd
 
 
