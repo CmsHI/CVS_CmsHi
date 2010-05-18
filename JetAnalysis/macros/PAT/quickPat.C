@@ -12,7 +12,7 @@
     Events->SetAlias("genjets","recoGenJets_iterativeCone5HiGenJets__RECO");
   }
 
-  Events->SetAlias("patjets","patJets_patJets__.PAT");
+  Events->SetAlias("patjets","patJets_patJets__PAT");
   Events->SetAlias("njets","Sum$(patjets.pt() > -200 )");
   Events->SetAlias("hf","cent->EtHFhitSum()");
 

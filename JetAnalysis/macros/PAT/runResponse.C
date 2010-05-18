@@ -83,10 +83,17 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
    const char* jetTag = Form("%spatJets",algo.data());
    const char* rhoTag = "";
 
-   if(algo.compare("ak5") == 0) rhoTag = "akFastPu5CaloJets";
-   if(algo.compare("ak7") == 0) rhoTag = "akFastPu7CaloJets";
-   if(algo.compare("kt4") == 0) rhoTag = "ktFastPu4CaloJets";
-   if(algo.compare("kt6") == 0) rhoTag = "ktFastPu6CaloJets";
+   if(0){
+     if(algo.compare("ak5") == 0) rhoTag = "akFastPu5CaloJets";
+     if(algo.compare("ak7") == 0) rhoTag = "akFastPu7CaloJets";
+     if(algo.compare("kt4") == 0) rhoTag = "ktFastPu4CaloJets";
+     if(algo.compare("kt6") == 0) rhoTag = "ktFastPu6CaloJets";
+   }else{
+     if(algo.compare("ak5") == 0) rhoTag = "kt4CaloJets";
+     if(algo.compare("ak7") == 0) rhoTag = "kt6CaloJets"; //?
+     if(algo.compare("kt4") == 0) rhoTag = "kt4CaloJets";
+     if(algo.compare("kt6") == 0) rhoTag = "kt6CaloJets"; //?
+   }
 
    cout<<"Running for algorithm : "<<jetTag<<endl;
    cout<<"Saving in directory : "<<name<<endl;
@@ -164,7 +171,7 @@ void runResponseForAlgo(string algo, TFile* infile, TFile* outFile, float weight
       ev.getByLabel(edm::InputTag(jetTag),jets);
 
       edm::Handle<double> rho;
-      if(doFastJet) ev.getByLabel(edm::InputTag(rhoTag),rho);
+      if(doFastJet) ev.getByLabel(edm::InputTag(rhoTag, "rho"),rho);
     
       // FILL JRA TREE
       jets_.b = mc->b();
