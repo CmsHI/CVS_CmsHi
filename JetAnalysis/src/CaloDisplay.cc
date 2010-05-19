@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: CaloDisplay.cc,v 1.1 2008/04/07 14:29:18 yilmaz Exp $
+// $Id: CaloDisplay.cc,v 1.1 2009/04/27 21:24:37 yilmaz Exp $
 //
 //
 
@@ -35,7 +35,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 
@@ -205,7 +205,7 @@ CaloDisplay::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    edm::Handle<reco::JetView> jets;
    iEvent.getByLabel("iterativeConePu5CaloJets",jets);
-   for(int ijet = 0; ijet < jets->size(); ++ijet){
+   for(unsigned int ijet = 0; ijet < jets->size(); ++ijet){
       const reco::Jet* jet = &((*jets)[ijet]); 
       double pt = jet->pt();
       double eta = jet->eta();

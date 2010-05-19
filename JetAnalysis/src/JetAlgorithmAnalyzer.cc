@@ -6,6 +6,11 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TNtuple.h"
+#include "TH2D.h"
+#include <vector>
+
+static const int nSteps = 8;
+static const double PI = 3.141592653589;
 
 class JetAlgorithmAnalyzer : public VirtualJetProducer
 {
@@ -29,7 +34,7 @@ protected:
   template< typename T >
   void writeBkgJets( edm::Event & iEvent, edm::EventSetup const& iSetup );
 
-   void fillNtuple(bool output, const  std::vector<fastjet::PseudoJet>& jets, int step);
+   void fillNtuple(int output, const  std::vector<fastjet::PseudoJet>& jets, int step);
    void fillTowerNtuple(const  std::vector<fastjet::PseudoJet>& jets, int step);
    void fillJetNtuple(const  std::vector<fastjet::PseudoJet>& jets, int step);
    void fillBkgNtuple(const PileUpSubtractor* subtractor, int step);
@@ -41,6 +46,8 @@ protected:
   bool useOnlyOnePV_;
   float dzTrVtxMax_;
 
+  double phi0_;
+
   int nFill_;
    float etaMax_;
    int iev_;
@@ -48,10 +55,21 @@ protected:
 
    bool doAnalysis_;
 
+  bool doMC_;
+
    TNtuple* ntTowers;
+  TNtuple* ntTowersFromEvtPlane;
+
    TNtuple* ntJets;
    TNtuple* ntPU;
    TNtuple* ntRandom;
+
+  std::vector<TH2D*> hTowers;
+  std::vector<TH2D*> hTowersFromEvtPlane;
+
+  std::vector<TH2D*> hJets;
+  std::vector<TH2D*> hPU;
+  std::vector<TH2D*> hRandom;
 
    const CaloGeometry *geo;
    edm::Service<TFileService> f;
@@ -93,6 +111,8 @@ protected:
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
+#include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
+
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
@@ -125,6 +145,7 @@ CLHEP::HepRandomEngine* randomEngine;
 //______________________________________________________________________________
 JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
    : VirtualJetProducer( iConfig ),
+     phi0_(0),
      nFill_(5),
      etaMax_(3),
      iev_(0),
@@ -134,6 +155,8 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
    randomEngine = &(rng->getEngine());
 
    doAnalysis_  = iConfig.getUntrackedParameter<bool>("doAnalysis",true);
+   doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
+
    avoidNegative_  = iConfig.getParameter<bool>("avoidNegative");
   
   if ( iConfig.exists("UseOnlyVertexTracks") )
@@ -158,6 +181,13 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
      ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:event");
+
+     for(int i = 0; i < nSteps; ++i){
+       hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
+       hJets.push_back(f->make<TH2D>(Form("hJets_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
+       hTowersFromEvtPlane.push_back(f->make<TH2D>(Form("hTowersFromEvtPlane_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
+     }
+
   }
 
 }
@@ -169,16 +199,38 @@ JetAlgorithmAnalyzer::~JetAlgorithmAnalyzer()
 } 
 
 
-void JetAlgorithmAnalyzer::fillNtuple(bool output, const  std::vector<fastjet::PseudoJet>& jets, int step){
+void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::PseudoJet>& jets, int step){
    if(!doAnalysis_) return;
 
    TNtuple* nt;
-   if(output) nt = ntJets;
-   else nt = ntTowers;
+   TH2D* h;
+
+   if(output == 1){
+     nt = ntJets;
+     h = hJets[step];
+   }
+   if(output == 0){
+     nt = ntTowers;
+     h = hTowers[step];
+   }
+
+   if(output == 2){
+     nt = ntTowersFromEvtPlane;
+     h = hTowersFromEvtPlane[step];
+   }
 
    for(unsigned int i = 0; i < jets.size(); ++i){
       const fastjet::PseudoJet& jet = jets[i];
+      
+      double phi = jet.phi();
+      if(output == 2){
+	phi = phi - phi0_;
+	if(phi < -PI) phi += 2*PI;
+        if(phi > PI) phi -= 2*PI;
+      }
+      
       nt->Fill(jet.eta(),jet.phi(),jet.perp(),step,iev_);
+      h->Fill(jet.eta(),jet.phi(),jet.perp());
    }
 
 }
@@ -186,6 +238,7 @@ void JetAlgorithmAnalyzer::fillNtuple(bool output, const  std::vector<fastjet::P
 
 void JetAlgorithmAnalyzer::fillTowerNtuple(const  std::vector<fastjet::PseudoJet>& jets, int step){
    fillNtuple(0,jets,step);
+   fillNtuple(2,jets,step);
 }
  
 void JetAlgorithmAnalyzer::fillJetNtuple(const  std::vector<fastjet::PseudoJet>& jets, int step){
@@ -245,7 +298,13 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    fjInputs_.clear();
    fjJets_.clear();
    inputs_.clear();  
-  
+
+   if(doAnalysis_ && doMC_){
+     Handle<GenHIEvent> hi;
+     iEvent.getByLabel("heavyIon",hi);
+     phi0_ = hi->evtPlane();
+   }
+
    // get inputs and convert them to the fastjet format (fastjet::PeudoJet)
    edm::Handle<reco::CandidateView> inputsHandle;
    iEvent.getByLabel(src_,inputsHandle);
@@ -330,6 +389,8 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    LogDebug("VirtualJetProducer") << "Wrote jets\n";
 
    ++iev_;
+
+   doAnalysis_ = false;
   
    return;
 }
