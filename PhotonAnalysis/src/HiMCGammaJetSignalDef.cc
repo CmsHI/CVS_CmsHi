@@ -86,7 +86,7 @@ bool HiMCGammaJetSignalDef::IsIsolated(const reco::GenParticle &pp)
 
 
 
-bool HiMCGammaJetSignalDef::IsIsolatedPP(const reco::GenParticle &pp)
+bool HiMCGammaJetSignalDef::IsIsolatedPP(const reco::GenParticle &pp,double cone, double etCut)
 {
   using namespace std;
   using namespace edm;
@@ -96,7 +96,6 @@ bool HiMCGammaJetSignalDef::IsIsolatedPP(const reco::GenParticle &pp)
 
   double  EtCone = 0;
   double  EtPhoton = 0;
-  double  cone = 0.4;
   
   const int maxindex = (int)fSigParticles->size();
   for(int i=0; i < maxindex ; ++i) {
@@ -123,10 +122,8 @@ bool HiMCGammaJetSignalDef::IsIsolatedPP(const reco::GenParticle &pp)
   EtPhoton = pp.et();
   
   // isolation cuts                                                                                                                                                                                  
-  if(EtCone-EtPhoton > 2)
+  if(EtCone-EtPhoton > etCut)
      return kFALSE;
-  //if(PtMaxHadron > 4.5+EtPhoton/40)
-  //  return kFALSE;
   
   return kTRUE;
   

@@ -27,7 +27,7 @@ class HiPhotonMCTruth
   HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle);
   bool IsPrompt(const reco::GenParticle &pp);
   bool IsIsolated(const reco::GenParticle &pp);
-  bool IsIsolatedPP(const reco::GenParticle &pp);
+  bool IsIsolatedPP(const reco::GenParticle &pp,double cone = 0.4, double etCut = 2.0);
   bool IsIsolatedJP(const reco::GenParticle &pp);
  
  private:

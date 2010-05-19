@@ -36,14 +36,14 @@ bool HiPhotonMCTruth::IsIsolated(const reco::GenParticle &pp)
   return  mcisocut.IsIsolated(pp);
 }
 
-bool HiPhotonMCTruth::IsIsolatedPP(const reco::GenParticle &pp)
+bool HiPhotonMCTruth::IsIsolatedPP(const reco::GenParticle &pp, double cone, double etCut)
 {
   using namespace std;
   using namespace edm;
   using namespace reco;
   // Check if a given particle is isolated.                                                                                                                                                          
 
-  return  mcisocut.IsIsolatedPP(pp);
+  return  mcisocut.IsIsolatedPP(pp,cone,etCut);
 }
 
 bool HiPhotonMCTruth::IsIsolatedJP(const reco::GenParticle &pp)
