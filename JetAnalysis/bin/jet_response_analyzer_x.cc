@@ -173,8 +173,8 @@ int main(int argc,char**argv)
     //
     // setup the tree for reading
     //
-    //    unsigned char nref;
-    int nref;
+    unsigned char nref;
+    //    int nref;
     float weight(1.0);
     int cent;
     int   refpdgid[100];
