@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "DataFormats/Common/interface/Handle.h"
 
@@ -55,13 +56,9 @@ private:
     typedef std::multimap<std::size_t, std::size_t> IndexToIndexes;
 
     IndexToIndexes trackIndexToDecayTrackIndexes_;
-
     void mapTrackIdToDecayTrackIndexes();
-
     void createTunedCollections();
-
     void addSimulatedHistory(SimTrack const &, int parentSimTrackIndex = -1);
-
     bool selectSimulatedTrack(SimTrack const &);
 
 };
@@ -119,10 +116,11 @@ void HiEventTuner<Tune>::produce(edm::Event& event, const edm::EventSetup& setup
     }
 
     // Collect all the SimTracks
-    event.getByLabel("mix", simHitLabel_, simTracks_);
+    event.getByLabel(simHitLabel_, simTracks_);
 
     // Collect all the simvertex from the crossing frame
-    event.getByLabel("mix", simHitLabel_, simVertexes_);
+    event.getByLabel(simHitLabel_, simVertexes_);
+    std::cout<<"Got products from event."<<std::endl;
 
     // Create collections of things we will put in event
     tunedSimTracks_ = std::auto_ptr<edm::SimTrackContainer>( new edm::SimTrackContainer );
@@ -130,9 +128,11 @@ void HiEventTuner<Tune>::produce(edm::Event& event, const edm::EventSetup& setup
 
     // Create a map between trackId and vertex (decay) index
     mapTrackIdToDecayTrackIndexes();
+    std::cout<<"Map of track IDs ready."<<std::endl;
 
     // Create the actual tuned collection
     createTunedCollections();
+    std::cout<<"Tuned collections produced"<<std::endl;
 
     // Put TrackingParticles and TrackingVertices in event
     event.put(tunedSimTracks_);
@@ -149,8 +149,13 @@ void HiEventTuner<Tune>::mapTrackIdToDecayTrackIndexes()
     trackIndexToDecayTrackIndexes_.clear();
 
     // Loop over the track collection
+
+    std::cout<<"Number of input simtracks : "<<simTracks_->size()<<std::endl;
+
     for (edm::SimTrackContainer::const_iterator simTrack = simTracks_->begin(); simTrack != simTracks_->end(); ++simTrack, ++index)
     {
+
+      //      std::cout<<"Evaluating track "<<index<<std::endl;
         // Check for a source vertex
         if (simTrack->noVertex()) continue;
 
@@ -161,6 +166,14 @@ void HiEventTuner<Tune>::mapTrackIdToDecayTrackIndexes()
         if (sourceVertex.noParent()) continue;
 
         // Get the source vertex
+
+	if( (int)(sourceVertex.parentIndex())  > (int)(simTracks_->size()) ){
+	  std::cout<<"What the hell??"<<std::endl;
+	  std::cout<<"Screwed track "<<index<<std::endl;
+	  std::cout<<"sourceVertex.parentIndex() "<<sourceVertex.parentIndex()<<std::endl;
+	  std::cout<<"simTracks_->size() "<<simTracks_->size()<<std::endl;
+   }
+
         SimTrack const & parentTrack = simTracks_->at( sourceVertex.parentIndex() );
 
         // Making the association between parentSimTrack and decay index
