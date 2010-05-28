@@ -4,11 +4,17 @@ import FWCore.ParameterSet.Config as cms
 #
 from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
 
+
+
 GenMuons = cms.EDFilter("CandViewRefSelector",
-                        src = cms.InputTag("genParticles"),
+                        #src = cms.InputTag("genParticles"),
+                        src = cms.InputTag("hiGenParticles"),
                         cut = cms.string('abs(pdgId) = 13 & (pt > 10 & abs(eta)<2.5)'),
                         filter = cms.bool(True)
                         )
+
+
+
 
 GenDimuons = cms.EDFilter("CandViewShallowCloneCombiner",
                           checkCharge = cms.bool(True),
@@ -17,6 +23,12 @@ GenDimuons = cms.EDFilter("CandViewShallowCloneCombiner",
                           decay = cms.string('GenMuons@+ GenMuons@-')
                           )
 
+GenDimuonsFilter = cms.EDFilter("CandViewCountFilter",
+                                      src = cms.InputTag("GenDimuons"),
+                                      minNumber = cms.uint32(1)
+                                      )
+
+
 
 
 
@@ -24,15 +36,22 @@ GenDimuons = cms.EDFilter("CandViewShallowCloneCombiner",
 # muons
 Dimuons = cms.EDFilter("CandViewShallowCloneCombiner",
                        checkCharge = cms.bool(True),
-                       cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
+                       #cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
+                       cut = cms.string(' mass > 0 & mass < 10000 & charge=0'),
+
+
                        #decay = cms.string("muons@+ muons@-")
-                       decay = cms.string('selectedPatMuonsTriggerMatch@+ selectedPatMuonsTriggerMatch@-')
+                       decay = cms.string('patMuons@+ patMuons@-')
                        )
 
 dimuonsGlobalSTA = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("Dimuons"),
-                                cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10)&((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
+    #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10)&((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
+                                cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
                                 filter = cms.bool(True)
+
+
+
                             )
 
 
@@ -44,14 +63,17 @@ dimuonsGlobalSTAFilter = cms.EDFilter("CandViewCountFilter",
 
 dimuonsGlobal = cms.EDFilter("CandViewRefSelector",
                              src = cms.InputTag("Dimuons"),
-                             cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 1 &  daughter(1).isGlobalMuon = 1 )' ),
+                             #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 1 &  daughter(1).isGlobalMuon = 1 )' ),
+                             cut = cms.string('(daughter(0).isGlobalMuon = 1 &  daughter(1).isGlobalMuon = 1 )' ),
                              filter = cms.bool(True)
                              )
 
 
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("Dimuons"),
-                          cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
+                          #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
+
+                          cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
                                                           filter = cms.bool(True)
                                                           )
 

@@ -22,16 +22,34 @@ process.maxEvents = cms.untracked.PSet(
 
 
 process.source = cms.Source("PoolSource",
+
+                            noEventSort = cms.untracked.bool(True),
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+
                             fileNames = cms.untracked.vstring(
-    'file:Z0_hiCommonSkimAOD_HI_PAT.root'
-# 'file:Z0_hiCommonSkimAOD_pp_PAT.root'   
+
+
+    #'file:TestForGenPlots.root'
+##Central PbPb
+#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral2_recoMu.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral3_recoMu.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_CentralEmbadded4_recoMu.root'
+
+
+## Minimum biased PbPb
+    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded_recoMu.root',
+    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded2_recoMu.root',
+    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded3_recoMu.root'
+
+#'file:Z0_ZMuMuSkim_HI_PAT.root'
+#'file:Z0_hiCommonSkimAOD_pp_PAT.root'   
     )
                             )
 
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName = cms.string("ZMuMu_HI_PAT.root")
+    fileName = cms.string("TestForGen_Plot.root")
     )
 
 zPlots = cms.PSet(
@@ -184,12 +202,13 @@ zPlots = cms.PSet(
     )
     )
 
+
 process.GenDimuonsPlots = cms.EDFilter(
-        "CandViewHistoAnalyzer",
-            zPlots,
-            src = cms.InputTag("GenDimuons"),
-            filter = cms.bool(False)
-            )
+    "CandViewHistoAnalyzer",
+    zPlots,
+    src = cms.InputTag("Dimuons"),
+    filter = cms.bool(False)
+    )
 
 
 process.DimuonsPlots = cms.EDFilter(
@@ -221,9 +240,6 @@ process.dimuonsSTAPlots = cms.EDFilter(
     filter = cms.bool(False)
     )
 
-
-
-
 process.eventInfo = cms.OutputModule (
     "AsciiOutputModule"
         )
@@ -253,3 +269,4 @@ process.endPath = cms.EndPath(
     process.eventInfo
     )
 process.schedule=cms.Schedule(process.GenDimuonsPlotsPath,process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.endPath)
+#process.schedule=cms.Schedule(process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.endPath)
