@@ -1,10 +1,12 @@
 #ifndef RecoJets_JetProducers_plugins_JetAlgorithmAnalyzer_h
 #define RecoJets_JetProducers_plugins_JetAlgorithmAnalyzer_h
 
-#include "RecoJets/JetProducers/plugins/VirtualJetProducer.h"
+//#include "RecoJets/JetProducers/plugins/VirtualJetProducer.h"
+#include "MyVirtualJetProducer.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "TNtuple.h"
 #include "TH2D.h"
 #include <vector>
@@ -12,7 +14,7 @@
 static const int nSteps = 8;
 static const double PI = 3.141592653589;
 
-class JetAlgorithmAnalyzer : public VirtualJetProducer
+class JetAlgorithmAnalyzer : public MyVirtualJetProducer
 {
 
 public:
@@ -57,6 +59,9 @@ protected:
 
   bool doMC_;
 
+  int centBin_;
+  const CentralityBins* cbins_;
+
    TNtuple* ntTowers;
   TNtuple* ntTowersFromEvtPlane;
 
@@ -68,8 +73,13 @@ protected:
   std::vector<TH2D*> hTowersFromEvtPlane;
 
   std::vector<TH2D*> hJets;
-  std::vector<TH2D*> hPU;
+  std::vector<TH1D*> hPU;
+  std::vector<TH1D*> hMean;
+  std::vector<TH1D*> hSigma;
+
   std::vector<TH2D*> hRandom;
+
+
 
    const CaloGeometry *geo;
    edm::Service<TFileService> f;
@@ -144,19 +154,22 @@ CLHEP::HepRandomEngine* randomEngine;
 
 //______________________________________________________________________________
 JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
-   : VirtualJetProducer( iConfig ),
+   : MyVirtualJetProducer( iConfig ),
      phi0_(0),
      nFill_(5),
      etaMax_(3),
      iev_(0),
-     geo(0)
+     geo(0),
+     cbins_(0)
 {
    edm::Service<RandomNumberGenerator> rng;
    randomEngine = &(rng->getEngine());
 
    doAnalysis_  = iConfig.getUntrackedParameter<bool>("doAnalysis",true);
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
-
+   
+   if(doAnalysis_) centBin_ = iConfig.getUntrackedParameter<int>("centrality",0);
+   
    avoidNegative_  = iConfig.getParameter<bool>("avoidNegative");
   
   if ( iConfig.exists("UseOnlyVertexTracks") )
@@ -174,18 +187,26 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
   else
     dzTrVtxMax_ = false;
 
+  produces<reco::CaloJetCollection>("randomCones");
   produces<std::vector<bool> >("directions");
 
   if(doAnalysis_){
      ntTowers = f->make<TNtuple>("ntTowers","Algorithm Analysis Towers","eta:phi:et:step:event");
+     ntTowersFromEvtPlane = f->make<TNtuple>("ntTowersFromEvtPlane","Algorithm Analysis Towers","eta:phi:et:step:event");
+
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
      ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:event");
 
      for(int i = 0; i < nSteps; ++i){
-       hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
-       hJets.push_back(f->make<TH2D>(Form("hJets_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
-       hTowersFromEvtPlane.push_back(f->make<TH2D>(Form("hTowersFromEvtPlane_step%d",i),"",200,-5.5,5.5,200,-3.5,3.5));
+       hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
+       hJets.push_back(f->make<TH2D>(Form("hJets_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
+       hTowersFromEvtPlane.push_back(f->make<TH2D>(Form("hTowersFromEvtPlane_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
+
+       hPU.push_back(f->make<TH1D>(Form("hPU_step%d",i),"",200,-5.5,5.5));
+       hMean.push_back(f->make<TH1D>(Form("hMean_step%d",i),"",200,-5.5,5.5));
+       hSigma.push_back(f->make<TH1D>(Form("hSigma_step%d",i),"",200,-5.5,5.5));
+
      }
 
   }
@@ -225,12 +246,12 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
       double phi = jet.phi();
       if(output == 2){
 	phi = phi - phi0_;
-	if(phi < -PI) phi += 2*PI;
-        if(phi > PI) phi -= 2*PI;
+	if(phi < 0) phi += 2*PI;
+        if(phi > 2*PI) phi -= 2*PI;
       }
       
-      nt->Fill(jet.eta(),jet.phi(),jet.perp(),step,iev_);
-      h->Fill(jet.eta(),jet.phi(),jet.perp());
+      nt->Fill(jet.eta(),phi,jet.perp(),step,iev_);
+      h->Fill(jet.eta(),phi,jet.perp());
    }
 
 }
@@ -247,25 +268,26 @@ void JetAlgorithmAnalyzer::fillJetNtuple(const  std::vector<fastjet::PseudoJet>&
 
 void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int step){
    if(!doAnalysis_) return;
-   
    CaloTowerCollection col;
-
-   for(int ieta = 1; ieta < 29; ++ieta){
-
-      CaloTowerDetId id(ieta,0);
-      const GlobalPoint& hitpoint = geo->getPosition(id);
-      double eta = hitpoint.eta();
-      
-      //   CaloTowerDetId id(int ieta = 0, int iphi = 0);
-      math::PtEtaPhiMLorentzVector p4(1,eta,0,0);
-      GlobalPoint pos(1,1,1);
-      CaloTower c(id,1.,1.,1.,1,1, p4, pos,pos);      
-      col.push_back(c);
-      reco::CandidatePtr ptr(&col,col.size() - 1);
-      double mean = subtractor->getMeanAtTower(ptr);  
-      double sigma = subtractor->getMeanAtTower(ptr);
-      
-      ntPU->Fill(eta,mean,sigma,step,iev_);
+   for(int ieta = -29; ieta < 30; ++ieta){
+     if(ieta == 0) continue;
+       CaloTowerDetId id(ieta,1);
+       const GlobalPoint& hitpoint = geo->getPosition(id);
+       cout<<"iETA "<<ieta<<endl;
+       double eta = hitpoint.eta();
+       cout<<"eta "<<eta<<endl;
+       math::PtEtaPhiMLorentzVector p4(1,eta,1.,1.);
+       GlobalPoint pos(1,1,1);
+       CaloTower c(id,1.,1.,1.,1,1, p4, pos,pos);      
+       col.push_back(c);
+       reco::CandidatePtr ptr(&col,col.size() - 1);
+       double mean = subtractor->getMeanAtTower(ptr);  
+       double sigma = subtractor->getSigmaAtTower(ptr);
+       double pu = subtractor->getPileUpAtTower(ptr);
+       ntPU->Fill(eta,mean,sigma,step,iev_);
+       hPU[step]->Fill(eta,pu);
+       hMean[step]->Fill(eta,mean);
+       hSigma[step]->Fill(eta,sigma);
    }
 }
 
@@ -275,6 +297,14 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       edm::ESHandle<CaloGeometry> pGeo;
       iSetup.get<CaloGeometryRecord>().get(pGeo);
       geo = pGeo.product();
+   }
+
+   if(doAnalysis_){
+     edm::Handle<reco::Centrality> cent;
+     iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
+     if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+     int bin = cbins_->getBin(cent->EtHFhitSum());
+     if(bin != centBin_) return;
    }
 
    LogDebug("VirtualJetProducer") << "Entered produce\n";
@@ -303,6 +333,13 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
      Handle<GenHIEvent> hi;
      iEvent.getByLabel("heavyIon",hi);
      phi0_ = hi->evtPlane();
+
+     double b = hi->b();
+     cout<<"===================================="<<endl;
+     cout<<"IMPACT PARAMETER OF THE EVENT : "<<b<<endl;
+     cout<<"===================================="<<endl;
+
+
    }
 
    // get inputs and convert them to the fastjet format (fastjet::PeudoJet)
@@ -401,18 +438,23 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
    // and fjClusterSeq_                                                                
    switch( jetTypeE ) {
    case JetType::CaloJet :
-      writeBkgJets<reco::CaloJet>( iEvent, iSetup);
+     writeJets<reco::CaloJet>( iEvent, iSetup);
+     writeBkgJets<reco::CaloJet>( iEvent, iSetup);
       break;
    case JetType::PFJet :
+     writeJets<reco::PFJet>( iEvent, iSetup);
       writeBkgJets<reco::PFJet>( iEvent, iSetup);
       break;
    case JetType::GenJet :
+     writeJets<reco::GenJet>( iEvent, iSetup);
       writeBkgJets<reco::GenJet>( iEvent, iSetup);
       break;
    case JetType::TrackJet :
+     writeJets<reco::TrackJet>( iEvent, iSetup);
       writeBkgJets<reco::TrackJet>( iEvent, iSetup);
       break;
    case JetType::BasicJet :
+     writeJets<reco::BasicJet>( iEvent, iSetup);
       writeBkgJets<reco::BasicJet>( iEvent, iSetup);
       break;
    default:
@@ -485,11 +527,11 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       if(doAnalysis_) ntRandom->Fill(etaRandom[ir],phiRandom[ir],et[ir],pileUp[ir],iev_);
 
       if(et[ir] < 0){
-	 cout<<"Flipping vector"<<endl;
+	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
 	 et[ir] = -et[ir];
       }else{
-         cout<<"Keep vector same"<<endl;
+	//         cout<<"Keep vector same"<<endl;
          (*directions)[ir] = true;
       }
       cout<<"Lorentz"<<endl;
@@ -534,20 +576,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    }
   
    // put the jets in the collection
-   iEvent.put(jets);
+   iEvent.put(jets,"randomCones");
    iEvent.put(directions,"directions");
-   // calculate rho (median pT per unit area, for PU&UE subtraction down the line
-   std::auto_ptr<double> rho(new double(0.0));
-   std::auto_ptr<double> sigma(new double(0.0));
-
-   if (doRhoFastjet_) {
-      fastjet::ClusterSequenceArea const * clusterSequenceWithArea =
-	 dynamic_cast<fastjet::ClusterSequenceArea const *> ( &*fjClusterSeq_ );
-      double mean_area = 0;
-      clusterSequenceWithArea->get_median_rho_and_sigma(*fjRangeDef_,false,*rho,*sigma,mean_area);
-      iEvent.put(rho,"rho");
-      iEvent.put(sigma,"sigma");
-   }
 }
 
 void JetAlgorithmAnalyzer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup)

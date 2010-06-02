@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// VirtualJetProducer
+// MyVirtualJetProducer
 // ------------------
 //
 //            04/21/2009 Philipp Schieferdecker <philipp.schieferdecker@cern.ch>
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "RecoJets/JetProducers/plugins/VirtualJetProducer.h"
+#include "MyVirtualJetProducer.h"
 #include "RecoJets/JetProducers/interface/JetSpecific.h"
 
 #include "FWCore/Framework/interface/Event.h"
@@ -54,14 +54,14 @@ namespace reco {
 }
 
 //______________________________________________________________________________
-const char *VirtualJetProducer::JetType::names[] = {
+const char *MyVirtualJetProducer::JetType::names[] = {
   "BasicJet","GenJet","CaloJet","PFJet","TrackJet"
 };
 
 
 //______________________________________________________________________________
-VirtualJetProducer::JetType::Type
-VirtualJetProducer::JetType::byName(const string &name)
+MyVirtualJetProducer::JetType::Type
+MyVirtualJetProducer::JetType::byName(const string &name)
 {
   const char **pos = std::find(names, names + LastJetType, name);
   if (pos == names + LastJetType) {
@@ -72,7 +72,7 @@ VirtualJetProducer::JetType::byName(const string &name)
 }
 
 
-void VirtualJetProducer::makeProduces( std::string alias, std::string tag ) 
+void MyVirtualJetProducer::makeProduces( std::string alias, std::string tag ) 
 {
   if (makeCaloJet(jetTypeE)) {
     produces<reco::CaloJetCollection>(tag).setBranchAlias(alias);
@@ -96,7 +96,7 @@ void VirtualJetProducer::makeProduces( std::string alias, std::string tag )
 ////////////////////////////////////////////////////////////////////////////////
 
 //______________________________________________________________________________
-VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig)
+MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
   : moduleLabel_   (iConfig.getParameter<string>       ("@module_label"))
   , src_           (iConfig.getParameter<edm::InputTag>("src"))
   , srcPVs_        (iConfig.getParameter<edm::InputTag>("srcPVs"))
@@ -156,7 +156,7 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig)
 							    rParam_,-2) );
   else
     throw cms::Exception("Invalid jetAlgorithm")
-      <<"Jet algorithm for VirtualJetProducer is invalid, Abort!\n";
+      <<"Jet algorithm for MyVirtualJetProducer is invalid, Abort!\n";
   
   jetTypeE=JetType::byName(jetType_);
 
@@ -205,7 +205,7 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig)
 
 
 //______________________________________________________________________________
-VirtualJetProducer::~VirtualJetProducer()
+MyVirtualJetProducer::~MyVirtualJetProducer()
 {
 } 
 
@@ -215,13 +215,13 @@ VirtualJetProducer::~VirtualJetProducer()
 ////////////////////////////////////////////////////////////////////////////////
 
 //______________________________________________________________________________
-void VirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
+void MyVirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
-  LogDebug("VirtualJetProducer") << "Entered produce\n";
+  LogDebug("MyVirtualJetProducer") << "Entered produce\n";
   //determine signal vertex
   vertex_=reco::Jet::Point(0,0,0);
   if (makeCaloJet(jetTypeE)&&doPVCorrection_) {
-    LogDebug("VirtualJetProducer") << "Adding PV info\n";
+    LogDebug("MyVirtualJetProducer") << "Adding PV info\n";
     edm::Handle<reco::VertexCollection> pvCollection;
     iEvent.getByLabel(srcPVs_,pvCollection);
     if (pvCollection->size()>0) vertex_=pvCollection->begin()->position();
@@ -234,7 +234,7 @@ void VirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
   }
 
   // clear data
-  LogDebug("VirtualJetProducer") << "Clear data\n";
+  LogDebug("MyVirtualJetProducer") << "Clear data\n";
   fjInputs_.clear();
   fjJets_.clear();
   inputs_.clear();  
@@ -245,21 +245,21 @@ void VirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
   for (size_t i = 0; i < inputsHandle->size(); ++i) {
     inputs_.push_back(inputsHandle->ptrAt(i));
   }
-  LogDebug("VirtualJetProducer") << "Got inputs\n";
+  LogDebug("MyVirtualJetProducer") << "Got inputs\n";
   
   // Convert candidates to fastjet::PseudoJets.
   // Also correct to Primary Vertex. Will modify fjInputs_
   // and use inputs_
   fjInputs_.reserve(inputs_.size());
   inputTowers();
-  LogDebug("VirtualJetProducer") << "Inputted towers\n";
+  LogDebug("MyVirtualJetProducer") << "Inputted towers\n";
 
   // For Pileup subtraction using offset correction:
   // Subtract pedestal. 
   if ( doPUOffsetCorr_ ) {
      subtractor_->calculatePedestal(fjInputs_); 
      subtractor_->subtractPedestal(fjInputs_);    
-     LogDebug("VirtualJetProducer") << "Subtracted pedestal\n";
+     LogDebug("MyVirtualJetProducer") << "Subtracted pedestal\n";
   }
 
   // Run algorithm. Will modify fjJets_ and allocate fjClusterSeq_. 
@@ -269,7 +269,7 @@ void VirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
      subtractor_->setAlgorithm(fjClusterSeq_);
   }
 
-  LogDebug("VirtualJetProducer") << "Ran algorithm\n";
+  LogDebug("MyVirtualJetProducer") << "Ran algorithm\n";
 
   // For Pileup subtraction using offset correction:
   // Now we find jets and need to recalculate their energy,
@@ -289,14 +289,14 @@ void VirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetu
   // "writeJets", but can be overridden. 
   // this will use inputs_
   output( iEvent, iSetup );
-  LogDebug("VirtualJetProducer") << "Wrote jets\n";
+  LogDebug("MyVirtualJetProducer") << "Wrote jets\n";
   
   return;
 }
 
 //______________________________________________________________________________
   
-void VirtualJetProducer::inputTowers( )
+void MyVirtualJetProducer::inputTowers( )
 {
   std::vector<edm::Ptr<reco::Candidate> >::const_iterator inBegin = inputs_.begin(),
     inEnd = inputs_.end(), i = inBegin;
@@ -327,7 +327,7 @@ void VirtualJetProducer::inputTowers( )
 }
 
 //______________________________________________________________________________
-bool VirtualJetProducer::isAnomalousTower(reco::CandidatePtr input)
+bool MyVirtualJetProducer::isAnomalousTower(reco::CandidatePtr input)
 {
   if (!makeCaloJet(jetTypeE)) return false;
   const CaloTower* tower=dynamic_cast<const CaloTower*>(input.get());
@@ -345,11 +345,11 @@ bool VirtualJetProducer::isAnomalousTower(reco::CandidatePtr input)
 //------------------------------------------------------------------------------
 // This is pure virtual. 
 //______________________________________________________________________________
-// void VirtualJetProducer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup,
+// void MyVirtualJetProducer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup,
 // 				       std::vector<edm::Ptr<reco::Candidate> > const & inputs_);
 
 //______________________________________________________________________________
-void VirtualJetProducer::copyConstituents(const vector<fastjet::PseudoJet>& fjConstituents,
+void MyVirtualJetProducer::copyConstituents(const vector<fastjet::PseudoJet>& fjConstituents,
 					  reco::Jet* jet)
 {
   for (unsigned int i=0;i<fjConstituents.size();++i)
@@ -359,7 +359,7 @@ void VirtualJetProducer::copyConstituents(const vector<fastjet::PseudoJet>& fjCo
 
 //______________________________________________________________________________
 vector<reco::CandidatePtr>
-VirtualJetProducer::getConstituents(const vector<fastjet::PseudoJet>&fjConstituents)
+MyVirtualJetProducer::getConstituents(const vector<fastjet::PseudoJet>&fjConstituents)
 {
   vector<reco::CandidatePtr> result;
   for (unsigned int i=0;i<fjConstituents.size();i++) {
@@ -370,7 +370,7 @@ VirtualJetProducer::getConstituents(const vector<fastjet::PseudoJet>&fjConstitue
   return result;
 }
 
-void VirtualJetProducer::output(edm::Event & iEvent, edm::EventSetup const& iSetup)
+void MyVirtualJetProducer::output(edm::Event & iEvent, edm::EventSetup const& iSetup)
 {
   // Write jets and constitutents. Will use fjJets_, inputs_
   // and fjClusterSeq_
@@ -391,14 +391,14 @@ void VirtualJetProducer::output(edm::Event & iEvent, edm::EventSetup const& iSet
     writeJets<reco::BasicJet>( iEvent, iSetup);
     break;
   default:
-    throw cms::Exception("InvalidInput") << "invalid jet type in VirtualJetProducer\n";
+    throw cms::Exception("InvalidInput") << "invalid jet type in MyVirtualJetProducer\n";
     break;
   };
   
 }
 
 template< typename T >
-void VirtualJetProducer::writeJets( edm::Event & iEvent, edm::EventSetup const& iSetup )
+void MyVirtualJetProducer::writeJets( edm::Event & iEvent, edm::EventSetup const& iSetup )
 {
   // produce output jet collection
 
