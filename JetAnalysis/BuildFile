@@ -19,7 +19,8 @@
 <use name=DataFormats/GeometryVector>
 <use name=DataFormats/JetReco>
 <use name=DataFormats/PatCandidates>
-<use name=RecoJets/JetAlgorithms>
+<use name=RecoJets/JetProducers>
+<use name=DataFormats/HeavyIonEvent>
 
 <flags EDM_PLUGIN=1>
 <export>
