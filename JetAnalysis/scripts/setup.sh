@@ -4,6 +4,10 @@ cd $CMSSW_BASE/src
 cvs co RecoHI/HiCentralityAlgos/data
 cvs co HeavyIonsAnalysis/Configuration
 
+#RECO stuff
+cvs co RecoJets/JetProducers
+cvs co UserCode/yetkin/RecoJets/JetProducers/plugins/VirtualJetProducer.* RecoJets/JetProducers/plugins/
+
 # JRA stuff
 cvs co -r V00-07-04 JetMETAnalysis/JetUtilities
 cvs co -r V00-08-06 JetMETAnalysis/JetAnalyzers
@@ -14,9 +18,10 @@ cvs co -r jetCorrections_3_6_0_retrofit JetMETCorrections/Configuration
 cvs co -r jetCorrections_3_6_0_retrofit JetMETCorrections/Modules
 mv CondFormats/JetMETObjects/data/L5Flavor_IC5Calo.txt CondFormats/JetMETObjects/data/L5Flavor_IC5.txt 
 
-cvs co UserCode/CmsHi/JetAnalysis
-mv UserCode/CmsHi/JetAnalysis/bin/jet_response_analyzer_x.cc JetMETAnalysis/JetAnalyzers/bin/
+cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+mv CmsHi/JetAnalysis/bin/jet_response_analyzer_x.cc JetMETAnalysis/JetAnalyzers/bin/
 rm JetMETAnalysis/JetAnalyzers/python/JPTReconstruction_cff.py
+
 scram b
 pwd
 
