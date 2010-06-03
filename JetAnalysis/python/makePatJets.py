@@ -1,8 +1,9 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 
 ivars = VarParsing.VarParsing('standard')
+ivars.files = 'rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_6_0/UnquenchedDijet80to120_runs1to500.root'
+#ivars.files = 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_7_0_pre2/RelValPyquen_DiJet_pt80to120_2760GeV/GEN-SIM-RECO/MC_37Y_V1-v1/0018/1420F252-8453-DF11-9903-002618943882.root'
 
-ivars.files = 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_7_0_pre2/RelValPyquen_DiJet_pt80to120_2760GeV/GEN-SIM-RECO/MC_37Y_V1-v1/0018/1420F252-8453-DF11-9903-002618943882.root'
 ivars.output = 'jets_pat_80to120.root'
 ivars.maxEvents = 3
 
@@ -34,7 +35,7 @@ configureHeavyIons(process)
 process.ak5corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("ak5CaloJets"),
                                                   corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_AK5Calo"),
                                                                         L3Absolute = cms.string("L3Absolute_AK5Calo")))
-process.ak5clean = process.heavyIonCleanedGenJets.clone(src = cms.untracked.InputTag('ak5HiGenJets'))
+process.ak5clean = process.heavyIonCleanedGenJets.clone(src = cms.InputTag('ak5HiGenJets'))
 process.ak5match = process.patJetGenJetMatch.clone(src = cms.InputTag("ak5CaloJets"),
                                                    matched = cms.InputTag("ak5clean"))
 process.ak5parton = process.patJetPartonMatch.clone(src = cms.InputTag("ak5CaloJets"))
@@ -47,7 +48,7 @@ process.ak5patSequence = cms.Sequence(process.ak5CaloJets*process.ak5corr*proces
 process.ak7corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("ak7CaloJets"),
                                                   corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_AK7Calo"),
                                                                         L3Absolute = cms.string("L3Absolute_AK7Calo")))
-process.ak7clean = process.heavyIonCleanedGenJets.clone(src = cms.untracked.InputTag('ak7HiGenJets'))
+process.ak7clean = process.heavyIonCleanedGenJets.clone(src = cms.InputTag('ak7HiGenJets'))
 process.ak7match = process.patJetGenJetMatch.clone(src = cms.InputTag("ak7CaloJets"),
                                                    matched = cms.InputTag("ak7clean"))
 process.ak7parton = process.patJetPartonMatch.clone(src = cms.InputTag("ak7CaloJets"))
@@ -60,7 +61,7 @@ process.ak7patSequence = cms.Sequence(process.ak7CaloJets*process.ak7corr*proces
 process.akPu5corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("akPu5CaloJets"),
                                                     corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_AK5Calo"),
                                                                           L3Absolute = cms.string("L3Absolute_AK5Calo")))
-process.akPu5clean = process.heavyIonCleanedGenJets.clone(src = cms.untracked.InputTag('ak5HiGenJets'))
+process.akPu5clean = process.heavyIonCleanedGenJets.clone(src = cms.InputTag('ak5HiGenJets'))
 process.akPu5match = process.patJetGenJetMatch.clone(src = cms.InputTag("akPu5CaloJets"),
                                                      matched = cms.InputTag("akPu5clean"))
 process.akPu5parton = process.patJetPartonMatch.clone(src = cms.InputTag("akPu5CaloJets"))
@@ -73,7 +74,7 @@ process.akPu5patSequence = cms.Sequence(process.akPu5CaloJets*process.akPu5corr*
 process.akPu7corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("akPu7CaloJets"),
                                                     corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_AK7Calo"),
                                                                           L3Absolute = cms.string("L3Absolute_AK7Calo")))
-process.akPu7clean = process.heavyIonCleanedGenJets.clone(src = cms.untracked.InputTag('ak7HiGenJets'))
+process.akPu7clean = process.heavyIonCleanedGenJets.clone(src = cms.InputTag('ak7HiGenJets'))
 process.akPu7match = process.patJetGenJetMatch.clone(src = cms.InputTag("akPu7CaloJets"),
                                                      matched = cms.InputTag("akPu7clean"))
 process.akPu7parton = process.patJetPartonMatch.clone(src = cms.InputTag("akPu7CaloJets"))
@@ -92,6 +93,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 process.runAllJets = cms.Path(process.hiGenParticlesForJets *
                               process.hiRecoGenJets +
+                              process.iterativeConePu5CaloJets +
                               process.makeHeavyIonJets +
                               process.akPu5patSequence +
                               process.akPu7patSequence +
