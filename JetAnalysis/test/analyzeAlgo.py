@@ -21,6 +21,13 @@ process.maxEvents = cms.untracked.PSet(
             input = cms.untracked.int32(ivars.maxEvents)
                     )
 
+'''
+process.load("FWCore.MessageLogger.MessageLogger_cfi")
+process.MessageLogger.cout.placeholder = cms.untracked.bool(False)
+process.MessageLogger.cout.threshold = cms.untracked.string('DEBUG')
+process.MessageLogger.debugModules = cms.untracked.vstring('PileUpSubtractor','JetAlgorithmAnalyzer')
+'''
+
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.Geometry_cff')
 process.load('RecoJets.Configuration.GenJetParticles_cff')
@@ -53,6 +60,7 @@ process.icPu5CaloJets = cms.EDProducer('JetAlgorithmAnalyzer',
 
 process.icPu5CaloJets.doPUOffsetCorr = True
 process.icPu5CaloJets.doPVCorrection = False
+process.icPu5CaloJets.inputEtMin = 0
 process.icPu5CaloJets.jetPtMin = 10
 process.icPu5CaloJets.centrality = cms.untracked.int32(0)
 
@@ -62,7 +70,7 @@ process.icPu5CaloJets0 = process.icPu5CaloJets.clone()
 process.icPu5CaloJets1 = process.icPu5CaloJets.clone(centrality = cms.untracked.int32(15))
 process.icPu5CaloJets2 = process.icPu5CaloJets.clone(centrality = cms.untracked.int32(30))
 
-process.algoAna = cms.Sequence(process.icPu5CaloJets0 + process.icPu5CaloJets1 + process.icPu5CaloJets2)
+process.algoAna = cms.Sequence(process.icPu5CaloJets0) # + process.icPu5CaloJets1 + process.icPu5CaloJets2)
 
 process.icPu5corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("icPu5CaloJets"),
                                                     corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_IC5Calo"),

@@ -234,26 +234,51 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
      nt = ntTowers;
      h = hTowers[step];
    }
-
    if(output == 2){
      nt = ntTowersFromEvtPlane;
      h = hTowersFromEvtPlane[step];
    }
 
+   double totet = 0;
+   int ntow = 0;
+   
    for(unsigned int i = 0; i < jets.size(); ++i){
-      const fastjet::PseudoJet& jet = jets[i];
-      
-      double phi = jet.phi();
-      if(output == 2){
-	phi = phi - phi0_;
-	if(phi < 0) phi += 2*PI;
-        if(phi > 2*PI) phi -= 2*PI;
-      }
-      
-      nt->Fill(jet.eta(),phi,jet.perp(),step,iev_);
-      h->Fill(jet.eta(),phi,jet.perp());
-   }
+     const fastjet::PseudoJet& jet = jets[i];
 
+     double pt = jet.perp();
+
+     if(output != 1){
+       reco::CandidatePtr const & itow =  inputs_[ jet.user_index() ];
+       pt =  itow->et();
+     }
+     
+     double phi = jet.phi();
+     if(output == 2){
+       phi = phi - phi0_;
+       if(phi < 0) phi += 2*PI;
+       if(phi > 2*PI) phi -= 2*PI;
+     }
+     
+     double eta = jet.eta();
+     
+     if(eta > 0 && eta < 0.08){
+       //     if(fabs(eta) < 1.){ 
+       totet += pt;
+       ntow++;
+     }
+
+     nt->Fill(jet.eta(),phi,pt,step,iev_);
+     h->Fill(jet.eta(),phi,pt);
+   }
+   
+   cout<<"-----------------------------"<<endl;
+   cout<<"STEP             = "<<step<<endl;   
+   cout<<"Total ET         = "<<totet<<endl;
+   cout<<"Towers counted   = "<<ntow<<endl;
+   
+   cout<<"Average tower ET = "<<totet/ntow<<endl;
+   cout<<"-----------------------------"<<endl;     
+   
 }
 
 
@@ -293,6 +318,10 @@ void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int
 
 void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
+
+  if(doAnalysis_)   subtractor_->setDebug(1);
+  else subtractor_->setDebug(0);
+
    if(!geo){
       edm::ESHandle<CaloGeometry> pGeo;
       iSetup.get<CaloGeometryRecord>().get(pGeo);
@@ -403,6 +432,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       fillBkgNtuple(subtractor_.get(),4);
       fillJetNtuple(fjJets_,4);
 
+      //only the id's of the orphan input are used, not their energy
       subtractor_->calculatePedestal(orphanInput);
       fillTowerNtuple(orphanInput,5);
       fillBkgNtuple(subtractor_.get(),5);
