@@ -27,6 +27,10 @@
 #include "DataFormats/JetReco/interface/TrackJetCollection.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
+#include "DataFormats/Math/interface/Vector3D.h"
 
 #include "fastjet/SISConePlugin.hh"
 #include "fastjet/CMSIterativeConePlugin.hh"
@@ -120,6 +124,8 @@ MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
   , maxProblematicHcalCells_(iConfig.getParameter<unsigned>("maxProblematicHcalCells"))
   , jetCollInstanceName_ ("")
 {
+
+  //  ntuple = new TNtuple("nt","debug","ieta:eta:iphi:phi");
 
   //
   // additional parameters to think about:
@@ -217,6 +223,13 @@ MyVirtualJetProducer::~MyVirtualJetProducer()
 //______________________________________________________________________________
 void MyVirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
+
+  if(!geo){
+    edm::ESHandle<CaloGeometry> pGeo;
+    iSetup.get<CaloGeometryRecord>().get(pGeo);
+    geo = pGeo.product();
+  }
+
   LogDebug("MyVirtualJetProducer") << "Entered produce\n";
   //determine signal vertex
   vertex_=reco::Jet::Point(0,0,0);
@@ -306,6 +319,52 @@ void MyVirtualJetProducer::inputTowers( )
     if (input->et()    <inputEtMin_)  continue;
     if (input->energy()<inputEMin_)   continue;
     if (isAnomalousTower(input))      continue;
+
+    //Check consistency of kinematics
+
+    const CaloTower* ctc = dynamic_cast<const CaloTower*>(input.get());
+    if(ctc){
+      int ieta = ctc->id().ieta();
+      int iphi = ctc->id().iphi();
+
+      ntuple->Fill(ieta, input->eta(), iphi, input->phi(),input->et(),ctc->emEt(),ctc->hadEt());
+      
+      if(abs(ieta) < 5){
+
+	if(0){
+	  math::RhoEtaPhiVector v(1.4,input->eta(),input->phi());
+	  GlobalPoint point(v.x(),v.y(),v.z());
+	  //	  const DetId d = geo->getClosestCell(point);
+	  //	  HcalDetId hd(d);
+	  HcalDetId hd(0);  
+          if(hd.ieta() != ieta || hd.iphi() != iphi){
+	    cout<<"Inconsistent kinematics!!!   ET = "<<input->pt()<<endl;
+	    cout<<"ieta candidate : "<<ieta<<" ieta detid : "<<hd.ieta()<<endl;
+	    cout<<"iphi candidate : "<<iphi<<" iphi detid : "<<hd.iphi()<<endl;
+	  }
+
+	}
+	
+	if(0){
+	  HcalDetId det(HcalBarrel,ieta,iphi,1);
+
+	  if(geo->present(det)){
+	    double eta = geo->getPosition(det).eta();
+	    double phi = geo->getPosition(det).phi();
+	    
+	    if(input->eta() != eta || input->phi() != phi){
+	      cout<<"Inconsistent kinematics!!!   ET = "<<input->pt()<<endl;
+	      cout<<"eta candidate : "<<input->eta()<<" eta detid : "<<eta<<endl;
+	      cout<<"phi candidate : "<<input->phi()<<" phi detid : "<<phi<<endl;
+	    }
+	  }else{
+	    cout<<"DetId not present in the Calo Geometry : ieta = "<<ieta<<" iphi = "<<iphi<<endl;
+	  }
+	}
+      }
+      
+    }
+
     if (makeCaloJet(jetTypeE)&&doPVCorrection_) {
       const CaloTower* tower=dynamic_cast<const CaloTower*>(input.get());
       math::PtEtaPhiMLorentzVector ct(tower->p4(vertex_));

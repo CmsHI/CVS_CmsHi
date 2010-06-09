@@ -23,6 +23,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "TNtuple.h"
 
 class MyVirtualJetProducer : public edm::EDProducer
 {
@@ -75,6 +76,8 @@ public:
   typedef boost::shared_ptr<fastjet::JetDefinition>          JetDefPtr;
   typedef boost::shared_ptr<fastjet::ActiveAreaSpec>         ActiveAreaSpecPtr;
   typedef boost::shared_ptr<fastjet::RangeDefinition>        RangeDefPtr;
+
+  TNtuple* ntuple;
   
   //
   // member functions
@@ -180,6 +183,7 @@ protected:
 
   std::string                     jetCollInstanceName_;       // instance name for output jet collection
   boost::shared_ptr<PileUpSubtractor>  subtractor_;
+  const CaloGeometry *geo;
 
 };
 

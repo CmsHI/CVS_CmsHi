@@ -198,6 +198,8 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
      ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:event");
 
+     ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
+
      for(int i = 0; i < nSteps; ++i){
        hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
        hJets.push_back(f->make<TH2D>(Form("hJets_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
@@ -241,7 +243,11 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
 
    double totet = 0;
    int ntow = 0;
-   
+   int nj = jets.size();
+
+   cout<<"step : "<<step<<endl;
+   cout<<"Size of input : "<<nj<<endl;
+
    for(unsigned int i = 0; i < jets.size(); ++i){
      const fastjet::PseudoJet& jet = jets[i];
 
