@@ -62,7 +62,9 @@ protected:
   int centBin_;
   const CentralityBins* cbins_;
 
-   TNtuple* ntTowers;
+  TNtuple* ntTowers;
+  TNtuple* ntJetTowers;
+
   TNtuple* ntTowersFromEvtPlane;
 
    TNtuple* ntJets;
@@ -70,6 +72,8 @@ protected:
    TNtuple* ntRandom;
 
   std::vector<TH2D*> hTowers;
+  std::vector<TH2D*> hJetTowers;
+
   std::vector<TH2D*> hTowersFromEvtPlane;
 
   std::vector<TH2D*> hJets;
@@ -193,6 +197,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
   if(doAnalysis_){
      ntTowers = f->make<TNtuple>("ntTowers","Algorithm Analysis Towers","eta:phi:et:step:event");
      ntTowersFromEvtPlane = f->make<TNtuple>("ntTowersFromEvtPlane","Algorithm Analysis Towers","eta:phi:et:step:event");
+     ntJetTowers = f->make<TNtuple>("ntTowers","Algorithm Analysis Towers","eta:phi:et:step:event");
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
@@ -204,6 +209,8 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
        hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
        hJets.push_back(f->make<TH2D>(Form("hJets_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
        hTowersFromEvtPlane.push_back(f->make<TH2D>(Form("hTowersFromEvtPlane_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
+
+       hJetTowers.push_back(f->make<TH2D>(Form("hJetTowers_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
 
        hPU.push_back(f->make<TH1D>(Form("hPU_step%d",i),"",200,-5.5,5.5));
        hMean.push_back(f->make<TH1D>(Form("hMean_step%d",i),"",200,-5.5,5.5));
@@ -220,7 +227,6 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 JetAlgorithmAnalyzer::~JetAlgorithmAnalyzer()
 {
 } 
-
 
 void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::PseudoJet>& jets, int step){
    if(!doAnalysis_) return;
@@ -239,6 +245,10 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
    if(output == 2){
      nt = ntTowersFromEvtPlane;
      h = hTowersFromEvtPlane[step];
+   }
+   if(output == 3){
+     nt = ntJetTowers;
+     h = hJetTowers[step];
    }
 
    double totet = 0;
@@ -295,6 +305,13 @@ void JetAlgorithmAnalyzer::fillTowerNtuple(const  std::vector<fastjet::PseudoJet
  
 void JetAlgorithmAnalyzer::fillJetNtuple(const  std::vector<fastjet::PseudoJet>& jets, int step){
    fillNtuple(1,jets,step);
+
+   for(unsigned int i = 0; i < jets.size(); ++i){
+     const fastjet::PseudoJet& jet = jets[i];
+     std::vector<fastjet::PseudoJet> fjConstituents = sorted_by_pt(fjClusterSeq_->constituents(jet));
+     
+     fillNtuple(3,fjConstituents,step);
+   }
 }
 
 void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int step){
@@ -325,8 +342,8 @@ void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int
 void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
 
-  if(doAnalysis_)   subtractor_->setDebug(1);
-  else subtractor_->setDebug(0);
+  //  if(doAnalysis_)   subtractor_->setDebug(1);
+  //  else subtractor_->setDebug(0);
 
    if(!geo){
       edm::ESHandle<CaloGeometry> pGeo;
