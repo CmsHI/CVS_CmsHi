@@ -151,8 +151,8 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   eeReducedRecHitCollection_       = ps.getParameter<edm::InputTag>("eeReducedRecHitCollection");
   srcTowers_                       = ps.getParameter<edm::InputTag>("caloTowers");
   //heavy ion
-  basicClusterBarrel_              = ps.getParameter<edm::InputTag>("islandBasicClustersIslandBarrelBasicClusters");
-  basicClusterEndcap_              = ps.getParameter<edm::InputTag>("islandBasicClustersIslandEndcapBasicClusters");
+  basicClusterBarrel_              = ps.getParameter<edm::InputTag>("basicClusterBarrel");
+  basicClusterEndcap_              = ps.getParameter<edm::InputTag>("basicClusterEndcap");
   hbhe_                            = ps.getParameter<edm::InputTag>("hbhe");
   hf_                              = ps.getParameter<edm::InputTag>("hf");
   ho_                              = ps.getParameter<edm::InputTag>("ho");
