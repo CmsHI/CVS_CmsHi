@@ -351,7 +351,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       geo = pGeo.product();
    }
 
-   if(doAnalysis_){
+   if(doAnalysis_ && centBin_ >= 0){
      edm::Handle<reco::Centrality> cent;
      iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
      if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
