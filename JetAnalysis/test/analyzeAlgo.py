@@ -43,7 +43,7 @@ process.RandomNumberGeneratorService.icPu5CaloJets1 = process.RandomNumberGenera
 process.RandomNumberGeneratorService.icPu5CaloJets2 = process.RandomNumberGeneratorService.generator.clone()
 
 process.TFileService = cms.Service('TFileService',
-                                   fileName = cms.string('treefile4.root')
+                                   fileName = cms.string('treefile_' + ivars.output)
                                    )
 
 from RecoJets.JetProducers.CaloJetParameters_cfi import *

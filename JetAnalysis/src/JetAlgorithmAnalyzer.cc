@@ -291,7 +291,6 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
    cout<<"STEP             = "<<step<<endl;   
    cout<<"Total ET         = "<<totet<<endl;
    cout<<"Towers counted   = "<<ntow<<endl;
-   
    cout<<"Average tower ET = "<<totet/ntow<<endl;
    cout<<"-----------------------------"<<endl;     
    
@@ -309,6 +308,9 @@ void JetAlgorithmAnalyzer::fillJetNtuple(const  std::vector<fastjet::PseudoJet>&
    for(unsigned int i = 0; i < jets.size(); ++i){
      const fastjet::PseudoJet& jet = jets[i];
      std::vector<fastjet::PseudoJet> fjConstituents = sorted_by_pt(fjClusterSeq_->constituents(jet));
+
+
+
      
      fillNtuple(3,fjConstituents,step);
    }
@@ -414,13 +416,14 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
 
    // For Pileup subtraction using offset correction:
    // Subtract pedestal. 
+
    if ( doPUOffsetCorr_ ) {
+      subtractor_->reset(inputs_,fjInputs_,fjJets_);
       subtractor_->calculatePedestal(fjInputs_); 
 
       fillTowerNtuple(fjInputs_,1);
       fillBkgNtuple(subtractor_.get(),1);
-
-      subtractor_->subtractPedestal(fjInputs_);    
+      subtractor_->subtractPedestal(fjInputs_); 
 
       fillTowerNtuple(fjInputs_,2);
       fillBkgNtuple(subtractor_.get(),2);
@@ -633,14 +636,15 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    iEvent.put(directions,"directions");
 }
 
+//void JetAlgorithmAnalyzer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup, std::vector<fastjet::PseudoJet>& input )
 void JetAlgorithmAnalyzer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup)
 {
-   if ( !doAreaFastjet_ && !doRhoFastjet_) {
-      fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequence( fjInputs_, *fjJetDefinition_ ) );
-   } else {
-      fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceArea( fjInputs_, *fjJetDefinition_ , *fjActiveArea_ ) );
-   }
-   fjJets_ = fastjet::sorted_by_pt(fjClusterSeq_->inclusive_jets(jetPtMin_));
+  if ( !doAreaFastjet_ && !doRhoFastjet_) {
+    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequence( fjInputs_, *fjJetDefinition_ ) );
+  } else {
+    fjClusterSeq_ = ClusterSequencePtr( new fastjet::ClusterSequenceArea( fjInputs_, *fjJetDefinition_ , *fjActiveArea_ ) );
+  }
+  fjJets_ = fastjet::sorted_by_pt(fjClusterSeq_->inclusive_jets(jetPtMin_));
 
 }
 
