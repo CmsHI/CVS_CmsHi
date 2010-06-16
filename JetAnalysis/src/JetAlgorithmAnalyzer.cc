@@ -484,7 +484,6 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    ++iev_;
 
    doAnalysis_ = false;
-  
    return;
 }
 
@@ -563,8 +562,16 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	input_object != fjInputsEnd; ++input_object) {
 
       const reco::CandidatePtr & tower=inputs_[input_object->user_index()];
+      const CaloTower* ctc = dynamic_cast<const CaloTower*>(tower.get());
+      int ieta = ctc->id().ieta();
+      int iphi = ctc->id().iphi();
+      CaloTowerDetId id(ieta,iphi);
+      const GlobalPoint& hitpoint = geo->getPosition(id);
+      double towEta = hitpoint.eta();
+      double towPhi = hitpoint.phi();
+
       for(int ir = 0; ir < nFill_; ++ir){
-	 if(reco::deltaR(tower->eta(),tower->phi(),etaRandom[ir],phiRandom[ir]) > rParam_) continue;
+	 if(reco::deltaR(towEta,towPhi,etaRandom[ir],phiRandom[ir]) > rParam_) continue;
 
 	 constituents_[ir].push_back(tower);
 
