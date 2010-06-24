@@ -27,7 +27,7 @@ rm JetMETAnalysis/JetAnalyzers/python/JPTReconstruction_cff.py
 
 mkdir -p RecoMET/METProducers/python
 touch RecoMET/METProducers/python/MuonMETValueMapProducer_cff.py
-touch RecoMET/METProducers/python/MetMuonCorrecions_cff.py
+touch RecoMET/METProducers/python/MetMuonCorrections_cff.py
 
 scram b
 pwd
