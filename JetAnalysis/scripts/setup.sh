@@ -25,12 +25,7 @@ cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 mv CmsHi/JetAnalysis/bin/jet_response_analyzer_x.cc JetMETAnalysis/JetAnalyzers/bin/
 rm JetMETAnalysis/JetAnalyzers/python/JPTReconstruction_cff.py
 
-rm PhysicsTools/PatAlgos/python/recoLayer0/jetMETCorrections_cff.py
-touch PhysicsTools/PatAlgos/python/recoLayer0/jetMETCorrections_cff.py
-
-#mkdir -p RecoMET/METProducers/python
-#touch RecoMET/METProducers/python/MuonMETValueMapProducer_cff.py
-#touch RecoMET/METProducers/python/MetMuonCorrections_cff.py
+mv CmsHi/JetAnalysis/python/jetMETCorrections_cff.py PhysicsTools/PatAlgos/python/recoLayer0/jetMETCorrections_cff.py
 
 scram b
 pwd
