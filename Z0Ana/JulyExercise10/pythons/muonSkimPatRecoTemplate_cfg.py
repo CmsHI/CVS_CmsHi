@@ -27,7 +27,8 @@ process.MessageLogger = cms.Service("MessageLogger",
                                     )
 
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('rfio:///castor/cern.ch/user/m/mironov/cmssw370/digireco/root/z0_sgn_hitrk_f0.root')
+                            fileNames = cms.untracked.vstring('rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_05_908.root')
+#rfio:///castor/cern.ch/user/m/mironov/cmssw370/digireco/root/z0_sgn_hitrk_f0.root')
                             )
 
 process.GlobalTag.globaltag = 'MC_37Y_V5::All'
@@ -35,15 +36,23 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 
-# =============== PAT sequence =====================
+# =============== PAT sequence and settings =====================
 process.load("PhysicsTools.PatAlgos.producersHeavyIons.heavyIonMuons_cff")
 process.patMuons.embedCaloMETMuonCorrs = cms.bool(False)
 process.patMuons.embedTcMETMuonCorrs   = cms.bool(False)
+process.patMuons.useParticledFlow      = cms.bool(False)
+
+# in case you do NOT want genMatching (deltaR) 
+process.patMuons.addGenMatch      = cms.bool(False)
+process.patMuons.embedGenMatch    = cms.bool(False)
+# if want genMAtching and have a HI mixed sample: 
+#process.muonMatch.matched         = cms.InputTag("hiGenParticles")
+
 
 # ====== filter skimming
 process.muonSelector = cms.EDFilter("MuonSelector",
                                     src = cms.InputTag("muons"),
-                                    cut = cms.string(" isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon && pt > 1."),
+                                    cut = cms.string("(isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon) && pt > 1."),
                                     filter = cms.bool(True)
                                     )
 process.muonFilter = cms.EDFilter("MuonCountFilter",
@@ -64,7 +73,7 @@ process.outputmuskim = cms.OutputModule("PoolOutputModule",
                                         )
 
 
-process.hiMuonPat     = cms.Path(process.makeHeavyIonMuons)
+process.hiMuonPat     = cms.Path(process.patMuons)#process.makeHeavyIonMuons)
 process.endjob_step   = cms.Path(process.endOfProcess)
 process.out_step      = cms.EndPath(process.outputmuskim)
 
