@@ -2,9 +2,7 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
-from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
-
-
+#from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
 
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
@@ -13,10 +11,7 @@ GenMuons = cms.EDFilter("CandViewRefSelector",
                         filter = cms.bool(True)
                         )
 
-
-
-
-GenDimuons = cms.EDFilter("CandViewShallowCloneCombiner",
+GenDimuons = cms.EDProducer("CandViewShallowCloneCombiner",
                           checkCharge = cms.bool(True),
                           cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
                           #decay = cms.string("muons@+ muons@-")
@@ -29,28 +24,24 @@ GenDimuonsFilter = cms.EDFilter("CandViewCountFilter",
                                       )
 
 
-
-
-
-
 # muons
-Dimuons = cms.EDFilter("CandViewShallowCloneCombiner",
+Dimuons = cms.EDProducer("CandViewShallowCloneCombiner",
                        checkCharge = cms.bool(True),
-                       #cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
-                       cut = cms.string(' mass > 0 & mass < 10000 & charge=0'),
-
-
-                       #decay = cms.string("muons@+ muons@-")
-                       decay = cms.string('patMuons@+ patMuons@-')
-                       )
+                         #cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
+                         cut = cms.string(' mass > 0 & mass < 10000 & charge=0'),
+                         #goodMuons
+                                        
+                         #decay = cms.string("goodMuons@+ goodMuons@-")
+                         decay = cms.string("muons@+ muons@-")
+                         #decay = cms.string('patMuons@+ patMuons@-')
+                         )
 
 dimuonsGlobalSTA = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("Dimuons"),
-    #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10)&((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
+                                #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10)&((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
                                 cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
                                 filter = cms.bool(True)
-
-
+                                                          
 
                             )
 
@@ -72,10 +63,10 @@ dimuonsGlobal = cms.EDFilter("CandViewRefSelector",
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("Dimuons"),
                           #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
-
+                          
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
-                                                          filter = cms.bool(True)
-                                                          )
+                          filter = cms.bool(True)
+                          )
 
 
 
@@ -120,6 +111,8 @@ dimuonsGlobalFilter = cms.EDFilter("CandViewCountFilter",
                                     src = cms.InputTag("dimuonsGlobal"),
                                     minNumber = cms.uint32(1)
                                 )
+
+
 
 
 
