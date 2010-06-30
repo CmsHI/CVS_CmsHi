@@ -8,7 +8,7 @@ from SimGeneral.HepPDTESSource.pythiapdt_cfi import *
 # PAT TRACKS 
 
 # before pat: conversion to track candidates for pat; isolation 
-from HeavyIonsAnalysis.Configuration.patAODTrackCandSequence_cff import *
+from Z0Ana.ZToMuMu.patAODTrackCandSequence_cff import *
 patAODTrackCands.cut = 'pt > 10.'
 
 # pat tracks
@@ -47,7 +47,7 @@ selectedPatTracks.cut = 'pt > 10.'
 
 # PAT MUONS
 
-# before pat: Merge CaloMuons into the collection of reco::Muons
+#before pat: Merge CaloMuons into the collection of reco::Muons
 # Starting from 3_4_X a special recipe is needed for CaloMuons merging
 # Uncomment the following lines and follow the recipe in:
 # https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIsolation#To_remake_IsoDeposits_in_CMSSW_3
@@ -84,6 +84,16 @@ patMuons.userIsolation = cms.PSet(
             deltaR = cms.double(0.3)
         )
     )
+
+# embedding of muon MET corrections for caloMET
+#embedCaloMETMuonCorrs = cms.bool(False),
+#caloMETMuonCorrs = cms.InputTag("muonMETValueMapProducer"  , "muCorrData"),
+# embedding of muon MET corrections for tcMET
+#embedTcMETMuonCorrs   = cms.bool(False),
+#tcMETMuonCorrs   = cms.InputTag("muonTCMETValueMapProducer", "muCorrData"),
+
+
+
 
 patMuons.addGenMatch = cms.bool(False)
 patMuons.embedTrack = cms.bool(True)
@@ -140,8 +150,8 @@ muonTriggerMatchEmbedder = cms.Sequence(
 
 # uncomment in case of CaloMuons merging
 #beforePatMuons = cms.Sequence(
-#    muons *
-#    muIsolation
+#    muons 
+    #muIsolation
 #)
 
 beforePatTracks = cms.Sequence(
@@ -163,8 +173,8 @@ patCandsSequence = cms.Sequence(
 
 goodMuonRecoForDimuon = cms.Sequence(
     beforePat *
-    patCandsSequence *
-    patTriggerSequence *
-    muonTriggerMatchEmbedder
+    patCandsSequence
+    #patTriggerSequence *
+    #muonTriggerMatchEmbedder
 )
 
