@@ -1,3 +1,4 @@
+##Take out put of ZToMuMuSkim_cfg.py and plots Z0 and daughter muons kinematical disstributions
 ##Gen level ploting is not working so gen level plots are same as reconstructed :)
 ##Vineet Kumar & Prashant Shukla
 import FWCore.ParameterSet.Config as cms
@@ -29,7 +30,10 @@ process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
 
 
-    #'file:TestForGenPlots.root'
+    'file:ZMuMuSkim.root'
+#'rfio:/castor/cern.ch/user/k/kumarv/Z0/cms370/Z0MuMuSkim.root'
+
+
 ##Central PbPb
 #'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral2_recoMu.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral3_recoMu.root',
@@ -37,9 +41,9 @@ process.source = cms.Source("PoolSource",
 
 
 ## Minimum biased PbPb
-    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded_recoMu.root',
-    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded2_recoMu.root',
-    'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded3_recoMu.root'
+   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded_recoMu.root',
+   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded2_recoMu.root',
+   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded3_recoMu.root'
 
 #'file:Z0_ZMuMuSkim_HI_PAT.root'
 #'file:Z0_hiCommonSkimAOD_pp_PAT.root'   
@@ -49,7 +53,7 @@ process.source = cms.Source("PoolSource",
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName = cms.string("TestForGen_Plot.root")
+    fileName = cms.string("ZMuMu_Plot.root")
     )
 
 zPlots = cms.PSet(
@@ -203,29 +207,30 @@ zPlots = cms.PSet(
     )
 
 
-process.GenDimuonsPlots = cms.EDFilter(
+process.GenDimuonsPlots = cms.EDAnalyzer(
+    "CandViewHistoAnalyzer",
+    zPlots,
+    src = cms.InputTag("Dimuons"),
+    #src = cms.InputTag("GenDimuons"),
+    filter = cms.bool(False)
+    )
+
+
+process.DimuonsPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
     src = cms.InputTag("Dimuons"),
     filter = cms.bool(False)
     )
 
-
-process.DimuonsPlots = cms.EDFilter(
-    "CandViewHistoAnalyzer",
-    zPlots,
-    src = cms.InputTag("Dimuons"),
-    filter = cms.bool(False)
-    )
-
-process.dimuonsGlobalPlots = cms.EDFilter(
+process.dimuonsGlobalPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
     src = cms.InputTag("dimuonsGlobal"),
     filter = cms.bool(False)
     )
 
-process.dimuonsGlobalSTAPlots = cms.EDFilter(
+process.dimuonsGlobalSTAPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
     src = cms.InputTag("dimuonsGlobalSTA"),
@@ -233,7 +238,7 @@ process.dimuonsGlobalSTAPlots = cms.EDFilter(
     )
 
 
-process.dimuonsSTAPlots = cms.EDFilter(
+process.dimuonsSTAPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
     src = cms.InputTag("dimuonsSTA"),
