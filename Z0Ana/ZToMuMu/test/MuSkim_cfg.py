@@ -1,5 +1,5 @@
 ##Takes input put from heavy ion reconstructed files and do layer 0 skimming
-## make PAT muons and store them using pp pat sequence (No MC matching)
+## make PAT muons and store them (using pp pat sequence, No MC matching)
 ##Select muons with kinematical cuts which can be specified right here
 
 import FWCore.ParameterSet.Config as cms
@@ -30,7 +30,7 @@ process.source = cms.Source("PoolSource",
                             
                             )
 
-##This should be uncommented
+##This should be uncommented if you want to include files automatically from a castor directory 
 #import os,commands
 #def getCastorDirectoryList(path):
 #    cmd  = 'nsls %s/ ' % (path)
