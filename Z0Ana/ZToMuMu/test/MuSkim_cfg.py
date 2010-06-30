@@ -52,7 +52,7 @@ process.patMuons.embedTcMETMuonCorrs   = cms.bool(False)
 # ====== Layer 0 filters (selecting events with muons )
 process.MuonSelector = cms.EDFilter("MuonSelector",
                                     src = cms.InputTag("muons"),
-                                    cut = cms.string(" isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon && pt > 10."),
+                                    cut = cms.string("(isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon) && pt > 5."),
                                     filter = cms.bool(True)
                                     )
 process.MuonFilter = cms.EDFilter("MuonCountFilter",
