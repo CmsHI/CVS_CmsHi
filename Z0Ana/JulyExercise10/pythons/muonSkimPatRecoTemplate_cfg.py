@@ -52,7 +52,7 @@ process.patMuons.embedGenMatch    = cms.bool(False)
 # ====== filter skimming
 process.muonSelector = cms.EDFilter("MuonSelector",
                                     src = cms.InputTag("muons"),
-                                    cut = cms.string("(isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon) && pt > 1."),
+                                    cut = cms.string("isStandAloneMuon || isGlobalMuon || isTrackerMuon || isCaloMuon"),
                                     filter = cms.bool(True)
                                     )
 process.muonFilter = cms.EDFilter("MuonCountFilter",
