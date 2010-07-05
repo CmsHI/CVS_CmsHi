@@ -2,7 +2,7 @@
 
 cd $CMSSW_BASE/src
 cvs co -d CmsHi/JulyExercise UserCode/CmsHi/JulyExercise
-
+cvs co HeavyIonsAnalysis/Configuration
 
 scram b
 
