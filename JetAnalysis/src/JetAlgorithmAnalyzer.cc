@@ -493,8 +493,8 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
    // and fjClusterSeq_                                                                
    switch( jetTypeE ) {
    case JetType::CaloJet :
-     writeJets<reco::CaloJet>( iEvent, iSetup);
-     writeBkgJets<reco::CaloJet>( iEvent, iSetup);
+      writeJets<reco::CaloJet>( iEvent, iSetup);
+      writeBkgJets<reco::CaloJet>( iEvent, iSetup);
       break;
    case JetType::PFJet :
      writeJets<reco::PFJet>( iEvent, iSetup);
