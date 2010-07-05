@@ -11,11 +11,10 @@ process.maxEvents = cms.untracked.PSet(
     )
 
 process.load('PhysicsTools.PatAlgos.patHeavyIonSequences_cff')
-from Saved.PatAlgos.tools.heavyIonTools import *
+from PhysicsTools.PatAlgos.tools.heavyIonTools import *
 configureHeavyIons(process)
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
-#switchJECSet( process, "Spring10") # Spring10 is the new default
 
 process.load("HeavyIonsAnalysis.Configuration.analysisProducers_cff")
 process.load("HeavyIonsAnalysis.Configuration.analysisEventContent_cff")
