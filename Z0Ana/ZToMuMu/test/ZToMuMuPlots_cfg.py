@@ -1,10 +1,7 @@
-##Take out put of ZToMuMuSkim_cfg.py and plots Z0 and daughter muons kinematical disstributions
 ##Gen level ploting is not working so gen level plots are same as reconstructed :)
 ##Vineet Kumar & Prashant Shukla
 import FWCore.ParameterSet.Config as cms
-
 process = cms.Process("ZMuMuGolden")
-
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -17,21 +14,44 @@ process.GlobalTag.globaltag = cms.string('MC_3XY_V26::All')
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
 
+##making a filter for centrality
+process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
+process.load("CondCore.DBCommon.CondDBCommon_cfi")
+process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/RecoHI/HiCentralityAlgos/data/CentralityTables.db"
+process.PoolDBESSource = cms.ESSource("PoolDBESSource",
+                                      process.CondDBCommon,
+                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
+                                                                 tag = cms.string('HFhits40_MC_Hydjet2760GeV_MC_3XY_V24_v0')
+                                                                 )
+                                                        )
+                                      )
+
+
+
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
     )
 
-
+process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.source = cms.Source("PoolSource",
-
                             noEventSort = cms.untracked.bool(True),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
-
                             fileNames = cms.untracked.vstring(
 
+#'file:ZMuMuSkim1.root',
+#'file:ZMuMuSkim2.root',
 
-    'file:ZMuMuSkim.root'
-#'rfio:/castor/cern.ch/user/k/kumarv/Z0/cms370/Z0MuMuSkim.root'
+'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_1.root',
+#'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_2.root',
+#'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_3.root',
+#'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_4.root',
+#'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_5.root',
+
+
+
+
+#'rfio:/castor/cern.ch/user/k/kumarv/Z0/cms370/ZMuMuSkim1.root'
 
 
 ##Central PbPb
@@ -66,6 +86,7 @@ zPlots = cms.PSet(
     description = cms.untracked.string("Z mass [GeV/c^{2}]"),
     plotquantity = cms.untracked.string("mass")
     ),
+    
     
     cms.PSet(
     min = cms.untracked.double(-10.0),
@@ -230,6 +251,15 @@ process.dimuonsGlobalPlots = cms.EDAnalyzer(
     filter = cms.bool(False)
     )
 
+#process.dimuonsSTA2DPlots = cms.EDAnalyzer(
+#    "ZToMuMu2DPlots",
+#    OutputFileName = cms.untracked.string("ZMuMu_Plot.root"),
+##    dimuonCandTag = cms.untracked.InputTag("dimuonsSTA"),
+#    histName = cms.untracked.string("diMuonSTAInvMassVsPt"),
+#    histName1 = cms.untracked.string("diMuonSTAInvMassVsY"),
+#    )
+
+
 process.dimuonsGlobalSTAPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
@@ -245,9 +275,16 @@ process.dimuonsSTAPlots = cms.EDAnalyzer(
     filter = cms.bool(False)
     )
 
+process.dimuons2DPlots = cms.EDAnalyzer(
+        "ZToMuMu2DPlots",
+        OutputFileName = cms.untracked.string("ZMuMu_2DPlot.root"),
+    )
+
+
 process.eventInfo = cms.OutputModule (
     "AsciiOutputModule"
-        )
+       )
+ 
 
 process.GenDimuonsPlotsPath = cms.Path(
         process.GenDimuonsPlots
@@ -261,6 +298,7 @@ process.DimuonsPlotsPath = cms.Path(
 process.dimuonsGlobalPlotsPath = cms.Path(
     process.dimuonsGlobalPlots
     )
+
 process.dimuonsGlobalSTAPlotsPath = cms.Path(
     process.dimuonsGlobalSTAPlots
     )
@@ -270,8 +308,15 @@ process.dimuonsSTAPlotsPath = cms.Path(
     )
 
 
-process.endPath = cms.EndPath(
-    process.eventInfo
-    )
-process.schedule=cms.Schedule(process.GenDimuonsPlotsPath,process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.endPath)
+
+process.dimuons2DPlotsPath = cms.Path(
+                        process.dimuons2DPlots
+                                      )
+
+
+process.endPath = cms.EndPath(process.eventInfo)
+
+process.schedule=cms.Schedule(process.GenDimuonsPlotsPath,process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.endPath)
+
+
 #process.schedule=cms.Schedule(process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.endPath)
