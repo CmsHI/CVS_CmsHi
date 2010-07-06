@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.1 2010/07/05 12:22:38 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.2 2010/07/06 20:43:37 yilmaz Exp $
 //
 //
 
@@ -128,7 +128,6 @@ private:
 	double genJetPtMin_;
 	double towersize_;
 	double jetEtaMax_;
-	double towerEtamax_;
 	double genpartEtamax_;
 	double b_;
 	double npart_;
@@ -207,15 +206,16 @@ geo(0)
 {
    //now do what ever initialization is needed
 	TH1D::SetDefaultSumw2();
-	SumEtMin_ = 1000;
-	SumEtMax_ = 1500;
-	jetEtMin_ = -50; ///if negative all jets applied
-	missingTowers_ = 72;
-	cone_ = 0.5;
-	genJetPtMin_ = 20.;
-	towersize_ = 1584;
-	jetEtaMax_ = 1;
-	towerEtamax_ =11.5;
+	SumEtMin_ = iConfig.getUntrackedParameter<double>("sumEtMin",1000);
+	SumEtMax_ = iConfig.getUntrackedParameter<double>("sumEtMax",1500);
+
+	jetEtMin_ = iConfig.getUntrackedParameter<double>("jetEtMin",0);
+	missingTowers_ = iConfig.getUntrackedParameter<int>("missingTowers",67);
+	cone_ = iConfig.getUntrackedParameter<double>("coneSize",0.5);
+
+	genJetPtMin_ =  iConfig.getUntrackedParameter<double>("genJetPtMin",20);
+	towersize_ = iConfig.getUntrackedParameter<int>("nTowers",1584);
+	jetEtaMax_ = iConfig.getUntrackedParameter<double>("jetEtaMax",1);
 	genpartEtamax_ = 0.5;
 	iEtamax_ = 11.5;
 	
