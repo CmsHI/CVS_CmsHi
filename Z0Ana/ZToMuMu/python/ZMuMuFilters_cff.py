@@ -7,13 +7,15 @@ import FWCore.ParameterSet.Config as cms
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
                         src = cms.InputTag("hiGenParticles"),
-                        cut = cms.string('abs(pdgId) = 13 & (pt > 10 & abs(eta)<2.5)'),
+                        cut = cms.string('abs(pdgId) = 13  & abs(eta)<2.5)'),
+			# cut = cms.string('abs(pdgId) = 13 & (pt > 10 & abs(eta)<2.5)'),
                         filter = cms.bool(True)
                         )
 
 GenDimuons = cms.EDProducer("CandViewShallowCloneCombiner",
                           checkCharge = cms.bool(True),
-                          cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
+			 cut = cms.string(' mass > 0 & mass < 1000 & charge=0'),
+                       #   cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
                           #decay = cms.string("muons@+ muons@-")
                           decay = cms.string('GenMuons@+ GenMuons@-')
                           )
@@ -76,7 +78,8 @@ dimuonsSTA = cms.EDFilter("CandViewRefSelector",
 #goodSTAMuons = cms.EDFilter("MuonViewRefSelector",
 goodSTAMuons = cms.EDFilter("CandViewRefSelector",
     src = cms.InputTag("muons"),
-    cut = cms.string('isStandAloneMuon = 1 & pt > 10 & abs(eta)<2.5'),
+  cut = cms.string('isStandAloneMuon = 1  & abs(eta)<2.5'), 
+#  cut = cms.string('isStandAloneMuon = 1 & pt > 10 & abs(eta)<2.5'),
     filter = cms.bool(True)                                
 )
 
@@ -96,7 +99,8 @@ dimuonsSTAFilter = cms.EDFilter("CandViewCountFilter",
 goodGlobalMuons = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("muons"),
                                 #src=cms.InputTag("selectedPatMuons"),
-                                cut = cms.string('isGlobalMuon = 1 & pt > 10 & abs(eta)<2.5'),
+				 cut = cms.string('isGlobalMuon = 1 & abs(eta)<2.5'),                         
+#       cut = cms.string('isGlobalMuon = 1 & pt > 10 & abs(eta)<2.5'),
                                 filter = cms.bool(True)
                             )
 
