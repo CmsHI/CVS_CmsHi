@@ -16,6 +16,11 @@
 <use name=DataFormats/HeavyIonEvent>
 <use name=CondFormats/HIObjects>
 <use name=CondFormats/DataRecord>
+<use name=DataFormats/Candidate>
+<use name=DataFormats/HcalRecHit>
+<use name=CondCore/DBCommon>
+<use name=CondCore/DBOutputService>
+
 <export>
    <lib name=Z0AnaZToMuMu>
    <use name=FWCore/Framework>
