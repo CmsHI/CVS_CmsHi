@@ -5,9 +5,11 @@ ivars.files = [
               ]
 
 ivars.output = 'RandomCones_Hydjet_370.root'
+
 ivars.maxEvents = -1
-ivars.register ('randomNumber',                
-                mult=ivars.multiplicity.singleton,                
+
+ivars.register ('randomNumber',
+                mult=ivars.multiplicity.singleton,
                 info="for testing")
 ivars.randomNumber=5
 ivars.parseArguments()
@@ -35,8 +37,8 @@ process.TFileService = cms.Service('TFileService',
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 process.load('Configuration/StandardSequences/Services_cff')
 
-process.RandomNumberGeneratorService.bkg4Jets = cms.PSet( initialSeed = cms.untracked.uint32(ivars.randomNumber),    
-                                                         engineName = cms.untracked.string('HepJamesRandom')    )
+process.RandomNumberGeneratorService.bkg4Jets = cms.PSet(initialSeed = cms.untracked.uint32(ivars.randomNumber),
+                                                         engineName = cms.untracked.string('HepJamesRandom') )
 process.RandomNumberGeneratorService.bkg5Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
 process.RandomNumberGeneratorService.bkg6Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
 process.RandomNumberGeneratorService.bkg7Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
