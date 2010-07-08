@@ -1,26 +1,45 @@
+import FWCore.ParameterSet.VarParsing as VarParsing
+ivars = VarParsing.VarParsing('standard')
+ivars.files = [
+    'rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_7_0/SignalQuenchedDijet80to120_runs1to100.root'
+              ]
+
+ivars.output = 'RandomCones_Hydjet_370.root'
+ivars.maxEvents = -1
+ivars.register ('randomNumber',                
+                mult=ivars.multiplicity.singleton,                
+                info="for testing")
+ivars.randomNumber=5
+ivars.parseArguments()
+
 import FWCore.ParameterSet.Config as cms
 
 
 process = cms.Process('ANALYSIS')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2)
-   
+    input = cms.untracked.int32(ivars.maxEvents)   
     )
-
 
 
 # Input source
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring('rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_7_0/SignalQuenchedDijet80to120_runs1to100.root')
+                            fileNames = cms.untracked.vstring(ivars.files)
 
                           )
 
 process.TFileService = cms.Service('TFileService',
-                                   fileName = cms.string('plots.root')
+                                   fileName = cms.string('plots_' + ivars.output)
                                    )
 
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
+process.load('Configuration/StandardSequences/Services_cff')
+
+process.RandomNumberGeneratorService.bkg4Jets = cms.PSet( initialSeed = cms.untracked.uint32(ivars.randomNumber),    
+                                                         engineName = cms.untracked.string('HepJamesRandom')    )
+process.RandomNumberGeneratorService.bkg5Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
+process.RandomNumberGeneratorService.bkg6Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
+process.RandomNumberGeneratorService.bkg7Jets = process.RandomNumberGeneratorService.bkg4Jets.clone()
 
 from RecoJets.JetProducers.CaloJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
