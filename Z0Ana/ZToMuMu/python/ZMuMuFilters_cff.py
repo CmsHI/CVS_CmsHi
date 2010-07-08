@@ -2,10 +2,9 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
+
+
 from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
-
-
-#from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
 
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
@@ -95,7 +94,7 @@ dimuonsGlobalHighQuality = cms.EDFilter("CandViewRefSelector",
 
 
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
-                          src = cms.InputTag("DimuonsMassCut"),
+                          src = cms.InputTag("Dimuons"),
                           #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
                           
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
