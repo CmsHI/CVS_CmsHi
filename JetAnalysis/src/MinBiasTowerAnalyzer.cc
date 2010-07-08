@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.3 2010/07/06 21:14:25 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.4 2010/07/08 16:34:01 nart Exp $
 //
 //
 
@@ -202,7 +202,8 @@ private:
 // constructors and destructor
 //
 MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) : 
-geo(0)
+  cbins_(0),
+  geo(0)
 {
    //now do what ever initialization is needed
 	TH1D::SetDefaultSumw2();
