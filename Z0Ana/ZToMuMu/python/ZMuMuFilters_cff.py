@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
-from my_code.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
+from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
 
 
 #from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
