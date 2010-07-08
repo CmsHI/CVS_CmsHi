@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.2 2010/07/06 20:43:37 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.3 2010/07/06 21:14:25 yilmaz Exp $
 //
 //
 
@@ -94,71 +94,71 @@ static const int nCentBins = 11;
 
 class MinBiasTowerAnalyzer : public edm::EDAnalyzer {
 public:
-   explicit MinBiasTowerAnalyzer(const edm::ParameterSet&);
-   ~MinBiasTowerAnalyzer();
-   
-   
+  explicit MinBiasTowerAnalyzer(const edm::ParameterSet&);
+  ~MinBiasTowerAnalyzer();
+  
+  
 private:
-   virtual void beginJob() ;
-   virtual void analyze(const edm::Event&, const edm::EventSetup&);
-   virtual void endJob() ;
-   void loadEvent(const edm::Event&, const edm::EventSetup&);
-   void sumET();
-   void analyzeMC();
-   int analyzeGenParticles();
-   void analyzeTowers();
-   void analyzeRandomCones();
-   double       getEt(const DetId &id, double energy);
-   double       getEta(const DetId &id);
-   double       getPhi(const DetId &id);
+  virtual void beginJob() ;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+  void loadEvent(const edm::Event&, const edm::EventSetup&);
+  void sumET();
+  void analyzeMC();
+  int analyzeGenParticles();
+  void analyzeTowers();
+  void analyzeRandomCones();
+  double       getEt(const DetId &id, double energy);
+  double       getEta(const DetId &id);
+  double       getPhi(const DetId &id);
+  
+  // ----------member data ---------------------------
    
-   // ----------member data ---------------------------
-   
-   
-	int iEtamax_;
-	double SumEtMin_;
-	double SumEtMax_;
-	double jetEtMin_;
-	double sumET_;
-	double Et_Min_;
-	double Et_Max_;
-	int missingTowers_;
+  
+  int iEtamax_;
+  double SumEtMin_;
+  double SumEtMax_;
+  double jetEtMin_;
+  double sumET_;
+  double Et_Min_;
+  double Et_Max_;
+  int missingTowers_;
+  
+  double cone_;
+  double genJetPtMin_;
+  double towersize_;
+  double jetEtaMax_;
+  double genpartEtamax_;
+  double b_;
+  double npart_;
+  double ncoll_;
+  double nhard_;
+  double phi0_;
+  
+  bool doMC_;
+  bool doGenParticles_;
+  bool excludeJets_;
+  InputTag jetSrc_;
+  InputTag Hi_;
+  InputTag HiCent_;
+  InputTag Towers_;
+  InputTag jetFake_;
+  InputTag jetGen_;
+  InputTag Direct_;
+  
+  const CaloGeometry *geo;
+  edm::Service<TFileService> fs;
+  
+  TNtuple* nt;
+  TRandom * rand;
 
-	double cone_;
-	double genJetPtMin_;
-	double towersize_;
-	double jetEtaMax_;
-	double genpartEtamax_;
-	double b_;
-	double npart_;
-	double ncoll_;
-	double nhard_;
-	double phi0_;
-
-	bool doMC_;
-   bool doGenParticles_;
-   bool excludeJets_;
-	InputTag jetSrc_;
-	InputTag Hi_;
-	InputTag HiCent_;
-	InputTag Towers_;
-	InputTag jetFake_;
-	InputTag jetGen_;
-	InputTag Direct_;
-	
-	const CaloGeometry *geo;
-	edm::Service<TFileService> fs;
-
-	TNtuple* nt;
-	TRandom * rand;
-
-	edm::Handle<CaloTowerCollection> towers;
-	edm::Handle<pat::JetCollection> jets;
-	edm::Handle<reco::CaloJetCollection> calojets;
+  edm::Handle<CaloTowerCollection> towers;
+  edm::Handle<pat::JetCollection> jets;
+  edm::Handle<reco::CaloJetCollection> calojets;
 	edm::Handle<reco::CaloJetCollection> fakejets;
-	edm::Handle<std::vector<bool> > directions;
-	edm::Handle<reco::GenJetCollection> genjets;
-   edm::Handle<reco::GenParticleCollection> genparticles;
+  edm::Handle<std::vector<bool> > directions;
+  edm::Handle<reco::GenJetCollection> genjets;
+  edm::Handle<reco::GenParticleCollection> genparticles;
 
 	edm::Handle<edm::GenHIEvent> mc;
 	edm::Handle<reco::Centrality> centrality;
@@ -278,7 +278,7 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
    ev.getByLabel(HiCent_,centrality);
    ev.getByLabel(Towers_,towers);
    ev.getByLabel(jetSrc_,jets);
-  //   ev.getByLabel(edm::InputTag("iterativeConePu5CaloJets"),jets); 
+   // ev.getByLabel(edm::InputTag("iterativeConePu5CaloJets"),jets); 
    ev.getByLabel(Direct_,directions);
    ev.getByLabel(jetFake_,fakejets);
    ev.getByLabel(jetGen_,genjets);
@@ -397,10 +397,10 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 /// LOOP OVER gen particles
 
 int MinBiasTowerAnalyzer::analyzeGenParticles(){
-
+  
 	bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
 	int genparticlecount = 0;
-
+	
 	for(unsigned int i = 0 ; i < genparticles->size(); ++i){
 	   const reco::GenParticle& genparticle = (*genparticles)[i];
 	   if(fabs(genparticle.eta())>genpartEtamax_) continue;
@@ -411,7 +411,7 @@ int MinBiasTowerAnalyzer::analyzeGenParticles(){
 	      genparticlecount++;
 	   }
 	}
-	hDndeta->Fill(genparticlecount);
+	hDndeta->Fill(genparticlecount); 
 	return genparticlecount;
 }
 
@@ -491,20 +491,20 @@ MinBiasTowerAnalyzer::beginJob()
 	hETphi = fs->make<TH1D>("et-phi","fhisto; phi ;et(GeV) ",1000,-5,5);
 	hMeanETdNdEta = fs->make<TH2D>("hMeanETdNdEta","mean_dndeta; mean tower p_{T} [GeV/c]; dNdeta",100,0,2,300,0,3000);
 	hTowerEta = fs->make<TH1D>("hTowerEta","histogram; eta",1000,-15,15);
-    hTowerET = fs->make<TH1D>("hTowerET","histogram; p_{T} [GeV/c]; entries",505,-1,100);
+	hTowerET = fs->make<TH1D>("hTowerET","histogram; p_{T} [GeV/c]; entries",505,-1,100);
 	hhSumET = fs->make<TH1D>("hhSumET","histogram;SumTower E_{T}[GeV]; entries",250,-1,2501);
-    hTowerETjet = fs->make<TH1D>("hTowerETjet","histo; p_{T} [GeV/c]; entries",505,-1,100);
-    hTowerETnojet = fs->make<TH1D>("pt_nojet","histo; p_{T} [GeV/c]; entries",505,-1,100);
-    toweret = fs->make<TH1D>("toweret","histogram; E_{T} [GeV]; entries",505,-1,100);
+	hTowerETjet = fs->make<TH1D>("hTowerETjet","histo; p_{T} [GeV/c]; entries",505,-1,100);
+	hTowerETnojet = fs->make<TH1D>("pt_nojet","histo; p_{T} [GeV/c]; entries",505,-1,100);
+	toweret = fs->make<TH1D>("toweret","histogram; E_{T} [GeV]; entries",505,-1,100);
 	hPtGen = fs->make<TH1D>("hPtGen","histogram; p_{T} [GeV/c]; entries",100,0,100);
-    hDndeta = fs->make<TH1D>("hDndeta","histogram; dNdeta; entries",300,0,3000);
-    hRMS= fs->make<TH1D> ("tower_rms","histo",100,0.,1.5);
-    hMean = fs->make<TH1D>("ptaverage","histo;p_{T} GeV/c; entries",100, 0.,1.5);
-    hMeanNoJets = fs->make<TH1D>("nojet_ptaverage","histo;p_{T} GeV/c",100, 0.,1.5);
-    hMeanRMS = fs->make<TH1D>("tower_mean_rms","histo; Tower mean+rms p_{T} [GeV/c]; entries",100,0.5,2.5);
-    hMeanRMSnoJets= fs->make<TH1D>("hMeanRMSnoJets","histo; No-Jet Tower mean+rms p_{T} [GeV/c]; entries",100,0.5,2.);
-    hRMSnoJets = fs->make<TH1D>("hRMSnoJets","histo; hRMSnoJets",100,0,1.5);
-    hJetET = fs->make<TH1D>("hJetET","histogram;Jet E_{T} [GeV]; entries",280,0,70);
+	hDndeta = fs->make<TH1D>("hDndeta","histogram; dNdeta; entries",300,0,3000);
+	hRMS= fs->make<TH1D> ("tower_rms","histo",100,0.,1.5);
+	hMean = fs->make<TH1D>("ptaverage","histo;p_{T} GeV/c; entries",100, 0.,1.5);
+	hMeanNoJets = fs->make<TH1D>("nojet_ptaverage","histo;p_{T} GeV/c",100, 0.,1.5);
+	hMeanRMS = fs->make<TH1D>("tower_mean_rms","histo; Tower mean+rms p_{T} [GeV/c]; entries",100,0.5,2.5);
+	hMeanRMSnoJets= fs->make<TH1D>("hMeanRMSnoJets","histo; No-Jet Tower mean+rms p_{T} [GeV/c]; entries",100,0.5,2.);
+	hRMSnoJets = fs->make<TH1D>("hRMSnoJets","histo; hRMSnoJets",100,0,1.5);
+	hJetET = fs->make<TH1D>("hJetET","histogram;Jet E_{T} [GeV]; entries",280,0,70);
 
 }
 
