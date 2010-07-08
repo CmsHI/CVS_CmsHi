@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.4 2010/07/08 16:34:01 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.5 2010/07/08 16:35:48 nart Exp $
 //
 //
 
@@ -138,13 +138,13 @@ private:
   bool doMC_;
   bool doGenParticles_;
   bool excludeJets_;
-  InputTag jetSrc_;
-  InputTag Hi_;
-  InputTag HiCent_;
-  InputTag Towers_;
-  InputTag jetFake_;
-  InputTag jetGen_;
-  InputTag Direct_;
+  InputTag PatJetSrc_;
+  InputTag HiSrc_;
+  InputTag HiCentSrc_;
+  InputTag TowersSrc_;
+  InputTag FakeJetSrc_;
+  InputTag GenJetSrc_;
+  InputTag DirectSrc_;
   
   const CaloGeometry *geo;
   edm::Service<TFileService> fs;
@@ -203,7 +203,8 @@ private:
 //
 MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) : 
   cbins_(0),
-  geo(0)
+  geo(0),
+  phi0_(0)
 {
    //now do what ever initialization is needed
 	TH1D::SetDefaultSumw2();
@@ -224,13 +225,13 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	doGenParticles_  = iConfig.getUntrackedParameter<bool>("doGenParticles",false);
         excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",false);
 	
-	jetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("jetSrc_",edm::InputTag("icPu5patJets"));
-	Hi_ = iConfig.getUntrackedParameter<edm::InputTag>("Hi_",edm::InputTag("heavyIon"));
-	HiCent_ = iConfig.getUntrackedParameter<edm::InputTag>("HiCent_",edm::InputTag("hiCentrality"));
-	Towers_ = iConfig.getUntrackedParameter<edm::InputTag>("Towers_",edm::InputTag("towerMaker"));
-	jetFake_ = iConfig.getUntrackedParameter<edm::InputTag>("jetFake_",edm::InputTag("bkg5Jets"));
-	Direct_ = iConfig.getUntrackedParameter<edm::InputTag>("Direct_",edm::InputTag("bkg5Jets","directions"));
-	jetGen_ = iConfig.getUntrackedParameter<edm::InputTag>("jetGen_",edm::InputTag("iterativeCone5HiGenJets"));
+	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("PatJetSrc_",edm::InputTag("icPu5patJets"));
+	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("HiSrc_",edm::InputTag("heavyIon"));
+	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("HiCentSrc_",edm::InputTag("hiCentrality"));
+	TowersSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("TowersSrc_",edm::InputTag("towerMaker"));
+	FakeJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("FakeJetSrc_",edm::InputTag("bkg5Jets"));
+	DirectSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("DirectSrc_",edm::InputTag("bkg5Jets","directions"));
+	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("GenJetSrc_",edm::InputTag("iterativeCone5HiGenJets"));
 	
 }
 
@@ -275,14 +276,14 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
    }
    if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
-   ev.getByLabel(Hi_,mc);
-   ev.getByLabel(HiCent_,centrality);
-   ev.getByLabel(Towers_,towers);
-   ev.getByLabel(jetSrc_,jets);
+   ev.getByLabel(HiSrc_,mc);
+   ev.getByLabel(HiCentSrc_,centrality);
+   ev.getByLabel(TowersSrc_,towers);
+   ev.getByLabel(PatJetSrc_,jets);
    // ev.getByLabel(edm::InputTag("iterativeConePu5CaloJets"),jets); 
-   ev.getByLabel(Direct_,directions);
-   ev.getByLabel(jetFake_,fakejets);
-   ev.getByLabel(jetGen_,genjets);
+   ev.getByLabel(DirectSrc_,directions);
+   ev.getByLabel(FakeJetSrc_,fakejets);
+   ev.getByLabel(GenJetSrc_,genjets);
 	
 }
 
@@ -421,7 +422,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
    int njet = jets->size();
    int njet20 = 0;
    int njet30 = 0;
-
+   
    double hf = centrality->EtHFhitSum();
    int bin = cbins_->getBin(hf);
    
@@ -431,27 +432,39 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       double aveta = 0;
       double totpt = 0;
       double avphi = 0;
-
+    
       int ncons = constits.size();
+     
       vector<int> used;
-
+    
       double area = fakejet.towersArea();
-
+    
       double sign = (int)((*directions)[i])*2 - 1;
+    
       double fpt = sign*fakejet.pt();
+    
       double fpu = fakejet.pileup();
-      double phi = reco::deltaPhi(fakejet.phi(),phi0_);
-
+    
+      //double phi = reco::deltaPhi(fakejet.phi(),phi0_);
+        double phi =fakejet.phi();
+     
       int nc = 0;
+
+      
       for(int ic1 = 0; ic1 < ncons-missingTowers_; ++ic1){
 	 int ic = -1;
+ 
 	 while(find(used.begin(),used.end(), ic) != used.end() || ic < 0 || ic >= ncons){
-            ic = (int)(ncons*rand->Rndm());
+	  
+	   double r = rand->Rndm();
+            ic = (int)(ncons*r);
 	 }
 	 used.push_back(ic);
+	
 
 	 double toweta = constits[ic]->eta();
 	 double towphi = reco::deltaPhi(constits[ic]->phi(),phi0_);
+	 // double towphi = constits[ic]->phi();
 	 double towpt = constits[ic]->et();
 	 aveta += toweta*towpt;
 	 avphi += towphi*towpt;
@@ -462,7 +475,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 
       aveta /= totpt;
       avphi /= totpt;
-
+   
       float entry[17] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc};
       nt->Fill(entry);
       
@@ -472,7 +485,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       }
       
    }
-      
+  
 }
 
 
@@ -513,6 +526,7 @@ MinBiasTowerAnalyzer::beginJob()
 void 
 MinBiasTowerAnalyzer::endJob() {
 
+  cout<<" bittiii laaa "<<endl;
 }
 
 double MinBiasTowerAnalyzer::getEt(const DetId &id, double energy){

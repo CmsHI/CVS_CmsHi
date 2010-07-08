@@ -1,12 +1,13 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 ivars = VarParsing.VarParsing('standard')
 ivars.files = [
-    'rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_7_0/SignalQuenchedDijet80to120_runs1to100.root'
+   # 'rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_7_0/SignalQuenchedDijet80to120_runs1to100.root'
+    'rfio:/castor/cern.ch/user/y/yilmaz/share/MinBias0708_runs1to50.root'
               ]
 
 ivars.output = 'RandomCones_Hydjet_370.root'
 
-ivars.maxEvents = -1
+ivars.maxEvents = 10000
 
 ivars.register ('randomNumber',
                 mult=ivars.multiplicity.singleton,
@@ -34,6 +35,13 @@ process.TFileService = cms.Service('TFileService',
                                    fileName = cms.string('plots_' + ivars.output)
                                    )
 
+
+process.output = cms.OutputModule("PoolOutputModule",
+                                   outputCommands = cms.untracked.vstring("keep *_*_*_*"),
+                                  fileName = cms.untracked.string(ivars.output)
+                                  )
+
+
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 process.load('Configuration/StandardSequences/Services_cff')
 
@@ -47,8 +55,8 @@ from RecoJets.JetProducers.CaloJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 
 process.bkg4Jets = cms.EDProducer(
-    "JetAlgorithmAnalyzer",
-#  "BackgroundJetProducer",
+#    "JetAlgorithmAnalyzer",
+  "BackgroundJetProducer",
   CaloJetParameters,
   AnomalousCellParameters,
   jetAlgorithm = cms.string("IterativeCone"),
@@ -76,7 +84,12 @@ process.bkg7Jets.radiusPU = 0.7
 
 process.bkgJets = cms.Sequence(process.bkg5Jets)
 
-process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer')
+process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer',
+                            # missingTowers_ = cms.untracked.int32(10000),
+                             FakeJetSrc_ = cms.untracked.InputTag('bkg5Jets'),
+                             PatJetSrc_ = cms.untracked.InputTag('patJets')
+                            
+                             )
 
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
@@ -89,5 +102,10 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                                         )
                                       )
 
-process.p = cms.Path(process.bkgJets*process.ana)
+process.p = cms.Path(process.bkgJets
+                     *process.ana
+                     )
+process.out_step = cms.EndPath(process.output)
+
+
 
