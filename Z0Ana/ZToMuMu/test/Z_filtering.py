@@ -56,7 +56,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.load("Z0Ana.ZToMuMu.ZMuMuFilters_cff")
 
 process.DiMuonsSTA_Step=cms.Path(process.DimuonsMassCut*process.dimuonsSTA*process.dimuonsSTAFilter)
-process.DiMuonsGlobalHightQuality_Step = cms.Path(process.DimuonsMassCut*process.dimuonsGlobalHightQuality*process.dimuonsGlobalFilter)
+process.DiMuonsGlobalHighQuality_Step = cms.Path(process.DimuonsMassCut*process.dimuonsGlobalHighQuality*process.dimuonsGlobalFilter)
 
 # =============== Output ================================
 
@@ -69,10 +69,10 @@ process.output = cms.OutputModule("PoolOutputModule",
                                #      fileName = cms.untracked.string('/castor/cern.ch/user/s/silvest/JulyExercise/rootfiles/MC_370_ZembeddedHydjet_filtering_RECO_on_STApairs_60-120.root'),
  SelectEvents=cms.untracked.PSet(
                                    #SelectEvents=cms.vstring('DiMuonsSTA_Step')
-                                   SelectEvents=cms.vstring('DiMuonsGlobalHightQuality_Step') 	
+                                   SelectEvents=cms.vstring('DiMuonsGlobalHighQuality_Step') 	
                                    ))
                                   
 process.outpath = cms.EndPath(process.output)
 # If generator level information is avilable uncomment this
 #process.schedule=cms.Schedule(process.DiMuonsSTA_Step,process.outpath)
-process.schedule=cms.Schedule(process.DiMuonsGlobalHightQuality_Step,process.outpath)
+process.schedule=cms.Schedule(process.DiMuonsGlobalHighQuality_Step,process.outpath)

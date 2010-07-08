@@ -44,7 +44,7 @@ Dimuons = cms.EDProducer("CandViewShallowCloneCombiner",
 DimuonsMassCut = cms.EDProducer("CandViewShallowCloneCombiner",
                        checkCharge = cms.bool(True),
                          #cut = cms.string(' mass > 70 & mass < 120 & charge=0'),
-                         cut = cms.string(' mass > 60 & mass < 120 & charge=0'),
+                         cut = cms.string(' mass > 88 & mass < 92 & charge=0'),
                          #goodMuons
                                         
                          #decay = cms.string("goodMuons@+ goodMuons@-")
@@ -86,8 +86,8 @@ dimuonsGlobal = cms.EDFilter("CandViewRefSelector",
                              filter = cms.bool(True)
                              )
 
-dimuonsGlobalHightQuality = cms.EDFilter("CandViewRefSelector",
-                             src = cms.InputTag("Dimuons"),
+dimuonsGlobalHighQuality = cms.EDFilter("CandViewRefSelector",
+                             src = cms.InputTag("DimuonsMassCut"),
                              cut = cms.string('(daughter(0).pt>40 & daughter(1).pt>40) & (daughter(0).isGlobalMuon = 1 &  daughter(1).isGlobalMuon = 1 )' ),
                              filter = cms.bool(True)
                              )
@@ -95,7 +95,7 @@ dimuonsGlobalHightQuality = cms.EDFilter("CandViewRefSelector",
 
 
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
-                          src = cms.InputTag("Dimuons"),
+                          src = cms.InputTag("DimuonsMassCut"),
                           #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
                           
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
