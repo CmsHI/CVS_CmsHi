@@ -2,8 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 ZMuMuContent = cms.PSet(
     outputCommands = cms.untracked.vstring(
-    #'keep *',
-    
+    #'keep *',    
     'keep *_generator_*_*',
     'keep *_genParticles_*_*',
     'keep *_hiCentrality_*_*',
@@ -14,8 +13,9 @@ ZMuMuContent = cms.PSet(
     'keep *_dimuonsGlobalSTA_*_*',
     'keep *_dimuonsSTA_*_*',
     'keep *_GenDimuons_*_*',
-    'keep *_Dimuons_*_*'
-    
+    'keep *_Dimuons_*_*',
+    'keep *_ditracksSiliconTrk_*_*',
+    'keep *_dimuonsTrk_*_*'
     )
     )
 
