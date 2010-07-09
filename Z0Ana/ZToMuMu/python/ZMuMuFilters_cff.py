@@ -2,6 +2,7 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
+#from my_code.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
 
 
 from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
@@ -50,6 +51,15 @@ DimuonsMassCut = cms.EDProducer("CandViewShallowCloneCombiner",
                          decay = cms.string("muons@+ muons@-")
                          #decay = cms.string('patMuons@+ patMuons@-')
                          )
+DimuonsMassCutLoose = cms.EDProducer("CandViewShallowCloneCombiner",
+                       checkCharge = cms.bool(True),
+                         cut = cms.string(' mass > 60 & mass < 120 & charge=0'),
+                         #goodMuons
+                                        
+                         #decay = cms.string("goodMuons@+ goodMuons@-")
+                         decay = cms.string("muons@+ muons@-")
+                         #decay = cms.string('patMuons@+ patMuons@-')
+                         )
 #Ditracks
 trackCands = cms.EDProducer("ConcreteChargedCandidateProducer",
                             src          = cms.InputTag("hiGlobalPrimTracks"),
@@ -91,10 +101,17 @@ dimuonsGlobalHighQuality = cms.EDFilter("CandViewRefSelector",
                              filter = cms.bool(True)
                              )
 
-
-
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("Dimuons"),
+                          #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
+                          
+                          cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
+                          filter = cms.bool(True)
+                          )
+
+
+dimuonsSTAMassCut = cms.EDFilter("CandViewRefSelector",
+                          src = cms.InputTag("DimuonsMassCutLoose"),
                           #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
                           
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
