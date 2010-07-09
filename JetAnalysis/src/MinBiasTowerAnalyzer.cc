@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.5 2010/07/08 16:35:48 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.6 2010/07/08 21:56:17 nart Exp $
 //
 //
 
@@ -202,14 +202,15 @@ private:
 // constructors and destructor
 //
 MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) : 
+   sumET_(0),
+   phi0_(0),
   cbins_(0),
-  geo(0),
-  phi0_(0)
+  geo(0)
 {
    //now do what ever initialization is needed
 	TH1D::SetDefaultSumw2();
-	SumEtMin_ = iConfig.getUntrackedParameter<double>("sumEtMin",1000);
-	SumEtMax_ = iConfig.getUntrackedParameter<double>("sumEtMax",1500);
+	SumEtMin_ = iConfig.getUntrackedParameter<double>("sumEtMin",500);
+	SumEtMax_ = iConfig.getUntrackedParameter<double>("sumEtMax",750);
 
 	jetEtMin_ = iConfig.getUntrackedParameter<double>("jetEtMin",0);
 	missingTowers_ = iConfig.getUntrackedParameter<int>("missingTowers",67);
@@ -289,12 +290,16 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
 
 void MinBiasTowerAnalyzer::sumET(){
    sumET_ = 0;
-   for(unsigned int i = 0 ; i < towers->size(); ++i){
-      const CaloTower& tower = (*towers)[i];
-      if(abs(tower.ieta())>iEtamax_) continue;
-      double tower_et = tower.et();
-      sumET_=sumET_+tower_et;
+   if(0){
+      for(unsigned int i = 0 ; i < towers->size(); ++i){
+	 const CaloTower& tower = (*towers)[i];
+	 if(abs(tower.ieta())>iEtamax_) continue;
+	 double tower_et = tower.et();
+	 sumET_=sumET_+tower_et;
+      }
    }
+   sumET_ = centrality->EtMidRapiditySum();
+
 }
 
 void MinBiasTowerAnalyzer::analyzeMC(){
@@ -495,6 +500,8 @@ MinBiasTowerAnalyzer::beginJob()
 {
    nt = fs->make<TNtuple>("nt","","eta1:eta2:phi1:phi2:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc");
    rand = new TRandom();
+
+   TH1::SetDefaultSumw2();
 
 	hNtowers = fs->make<TH1D>("nTowers","histogram;N_{towers};entries",480,-0.5,60.5);
 	hNtowers2 = fs->make<TH1D>("nTowers2","histogram;N_{towers}; entries",240,-0.5,60.5);          
