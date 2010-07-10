@@ -113,8 +113,8 @@ dimuonsSTA = cms.EDFilter("CandViewRefSelector",
 dimuonsSTAMassCut = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("DimuonsMassCutLoose"),
                           #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
-                          
-                          cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
+                            cut = cms.string('( daughter(0).isStandAloneMuon = 1) & ( daughter(1).isStandAloneMuon = 1) ' ),
+#                          cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
                           filter = cms.bool(True)
                           )
 
@@ -146,6 +146,10 @@ dimuonsSTAFilter = cms.EDFilter("CandViewCountFilter",
     minNumber = cms.uint32(1)
 )
 
+dimuonsSTAMassCutFilter = cms.EDFilter("CandViewCountFilter",
+    src = cms.InputTag("dimuonsSTAMassCut"),
+    minNumber = cms.uint32(1)
+)
 
 #goodGlobalMuons = cms.EDFilter("MuonViewRefSelector",
 goodGlobalMuons = cms.EDFilter("CandViewRefSelector",
@@ -167,7 +171,10 @@ dimuonsGlobalFilter = cms.EDFilter("CandViewCountFilter",
                                     src = cms.InputTag("dimuonsGlobal"),
                                     minNumber = cms.uint32(1)
                                 )
-
+dimuonsGlobalHighQualityFilter = cms.EDFilter("CandViewCountFilter",
+                                    src = cms.InputTag("dimuonsGlobalHighQuality"),
+                                    minNumber = cms.uint32(1)
+                                )
 
 
 
