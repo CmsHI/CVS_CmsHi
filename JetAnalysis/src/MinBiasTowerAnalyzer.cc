@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.6 2010/07/08 21:56:17 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.7 2010/07/09 08:08:15 yilmaz Exp $
 //
 //
 
@@ -289,8 +289,8 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
 }
 
 void MinBiasTowerAnalyzer::sumET(){
-   sumET_ = 0;
-   if(0){
+   sumET_ = centrality->EtMidRapiditySum();
+   if(sumET_ == 0){
       for(unsigned int i = 0 ; i < towers->size(); ++i){
 	 const CaloTower& tower = (*towers)[i];
 	 if(abs(tower.ieta())>iEtamax_) continue;
@@ -298,8 +298,6 @@ void MinBiasTowerAnalyzer::sumET(){
 	 sumET_=sumET_+tower_et;
       }
    }
-   sumET_ = centrality->EtMidRapiditySum();
-
 }
 
 void MinBiasTowerAnalyzer::analyzeMC(){
@@ -423,6 +421,7 @@ int MinBiasTowerAnalyzer::analyzeGenParticles(){
 }
 
 void MinBiasTowerAnalyzer::analyzeRandomCones(){
+
    bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
    int njet = jets->size();
    int njet20 = 0;
@@ -481,11 +480,11 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       aveta /= totpt;
       avphi /= totpt;
    
-      float entry[17] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc};
+      float entry[19] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
       nt->Fill(entry);
       
       if(interest){
-	 float entry[17] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc};
+	 float entry[19] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
 	 nt->Fill(entry);
       }
       
@@ -498,7 +497,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 void 
 MinBiasTowerAnalyzer::beginJob()
 {
-   nt = fs->make<TNtuple>("nt","","eta1:eta2:phi1:phi2:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc");
+   nt = fs->make<TNtuple>("nt","","eta1:eta2:phi1:phi2:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf");
    rand = new TRandom();
 
    TH1::SetDefaultSumw2();
