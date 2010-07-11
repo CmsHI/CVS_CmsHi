@@ -172,10 +172,6 @@ void BackgroundJetProducer::writeBkgJets( edm::Event & iEvent, edm::EventSetup c
 	   fjInputsEnd = fjInputs_.end();
 	input_object != fjInputsEnd; ++input_object) {
 
-     for (vector<fastjet::PseudoJet>::const_iterator input_object = fjInputs_.begin (),
-	    fjInputsEnd = fjInputs_.end();
-	  input_object != fjInputsEnd; ++input_object) {
-       
        const reco::CandidatePtr & tower=inputs_[input_object->user_index()];
        const CaloTower* ctc = dynamic_cast<const CaloTower*>(tower.get());
        int ieta = ctc->id().ieta();
@@ -197,7 +193,6 @@ void BackgroundJetProducer::writeBkgJets( edm::Event & iEvent, edm::EventSetup c
          et[ir] += etadd;
          pileUp[ir] += towet - etadd;
        }
-     }
    }
 
    cout<<"Start filling jets"<<endl;
