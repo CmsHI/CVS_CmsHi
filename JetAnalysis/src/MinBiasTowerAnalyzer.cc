@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.7 2010/07/09 08:08:15 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.8 2010/07/10 15:48:39 yilmaz Exp $
 //
 //
 
@@ -72,6 +72,7 @@
 #include "HepMC/GenEvent.h"
 #include "HepMC/HeavyIon.h"
 
+#include <TF1.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TNtuple.h>
@@ -122,8 +123,9 @@ private:
   double sumET_;
   double Et_Min_;
   double Et_Max_;
-  int missingTowers_;
-  
+  vector<double> missingTowersMean_;
+  vector<double> missingTowersRMS_;
+
   double cone_;
   double genJetPtMin_;
   double towersize_;
@@ -187,6 +189,8 @@ private:
 	TH1D* hMeanRMSnoJets;
 	TH1D* hRMSnoJets;
 	TH1D* hJetET;
+
+   vector<TF1*> fNtowers;
    
 };
 
@@ -213,7 +217,8 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	SumEtMax_ = iConfig.getUntrackedParameter<double>("sumEtMax",750);
 
 	jetEtMin_ = iConfig.getUntrackedParameter<double>("jetEtMin",0);
-	missingTowers_ = iConfig.getUntrackedParameter<int>("missingTowers",67);
+	missingTowersMean_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersMean",vector<double>(0));
+        missingTowersRMS_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersRMS",vector<double>(0));
 	cone_ = iConfig.getUntrackedParameter<double>("coneSize",0.5);
 
 	genJetPtMin_ =  iConfig.getUntrackedParameter<double>("genJetPtMin",20);
@@ -226,14 +231,14 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	doGenParticles_  = iConfig.getUntrackedParameter<bool>("doGenParticles",false);
         excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",false);
 	
-	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("PatJetSrc_",edm::InputTag("icPu5patJets"));
-	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("HiSrc_",edm::InputTag("heavyIon"));
-	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("HiCentSrc_",edm::InputTag("hiCentrality"));
-	TowersSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("TowersSrc_",edm::InputTag("towerMaker"));
-	FakeJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("FakeJetSrc_",edm::InputTag("bkg5Jets"));
-	DirectSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("DirectSrc_",edm::InputTag("bkg5Jets","directions"));
-	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("GenJetSrc_",edm::InputTag("iterativeCone5HiGenJets"));
-	
+	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("patJetSrc",edm::InputTag("icPu5patJets"));
+	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc_",edm::InputTag("heavyIon"));
+	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("centralitySrc_",edm::InputTag("hiCentrality"));
+	TowersSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc_",edm::InputTag("towerMaker"));
+	FakeJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("fakeJetSrc_",edm::InputTag("bkg5Jets"));
+	DirectSrc_ = edm::InputTag(FakeJetSrc_.label(),"directions");
+	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("genJetSrc_",edm::InputTag("iterativeCone5HiGenJets"));
+
 }
 
 
@@ -439,23 +444,18 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
     
       int ncons = constits.size();
      
-      vector<int> used;
-    
+      vector<int> used;    
       double area = fakejet.towersArea();
-    
-      double sign = (int)((*directions)[i])*2 - 1;
-    
-      double fpt = sign*fakejet.pt();
-    
+      double sign = (int)((*directions)[i])*2 - 1;   
+      double fpt = sign*fakejet.pt();    
       double fpu = fakejet.pileup();
     
       //double phi = reco::deltaPhi(fakejet.phi(),phi0_);
         double phi =fakejet.phi();
      
       int nc = 0;
-
-      
-      for(int ic1 = 0; ic1 < ncons-missingTowers_; ++ic1){
+      int nTow = (int) fNtowers[bin]->GetRandom();
+      for(int ic1 = 0; ic1 < nTow; ++ic1){
 	 int ic = -1;
  
 	 while(find(used.begin(),used.end(), ic) != used.end() || ic < 0 || ic >= ncons){
@@ -480,11 +480,11 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       aveta /= totpt;
       avphi /= totpt;
    
-      float entry[19] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
+      float entry[19] = {fakejet.eta(),phi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
       nt->Fill(entry);
       
       if(interest){
-	 float entry[19] = {fakejet.eta(),aveta,phi,avphi,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
+	 float entry[19] = {fakejet.eta(),phi,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum()};
 	 nt->Fill(entry);
       }
       
@@ -497,10 +497,17 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 void 
 MinBiasTowerAnalyzer::beginJob()
 {
-   nt = fs->make<TNtuple>("nt","","eta1:eta2:phi1:phi2:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf");
+   nt = fs->make<TNtuple>("nt","","eta:phi:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf");
    rand = new TRandom();
 
    TH1::SetDefaultSumw2();
+
+   for(unsigned int i = 0; i < missingTowersMean_.size(); ++i){
+      fNtowers[i] = fs->make<TF1>(Form("fNtowers%d",i),"gaus(0)",0,80);
+      fNtowers[i]->SetParameter(0,1);
+      fNtowers[i]->SetParameter(1,missingTowersMean_[i]);
+      fNtowers[i]->SetParameter(2,missingTowersRMS_[i]);
+   }
 
 	hNtowers = fs->make<TH1D>("nTowers","histogram;N_{towers};entries",480,-0.5,60.5);
 	hNtowers2 = fs->make<TH1D>("nTowers2","histogram;N_{towers}; entries",240,-0.5,60.5);          

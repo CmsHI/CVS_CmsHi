@@ -85,10 +85,10 @@ process.bkg7Jets.radiusPU = 0.7
 process.bkgJets = cms.Sequence(process.bkg5Jets)
 
 process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer',
-                            # missingTowers_ = cms.untracked.int32(10000),
-                             FakeJetSrc_ = cms.untracked.InputTag('bkg5Jets'),
-                             PatJetSrc_ = cms.untracked.InputTag('patJets')
-                            
+                             jetTowersMean = cms.untracked.vdouble(21,21.4,21.4,22,22.5,21.3,17.4,16.1,11.5,0),
+                             jetTowersRMS = cms.untracked.vdouble(5.4,5.2,5.2,5.4,5.8,5.8,4.9,4.1,3.2,0),           
+                             fakeJetSrc = cms.untracked.InputTag('bkg5Jets'),
+                             patJetSrc = cms.untracked.InputTag('patJets')                            
                              )
 
 
@@ -97,7 +97,7 @@ process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/n/nart/scratch0/CM
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits40_DataJulyExercise_Hydjet2760GeV_MC_37Y_V5_v0')
+                                                                 tag = cms.string('HFhits10_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_v0')
                                                                  )
                                                         )
                                       )
