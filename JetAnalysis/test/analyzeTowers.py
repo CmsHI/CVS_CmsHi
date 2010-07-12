@@ -112,7 +112,7 @@ process.CondDBCommon.connect = "sqlite_file:/net/hisrv0001/home/yetkin/cvs/UserC
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits10_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_v0')
+                                                                 tag = cms.string('HFhits10_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
                                                                  )
                                                         )
                                       )

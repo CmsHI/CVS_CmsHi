@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.8 2010/07/10 15:48:39 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.9 2010/07/12 14:03:26 yilmaz Exp $
 //
 //
 
@@ -232,12 +232,12 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
         excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",false);
 	
 	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("patJetSrc",edm::InputTag("icPu5patJets"));
-	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc_",edm::InputTag("heavyIon"));
-	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("centralitySrc_",edm::InputTag("hiCentrality"));
-	TowersSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc_",edm::InputTag("towerMaker"));
-	FakeJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("fakeJetSrc_",edm::InputTag("bkg5Jets"));
+	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc",edm::InputTag("heavyIon"));
+	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("centralitySrc",edm::InputTag("hiCentrality"));
+	TowersSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
+	FakeJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("fakeJetSrc",edm::InputTag("bkg5Jets"));
 	DirectSrc_ = edm::InputTag(FakeJetSrc_.label(),"directions");
-	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("genJetSrc_",edm::InputTag("iterativeCone5HiGenJets"));
+	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("genJetSrc",edm::InputTag("iterativeCone5HiGenJets"));
 
 }
 
@@ -503,10 +503,11 @@ MinBiasTowerAnalyzer::beginJob()
    TH1::SetDefaultSumw2();
 
    for(unsigned int i = 0; i < missingTowersMean_.size(); ++i){
-      fNtowers[i] = fs->make<TF1>(Form("fNtowers%d",i),"gaus(0)",0,80);
-      fNtowers[i]->SetParameter(0,1);
-      fNtowers[i]->SetParameter(1,missingTowersMean_[i]);
-      fNtowers[i]->SetParameter(2,missingTowersRMS_[i]);
+      TF1* f = fs->make<TF1>(Form("fNtowers%d",i),"gaus(0)",0,80);
+      f->SetParameter(0,1);
+      f->SetParameter(1,missingTowersMean_[i]);
+      f->SetParameter(2,missingTowersRMS_[i]);
+      fNtowers.push_back(f);
    }
 
 	hNtowers = fs->make<TH1D>("nTowers","histogram;N_{towers};entries",480,-0.5,60.5);
