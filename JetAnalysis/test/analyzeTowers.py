@@ -1,13 +1,29 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 ivars = VarParsing.VarParsing('standard')
+
 ivars.files = [
-   # 'rfio:/castor/cern.ch/user/y/yilmaz/pat/CMSSW_3_7_0/SignalQuenchedDijet80to120_runs1to100.root'
-    'rfio:/castor/cern.ch/user/y/yilmaz/share/MinBias0708_runs1to50.root'
-              ]
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs11to20.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs1to10.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs1to5.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs21to30.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs31to40.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs41to50.root',
+'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs51to100.root'
+    ]
 
-ivars.output = 'RandomCones_Hydjet_370.root'
+'''
+ivars.files = [
+        'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs101to200.root',
+            'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs1to1.root',
+            'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs1to100.root',
+            'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs201to300.root',
+            'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs301to400.root'
+            ]
+'''
 
-ivars.maxEvents = 10000
+ivars.output = 'towers_data01.root'
+
+ivars.maxEvents = -1
 
 ivars.register ('randomNumber',
                 mult=ivars.multiplicity.singleton,
@@ -86,14 +102,13 @@ process.bkgJets = cms.Sequence(process.bkg5Jets)
 
 process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer',
                              jetTowersMean = cms.untracked.vdouble(21,21.4,21.4,22,22.5,21.3,17.4,16.1,11.5,0),
-                             jetTowersRMS = cms.untracked.vdouble(5.4,5.2,5.2,5.4,5.8,5.8,4.9,4.1,3.2,0),           
+                             jetTowersRMS = cms.untracked.vdouble(5.4,5.2,5.2,5.4,5.8,5.8,4.9,4.1,3.2,0),
                              fakeJetSrc = cms.untracked.InputTag('bkg5Jets'),
-                             patJetSrc = cms.untracked.InputTag('patJets')                            
+                             patJetSrc = cms.untracked.InputTag('patJets')                             
                              )
 
-
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/n/nart/scratch0/CMSSW_3_7_0_patch4/src/CmsHi/JulyExercise/data/CentralityTables.db"
+process.CondDBCommon.connect = "sqlite_file:/net/hisrv0001/home/yetkin/cvs/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
@@ -105,7 +120,7 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
 process.p = cms.Path(process.bkgJets
                      *process.ana
                      )
-process.out_step = cms.EndPath(process.output)
+#process.out_step = cms.EndPath(process.output)
 
 
 
