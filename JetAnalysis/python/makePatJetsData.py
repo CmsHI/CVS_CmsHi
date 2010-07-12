@@ -8,7 +8,7 @@ ivars.register('initialEvent',mult=ivars.multiplicity.singleton,info="for testin
 ivars.files = "file:/net/hisrv0001/home/nart/scratch/july/CMSSW_3_7_0_patch4/src/CmsHi/JetAnalysis/test/MinBias0711_runs11to20.root"
 
 ivars.output = 'jets_pat_80to120.root'
-ivars.maxEvents = 1
+ivars.maxEvents = -1
 ivars.initialEvent = 1
 
 ivars.parseArguments()
@@ -18,8 +18,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process('HIJETS')
 
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring(ivars.files),
-                            skipEvents = cms.untracked.uint32(ivars.initialEvent)
+                            fileNames = cms.untracked.vstring(ivars.files)
                             )
 
 process.maxEvents = cms.untracked.PSet(
@@ -27,8 +26,6 @@ process.maxEvents = cms.untracked.PSet(
                     )
 
 process.load('Configuration.StandardSequences.Geometry_cff')
-process.load('RecoJets.Configuration.GenJetParticles_cff')
-process.load('RecoHI.HiJetAlgos.HiGenJets_cff')
 process.load('RecoHI.HiJetAlgos.HiRecoJets_cff')
 process.load('PhysicsTools.PatAlgos.patHeavyIonSequences_cff')
 from PhysicsTools.PatAlgos.tools.heavyIonTools import *
