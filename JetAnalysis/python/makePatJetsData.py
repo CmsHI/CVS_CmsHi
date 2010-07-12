@@ -110,6 +110,7 @@ process.ktPu6patJets = process.patJets.clone(jetSource  = cms.InputTag("ktPu6Cal
 
 process.ktPu6patSequence = cms.Sequence(process.ktPu6CaloJets*process.ktPu6corr*process.ktPu6patJets)
 
+process.load("HeavyIonsAnalysis.Configuration.analysisProducers_cff")
 process.load("HeavyIonsAnalysis.Configuration.analysisEventContent_cff")
 
 process.output = cms.OutputModule("PoolOutputModule",
@@ -117,21 +118,20 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   fileName = cms.untracked.string(ivars.output)
                                   )
 
-process.runAllJets = cms.Path(#process.hiGenParticlesForJets *
-    #process.hiRecoGenJets +
-    process.iterativeConePu5CaloJets +
-    # process.makeHeavyIonJets +
+process.output.outputCommands.extend(["drop *_towerMaker_*_*"])
+
+process.runAllJets = cms.Path(
+    process.allTracks +
+    process.icPu5patSequence +
     process.ktPu4patSequence +
     process.ktPu6patSequence +
     process.kt4patSequence +
     process.kt6patSequence +
-
     process.akPu5patSequence +
     process.akPu7patSequence +
     process.ak5patSequence +
     process.ak7patSequence 
-
-                              )
+    )
 
 process.out_step = cms.EndPath(process.output)
 
