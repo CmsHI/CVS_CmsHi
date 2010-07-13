@@ -17,11 +17,11 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 ##making a filter for centrality
 process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/RecoHI/HiCentralityAlgos/data/CentralityTables.db"
+process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits40_MC_Hydjet2760GeV_MC_3XY_V24_v0')
+                                                                 tag = cms.string('HFhits40_DataJulyExercise_Hydjet2760GeV_MC_37Y_V5_NZS_v0')
                                                                  )
                                                         )
                                       )
@@ -39,41 +39,43 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
-#'file:ZMuMuSkim1.root',
+
+
+#'rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZToMuMuSkim_Vtxcor_ZS_87_1_u6q.root'
+#'rfio:/castor/cern.ch/user/h/hckim/JulyExercise10/JulyExercise10_MinimumBiasHI_dilepton_skim0/JulyExercise10_MinimumBiasHI_dilepton_skim0_95_1_E2H.root'
+'file:ZToMuMuSkim_Vtxcor_ZS.root'
 #'file:ZMuMuSkim2.root',
 
-'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_1.root',
+#'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_1.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_2.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_3.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_4.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_5.root',
 
-
-
-
-#'rfio:/castor/cern.ch/user/k/kumarv/Z0/cms370/ZMuMuSkim1.root'
-
-
-##Central PbPb
-#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral2_recoMu.root',
-#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_EmbaddedCentral3_recoMu.root',
-#'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_CentralEmbadded4_recoMu.root'
-
-
-## Minimum biased PbPb
-   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded_recoMu.root',
-   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded2_recoMu.root',
-   # 'rfio:/castor/cern.ch/user/k/kumarv/Z0/Z0_ZMuMuSkim_Embadded3_recoMu.root'
-
-#'file:Z0_ZMuMuSkim_HI_PAT.root'
-#'file:Z0_hiCommonSkimAOD_pp_PAT.root'   
     )
                             )
 
 
+
+##This should be uncommented to include all files from any castor directory automatically
+#import os,commands
+#def getCastorDirectoryList(path):
+#    cmd  = 'nsls %s/ ' % (path)
+#    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+#    return file
+#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseNew")
+
+
+
+
+
+
+
 process.TFileService = cms.Service(
     "TFileService",
-    fileName = cms.string("ZMuMu_Plot.root")
+    #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
+
+    fileName = cms.string("ZMuMu_PlotNew.root")
     )
 
 zPlots = cms.PSet(
@@ -81,9 +83,9 @@ zPlots = cms.PSet(
     cms.PSet(
     min = cms.untracked.double(0.0),
     max = cms.untracked.double(200.0),
-    nbins = cms.untracked.int32(200),
-    name = cms.untracked.string("zMass"),
-    description = cms.untracked.string("Z mass [GeV/c^{2}]"),
+    nbins = cms.untracked.int32(4000),
+    name = cms.untracked.string("DiMuonMass"),
+    description = cms.untracked.string("DiMuon mass [GeV/c^{2}]"),
     plotquantity = cms.untracked.string("mass")
     ),
     
@@ -92,32 +94,32 @@ zPlots = cms.PSet(
     min = cms.untracked.double(-10.0),
     max = cms.untracked.double(10.0),
     nbins = cms.untracked.int32(200),
-    name = cms.untracked.string("zEta"),
-    description = cms.untracked.string("Z #eta"),
+    name = cms.untracked.string("DiMuonEta"),
+    description = cms.untracked.string("DiMuon #eta"),
     plotquantity = cms.untracked.string("eta")
     ),
     cms.PSet(
     min = cms.untracked.double(-6.0),
     max = cms.untracked.double(6.0),
     nbins = cms.untracked.int32(120),
-    name = cms.untracked.string("zRapidity"),
-    description = cms.untracked.string("Z y"),
+    name = cms.untracked.string("DiMuonRapidity"),
+    description = cms.untracked.string("DiMuon y"),
     plotquantity = cms.untracked.string("rapidity")
     ),
     cms.PSet(
     min = cms.untracked.double(0),
     max = cms.untracked.double(200),
     nbins = cms.untracked.int32(200),
-    name = cms.untracked.string("zPt"),
-    description = cms.untracked.string("Z p_{t} [GeV/c]"),
+    name = cms.untracked.string("DiMuonPt"),
+    description = cms.untracked.string("DiMuon p_{t} [GeV/c]"),
     plotquantity = cms.untracked.string("pt")
     ),
     cms.PSet(
     min = cms.untracked.double(-4),
     max = cms.untracked.double(4),
     nbins = cms.untracked.int32(80),
-    name = cms.untracked.string("zPhi"),
-    description = cms.untracked.string("Z #phi"),
+    name = cms.untracked.string("DiMuonPhi"),
+    description = cms.untracked.string("DiMuon #phi"),
     plotquantity = cms.untracked.string("phi")
     ),
     cms.PSet(
@@ -231,16 +233,16 @@ zPlots = cms.PSet(
 process.GenDimuonsPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
-    src = cms.InputTag("Dimuons"),
+    src = cms.InputTag("dimuons"),
     #src = cms.InputTag("GenDimuons"),
     filter = cms.bool(False)
     )
 
 
-process.DimuonsPlots = cms.EDAnalyzer(
+process.dimuonsPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     zPlots,
-    src = cms.InputTag("Dimuons"),
+    src = cms.InputTag("dimuons"),
     filter = cms.bool(False)
     )
 
@@ -277,8 +279,40 @@ process.dimuonsSTAPlots = cms.EDAnalyzer(
 
 process.dimuons2DPlots = cms.EDAnalyzer(
         "ZToMuMu2DPlots",
-        OutputFileName = cms.untracked.string("ZMuMu_2DPlot.root"),
+        OutputFileName = cms.untracked.string("ZMuMu_2DPlotNew.root"),
     )
+
+
+process.dimuonsSameChargePlots = cms.EDAnalyzer(
+    "CandViewHistoAnalyzer",
+    zPlots,
+    src = cms.InputTag("dimuonsSameCharge"),
+    filter = cms.bool(False)
+    )
+
+process.dimuonsGlobalSameChargePlots = cms.EDAnalyzer(
+        "CandViewHistoAnalyzer",
+            zPlots,
+            src = cms.InputTag("dimuonsGlobalSameCharge"),
+            filter = cms.bool(False)
+            )
+
+
+process.dimuonsGlobalSTASameChargePlots = cms.EDAnalyzer(
+            "CandViewHistoAnalyzer",
+                        zPlots,
+                        src = cms.InputTag("dimuonsGlobalSTASameCharge"),
+                        filter = cms.bool(False)
+                        )
+
+
+process.dimuonsSTASameChargePlots = cms.EDAnalyzer(
+    "CandViewHistoAnalyzer",
+    zPlots,
+    src = cms.InputTag("dimuonsSTASameCharge"),
+    filter = cms.bool(False)
+    )
+
 
 
 process.eventInfo = cms.OutputModule (
@@ -290,10 +324,9 @@ process.GenDimuonsPlotsPath = cms.Path(
         process.GenDimuonsPlots
             )
 
-process.DimuonsPlotsPath = cms.Path(
-    process.DimuonsPlots
+process.dimuonsPlotsPath = cms.Path(
+    process.dimuonsPlots
     )
-
 
 process.dimuonsGlobalPlotsPath = cms.Path(
     process.dimuonsGlobalPlots
@@ -313,10 +346,29 @@ process.dimuons2DPlotsPath = cms.Path(
                         process.dimuons2DPlots
                                       )
 
+process.dimuonsSameChargePlotsPath = cms.Path(
+        process.dimuonsSameChargePlots
+            )
+
+
+process.dimuonsGlobalSameChargePlotsPath = cms.Path(
+            process.dimuonsGlobalSameChargePlots
+                        )
+
+process.dimuonsGlobalSTASameChargePlotsPath = cms.Path(
+                process.dimuonsGlobalSTASameChargePlots
+                                        )
+
+
+
+process.dimuonsSTASameChargePlotsPath = cms.Path(
+    process.dimuonsSTASameChargePlots
+    )
+
 
 process.endPath = cms.EndPath(process.eventInfo)
 
-process.schedule=cms.Schedule(process.GenDimuonsPlotsPath,process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.endPath)
+process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.endPath)
 
 
 #process.schedule=cms.Schedule(process.DimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.endPath)
