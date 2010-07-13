@@ -5,7 +5,7 @@ ivars.register('initialEvent',mult=ivars.multiplicity.singleton,info="for testin
 #ivars.files = 'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/nart/MinimumBiasHI/HighPtMinBiasAnaSkimHardEnriched_01/6edc9684fb662a4038079f7b1d3fbd82/minbiashardenriched_2_1_wUe.root'
 #ivars.files = 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_7_0_pre2/RelValPyquen_DiJet_pt80to120_2760GeV/GEN-SIM-RECO/MC_37Y_V1-v1/0018/1420F252-8453-DF11-9903-002618943882.root'
 
-ivars.files = "file:/net/hisrv0001/home/nart/scratch/july/CMSSW_3_7_0_patch4/src/CmsHi/JetAnalysis/test/MinBias0711_runs11to20.root"
+ivars.files = "dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/nart/MinimumBiasHI/HighPtHardEnrichedAnaSkimNZS_03/b651c142d334b6448e9d198ad759ddac/allenrichedNZS_4_1_OCO.root"
 
 ivars.output = 'jets_pat_80to120.root'
 ivars.maxEvents = -1
@@ -46,6 +46,16 @@ process.icPu5patJets = process.patJets.clone(jetSource  = cms.InputTag("icPu5Cal
                                            jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu5corr")))
 
 process.icPu5patSequence = cms.Sequence(process.icPu5CaloJets*process.icPu5corr*process.icPu5patJets)
+
+process.icPu7CaloJets = process.iterativeConePu7CaloJets.clone()
+process.icPu7corr = process.patJetCorrFactors.clone()
+process.icPu7corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("icPu7CaloJets"),
+                                                    corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_IC5Calo"),
+                                                                          L3Absolute = cms.string("L3Absolute_IC5Calo")))
+process.icPu7patJets = process.patJets.clone(jetSource  = cms.InputTag("icPu7CaloJets"),
+                                             jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu7corr")))
+
+process.icPu7patSequence = cms.Sequence(process.icPu7CaloJets*process.icPu7corr*process.icPu7patJets)
 
 process.ak5corr = process.patJetCorrFactors.clone(jetSource = cms.InputTag("ak5CaloJets"),
                                                   corrLevels = cms.PSet(L2Relative = cms.string("L2Relative_AK5Calo"),
@@ -120,12 +130,13 @@ process.output.outputCommands.extend(["drop *_towerMaker_*_*"])
 process.runAllJets = cms.Path(
     process.allTracks +
     process.icPu5patSequence +
-    process.ktPu4patSequence +
-    process.ktPu6patSequence +
+    process.icPu7patSequence +
+#    process.ktPu4patSequence +
+#    process.ktPu6patSequence +
     process.kt4patSequence +
     process.kt6patSequence +
-    process.akPu5patSequence +
-    process.akPu7patSequence +
+#    process.akPu5patSequence +
+#    process.akPu7patSequence +
     process.ak5patSequence +
     process.ak7patSequence 
     )
