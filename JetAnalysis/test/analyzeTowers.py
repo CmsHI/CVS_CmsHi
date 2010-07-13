@@ -21,7 +21,7 @@ ivars.files = [
             ]
 '''
 
-ivars.output = 'towers_data01.root'
+ivars.output = 'towers_data02.root'
 
 ivars.maxEvents = -1
 
@@ -60,6 +60,7 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 process.load('Configuration/StandardSequences/Services_cff')
+process.load('Configuration/StandardSequences/ReconstructionHeavyIons_cff')
 
 process.RandomNumberGeneratorService.bkg4Jets = cms.PSet(initialSeed = cms.untracked.uint32(ivars.randomNumber),
                                                          engineName = cms.untracked.string('HepJamesRandom') )
@@ -117,9 +118,12 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                                         )
                                       )
 
-process.p = cms.Path(process.bkgJets
-                     *process.ana
-                     )
+process.p = cms.Path(
+    process.ak5CaloJets *
+    process.kt4CaloJets *
+    process.bkgJets *
+    process.ana
+    )
 #process.out_step = cms.EndPath(process.output)
 
 
