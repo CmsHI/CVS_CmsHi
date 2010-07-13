@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.10 2010/07/12 15:29:47 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.11 2010/07/13 08:52:19 yilmaz Exp $
 //
 //
 
@@ -52,6 +52,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityBins.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
@@ -152,7 +153,8 @@ private:
   double npart_;
   double ncoll_;
   double nhard_;
-  double phi0_;
+  double phi0MC_;
+   double phi0_;
   
   bool doMC_;
   bool doGenParticles_;
@@ -160,6 +162,8 @@ private:
 
    InputTag ktSrc_;
    InputTag akSrc_;
+   InputTag evtPlaneSrc_;
+
   InputTag PatJetSrc_;
   InputTag HiSrc_;
   InputTag HiCentSrc_;
@@ -185,6 +189,8 @@ private:
    edm::Handle<vector<double> > akRhos;
    edm::Handle<edm::GenHIEvent> mc;
    edm::Handle<reco::Centrality> centrality;
+
+   edm::Handle<std::vector<reco::EvtPlane> > evtPlanes;
    const CentralityBins* cbins_;
 
 	TH1D* hNtowers;
@@ -229,6 +235,7 @@ private:
 MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) : 
    sumET_(0),
    phi0_(0),
+   phi0MC_(0),
   cbins_(0),
   geo(0)
 {
@@ -261,6 +268,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	GenJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("genJetSrc",edm::InputTag("iterativeCone5HiGenJets"));
         ktSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("ktSrc",edm::InputTag("kt4CaloJets"));
         akSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("akSrc",edm::InputTag("ak5CaloJets"));
+        evtPlaneSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("evtPlaneSrc",edm::InputTag("hiEvtPlane","recoLevel"));
 
 }
 
@@ -305,6 +313,8 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
    }
    if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
+   if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
+
    ev.getByLabel(HiSrc_,mc);
    ev.getByLabel(HiCentSrc_,centrality);
    ev.getByLabel(TowersSrc_,towers);
@@ -315,8 +325,10 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
    ev.getByLabel(GenJetSrc_,genjets);
    ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
    ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
-
-	
+   ev.getByLabel(edm::InputTag(evtPlaneSrc_),evtPlanes);
+   
+   cout<<"Using event plane determined by : "<<(*evtPlanes)[0].label()<<endl;
+   phi0_ = (*evtPlanes)[0].angle();
 }
 
 void MinBiasTowerAnalyzer::sumET(){
@@ -337,7 +349,7 @@ b_ = mc->b();
 npart_ = mc->Npart();
 ncoll_ = mc->Ncoll();
 nhard_ = mc->Nhard();
-phi0_ = mc->evtPlane();
+phi0MC_ = mc->evtPlane();
 
 }
 
@@ -374,6 +386,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 	   double pt = tower.pt();
 	   double et = tower.et();
 	   double phi = tower.phi();      
+	   double phiRel = reco::deltaPhi(phi,phi0_);
 	   bool recomatched = false;
 	   
 		sumofTowerpt=sumofTowerpt+pt;
@@ -383,7 +396,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 		hTowerEta->Fill(eta);
 		toweret->Fill(et);
 		hETeta->Fill(eta,pt);
-		hETphi->Fill(phi,et);
+		hETphi->Fill(phiRel,et);
 		
 
       for(unsigned int j = 0 ; j < jets->size(); ++j){
@@ -467,35 +480,30 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       double aveta = 0;
       double totpt = 0;
       double avphi = 0;
-    
       int ncons = constits.size();
-     
       vector<int> used;    
       double area = fakejet.towersArea();
       double sign = (int)((*directions)[i])*2 - 1;   
       double fpt = sign*fakejet.pt();    
       double fpu = fakejet.pileup();
-    
       double eta = fakejet.eta();
-      //double phi = reco::deltaPhi(fakejet.phi(),phi0_);
+      double phiRel = reco::deltaPhi(fakejet.phi(),phi0_);
         double phi =fakejet.phi();
 
 	double ktRho = getRho(eta,*ktRhos);
 	double akRho = getRho(eta,*akRhos);
      
       int nc = 0;
-      int nTow = (int) fNtowers[bin]->GetRandom();
+      
+      int nTow = -1;
+      while(nTow < 0 || nTow > ncons) nTow = (int)(fNtowers[bin]->GetRandom());
       for(int ic1 = 0; ic1 < nTow; ++ic1){
-	 int ic = -1;
- 
+	 int ic = -1; 
 	 while(find(used.begin(),used.end(), ic) != used.end() || ic < 0 || ic >= ncons){
-	  
-	   double r = rand->Rndm();
+  	   double r = rand->Rndm();
             ic = (int)(ncons*r);
 	 }
 	 used.push_back(ic);
-	
-
 	 double toweta = constits[ic]->eta();
 	 double towphi = reco::deltaPhi(constits[ic]->phi(),phi0_);
 	 // double towphi = constits[ic]->phi();
@@ -506,15 +514,14 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 	 nc++;
 
       }
-
       aveta /= totpt;
       avphi /= totpt;
    
-      float entry[21] = {eta,phi,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
+      float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
       nt->Fill(entry);
       
       if(interest){
-	 float entry[21] = {eta,phi,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
+	 float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
 	 nt->Fill(entry);
       }
       
@@ -527,7 +534,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 void 
 MinBiasTowerAnalyzer::beginJob()
 {
-   nt = fs->make<TNtuple>("nt","","eta:phi:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
+   nt = fs->make<TNtuple>("nt","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
    rand = new TRandom();
 
    TH1::SetDefaultSumw2();
