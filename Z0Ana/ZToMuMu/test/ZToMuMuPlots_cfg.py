@@ -1,4 +1,4 @@
-##Gen level ploting is not working so gen level plots are same as reconstructed :)
+##Gen level ploting are now  working 
 ##Vineet Kumar & Prashant Shukla
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("ZMuMuGolden")
@@ -21,7 +21,7 @@ process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits40_DataJulyExercise_Hydjet2760GeV_MC_37Y_V5_NZS_v0')
+                                                                 tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
                                                                  )
                                                         )
                                       )
@@ -39,13 +39,10 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
-
-
-#'rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZToMuMuSkim_Vtxcor_ZS_87_1_u6q.root'
+#'rfio:/castor/cern.ch/user/k/kumarv/JulyExerciseZMuMuSkim/ZToMuMuSkim_Vtxcor_ZS_97_1_Y5J.root'
 #'rfio:/castor/cern.ch/user/h/hckim/JulyExercise10/JulyExercise10_MinimumBiasHI_dilepton_skim0/JulyExercise10_MinimumBiasHI_dilepton_skim0_95_1_E2H.root'
-'file:ZToMuMuSkim_Vtxcor_ZS.root'
+'file:ZToMuMuSkim_WithGen.root'
 #'file:ZMuMuSkim2.root',
-
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_1.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_2.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/EmbZ0toMuMuSkim/Z0_2.76TeV_Emb_ZtoMuMuSkim_3.root',
@@ -63,10 +60,7 @@ process.source = cms.Source("PoolSource",
 #    cmd  = 'nsls %s/ ' % (path)
 #    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
 #    return file
-#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseNew")
-
-
-
+#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseZMuMuSkim")
 
 
 
@@ -280,6 +274,12 @@ process.dimuonsSTAPlots = cms.EDAnalyzer(
 process.dimuons2DPlots = cms.EDAnalyzer(
         "ZToMuMu2DPlots",
         OutputFileName = cms.untracked.string("ZMuMu_2DPlotNew.root"),
+
+     ##for generator info put IsGenInfo as TRUE
+       IsGenInfo=cms.untracked.string("TRUE"),
+       #IsGenInfo=cms.untracked.string("FALSE"),
+
+
     )
 
 
