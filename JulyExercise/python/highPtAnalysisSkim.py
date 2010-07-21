@@ -1,3 +1,4 @@
+
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('PAT')
@@ -16,6 +17,10 @@ process.maxEvents = cms.untracked.PSet(
 
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
 
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('Configuration/StandardSequences/MagneticField_38T_cff')
+process.GlobalTag.globaltag = 'MC_37Y_V5::All'
+
 process.load('Configuration/StandardSequences/ReconstructionHeavyIons_cff')
 
 process.hiCentrality.produceHFhits = False
@@ -24,7 +29,7 @@ process.hiCentrality.produceEcalhits = False
 process.hiCentrality.produceBasicClusters = False
 process.hiCentrality.produceZDChits = False
 process.hiCentrality.produceETmidRapidity = True
-
+process.hiCentrality.producePixelhits = True
 
 process.load('PhysicsTools.PatAlgos.patHeavyIonSequences_cff')
 from PhysicsTools.PatAlgos.tools.heavyIonTools import *
@@ -36,22 +41,23 @@ process.load("HeavyIonsAnalysis.Configuration.analysisProducers_cff")
 process.load("HeavyIonsAnalysis.Configuration.analysisEventContent_cff")
 
 process.output = cms.OutputModule("PoolOutputModule",
-    process.jetTrkSkimContent,
-    fileName = cms.untracked.string("allenrichedNZS.root")
-    )
+                                  process.jetTrkSkimContent,
+                                      fileName = cms.untracked.string("allenrichedNZS.root")
+                                  )
 
 process.output.outputCommands.extend([
     "keep recoVertexs_hiSelectedVertex__RECO",
-#    "keep *_hiSelectedTracks_*_*",
     "keep recoTracks_hiSelectedTracks__RECO",
     "keep recoPhotons_*_*_*" ,
-    "keep edmTriggerResults_TriggerResults__HISIGNAL2" ,
-    "keep triggerTriggerEvent_hltTriggerSummaryAOD__HISIGNAL2"
+    "keep edmTriggerResults_TriggerResults__*" ,
+    "keep triggerTriggerEvent_hltTriggerSummaryAOD__*"
     ])
 
 process.prod = cms.Path(
-    # process.allTracks +
+    process.siPixelRecHits +
     process.iterativeConePu5CaloJets +
+    process.kt4CaloJets +
+    process.ak5CaloJets +
     process.hiCentrality +
     process.makeHeavyIonJets
     )
@@ -60,4 +66,5 @@ from CmsHi.JulyExercise.DisableMC_cff import *
 disableMC(process)
 
 process.out_step = cms.EndPath(process.output)
+
 
