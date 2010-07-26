@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.13 2010/07/22 15:50:46 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.14 2010/07/23 13:17:41 nart Exp $
 //
 //
 
@@ -218,7 +218,7 @@ private:
   vector<TH1D*> hJetET;
   vector<TH2D*> hTowerJet;  
   vector<TF1*> fNtowers;
-  
+  vector <TH1D*> hRemainPUTow;  
 };
 
 //
@@ -364,7 +364,13 @@ void MinBiasTowerAnalyzer::analyzeMC(){
 
 void MinBiasTowerAnalyzer::analyzeTowers(){
   
-  
+  map<int,int> tm;
+
+  for(int i = 1; i < 12; ++i){
+    tm[i] = 0;
+    tm[-i] = 0;
+  }
+
   bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
   double hf = centrality->EtHFhitSum();
   int bin = cbins_->getBin(hf); 
@@ -428,8 +434,9 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
       if(recomatched){
 	hTowerETjet[bin]->Fill(pt);
 	hTowerJet[bin]->Fill(pt,rawJetEt);     
- }
+      }
       else {
+	tm[ieta]++;
 	hTowerETnojet[bin]->Fill(pt);
 	sumofTowerNojetpt=sumofTowerNojetpt+pt;
 	numberofNojetTower++;
@@ -438,6 +445,12 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
       
     }
     
+    for(int i = 1; i < 12; ++i){
+    hRemainPUTow[bin]->Fill(tm[i]);
+    hRemainPUTow[bin]->Fill(tm[-i]);
+    }
+
+
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
 	hTowerPT[bin]->Fill(0); 
@@ -599,6 +612,9 @@ MinBiasTowerAnalyzer::beginJob()
      hMeanRMSnoJets.push_back(fs->make<TH1D>(Form("hMeanRMSnoJets%d",i),"histo; No-Jet Tower mean+rms p_{T} [GeV/c]; entries",100,0,2.5));
      hRMSnoJets.push_back(fs->make<TH1D>(Form("hRMSnoJets%d",i),"histo; hRMSnoJets",100,0,2.5));
      hJetET.push_back(fs->make<TH1D>(Form("hJetET%d",i),"histogram;Jet E_{T} [GeV]; entries",150,0,150));
+     hRemainPUTow.push_back(fs->make<TH1D>(Form("hRemainPUTow%d",i),"histogram;Remain towers after PU; entries",100,0,100));
+
+
    }
    
 }
