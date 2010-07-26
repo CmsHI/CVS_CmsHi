@@ -46,20 +46,20 @@ protected:
   // trackjet clustering parameters
   bool useOnlyVertexTracks_;
   bool useOnlyOnePV_;
-  float dzTrVtxMax_;
-
-  double phi0_;
-
-  int nFill_;
+   float dzTrVtxMax_;
+   
+   double phi0_;
+   int nFill_;
    float etaMax_;
    int iev_;
-  bool avoidNegative_;
-
+   bool avoidNegative_;
+   
    bool doAnalysis_;
 
   bool doMC_;
 
   int centBin_;
+   edm::InputTag centTag_;
   const CentralityBins* cbins_;
 
   TNtuple* ntTowers;
@@ -84,6 +84,10 @@ protected:
   std::vector<TH2D*> hRandom;
 
 
+   TH2D* hPTieta;
+   TH1D* hMeanieta;
+   TH1D* hRMSieta;
+   TH1D* hPUieta;
 
    const CaloGeometry *geo;
    edm::Service<TFileService> f;
@@ -171,6 +175,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
    doAnalysis_  = iConfig.getUntrackedParameter<bool>("doAnalysis",true);
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
+   centTag_  = iConfig.getParameter<InputTag>("centralityTag");
    
    if(doAnalysis_) centBin_ = iConfig.getUntrackedParameter<int>("centrality",0);
    
@@ -204,6 +209,11 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
      ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:event");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
+
+     hPTieta = f->make<TH2D>("hPTieta","hPTieta",23,-11.5,11.5,200,0,10);
+     hRMSieta = f->make<TH1D>("hRMSieta","hPTieta",23,-11.5,11.5);
+     hMeanieta = f->make<TH1D>("hMeanieta","hPTieta",23,-11.5,11.5);
+     hPUieta = f->make<TH1D>("hPUieta","hPTieta",23,-11.5,11.5);
 
      for(int i = 0; i < nSteps; ++i){
        hTowers.push_back(f->make<TH2D>(Form("hTowers_step%d",i),"",200,-5.5,5.5,200,-0.02,6.3));
@@ -262,10 +272,15 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
      const fastjet::PseudoJet& jet = jets[i];
 
      double pt = jet.perp();
-
+     int ieta = -99;
      if(output != 1){
        reco::CandidatePtr const & itow =  inputs_[ jet.user_index() ];
        pt =  itow->et();
+       ieta = subtractor_->ieta(itow);
+     }
+
+     if(output == 0 && step == 6){
+	hPTieta->Fill(ieta,pt);
      }
      
      double phi = jet.phi();
@@ -275,8 +290,7 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
        if(phi > 2*PI) phi -= 2*PI;
      }
      
-     double eta = jet.eta();
-     
+     double eta = jet.eta();     
      if(eta > 0 && eta < 0.08){
        //     if(fabs(eta) < 1.){ 
        totet += pt;
@@ -338,6 +352,12 @@ void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int
        hPU[step]->Fill(eta,pu);
        hMean[step]->Fill(eta,mean);
        hSigma[step]->Fill(eta,sigma);
+
+       if(step == 7){
+	  hPUieta->Fill(ieta,pu);
+          hMeanieta->Fill(ieta,mean);
+          hRMSieta->Fill(ieta,sigma);
+       }
    }
 }
 
@@ -355,7 +375,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
 
    if(doAnalysis_ && centBin_ >= 0){
      edm::Handle<reco::Centrality> cent;
-     iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
+     iEvent.getByLabel(centTag_,cent);
      if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
      int bin = cbins_->getBin(cent->EtHFhitSum());
      if(bin != centBin_) return;

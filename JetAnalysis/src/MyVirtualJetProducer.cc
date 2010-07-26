@@ -174,7 +174,7 @@ MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
     if ( jetTypeE != JetType::CaloJet ) {
       throw cms::Exception("InvalidInput") << "Can only offset correct jets of type CaloJet";
     }
-    //     subtractor_ = boost::shared_ptr<PileUpSubtractor>(new PileUpSubtractor(iConfig));
+
     puSubtractorName_  =  iConfig.getParameter<string> ("subtractorName");
     if(puSubtractorName_.empty()){
       edm::LogWarning("VirtualJetProducer") << "Pile Up correction on; however, pile up type is not specified. Using default... \n";
@@ -196,7 +196,22 @@ MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
 								   activeAreaRepeats,
 								   ghostArea));
     fjRangeDef_ = RangeDefPtr( new fastjet::RangeDefinition(ghostEtaMax) );
-  } 
+
+  }
+
+  if ( doRhoFastjet_ ) {
+     doFastJetNonUniform_ = iConfig.getParameter<bool>   ("doFastJetNonUniform");
+     if(doFastJetNonUniform_){
+	puCenters_ = iConfig.getParameter<std::vector<double> >("puCenters");
+	puWidth_ = iConfig.getParameter<double>("puWidth");
+	produces<std::vector<double> >("rhos");
+	produces<std::vector<double> >("sigmas");
+     }else{
+	produces<double>("rho");
+	produces<double>("sigma");
+     }
+     
+  }
 
   // restrict inputs to first "maxInputs" towers?
   if ( iConfig.exists("restrictInputs") ) {
@@ -277,6 +292,7 @@ void MyVirtualJetProducer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
   // For Pileup subtraction using offset correction:
   // Subtract pedestal. 
   if ( doPUOffsetCorr_ ) {
+     subtractor_->reset(inputs_,fjInputs_,fjJets_);
      subtractor_->calculatePedestal(fjInputs_); 
      subtractor_->subtractPedestal(fjInputs_);    
      LogDebug("MyVirtualJetProducer") << "Subtracted pedestal\n";
@@ -520,16 +536,39 @@ void MyVirtualJetProducer::writeJets( edm::Event & iEvent, edm::EventSetup const
   iEvent.put(jets);
 
   // calculate rho (median pT per unit area, for PU&UE subtraction down the line
-  std::auto_ptr<double> rho(new double(0.0));
-  std::auto_ptr<double> sigma(new double(0.0));
-
   if (doRhoFastjet_) {
-    fastjet::ClusterSequenceArea const * clusterSequenceWithArea =
-      dynamic_cast<fastjet::ClusterSequenceArea const *> ( &*fjClusterSeq_ );
-    double mean_area = 0;
-    clusterSequenceWithArea->get_median_rho_and_sigma(*fjRangeDef_,false,*rho,*sigma,mean_area);
-    iEvent.put(rho,"rho");
-    iEvent.put(sigma,"sigma");
+     if(doFastJetNonUniform_){
+	std::auto_ptr<std::vector<double> > rhos(new std::vector<double>);
+	std::auto_ptr<std::vector<double> > sigmas(new std::vector<double>);
+	int nEta = puCenters_.size();
+	rhos->reserve(nEta);
+	sigmas->reserve(nEta);
+	fastjet::ClusterSequenceArea const * clusterSequenceWithArea =
+	   dynamic_cast<fastjet::ClusterSequenceArea const *> ( &*fjClusterSeq_ );
+	for(int ie = 0; ie < nEta; ++ie){
+	   double eta = puCenters_[ie];
+	   double rho = 0;
+	   double sigma = 0;
+	   double etamin=eta-puWidth_;
+	   double etamax=eta+puWidth_;
+	   fastjet::RangeDefinition range_rho(etamin,etamax);
+	   clusterSequenceWithArea->get_median_rho_and_sigma(range_rho, true, rho, sigma);
+	   rhos->push_back(rho);
+	   sigmas->push_back(sigma);
+	}
+	iEvent.put(rhos,"rhos");
+	iEvent.put(sigmas,"sigmas");
+     }else{
+	std::auto_ptr<double> rho(new double(0.0));
+	std::auto_ptr<double> sigma(new double(0.0));
+	double mean_area = 0;
+	fastjet::ClusterSequenceArea const * clusterSequenceWithArea =
+	   dynamic_cast<fastjet::ClusterSequenceArea const *> ( &*fjClusterSeq_ );
+	clusterSequenceWithArea->get_median_rho_and_sigma(*fjRangeDef_,false,*rho,*sigma,mean_area);
+	iEvent.put(rho,"rho");
+	iEvent.put(sigma,"sigma");
+     }
   }
 }
+
 

@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
-
 #include "TNtuple.h"
 
 class MyVirtualJetProducer : public edm::EDProducer
@@ -159,10 +158,12 @@ protected:
   bool                  doAreaFastjet_;             // calculate area w/ fastjet?
   // for fastjet rho calculation
   bool                  doRhoFastjet_;              // calculate rho w/ fastjet?
+  bool                  doFastJetNonUniform_;       // choice of eta-dependent PU calculation
   
   // for pileup offset correction
   bool                  doPUOffsetCorr_;            // add the pileup calculation from offset correction? 
   std::string           puSubtractorName_;
+
   // anomalous cell cuts
   unsigned int          maxBadEcalCells_;           // maximum number of bad ECAL cells
   unsigned int          maxRecoveredEcalCells_;     // maximum number of recovered ECAL cells
@@ -180,6 +181,10 @@ protected:
   RangeDefPtr                     fjRangeDef_;      // range definition
   std::vector<fastjet::PseudoJet> fjInputs_;        // fastjet inputs
   std::vector<fastjet::PseudoJet> fjJets_;          // fastjet jets
+
+  // Parameters of the eta-dependent rho calculation
+  std::vector<double>             puCenters_;
+  double                          puWidth_;
 
   std::string                     jetCollInstanceName_;       // instance name for output jet collection
   boost::shared_ptr<PileUpSubtractor>  subtractor_;
