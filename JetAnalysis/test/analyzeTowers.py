@@ -1,6 +1,17 @@
+
 import FWCore.ParameterSet.VarParsing as VarParsing
 ivars = VarParsing.VarParsing('standard')
 
+ivars.files = [
+#    'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0711/MinBias0711_runs11to20.root'
+    'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs101to150.root',
+    'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs151to200.root',
+    'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs1to50.root',
+    'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs51to100.root'
+    ]
+
+
+'''
 ivars.files = [
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs11to20.root',
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs1to10.root',
@@ -10,6 +21,7 @@ ivars.files = [
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs41to50.root',
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs51to100.root'
     ]
+'''
 
 '''
 ivars.files = [
@@ -21,7 +33,7 @@ ivars.files = [
             ]
 '''
 
-ivars.output = 'towers_data02.root'
+ivars.output = 'towers_mixed_B0_0725.root'
 
 ivars.maxEvents = -1
 
@@ -71,6 +83,27 @@ process.RandomNumberGeneratorService.bkg7Jets = process.RandomNumberGeneratorSer
 from RecoJets.JetProducers.CaloJetParameters_cfi import *
 from RecoJets.JetProducers.AnomalousCellParameters_cfi import *
 
+process.load('PhysicsTools.PatAlgos.patHeavyIonSequences_cff')
+from PhysicsTools.PatAlgos.tools.heavyIonTools import *
+configureHeavyIons(process)
+
+process.patJets.addJetCorrFactors = True
+process.patJets.addGenPartonMatch  = False
+process.patJets.addJetID = False
+process.patJets.addGenJetMatch = False
+process.patJets.embedGenJetMatch = False
+
+process.icPu5corr = process.patJetCorrFactors.clone()
+process.icPu5corr.jetSource = cms.InputTag("iterativeConePu5CaloJetsB0","")
+process.icPu5corr.corrLevels.L2Relative = cms.string('L2Relative_IC5Calo')
+process.icPu5corr.corrLevels.L3Absolute = cms.string('L3Absolute_IC5Calo')
+
+process.icPu5patJets = process.patJets.clone()
+process.icPu5patJets.jetSource = cms.InputTag("iterativeConePu5CaloJetsB0","")
+#process.icPu5patJets.genJetMatch = cms.InputTag("icPu5match")
+process.icPu5patJets.jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu5corr") )
+
+'''
 process.bkg4Jets = cms.EDProducer(
 #    "JetAlgorithmAnalyzer",
   "BackgroundJetProducer",
@@ -99,29 +132,37 @@ process.bkg7Jets = process.bkg4Jets.clone()
 process.bkg7Jets.rParam = 0.7
 process.bkg7Jets.radiusPU = 0.7
 
-process.bkgJets = cms.Sequence(process.bkg5Jets)
+#process.bkgJets = cms.Sequence(process.bkg5Jets)
+'''
 
 process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer',
                              jetTowersMean = cms.untracked.vdouble(21,21.4,21.4,22,22.5,21.3,17.4,16.1,11.5,0),
                              jetTowersRMS = cms.untracked.vdouble(5.4,5.2,5.2,5.4,5.8,5.8,4.9,4.1,3.2,0),
-                             fakeJetSrc = cms.untracked.InputTag('bkg5Jets'),
-                             patJetSrc = cms.untracked.InputTag('patJets')                             
+                             fakeJetSrc = cms.untracked.InputTag("iterativeConePu5CaloJets"),
+                             patJetSrc = cms.untracked.InputTag("icPu5patJets","","ANALYSIS"),   
+                             towersSrc =  cms.untracked.InputTag("towerMaker","","RECO"),
+                             nBins = cms.untracked.double(10),
+                             doRandomCone = cms.untracked.bool(False),
+                             centralitySrc = cms.untracked.InputTag("hiCentrality","","RECO")
                              )
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = "sqlite_file:/net/hisrv0001/home/yetkin/cvs/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
+process.CondDBCommon.connect = "sqlite_file:/net/hisrv0001/home/nart/scratch/july/CMSSW_3_7_0_patch4/src/CmsHi/JulyExercise/data/CentralityTables.db"
 process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       process.CondDBCommon,
                                       toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits10_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
+                                                                 tag = cms.string('HFhits10_MC_Hydjet2760GeV_MC_3XY_V24_NoZS_v0')
                                                                  )
                                                         )
                                       )
 
 process.p = cms.Path(
-    process.ak5CaloJets *
-    process.kt4CaloJets *
-    process.bkgJets *
+  #  process.hiEvtPlane *
+  #  process.ak5CaloJets *
+  #  process.kt4CaloJets *
+ #   process.bkgJets *
+    process.icPu5corr +
+    process.icPu5patJets +
     process.ana
     )
 #process.out_step = cms.EndPath(process.output)
