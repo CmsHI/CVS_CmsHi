@@ -58,6 +58,13 @@ protected:
 
   bool doMC_;
 
+   bool doRandomCones_;
+   bool doFullCone_;
+
+   double hf_;
+   double sumET_;
+   int bin_;
+
   int centBin_;
    edm::InputTag centTag_;
   const CentralityBins* cbins_;
@@ -174,6 +181,9 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
    randomEngine = &(rng->getEngine());
 
    doAnalysis_  = iConfig.getUntrackedParameter<bool>("doAnalysis",true);
+   doRandomCones_  = iConfig.getUntrackedParameter<bool>("doRandomCones",true);
+   doFullCone_  = iConfig.getUntrackedParameter<bool>("doFullCone",true);
+
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
    centTag_  = iConfig.getParameter<InputTag>("centralityTag");
    
@@ -206,7 +216,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:event");
+     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:mean:rms:bin:hf:sumET:event");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -377,8 +387,12 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
      edm::Handle<reco::Centrality> cent;
      iEvent.getByLabel(centTag_,cent);
      if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-     int bin = cbins_->getBin(cent->EtHFhitSum());
-     if(bin != centBin_) return;
+
+     hf_ = cent->EtHFhitSum();
+     sumET_ = cent->EtMidRapiditySum();
+     bin_ = cbins_->getBin(hf_);
+
+     if(bin_ != centBin_) return;
    }
 
    LogDebug("VirtualJetProducer") << "Entered produce\n";
@@ -552,6 +566,9 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    vector<double> etaRandom;
    vector<double> et;
    vector<double> pileUp;
+   vector<double> mean;
+   vector<double> rms;
+
    std::auto_ptr<std::vector<bool> > directions(new std::vector<bool>());
    directions->reserve(nFill_);
 
@@ -559,6 +576,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    etaRandom.reserve(nFill_);
    et.reserve(nFill_);
    pileUp.reserve(nFill_);
+   rms.reserve(nFill_);
+   mean.reserve(nFill_);
 
    fjFakeJets_.reserve(nFill_);
    constituents_.reserve(nFill_);
@@ -601,14 +620,16 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	 if(avoidNegative_ && etadd < 0.) etadd = 0;
 	 et[ir] += etadd;
 	 pileUp[ir] += towet - etadd;
+	 mean[ir] += subtractor_->getMeanAtTower(tower);
+         rms[ir] += subtractor_->getSigmaAtTower(tower);
+
       }
    }
    cout<<"Start filling jets"<<endl;
 
    for(int ir = 0; ir < nFill_; ++ir){
 
-      if(doAnalysis_) ntRandom->Fill(etaRandom[ir],phiRandom[ir],et[ir],pileUp[ir],iev_);
-
+      ntRandom->Fill(etaRandom[ir],phiRandom[ir],et[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
