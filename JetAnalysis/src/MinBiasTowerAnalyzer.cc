@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.14 2010/07/23 13:17:41 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.15 2010/07/26 11:21:53 nart Exp $
 //
 //
 
@@ -152,7 +152,8 @@ private:
   double nhard_;
   double phi0MC_;
   double phi0_;
-  
+
+  bool doEventPlane_;  
   bool doMC_;
   bool doGenParticles_;
   bool excludeJets_;
@@ -207,7 +208,7 @@ private:
   vector<TH1D*> hTowerETjet;
   vector<TH1D*> hTowerETnojet;
   vector<TH1D*> hTowerET;
-  vector< TH1D*> hPtGen;
+  vector<TH1D*> hPtGen;
   vector<TH1D*> hDndeta;
   vector<TH1D*> hRMS;
   vector<TH1D*> hMean;
@@ -219,6 +220,8 @@ private:
   vector<TH2D*> hTowerJet;  
   vector<TF1*> fNtowers;
   vector <TH1D*> hRemainPUTow;  
+  vector<TH2D*> hTowerptvsieta;  
+
 };
 
 //
@@ -248,7 +251,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	missingTowersMean_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersMean",vector<double>(0));
         missingTowersRMS_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersRMS",vector<double>(0));
 	cone_ = iConfig.getUntrackedParameter<double>("coneSize",0.5);
-        nBins_ = iConfig.getUntrackedParameter<double>("nBins",10);
+        nBins_ = iConfig.getUntrackedParameter<double>("nBins",40);
 
 	genJetPtMin_ =  iConfig.getUntrackedParameter<double>("genJetPtMin",20);
 	towersize_ = iConfig.getUntrackedParameter<int>("nTowers",1584);
@@ -256,12 +259,13 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	genpartEtamax_ =iConfig.getUntrackedParameter<double>("genPartEtaMax",1);
 	iEtamax_ = iConfig.getUntrackedParameter<double>("iEtaMax",11.5);
 	
-        doRandomCone_ = iConfig.getUntrackedParameter<bool>("doRandomCone",true);
+        doRandomCone_ = iConfig.getUntrackedParameter<bool>("doRandomCone",false);
         doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
 	doMC_ = iConfig.getUntrackedParameter<bool>("doMC",false);
 	isSignal_ = iConfig.getUntrackedParameter<bool>("isSignal",false);
 	doGenParticles_  = iConfig.getUntrackedParameter<bool>("doGenParticles",false);
-        excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",false);
+        excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",true);
+	doEventPlane_ = iConfig.getUntrackedParameter<bool>("doEventPlane",false);
 	
 	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("patJetSrc",edm::InputTag("icPu5patJets"));
 	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc",edm::InputTag("heavyIon"));
@@ -293,14 +297,12 @@ MinBiasTowerAnalyzer::~MinBiasTowerAnalyzer()
 // ------------ method called to for each event  ------------
 
 
-void
-MinBiasTowerAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
+void MinBiasTowerAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 {
   loadEvent(ev, iSetup);
   sumET();
   if(doMC_){
     analyzeMC();
-  
     if(doGenParticles_) analyzeGenParticles();
   }
 
@@ -317,23 +319,32 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
     iSetup.get<CaloGeometryRecord>().get(pGeo);
     geo = pGeo.product();
   }
+  
   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
   
   if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
   
-   ev.getByLabel(HiSrc_,mc);
-   ev.getByLabel(HiCentSrc_,centrality);
-   ev.getByLabel(TowersSrc_,towers);
-   ev.getByLabel(PatJetSrc_,jets);
-   ev.getByLabel(DirectSrc_,directions);
-   ev.getByLabel(FakeJetSrc_,fakejets);
-   ev.getByLabel(GenJetSrc_,genjets);
-   ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
-   ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
-   ev.getByLabel(edm::InputTag(evtPlaneSrc_),evtPlanes);
-   
-   //   cout<<"Using event plane determined by : "<<(*evtPlanes)[0].label()<<endl;
-   phi0_ = (*evtPlanes)[0].angle();
+  if(doMC_){
+    ev.getByLabel(HiSrc_,mc);
+    ev.getByLabel(GenJetSrc_,genjets);
+  }
+  
+  ev.getByLabel(HiCentSrc_,centrality);
+  ev.getByLabel(TowersSrc_,towers);
+  
+  if(!excludeJets_) {
+    ev.getByLabel(PatJetSrc_,jets);
+    ev.getByLabel(DirectSrc_,directions);
+    ev.getByLabel(FakeJetSrc_,fakejets);
+    ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
+    ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
+  }  
+  
+   if(doEventPlane_) {    
+     ev.getByLabel(edm::InputTag(evtPlaneSrc_),evtPlanes);
+     cout<<"Using event plane determined by : "<<(*evtPlanes)[0].label()<<endl;
+     phi0_ = (*evtPlanes)[0].angle();
+   }
 }
 
 void MinBiasTowerAnalyzer::sumET(){
@@ -397,6 +408,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     
     for(unsigned int i = 0 ; i < towers->size(); ++i){
       const CaloTower& tower = (*towers)[i];
+      hTowerptvsieta[bin]->Fill(tower.ieta(),tower.pt());
       if(abs(tower.ieta())>iEtamax_) continue;
       
       numberofTower++;
@@ -418,7 +430,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
       hETeta[bin]->Fill(eta,pt);
       hETphi[bin]->Fill(phiRel,et);
       
-      
+      if(!excludeJets_){
       for(unsigned int j = 0 ; j < jets->size(); ++j){
 	//         const reco::CaloJet& jet = (*jets)[j];
 	const pat::Jet& jet = (*jets)[j];
@@ -430,6 +442,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 	if(dr < cone_){
 	  recomatched = true;
 	}
+      }
       }
       if(recomatched){
 	hTowerETjet[bin]->Fill(pt);
@@ -450,7 +463,8 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     hRemainPUTow[bin]->Fill(tm[-i]);
     }
 
-
+    cout<<"tower size in this event : "<<numberofTower<<endl;
+    
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
 	hTowerPT[bin]->Fill(0); 
@@ -470,7 +484,6 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 	average_Nojetptrms=average_nojetpt+rmsofNojetTowerpt;
 	hMeanRMSnoJets[bin]->Fill(average_Nojetptrms);
 	hMeanETdNdEta[bin]->Fill(average_ptrms,genparticlecount);
-	
  
 }
 
@@ -508,7 +521,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
   
   double hf = centrality->EtHFhitSum();
   int bin = cbins_->getBin(hf); 
-  if(isSignal_) int bin = 0;
+  if(isSignal_) bin = 0;
 
   for(unsigned int i = 0 ; i < fakejets->size(); ++i){
     const reco::CaloJet& fakejet = (*fakejets)[i];
@@ -597,23 +610,23 @@ MinBiasTowerAnalyzer::beginJob()
      hETphi.push_back(fs->make<TH1D>(Form("phivsET%d",i),"fhisto; phi ;et(GeV) ",1000,-5,5));
      hMeanETdNdEta.push_back(fs->make<TH2D>(Form("hMeanETdNdEta%d",i),"mean_dndeta; mean tower p_{T} [GeV/c]; dNdeta",100,0,2,300,0,3000));
      hTowerEta.push_back(fs->make<TH1D>(Form("hTowerEta%d",i),"histogram; eta",1000,-15,15));
-     hTowerPT.push_back(fs->make<TH1D>(Form("hTowerPT%d",i),"histogram; p_{T} [GeV/c]; entries",505,-1,50));
-     hhSumET.push_back(fs->make<TH1D>(Form("hhSumET%d",i),"histogram;SumTower E_{T}[GeV]; entries",250,-1,2501));
-     hTowerETjet.push_back(fs->make<TH1D>(Form("hTowerETjet%d",i),"histo; p_{T} [GeV/c]; entries",505,-1,50));
-     hTowerJet.push_back(fs->make<TH2D>(Form("hTowerJet%d",i),"histo; Tower E_{T}; Jet p_{T}",505,-1,50,250,0,250));
-     hTowerETnojet.push_back(fs->make<TH1D>(Form("hnojetPT%d",i),"histo; p_{T} [GeV/c]; entries",505,-1,50));
-     hTowerET.push_back(fs->make<TH1D>(Form("htowerET%d",i),"histogram; E_{T} [GeV]; entries",505,-1,50));
+     hTowerPT.push_back(fs->make<TH1D>(Form("hTowerPT%d",i),"histogram; p_{T} [GeV/c]; entries",510,-1,50));
+     hhSumET.push_back(fs->make<TH1D>(Form("hhSumET%d",i),"histogram;SumTower E_{T}[GeV]; entries",252,-1,2501));
+     hTowerETjet.push_back(fs->make<TH1D>(Form("hTowerETjet%d",i),"histo; p_{T} [GeV/c]; entries",510,-1,50));
+     hTowerJet.push_back(fs->make<TH2D>(Form("hTowerJet%d",i),"histo; Tower E_{T}; Jet p_{T}",510,-1,50,250,0,250));
+     hTowerETnojet.push_back(fs->make<TH1D>(Form("hnojetPT%d",i),"histo; p_{T} [GeV/c]; entries",510,-1,50));
+     hTowerET.push_back(fs->make<TH1D>(Form("htowerET%d",i),"histogram; E_{T} [GeV]; entries",510,-1,50));
      hPtGen.push_back(fs->make<TH1D>(Form("hPtGen%d",i),"histogram; p_{T} [GeV/c]; entries",100,0,100));
      hDndeta.push_back(fs->make<TH1D>(Form("hDndeta%d",i),"histogram; dNdeta; entries",300,0,3000));
-     hRMS.push_back(fs->make<TH1D> (Form("htowerRMS%d",i),"histo",100,0,2.5));
-     hMean.push_back(fs->make<TH1D>(Form("hPTaverage%d",i),"histo;p_{T} GeV/c; entries",100, 0,2.5));
-     hMeanNoJets.push_back(fs->make<TH1D>(Form("hnojetmeanPT%d",i),"histo;p_{T} GeV/c",100, 0,2.5));
+     hRMS.push_back(fs->make<TH1D> (Form("htowerRMS%d",i),"histo",100,0,4));
+     hMean.push_back(fs->make<TH1D>(Form("hPTaverage%d",i),"histo;p_{T} GeV/c; entries",100, 0,4));
+     hMeanNoJets.push_back(fs->make<TH1D>(Form("hnojetmeanPT%d",i),"histo;p_{T} GeV/c",100, 0,4));
      hMeanRMS.push_back(fs->make<TH1D>(Form("htowerMeanRMS%d",i),"histo; Tower mean+rms p_{T} [GeV/c]; entries",100,0,2.5));
-     hMeanRMSnoJets.push_back(fs->make<TH1D>(Form("hMeanRMSnoJets%d",i),"histo; No-Jet Tower mean+rms p_{T} [GeV/c]; entries",100,0,2.5));
-     hRMSnoJets.push_back(fs->make<TH1D>(Form("hRMSnoJets%d",i),"histo; hRMSnoJets",100,0,2.5));
+     hMeanRMSnoJets.push_back(fs->make<TH1D>(Form("hMeanRMSnoJets%d",i),"histo; No-Jet Tower mean+rms p_{T} [GeV/c]; entries",100,0,4));
+     hRMSnoJets.push_back(fs->make<TH1D>(Form("hRMSnoJets%d",i),"histo; hRMSnoJets",100,0,4));
      hJetET.push_back(fs->make<TH1D>(Form("hJetET%d",i),"histogram;Jet E_{T} [GeV]; entries",150,0,150));
      hRemainPUTow.push_back(fs->make<TH1D>(Form("hRemainPUTow%d",i),"histogram;Remain towers after PU; entries",100,0,100));
-
+     hTowerptvsieta.push_back(fs->make<TH2D>(Form("hTower_%d",i),";ieta;p_{T}",101,-50.5,50.5,1020,-1,50));
 
    }
    
