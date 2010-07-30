@@ -7,7 +7,7 @@ cvs co HeavyIonsAnalysis/Configuration
 #RECO stuff
 cvs co RecoJets/JetProducers
 cvs co UserCode/yetkin/RecoJets/JetProducers/plugins/VirtualJetProducer.* RecoJets/JetProducers/plugins/
-cvs co -r $CMSSW_VERSION PhysicsTools/PatAlgos
+cvs co -r $CMSSW_VERSION PhysicsTools/PatAlgos/python
 rm -r PhysicsTools/PatAlgos/python/producersHeavyIons
 cvs co PhysicsTools/PatAlgos/python/producersHeavyIons
 
