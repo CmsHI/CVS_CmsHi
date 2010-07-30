@@ -124,7 +124,6 @@ MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
   , maxProblematicHcalCells_(iConfig.getParameter<unsigned>("maxProblematicHcalCells"))
   , jetCollInstanceName_ ("")
 {
-
   //  ntuple = new TNtuple("nt","debug","ieta:eta:iphi:phi");
 
   //
@@ -176,10 +175,15 @@ MyVirtualJetProducer::MyVirtualJetProducer(const edm::ParameterSet& iConfig)
     }
 
     puSubtractorName_  =  iConfig.getParameter<string> ("subtractorName");
+
+    cout<<"puSubtractorName_ is : "<<puSubtractorName_.data()<<endl; 
     if(puSubtractorName_.empty()){
       edm::LogWarning("VirtualJetProducer") << "Pile Up correction on; however, pile up type is not specified. Using default... \n";
+      cout<<"Pile Up correction on; however, pile up type is not specified. Using default A.K... \n";
       subtractor_ =  boost::shared_ptr<PileUpSubtractor>(new PileUpSubtractor(iConfig));
+
     }else{
+       cout<<"getting subtractor "<<endl;
       subtractor_ =  boost::shared_ptr<PileUpSubtractor>(PileUpSubtractorFactory::get()->create( puSubtractorName_, iConfig));
     }
   }

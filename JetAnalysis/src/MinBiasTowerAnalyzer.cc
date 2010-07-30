@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.15 2010/07/26 11:21:53 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.16 2010/07/29 12:12:30 nart Exp $
 //
 //
 
@@ -266,7 +266,6 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	doGenParticles_  = iConfig.getUntrackedParameter<bool>("doGenParticles",false);
         excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",true);
 	doEventPlane_ = iConfig.getUntrackedParameter<bool>("doEventPlane",false);
-	
 	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("patJetSrc",edm::InputTag("icPu5patJets"));
 	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc",edm::InputTag("heavyIon"));
 	HiCentSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("centralitySrc",edm::InputTag("hiCentrality"));
@@ -321,9 +320,8 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
   }
   
   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-  
-  if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
-  
+    if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
+
   if(doMC_){
     ev.getByLabel(HiSrc_,mc);
     ev.getByLabel(GenJetSrc_,genjets);
@@ -345,6 +343,7 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
      cout<<"Using event plane determined by : "<<(*evtPlanes)[0].label()<<endl;
      phi0_ = (*evtPlanes)[0].angle();
    }
+
 }
 
 void MinBiasTowerAnalyzer::sumET(){
@@ -358,7 +357,7 @@ void MinBiasTowerAnalyzer::sumET(){
        const CaloTower& tower = (*towers)[i];
        if(abs(tower.ieta())>iEtamax_) continue;
        double tower_et = tower.et();
-       sumET_=sumET_+tower_et;
+       sumET_=sumET_+tower_et/2;
      }
    }
    hhSumET[bin]->Fill(sumET_);
@@ -464,7 +463,6 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     }
 
     cout<<"tower size in this event : "<<numberofTower<<endl;
-    
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
 	hTowerPT[bin]->Fill(0); 

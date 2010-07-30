@@ -7,9 +7,12 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 #include "TNtuple.h"
 #include "TH2D.h"
 #include <vector>
+#include <iostream>
+using namespace std;
 
 static const int nSteps = 8;
 static const double PI = 3.141592653589;
@@ -57,7 +60,7 @@ protected:
    bool doAnalysis_;
 
   bool doMC_;
-
+   bool doRecoEvtPlane_;
    bool doRandomCones_;
    bool doFullCone_;
 
@@ -67,6 +70,7 @@ protected:
 
   int centBin_;
    edm::InputTag centTag_;
+   edm::InputTag epTag_;
   const CentralityBins* cbins_;
 
   TNtuple* ntTowers;
@@ -185,7 +189,10 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
    doFullCone_  = iConfig.getUntrackedParameter<bool>("doFullCone",true);
 
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
+   doRecoEvtPlane_  = iConfig.getUntrackedParameter<bool>("doRecoEvtPlane",true);
+
    centTag_  = iConfig.getParameter<InputTag>("centralityTag");
+   epTag_  = iConfig.getParameter<InputTag>("evtPlaneTag");
    
    if(doAnalysis_) centBin_ = iConfig.getUntrackedParameter<int>("centrality",0);
    
@@ -216,7 +223,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:et:pu:mean:rms:bin:hf:sumET:event");
+     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:pu:mean:rms:bin:hf:sumET:event");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -376,6 +383,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
 
   //  if(doAnalysis_)   subtractor_->setDebug(1);
   //  else subtractor_->setDebug(0);
+   phi0_ = 0;
 
    if(!geo){
       edm::ESHandle<CaloGeometry> pGeo;
@@ -383,18 +391,16 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       geo = pGeo.product();
    }
 
-   if(doAnalysis_ && centBin_ >= 0){
-     edm::Handle<reco::Centrality> cent;
-     iEvent.getByLabel(centTag_,cent);
-     if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-
-     hf_ = cent->EtHFhitSum();
-     sumET_ = cent->EtMidRapiditySum();
-     bin_ = cbins_->getBin(hf_);
-
-     if(bin_ != centBin_) return;
-   }
-
+   edm::Handle<reco::Centrality> cent;
+   iEvent.getByLabel(centTag_,cent);
+   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+   
+   hf_ = cent->EtHFhitSum();
+   sumET_ = cent->EtMidRapiditySum();
+   bin_ = cbins_->getBin(hf_);
+   
+   if(centBin_ >= 0 && bin_ != centBin_) return;
+   
    LogDebug("VirtualJetProducer") << "Entered produce\n";
    //determine signal vertex
    vertex_=reco::Jet::Point(0,0,0);
@@ -408,6 +414,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    // For Pileup subtraction using offset correction:
    // set up geometry map
    if ( doPUOffsetCorr_ ) {
+      cout<<"setting up ... "<<endl;
       subtractor_->setupGeometryMap(iEvent, iSetup);
    }
 
@@ -426,9 +433,14 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
      cout<<"===================================="<<endl;
      cout<<"IMPACT PARAMETER OF THE EVENT : "<<b<<endl;
      cout<<"===================================="<<endl;
-
-
    }
+
+   if(doRecoEvtPlane_){
+      Handle<reco::EvtPlaneCollection> planes;
+      iEvent.getByLabel(epTag_,planes);
+      phi0_  = (*planes)[0].angle();
+    }
+
 
    // get inputs and convert them to the fastjet format (fastjet::PeudoJet)
    edm::Handle<reco::CandidateView> inputsHandle;
@@ -525,6 +537,9 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
 {
    // Write jets and constitutents. Will use fjJets_, inputs_                          
    // and fjClusterSeq_                                                                
+
+   cout<<"output running "<<endl;
+
    switch( jetTypeE ) {
    case JetType::CaloJet :
       writeJets<reco::CaloJet>( iEvent, iSetup);
@@ -628,8 +643,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    cout<<"Start filling jets"<<endl;
 
    for(int ir = 0; ir < nFill_; ++ir){
-
-      ntRandom->Fill(etaRandom[ir],phiRandom[ir],et[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_);
+      double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
+      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
