@@ -11,7 +11,7 @@
 //
 // Original Author:  Camelia Mironov,40 1-A32,+41227679747,
 //         Created:  Sun Feb  7 15:25:05 CET 2010
-// $Id: DimuonAnalyzer.cc,v 1.2 2010/02/08 17:20:39 mironov Exp $
+// $Id: DimuonAnalyzer.cc,v 1.1 2010/08/02 13:57:58 miheejo Exp $
 //
 //
 
@@ -161,6 +161,7 @@ private:
   Bool_t doMC;        //Is GEN, SIM info included?
   Bool_t doSim;       //SIM tracks
   Bool_t doSignal;    //GEN hisignal
+  Bool_t doZ0check;   //GEN Z0 daughter trace
 
   Bool_t acceptDimuon(Float_t pt, Float_t m);
   Bool_t acceptMuon(Float_t pt, Float_t eta);
@@ -217,6 +218,7 @@ DimuonAnalyzer::DimuonAnalyzer(const edm::ParameterSet& pset):
   doMC(pset.getParameter<bool>("doMC")),
   doSim(pset.getParameter<bool>("doSim")),
   doSignal(pset.getParameter<bool>("doSignal")),
+  doZ0check(pset.getParameter<bool>("doZ0check")),
   cbins_(0)
 {
   // constructor
@@ -460,7 +462,7 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
             const GenParticleRef genPart1(genCollection,i);
             
             //Check all gen particles from Z0
-            if (genPart1->pdgId() == 23)
+            if (doZ0check && genPart1->pdgId() == 23)
             {
               Int_t ndau = genPart1->numberOfDaughters();
               for (int d=0; d<ndau; d++)
@@ -511,19 +513,25 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
                 const Candidate *mom = genPart1->mother(0);
                 momid1[0] = mom->pdgId();
                 momstat1[0] = mom->status();
-                cout << "\t1st: " << genPart1->numberOfMothers()<<" "<< genPart1->pdgId()
-                     << " " << genPart1->pt() <<" "<< genPart1->status()<<endl;
-                cout << "\t     " << mom->numberOfMothers() << " " << mom->pdgId() << " "
-                     <<  mom->pt() << " " << mom->status() << endl;
+                if (doZ0check)
+                {
+                  cout << "\t1st: " << genPart1->numberOfMothers()<<" "<< genPart1->pdgId()
+                       << " " << genPart1->pt() <<" "<< genPart1->status()<<endl;
+                  cout << "\t     " << mom->numberOfMothers() << " " << mom->pdgId() << " "
+                       <<  mom->pt() << " " << mom->status() << endl;
+                }
                 for (int a=0; mom->numberOfMothers()>0 ;a++)
                 {
                   mom = mom->mother(0);
                   momid1[1] = mom->pdgId();
                   momstat1[1] = mom->status();
-                  cout<<mom->numberOfMothers()<<" "<<mom->pdgId()<<" "<<mom->pt()<<" "<<mom->status() << endl;
+                  if (doZ0check)
+                    cout<<mom->numberOfMothers()<<" "<<mom->pdgId()<<" "<<mom->pt()<<" "<<mom->status() << endl;
                 }
               }
-              cout << "end 1st muon:" << momid1[0] << " " << momid1[1] << endl;
+              if (doZ0check)
+                cout << "end 1st muon:" << momid1[0] << " " << momid1[1] << endl;
+  
               float momid2[2]={10}, momstat2[2]={10};
               numMom = genPart2->numberOfMothers();
               if(numMom > 0)
@@ -531,21 +539,27 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
                 const Candidate *mom = genPart2->mother(0);
                 momid2[0] = mom->pdgId();
                 momstat2[0] = mom->status();
-                cout << "\t2nd: " << genPart2->numberOfMothers()<<" "<<genPart2->pdgId()
-                     << " " << genPart2->pt() << " "<<genPart2->status() << endl;
-                cout << "\t     " << mom->numberOfMothers() << " " << mom->pdgId()
-                     << " " <<  mom->pt() << " " << mom->status()<< endl;
+                if (doZ0check)
+                {
+                  cout << "\t2nd: " << genPart2->numberOfMothers()<<" "<<genPart2->pdgId()
+                       << " " << genPart2->pt() << " "<<genPart2->status() << endl;
+                  cout << "\t     " << mom->numberOfMothers() << " " << mom->pdgId()
+                       << " " <<  mom->pt() << " " << mom->status()<< endl;
+                }
                 for (int a=0; mom->numberOfMothers()>0 ;a++)
                 {
                   mom = mom->mother(0);
                   momid2[1] = mom->pdgId();
                   momstat2[1] = mom->status();
-                  cout<<mom->numberOfMothers()<<" "<<mom->pdgId()<<" "<<mom->pt()<<" "<<mom->status() << endl;
+                  if (doZ0check)
+                    cout<<mom->numberOfMothers()<<" "<<mom->pdgId()<<" "<<mom->pt()<<" "<<mom->status() << endl;
                 }
               }
-              cout <<"end 2nd muon:" << momid2[0] << " " << momid2[1] << endl;
-
-              cout << "\t\tDimuon " << genPart1->pdgId()*genPart2->pdgId()/169 << ": " << dimuon.Pt() << " " << dimuon.Mag() << endl;
+              if (doZ0check)
+              {
+                cout <<"end 2nd muon:" << momid2[0] << " " << momid2[1] << endl;
+                cout << "\t\tDimuon " << genPart1->pdgId()*genPart2->pdgId()/169 << ": " << dimuon.Pt() << " " << dimuon.Mag() << endl;
+              }
               
               vector<float> geninfo;
               geninfo.push_back(genPart1->pdgId());
@@ -586,7 +600,8 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
               phM_genDimuon->Fill(dimuon.Mag());
             }//genparticle 2nd loop
         }//genparticle 1st loop
-        cout << "All single muons : " << muons << " " << smuons << endl;
+        if (doZ0check)
+          cout << "All single muons : " << muons << " " << smuons << endl;
     }//------ recoGenParticle loop end
     else  LogDebug("DimuonAnalyzer::analyze()") << "##### NO genPArticleCollectino found!";
 
