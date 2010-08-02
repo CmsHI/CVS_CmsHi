@@ -13,7 +13,6 @@ demo = cms.EDAnalyzer('DimuonAnalyzer',
                               ptMinMuon    = cms.double(3.5),
                               etaMaxTrack  = cms.double(2.5),
                               etaMinTrack  = cms.double(-2.5),
-<<<<<<< dimuonanalyzer_cfi.py
                               ptMinTrack   = cms.double(1.),
                               doRecoSingleMuon = cms.bool(True),
                               doMC         = cms.bool(False),
@@ -23,9 +22,4 @@ demo = cms.EDAnalyzer('DimuonAnalyzer',
                               genSignal    = cms.untracked.InputTag("hiSignal"),
                               vertices     = cms.untracked.InputTag("hiSelectedVertex"),
                               simtracks    = cms.untracked.InputTag("mergedtruth","MergedTrackTruth")
-=======
-                              ptMinTrack   = cms.double(1.),
-                              doSingleMuon = cms.bool(True),
-                              doMC         = cms.bool(False)
->>>>>>> 1.2
                       )
