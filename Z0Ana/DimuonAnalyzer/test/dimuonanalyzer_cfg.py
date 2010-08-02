@@ -54,6 +54,7 @@ process.demo = cms.EDAnalyzer('DimuonAnalyzer',
                               doReco       = cms.bool(False),
                               doSim        = cms.bool(False),
                               doSignal     = cms.bool(True),
+                              doZ0check    = cms.bool(True),
                               genSignal    = cms.untracked.InputTag("hiSignal"),
                               vertices     = cms.untracked.InputTag("hiSelectedVertex"),
                               simtracks    = cms.untracked.InputTag("mergedtruth","MergedTrackTruth")
