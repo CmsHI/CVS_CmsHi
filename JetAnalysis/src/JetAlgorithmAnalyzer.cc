@@ -599,7 +599,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    pileUp.reserve(nFill_);
    rms.reserve(nFill_);
    mean.reserve(nFill_);
-   et.reserve(nFill_);
+   em.reserve(nFill_);
    had.reserve(nFill_);
 
    fjFakeJets_.reserve(nFill_);
