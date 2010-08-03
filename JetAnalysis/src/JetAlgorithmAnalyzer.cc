@@ -64,6 +64,8 @@ protected:
    bool doRandomCones_;
    bool doFullCone_;
 
+   bool sumRecHits_;
+
    double hf_;
    double sumET_;
    int bin_;
@@ -190,6 +192,8 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
    doRecoEvtPlane_  = iConfig.getUntrackedParameter<bool>("doRecoEvtPlane",true);
+
+   sumRecHits_  = iConfig.getParameter<bool>("sumRecHits");
 
    centTag_  = iConfig.getParameter<InputTag>("centralityTag");
    epTag_  = iConfig.getParameter<InputTag>("evtPlaneTag");
@@ -630,6 +634,12 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	 constituents_[ir].push_back(tower);
 
 	 double towet = tower->et();
+	 if(sumRecHits_){
+	    const GlobalPoint& pos=geo->getPosition(ctc->id());
+	    double energy = ctc->emEnergy() + ctc->hadEnergy();
+	    towet = energy*sin(pos.theta());
+	 }
+
 	 double putow = subtractor_->getPileUpAtTower(tower);
 	 double etadd = towet - putow; 
 	 if(avoidNegative_ && etadd < 0.) etadd = 0;

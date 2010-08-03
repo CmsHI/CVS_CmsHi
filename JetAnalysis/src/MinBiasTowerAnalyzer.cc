@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.16 2010/07/29 12:12:30 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.17 2010/07/30 13:31:54 yilmaz Exp $
 //
 //
 
@@ -38,7 +38,6 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "DataFormats/DetId/interface/DetId.h"
@@ -123,6 +122,7 @@ private:
   int analyzeGenParticles();
   void analyzeTowers();
   void analyzeRandomCones();
+   void analyzeRecHits();
   double       getEt(const DetId &id, double energy);
   double       getEta(const DetId &id);
   double       getPhi(const DetId &id);
@@ -159,6 +159,7 @@ private:
   bool excludeJets_;
   bool doRandomCone_;
   bool doTowers_;
+   bool doRecHits_;
   bool isSignal_;
   
   InputTag ktSrc_;
@@ -177,7 +178,15 @@ private:
   edm::Service<TFileService> fs;
   
   TNtuple* nt;
+   TNtuple* ntHits;
+
   TRandom * rand;
+
+
+   //
+
+   edm::Handle<HFRecHitCollection> hfHits;
+   edm::Handle<HBHERecHitCollection> hbheHits;
   
   edm::Handle<CaloTowerCollection> towers;
   edm::Handle<pat::JetCollection> jets;
@@ -259,6 +268,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	genpartEtamax_ =iConfig.getUntrackedParameter<double>("genPartEtaMax",1);
 	iEtamax_ = iConfig.getUntrackedParameter<double>("iEtaMax",11.5);
 	
+        doRecHits_ = iConfig.getUntrackedParameter<bool>("doRecHits",false);
         doRandomCone_ = iConfig.getUntrackedParameter<bool>("doRandomCone",false);
         doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
 	doMC_ = iConfig.getUntrackedParameter<bool>("doMC",false);
@@ -307,7 +317,7 @@ void MinBiasTowerAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& 
 
   if(doTowers_) analyzeTowers();
   if(doRandomCone_) analyzeRandomCones();
-
+  if(doRecHits_) analyzeRecHits();
 }
 
 void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup& iSetup){
@@ -579,11 +589,50 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 }
 
 
+void MinBiasTowerAnalyzer::analyzeRecHits(){
+
+
+   for(unsigned int i = 0; i < hfHits->size(); ++i){
+      const HFRecHit & hit= (*hfHits)[i];
+
+      bool matched = false;
+      //      for()
+
+
+   }
+
+
+   for(unsigned int i = 0; i < hbheHits->size(); ++i){
+      const HBHERecHit & hit= (*hbheHits)[i];
+
+
+   }
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
 // ------------ method called once each job just before starting event loop  ------------
 void 
 MinBiasTowerAnalyzer::beginJob()
 {
   nt = fs->make<TNtuple>("nt","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
+
+  ntHits = fs->make<TNtuple>("ntHits","","e:et:eta:phi:ieta:iphi:hf:sumet:bin:calo:isjet");
+
   rand = new TRandom();
   
    TH1::SetDefaultSumw2();
