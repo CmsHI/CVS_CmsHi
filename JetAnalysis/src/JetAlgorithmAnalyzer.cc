@@ -227,7 +227,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:pu:mean:rms:bin:hf:sumET:event");
+     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:etHad:etEM:pu:mean:rms:bin:hf:sumET:event");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -584,6 +584,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    vector<double> phiRandom;
    vector<double> etaRandom;
    vector<double> et;
+   vector<double> had;
+   vector<double> em;
    vector<double> pileUp;
    vector<double> mean;
    vector<double> rms;
@@ -597,6 +599,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    pileUp.reserve(nFill_);
    rms.reserve(nFill_);
    mean.reserve(nFill_);
+   et.reserve(nFill_);
+   had.reserve(nFill_);
 
    fjFakeJets_.reserve(nFill_);
    constituents_.reserve(nFill_);
@@ -612,6 +616,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       phiRandom[ijet] = 2*pi*randomEngine->flat() - pi;
       etaRandom[ijet] = 2*etaMax_*randomEngine->flat() - etaMax_;
       et[ijet] = 0;
+      had[ijet] = 0;
+      em[ijet] = 0;
       pileUp[ijet] = 0;
    }
 
@@ -637,7 +643,10 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	 if(sumRecHits_){
 	    const GlobalPoint& pos=geo->getPosition(ctc->id());
 	    double energy = ctc->emEnergy() + ctc->hadEnergy();
-	    towet = energy*sin(pos.theta());
+	    double ang = sin(pos.theta());
+	    towet = energy*ang;
+	    em[ir] += ctc->emEnergy()*ang;
+            had[ir] += ctc->hadEnergy()*ang;
 	 }
 
 	 double putow = subtractor_->getPileUpAtTower(tower);
@@ -654,7 +663,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
    for(int ir = 0; ir < nFill_; ++ir){
       double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
-      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_);
+      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
