@@ -17,6 +17,6 @@ def removePatMCMatch(process):
 
 # Top Config to turn off all mc dependence
 def disableMC(process):
-  process.heavyIon.doMC = False
+  process.prod.remove(process.heavyIon)
   removePatMCMatch(process)
   return process

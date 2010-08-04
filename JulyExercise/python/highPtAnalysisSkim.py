@@ -58,20 +58,21 @@ process.output.outputCommands.extend([
     "keep recoTracks_hiSelectedTracks__RECO",
     "keep recoPhotons_*_*_*" ,
     "keep edmTriggerResults_TriggerResults__*" ,
-    "keep triggerTriggerEvent_hltTriggerSummaryAOD__*"
+    "keep triggerTriggerEvent_hltTriggerSummaryAOD__*",
+    "keep *_hiGenParticles_*_*",
     ])
 
 process.prod = cms.Path(
+    process.heavyIon +
     process.siPixelRecHits +
     process.iterativeConePu5CaloJets +
     process.kt4CaloJets +
     process.ak5CaloJets +
     process.hiCentrality +
     process.makeHeavyIonJets
-    
     )
  
-#from CmsHi.JulyExercise.DisableMC_cff import *
+from CmsHi.JulyExercise.DisableMC_cff import *
 #disableMC(process)
 
 process.out_step = cms.EndPath(process.output)
