@@ -348,13 +348,12 @@ void MyVirtualJetProducer::inputTowers( )
     if (isAnomalousTower(input))      continue;
 
     //Check consistency of kinematics
-
     const CaloTower* ctc = dynamic_cast<const CaloTower*>(input.get());
     if(ctc){
       int ieta = ctc->id().ieta();
       int iphi = ctc->id().iphi();
 
-      ntuple->Fill(ieta, input->eta(), iphi, input->phi(),input->et(),ctc->emEt(),ctc->hadEt());
+      if(0 && ntuple)ntuple->Fill(ieta, input->eta(), iphi, input->phi(),input->et(),ctc->emEt(),ctc->hadEt());
       
       if(abs(ieta) < 5){
 
