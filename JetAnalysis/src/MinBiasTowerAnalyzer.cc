@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.17 2010/07/30 13:31:54 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.18 2010/08/03 20:31:42 yilmaz Exp $
 //
 //
 
@@ -129,7 +129,7 @@ private:
   
   // ----------member data ---------------------------
   
-  
+   int evtPlaneIndex_;  
   int iEtamax_;
   double SumEtMin_;
   double SumEtMax_;
@@ -286,7 +286,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
         ktSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("ktSrc",edm::InputTag("kt4CaloJets"));
         akSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("akSrc",edm::InputTag("ak5CaloJets"));
         evtPlaneSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("evtPlaneSrc",edm::InputTag("hiEvtPlane","recoLevel"));
-
+	evtPlaneIndex_ = iConfig.getUntrackedParameter<int>("evtPlaneIndex",31);
 }
 
 
@@ -350,7 +350,7 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
   
    if(doEventPlane_) {    
      ev.getByLabel(edm::InputTag(evtPlaneSrc_),evtPlanes);
-     cout<<"Using event plane determined by : "<<(*evtPlanes)[0].label()<<endl;
+     cout<<"Using event plane determined by : "<<(*evtPlanes)[evtPlaneIndex_].label()<<endl;
      phi0_ = (*evtPlanes)[0].angle();
    }
 

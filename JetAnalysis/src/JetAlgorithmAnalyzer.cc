@@ -51,6 +51,7 @@ protected:
   bool useOnlyOnePV_;
    float dzTrVtxMax_;
    
+   int evtPlaneIndex_;
    double phi0_;
    int nFill_;
    float etaMax_;
@@ -192,6 +193,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
    doRecoEvtPlane_  = iConfig.getUntrackedParameter<bool>("doRecoEvtPlane",true);
+   evtPlaneIndex_ = iConfig.getUntrackedParameter<int>("evtPlaneIndex",31);
 
    sumRecHits_  = iConfig.getParameter<bool>("sumRecHits");
 
@@ -442,7 +444,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    if(doRecoEvtPlane_){
       Handle<reco::EvtPlaneCollection> planes;
       iEvent.getByLabel(epTag_,planes);
-      phi0_  = (*planes)[0].angle();
+      phi0_  = (*planes)[evtPlaneIndex_].angle();
     }
 
 
