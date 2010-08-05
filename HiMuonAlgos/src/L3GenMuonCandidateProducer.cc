@@ -3,7 +3,7 @@
 // Package:    L3GenMuonCandidateProducer
 // Class:      L3GenMuonCandidateProducer
 // 
-/**\class L3GenMuonCandidateProducer L3GenMuonCandidateProducer.cc CmsHi/L3GenMuonCandidateProducer/src/L3GenMuonCandidateProducer.cc
+/**\class L3GenMuonCandidateProducer L3GenMuonCandidateProducer.cc CmsHi/HiMuonAlgos/src/L3GenMuonCandidateProducer.cc
 
  Description: [one line class summary]
 
@@ -15,7 +15,7 @@
 //         Created:  Thu Aug  5 15:56:49 CEST 2010
 // $Id$
 //
-//
+// L3MuonCandidateProducer with Gen Info, instead of L3Muon object
 
 
 // system include files
@@ -63,6 +63,8 @@ class L3GenMuonCandidateProducer : public edm::EDProducer {
       virtual void endJob() ;
       
       // ----------member data ---------------------------
+      edm::InputTag triggerResults_;
+      string HLT_Path_;
 };
 
 //
@@ -79,15 +81,11 @@ class L3GenMuonCandidateProducer : public edm::EDProducer {
 //
 L3GenMuonCandidateProducer::L3GenMuonCandidateProducer(const edm::ParameterSet& iConfig)
 {
-   //register your products
-/* Examples
-   produces<ExampleData2>();
-
-   //if do put with a label
-   produces<ExampleData2>("label");
-*/
    //now do what ever other initialization is needed
+   triggerResults_ = iConfig.getParameter<edm::InputTag>("TriggerResults");
+   HLT_Path_ = iConfig.getParameter<string>("HLT_Path");
    produces<RecoChargedCandidateCollection>();
+   //cout<<"L3 Gen Muon Candidate producer "<<endl;
 }
 
 
@@ -108,43 +106,31 @@ L3GenMuonCandidateProducer::~L3GenMuonCandidateProducer()
 void
 L3GenMuonCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   using namespace edm;
-/* This is an event example
-   //Read 'ExampleData' from the Event
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
 
-   //Use the ExampleData to create an ExampleData2 which 
-   // is put into the Event
-   std::auto_ptr<ExampleData2> pOut(new ExampleData2(*pIn));
-   iEvent.put(pOut);
-*/
-
-/* this is an EventSetup example
-   //Read SetupData from the SetupRecord in the EventSetup
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-*/
     const string metname = "RecoHI|HiMuonAlgos|L3GenMuonCandidate";
 
     Handle<GenParticleCollection> mctruth;
     iEvent.getByLabel("hiGenParticles", mctruth);
 
     Handle<TriggerResults> hltresults;
-    iEvent.getByLabel("TriggerResults",hltresults);
+    iEvent.getByLabel(triggerResults_,hltresults);
+    //iEvent.getByLabel("TriggerResults",hltresults);
 
     auto_ptr<RecoChargedCandidateCollection> candidates( new RecoChargedCandidateCollection());
 
     std::string PathName;
-    PathName = "HLT_HIDoubleMu";
+    //PathName = "HLT_HIDoubleMu";
+    //PathName = "L1_DoubleMuOpen";
+    PathName = HLT_Path_;
 
     if (hltresults.isValid()) {
         int ntrigs = hltresults->size();
         if (ntrigs==0){std::cout << "%HLTInfo -- No trigger name given in TriggerResults of the input " << std::endl;}
-
+        //cout<<"ntrigs : "<<ntrigs<<endl;
         edm::TriggerNames const& triggerNames_ = iEvent.triggerNames(*hltresults);
         for (int itrig = 0; itrig != ntrigs; ++itrig){
             string trigName=triggerNames_.triggerName(itrig);
+            //cout<<"Trigger Name : "<<trigName<<endl;
             bool accept = hltresults->accept(itrig);
 
             if(accept == 1 && trigName == PathName){
@@ -171,7 +157,6 @@ L3GenMuonCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
                 }
             }
         } 
-        //std::cout << "%HLTInfo -- No Trigger Result" << std::endl;
     }
     iEvent.put(candidates);
 
