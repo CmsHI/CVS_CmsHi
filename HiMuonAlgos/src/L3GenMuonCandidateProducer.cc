@@ -85,7 +85,6 @@ L3GenMuonCandidateProducer::L3GenMuonCandidateProducer(const edm::ParameterSet& 
    triggerResults_ = iConfig.getParameter<edm::InputTag>("TriggerResults");
    HLT_Path_ = iConfig.getParameter<string>("HLT_Path");
    produces<RecoChargedCandidateCollection>();
-   //cout<<"L3 Gen Muon Candidate producer "<<endl;
 }
 
 
@@ -108,6 +107,7 @@ L3GenMuonCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
 {
 
     const string metname = "RecoHI|HiMuonAlgos|L3GenMuonCandidate";
+    cout<<"L3 Gen Muon Candidate producer starts !!!!"<<endl;
 
     Handle<GenParticleCollection> mctruth;
     iEvent.getByLabel("hiGenParticles", mctruth);
@@ -122,20 +122,20 @@ L3GenMuonCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
     //PathName = "HLT_HIDoubleMu";
     //PathName = "L1_DoubleMuOpen";
     PathName = HLT_Path_;
-
+/*
     if (hltresults.isValid()) {
         int ntrigs = hltresults->size();
         if (ntrigs==0){std::cout << "%HLTInfo -- No trigger name given in TriggerResults of the input " << std::endl;}
-        //cout<<"ntrigs : "<<ntrigs<<endl;
+        cout<<"ntrigs : "<<ntrigs<<endl;
         edm::TriggerNames const& triggerNames_ = iEvent.triggerNames(*hltresults);
         for (int itrig = 0; itrig != ntrigs; ++itrig){
             string trigName=triggerNames_.triggerName(itrig);
-            //cout<<"Trigger Name : "<<trigName<<endl;
+            cout<<"Trigger Name : "<<trigName<<endl;
             bool accept = hltresults->accept(itrig);
 
             if(accept == 1 && trigName == PathName){
-                //std::cout<<"%%%%% HLT_HIDoubleMu Fired %%%%%"<<std::endl;
-                //std::cout<<"%%%%% L3 Muons filling up with Gen Muons %%%%%"<<std::endl;
+                std::cout<<"%%%%% HLT_HIDoubleMu Fired %%%%%"<<std::endl;
+                std::cout<<"%%%%% L3 Muons filling up with Gen Muons %%%%%"<<std::endl;
                 if (mctruth.isValid()){
                     for(size_t i = 0; i < mctruth->size(); ++ i) {
                         const Candidate & p = (*mctruth)[i];
@@ -158,6 +158,28 @@ L3GenMuonCandidateProducer::produce(edm::Event& iEvent, const edm::EventSetup& i
             }
         } 
     }
+*/    
+    if (mctruth.isValid()){
+        for(size_t i = 0; i < mctruth->size(); ++ i) {
+            const Candidate & p = (*mctruth)[i];
+            int id = p.pdgId();
+            if(abs(id) == 13 && p.status() == 1) {
+                cout<<"Produce L3 with Gen !!!!!, muon status : "<<p.status()<<endl;
+                Particle::Charge q = p.charge();
+                Particle::LorentzVector p4(p.px(), p.py(), p.pz(), p.p());
+                Particle::Point vtx(p.vx(), p.vy(), p.vz());
+                int pid = 13;
+                if(abs(q)==1) pid = q <0 ? 13 : -13;
+                else LogWarning(metname) << "L3GenMuonCandidate has charge : "<<q;
+                RecoChargedCandidate cand(q, p4, vtx, pid);
+
+                //cand.setTrack(p);
+                candidates->push_back(cand);
+
+            }
+        }
+    }
+
     iEvent.put(candidates);
 
 }
