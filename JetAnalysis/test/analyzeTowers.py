@@ -9,13 +9,13 @@ ivars.files = [
     'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs51to100.root'
     ]
 '''
-'''
+
 ivars.files = [
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs11to20.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs21to40.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs61to80.root'
     ]
-'''
+    
 '''
 ivars.files = [
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs11to20.root',
@@ -28,14 +28,14 @@ ivars.files = [
     ]
 '''
 
-
+'''
 ivars.files = [
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs101to200.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs1to100.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs201to300.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100628/Hydjet_MinBias_2760GeV_runs301to400.root'
     ]
-
+'''
 
 ivars.output = 'data0628_multiplePU_avoidT.root'
 
@@ -133,7 +133,8 @@ process.bkgXJets = cms.EDProducer(
     evtPlaneTag = cms.InputTag("hiEvtPlane"),
     doRecoEvtPlane = cms.untracked.bool(False),
     interpolate = cms.untracked.bool(False),
-    centrality = cms.untracked.int32(-1)
+    centrality = cms.untracked.int32(-1),
+    sumRecHits = cms.bool(False)
     )
 
 process.bkgXJets.doPUOffsetCorr = True
