@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.18 2010/08/03 20:31:42 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.19 2010/08/04 11:27:36 yilmaz Exp $
 //
 //
 
@@ -40,6 +40,7 @@
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
+#include "DataFormats/EcalDetId/interface/EcalDetIdCollections.h"
 #include "DataFormats/DetId/interface/DetId.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/IdealGeometryRecord.h"
@@ -122,14 +123,14 @@ private:
   int analyzeGenParticles();
   void analyzeTowers();
   void analyzeRandomCones();
-   void analyzeRecHits();
+  void analyzeRecHits();
   double       getEt(const DetId &id, double energy);
   double       getEta(const DetId &id);
   double       getPhi(const DetId &id);
   
   // ----------member data ---------------------------
   
-   int evtPlaneIndex_;  
+  int evtPlaneIndex_;  
   int iEtamax_;
   double SumEtMin_;
   double SumEtMax_;
@@ -159,7 +160,7 @@ private:
   bool excludeJets_;
   bool doRandomCone_;
   bool doTowers_;
-   bool doRecHits_;
+  bool doRecHits_;
   bool isSignal_;
   
   InputTag ktSrc_;
@@ -173,21 +174,24 @@ private:
   InputTag FakeJetSrc_;
   InputTag GenJetSrc_;
   InputTag DirectSrc_;
-  
+  InputTag EcalRecHitEESrc_;
+  InputTag EcalRecHitEBSrc_;
+  InputTag HcalRecHitHFSrc_;
+  InputTag HcalRecHitHBHESrc_;
+
   const CaloGeometry *geo;
   edm::Service<TFileService> fs;
   
   TNtuple* nt;
-   TNtuple* ntHits;
-
+  TNtuple* ntHits;
   TRandom * rand;
-
-
-   //
-
-   edm::Handle<HFRecHitCollection> hfHits;
-   edm::Handle<HBHERecHitCollection> hbheHits;
   
+
+
+  edm::Handle<HFRecHitCollection> hfHits;
+  edm::Handle<HBHERecHitCollection> hbheHits;
+  edm::Handle<EcalRecHitCollection> ebHits;
+  edm::Handle<EcalRecHitCollection> eeHits;
   edm::Handle<CaloTowerCollection> towers;
   edm::Handle<pat::JetCollection> jets;
   edm::Handle<reco::CaloJetCollection> calojets;
@@ -199,7 +203,6 @@ private:
   edm::Handle<vector<double> > akRhos;
   edm::Handle<edm::GenHIEvent> mc;
   edm::Handle<reco::Centrality> centrality;
-  
   edm::Handle<std::vector<reco::EvtPlane> > evtPlanes;
   const CentralityBins* cbins_;
   
@@ -287,6 +290,10 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
         akSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("akSrc",edm::InputTag("ak5CaloJets"));
         evtPlaneSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("evtPlaneSrc",edm::InputTag("hiEvtPlane","recoLevel"));
 	evtPlaneIndex_ = iConfig.getUntrackedParameter<int>("evtPlaneIndex",31);
+	EcalRecHitEBSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("ecalEBRecHitSrc",edm::InputTag("ecalRechit"));
+	EcalRecHitEESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("ecalEERecHitSrc",edm::InputTag("ecalRechit"));
+	HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
+	HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
 }
 
 
@@ -296,7 +303,7 @@ MinBiasTowerAnalyzer::~MinBiasTowerAnalyzer()
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
 
-}
+} 
 
 
 //
@@ -332,6 +339,7 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
     if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
 
+
   if(doMC_){
     ev.getByLabel(HiSrc_,mc);
     ev.getByLabel(GenJetSrc_,genjets);
@@ -347,15 +355,21 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
     ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
     ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
   }  
-  
+
    if(doEventPlane_) {    
      ev.getByLabel(edm::InputTag(evtPlaneSrc_),evtPlanes);
      cout<<"Using event plane determined by : "<<(*evtPlanes)[evtPlaneIndex_].label()<<endl;
      phi0_ = (*evtPlanes)[0].angle();
    }
 
-}
+   if(doRecHits_){
+     ev.getByLabel(HcalRecHitHFSrc_,hfHits);
+     ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
+     ev.getByLabel(EcalRecHitEESrc_,eeHits);
+     ev.getByLabel(EcalRecHitEBSrc_,ebHits);
+   }
 
+}
 void MinBiasTowerAnalyzer::sumET(){
    sumET_ = centrality->EtMidRapiditySum();
    double hf = centrality->EtHFhitSum();
@@ -472,7 +486,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     hRemainPUTow[bin]->Fill(tm[-i]);
     }
 
-    cout<<"tower size in this event : "<<numberofTower<<endl;
+    cout<<"tower size at mid-rapidity : "<<numberofTower<<endl;
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
 	hTowerPT[bin]->Fill(0); 
@@ -590,39 +604,90 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 
 
 void MinBiasTowerAnalyzer::analyzeRecHits(){
-
-
-   for(unsigned int i = 0; i < hfHits->size(); ++i){
-      const HFRecHit & hit= (*hfHits)[i];
-
-      bool matched = false;
-      //      for()
-
-
-   }
-
-
-   for(unsigned int i = 0; i < hbheHits->size(); ++i){
-      const HBHERecHit & hit= (*hbheHits)[i];
-
-
-   }
-
-
-
-
-
-
-
-
-
-
+  bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
+  double hf = centrality->EtHFhitSum();
+  int bin = cbins_->getBin(hf);
+  if(isSignal_) bin = 0;
+  int calo = 0;
+  
+  for(unsigned int i = 0; i < hfHits->size(); ++i){
+    const HFRecHit & hit= (*hfHits)[i];
+    double pt = getEt(hit.id(),hit.energy());
+    double eta = getEta(hit.id());
+    double phi = getPhi(hit.id());
+    double ieta = hit.id().ieta();
+    double iphi = hit.id().iphi();
+    bool matched = false;
+    calo = 4;
+    if(!excludeJets_){
+      for(unsigned int j = 0 ; j < jets->size(); ++j){
+	const pat::Jet& jet = (*jets)[j];
+	double dr = reco::deltaR(getEta(hit.id()),getPhi(hit.id()),jet.eta(),jet.phi());
+	if(dr < cone_){ matched = true; }
+      }
+    }
+    float entry[11] = {hit.energy(),pt,eta,phi,ieta,iphi,hf,sumET_,bin,calo,matched};
+    ntHits->Fill(entry);
+  }
+  
+  for(unsigned int i = 0; i < hbheHits->size(); ++i){
+    const HBHERecHit & hit= (*hbheHits)[i];
+    double pt = getEt(hit.id(),hit.energy());
+    double eta = getEta(hit.id());
+    double phi = getPhi(hit.id());
+    double ieta = hit.id().ieta();
+    double iphi = hit.id().iphi();
+    bool matched = false;
+    calo = 3;
+    if(!excludeJets_){
+      for(unsigned int j = 0 ; j < jets->size(); ++j){
+	const pat::Jet& jet = (*jets)[j];
+	double dr = reco::deltaR(getEta(hit.id()),getPhi(hit.id()),jet.eta(),jet.phi());
+	if(dr < cone_){ matched = true; }
+      }
+    }
+    float entry[11] = {hit.energy(),pt,eta,phi,ieta,iphi,hf,sumET_,bin,calo,matched};
+    ntHits->Fill(entry);
+  }
+  
+   
+  for(unsigned int i = 0; i < ebHits->size(); ++i){
+    const EcalRecHit & hit = (*ebHits)[i];
+    double pt = getEt(hit.id(),hit.energy());
+    double eta = getEta(hit.id());
+    double phi = getPhi(hit.id());
+    bool matched = false;
+    calo = 1;
+    if(!excludeJets_){
+      for(unsigned int j = 0 ; j < jets->size(); ++j){
+	const pat::Jet& jet = (*jets)[j];
+	double dr = reco::deltaR(getEta(hit.id()),getPhi(hit.id()),jet.eta(),jet.phi());
+	if(dr < cone_){ matched = true; }
+      }
+    }
+    float entry[11] = {hit.energy(),pt,eta,phi,eta,phi,hf,sumET_,bin,calo,matched};
+    ntHits->Fill(entry);
+  }
+  
+  for(unsigned int i = 0; i < eeHits->size(); ++i){
+    const EcalRecHit & hit = (*eeHits)[i];
+    double pt = getEt(hit.id(),hit.energy());
+    double eta = getEta(hit.id());
+    double phi = getPhi(hit.id());
+    bool matched = false;
+    calo = 2;
+    if(!excludeJets_){
+      for(unsigned int j = 0 ; j < jets->size(); ++j){
+	const pat::Jet& jet = (*jets)[j];
+	double dr = reco::deltaR(getEta(hit.id()),getPhi(hit.id()),jet.eta(),jet.phi());
+	if(dr < cone_){ matched = true; }
+      }
+    }
+    float entry[11] = {hit.energy(),pt,eta,phi,eta,phi,hf,sumET_,bin,calo,matched};
+    ntHits->Fill(entry);
+  }
+  
 }
-
-
-
-
-
 
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -630,9 +695,9 @@ void
 MinBiasTowerAnalyzer::beginJob()
 {
   nt = fs->make<TNtuple>("nt","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
-
+  
   ntHits = fs->make<TNtuple>("ntHits","","e:et:eta:phi:ieta:iphi:hf:sumet:bin:calo:isjet");
-
+  
   rand = new TRandom();
   
    TH1::SetDefaultSumw2();
