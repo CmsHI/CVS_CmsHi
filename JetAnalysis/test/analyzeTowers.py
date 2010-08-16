@@ -9,13 +9,20 @@ ivars.files = [
     'file:/net/hisrv0001/home/yetkin/hibat0007/analysis/jets/SignalUnquenchedDijet80to120_runs51to100.root'
     ]
 '''
-
+'''
 ivars.files = [
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs11to20.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs21to40.root',
     'file:/net/hisrv0001/home/yetkin/pstore02/reco/NoZSP/local2/Hydjet_MinBias_2760GeV_d20100713/Hydjet_MinBias_2760GeV_runs61to80.root'
     ]
-    
+'''
+
+ivars.files = [
+'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yetkin/reco/CMSSW_3_8_1_patch1/MC_38Y_V8/Hydjet_MinBias_2760GeV_d20100812/Hydjet_Quenched_MinBias_2760GeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_1.root',
+'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yetkin/reco/CMSSW_3_8_1_patch1/MC_38Y_V8/Hydjet_MinBias_2760GeV_d20100812/Hydjet_Quenched_MinBias_2760GeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_10.root',
+'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yetkin/reco/CMSSW_3_8_1_patch1/MC_38Y_V8/Hydjet_MinBias_2760GeV_d20100812/Hydjet_Quenched_MinBias_2760GeV_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_100.root'
+]
+
 '''
 ivars.files = [
 'file:/net/hisrv0001/home/yetkin/hibat0007/aod/JulyExercise/MinBias0709/MinBias0709_runs11to20.root',
@@ -37,7 +44,7 @@ ivars.files = [
     ]
 '''
 
-ivars.output = 'data0628_multiplePU_avoidT.root'
+ivars.output = 'Hydjet_Quenched_2760GeV.root'
 
 ivars.maxEvents = -1
 
@@ -176,8 +183,10 @@ process.ana = cms.EDAnalyzer('MinBiasTowerAnalyzer',
                              doRandomCone = cms.untracked.bool(True),
                              doEvtPlane = cms.untracked.bool(True),
                              centralitySrc = cms.untracked.InputTag("hiCentrality","","RECO"),
-                             excludeJets = cms.untracked.bool(False)
-
+                             excludeJets = cms.untracked.bool(False),
+                             doRecHits = cms.untracked.bool(True),
+                             ecalEBRecHitSrc = cms.untracked.InputTag("ecalRecHit","EcalRecHitsEB","RECO"),
+                             ecalEERecHitSrc = cms.untracked.InputTag("ecalRecHit","EcalRecHitsEE","RECO")
                              )
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
