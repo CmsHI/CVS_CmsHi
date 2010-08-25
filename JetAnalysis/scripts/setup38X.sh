@@ -6,6 +6,7 @@ cvs co RecoHI/HiCentralityAlgos
 cvs co RecoHI/HiEvtPlaneAlgos
 cvs co RecoHI/HiJetAlgos
 cvs co RecoHI/HiMuonAlgos
+cvs co RecoHI/HiTracking
 
 cvs co RecoJets/JetAlgorithms
 cvs co RecoJets/JetProducers
