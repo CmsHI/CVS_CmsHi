@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.19 2010/08/04 11:27:36 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.20 2010/08/16 20:35:25 nart Exp $
 //
 //
 
@@ -263,7 +263,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	missingTowersMean_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersMean",vector<double>(0));
         missingTowersRMS_ = iConfig.getUntrackedParameter<vector<double> >("jetTowersRMS",vector<double>(0));
 	cone_ = iConfig.getUntrackedParameter<double>("coneSize",0.5);
-        nBins_ = iConfig.getUntrackedParameter<double>("nBins",40);
+        nBins_ = iConfig.getUntrackedParameter<int>("nBins",40);
 
 	genJetPtMin_ =  iConfig.getUntrackedParameter<double>("genJetPtMin",20);
 	towersize_ = iConfig.getUntrackedParameter<int>("nTowers",1584);
