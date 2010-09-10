@@ -13,13 +13,14 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id$
+// $Id: HiJetResponseAnalyzer.cc,v 1.1 2010/09/09 15:05:01 yilmaz Exp $
 //
 //
 
 
 // system include files
 #include <memory>
+#include <iostream>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -38,6 +39,10 @@
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
+
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+
 
 #include "TTree.h"
 
@@ -83,7 +88,13 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
 
+   bool usePat_;
+   bool doMC_;
+
    double genJetPtMin_;
+
+
+   edm::InputTag jetTag_;
 
    JRA jra_;
    TTree* t;
@@ -92,9 +103,10 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
    edm::Handle<reco::Centrality> cent;
 
    edm::Handle<reco::JetView> jets;
+   //   edm::Handle<pat::JetCollection> jets;
 
 
-
+   edm::Service<TFileService> fs;
 
 };
 
@@ -114,6 +126,12 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
    genJetPtMin_ = 0;
+
+   usePat_ = false;
+   doMC_ = false;
+
+   jetTag_ = edm::InputTag("selectedPatJets");
+
 }
 
 
@@ -136,40 +154,42 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 {
    using namespace edm;
 
+   iEvent.getByLabel(jetTag_,jets);
+   cout<<"a"<<endl;
 
+   jra_.nref = 0;
    for(unsigned int j = 0 ; j < jets->size(); ++j){
-
-      const pat::Jet jet = (pat::Jet)((*jets)[j]);
+      cout<<"b"<<endl;
       
-      if(jet.genJet() != 0){
-
-	 if(jet.genJet()->pt() < genJetPtMin_) continue;
-	 jra_.refpt[jra_.nref] = jet.genJet()->pt();
-	 jra_.refeta[jra_.nref] = jet.genJet()->eta();
-	 jra_.refphi[jra_.nref] = jet.genJet()->phi();
-	   
-	 jra_.jtpt[jra_.nref] = jet.pt();
-	 jra_.jteta[jra_.nref] = jet.eta();
-	 jra_.jtphi[jra_.nref] = jet.phi();
-	  
-	 jra_.nref++;
-	   
+      //      const pat::Jet& jet = (*jets)[j];
+      const reco::Jet jet = (*jets)[j];      
+      jra_.jtpt[jra_.nref] = jet.pt();
+      jra_.jteta[jra_.nref] = jet.eta();
+      jra_.jtphi[jra_.nref] = jet.phi();
+      cout<<"c"<<endl;
+      
+      if(usePat_){
+	 const pat::Jet& patjet = (*jets)[j];
+	 
+	 if(doMC_ && patjet.genJet() != 0){	    
+	    //	    if(jet.genJet()->pt() < genJetPtMin_) continue;
+	    jra_.refpt[jra_.nref] = patjet.genJet()->pt();
+	    jra_.refeta[jra_.nref] = patjet.genJet()->eta();
+	    jra_.refphi[jra_.nref] = patjet.genJet()->phi();
+	    	    	    
+	 }else{
+	    jra_.refpt[jra_.nref] = -99;
+            jra_.refeta[jra_.nref] = -99;
+            jra_.refphi[jra_.nref] = -99;
+	 }
       }
+      
+      jra_.nref++;
+      
    }
 
    t->Fill();
 
-
-
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
 }
 
 
@@ -177,6 +197,22 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 void 
 HiJetResponseAnalyzer::beginJob()
 {
+
+   t= fs->make<TTree>("t","Jet Response Analyzer");
+   t->Branch("b",&jra_.b,"b/F");
+   t->Branch("hf",&jra_.hf,"hf/F");
+   t->Branch("nref",&jra_.nref,"nref/I");
+   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
+   t->Branch("refpt",jra_.refpt,"refpt[nref]/F");
+   t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
+   t->Branch("refeta",jra_.refeta,"refeta[nref]/F");
+   t->Branch("jtphi",jra_.jtphi,"jtphi[nref]/F");
+   t->Branch("refphi",jra_.refphi,"refphi[nref]/F");
+   t->Branch("weight",&jra_.weight,"weight/F");
+   t->Branch("bin",&jra_.bin,"bin/I");
+
+
+
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
