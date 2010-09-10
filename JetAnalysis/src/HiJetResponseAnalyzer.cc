@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.1 2010/09/09 15:05:01 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.2 2010/09/10 12:54:47 yilmaz Exp $
 //
 //
 
@@ -155,18 +155,15 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    using namespace edm;
 
    iEvent.getByLabel(jetTag_,jets);
-   cout<<"a"<<endl;
 
    jra_.nref = 0;
    for(unsigned int j = 0 ; j < jets->size(); ++j){
-      cout<<"b"<<endl;
       
       //      const pat::Jet& jet = (*jets)[j];
       const reco::Jet jet = (*jets)[j];      
       jra_.jtpt[jra_.nref] = jet.pt();
       jra_.jteta[jra_.nref] = jet.eta();
       jra_.jtphi[jra_.nref] = jet.phi();
-      cout<<"c"<<endl;
       
       if(usePat_){
 	 const pat::Jet& patjet = (*jets)[j];
