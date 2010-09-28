@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.2 2010/09/10 12:54:47 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.3 2010/09/10 14:47:48 yilmaz Exp $
 //
 //
 
@@ -62,6 +62,7 @@ struct JRA{
    float b;
    float hf;
    float jtpt[MAXJETS];
+   float jtcorpt[MAXJETS];
    float refpt[MAXJETS];
    float jteta[MAXJETS];
    float refeta[MAXJETS];
@@ -127,10 +128,10 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
    //now do what ever initialization is needed
    genJetPtMin_ = 0;
 
-   usePat_ = false;
-   doMC_ = false;
+   usePat_ = iConfig.getUntrackedParameter<bool>("usePat",true);
+   doMC_ = iConfig.getUntrackedParameter<bool>("doMC",true);
 
-   jetTag_ = edm::InputTag("selectedPatJets");
+   jetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("src",edm::InputTag("selectedPatJets"));
 
 }
 
@@ -156,6 +157,9 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
    iEvent.getByLabel(jetTag_,jets);
 
+   edm::Handle<pat::JetCollection> patjets;
+   if(usePat_)iEvent.getByLabel(jetTag_,patjets);
+
    jra_.nref = 0;
    for(unsigned int j = 0 ; j < jets->size(); ++j){
       
@@ -164,9 +168,13 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       jra_.jtpt[jra_.nref] = jet.pt();
       jra_.jteta[jra_.nref] = jet.eta();
       jra_.jtphi[jra_.nref] = jet.phi();
-      
+      jra_.jtcorpt[jra_.nref] = jet.pt();
+
       if(usePat_){
-	 const pat::Jet& patjet = (*jets)[j];
+	 const pat::Jet& patjet = (*patjets)[j];
+
+	 jra_.jtpt[jra_.nref] = patjet.correctedJet("raw").pt();
+         jra_.jtcorpt[jra_.nref] = patjet.pt();
 	 
 	 if(doMC_ && patjet.genJet() != 0){	    
 	    //	    if(jet.genJet()->pt() < genJetPtMin_) continue;
@@ -200,6 +208,7 @@ HiJetResponseAnalyzer::beginJob()
    t->Branch("hf",&jra_.hf,"hf/F");
    t->Branch("nref",&jra_.nref,"nref/I");
    t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
+   t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
    t->Branch("refpt",jra_.refpt,"refpt[nref]/F");
    t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
    t->Branch("refeta",jra_.refeta,"refeta[nref]/F");
