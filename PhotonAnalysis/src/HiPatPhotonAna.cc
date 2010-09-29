@@ -10,7 +10,7 @@
 //                                                                                                                                                                
 // Original Author:  Yongsun Kim                                                                                                                                    
 //         Created:  Sun Sep 20 05:04:32 EDT 2009                                                                                                                   
-// $Id: HiPatPhotonAna.cc,v 1.1 2010/04/08 13:45:49 kimy Exp $          
+// $Id: HiPatPhotonAna.cc,v 1.1 2010/04/08 14:00:42 kimy Exp $          
 //                                                                                                                                                                       
 //                                                                                                                                                                       
 
@@ -25,7 +25,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
