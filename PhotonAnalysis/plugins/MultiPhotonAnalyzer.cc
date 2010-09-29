@@ -21,7 +21,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.20 2010/04/23 12:46:51 musella Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.4 2010/08/18 16:59:48 kimy Exp $
  *
  */
 
@@ -147,24 +147,35 @@ int MultiPhotonAnalyzer::selectStorePhotons(const edm::Event& e,const edm::Event
   // Photon Section: store kMaxPhotons in the events as an array in the tree //
   /////////////////////////////////////////////////////////////////////////////
   // Get photon details  
-  Handle<PhotonCollection> photons;
+   Handle<pat::PhotonCollection> photons;
   e.getByLabel(photonProducer_, photons);   
-  
+
   // Sort photons according to pt
-  PhotonCollection myphotons;
+  pat::PhotonCollection myphotons;
   for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr != photons->end(); ++phoItr) {  
     myphotons.push_back(*phoItr);
   }
+  
+  Handle<reco::PhotonCollection> compPhotons;
+  e.getByLabel(compPhotonProducer_, compPhotons);
+
+  // Sort comp photons according to pt                                                                                                            
+  reco::PhotonCollection myCompPhotons;
+  for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr) {
+     myCompPhotons.push_back(*phoItr);
+  }
+  
+
 
   GreaterByPt<Photon> pTComparator_;
   std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
   
-
-  return storePhotons(e,iSetup,myphotons,prefx);
-
+  
+  return storePhotons(e,iSetup,myphotons,myCompPhotons, prefx);
+  
 }
 
-int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup& iSetup,PhotonCollection & myphotons, const char* prefx){
+int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup& iSetup,PhotonCollection & myphotons, reco::PhotonCollection & myCompPhotons,  const char* prefx){
    
 
   TString pfx(prefx);
@@ -181,6 +192,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   iSetup.get<EcalChannelStatusRcd>().get(chStatus);
   
   EcalClusterLazyTools lazyTool(e, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_ );   
+
+  // Tools to get the Track informations.
 
   // Heavy Ion variable calculator
   CxCalculator CxC(e,iSetup, basicClusterBarrel_, basicClusterEndcap_);
@@ -222,12 +235,20 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> ecalRecHitSumEtConeDR04(kMaxPhotons), hcalTowerSumEtConeDR04(kMaxPhotons), hcalDepth1TowerSumEtConeDR04(kMaxPhotons);
   HTValVector<Float_t> hcalDepth2TowerSumEtConeDR04(kMaxPhotons), trkSumPtSolidConeDR04(kMaxPhotons), trkSumPtHollowConeDR04(kMaxPhotons);
   HTValVector<Int_t> nTrkSolidConeDR04(kMaxPhotons), nTrkHollowConeDR04(kMaxPhotons);
-
+  
+  // Comp. Cone R= 0.4   (Average of all comp cones corresponding to that photon )
+  HTValVector<Float_t> compTrackIso(kMaxPhotons), compEcalIso(kMaxPhotons), compHcalIso(kMaxPhotons);
+  
+  
+  
+  
   // Delta R= 0.3
   HTValVector<Float_t> ecalRecHitSumEtConeDR03(kMaxPhotons), hcalTowerSumEtConeDR03(kMaxPhotons), hcalDepth1TowerSumEtConeDR03(kMaxPhotons);
   HTValVector<Float_t> hcalDepth2TowerSumEtConeDR03(kMaxPhotons), trkSumPtSolidConeDR03(kMaxPhotons), trkSumPtHollowConeDR03(kMaxPhotons);
   HTValVector<Int_t> nTrkSolidConeDR03(kMaxPhotons), nTrkHollowConeDR03(kMaxPhotons);
   
+ 
+
   // Heavy Ion Variables
   HTValVector<Float_t> c1(kMaxPhotons), c2(kMaxPhotons),c3(kMaxPhotons),c4(kMaxPhotons),c5(kMaxPhotons);
   HTValVector<Float_t> cc1(kMaxPhotons), cc2(kMaxPhotons),cc3(kMaxPhotons),cc4(kMaxPhotons),cc5(kMaxPhotons);
@@ -241,8 +262,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> t21(kMaxPhotons),t22(kMaxPhotons),t23(kMaxPhotons),t24(kMaxPhotons);
   HTValVector<Float_t> t31(kMaxPhotons),t32(kMaxPhotons),t33(kMaxPhotons),t34(kMaxPhotons);
   HTValVector<Float_t> t41(kMaxPhotons),t42(kMaxPhotons),t43(kMaxPhotons),t44(kMaxPhotons);
+  HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
 
-  
+
+
 
   HTValVector<Float_t> txy(kMaxPhotons), drxy(kMaxPhotons)  ;
   
@@ -274,6 +297,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Int_t>   genMomId(kMaxPhotons);
   HTValVector<Int_t>   genGrandMomId(kMaxPhotons);
   HTValVector<Int_t>   genNSiblings(kMaxPhotons);
+  HTValVector<Int_t>   genMatchedCollId(kMaxPhotons);
   HTValVector<Float_t> genMatchedPt(kMaxPhotons), genMatchedEta(kMaxPhotons), genMatchedPhi(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR03(kMaxPhotons), genTrkIsoDR03(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR04(kMaxPhotons), genTrkIsoDR04(kMaxPhotons);
@@ -285,7 +309,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
       _gammaPtHist ->Fill(phoItr->et());
       _gammaEtaHist->Fill(phoItr->eta());
     }
-
+    
     // Dump photon kinematics and AOD
     Photon photon = Photon(*phoItr);
     // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
@@ -398,7 +422,48 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     ecalIso             (nphotonscounter)   =  photon.ecalIso();
     hcalIso             (nphotonscounter)   =  photon.hcalIso();
 
+    // Compl cones. 
 
+    int nComp = 0;
+    int allcomps = 0;
+    float sumCompEIso=0;
+    float sumCompHIso=0;
+    float sumCompTIso=0;
+    
+    for (reco::PhotonCollection::const_iterator compItr = myCompPhotons.begin(); compItr != myCompPhotons.end(); ++compItr) {
+       allcomps++;
+       if(compItr->pt() < ptMin_ || fabs(compItr->p4().eta()) > etaMax_) continue;
+       
+       //       cout << " et of photon = " << photon.superCluster()->energy() << "        and et of the comp photon = " << compItr->superCluster()->energy() << endl;
+       //  cout << " eta of photon = " << photon.superCluster()->eta() <<   "       and eta of the comp photon = " << compItr->superCluster()->eta() <<endl;
+       
+       
+       if(compItr->superCluster()->energy() != photon.superCluster()->energy() ) continue;
+       
+       
+       nComp++;
+       Photon compPhoton = Photon(*compItr);
+       compPhoton.setVertex(vtx_);
+       sumCompEIso =  sumCompEIso + compItr->ecalRecHitSumEtConeDR04();
+       sumCompHIso =  sumCompHIso + compItr->hcalTowerSumEtConeDR04();
+       sumCompTIso =  sumCompTIso + compItr->trkSumPtHollowConeDR04();
+       
+    }
+    
+    cout << " Number of compl cones = " << nComp << endl;
+    
+    if ( nComp > 0 ) {
+       compTrackIso(nphotonscounter) = sumCompTIso/(double)nComp;
+       compEcalIso (nphotonscounter) = sumCompEIso/(double)nComp;
+       compHcalIso (nphotonscounter) = sumCompHIso/(double)nComp;
+    }
+    else {
+       compTrackIso(nphotonscounter) = -100;
+       compEcalIso (nphotonscounter) = -100;
+       compHcalIso (nphotonscounter) = -100;
+    }
+      
+    
 // Delta R= 0.4
     
     ecalRecHitSumEtConeDR04     (nphotonscounter)   =  photon.ecalRecHitSumEtConeDR04();
@@ -485,6 +550,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     t42                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,2);
     t43                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,3);
     t44                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,4);
+    
+    nAllTracks                  (nphotonscounter)   =  (float)Txy.getNumAllTracks(1);   // pt Cut of the track = 1GeV
+    nLocalTracks                (nphotonscounter)   =  (float)Txy.getNumLocalTracks(photon.superCluster(),0.5,1); // dEta cut = 0.5     and    pt Cut = 1GeV                                                                               
+
 
     
     
@@ -493,17 +562,17 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     hasConversionTracks(nphotonscounter)   =  photon.hasConversionTracks();
     hasPixelSeed       (nphotonscounter)   =  photon.hasPixelSeed();
     
-// IDs
+    // IDs
     try { isLoose(nphotonscounter)=photon.photonID("PhotonCutBasedIDLoose"); } 
     catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
     try { isTight(nphotonscounter)=photon.photonID("PhotonCutBasedIDTight"); } 
     catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
-
+    
     if (photon.conversions().size() > 0) {
-
+      
       isConverted(nphotonscounter)   = kTRUE;
       nTracks(nphotonscounter)       = photon.conversions()[0]->nTracks();
-
+      
       if (nTracks(nphotonscounter) == 2) {
 	convPairInvariantMass(nphotonscounter)      = photon.conversions()[0]->pairInvariantMass(); 
 	convpairCotThetaSeparation(nphotonscounter) = photon.conversions()[0]->pairCotThetaSeparation(); 
@@ -545,26 +614,28 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 							  photon.conversions()[0]->conversionVertex().ndof() );
 
       }
-
+      
       convEoverP(nphotonscounter)                     = photon.conversions()[0]->EoverP(); 
       convzOfPrimaryVertexFromTracks(nphotonscounter) = photon.conversions()[0]->zOfPrimaryVertexFromTracks(); 
       
     }	
-
-
-///////////////////////////////////////////
-//  Build Monte Carlo truth associations //
-///////////////////////////////////////////
+    
+    
+    ///////////////////////////////////////////
+    //  Build Monte Carlo truth associations //
+    ///////////////////////////////////////////
     if (isMCData_) {
-
+      
       edm::Handle<reco::GenParticleCollection> genParticles;
-
+      
       //  get generated particles and store generator ntuple 
       try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
-
+      
       float delta(0.15);
       isGenMatched(nphotonscounter) = kFALSE; genMomId(nphotonscounter) = 0; genGrandMomId(nphotonscounter) = 0; genNSiblings(nphotonscounter) = 0;
       genMatchedPt(nphotonscounter) = -1; genMatchedEta(nphotonscounter) = -1000;   genMatchedPhi(nphotonscounter) = 0;
+      genMatchedCollId(nphotonscounter) = -100;
+      
       genCalIsoDR03(nphotonscounter) = 99999.; genTrkIsoDR03(nphotonscounter) = 99999.;
       genCalIsoDR04(nphotonscounter) = 99999.; genTrkIsoDR04(nphotonscounter) = 99999.;
       const reco::Candidate *cndMc(0);
@@ -573,7 +644,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
       
       for (reco::GenParticleCollection::const_iterator it_gen = 
 	     genParticles->begin(); it_gen!= genParticles->end(); it_gen++){   
-
+	
 	const reco::Candidate &p = (*it_gen);    
 	if (p.status() != 1 || (p.pdgId()) != pdgId_ ) continue;      
 	if(ROOT::Math::VectorUtil::DeltaR(p.p4(),phoItr->p4())<delta && p.pt() > currentMaxPt ) {
@@ -585,20 +656,21 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	    }
 	  }
 	  isGenMatched(nphotonscounter) = kTRUE; cndMc = &p;
+	  genMatchedCollId(nphotonscounter) = it_gen->collisionId();
 	  currentMaxPt = p.pt();
 	  matchedPart  = it_gen;
 	}
       }      
 	
-    	
+      
       // if no matching photon was found try with other particles
       if( ! isGenMatched(nphotonscounter) ) {
-
+	
 	currentMaxPt = -1;
 	for (reco::GenParticleCollection::const_iterator it_gen = 
 	       genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
 	  const reco::Candidate &p = (*it_gen);    
-
+	  
 	  if (p.status() != 1 || find(otherPdgIds_.begin(),otherPdgIds_.end(),fabs(p.pdgId())) == otherPdgIds_.end() ) continue;      	
 	  if(ROOT::Math::VectorUtil::DeltaR(p.p4(),phoItr->p4())<delta && p.pt() > currentMaxPt ) {
 	    genMomId(nphotonscounter) = p.pdgId();	
@@ -632,7 +704,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     nphotonscounter++;
     if (nphotonscounter>kMaxPhotons-1) break;
   }
-
+  
   _nPhotonsHist->Fill(nphotonscounter);
 
   _ntuple->Column(pfx+"nPhotons",     (Int_t) nphotonscounter);
@@ -723,10 +795,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"caloIso",  caloIso,  pfx+"nPhotons");
   _ntuple->Column(pfx+"ecalIso",  ecalIso,  pfx+"nPhotons");
   _ntuple->Column(pfx+"hcalIso",  hcalIso,  pfx+"nPhotons");
-
-
-// Delta R= 0.4
-
+  
+  _ntuple->Column(pfx+"compTrackIso", compTrackIso, pfx+"nPhotons");
+  _ntuple->Column(pfx+"compEcalIso",  compEcalIso,  pfx+"nPhotons");
+  _ntuple->Column(pfx+"compHcalIso",  compHcalIso,  pfx+"nPhotons");
+  
+  // Delta R= 0.4
+  
   _ntuple->Column(pfx+"ecalRecHitSumEtConeDR04",      ecalRecHitSumEtConeDR04,      pfx+"nPhotons");
   _ntuple->Column(pfx+"hcalTowerSumEtConeDR04",       hcalTowerSumEtConeDR04,       pfx+"nPhotons");
   _ntuple->Column(pfx+"hcalDepth1TowerSumEtConeDR04", hcalDepth1TowerSumEtConeDR04, pfx+"nPhotons");
@@ -761,6 +836,18 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"r4",                           r4,                           pfx+"nPhotons");
   _ntuple->Column(pfx+"r5",                           r5,                           pfx+"nPhotons");
 
+  _ntuple->Column(pfx+"cc1",                          cc1,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cc2",                          cc2,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cc3",                          cc3,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cc4",                          cc4,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cc5",                          cc5,                          pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"cr1",                          cr1,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cr2",                          cr2,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cr3",                          cr3,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cr4",                          cr4,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"cr5",                          cr5,                          pfx+"nPhotons");
+
   _ntuple->Column(pfx+"dr11",                         dr11,                         pfx+"nPhotons");
   _ntuple->Column(pfx+"dr12",                         dr12,                         pfx+"nPhotons");
   _ntuple->Column(pfx+"dr13",                         dr13,                         pfx+"nPhotons");
@@ -794,7 +881,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"t42",                         t42,                         pfx+"nPhotons");
   _ntuple->Column(pfx+"t43",                         t43,                         pfx+"nPhotons");
   _ntuple->Column(pfx+"t44",                         t44,                         pfx+"nPhotons");
-  
+  _ntuple->Column(pfx+"nAllTracks",                  nAllTracks,                  pfx+"nPhotons");
+  _ntuple->Column(pfx+"nLocalTracks",                nLocalTracks,                pfx+"nPhotons");
 
   
 
@@ -861,7 +949,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
       _ntuple->Column(pfx+"genMatchedEta",genMatchedEta, pfx+"nPhotons");
       _ntuple->Column(pfx+"genMatchedPhi",genMatchedPhi, pfx+"nPhotons");
     }
+
     _ntuple->Column(pfx+"genMomId",          genMomId,           pfx+"nPhotons");
+    _ntuple->Column(pfx+"genMatchedCollId",  genMatchedCollId,   pfx+"nPhotons");
     _ntuple->Column(pfx+"genGrandMomId",     genGrandMomId,      pfx+"nPhotons");
     _ntuple->Column(pfx+"genNSiblings",      genNSiblings,       pfx+"nPhotons");    
     _ntuple->Column(pfx+"genCalIsoDR03",     genCalIsoDR03,      pfx+"nPhotons");

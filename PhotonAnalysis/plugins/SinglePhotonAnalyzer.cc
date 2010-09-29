@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.46 2010/04/23 12:46:51 musella Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.5 2010/08/18 16:59:34 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -141,6 +141,8 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
 
   genParticleProducer_             = ps.getParameter<InputTag>("GenParticleProducer");
   photonProducer_                  = ps.getParameter<InputTag>("PhotonProducer"); 
+  compPhotonProducer_              = ps.getParameter<InputTag>("compPhotonProducer");
+  
   trackProducer_                   = ps.getParameter<InputTag>("TrackProducer");
   jetProducer_                     = ps.getParameter<InputTag>("JetProducer");
   metProducer_                     = ps.getParameter<InputTag>("METProducer");
@@ -158,9 +160,10 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   ho_                              = ps.getParameter<edm::InputTag>("ho");
 
 
-
-
-  ptMin_                           = ps.getUntrackedParameter<double>("GammaPtMin", 20);
+  // for July exercise
+  isMC_                        = ps.getUntrackedParameter<bool>("isMC_",false); 
+  
+  ptMin_                           = ps.getUntrackedParameter<double>("GammaPtMin", 10);
   etaMax_                          = ps.getUntrackedParameter<double>("GammaEtaMax",3);
   ecalBarrelMaxEta_                = ps.getUntrackedParameter<double>("EcalBarrelMaxEta",1.45);
   ecalEndcapMinEta_                = ps.getUntrackedParameter<double>("EcalEndcapMinEta",1.55);
@@ -179,13 +182,16 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   doStoreVertex_                   = ps.getUntrackedParameter<bool>("doStoreVertex",true);
   doStoreMET_                      = ps.getUntrackedParameter<bool>("doStoreMET",true);
   doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",true);
-
+  doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",true);
+  
   
   // book ntuples; columns are defined dynamically later
   tplmgr = new HTupleManager(outputFile_.c_str(),"RECREATE");
 
   tplmgr->SetDir("1D-Spectra");
   _ptHist    = tplmgr->MomentumHistogram("GenPt"  ,"p_{T} MC photon (GeV/c);p_{T} (GeV/c)",100,0,50);
+  _ptHatHist = tplmgr->MomentumHistogram("GenPtHat"  ,"p_{T} Hat MC Events (GeV/c);p_{T} (GeV/c)",500,0,500);
+  
   _etaHist   = tplmgr->MomentumHistogram("GenEta" ,"#eta MC photon;#eta"  ,100,-3,3);
   _vtxX      = tplmgr->MomentumHistogram("GenVtxX","Generated Vertex X"   ,100, 0.01,0.06);
   _vtxY      = tplmgr->MomentumHistogram("GenVtxY","Generated Vertex Y"   ,100,-0.02,0.02);
@@ -288,14 +294,14 @@ void SinglePhotonAnalyzer::storeGeneral(const edm::Event& e, const edm::EventSet
 	 _ntupleMC->Column("event",(Int_t)e.id().event());
 	 
 	 // centrality
-	 if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+	 cbins_ = getCentralityBinsFromDB(iSetup);
 	 
 	 edm::Handle<reco::Centrality> cent;
 	 e.getByLabel(edm::InputTag("hiCentrality"),cent);
 	 
-	 double hf = cent->EtHFhitSum();
+	 double hf = (double)cent->EtHFhitSum();
 
-	 _ntuple->Column("hf",hf);
+	 _ntuple->Column("hf",(double)cent->EtHFhitSum());
 	 _ntuple->Column("hftp",(double)cent->EtHFtowerSumPlus());
 	 _ntuple->Column("hftm",(double)cent->EtHFtowerSumMinus());
 	 _ntuple->Column("eb",(double)cent->EtEBSum());
@@ -528,23 +534,23 @@ void SinglePhotonAnalyzer::storeHF(const edm::Event& e){
 }	
 
 bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
-	/////////////////////////////////////////////////////////
-	// Generator Section: Analyzing Monte Carlo Truth Info //                                  
-	/////////////////////////////////////////////////////////
-	
-	Handle<HepMCProduct> evtMC;
-	e.getByLabel("generator",evtMC);
-	if (evtMC.isValid())  isMCData_=kTRUE;
-	
-	// get hold of generated particles from MC thuth 
+  /////////////////////////////////////////////////////////
+  // Generator Section: Analyzing Monte Carlo Truth Info //                                  
+  /////////////////////////////////////////////////////////
+  
+  Handle<HepMCProduct> evtMC;
+  e.getByLabel("generator",evtMC);
+  if (evtMC.isValid())  isMCData_=kTRUE;
+  
+  // get hold of generated particles from MC thuth 
   edm::Handle<reco::GenParticleCollection> genParticles;
-	
+  
   if (isMCData_) {
-		// get simulated vertex and store in ntuple
-    Float_t simVertexX(0), simVertexY(0), simVertexZ(0);
-    if(evtMC->GetEvent()->signal_process_vertex() != NULL) {
-      simVertexX = evtMC->GetEvent()->signal_process_vertex()->position().x();
-      simVertexY = evtMC->GetEvent()->signal_process_vertex()->position().y();
+     // get simulated vertex and store in ntuple
+     Float_t simVertexX(0), simVertexY(0), simVertexZ(0);
+     if(evtMC->GetEvent()->signal_process_vertex() != NULL) {
+	simVertexX = evtMC->GetEvent()->signal_process_vertex()->position().x();
+	simVertexY = evtMC->GetEvent()->signal_process_vertex()->position().y();
       simVertexZ = evtMC->GetEvent()->signal_process_vertex()->position().z();
       _vtxX->Fill(simVertexX);
       _vtxY->Fill(simVertexY);
@@ -559,26 +565,35 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       _ntuple->Column("simVertexZ", simVertexZ);     
     }
 		
-    // get pthat value and store in ntuple
+    // get pthat value and store in ntuple                                                                                 
     edm::Handle<GenEventInfoProduct>    genEventScale;
-    e.getByLabel("generator", genEventScale);
+    e.getByLabel("hiSignal", genEventScale);   // hi style                                                                 
     Float_t  pthat(0);
-    if( genEventScale->hasBinningValues() ) {
-      pthat = genEventScale->binningValues()[0];
-    }
+    pthat = genEventScale->qScale();
+    _ptHatHist->Fill(pthat);
+
+    //    if( genEventScale->hasBinningValues() ) {                                                                       
+    //   pthat = genEventScale->binningValues()[0];                                                                    
+    //  } 
     _ntuple->Column("ptHat", pthat);
-		
+    
 		
     //  get generated particles and store generator ntuple 
     try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
     int count(0);
     int mothId(0), grandMothId(0), nSiblings(0);
     Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
- 
+    
+    
+    // centrality                                                                                                                                 
+    edm::Handle<reco::Centrality> cent;
+    e.getByLabel(edm::InputTag("hiCentrality"),cent);
+    
+    
     for (reco::GenParticleCollection::const_iterator it_gen = 
 	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
- 
-      const reco::Candidate &p = (*it_gen);    
+       
+       const reco::GenParticle &p = (*it_gen);    
       if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
       
       count++;
@@ -600,6 +615,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       }
 
       _ntupleMC->Column("ptHat",    pthat);
+      _ntupleMC->Column("collId",   p.collisionId());
       _ntupleMC->Column("pt",       p.pt());
       _ntupleMC->Column("eta",      p.eta());
       _ntupleMC->Column("phi",      p.phi());
@@ -608,6 +624,22 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       _ntupleMC->Column("nSiblings", nSiblings);
       _ntupleMC->Column("counts",   count); 
 
+      double theHf = cent->EtHFhitSum();
+      _ntupleMC->Column("hf",theHf);
+      _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
+      _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
+      _ntupleMC->Column("eb",(double)cent->EtEBSum());
+      _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
+      _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
+      _ntupleMC->Column("cBin",(int)cbins_->getBin(theHf));
+      _ntupleMC->Column("nbins",(int)cbins_->getNbins());
+      _ntupleMC->Column("binsize",(int)(100/cbins_->getNbins() ));
+      _ntupleMC->Column("npart",(double)cbins_->NpartMean(theHf));
+      _ntupleMC->Column("npartSigma",(double)cbins_->NpartSigma(theHf));
+      _ntupleMC->Column("ncoll",(double)cbins_->NcollMean(theHf));
+      _ntupleMC->Column("ncollSigma",(double)cbins_->NcollSigma(theHf));
+
+      
       // calculate isolation at the generator level
       _ntupleMC->Column("calIsoDR03", genCalIsoDR03);
       _ntupleMC->Column("trkIsoDR03", genTrkIsoDR03);
@@ -1193,7 +1225,7 @@ bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon
   
   if (isMCData_) {
     float delta(0.15);
-    Int_t momId(0), grandMomId(0), nSiblings(0);
+    Int_t momId(0), grandMomId(0), nSiblings(0), genMatchedCollId(-100);
     Bool_t isGenMatched(kFALSE);
     Float_t genMatchedPt(-1), genMatchedEta(-1000), genMatchedPhi(0);
     Float_t currentMaxPt(-1);
@@ -1222,6 +1254,7 @@ bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon
 	isGenMatched  = kTRUE; cndMc = &p;
 	currentMaxPt  = p.pt();
 	matchedPart   = it_gen;
+	genMatchedCollId = it_gen->collisionId();
       }
     } // end of loop over gen particles
 
@@ -1267,18 +1300,18 @@ bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon
       _ntuple->Column(prx+"genMatchedEta",genMatchedEta);
       _ntuple->Column(prx+"genMatchedPhi",genMatchedPhi);
     }
+    _ntuple->Column(prx+"genCollId",     genMatchedCollId);
     _ntuple->Column(prx+"motherID",     momId);
     _ntuple->Column(prx+"grandMotherID",     grandMomId);
     _ntuple->Column(prx+"nSiblings",     nSiblings);
-
     // calculate isolation at the generator level
     _ntuple->Column(prx+"genCalIsoDR03", genCalIsoDR03);
     _ntuple->Column(prx+"genTrkIsoDR03", genTrkIsoDR03);
-
+    
     _ntuple->Column(prx+"genCalIsoDR04", genCalIsoDR04);
     _ntuple->Column(prx+"genTrkIsoDR04", genTrkIsoDR04);
-
-
+    
+    
   }
   
   return (isMCData_);

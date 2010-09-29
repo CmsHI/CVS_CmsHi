@@ -20,7 +20,7 @@
  * \author Pasquale Musella,    LIP, PT
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
- * \version $Id: MultiPhotonAnalyzer.h,v 1.2 2010/03/29 22:25:39 adebened Exp $
+ * \version $Id: MultiPhotonAnalyzer.h,v 1.3 2010/08/18 16:59:47 kimy Exp $
  *
  */
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -31,21 +31,23 @@
 #include "QCDPhotonAnalysis/DataAnalyzers/plugins/SinglePhotonAnalyzer.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
+
 class MultiPhotonAnalyzer : public SinglePhotonAnalyzer { 
 
 public:
-
-	explicit MultiPhotonAnalyzer(const edm::ParameterSet&);
-  ~MultiPhotonAnalyzer();
-
-protected:
-
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);	
-  virtual int selectStorePhotons(const edm::Event&,const edm::EventSetup&,const char* pfx="");
-  virtual int storePhotons(const edm::Event&,const edm::EventSetup&  ,pat::PhotonCollection & ,const char* pfx="");
-
-  const int kMaxPhotons;
-
+   
+   explicit MultiPhotonAnalyzer(const edm::ParameterSet&);
+   ~MultiPhotonAnalyzer();
+   
+ protected:
+   
+   virtual void analyze(const edm::Event&, const edm::EventSetup&);	
+   virtual int selectStorePhotons(const edm::Event&,const edm::EventSetup&,const char* pfx="");
+   virtual int storePhotons(const edm::Event&,const edm::EventSetup&  ,pat::PhotonCollection &, reco::PhotonCollection &,const char* pfx="");
+   
+   const int kMaxPhotons;
+   
 };
 
 #endif

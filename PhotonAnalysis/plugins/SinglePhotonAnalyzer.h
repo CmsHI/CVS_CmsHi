@@ -101,12 +101,18 @@ protected:
   edm::InputTag vertexProducer_;      // vertecies producer
   edm::InputTag beamSpotProducer_;    // beam spot producer
 	
+  edm::InputTag compPhotonProducer_;      // photon producer                                                                                                          
+  
   edm::InputTag ebReducedRecHitCollection_;
   edm::InputTag eeReducedRecHitCollection_;
   edm::InputTag srcTowers_;           // CaloTowers
 	
   edm::TriggerNames triggerNames_;    // TriggerNames class
 	
+
+  // HepMC switch for HI July Exercise.
+  bool         isMC_; 
+  
   // basiccluster inputtags for heavy ion
   edm::InputTag basicClusterBarrel_;
   edm::InputTag basicClusterEndcap_;
@@ -129,6 +135,7 @@ protected:
   
   // Leading photon  MC truth histograms
   HHistogram     *_ptHist;       // leading photon pt histo
+  HHistogram     *_ptHatHist;       // leading photon pt histo                                                                    
   HHistogram     *_etaHist;      // leading photon eta histo
   HHistogram     *_vtxX;         // generated vertex X
   HHistogram     *_vtxY;         // generated vertex Y
@@ -154,6 +161,8 @@ protected:
   bool	doStoreVertex_;		 // Store Vertex
   bool 	doStoreMET_; 		 // Store MET
   bool 	doStoreJets_;		 // Store Jets
+
+  bool  doStoreCompCone_;
 
   HTuple         *_ntuple;        // Analysis ntuple
   HTuple         *_ntupleMC;      // MC truth ntuple
