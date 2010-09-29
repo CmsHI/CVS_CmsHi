@@ -1,5 +1,5 @@
 
-/** \class SinglePhotonAnalyzer  QCDPhotonAnalysis/DataAnalyzers/plugins/SinglePhotonAnalyzer.cc
+/** \class SinglePhotonAnalyzer  CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.cc
  *
  * Description: 
  * Analysis code of the QCD Photons group;
@@ -23,12 +23,12 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.5 2010/08/18 16:59:34 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.3 2010/09/29 11:27:03 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
 
-#include "QCDPhotonAnalysis/DataAnalyzers/plugins/SinglePhotonAnalyzer.h"
+#include "CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.h"
 
 #include <memory>
 #include <iostream>

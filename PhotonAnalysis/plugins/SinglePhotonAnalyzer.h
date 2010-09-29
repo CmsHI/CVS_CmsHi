@@ -1,5 +1,5 @@
-#ifndef QCDPhotonAnalysis_DataAnalyzers_SinglePhotonAnalyzer_h
-#define QCDPhotonAnalysis_DataAnalyzers_SinglePhotonAnalyzer_h
+#ifndef CmsHi_PhotonAnalysis_SinglePhotonAnalyzer_h
+#define CmsHi_PhotonAnalysis_SinglePhotonAnalyzer_h
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -12,7 +12,7 @@
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 
-#include "QCDPhotonAnalysis/DataAnalyzers/plugins/Limits.h"
+#include "CmsHi/PhotonAnalysis/plugins/Limits.h"
 #if MPA_VERSION < 2
 #include "RecoEgamma/EgammaTools/interface/ConversionLikelihoodCalculator.h"
 #endif

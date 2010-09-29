@@ -1,4 +1,4 @@
-/** \class MultiPhotonAnalyzer MultiPhotonAnalyzer.cc QCDPhotonAnalysis/DataAnalyzers/plugin/MultiPhotonAnalyzer.cc
+/** \class MultiPhotonAnalyzer MultiPhotonAnalyzer.cc CmsHi/PhotonAnalysis/plugin/MultiPhotonAnalyzer.cc
  *
  * Description: 
  * Analysis code of the QCD Photons group;
@@ -21,7 +21,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.4 2010/08/18 16:59:48 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.2 2010/09/29 11:27:02 yjlee Exp $
  *
  */
 
@@ -91,7 +91,7 @@
 #include <TLorentzVector.h>
 
 //Include the Single Photon Analyzer
-#include "QCDPhotonAnalysis/DataAnalyzers/plugins/MultiPhotonAnalyzer.h"
+#include "CmsHi/PhotonAnalysis/plugins/MultiPhotonAnalyzer.h"
 
 //Include Heavy Ion isolation variable calculator
 #include "RecoHI/HiEgammaAlgos/interface/CxCalculator.h"

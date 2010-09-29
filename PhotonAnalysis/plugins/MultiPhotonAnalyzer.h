@@ -1,4 +1,4 @@
-/** QCDPhotonAnalysis/DataAnalyzers/plugin/MultiPhotonAnalyzer.h
+/** CmsHi/PhotonAnalysis/plugin/MultiPhotonAnalyzer.h
  *
  * Description: 
  * Analysis code of the QCD Photons group;
@@ -20,15 +20,15 @@
  * \author Pasquale Musella,    LIP, PT
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
- * \version $Id: MultiPhotonAnalyzer.h,v 1.3 2010/08/18 16:59:47 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.h,v 1.2 2010/09/29 11:27:03 yjlee Exp $
  *
  */
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
 
-#ifndef QCDPhotonAnalysis_DataAnalyzers_MultiPhotonAnalyzer_h
-#define QCDPhotonAnalysis_DataAnalyzers_MultiPhotonAnalyzer_h
+#ifndef CmsHi_PhotonAnalysis_MultiPhotonAnalyzer_h
+#define CmsHi_PhotonAnalysis_MultiPhotonAnalyzer_h
 
-#include "QCDPhotonAnalysis/DataAnalyzers/plugins/SinglePhotonAnalyzer.h"
+#include "CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
