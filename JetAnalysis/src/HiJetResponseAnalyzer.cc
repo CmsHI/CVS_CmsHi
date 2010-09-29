@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.3 2010/09/10 14:47:48 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.4 2010/09/28 16:02:52 yilmaz Exp $
 //
 //
 
@@ -86,14 +86,21 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
       virtual void beginJob() ;
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
+   bool selectJet(int i);
 
       // ----------member data ---------------------------
 
    bool usePat_;
    bool doMC_;
+   bool filterJets_;
+   bool diJetsOnly_;
+   bool matchDiJets_;
 
-   double genJetPtMin_;
-
+   double genPtMin_;
+   double ptMin_;
+   double emfMin_;
+   double n90Min_;
+   double n90hitMin_;
 
    edm::InputTag jetTag_;
 
@@ -104,12 +111,38 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
    edm::Handle<reco::Centrality> cent;
 
    edm::Handle<reco::JetView> jets;
-   //   edm::Handle<pat::JetCollection> jets;
-
+   edm::Handle<pat::JetCollection> patjets;
 
    edm::Service<TFileService> fs;
 
 };
+
+bool HiJetResponseAnalyzer::selectJet(int i){
+   
+   const reco::Jet& jet = (*jets)[i];
+   
+   if(usePat_){
+      //      cout<<"a"<<endl;
+      const pat::Jet& patjet = (*patjets)[i];
+      //      cout<<"b"<<endl;
+      
+      if(patjet.emEnergyFraction() <= emfMin_) return false;
+      //      cout<<"c"<<endl;
+
+      if(patjet.jetID().n90Hits <= n90hitMin_) return false;
+      //      cout<<"d"<<endl;
+
+      if(doMC_){
+	 
+      }
+
+   }
+
+   return true;
+
+}
+
+
 
 //
 // constants, enums and typedefs
@@ -126,11 +159,18 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
 
 {
    //now do what ever initialization is needed
-   genJetPtMin_ = 0;
 
+   ptMin_ = iConfig.getUntrackedParameter<double>("ptMin",0);
+   genPtMin_ = iConfig.getUntrackedParameter<double>("genPtMin",0);
+   emfMin_ = iConfig.getUntrackedParameter<double>("emfMin",0);
+   n90Min_ = iConfig.getUntrackedParameter<double>("n90Min",0);
+   n90hitMin_ = iConfig.getUntrackedParameter<double>("n90hitMin",0);
+
+   filterJets_ = iConfig.getUntrackedParameter<bool>("filterJets",true);
+   diJetsOnly_ = iConfig.getUntrackedParameter<bool>("diJetsOnly",true);
+   matchDiJets_ = iConfig.getUntrackedParameter<bool>("usePat",true);
    usePat_ = iConfig.getUntrackedParameter<bool>("usePat",true);
    doMC_ = iConfig.getUntrackedParameter<bool>("doMC",true);
-
    jetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("src",edm::InputTag("selectedPatJets"));
 
 }
@@ -156,15 +196,16 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    using namespace edm;
 
    iEvent.getByLabel(jetTag_,jets);
-
-   edm::Handle<pat::JetCollection> patjets;
    if(usePat_)iEvent.getByLabel(jetTag_,patjets);
 
    jra_.nref = 0;
    for(unsigned int j = 0 ; j < jets->size(); ++j){
       
       //      const pat::Jet& jet = (*jets)[j];
-      const reco::Jet jet = (*jets)[j];      
+      if(filterJets_ && !selectJet(j)) continue;
+
+      const reco::Jet& jet = (*jets)[j];      
+
       jra_.jtpt[jra_.nref] = jet.pt();
       jra_.jteta[jra_.nref] = jet.eta();
       jra_.jtphi[jra_.nref] = jet.phi();
@@ -177,7 +218,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
          jra_.jtcorpt[jra_.nref] = patjet.pt();
 	 
 	 if(doMC_ && patjet.genJet() != 0){	    
-	    //	    if(jet.genJet()->pt() < genJetPtMin_) continue;
+	    if(patjet.genJet()->pt() < genPtMin_) continue;
 	    jra_.refpt[jra_.nref] = patjet.genJet()->pt();
 	    jra_.refeta[jra_.nref] = patjet.genJet()->eta();
 	    jra_.refphi[jra_.nref] = patjet.genJet()->phi();
