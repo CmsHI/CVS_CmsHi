@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.3 2010/09/29 11:27:03 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.4 2010/09/29 15:51:01 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -140,6 +140,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   triggerPathsToStore_             = ps.getParameter<vector<string> >("TriggerPathsToStore");
 
   genParticleProducer_             = ps.getParameter<InputTag>("GenParticleProducer");
+  genEventScale_                   = ps.getParameter<InputTag>("GenEventScale");
   photonProducer_                  = ps.getParameter<InputTag>("PhotonProducer"); 
   compPhotonProducer_              = ps.getParameter<InputTag>("compPhotonProducer");
   
@@ -539,7 +540,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
   /////////////////////////////////////////////////////////
   
   Handle<HepMCProduct> evtMC;
-  e.getByLabel("generator",evtMC);
+  e.getByLabel(genParticleProducer_,evtMC);
   if (evtMC.isValid())  isMCData_=kTRUE;
   
   // get hold of generated particles from MC thuth 
@@ -567,7 +568,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
 		
     // get pthat value and store in ntuple                                                                                 
     edm::Handle<GenEventInfoProduct>    genEventScale;
-    e.getByLabel("hiSignal", genEventScale);   // hi style                                                                 
+    e.getByLabel(genEventScale_, genEventScale);   // hi style                                                                 
     Float_t  pthat(0);
     pthat = genEventScale->qScale();
     _ptHatHist->Fill(pthat);
@@ -589,10 +590,8 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     edm::Handle<reco::Centrality> cent;
     e.getByLabel(edm::InputTag("hiCentrality"),cent);
     
-    
     for (reco::GenParticleCollection::const_iterator it_gen = 
 	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
-       
        const reco::GenParticle &p = (*it_gen);    
       if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
       

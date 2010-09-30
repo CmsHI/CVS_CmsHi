@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.3 2010/09/29 15:51:01 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.4 2010/09/30 12:57:34 yjlee Exp $
  *
  */
 
@@ -120,13 +120,21 @@ MultiPhotonAnalyzer::~MultiPhotonAnalyzer(){
 void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
    
    if (doStoreGeneral_) 	storeGeneral(e, iSetup);
+	cout <<1<<endl;
 	if (doStoreL1Trigger_) 	storeL1Trigger(e);
+	cout <<2<<endl;
 	if (doStoreHLT_) 	storeHLT(e);
+	cout <<3<<endl;
 	if (doStoreHF_)		storeHF(e);
+	cout <<4<<endl;
 	analyzeMC(e);
+	cout <<5<<endl;
 	if (doStoreVertex_)	storeVertex(e);
+	cout <<6<<endl;
 	if (doStoreMET_)	storeMET(e);
+	cout <<7<<endl;
 	if (doStoreJets_)	storeJets(e);
+	cout <<8<<endl;
        
 	bool foundPhotons = selectStorePhotons(e,iSetup,"");
 	
@@ -151,25 +159,29 @@ int MultiPhotonAnalyzer::selectStorePhotons(const edm::Event& e,const edm::Event
    Handle<pat::PhotonCollection> photons;
   e.getByLabel(photonProducer_, photons);   
 
-  // Sort photons according to pt
   pat::PhotonCollection myphotons;
   for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr != photons->end(); ++phoItr) {  
     myphotons.push_back(*phoItr);
   }
   
-  Handle<reco::PhotonCollection> compPhotons;
-  e.getByLabel(compPhotonProducer_, compPhotons);
-
-  // Sort comp photons according to pt                                                                                                            
   reco::PhotonCollection myCompPhotons;
-  for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr) {
-     myCompPhotons.push_back(*phoItr);
+
+  if (doStoreCompCone_) {
+
+     Handle<reco::PhotonCollection> compPhotons;
+     e.getByLabel(compPhotonProducer_, compPhotons);
+
+     for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr) {
+        myCompPhotons.push_back(*phoItr);
+     }
   }
-  
 
 
   GreaterByPt<Photon> pTComparator_;
+
+  // Sort photons according to pt
   std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
+  std::sort(myCompPhotons.begin(), myCompPhotons.end(), pTComparator_);
   
   
   return storePhotons(e,iSetup,myphotons,myCompPhotons, prefx);
