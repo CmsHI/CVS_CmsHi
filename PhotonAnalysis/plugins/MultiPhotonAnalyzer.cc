@@ -17,11 +17,12 @@
  * \author Vasundhara Chetluru, FNAL, US
  * \author Vladimir Litvin,     Caltech, US
  * \author Yen-Jie Lee,         MIT, US
+ * \author Yongsun Kim,         MIT, US
  * \author Pasquale Musella,    LIP, PT
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.2 2010/09/29 11:27:02 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.3 2010/09/29 15:51:01 yjlee Exp $
  *
  */
 
@@ -77,7 +78,7 @@
 #include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 #include "CommonTools/Utils/interface/PtComparator.h"
-//#include "RecoEgamma/EgammaTools/interface/ConversionLikelihoodCalculator.h"
+
 #include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
 
@@ -238,9 +239,6 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   // Comp. Cone R= 0.4   (Average of all comp cones corresponding to that photon )
   HTValVector<Float_t> compTrackIso(kMaxPhotons), compEcalIso(kMaxPhotons), compHcalIso(kMaxPhotons);
-  
-  
-  
   
   // Delta R= 0.3
   HTValVector<Float_t> ecalRecHitSumEtConeDR03(kMaxPhotons), hcalTowerSumEtConeDR03(kMaxPhotons), hcalDepth1TowerSumEtConeDR03(kMaxPhotons);
