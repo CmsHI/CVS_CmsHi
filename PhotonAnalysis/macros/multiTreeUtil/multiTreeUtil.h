@@ -71,8 +71,8 @@ void multiTreeUtil::addFile(char *filename, char *treeName, TCut cut, Float_t sc
 void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut)
 {
 
-   cleanHist(h);
-
+   h->Reset();
+   
    for (int i=0;i<trees_.size();i++)
    {
       TH1D *htmp = (TH1D*)h->Clone();
@@ -94,8 +94,8 @@ void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut)
 {
    TH1D *hComponent[100];
 
-   cleanHist(h);
-
+   h->Reset();
+   
    for (int i=0;i<trees_.size();i++)
    {
       char *hName = Form("%s_Draw_%d",h->GetName(),i);
