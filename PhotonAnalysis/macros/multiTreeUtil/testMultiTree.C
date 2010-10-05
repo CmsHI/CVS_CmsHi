@@ -16,9 +16,9 @@ void testMultiTree()
 
    // Draw r9
    TCanvas *c2 = new TCanvas("c2","",600,600);
-   TH1D *h2 = new TH1D("h2","",100,0,1.5);
-   myTrees.Draw2(h2,"r9[0]","");
-   h2->SetXTitle("r9");
+   TH1D *h2 = new TH1D("h2","",100,0,0.02);
+   myTrees.Draw2(h2,"sigmaIetaIeta[0]","abs(eta[0])<1.479");
+   h2->SetXTitle("#sigma_{i#eta i#eta}");
 
    // Draw ptHat
    TCanvas *c3 = new TCanvas("c3","",600,600);
@@ -27,4 +27,10 @@ void testMultiTree()
    myTrees.Draw(h3,"ptHat","");
    h3->SetXTitle("#hat{p_{T}} (GeV/c)");
 
+   // Print the first tree
+   myTrees.Print();
+
+   // Get the first tree and draw something
+   TCanvas *c4 = new TCanvas("c4","",600,600);
+   myTrees.getTree(0)->Draw("et");
 }

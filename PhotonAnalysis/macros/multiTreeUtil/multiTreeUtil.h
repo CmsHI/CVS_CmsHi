@@ -29,9 +29,10 @@ class multiTreeUtil
       
       }
       void addFile(char *filename, char *treeName, TCut cut, Float_t scaleFactor);
-      void Draw(TH1D* h,char* expression,char* cut);
-      void Draw2(TH1D* h,char* expression,char* cut);
-      void Project(TH1D *){};
+      void Draw(TH1D* h,char* expression,char* cut = "");
+      void Draw2(TH1D* h,char* expression,char* cut = "");
+      void Print(Option_t* option = "");
+      TTree *getTree(int i) { return trees_[i]; };
       
    private:
       int nTrees;
@@ -41,9 +42,14 @@ class multiTreeUtil
       vector<TCut>    tcuts_;
       vector<Float_t> scaleFactors_;
       int color[100];
+
+      void cleanHist(TH1* h);
+
 };
 
+// =========================================================================
 // Add file
+// =========================================================================
 void multiTreeUtil::addFile(char *filename, char *treeName, TCut cut, Float_t scaleFactor)
 {
    TFile *f = new TFile(filename);
@@ -59,14 +65,19 @@ void multiTreeUtil::addFile(char *filename, char *treeName, TCut cut, Float_t sc
    }
 }
 
+// =========================================================================
 // Draw
+// =========================================================================
 void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut)
 {
+
+   cleanHist(h);
+
    for (int i=0;i<trees_.size();i++)
    {
       TH1D *htmp = (TH1D*)h->Clone();
-      htmp->SetName("my_htmp");
-      trees_[i]->Draw(Form("%s>>my_htmp",expression),cut&&tcuts_[i]);
+      htmp->SetName(Form("my_htmp_%d",i));
+      trees_[i]->Draw(Form("%s>>my_htmp_%d",expression,i),cut&&tcuts_[i]);
       htmp->Sumw2();
       htmp->Scale(scaleFactors_[i]);
       h->Add(htmp);
@@ -76,10 +87,15 @@ void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut)
    h->Draw();
 }
 
-// Draw
+// =========================================================================
+// Draw components
+// =========================================================================
 void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut)
 {
    TH1D *hComponent[100];
+
+   cleanHist(h);
+
    for (int i=0;i<trees_.size();i++)
    {
       char *hName = Form("%s_Draw_%d",h->GetName(),i);
@@ -98,5 +114,26 @@ void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut)
    {
       hComponent[i]->SetLineColor(color[i]);
       hComponent[i]->Draw("hist same");
+   }
+}
+
+// =========================================================================
+// Print variables from the first tree
+// =========================================================================
+void multiTreeUtil::Print(Option_t* option)
+{
+   trees_[0]->Print(option);   
+}
+
+//--------------------------------PRIVATE-----------------------------------
+
+// =========================================================================
+// Clear
+// =========================================================================
+void multiTreeUtil::cleanHist(TH1* h)
+{
+   for (int i=0;i<=h->GetNbinsX()+1;i++) {
+      h->SetBinContent(i,0);
+      h->SetBinError(i,0);
    }
 }
