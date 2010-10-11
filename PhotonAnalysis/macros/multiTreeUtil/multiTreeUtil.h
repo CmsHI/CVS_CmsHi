@@ -24,17 +24,37 @@ class multiTreeUtil
 	 color[3]=6;
 	 color[4]=7;
 	 color[5]=kGreen+4;
+	 color[6]=kBlue-2;
+         color[7]=kAzure+3;
+         color[8]=kOrange+3;
+	 color[9]=kSpring-7;
+	 color[10]=kPink+4;
+
+	 /*
+	   handsomeTH1(tmp1[1],2);
+	   handsomeTH1(tmp1[2],4);
+	   handsomeTH1(tmp1[3],kGreen+2);
+	   handsomeTH1(tmp1[4],6);
+	   handsomeTH1(tmp1[5],7);
+	   handsomeTH1(tmp1[6],kGreen+4);
+	   handsomeTH1(tmp1[7],kBlue-2);
+	   handsomeTH1(tmp1[8],kAzure+3);
+	   handsomeTH1(tmp1[9],kOrange+3);
+	   handsomeTH1(tmp1[10],kSpring-7);
+	   handsomeTH1(tmp1[11],kPink+4);
+	 */
+	 
       }
       ~multiTreeUtil() {
-      
+	 
       }
       void addFile(char *filename, char *treeName, TCut cut, Float_t scaleFactor);
-      void Draw(TH1D* h,char* expression,char* cut = "");
-      void Draw2(TH1D* h,char* expression,char* cut = "");
+      void Draw(TH1D* h,char* expression,char* cut = "" , char * opt="");
+      void Draw2(TH1D* h,char* expression,char* cut = "", char * opt="");
       void Print(Option_t* option = "");
       TTree *getTree(int i) { return trees_[i]; };
       
-   private:
+ private:
       int nTrees;
       vector<TFile*>  tfiles_;                // TFile 
       vector<TTree*>  trees_;                 // Trees
@@ -68,7 +88,7 @@ void multiTreeUtil::addFile(char *filename, char *treeName, TCut cut, Float_t sc
 // =========================================================================
 // Draw
 // =========================================================================
-void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut)
+void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut, char *opt)
 {
 
    h->Reset();
@@ -84,20 +104,20 @@ void multiTreeUtil::Draw(TH1D *h, char *expression, char *cut)
       delete htmp;
    }
    
-   h->Draw();
+   h->Draw(opt);
 }
 
 // =========================================================================
 // Draw components
 // =========================================================================
-void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut)
+void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut, char *opt)
 {
    TH1D *hComponent[100];
-
+   
    h->Reset();
    
    for (int i=0;i<trees_.size();i++)
-   {
+      {
       char *hName = Form("%s_Draw_%d",h->GetName(),i);
       TH1D *htmp= (TH1D*)h->Clone();
       htmp->SetName(hName);
@@ -106,15 +126,16 @@ void multiTreeUtil::Draw2(TH1D *h, char *expression, char *cut)
       htmp->Scale(scaleFactors_[i]);
       h->Add(htmp);
       hComponent[i]=htmp;
-   }
+      }
    
-   h->Draw("hist");
-
+   h->Draw(opt);
+   
    for (int i=0;i<trees_.size();i++)
-   {
-      hComponent[i]->SetLineColor(color[i]);
-      hComponent[i]->Draw("hist same");
-   }
+      {
+	 hComponent[i]->SetLineColor(color[i]);
+         hComponent[i]->SetMarkerColor(color[i]);
+	 hComponent[i]->Draw(Form("%s same",opt));
+      }
 }
 
 // =========================================================================
