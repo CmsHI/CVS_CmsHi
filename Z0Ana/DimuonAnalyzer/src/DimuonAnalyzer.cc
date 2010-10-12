@@ -11,7 +11,7 @@
 //
 // Original Author:  Camelia Mironov,40 1-A32,+41227679747,
 //         Created:  Sun Feb  7 15:25:05 CET 2010
-// $Id: DimuonAnalyzer.cc,v 1.1 2010/08/02 13:57:58 miheejo Exp $
+// $Id: DimuonAnalyzer.cc,v 1.2 2010/08/02 15:55:03 miheejo Exp $
 //
 //
 
@@ -184,6 +184,7 @@ private:
   
   TNtuple                      *pnEventInfo;          //RECO event informations
   TNtuple                      *pnDimuRecoInfo;       //RECO dimuon
+  TNtuple                      *pnSinglemuRecoInfo;    //RECO single muon
   TNtuple                      *pnSTAmuInfo;          //RECO STA muon
   TNtuple                      *pnGLBmuInfo;          //RECO GLB muon
   TNtuple                      *pnDimuSimInfo;        //SIM dimuon
@@ -358,6 +359,7 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
           }
       }// end of reco::Muon loop
       nTMuTrk->Fill(nTMu);nGLB->Fill(ngMu);nSTA->Fill(nsMu);nOTH->Fill(noMu);
+      pnSinglemuRecoInfo->Fill(nTMu,ngMu,nsMu,noMu);
     }//end of doSingMu
 
     //------ Get muon track's closest vertex distance (dxy, dz)
@@ -797,6 +799,7 @@ void DimuonAnalyzer::beginJob()
   phPtPhi_recoTrack   = fs->make<TH2D>("phPtPhi_recoTrack",";p_{T}[GeV/c];#phi",200,0,100,100,-4.,4.) ;    
 
   pnEventInfo         = fs->make<TNtuple>("pnEventInfo","pnEventInfo","ntrk:nmu:bmean:bsigma:npartmean:npartsigma:ncollmean:ncollsigma:bin:hf:b_gen:nvtx:vx:vy:vz");
+  pnSinglemuRecoInfo  = fs->make<TNtuple>("pnSinglemuRecoInfo","pnSinglemuRecoInfo","nTotMu:nGLB:nSTA:nTRK");
   pnDimuRecoInfo      = fs->make<TNtuple>("pnDimuRecoInfo","pnDimuRecoInfo","mu1charge:mu1pt:mu1eta:dxy1:sigmaDxy1:dz1:sigmaDz1:mu2charge:mu2pt:mu2eta:dxy2:sigmaDxy2:dz2:sigmaDz2:dimupt:dimuy:dimum");
   pnSTAmuInfo         = fs->make<TNtuple>("pnSTAmuInfo","pnSTAmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz");
   pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz");
