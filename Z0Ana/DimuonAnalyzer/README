@@ -1,5 +1,6 @@
 *** Use cfg in the test/dimuonanalyzer_cfg.py to produce TNuples.
 *** Root macros to draw histograms are also under the test/.
+*** Before run below macros, please check the TNtuple's name is correct.
 1. test/printgenmom.cpp : Print out pid number of all di-muon's mothers.
 2. test/genmom.cpp : Read gen di-muon's mother pid and plot di-muon mass plot with respect to their mother particle.
 3. test/muonkine.cpp : Plot GEN single muon and di-muon's mass, pt, phi, eta.
