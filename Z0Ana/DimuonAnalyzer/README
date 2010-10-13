@@ -1,1 +1,8 @@
-Use cfg in the test/dimuonanalyzer_cfg.py
+*** Use cfg in the test/dimuonanalyzer_cfg.py to produce TNuples.
+*** Root macros to draw histograms are also under the test/.
+1. test/printgenmom.cpp : Print out pid number of all di-muon's mothers.
+2. test/genmom.cpp : Read gen di-muon's mother pid and plot di-muon mass plot with respect to their mother particle.
+3. test/muonkine.cpp : Plot GEN single muon and di-muon's mass, pt, phi, eta.
+4. test/superimp.cpp : 
+   1. Superimpose 3 root files with reco object.
+   2. Superimpose sim and reco object from the MC sample. 
