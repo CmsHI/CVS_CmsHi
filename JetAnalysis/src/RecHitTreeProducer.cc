@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.1 2010/09/23 13:28:28 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.1 2010/10/16 13:46:13 yilmaz Exp $
 //
 //
 
@@ -104,21 +104,26 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    edm::Handle<vector<double> > ktRhos;
    edm::Handle<vector<double> > akRhos;
 
-   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > jets1;
-   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > jets2;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebHits;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeHits;
 
-   //   typedef edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >::const_iterator EcalIterator;
+  edm::Handle<HFRecHitCollection> hfHits;
+  edm::Handle<HBHERecHitCollection> hbheHits;
+
    typedef vector<EcalRecHit>::const_iterator EcalIterator;
 
    edm::Handle<reco::CaloJetCollection> signalJets;
 
   MyRecHit hbheRecHit;
   MyRecHit hfRecHit;
+  MyRecHit ebRecHit;
+  MyRecHit eeRecHit;
 
   TTree* hbheTree;
   TTree* hfTree;
-
-   double cone;
+  TTree* ebTree;
+  TTree* eeTree;
+  double cone;
 
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
@@ -126,6 +131,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
 
   edm::InputTag HcalRecHitHFSrc_;
   edm::InputTag HcalRecHitHBHESrc_;
+  edm::InputTag EBSrc_;
+  edm::InputTag EESrc_;
 
 
 };
@@ -147,6 +154,9 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
    cone(0.5)
 {
    //now do what ever initialization is needed
+
+  EBSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEB"));
+  EESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEE"));
   HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
 }
@@ -172,13 +182,14 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
   hfRecHit.n = 0;
   hbheRecHit.n = 0;
+  ebRecHit.n = 0;
+  eeRecHit.n = 0;
 
-  edm::Handle<HFRecHitCollection> hfHits;
-  edm::Handle<HBHERecHitCollection> hbheHits;
+  ev.getByLabel(EBSrc_,ebHits);
+  ev.getByLabel(EESrc_,eeHits);
 
   ev.getByLabel(HcalRecHitHFSrc_,hfHits);
   ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
-
 
    if(0 && !cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
@@ -194,9 +205,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.et[hfRecHit.n] = getEt(hit.id(),hit.energy());
      hfRecHit.eta[hfRecHit.n] = getEta(hit.id());
      hfRecHit.phi[hfRecHit.n] = getPhi(hit.id());
-     //     hfRecHit.ieta[hfRecHit.n] = hit.id().ieta();
-     //     hfRecHit.iphi[hfRecHit.n] = hit.id().iphi();
-     
      hfRecHit.n++;
    }
 
@@ -206,11 +214,29 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hbheRecHit.et[hfRecHit.n] = getEt(hit.id(),hit.energy());
      hbheRecHit.eta[hfRecHit.n] = getEta(hit.id());
      hbheRecHit.phi[hfRecHit.n] = getPhi(hit.id());
-     //     hbheRecHit.ieta[hfRecHit.n] = hit.id().ieta();
-     //     hbheRecHit.iphi[hfRecHit.n] = hit.id().iphi();
-
      hbheRecHit.n++;
    }
+
+   for(unsigned int i = 0; i < ebHits->size(); ++i){
+     const EcalRecHit & hit= (*ebHits)[i];
+     ebRecHit.e[ebRecHit.n] = hit.energy();
+     ebRecHit.et[ebRecHit.n] = getEt(hit.id(),hit.energy());
+     ebRecHit.eta[ebRecHit.n] = getEta(hit.id());
+     ebRecHit.phi[ebRecHit.n] = getPhi(hit.id());
+     ebRecHit.n++;
+   }
+
+   for(unsigned int i = 0; i < eeHits->size(); ++i){
+     const EcalRecHit & hit= (*eeHits)[i];
+     eeRecHit.e[eeRecHit.n] = hit.energy();
+     eeRecHit.et[eeRecHit.n] = getEt(hit.id(),hit.energy());
+     eeRecHit.eta[eeRecHit.n] = getEta(hit.id());
+     eeRecHit.phi[eeRecHit.n] = getPhi(hit.id());
+     eeRecHit.n++;
+   }
+
+   eeTree->Fill();
+   ebTree->Fill();
 
    hbheTree->Fill();
    hfTree->Fill();
@@ -236,6 +262,20 @@ RecHitTreeProducer::beginJob()
   hfTree->Branch("et",hfRecHit.et,"et[n]/F");
   hfTree->Branch("eta",hfRecHit.eta,"eta[n]/F");
   hfTree->Branch("phi",hfRecHit.phi,"phi[n]/F");
+
+  eeTree = fs->make<TTree>("ee","");
+  eeTree->Branch("n",&eeRecHit.n,"n/I");
+  eeTree->Branch("e",eeRecHit.e,"e[n]/F");
+  eeTree->Branch("et",eeRecHit.et,"et[n]/F");
+  eeTree->Branch("eta",eeRecHit.eta,"eta[n]/F");
+  eeTree->Branch("phi",eeRecHit.phi,"phi[n]/F");
+
+  ebTree = fs->make<TTree>("eb","");
+  ebTree->Branch("n",&ebRecHit.n,"n/I");
+  ebTree->Branch("e",ebRecHit.e,"e[n]/F");
+  ebTree->Branch("et",ebRecHit.et,"et[n]/F");
+  ebTree->Branch("eta",ebRecHit.eta,"eta[n]/F");
+  ebTree->Branch("phi",ebRecHit.phi,"phi[n]/F");
 
 }
 

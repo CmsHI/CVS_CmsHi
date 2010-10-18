@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id$
+// $Id: RecHitComparison.cc,v 1.1 2010/09/23 13:28:28 yilmaz Exp $
 //
 //
 
@@ -52,6 +52,8 @@
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
+#include "DataFormats/HcalDetId/interface/HcalDetId.h"
 
 #include "TNtuple.h"
 
@@ -79,15 +81,35 @@ class RecHitComparison : public edm::EDAnalyzer {
    edm::Handle<vector<double> > ktRhos;
    edm::Handle<vector<double> > akRhos;
 
-   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > jets1;
-   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > jets2;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebHits1;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebHits2;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeHits1;
+  edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeHits2;
 
-   //   typedef edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > >::const_iterator EcalIterator;
+  edm::Handle<HFRecHitCollection> hfHits1;
+  edm::Handle<HFRecHitCollection> hfHits2;
+  edm::Handle<HBHERecHitCollection> hbheHits1;
+  edm::Handle<HBHERecHitCollection> hbheHits2;
+
    typedef vector<EcalRecHit>::const_iterator EcalIterator;
+  typedef vector<HFRecHit>::const_iterator HFIterator;
+  typedef vector<HBHERecHit>::const_iterator HBHEIterator;
 
    edm::Handle<reco::CaloJetCollection> signalJets;
 
-   TNtuple* nthit;
+  edm::InputTag HcalRecHitHFSrc1_;
+  edm::InputTag HcalRecHitHFSrc2_;
+  edm::InputTag HcalRecHitHBHESrc1_;
+  edm::InputTag HcalRecHitHBHESrc2_;
+  edm::InputTag EBSrc1_;
+  edm::InputTag EBSrc2_;
+  edm::InputTag EESrc1_;
+  edm::InputTag EESrc2_;
+
+   TNtuple* ntEB;
+  TNtuple* ntEE;
+  TNtuple* ntHBHE;
+  TNtuple* ntHF;
    TNtuple* ntjet;
 
    double cone;
@@ -114,6 +136,14 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
    cone(0.5)
 {
    //now do what ever initialization is needed
+  HcalRecHitHFSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc1",edm::InputTag("hfreco"));
+  HcalRecHitHFSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc2",edm::InputTag("hfreco"));
+  HcalRecHitHBHESrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc1",edm::InputTag("hbhereco"));
+  HcalRecHitHBHESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc2",edm::InputTag("hbhereco"));
+  EBSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
+  EBSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","SIGNALONLY"));
+  EESrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEE","RECO"));
+  EESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEE","SIGNALONLY"));
 
 }
 
@@ -143,18 +173,23 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       geo = pGeo.product();
    }
 
-   edm::InputTag jetTag1("ecalRecHit","EcalRecHitsEB","SIGNALONLY");
-   edm::InputTag jetTag2("ecalRecHit","EcalRecHitsEB","RECO");
-
    edm::InputTag signalTag("iterativeConePu5CaloJets","","SIGNALONLY");
    edm::InputTag centTag("hiCentrality","","RECO");
 
    using namespace edm;
 
    ev.getByLabel(centTag,cent);
-   ev.getByLabel(jetTag1,jets1);
-   ev.getByLabel(jetTag2,jets2);
+   ev.getByLabel(EBSrc1_,ebHits1);
+   ev.getByLabel(EBSrc1_,ebHits2);
    ev.getByLabel(signalTag,signalJets);
+
+   ev.getByLabel(HcalRecHitHFSrc1_,hfHits1);
+   ev.getByLabel(HcalRecHitHFSrc2_,hfHits2);
+   ev.getByLabel(HcalRecHitHBHESrc1_,hbheHits1);
+   ev.getByLabel(HcalRecHitHBHESrc2_,hbheHits2);
+
+   ev.getByLabel(EESrc1_,eeHits1);
+   ev.getByLabel(EESrc2_,eeHits2);
 
    double hf = cent->EtHFhitSum();
    double sumet = cent->EtMidRapiditySum();
@@ -190,9 +225,9 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       f3.push_back(0);
    }
 
-   for(unsigned int j1 = 0 ; j1 < jets1->size(); ++j1){
+   for(unsigned int j1 = 0 ; j1 < ebHits1->size(); ++j1){
 
-      const EcalRecHit& jet1 = (*jets1)[j1];
+      const EcalRecHit& jet1 = (*ebHits1)[j1];
       double e1 = jet1.energy();
 
       const GlobalPoint& pos1=geo->getPosition(jet1.id());
@@ -238,10 +273,8 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       
       GlobalPoint pos2;
       double e2 = -1;
-      int siz = jets2->size();
-
-      EcalIterator hitit = jets2->find(jet1.id());
-      if(hitit != jets2->end()){
+      EcalIterator hitit = ebHits2->find(jet1.id());
+      if(hitit != ebHits2->end()){
 	 e2 = hitit->energy();
 	 pos2=geo->getPosition(hitit->id());
       }else{
@@ -252,9 +285,118 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       double eta2 = pos2.eta();
       double phi2 = pos2.eta();
       double et2 = e2*sin(pos2.theta());
-      
-      if(isjet) nthit->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
-      
+      if(isjet) ntEB->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+   }
+
+   for(unsigned int i = 0; i < eeHits1->size(); ++i){
+     const EcalRecHit & jet1= (*eeHits1)[i];
+     double e1 = jet1.energy();
+     const GlobalPoint& pos1=geo->getPosition(jet1.id());
+     double eta1 = pos1.eta();
+     double phi1 = pos1.phi();
+     double et1 = e1*sin(pos1.theta());
+     double drjet = -1;
+     double jetpt = -1;
+     bool isjet = false;
+     int matchedJet = -1;
+     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+       const reco::CaloJet & jet = (*signalJets)[j];
+       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+       if(dr < cone){
+         jetpt = jet.pt();
+         drjet = dr;
+         isjet = true;
+         matchedJet = j;
+       }
+     }
+     GlobalPoint pos2;
+     double e2 = -1;
+     EcalIterator hitit = eeHits2->find(jet1.id());
+     if(hitit != eeHits2->end()){
+       e2 = hitit->energy();
+       pos2=geo->getPosition(hitit->id());
+     }else{
+       e2 = 0;
+       pos2 = pos1;
+     }
+     double eta2 = pos2.eta();
+     double phi2 = pos2.eta();
+     double et2 = e2*sin(pos2.theta());
+     if(isjet) ntEE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+   }
+   
+   for(unsigned int i = 0; i < hbheHits1->size(); ++i){
+     const HBHERecHit & jet1= (*hbheHits1)[i];
+     double e1 = jet1.energy();
+     const GlobalPoint& pos1=geo->getPosition(jet1.id());
+     double eta1 = pos1.eta();
+     double phi1 = pos1.phi();
+     double et1 = e1*sin(pos1.theta());
+     double drjet = -1;
+     double jetpt = -1;
+     bool isjet = false;
+     int matchedJet = -1;
+     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+       const reco::CaloJet & jet = (*signalJets)[j];
+       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+       if(dr < cone){
+         jetpt = jet.pt();
+         drjet = dr;
+         isjet = true;
+         matchedJet = j;
+       }
+     }
+     GlobalPoint pos2;
+     double e2 = -1;
+     HBHEIterator hitit = hbheHits2->find(jet1.id());
+     if(hitit != hbheHits2->end()){
+       e2 = hitit->energy();
+       pos2=geo->getPosition(hitit->id());
+     }else{
+       e2 = 0;
+       pos2 = pos1;
+     }
+     double eta2 = pos2.eta();
+     double phi2 = pos2.eta();
+     double et2 = e2*sin(pos2.theta());
+     if(isjet) ntHBHE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+   }
+
+   for(unsigned int i = 0; i < hfHits1->size(); ++i){
+     const HFRecHit & jet1= (*hfHits1)[i];
+     double e1 = jet1.energy();
+     const GlobalPoint& pos1=geo->getPosition(jet1.id());
+     double eta1 = pos1.eta();
+     double phi1 = pos1.phi();
+     double et1 = e1*sin(pos1.theta());
+     double drjet = -1;
+     double jetpt = -1;
+     bool isjet = false;
+     int matchedJet = -1;
+     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+       const reco::CaloJet & jet = (*signalJets)[j];
+       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+       if(dr < cone){
+	 jetpt = jet.pt();
+	 drjet = dr;
+	 isjet = true;
+	 matchedJet = j;
+       }
+     }
+     GlobalPoint pos2;
+     double e2 = -1;
+     HFIterator hitit = hfHits2->find(jet1.id());
+     if(hitit != hfHits2->end()){
+       e2 = hitit->energy();
+       pos2=geo->getPosition(hitit->id());
+     }else{
+       e2 = 0;
+       pos2 = pos1;
+     }
+     double eta2 = pos2.eta();
+     double phi2 = pos2.eta();
+     double et2 = e2*sin(pos2.theta());
+     if(isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
@@ -273,7 +415,10 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 void 
 RecHitComparison::beginJob()
 {
-   nthit = fs->make<TNtuple>("nthit","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
+   ntEB = fs->make<TNtuple>("ntEB","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
+   ntEE = fs->make<TNtuple>("ntEE","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
+   ntHBHE = fs->make<TNtuple>("ntHBHE","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
+   ntHF = fs->make<TNtuple>("ntHF","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
    ntjet = fs->make<TNtuple>("ntjet","","bin:pt:eta:ethit:f05:f1:f15:f2:f25:f3:em:emf");
    
 }
