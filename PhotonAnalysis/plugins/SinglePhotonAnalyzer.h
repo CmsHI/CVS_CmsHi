@@ -156,6 +156,7 @@ protected:
 
   // Flags for the fillers
   bool 	doStoreGeneral_; 	 // Store General information
+  bool 	doStoreCentrality_; 	 // Store Centrality information
   bool 	doStoreHLT_;     	 // Store HLT Trigger	
   bool	doStoreL1Trigger_;	 // Store L1 Trigger
   bool 	doStoreHF_;		 // Store HF

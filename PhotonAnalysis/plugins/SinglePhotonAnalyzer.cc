@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.4 2010/09/29 15:51:01 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.5 2010/09/30 14:17:41 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -177,6 +177,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   mcEtaMax_                        = ps.getUntrackedParameter<double>("McEtaMax",3.5);
 
   doStoreGeneral_                  = ps.getUntrackedParameter<bool>("doStoreGeneral",true);
+  doStoreCentrality_                  = ps.getUntrackedParameter<bool>("doStoreCentrality",true);
   doStoreL1Trigger_                = ps.getUntrackedParameter<bool>("doStoreL1Trigger",true);
   doStoreHLT_                      = ps.getUntrackedParameter<bool>("doStoreHLT",true);
   doStoreHF_                       = ps.getUntrackedParameter<bool>("doStoreHF",true);
@@ -241,7 +242,7 @@ SinglePhotonAnalyzer::~SinglePhotonAnalyzer() {
 
 void SinglePhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
-   if (doStoreGeneral_) 	storeGeneral(e, iSetup);
+        if (doStoreGeneral_) 	storeGeneral(e, iSetup);
 	if (doStoreL1Trigger_) 	storeL1Trigger(e);
 	if (doStoreHLT_) 	storeHLT(e);
 	if (doStoreHF_)		storeHF(e);
@@ -295,31 +296,32 @@ void SinglePhotonAnalyzer::storeGeneral(const edm::Event& e, const edm::EventSet
 	 _ntupleMC->Column("event",(Int_t)e.id().event());
 	 
 	 // centrality
-	 cbins_ = getCentralityBinsFromDB(iSetup);
+         if (doStoreCentrality_) {
+   	    cbins_ = getCentralityBinsFromDB(iSetup);
 	 
-	 edm::Handle<reco::Centrality> cent;
-	 e.getByLabel(edm::InputTag("hiCentrality"),cent);
+	    edm::Handle<reco::Centrality> cent;
+	    e.getByLabel(edm::InputTag("hiCentrality"),cent);
 	 
-	 double hf = (double)cent->EtHFhitSum();
+	    double hf = (double)cent->EtHFhitSum();
 
-	 _ntuple->Column("hf",(double)cent->EtHFhitSum());
-	 _ntuple->Column("hftp",(double)cent->EtHFtowerSumPlus());
-	 _ntuple->Column("hftm",(double)cent->EtHFtowerSumMinus());
-	 _ntuple->Column("eb",(double)cent->EtEBSum());
-	 _ntuple->Column("eep",(double)cent->EtEESumPlus());
-         _ntuple->Column("eem",(double)cent->EtEESumMinus());
-	 _ntuple->Column("cBin",(int)cbins_->getBin(hf));
-	 _ntuple->Column("nbins",(int)cbins_->getNbins()); 
-	 _ntuple->Column("binsize",(int)(100/cbins_->getNbins() ));
-	 _ntuple->Column("npart",(double)cbins_->NpartMean(hf));
-	 _ntuple->Column("npartSigma",(double)cbins_->NpartSigma(hf));
-	 _ntuple->Column("ncoll",(double)cbins_->NcollMean(hf));
-	 _ntuple->Column("ncollSigma",(double)cbins_->NcollSigma(hf));
-	 _ntuple->Column("nhard",(double)cbins_->NhardMean(hf));
-	 _ntuple->Column("nhardSigma",(double)cbins_->NhardSigma(hf));
-	 _ntuple->Column("b",(double)cbins_->bMean(hf));
-	 _ntuple->Column("bSigma",(double)cbins_->bSigma(hf));
-	 
+	    _ntuple->Column("hf",(double)cent->EtHFhitSum());
+	    _ntuple->Column("hftp",(double)cent->EtHFtowerSumPlus());
+	    _ntuple->Column("hftm",(double)cent->EtHFtowerSumMinus());
+            _ntuple->Column("eb",(double)cent->EtEBSum());
+       	    _ntuple->Column("eep",(double)cent->EtEESumPlus());
+            _ntuple->Column("eem",(double)cent->EtEESumMinus());
+	    _ntuple->Column("cBin",(int)cbins_->getBin(hf));
+	    _ntuple->Column("nbins",(int)cbins_->getNbins()); 
+	    _ntuple->Column("binsize",(int)(100/cbins_->getNbins() ));
+	    _ntuple->Column("npart",(double)cbins_->NpartMean(hf));
+	    _ntuple->Column("npartSigma",(double)cbins_->NpartSigma(hf));
+	    _ntuple->Column("ncoll",(double)cbins_->NcollMean(hf));
+	    _ntuple->Column("ncollSigma",(double)cbins_->NcollSigma(hf));
+	    _ntuple->Column("nhard",(double)cbins_->NhardMean(hf));
+	    _ntuple->Column("nhardSigma",(double)cbins_->NhardSigma(hf));
+	    _ntuple->Column("b",(double)cbins_->bMean(hf));
+	    _ntuple->Column("bSigma",(double)cbins_->bSigma(hf));
+	 }
 }
 
 void SinglePhotonAnalyzer::storeL1Trigger(const edm::Event& e){
@@ -586,12 +588,13 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
     
     
-    // centrality                                                                                                                                 
     edm::Handle<reco::Centrality> cent;
-    e.getByLabel(edm::InputTag("hiCentrality"),cent);
-    
+    // centrality         
+    if (doStoreCentrality_){                                                                                                                          
+       e.getByLabel(edm::InputTag("hiCentrality"),cent);
+    }    
     for (reco::GenParticleCollection::const_iterator it_gen = 
-	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
+   	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
       if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
       
@@ -623,21 +626,22 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       _ntupleMC->Column("nSiblings", nSiblings);
       _ntupleMC->Column("counts",   count); 
 
-      double theHf = cent->EtHFhitSum();
-      _ntupleMC->Column("hf",theHf);
-      _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
-      _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
-      _ntupleMC->Column("eb",(double)cent->EtEBSum());
-      _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
-      _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
-      _ntupleMC->Column("cBin",(int)cbins_->getBin(theHf));
-      _ntupleMC->Column("nbins",(int)cbins_->getNbins());
-      _ntupleMC->Column("binsize",(int)(100/cbins_->getNbins() ));
-      _ntupleMC->Column("npart",(double)cbins_->NpartMean(theHf));
-      _ntupleMC->Column("npartSigma",(double)cbins_->NpartSigma(theHf));
-      _ntupleMC->Column("ncoll",(double)cbins_->NcollMean(theHf));
-      _ntupleMC->Column("ncollSigma",(double)cbins_->NcollSigma(theHf));
-
+      if (doStoreCentrality_) {
+         double theHf = cent->EtHFhitSum();
+         _ntupleMC->Column("hf",theHf);
+         _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
+         _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
+         _ntupleMC->Column("eb",(double)cent->EtEBSum());
+         _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
+         _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
+         _ntupleMC->Column("cBin",(int)cbins_->getBin(theHf));
+         _ntupleMC->Column("nbins",(int)cbins_->getNbins());
+         _ntupleMC->Column("binsize",(int)(100/cbins_->getNbins() ));
+         _ntupleMC->Column("npart",(double)cbins_->NpartMean(theHf));
+         _ntupleMC->Column("npartSigma",(double)cbins_->NpartSigma(theHf));
+         _ntupleMC->Column("ncoll",(double)cbins_->NcollMean(theHf));
+         _ntupleMC->Column("ncollSigma",(double)cbins_->NcollSigma(theHf));  
+      }
       
       // calculate isolation at the generator level
       _ntupleMC->Column("calIsoDR03", genCalIsoDR03);
@@ -1130,8 +1134,8 @@ void SinglePhotonAnalyzer::storePhotonAOD(Photon * photon,  const edm::Event& e,
     if (nTracks == 2) {
       convPairInvariantMass      = photon->conversions()[0]->pairInvariantMass(); 
       convpairCotThetaSeparation = photon->conversions()[0]->pairCotThetaSeparation(); 
-      convPairMomentumMag        = photon->conversions()[0]->pairMomentum().mag(); 
-      convPairMomentumPerp       = photon->conversions()[0]->pairMomentum().perp(); 
+      convPairMomentumMag        = sqrt(photon->conversions()[0]->pairMomentum().Mag2()); 
+      convPairMomentumPerp       = sqrt(photon->conversions()[0]->pairMomentum().perp2()); 
       convPairMomentumEta        = photon->conversions()[0]->pairMomentum().eta(); 
       convPairMomentumPhi        = photon->conversions()[0]->pairMomentum().phi(); 
       convPairMomentumX          = photon->conversions()[0]->pairMomentum().x(); 

@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.4 2010/09/30 12:57:34 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.5 2010/09/30 14:17:40 yjlee Exp $
  *
  */
 
@@ -137,7 +137,7 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
 	cout <<8<<endl;
        
 	bool foundPhotons = selectStorePhotons(e,iSetup,"");
-	
+        cout <<"Found photons? "<<foundPhotons<<endl;
 	if (foundPhotons){
 		// Dump analysis ntuple 
 		// NOTE: dump ntuple only if at least one photon detected in a given acceptance
@@ -589,8 +589,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	convPairMomentum(nphotonscounter)           = TVector3(photon.conversions()[0]->pairMomentum().x(),
 							       photon.conversions()[0]->pairMomentum().y(),
 							       photon.conversions()[0]->pairMomentum().z()); 
-	convPairMomentumMag(nphotonscounter)        = photon.conversions()[0]->pairMomentum().mag(); 
-	convPairMomentumPerp(nphotonscounter)       = photon.conversions()[0]->pairMomentum().perp(); 
+	convPairMomentumMag(nphotonscounter)        = sqrt(photon.conversions()[0]->pairMomentum().Mag2()); 
+	convPairMomentumPerp(nphotonscounter)       = sqrt(photon.conversions()[0]->pairMomentum().perp2()); 
 	convPairMomentumEta(nphotonscounter)        = photon.conversions()[0]->pairMomentum().eta(); 
 	convPairMomentumPhi(nphotonscounter)        = photon.conversions()[0]->pairMomentum().phi(); 
 	convPairMomentumX(nphotonscounter)          = photon.conversions()[0]->pairMomentum().x(); 
