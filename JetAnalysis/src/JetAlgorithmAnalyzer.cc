@@ -184,6 +184,10 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
      geo(0),
      cbins_(0)
 {
+
+   puSubtractorName_  =  iConfig.getParameter<string> ("subtractorName");
+   subtractor_ =  boost::shared_ptr<PileUpSubtractor>(PileUpSubtractorFactory::get()->create( puSubtractorName_, iConfig));
+
    edm::Service<RandomNumberGenerator> rng;
    randomEngine = &(rng->getEngine());
 

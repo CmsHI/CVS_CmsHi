@@ -187,6 +187,8 @@ protected:
   double                          puWidth_;
 
   std::string                     jetCollInstanceName_;       // instance name for output jet collection
+
+ public:
   boost::shared_ptr<PileUpSubtractor>  subtractor_;
   const CaloGeometry *geo;
 
