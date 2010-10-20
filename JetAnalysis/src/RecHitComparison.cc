@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.2 2010/10/18 16:13:37 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.3 2010/10/20 14:11:46 yilmaz Exp $
 //
 //
 
@@ -106,6 +106,7 @@ class RecHitComparison : public edm::EDAnalyzer {
   edm::InputTag EESrc1_;
   edm::InputTag EESrc2_;
    edm::InputTag signalTag_;
+   edm::InputTag centTag_;
 
    TNtuple* ntEB;
   TNtuple* ntEE;
@@ -137,6 +138,8 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
    cone(0.5)
 {
    //now do what ever initialization is needed
+   centTag_ =  iConfig.getUntrackedParameter<edm::InputTag>("centrality",edm::InputTag("hiCentrality","","RECO"));
+
    signalTag_ = iConfig.getUntrackedParameter<edm::InputTag>("signalJets",edm::InputTag("iterativeCone5CaloJets","","SIGNAL"));
 
   HcalRecHitHFSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc1",edm::InputTag("hfreco"));
@@ -176,11 +179,9 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       geo = pGeo.product();
    }
 
-   edm::InputTag centTag("hiCentrality","","RECO");
-
    using namespace edm;
 
-   ev.getByLabel(centTag,cent);
+   ev.getByLabel(centTag_,cent);
    ev.getByLabel(EBSrc1_,ebHits1);
    ev.getByLabel(EBSrc1_,ebHits2);
    ev.getByLabel(signalTag_,signalJets);
