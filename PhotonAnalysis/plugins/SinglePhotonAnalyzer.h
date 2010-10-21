@@ -94,6 +94,7 @@ protected:
   std::vector<std::string> triggerPathsToStore_;  // Vector to store list of HLT paths to store results of in ntuple
 
   edm::InputTag genParticleProducer_; // MC particle producer
+  edm::InputTag hepMCProducer_; // MC hepMC producer
   edm::InputTag genEventScale_; // MC gen Event Scale
   edm::InputTag photonProducer_;      // photon producer
   edm::InputTag trackProducer_;       // track producer 

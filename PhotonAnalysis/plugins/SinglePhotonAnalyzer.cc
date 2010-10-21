@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.5 2010/09/30 14:17:41 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.6 2010/10/19 14:34:40 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -140,6 +140,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   triggerPathsToStore_             = ps.getParameter<vector<string> >("TriggerPathsToStore");
 
   genParticleProducer_             = ps.getParameter<InputTag>("GenParticleProducer");
+  hepMCProducer_                   = ps.getParameter<InputTag>("HepMCProducer");
   genEventScale_                   = ps.getParameter<InputTag>("GenEventScale");
   photonProducer_                  = ps.getParameter<InputTag>("PhotonProducer"); 
   compPhotonProducer_              = ps.getParameter<InputTag>("compPhotonProducer");
@@ -542,10 +543,8 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
   /////////////////////////////////////////////////////////
   
   Handle<HepMCProduct> evtMC;
-  e.getByLabel(genParticleProducer_,evtMC);
+  e.getByLabel(hepMCProducer_,evtMC);
   if (evtMC.isValid())  isMCData_=kTRUE;
-  
-  // get hold of generated particles from MC thuth 
   edm::Handle<reco::GenParticleCollection> genParticles;
   
   if (isMCData_) {
@@ -1221,7 +1220,6 @@ void SinglePhotonAnalyzer::storePhotonAOD(Photon * photon,  const edm::Event& e,
 bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx){
 
   TString prx(prefx);
-
   Handle<HepMCProduct> evtMC;
   e.getByLabel("generator",evtMC);
   if (evtMC.isValid())  isMCData_=kTRUE;	
