@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.6 2010/10/18 16:13:37 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.7 2010/10/21 11:26:40 yilmaz Exp $
 //
 //
 
@@ -72,9 +72,8 @@ struct JRA{
    float weight;
 };
 
-
 struct JRAV{
-
+  int index;
   float jtpt;
   float jtcorpt;
   float refpt;
@@ -122,10 +121,13 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
    double n90Min_;
    double n90hitMin_;
 
-   edm::InputTag jetTag_;
+  edm::InputTag jetTag_;
   edm::InputTag matchTag_;
+  std::vector<edm::InputTag> matchTags_;
+  
+  JRA jra_;
+  std::vector<JRA> jraMatch_;
 
-   JRA jra_;
    TTree* t;
 
    edm::Handle<edm::GenHIEvent> mc;
@@ -193,6 +195,7 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
 
    jetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("src",edm::InputTag("selectedPatJets"));
    matchTag_ = iConfig.getUntrackedParameter<edm::InputTag>("match",edm::InputTag("selectedPatJets"));
+   matchTags_ = iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("matches",std::vector<edm::InputTag>(0));
 }
 
 
@@ -217,8 +220,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
    iEvent.getByLabel(jetTag_,jets);
    if(usePat_)iEvent.getByLabel(jetTag_,patjets);
-   if(matchNew_)iEvent.getByLabel(matchTag_,matchedJets);
-
    std::vector<JRAV> jraV;
 
    for(unsigned int j = 0 ; j < jets->size(); ++j){
@@ -229,7 +230,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jv.jteta = jet.eta();
      jv.jtphi = jet.phi();
      jv.jtcorpt = jet.pt();
-
+     jv.index = j;
      if(usePat_){
        const pat::Jet& patjet = (*patjets)[j];
 
@@ -241,7 +242,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	 jv.refpt = patjet.genJet()->pt();
 	 jv.refeta = patjet.genJet()->eta();
 	 jv.refphi = patjet.genJet()->phi();
-
        }else{
 	 jv.refpt = -99;
 	 jv.refeta = -99;
@@ -249,18 +249,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
        }
      }
 
-     if(matchNew_){
-       for(unsigned int m = 0 ; m < matchedJets->size(); ++m){
-	 const reco::Jet& match = (*matchedJets)[m];
-	 double dr = reco::deltaR(jet.eta(),jet.phi(),match.eta(),match.phi());
-	 if(dr < matchR_){
-	   jv.refcorpt = -99;
-           jv.refpt = match.pt();
-           jv.refeta = match.eta();
-           jv.refphi = match.phi();
-	 }
-       }
-     }
      jraV.push_back(jv);
    }
 
@@ -271,6 +259,24 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
    for(unsigned int i = 0; i < jraV.size(); ++i){
      JRAV& jv = jraV[i];
+     const reco::Jet& jet = (*jets)[jv.index];
+     
+     if(matchNew_){
+       for(unsigned int im = 0; im < matchTags_.size(); ++im){
+         iEvent.getByLabel(matchTags_[im],matchedJets);
+         for(unsigned int m = 0 ; m < matchedJets->size(); ++m){
+           const reco::Jet& match = (*matchedJets)[m];
+           double dr = reco::deltaR(jet.eta(),jet.phi(),match.eta(),match.phi());
+           if(dr < matchR_){
+             jraMatch_[im].jtcorpt[i] = -99;
+             jraMatch_[im].jtpt[i] = match.pt();
+             jraMatch_[im].jteta[i] = match.eta();
+             jraMatch_[im].jtphi[i] = match.phi();
+           }
+         }
+       }
+     }
+     
      jra_.jtpt[i] = jv.jtpt;
      jra_.jteta[i] = jv.jteta;
      jra_.jtphi[i] = jv.jtphi;
@@ -280,34 +286,39 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jra_.refphi[i] = jv.refphi;
    }
    jra_.nref = jraV.size();
-
+   
    t->Fill();
 
 }
 
-
 // ------------ method called once each job just before starting event loop  ------------
-void 
-HiJetResponseAnalyzer::beginJob()
-{
 
-   t= fs->make<TTree>("t","Jet Response Analyzer");
-   t->Branch("b",&jra_.b,"b/F");
-   t->Branch("hf",&jra_.hf,"hf/F");
-   t->Branch("nref",&jra_.nref,"nref/I");
-   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
-   t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
-   t->Branch("refpt",jra_.refpt,"refpt[nref]/F");
-   t->Branch("refcorpt",jra_.refpt,"refcorpt[nref]/F");
-   t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
+
+void 
+HiJetResponseAnalyzer::beginJob(){
+  t= fs->make<TTree>("t","Jet Response Analyzer");
+  t->Branch("b",&jra_.b,"b/F");
+  t->Branch("hf",&jra_.hf,"hf/F");
+  t->Branch("nref",&jra_.nref,"nref/I");
+  t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
+  t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
+  t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
+  t->Branch("jtphi",jra_.jtphi,"jtphi[nref]/F");
+  t->Branch("refpt",jra_.refpt,"refpt[nref]/F");
+  t->Branch("refcorpt",jra_.refpt,"refcorpt[nref]/F");
    t->Branch("refeta",jra_.refeta,"refeta[nref]/F");
-   t->Branch("jtphi",jra_.jtphi,"jtphi[nref]/F");
    t->Branch("refphi",jra_.refphi,"refphi[nref]/F");
    t->Branch("weight",&jra_.weight,"weight/F");
    t->Branch("bin",&jra_.bin,"bin/I");
-
-
-
+   for(unsigned int im = 0; im < matchTags_.size(); ++im){
+     JRA jrm;
+     jraMatch_.push_back(jrm);
+     t->Branch(Form("jtpt%d",im),jraMatch_[im].jtpt,Form("jtpt%d[nref]/F",im));
+     t->Branch(Form("jtcorpt%d",im),jraMatch_[im].jtcorpt,Form("jtcorpt%d[nref]/F",im));
+     t->Branch(Form("jteta%d",im),jraMatch_[im].jteta,Form("jteta%d[nref]/F",im));
+     t->Branch(Form("jtphi%d",im),jraMatch_[im].jtphi,Form("jtphi%d[nref]/F",im));
+   }
+   
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
