@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.5 2010/09/29 15:59:10 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.6 2010/10/18 16:13:37 yilmaz Exp $
 //
 //
 
@@ -222,7 +222,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    std::vector<JRAV> jraV;
 
    for(unsigned int j = 0 ; j < jets->size(); ++j){
-
      if(filterJets_ && !selectJet(j)) continue;
      const reco::Jet& jet = (*jets)[j];
      JRAV jv;
@@ -272,13 +271,13 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
    for(unsigned int i = 0; i < jraV.size(); ++i){
      JRAV& jv = jraV[i];
-     jra_.jtpt[jra_.nref] = jv.jtpt;
-     jra_.jteta[jra_.nref] = jv.jteta;
-     jra_.jtphi[jra_.nref] = jv.jtphi;
-     jra_.jtcorpt[jra_.nref] = jv.jtcorpt;
-     jra_.refpt[jra_.nref] = jv.refpt;
-     jra_.refeta[jra_.nref] = jv.refeta;
-     jra_.refphi[jra_.nref] = jv.refphi;
+     jra_.jtpt[i] = jv.jtpt;
+     jra_.jteta[i] = jv.jteta;
+     jra_.jtphi[i] = jv.jtphi;
+     jra_.jtcorpt[i] = jv.jtcorpt;
+     jra_.refpt[i] = jv.refpt;
+     jra_.refeta[i] = jv.refeta;
+     jra_.refphi[i] = jv.refphi;
    }
    jra_.nref = jraV.size();
 
