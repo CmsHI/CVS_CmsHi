@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.5 2010/09/30 14:17:40 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.6 2010/10/19 14:34:40 yjlee Exp $
  *
  */
 
@@ -234,9 +234,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> eMax(kMaxPhotons), e2nd(kMaxPhotons), e2x2(kMaxPhotons), e3x2(kMaxPhotons), e4x4(kMaxPhotons), e5x5(kMaxPhotons);
   HTValVector<Float_t> e2x5Right(kMaxPhotons), e2x5Left(kMaxPhotons), e2x5Top(kMaxPhotons), e2x5Bottom(kMaxPhotons);
   HTValVector<Float_t> eRight(kMaxPhotons), eLeft(kMaxPhotons), eTop(kMaxPhotons), eBottom(kMaxPhotons);
+  HTValVector<Float_t> e2overe8(kMaxPhotons); //NEW
   HTValVector<Float_t> covPhiPhi(kMaxPhotons), covEtaPhi(kMaxPhotons), covEtaEta(kMaxPhotons);
 
   HTValVector<Float_t> seedTime(kMaxPhotons), seedChi2(kMaxPhotons), seedOutOfTimeChi2(kMaxPhotons);
+  HTValVector<Float_t> tLef(kMaxPhotons), tRight(kMaxPhotons), tTop(kMaxPhotons), tBottom(kMaxPhotons);  
   HTValVector<Int_t>   seedRecoFlag(kMaxPhotons), seedSeverity(kMaxPhotons);
   
 
@@ -380,12 +382,34 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	    flags = it->recoFlag();
 	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
     }
+
+    float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
+    std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
+    std::vector<DetId> right  = lazyTool.matrixDetId(id, 1, 1, 0, 0);
+    std::vector<DetId> top    = lazyTool.matrixDetId(id, 0, 0, 1, 1);
+    std::vector<DetId> bottom = lazyTool.matrixDetId(id, 0, 0,-1,-1);
+    
+    float *times[4] = {&tlef,&tright,&ttop,&tbottom};
+    std::vector<DetId> ids[4]  = {left,right,top,bottom};
+    int nt = sizeof(times)/sizeof(float);
+    for(int ii=0; ii<nt; ++ii) {
+       if( ids[ii].empty() ) { continue; }
+       it = rechits.find( ids[ii][0] );
+       if( it != rechits.end() ) { *(times[ii]) = it->time(); }
+    }
+    
     seedTime              (nphotonscounter)  = time;
     seedOutOfTimeChi2     (nphotonscounter)  = outOfTimeChi2;
     seedChi2              (nphotonscounter)  = chi2;
     seedRecoFlag             (nphotonscounter)  = flags;
     seedSeverity          (nphotonscounter)  = severity;
-
+    
+    tLef         (nphotonscounter) = tlef;
+    tRight        (nphotonscounter) = tright;
+    tTop        (nphotonscounter) = ttop;
+    tBottom        (nphotonscounter) = tbottom;
+    
+    
     eMax         (nphotonscounter) =  lazyTool.eMax(*seed);
     e2nd         (nphotonscounter) =  lazyTool.e2nd(*seed);
     e2x2         (nphotonscounter) =  lazyTool.e2x2(*seed);
@@ -393,8 +417,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     e3x3         (nphotonscounter) =  lazyTool.e3x3(*seed);
     e4x4         (nphotonscounter) =  lazyTool.e4x4(*seed);
     e5x5         (nphotonscounter) =  lazyTool.e5x5(*seed);
-
-
+    e2overe8     (nphotonscounter) =  ( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) ==0 )? 0: lazyTool.e2nd(*seed)/( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) );
+    
     e2x5Right    (nphotonscounter) =  lazyTool.e2x5Right(*seed);
     e2x5Left     (nphotonscounter) =  lazyTool.e2x5Left(*seed);
     e2x5Top      (nphotonscounter) =  lazyTool.e2x5Top(*seed);
@@ -772,6 +796,12 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"seedOutOfTimeChi2",seedOutOfTimeChi2, pfx+"nPhotons");
   _ntuple->Column(pfx+"seedRecoFlag",seedRecoFlag, pfx+"nPhotons");
   _ntuple->Column(pfx+"seedSeverity",seedSeverity, pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"tRight",    tRight,     pfx+"nPhotons");
+  _ntuple->Column(pfx+"tLeft",     tLef,       pfx+"nPhotons");
+  _ntuple->Column(pfx+"tTop",      tTop,       pfx+"nPhotons");
+  _ntuple->Column(pfx+"tBottom",   tBottom,    pfx+"nPhotons");
+  
   _ntuple->Column(pfx+"eMax",eMax, pfx+"nPhotons");
   _ntuple->Column(pfx+"e2nd",e2nd, pfx+"nPhotons");
   _ntuple->Column(pfx+"e2x2",e2x2, pfx+"nPhotons");
@@ -779,7 +809,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"e3x3",e3x3, pfx+"nPhotons");
   _ntuple->Column(pfx+"e4x4",e4x4, pfx+"nPhotons");
   _ntuple->Column(pfx+"e5x5",e5x5, pfx+"nPhotons");
-  
+  _ntuple->Column(pfx+"e2overe8",e2overe8, pfx+"nPhotons");
+
   _ntuple->Column(pfx+"e2x5Right", e2x5Right,  pfx+"nPhotons");
   _ntuple->Column(pfx+"e2x5Left",  e2x5Left,   pfx+"nPhotons");
   _ntuple->Column(pfx+"e2x5Top",   e2x5Top,    pfx+"nPhotons");
