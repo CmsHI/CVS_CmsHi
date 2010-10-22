@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.3 2010/10/20 14:11:46 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.4 2010/10/20 15:51:18 yilmaz Exp $
 //
 //
 
@@ -115,6 +115,7 @@ class RecHitComparison : public edm::EDAnalyzer {
    TNtuple* ntjet;
 
    double cone;
+   bool jetsOnly_;
 
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
@@ -140,6 +141,7 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
    //now do what ever initialization is needed
    centTag_ =  iConfig.getUntrackedParameter<edm::InputTag>("centrality",edm::InputTag("hiCentrality","","RECO"));
 
+   jetsOnly_ = iConfig.getUntrackedParameter<bool>("jetsOnly",false);
    signalTag_ = iConfig.getUntrackedParameter<edm::InputTag>("signalJets",edm::InputTag("iterativeCone5CaloJets","","SIGNAL"));
 
   HcalRecHitHFSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc1",edm::InputTag("hfreco"));
@@ -288,7 +290,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       double eta2 = pos2.eta();
       double phi2 = pos2.eta();
       double et2 = e2*sin(pos2.theta());
-      if(isjet) ntEB->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+      if(!jetsOnly_ ||  isjet) ntEB->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int i = 0; i < eeHits1->size(); ++i){
@@ -325,7 +327,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(isjet) ntEE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntEE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
    }
    
    for(unsigned int i = 0; i < hbheHits1->size(); ++i){
@@ -362,7 +364,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(isjet) ntHBHE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntHBHE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int i = 0; i < hfHits1->size(); ++i){
@@ -399,7 +401,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){

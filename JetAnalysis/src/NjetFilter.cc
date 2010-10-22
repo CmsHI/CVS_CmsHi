@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Fri Sep 10 10:02:12 EDT 2010
-// $Id$
+// $Id: NjetFilter.cc,v 1.1 2010/09/10 14:47:48 yilmaz Exp $
 //
 //
 
@@ -53,6 +53,7 @@ class NjetFilter : public edm::EDFilter {
    edm::Handle<reco::JetView> jets;
 
    unsigned int njet_;
+   double ptMin_;
    bool equalMode_;
    bool eqGreaterMode_;
    bool lessMode_;
@@ -72,8 +73,9 @@ class NjetFilter : public edm::EDFilter {
 NjetFilter::NjetFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
-   jetTag_ = edm::InputTag("selectedPatJets");
+   jetTag_ = iConfig.getParameter<edm::InputTag>("src");
    njet_ = iConfig.getParameter<unsigned int>("nJet");
+   ptMin_ = iConfig.getParameter<double>("ptMin");
    equalMode_ = iConfig.getParameter<bool>("equalMode");
    eqGreaterMode_ = iConfig.getParameter<bool>("eqGreaterMode");
    lessMode_ = iConfig.getParameter<bool>("lessMode");
