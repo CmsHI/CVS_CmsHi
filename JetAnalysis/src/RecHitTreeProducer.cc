@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.2 2010/10/18 16:13:37 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.3 2010/10/20 15:01:11 nart Exp $
 //
 //
 
@@ -319,7 +319,7 @@ RecHitTreeProducer::beginJob()
   ebTree->Branch("et",ebRecHit.et,"et[n]/F");
   ebTree->Branch("eta",ebRecHit.eta,"eta[n]/F");
   ebTree->Branch("phi",ebRecHit.phi,"phi[n]/F");
-  ebTree->Branch("isjet",ebRecHit.isjet,"isjet[n]/I");
+  ebTree->Branch("isjet",ebRecHit.isjet,"isjet[n]/O");
 
 }
 
