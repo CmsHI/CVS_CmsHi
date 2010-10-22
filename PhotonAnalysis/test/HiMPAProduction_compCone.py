@@ -1,5 +1,5 @@
 #
-# \version $Id: HiMPAProduction.py,v 1.1 2010/09/30 14:21:44 yjlee Exp $
+# \version $Id: HiMPAProduction_compCone.py,v 1.1 2010/10/22 12:01:59 kimy Exp $
 #
 
 import FWCore.ParameterSet.Config as cms
@@ -75,7 +75,7 @@ process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('40 OR 41')
 process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
 process.multiPhotonAnalyzer.GenParticleProducer = cms.InputTag("hiGenParticles")
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
-process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiPixelAdaptiveVertex")
+process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
 process.multiPhotonAnalyzer.doStoreMET = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.OutputFile = cms.string('ntuple-HiMPA.root')
@@ -119,6 +119,7 @@ process.p = cms.Path(
     #    process.heavyIon *
     process.makeHeavyIonPhotons *
     process.selectedPatPhotons *
+    process.complePhotonSequence *
     process.multiPhotonAnalyzer *
     process.endOfProcess
     )

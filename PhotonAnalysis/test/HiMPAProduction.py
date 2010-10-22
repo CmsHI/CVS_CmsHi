@@ -1,5 +1,5 @@
 #
-# \version $Id: MPA_Apr27_V00-00-06_MC35X_START3X_V26.py,v 1.1 2010/04/27 16:15:21 musella Exp $
+# \version $Id: HiMPAProduction.py,v 1.1 2010/09/30 14:21:44 yjlee Exp $
 #
 
 import FWCore.ParameterSet.Config as cms
@@ -71,28 +71,6 @@ process.hltLevel1GTSeed.L1TechTriggerSeeding = cms.bool(True)
 process.hltLevel1GTSeed.L1SeedsLogicalExpression = cms.string('40 OR 41')
 
 
-# EGAMMA customization 
-process.photons.minSCEtBarrel = 10.
-process.photons.minSCEtEndcap = 10.
-process.photonCore.minSCEt = 5.
-#process.conversionTrackCandidates.minSCEt =1.
-#process.conversions.minSCEt =1.
-#process.trackerOnlyConversions.AllowTrackBC = cms.bool(False)
-#process.trackerOnlyConversions.AllowRightBC = cms.bool(False)
-#process.trackerOnlyConversions.MinApproach = cms.double(-.25)
-#process.trackerOnlyConversions.DeltaCotTheta = cms.double(.07)
-#process.trackerOnlyConversions.DeltaPhi = cms.double(.2)
-
-# Remove impact parameter cuts
-process.photons.isolationSumsCalculatorSet.transImpactParameterA_Barrel=9999.0
-process.photons.isolationSumsCalculatorSet.transImpactParameterB_Barrel=9999.0
-process.photons.isolationSumsCalculatorSet.transImpactParameterA_Endcap=9999.0
-process.photons.isolationSumsCalculatorSet.transImpactParameterB_Endcap=9999.0
-process.photons.isolationSumsCalculatorSet.longImpactParameterA_Barrel=9999.0
-process.photons.isolationSumsCalculatorSet.longImpactParameterB_Barrel=9999.0
-process.photons.isolationSumsCalculatorSet.longImpactParameterA_Endcap=9999.0
-process.photons.isolationSumsCalculatorSet.longImpactParameterB_Endcap=9999.0
-
 # Modification for HI
 process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
 process.multiPhotonAnalyzer.GenParticleProducer = cms.InputTag("hiGenParticles")
@@ -104,8 +82,8 @@ process.multiPhotonAnalyzer.OutputFile = cms.string('ntuple-HiMPA.root')
 process.multiPhotonAnalyzer.isMC_      = cms.untracked.bool(False)
 process.singlePhotonAnalyzer.isMC_      = cms.untracked.bool(False)
 
-# Comp Cone off for the moment
-process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(False)
+# Comp Cone Analysis
+process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
 
 # Change the track collection
@@ -120,13 +98,23 @@ process.selectDigi.endcapSuperClusterProducer = cms.InputTag("correctedIslandEnd
 # timing
 process.Timing = cms.Service("Timing")                                         
 
+# random Cone
+process.load("RandomConeAna.RandomPhotonProducer.randomConeSequence_cff")
+process.compleSuperCluster.etCut            = process.multiPhotonAnalyzer.GammaPtMin
+process.compleSuperCluster.etaCut           = process.multiPhotonAnalyzer.GammaEtaMax
+process.compleSuperCluster.hoeCut           = cms.untracked.double(0.5)
+process.complePhoton.isolationSumsCalculatorSet.trackProducer = process.multiPhotonAnalyzer.TrackProducer
+#for HI setting
+process.complePhoton.primaryVertexProducer = process.multiPhotonAnalyzer.VertexProducer
+
+
 ########### End process #################
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 
 
 # let it run
 process.p = cms.Path(
-    process.photonCore*process.photons*process.photonIDSequence*
+  #  process.photonCore*process.photons*process.photonIDSequence*
     #    process.patHeavyIonDefaultSequence 
     #    process.heavyIon *
     process.makeHeavyIonPhotons *
