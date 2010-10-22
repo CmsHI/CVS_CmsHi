@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.3 2010/10/20 15:01:11 nart Exp $
+// $Id: RecHitTreeProducer.cc,v 1.4 2010/10/22 14:06:15 yilmaz Exp $
 //
 //
 
@@ -295,7 +295,7 @@ RecHitTreeProducer::beginJob()
   hbheTree->Branch("et",hbheRecHit.et,"et[n]/F");
   hbheTree->Branch("eta",hbheRecHit.eta,"eta[n]/F");
   hbheTree->Branch("phi",hbheRecHit.phi,"phi[n]/F");
-  hbheTree->Branch("isjet",hbheRecHit.isjet,"isjet[n]/I");
+  hbheTree->Branch("isjet",hbheRecHit.isjet,"isjet[n]/O");
   
   hfTree = fs->make<TTree>("hf","");
   hfTree->Branch("n",&hfRecHit.n,"n/I");
@@ -303,7 +303,7 @@ RecHitTreeProducer::beginJob()
   hfTree->Branch("et",hfRecHit.et,"et[n]/F");
   hfTree->Branch("eta",hfRecHit.eta,"eta[n]/F");
   hfTree->Branch("phi",hfRecHit.phi,"phi[n]/F");
-  hfTree->Branch("isjet",hfRecHit.isjet,"isjet[n]/I");
+  hfTree->Branch("isjet",hfRecHit.isjet,"isjet[n]/O");
 
   eeTree = fs->make<TTree>("ee","");
   eeTree->Branch("n",&eeRecHit.n,"n/I");
@@ -311,7 +311,7 @@ RecHitTreeProducer::beginJob()
   eeTree->Branch("et",eeRecHit.et,"et[n]/F");
   eeTree->Branch("eta",eeRecHit.eta,"eta[n]/F");
   eeTree->Branch("phi",eeRecHit.phi,"phi[n]/F");
-  eeTree->Branch("isjet",eeRecHit.isjet,"isjet[n]/I");
+  eeTree->Branch("isjet",eeRecHit.isjet,"isjet[n]/O");
  
   ebTree = fs->make<TTree>("eb","");
   ebTree->Branch("n",&ebRecHit.n,"n/I");
