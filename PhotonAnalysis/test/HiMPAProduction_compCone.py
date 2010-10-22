@@ -1,5 +1,5 @@
 #
-# \version $Id: HiMPAProduction_compCone.py,v 1.1 2010/10/22 12:01:59 kimy Exp $
+# \version $Id: HiMPAProduction_compCone.py,v 1.2 2010/10/22 12:49:47 kimy Exp $
 #
 
 import FWCore.ParameterSet.Config as cms
@@ -17,22 +17,9 @@ process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
 #    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_0_pre1/RelValPyquen_GammaJet_pt20_2760GeV/GEN-SIM-RECO/MC_38Y_V8-v1/0010/B6921A75-FA9B-DF11-92E8-001A92971B80.root'
 #    'file:B6921A75-FA9B-DF11-92E8-001A92971B80.root'
-    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_0_pre4/RelValHydjetQ_B0_2760GeV/GEN-SIM-RECO/MC_38Y_V11-v2/0027/0C4A6D7C-C5C3-DF11-90CE-0026189438ED.root'
-    )
+#    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_0_pre4/RelValHydjetQ_B0_2760GeV/GEN-SIM-RECO/MC_38Y_V11-v2/0027/0C4A6D7C-C5C3-DF11-90CE-0026189438ED.root'
+    'dcache:///pnfs/cmsaf.mit.edu/t2bat/cms/store/user/kimy/MinimumBiasHI/Spring10-JulyAnalysisExercise_MC_37Y_V4-HardEnriched-GEN-SIM-RECO/6a7752772a3d4259db7cafda4079c785/hiRecoJEX_RAW2DIGI_RECO_262_1_dAt.root')
 )
-
-################# ESSource for the centrality #####
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/cms/slc5_ia32_gcc434/cms/cmssw/CMSSW_3_9_0_pre4/src/RecoHI/HiCentralityAlgos/data/CentralityTables.db"
-process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-                                      process.CondDBCommon,
-                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits40_MC_Hydjet2760GeV_MC_3XY_V24_v0')
-                                                                 )
-                                                        )
-                                      )
-######################################################
-
 
 ## # EGamma sequence
 process.load("RecoHI.HiEgammaAlgos.HiEgamma_cff")
@@ -44,7 +31,24 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('MC_38Y_V8::All')
-# process.GlobalTag.globaltag = cms.string('GR10_P_V4::All')
+#process.GlobalTag.globaltag = cms.string('MC_37Y_V4::All')
+
+################# ESSource for the centrality #####
+process.GlobalTag.toGet = cms.VPSet(
+            cms.PSet(record = cms.string("HeavyIonRcd"),
+                                                   tag = cms.string("CentralityTable_HFhits40_Hydjet2760GeV_v0_mc"),
+                                                   connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS")
+                                                   )
+                        )
+######################################################     
+
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+                                                   randomSuperCluster = cms.PSet(
+    engineName = cms.untracked.string("TRandom3"),
+    initialSeed = cms.untracked.uint32(982346)
+    ))
+
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
@@ -105,8 +109,14 @@ process.compleSuperCluster.etaCut           = process.multiPhotonAnalyzer.GammaE
 process.compleSuperCluster.hoeCut           = cms.untracked.double(0.5)
 process.complePhoton.isolationSumsCalculatorSet.trackProducer = process.multiPhotonAnalyzer.TrackProducer
 #for HI setting
-process.complePhoton.primaryVertexProducer = process.multiPhotonAnalyzer.VertexProducer
+process.complePhoton.primaryVertexProducer  = process.multiPhotonAnalyzer.VertexProducer
+process.randomPhotonAnalyzer.vertexProducer = process.multiPhotonAnalyzer.VertexProducer
+process.randomPhotonAnalyzer.useHICentrality = cms.untracked.bool(True)
 
+process.TFileService = cms.Service("TFileService",
+                                   fileName = cms.string('randomConeNtuple.root'),
+                                   closeFileFast = cms.untracked.bool(True)
+                                   )
 
 ########### End process #################
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -120,6 +130,7 @@ process.p = cms.Path(
     process.makeHeavyIonPhotons *
     process.selectedPatPhotons *
     process.complePhotonSequence *
+    process.randomConeSqeunce *
     process.multiPhotonAnalyzer *
     process.endOfProcess
     )
