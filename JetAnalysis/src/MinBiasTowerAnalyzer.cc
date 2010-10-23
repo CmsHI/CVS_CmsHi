@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.20 2010/08/16 20:35:25 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.21 2010/09/09 15:05:01 yilmaz Exp $
 //
 //
 
@@ -316,7 +316,7 @@ MinBiasTowerAnalyzer::~MinBiasTowerAnalyzer()
 void MinBiasTowerAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 {
   loadEvent(ev, iSetup);
-  sumET();
+  if(doTowers_)  sumET();
   if(doMC_){
     analyzeMC();
     if(doGenParticles_) analyzeGenParticles();
@@ -335,18 +335,18 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
     iSetup.get<CaloGeometryRecord>().get(pGeo);
     geo = pGeo.product();
   }
-  
+
+  if(!isSignal_){
   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
     if(cbins_->getNbins() != (int)(missingTowersMean_.size())) edm::LogError("BadConfig")<<"Number of bins is inconsistent in centrality table "<<cbins_->getNbins()<<" and the number of towers table!"<<missingTowersMean_.size();
-
+  }
 
   if(doMC_){
     ev.getByLabel(HiSrc_,mc);
     ev.getByLabel(GenJetSrc_,genjets);
   }
-  
-  ev.getByLabel(HiCentSrc_,centrality);
-  ev.getByLabel(TowersSrc_,towers);
+  if(!isSignal_){  ev.getByLabel(HiCentSrc_,centrality);  }
+  if(doTowers_){  ev.getByLabel(TowersSrc_,towers); }
   
   if(!excludeJets_) {
     ev.getByLabel(PatJetSrc_,jets);
@@ -371,11 +371,12 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
 
 }
 void MinBiasTowerAnalyzer::sumET(){
-   sumET_ = centrality->EtMidRapiditySum();
-   double hf = centrality->EtHFhitSum();
-   int bin = cbins_->getBin(hf); 
+   if(!isSignal_) sumET_ = centrality->EtMidRapiditySum();
+   double hf;
+   if(!isSignal_) hf = centrality->EtHFhitSum();
+   int bin;
+   if(!isSignal_) bin = cbins_->getBin(hf);
    if(isSignal_) bin = 0;
-
    if(sumET_ == 0){
      for(unsigned int i = 0 ; i < towers->size(); ++i){
        const CaloTower& tower = (*towers)[i];
@@ -406,8 +407,10 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
   }
 
   bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
-  double hf = centrality->EtHFhitSum();
-  int bin = cbins_->getBin(hf); 
+  double hf;
+  if(!isSignal_) hf = centrality->EtHFhitSum();
+  int bin;
+  if(!isSignal_) bin = cbins_->getBin(hf);
   if(isSignal_)  bin = 0;
 
   double sumofTowerpt = 0;
@@ -486,13 +489,13 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     hRemainPUTow[bin]->Fill(tm[-i]);
     }
 
-    cout<<"tower size at mid-rapidity : "<<numberofTower<<endl;
+    cout<<"Tower size at MR: "<<numberofTower<<endl;
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
 	hTowerPT[bin]->Fill(0); 
-	cout<<"missed tower in Calotower collection"<<endl;
+	if(k == (towersize_- numberofTower)-1 ) cout<<"Number of missed tower at MR: "<<towersize_- numberofTower<<endl;
       }
-    
+   
     	average_pt=sumofTowerpt/(numberofTower);
 	hMean[bin]->Fill(average_pt);
 	average_nojetpt=sumofTowerNojetpt/numberofNojetTower;
@@ -540,9 +543,10 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
   int njet = jets->size();
   int njet20 = 0;
   int njet30 = 0;
-  
-  double hf = centrality->EtHFhitSum();
-  int bin = cbins_->getBin(hf); 
+  double hf;
+  if(!isSignal_) hf = centrality->EtHFhitSum();
+  int bin;
+  if(!isSignal_) bin = cbins_->getBin(hf);
   if(isSignal_) bin = 0;
 
   for(unsigned int i = 0 ; i < fakejets->size(); ++i){
@@ -605,9 +609,11 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
 
 void MinBiasTowerAnalyzer::analyzeRecHits(){
   bool interest = sumET_>SumEtMin_ && sumET_<SumEtMax_;
-  double hf = centrality->EtHFhitSum();
-  int bin = cbins_->getBin(hf);
-  if(isSignal_) bin = 0;
+  double hf;
+  if(!isSignal_) hf = centrality->EtHFhitSum();
+  int bin;
+  if(!isSignal_) bin = cbins_->getBin(hf);
+  if(isSignal_)  bin = 0;
   int calo = 0;
   
   for(unsigned int i = 0; i < hfHits->size(); ++i){
