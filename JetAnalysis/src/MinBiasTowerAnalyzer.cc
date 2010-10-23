@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.21 2010/09/09 15:05:01 yilmaz Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.22 2010/10/23 15:47:27 nart Exp $
 //
 //
 
@@ -162,6 +162,7 @@ private:
   bool doTowers_;
   bool doRecHits_;
   bool isSignal_;
+  bool doFastJets_;
   
   InputTag ktSrc_;
   InputTag akSrc_;
@@ -182,7 +183,7 @@ private:
   const CaloGeometry *geo;
   edm::Service<TFileService> fs;
   
-  TNtuple* nt;
+  TNtuple* ntRandom;
   TNtuple* ntHits;
   TRandom * rand;
   
@@ -278,6 +279,7 @@ MinBiasTowerAnalyzer::MinBiasTowerAnalyzer(const edm::ParameterSet& iConfig) :
 	isSignal_ = iConfig.getUntrackedParameter<bool>("isSignal",false);
 	doGenParticles_  = iConfig.getUntrackedParameter<bool>("doGenParticles",false);
         excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",true);
+	doFastJets_ = iConfig.getUntrackedParameter<bool>("doFastJets",false);
 	doEventPlane_ = iConfig.getUntrackedParameter<bool>("doEventPlane",false);
 	PatJetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("patJetSrc",edm::InputTag("icPu5patJets"));
 	HiSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hiSrc",edm::InputTag("heavyIon"));
@@ -352,8 +354,8 @@ void MinBiasTowerAnalyzer::loadEvent(const edm::Event& ev, const edm::EventSetup
     ev.getByLabel(PatJetSrc_,jets);
     ev.getByLabel(DirectSrc_,directions);
     ev.getByLabel(FakeJetSrc_,fakejets);
-    ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
-    ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
+    if(doFastJets_) ev.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
+    if(doFastJets_) ev.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
   }  
 
    if(doEventPlane_) {    
@@ -564,21 +566,23 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
     double eta = fakejet.eta();
     double phiRel = reco::deltaPhi(fakejet.phi(),phi0_);
     double phi =fakejet.phi();
-    
-    double ktRho = getRho(eta,*ktRhos);
-    double akRho = getRho(eta,*akRhos);
-    
+
+    double ktRho;
+    if(doFastJets_) ktRho = getRho(eta,*ktRhos);
+    double akRho; 
+    if(doFastJets_) akRho = getRho(eta,*akRhos);
+
     int nc = 0;
     
     int nTow = -1;
     while(nTow < 0 || nTow > ncons) nTow = (int)(fNtowers[bin]->GetRandom());
     for(int ic1 = 0; ic1 < nTow; ++ic1){
       int ic = -1; 
-      
+
       while(find(used.begin(),used.end(), ic) != used.end() || ic < 0 || ic >= ncons){
 	
 	double r = rand->Rndm();
-	
+
 	ic = (int)(ncons*r);
       }
       used.push_back(ic);
@@ -589,17 +593,17 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       avphi += towphi*towpt;
       totpt += towpt;
       nc++;
-      
+
     }
     aveta /= totpt;
     avphi /= totpt;
     
-    float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
-    nt->Fill(entry);
+    float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,hf,ktRho,akRho};
+    ntRandom->Fill(entry);
     
     if(interest){
-      float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,centrality->EtHFhitSum(),ktRho,akRho};
-      nt->Fill(entry);
+      float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,-1,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,hf,ktRho,akRho};
+      ntRandom->Fill(entry);
     }
     
   }
@@ -700,7 +704,7 @@ void MinBiasTowerAnalyzer::analyzeRecHits(){
 void 
 MinBiasTowerAnalyzer::beginJob()
 {
-  nt = fs->make<TNtuple>("nt","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
+  ntRandom = fs->make<TNtuple>("ntRandom","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
   
   ntHits = fs->make<TNtuple>("ntHits","","e:et:eta:phi:ieta:iphi:hf:sumet:bin:calo:isjet");
   
