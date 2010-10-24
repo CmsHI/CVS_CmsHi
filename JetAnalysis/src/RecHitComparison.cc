@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.4 2010/10/20 15:51:18 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.5 2010/10/22 13:34:09 yilmaz Exp $
 //
 //
 
@@ -48,7 +48,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityBins.h"
 #include "DataFormats/CaloTowers/interface/CaloTower.h"
-#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
@@ -75,9 +75,6 @@ class RecHitComparison : public edm::EDAnalyzer {
       virtual void endJob() ;
 
       // ----------member data ---------------------------
-
-
-   edm::Handle<reco::Centrality> cent;
    edm::Handle<vector<double> > ktRhos;
    edm::Handle<vector<double> > akRhos;
 
@@ -106,7 +103,6 @@ class RecHitComparison : public edm::EDAnalyzer {
   edm::InputTag EESrc1_;
   edm::InputTag EESrc2_;
    edm::InputTag signalTag_;
-   edm::InputTag centTag_;
 
    TNtuple* ntEB;
   TNtuple* ntEE;
@@ -118,7 +114,7 @@ class RecHitComparison : public edm::EDAnalyzer {
    bool jetsOnly_;
 
    edm::Service<TFileService> fs;
-   const CentralityBins * cbins_;
+   CentralityProvider* centrality_;
    const CaloGeometry *geo;
 };
 
@@ -134,13 +130,11 @@ class RecHitComparison : public edm::EDAnalyzer {
 // constructors and destructor
 //
 RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
-   cbins_(0),
+   centrality_(0),
    geo(0),
    cone(0.5)
 {
    //now do what ever initialization is needed
-   centTag_ =  iConfig.getUntrackedParameter<edm::InputTag>("centrality",edm::InputTag("hiCentrality","","RECO"));
-
    jetsOnly_ = iConfig.getUntrackedParameter<bool>("jetsOnly",false);
    signalTag_ = iConfig.getUntrackedParameter<edm::InputTag>("signalJets",edm::InputTag("iterativeCone5CaloJets","","SIGNAL"));
 
@@ -173,8 +167,7 @@ RecHitComparison::~RecHitComparison()
 void
 RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 {
-
-   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+   if(!centrality_) centrality_ = new CentralityProvider(iSetup);
    if(!geo){
       edm::ESHandle<CaloGeometry> pGeo;
       iSetup.get<CaloGeometryRecord>().get(pGeo);
@@ -182,10 +175,8 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    }
 
    using namespace edm;
-
-   ev.getByLabel(centTag_,cent);
    ev.getByLabel(EBSrc1_,ebHits1);
-   ev.getByLabel(EBSrc1_,ebHits2);
+   ev.getByLabel(EBSrc2_,ebHits2);
    ev.getByLabel(signalTag_,signalJets);
 
    ev.getByLabel(HcalRecHitHFSrc1_,hfHits1);
@@ -196,12 +187,9 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    ev.getByLabel(EESrc1_,eeHits1);
    ev.getByLabel(EESrc2_,eeHits2);
 
-   double hf = cent->EtHFhitSum();
-   double sumet = cent->EtMidRapiditySum();
-   int run = ev.id().run();
-   run = 1;
-   int bin = cbins_->getBin(hf);
-   int margin = 0;
+   centrality_->newEvent(ev,iSetup);
+   double hf = centrality_->centralityValue(ev);
+   int bin = centrality_->getBin(ev);
 
    vector<double> fFull;
    vector<double> f05;
@@ -290,7 +278,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       double eta2 = pos2.eta();
       double phi2 = pos2.eta();
       double et2 = e2*sin(pos2.theta());
-      if(!jetsOnly_ ||  isjet) ntEB->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+      if(!jetsOnly_ ||  isjet) ntEB->Fill(e1,et1,e2,et2,eta2,phi2,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int i = 0; i < eeHits1->size(); ++i){
@@ -327,7 +315,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(!jetsOnly_ || isjet) ntEE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntEE->Fill(e1,et1,e2,et2,eta2,phi2,hf,bin,jetpt,drjet);
    }
    
    for(unsigned int i = 0; i < hbheHits1->size(); ++i){
@@ -364,7 +352,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(!jetsOnly_ || isjet) ntHBHE->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntHBHE->Fill(e1,et1,e2,et2,eta2,phi2,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int i = 0; i < hfHits1->size(); ++i){
@@ -401,7 +389,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double eta2 = pos2.eta();
      double phi2 = pos2.eta();
      double et2 = e2*sin(pos2.theta());
-     if(!jetsOnly_ || isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,sumet,hf,bin,jetpt,drjet);
+     if(!jetsOnly_ || isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,hf,bin,jetpt,drjet);
    }
 
    for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
@@ -420,10 +408,10 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 void 
 RecHitComparison::beginJob()
 {
-   ntEB = fs->make<TNtuple>("ntEB","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
-   ntEE = fs->make<TNtuple>("ntEE","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
-   ntHBHE = fs->make<TNtuple>("ntHBHE","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
-   ntHF = fs->make<TNtuple>("ntHF","","e1:et1:e2:et2:eta:phi:sumet:hf:bin:ptjet:drjet");
+   ntEB = fs->make<TNtuple>("ntEB","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
+   ntEE = fs->make<TNtuple>("ntEE","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
+   ntHBHE = fs->make<TNtuple>("ntHBHE","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
+   ntHF = fs->make<TNtuple>("ntHF","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
    ntjet = fs->make<TNtuple>("ntjet","","bin:pt:eta:ethit:f05:f1:f15:f2:f25:f3:em:emf");
    
 }

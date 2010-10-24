@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.7 2010/10/21 11:26:40 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.8 2010/10/21 16:24:04 yilmaz Exp $
 //
 //
 
@@ -297,8 +297,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 void 
 HiJetResponseAnalyzer::beginJob(){
   t= fs->make<TTree>("t","Jet Response Analyzer");
-  t->Branch("b",&jra_.b,"b/F");
-  t->Branch("hf",&jra_.hf,"hf/F");
   t->Branch("nref",&jra_.nref,"nref/I");
   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
   t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
@@ -309,7 +307,6 @@ HiJetResponseAnalyzer::beginJob(){
    t->Branch("refeta",jra_.refeta,"refeta[nref]/F");
    t->Branch("refphi",jra_.refphi,"refphi[nref]/F");
    t->Branch("weight",&jra_.weight,"weight/F");
-   t->Branch("bin",&jra_.bin,"bin/I");
    for(unsigned int im = 0; im < matchTags_.size(); ++im){
      JRA jrm;
      jraMatch_.push_back(jrm);
