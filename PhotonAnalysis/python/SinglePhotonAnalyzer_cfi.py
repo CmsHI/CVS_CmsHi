@@ -1,5 +1,5 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.5 2010/10/21 22:30:19 kimy Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.6 2010/10/22 12:49:47 kimy Exp $
 # 
 
 import FWCore.ParameterSet.Config as cms
@@ -54,7 +54,7 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       doStoreHLT                = cms.untracked.bool(True),
                                       doStoreHF                 = cms.untracked.bool(True),
                                       doStoreVertex             = cms.untracked.bool(True),
-                                      doStoreMET                = cms.untracked.bool(True),
+                                      doStoreMET                = cms.untracked.bool(False),
                                       doStoreJets               = cms.untracked.bool(True),
                                       doStoreCompCone           = cms.untracked.bool(True),
                                       )
