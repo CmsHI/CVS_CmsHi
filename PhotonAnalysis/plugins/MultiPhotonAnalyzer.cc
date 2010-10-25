@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.7 2010/10/21 22:30:19 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.8 2010/10/22 12:49:47 kimy Exp $
  *
  */
 
@@ -211,7 +211,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> px(kMaxPhotons), py(kMaxPhotons),  pz(kMaxPhotons);
   HTValVector<Float_t> pt(kMaxPhotons), eta(kMaxPhotons), phi(kMaxPhotons);
   
-  HTValVector<Float_t> r9(kMaxPhotons), rawEnergy(kMaxPhotons), preshowerEnergy(kMaxPhotons);
+  HTValVector<Float_t> r9(kMaxPhotons), scEnergy(kMaxPhotons), rawEnergy(kMaxPhotons), preshowerEnergy(kMaxPhotons);
   HTValVector<Float_t> phiWidth(kMaxPhotons), etaWidth(kMaxPhotons), scEta(kMaxPhotons), scPhi(kMaxPhotons);
   HTValVector<Int_t>   clustersSize(kMaxPhotons), numOfPreshClusters(kMaxPhotons);
   HTValVector<Float_t> ESRatio(kMaxPhotons);
@@ -345,6 +345,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 
 // Super-cluster parameters
 
+    scEnergy      (nphotonscounter)    =  photon.superCluster()->energy();
     rawEnergy      (nphotonscounter)   =  photon.superCluster()->rawEnergy();
     preshowerEnergy(nphotonscounter)   =  photon.superCluster()->preshowerEnergy();
     numOfPreshClusters(nphotonscounter)=  getNumOfPreshClusters(&photon, e);
@@ -760,6 +761,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"isEE",      isEE,      pfx+"nPhotons");
   
 
+  _ntuple->Column(pfx+"scEnergy",          scEnergy,          pfx+"nPhotons");
   _ntuple->Column(pfx+"rawEnergy",         rawEnergy,          pfx+"nPhotons");
   _ntuple->Column(pfx+"preshowerEnergy",   preshowerEnergy,    pfx+"nPhotons");
   _ntuple->Column(pfx+"numOfPreshClusters",numOfPreshClusters, pfx+"nPhotons");
