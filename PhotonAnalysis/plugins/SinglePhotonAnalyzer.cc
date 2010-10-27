@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.6 2010/10/19 14:34:40 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.7 2010/10/21 10:59:52 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -165,7 +165,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   // for July exercise
   isMC_                        = ps.getUntrackedParameter<bool>("isMC_",false); 
   
-  ptMin_                           = ps.getUntrackedParameter<double>("GammaPtMin", 10);
+  ptMin_                           = ps.getUntrackedParameter<double>("GammaPtMin", 15);
   etaMax_                          = ps.getUntrackedParameter<double>("GammaEtaMax",3);
   ecalBarrelMaxEta_                = ps.getUntrackedParameter<double>("EcalBarrelMaxEta",1.45);
   ecalEndcapMinEta_                = ps.getUntrackedParameter<double>("EcalEndcapMinEta",1.55);
@@ -177,6 +177,9 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 10);
   mcEtaMax_                        = ps.getUntrackedParameter<double>("McEtaMax",3.5);
 
+  etCutGenMatch_                   = ps.getUntrackedParameter<double>("etCutGenMatch",13);
+  etaCutGenMatch_                  = ps.getUntrackedParameter<double>("etaCutGenMatch",3);
+  
   doStoreGeneral_                  = ps.getUntrackedParameter<bool>("doStoreGeneral",true);
   doStoreCentrality_                  = ps.getUntrackedParameter<bool>("doStoreCentrality",true);
   doStoreL1Trigger_                = ps.getUntrackedParameter<bool>("doStoreL1Trigger",true);
@@ -186,7 +189,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   doStoreMET_                      = ps.getUntrackedParameter<bool>("doStoreMET",true);
   doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",true);
   doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",true);
-  
+  doStoreConversions_              = ps.getUntrackedParameter<bool>("doStoreConversions",false);
   
   // book ntuples; columns are defined dynamically later
   tplmgr = new HTupleManager(outputFile_.c_str(),"RECREATE");
@@ -595,7 +598,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     for (reco::GenParticleCollection::const_iterator it_gen = 
    	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
-      if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
+       if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
       
       count++;
       _ptHist->Fill(p.pt()); 
@@ -650,7 +653,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       _ntupleMC->Column("trkIsoDR04", genTrkIsoDR04);
   
       // conversion MC truth
-      storeConvMCTruth(e, it_gen, _ntupleMC);
+      //   storeConvMCTruth(e, it_gen, _ntupleMC);   // turned off for HI.
       
       if(fillMCNTuple_)
 	_ntupleMC->DumpData();
@@ -1240,15 +1243,18 @@ bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon
     try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
     
     for (reco::GenParticleCollection::const_iterator it_gen = 
-	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
-      
-      const reco::Candidate &p = (*it_gen);    
-      if ( p.status() != 1 || fabs(p.pdgId()) != pdgId_ ) continue;
-      if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
-	if( p.numberOfMothers() > 0 ) {
-	  momId = p.mother()->pdgId();
+	    genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
+       
+       const reco::Candidate &p = (*it_gen);  
+       if ( p.status() != 1 || fabs(p.pdgId()) != pdgId_ ) continue;
+       if ( p.et() < etCutGenMatch_ ) continue;
+       if ( fabs(p.eta()) > etaCutGenMatch_ ) continue;
+       
+       if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
+	  if( p.numberOfMothers() > 0 ) {
+	     momId = p.mother()->pdgId();
 	  if( p.mother()->numberOfMothers() > 0 ) {
-	    grandMomId = p.mother()->mother()->pdgId();
+	     grandMomId = p.mother()->mother()->pdgId();
 	  }
 	  nSiblings = p.mother()->numberOfDaughters();
 	}
@@ -1256,18 +1262,21 @@ bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon
 	currentMaxPt  = p.pt();
 	matchedPart   = it_gen;
 	genMatchedCollId = it_gen->collisionId();
-      }
+       }
     } // end of loop over gen particles
 
     // if no matching photon was found try with other particles
     if( !isGenMatched ) { 
-      
-      currentMaxPt = -1;
-      for (reco::GenParticleCollection::const_iterator it_gen = 
-	     genParticles->begin(); it_gen!= genParticles->end(); it_gen++){      
-	const reco::Candidate &p = (*it_gen);    	
-	if (p.status() != 1 || find(otherPdgIds_.begin(),otherPdgIds_.end(),fabs(p.pdgId())) == otherPdgIds_.end() ) continue;
-	if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
+       
+       currentMaxPt = -1;
+       for (reco::GenParticleCollection::const_iterator it_gen = 
+	       genParticles->begin(); it_gen!= genParticles->end(); it_gen++){      
+	  const reco::Candidate &p = (*it_gen);    	
+	  if (p.status() != 1 || find(otherPdgIds_.begin(),otherPdgIds_.end(),fabs(p.pdgId())) == otherPdgIds_.end() ) continue;
+	  if ( p.et() < etCutGenMatch_ ) continue;
+	  if ( fabs(p.eta()) > etaCutGenMatch_ ) continue;
+	  
+	  if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
 	  momId = p.pdgId();
 	  if( p.numberOfMothers() > 0 ) {
 	    grandMomId = p.mother()->pdgId();

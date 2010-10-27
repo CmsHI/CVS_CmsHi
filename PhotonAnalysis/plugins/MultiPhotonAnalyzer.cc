@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.8 2010/10/22 12:49:47 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.9 2010/10/25 15:09:31 yjlee Exp $
  *
  */
 
@@ -269,10 +269,6 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
 
 
-
-
-  HTValVector<Float_t> txy(kMaxPhotons), drxy(kMaxPhotons)  ;
-  
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
   
@@ -586,7 +582,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     // Conversion
     
-    hasConversionTracks(nphotonscounter)   =  photon.hasConversionTracks();
+    if (doStoreConversions_)
+       hasConversionTracks(nphotonscounter)   =  photon.hasConversionTracks();
     hasPixelSeed       (nphotonscounter)   =  photon.hasPixelSeed();
     
     // IDs
@@ -595,22 +592,22 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     try { isTight(nphotonscounter)=photon.photonID("PhotonCutBasedIDTight"); } 
     catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
     
-    if (photon.conversions().size() > 0) {
-      
-      isConverted(nphotonscounter)   = kTRUE;
+    if ( (doStoreConversions_) && (photon.conversions().size() > 0)  ) {
+       
+       isConverted(nphotonscounter)   = kTRUE;
       nTracks(nphotonscounter)       = photon.conversions()[0]->nTracks();
       
       if (nTracks(nphotonscounter) == 2) {
-	convPairInvariantMass(nphotonscounter)      = photon.conversions()[0]->pairInvariantMass(); 
-	convpairCotThetaSeparation(nphotonscounter) = photon.conversions()[0]->pairCotThetaSeparation(); 
-	convPairMomentum(nphotonscounter)           = TVector3(photon.conversions()[0]->pairMomentum().x(),
-							       photon.conversions()[0]->pairMomentum().y(),
-							       photon.conversions()[0]->pairMomentum().z()); 
-	convPairMomentumMag(nphotonscounter)        = sqrt(photon.conversions()[0]->pairMomentum().Mag2()); 
-	convPairMomentumPerp(nphotonscounter)       = sqrt(photon.conversions()[0]->pairMomentum().perp2()); 
-	convPairMomentumEta(nphotonscounter)        = photon.conversions()[0]->pairMomentum().eta(); 
-	convPairMomentumPhi(nphotonscounter)        = photon.conversions()[0]->pairMomentum().phi(); 
-	convPairMomentumX(nphotonscounter)          = photon.conversions()[0]->pairMomentum().x(); 
+	 convPairInvariantMass(nphotonscounter)      = photon.conversions()[0]->pairInvariantMass(); 
+	 convpairCotThetaSeparation(nphotonscounter) = photon.conversions()[0]->pairCotThetaSeparation(); 
+	 convPairMomentum(nphotonscounter)           = TVector3(photon.conversions()[0]->pairMomentum().x(),
+								photon.conversions()[0]->pairMomentum().y(),
+								photon.conversions()[0]->pairMomentum().z()); 
+	 convPairMomentumMag(nphotonscounter)        = sqrt(photon.conversions()[0]->pairMomentum().Mag2()); 
+	 convPairMomentumPerp(nphotonscounter)       = sqrt(photon.conversions()[0]->pairMomentum().perp2()); 
+	 convPairMomentumEta(nphotonscounter)        = photon.conversions()[0]->pairMomentum().eta(); 
+	 convPairMomentumPhi(nphotonscounter)        = photon.conversions()[0]->pairMomentum().phi(); 
+	 convPairMomentumX(nphotonscounter)          = photon.conversions()[0]->pairMomentum().x(); 
 	convPairMomentumY(nphotonscounter)          = photon.conversions()[0]->pairMomentum().y(); 
 	convPairMomentumZ(nphotonscounter)          = photon.conversions()[0]->pairMomentum().z();        
 	convDistOfMinimumApproach(nphotonscounter)  = photon.conversions()[0]->distOfMinimumApproach(); 
@@ -639,13 +636,15 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 #endif	
 	chi2Prob(nphotonscounter) = ChiSquaredProbability(photon.conversions()[0]->conversionVertex().chi2(),
 							  photon.conversions()[0]->conversionVertex().ndof() );
-
+	
       }
       
       convEoverP(nphotonscounter)                     = photon.conversions()[0]->EoverP(); 
       convzOfPrimaryVertexFromTracks(nphotonscounter) = photon.conversions()[0]->zOfPrimaryVertexFromTracks(); 
       
-    }	
+    }
+    
+    
     
     
     ///////////////////////////////////////////
@@ -923,6 +922,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 
 
 // Conversion
+  if (doStoreConversions_) {
 
   _ntuple->Column(pfx+"hasConversionTracks", hasConversionTracks, pfx+"nPhotons");
   _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");
@@ -972,7 +972,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
  
   _ntuple->Column(pfx+"convEoverP",                     convEoverP, pfx+"nPhotons"); 
   _ntuple->Column(pfx+"convzOfPrimaryVertexFromTracks", convzOfPrimaryVertexFromTracks, pfx+"nPhotons"); 
-
+  }
+  
 
 // MC truth associations
   if (isMCData_) {

@@ -1,5 +1,5 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.6 2010/10/22 12:49:47 kimy Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.7 2010/10/25 15:12:31 yjlee Exp $
 # 
 
 import FWCore.ParameterSet.Config as cms
@@ -42,12 +42,14 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                             "HLT_Photon15_L1R",
                                             "HLT_Photon20_L1R"),
                                       GammaPtMin                = cms.untracked.double(15),
-                                      GammaEtaMax               = cms.untracked.double(1.6),
-                                      McPtMin                   = cms.untracked.double(5),
-                                      McEtaMax                  = cms.untracked.double(1.6),
+                                      GammaEtaMax               = cms.untracked.double(3.0),
+                                      McPtMin                   = cms.untracked.double(10),
+                                      McEtaMax                  = cms.untracked.double(3.5),
                                       EcalBarrelMaxEta          = cms.untracked.double(1.45),
                                       EcalEndcapMinEta          = cms.untracked.double(1.55),
                                       JetPtMin                  = cms.untracked.double(20),
+                                      etCutGenMatch             = cms.untracked.double(10),
+                                      etaCutGenMatch            = cms.untracked.double(3.5),
                                       doStoreGeneral            = cms.untracked.bool(True),
                                       doStoreCentrality         = cms.untracked.bool(True),
                                       doStoreL1Trigger          = cms.untracked.bool(True),
@@ -55,8 +57,9 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       doStoreHF                 = cms.untracked.bool(True),
                                       doStoreVertex             = cms.untracked.bool(True),
                                       doStoreMET                = cms.untracked.bool(False),
-                                      doStoreJets               = cms.untracked.bool(True),
+                                      doStoreJets               = cms.untracked.bool(False),
                                       doStoreCompCone           = cms.untracked.bool(True),
+                                      doStoreConversions        = cms.untracked.bool(False)
                                       )
 
 

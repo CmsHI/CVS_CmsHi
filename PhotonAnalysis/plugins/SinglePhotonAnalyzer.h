@@ -131,7 +131,9 @@ protected:
   std::vector<int> otherPdgIds_;  // PDG ID of other MC particles to match
   double       mcPtMin_;          // min MC particle pt
   double       mcEtaMax_;         // max MC particle eta
-  
+
+  double       etCutGenMatch_;    // cut for the genMatching.. 
+  double       etaCutGenMatch_;   // cut for the genMatching..
   // TupleManager, Histograms, ntuples
   HTupleManager  *tplmgr; 
   
@@ -164,7 +166,7 @@ protected:
   bool	doStoreVertex_;		 // Store Vertex
   bool 	doStoreMET_; 		 // Store MET
   bool 	doStoreJets_;		 // Store Jets
-
+  bool  doStoreConversions_;
   bool  doStoreCompCone_;
 
   HTuple         *_ntuple;        // Analysis ntuple
