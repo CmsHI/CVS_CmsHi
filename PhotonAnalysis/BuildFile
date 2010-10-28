@@ -1,3 +1,5 @@
+<use name=CondFormats/DataRecord>
+<use name=CondFormats/EcalObjects>
 <use name=FWCore/Framework>
 <use name=FWCore/ParameterSet>
 <use name=FWCore/ServiceRegistrys>
