@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Wed Oct 27 23:56:49 CEST 2010
-// $Id: HiEcalSpikeFilter.cc,v 1.1 2010/10/28 12:17:04 kimy Exp $
+// $Id: HiEcalSpikeFilter.cc,v 1.2 2010/10/28 12:41:41 kimy Exp $
 //
 //
 
@@ -223,18 +223,20 @@ HiEcalSpikeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    // get the channel status from the DB                                                                                  
    edm::ESHandle<EcalChannelStatus> chStatus;
    iSetup.get<EcalChannelStatusRcd>().get(chStatus);
-
+   
    
 
    // Find the leading gamma
    float leadingEt(-1), leadingEta(-1), leadingScEta(-1);
    
+   if ( (*photons).size() == 0 )  // no photon candidates..
+     return true;
    for (pho = (*photons).begin(); pho!= (*photons).end(); pho++){
-      float tet       = (float)pho->et();
-      if ( tet > leadingEt ) {
-	leadingEt = tet;
+     float tet       = (float)pho->et();
+     if ( tet > leadingEt ) {
+       leadingEt = tet;
 	leadingPho = pho;
-      }
+     }
    }
    
    leadingEt = leadingPho->et();
@@ -257,16 +259,16 @@ HiEcalSpikeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       recoFlag = it->recoFlag();
    }
    cout << "severity= " << severity << "   recoFlag= " << recoFlag <<endl;
-   cout << "definition of severity : http://cmslxr.fnal.gov/lxr/source/RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h?v=CMSSW_3_9_0_pre4" << endl;
-   cout << "and that   of reco flag: http://cmslxr.fnal.gov/lxr/source/DataFormats/EcalRecHit/interface/EcalRecHit.h?v=CMSSW_3_9_0_pre4#074" << endl;
+   //  cout << "definition of severity : http://cmslxr.fnal.gov/lxr/source/RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h?v=CMSSW_3_9_0_pre4" << endl;
+   //  cout << "and that   of reco flag: http://cmslxr.fnal.gov/lxr/source/DataFormats/EcalRecHit/interface/EcalRecHit.h?v=CMSSW_3_9_0_pre4#074" << endl;
    
    bool finalFlag = true;
    if ( (severity==3) || (severity==4) || (recoFlag ==2) )  
-      finalFlag = false;
+     finalFlag = false;
    else 
-      finalFlag = true;
-
-     return finalFlag;
+     finalFlag = true;
+   
+return finalFlag;
 }
 
 
