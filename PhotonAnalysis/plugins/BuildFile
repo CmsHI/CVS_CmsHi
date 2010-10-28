@@ -28,6 +28,6 @@
 <flags EDM_PLUGIN=1>
 <export></export>
 <library name=UserCodeDataAnalyzers_plugins 
-file=SinglePhotonAnalyzer.cc,MultiPhotonAnalyzer.cc,HiEcalSpikeFilter.cc>
+file=SinglePhotonAnalyzer.cc,MultiPhotonAnalyzer.cc>
   <use name=UserCode/HafHistogram>
 </library>
