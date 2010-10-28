@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Wed Oct 27 23:56:49 CEST 2010
-// $Id$
+// $Id: HiEcalSpikeFilter.cc,v 1.1 2010/10/28 12:17:04 kimy Exp $
 //
 //
 
@@ -232,7 +232,8 @@ HiEcalSpikeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    for (pho = (*photons).begin(); pho!= (*photons).end(); pho++){
       float tet       = (float)pho->et();
       if ( tet > leadingEt ) {
-	 leadingPho = pho;
+	leadingEt = tet;
+	leadingPho = pho;
       }
    }
    
