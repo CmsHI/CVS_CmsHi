@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id$
+// $Id: IsoConeInspector.cc,v 1.1 2010/10/31 16:17:00 kimy Exp $
 //
 //
 
@@ -89,16 +89,16 @@ class IsoConeInspector : public edm::EDAnalyzer {
    TH1D*  NoE ;
    TTree* theTree;
    int nPho, nBC, nRH; 
-   float et[100];
-   float eta[100];
-   float phi[100];
+   float et;
+   float eta;
+   float phi;
    float BCet[1000];
    float BCeta[1000];
    float BCphi[1000];
-   float RHet[65000];
-   float RHeta[65000];
-   float RHphi[65000];
-   
+   float RHet[5000];
+   float RHdEta[5000];
+   float RHdPhi[5000];
+
 
 
 };
@@ -193,40 +193,41 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    nBC  = 0;
    
    for (pho = (*photons).begin(); pho!= (*photons).end(); pho++){
-      float tet       = (float)pho->et();
-      float teta      = (float)pho->superCluster()->eta();
-      float tphi      = (float)pho->superCluster()->phi();
-      if ( tet < etCut_ )  continue;
-      if ( fabs(teta) > etaCut_ ) continue;
-      
-      et[nPho] = tet;
-      eta[nPho] = teta;
-      phi[nPho] = tphi;
+      et       = (float)pho->et();
+      eta      = (float)pho->superCluster()->eta();
+      phi      = (float)pho->superCluster()->phi();
+      if ( et < etCut_ )  continue;
+      if ( fabs(eta) > etaCut_ ) continue;
       
       math::XYZPoint theCaloPosition = pho->superCluster()->position();
       GlobalPoint pclu (theCaloPosition.x () , theCaloPosition.y () , theCaloPosition.z () );
-            
+      
       int subdetnr(0);
       subdetnr = 0;  // barrel
       CaloSubdetectorGeometry::DetIdSet chosen = subdet_[subdetnr]->getCells(pclu,extRadius_);// select cells around cluster
       CaloRecHitMetaCollectionV::const_iterator j=RecHitsBarrel->end();
+    
+
+      nRH = 0;
       for (CaloSubdetectorGeometry::DetIdSet::const_iterator  i = chosen.begin ();i!= chosen.end ();++i){//loop selected cells
-	 
 	 j=RecHitsBarrel->find(*i); // find selected cell among rechits
 	 if( j!=RecHitsBarrel->end()){ // add rechit only if available 
 	    const  GlobalPoint & position = theCaloGeom.product()->getPosition(*i);
-	    double eta = position.eta();
-	    double phi = position.phi();
-	    double etaDiff = eta - teta;
-	    double phiDiff= deltaPhi(phi,tphi);
-	    double energy = j->energy();
+	    double etarh = position.eta();
+	    double phirh = position.phi();
+	    double etaDiff = etarh - eta;
+	    double phiDiff= deltaPhi(phirh,phi);
+	    double energyrh = j->energy();
+	    double etrh    = energyrh/cosh(etarh);
+	    
+	    RHet[nRH]   = etrh;
+	    RHdEta[nRH] = etaDiff;
+	    RHdPhi[nRH] = phiDiff;
+	    nRH++;
 	 }
-	 
-	 
       }
+      theTree->Fill();
       
-	 
-	 nPho++;
    }
    
    /* how to remove the spikes? 
@@ -260,21 +261,21 @@ IsoConeInspector::beginJob()
 {
    NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -1., 1. );
    theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
-   theTree->Branch("nPho",&nPho,"nPho/I");
+   //   theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
    theTree->Branch("nRH",&nRH,"nRH/I");
 
-   theTree->Branch("et",et,"et[nPho]/F");
-   theTree->Branch("eta",eta,"eta[nPho]/F");
-   theTree->Branch("phi",phi,"phi[nPho]/F");
+   theTree->Branch("et",&et,"et/F");
+   theTree->Branch("eta",&eta,"eta/F");
+   theTree->Branch("phi",&phi,"phi/F");
 
-   theTree->Branch("BCet",BCet,"BCet[nBC]/F");
-   theTree->Branch("BCeta",BCeta,"BCeta[nBC]/F");
-   theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
+   //   theTree->Branch("BCet",BCet,"BCet[nBC]/F");
+   //  theTree->Branch("BCeta",BCeta,"BCeta[nBC]/F");
+   //  theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
 
    theTree->Branch("RHet",RHet,"RHet[nRH]/F");
-   theTree->Branch("RHeta",RHeta,"RHeta[nRH]/F");
-   theTree->Branch("RHphi",RHphi,"RHphi[nRH]/F");
+   theTree->Branch("RHdEta",RHdEta,"RHdEta[nRH]/F");
+   theTree->Branch("RHdPhi",RHdPhi,"RHdPhi[nRH]/F");
 
     
 }
