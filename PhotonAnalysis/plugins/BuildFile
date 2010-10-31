@@ -19,6 +19,7 @@
 <use name=RecoEgamma/EgammaMCTools>
 <use name=RecoJets/JetAlgorithms>
 <use name=CommonTools/Statistics>
+<use name=Geometry/Records>
 <use name=Geometry/CaloGeometry>
 <use name=Geometry/EcalAlgo>
 <use name=RecoHI/HiEgammaAlgos>
@@ -28,6 +29,7 @@
 <flags EDM_PLUGIN=1>
 <export></export>
 <library name=UserCodeDataAnalyzers_plugins 
-file=SinglePhotonAnalyzer.cc,MultiPhotonAnalyzer.cc>
+file=SinglePhotonAnalyzer.cc,MultiPhotonAnalyzer.cc,IsoConeInspector.cc>
   <use name=UserCode/HafHistogram>
 </library>
+

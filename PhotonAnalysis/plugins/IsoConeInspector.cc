@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.1 2010/10/31 16:17:00 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.2 2010/10/31 16:40:46 kimy Exp $
 //
 //
 
@@ -186,7 +186,7 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    RecHitsEndcap = std::auto_ptr<CaloRecHitMetaCollectionV>(new EcalRecHitMetaCollection(*rechitsCollectionEndcap));
 
    
-   double extRadius_ = 0.4;
+   double extRadius_ = 0.45;
    
    nPho = 0;
    nRH  = 0;
