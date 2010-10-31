@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.2 2010/10/31 16:40:46 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.3 2010/10/31 19:03:09 kimy Exp $
 //
 //
 
@@ -147,7 +147,10 @@ void
 IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
-   //grab the photon collection                                                                                                                        
+   //grab the photon collection
+   NoE->Fill(0);
+
+
    Handle<reco::PhotonCollection> photonColl;
    iEvent.getByLabel(photonSrc_, photonColl);
    const reco::PhotonCollection *photons = photonColl.product();
@@ -259,7 +262,7 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 void 
 IsoConeInspector::beginJob() 
 {
-   NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -1., 1. );
+   NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -100., 100. );
    theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
    //   theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
