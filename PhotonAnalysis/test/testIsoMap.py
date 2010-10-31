@@ -13,7 +13,8 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_6_3/RelValPhotonJets_Pt_10/GEN-SIM-RECO/START36_V10-v1/0005/780848E8-0978-DF11-9D44-00261894389C.root'
+    # 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_6_3/RelValPhotonJets_Pt_10/GEN-SIM-RECO/START36_V10-v1/0005/780848E8-0978-DF11-9D44-00261894389C.root'  # pp
+    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_1/RelValHydjetQ_MinBias_2760GeV/GEN-SIM-RECO/MC_39Y_V3-v1/0062/E062CB6E-49E4-DF11-B10A-00261894397D.root' # hi
     ),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
@@ -74,11 +75,18 @@ process.TFileService = cms.Service("TFileService",
 #process.load("RecoHI.HiEgammaAlgos.hiEcalSpikeFilter_cfi")
 
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
+process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
+
+process.isoConeMap.etCut = 5;  # For hydjet
+
+
+
 process.p = cms.Path(
  #   process.goodPhotons *
     #    process.photonFilter*
    # process.hiEcalSpikeFilter    
-    process.isoConeMap
+    process.isoConeMap  *
+    process.ecalHistProducer
     )
 
 
