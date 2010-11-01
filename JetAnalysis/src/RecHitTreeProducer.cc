@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.4 2010/10/22 14:06:15 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.5 2010/10/22 14:08:05 yilmaz Exp $
 //
 //
 
@@ -57,6 +57,7 @@
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "DataFormats/EcalDetId/interface/EcalDetIdCollections.h"
+#include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/DetId/interface/DetId.h"
 
 
@@ -75,6 +76,10 @@ struct MyRecHit{
   float eta[MAXHITS];
   float phi[MAXHITS];
   bool isjet[MAXHITS];
+
+   float jtpt;
+   float jteta;
+   float jtphi;
 
 };
 
@@ -110,6 +115,10 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   edm::Handle<HFRecHitCollection> hfHits;
   edm::Handle<HBHERecHitCollection> hbheHits;
 
+   edm::Handle<reco::BasicClusterCollection> bClusters;
+   edm::Handle<CaloTowerCollection> towers;
+
+
   typedef vector<EcalRecHit>::const_iterator EcalIterator;
   
   edm::Handle<reco::CaloJetCollection> jets;
@@ -118,11 +127,16 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   MyRecHit hfRecHit;
   MyRecHit ebRecHit;
   MyRecHit eeRecHit;
+   MyRecHit myBC;
+   MyRecHit myTowers;
 
   TTree* hbheTree;
   TTree* hfTree;
   TTree* ebTree;
   TTree* eeTree;
+   TTree* bcTree;
+   TTree* towerTree;
+
   double cone;
 
    edm::Service<TFileService> fs;
@@ -133,8 +147,14 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   edm::InputTag HcalRecHitHBHESrc_;
   edm::InputTag EBSrc_;
   edm::InputTag EESrc_;
+   edm::InputTag BCSrc_;
+
+   edm::InputTag TowerSrc_;
+
   edm::InputTag JetSrc_;
-  bool excludeJets_;
+
+  bool useJets_;
+   bool doBasicClusters_;
 
 };
 
@@ -155,13 +175,16 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
    cone(0.5)
 {
    //now do what ever initialization is needed
-
   EBSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEB"));
   EESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEE"));
   HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
+  BCSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
+  TowerSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
   JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeCone5CaloJets"));
-  excludeJets_ = iConfig.getUntrackedParameter<bool>("excludeJets",false);
+  useJets_ = iConfig.getUntrackedParameter<bool>("useJets",false);
+  doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
+
 }
 
 
@@ -194,12 +217,17 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
   ev.getByLabel(HcalRecHitHFSrc_,hfHits);
   ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
 
-
-  if(!excludeJets_) {
+  if(useJets_) {
     ev.getByLabel(JetSrc_,jets);
   }
+
+  if(doBasicClusters_){
+     ev.getByLabel(BCSrc_,bClusters);
+  }
+
+
   
-   if(0 && !cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+  if(0 && !cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
    if(!geo){
       edm::ESHandle<CaloGeometry> pGeo;
@@ -214,7 +242,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.eta[hfRecHit.n] = getEta(hit.id());
      hfRecHit.phi[hfRecHit.n] = getPhi(hit.id());
      hfRecHit.isjet[hfRecHit.n] = false;
-     if(!excludeJets_){
+     if(!useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(hfRecHit.eta[hfRecHit.n],hfRecHit.phi[hfRecHit.n],jet.eta(),jet.phi());
@@ -231,7 +259,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hbheRecHit.eta[hbheRecHit.n] = getEta(hit.id());
      hbheRecHit.phi[hbheRecHit.n] = getPhi(hit.id());
      hbheRecHit.isjet[hbheRecHit.n] = false; 
-     if(!excludeJets_){
+     if(!useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(hbheRecHit.eta[hbheRecHit.n],hbheRecHit.phi[hbheRecHit.n],jet.eta(),jet.phi());
@@ -248,7 +276,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      ebRecHit.eta[ebRecHit.n] = getEta(hit.id());
      ebRecHit.phi[ebRecHit.n] = getPhi(hit.id());
      ebRecHit.isjet[ebRecHit.n] = false;
-     if(!excludeJets_){
+     if(!useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(ebRecHit.eta[ebRecHit.n],ebRecHit.phi[ebRecHit.n],jet.eta(),jet.phi());
@@ -265,7 +293,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      eeRecHit.eta[eeRecHit.n] = getEta(hit.id());
      eeRecHit.phi[eeRecHit.n] = getPhi(hit.id());
      eeRecHit.isjet[eeRecHit.n] = false;
-     if(!excludeJets_){
+     if(!useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(eeRecHit.eta[eeRecHit.n],eeRecHit.phi[eeRecHit.n],jet.eta(),jet.phi());
@@ -274,7 +302,31 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
      eeRecHit.n++;
    }
-   
+
+
+   if(doBasicClusters_){
+      for(unsigned int j = 0 ; j < jets->size(); ++j){
+	 const reco::Jet& jet = (*jets)[j];
+	 myBC.n = 0;
+	 myBC.jtpt = jet.pt();
+	 myBC.jteta = jet.eta();
+         myBC.jtphi = jet.phi();
+
+	 for(unsigned int i = 0; i < bClusters->size(); ++i){
+	    const reco::BasicCluster & bc= (*bClusters)[i];
+	    double dr = reco::deltaR(bc.eta(),bc.phi(),jet.eta(),jet.phi());
+	    if(dr < cone){ 
+	       myBC.e[myBC.n] = bc.energy();
+	       myBC.et[myBC.n] = bc.energy()*sin(bc.position().theta());
+	       myBC.eta[myBC.n] = bc.eta();
+	       myBC.phi[myBC.n] = bc.phi();
+	       myBC.n++; 
+	    }
+	 }
+	 bcTree->Fill(); 
+      }
+   }
+  
    eeTree->Fill();
    ebTree->Fill();
    
@@ -320,6 +372,21 @@ RecHitTreeProducer::beginJob()
   ebTree->Branch("eta",ebRecHit.eta,"eta[n]/F");
   ebTree->Branch("phi",ebRecHit.phi,"phi[n]/F");
   ebTree->Branch("isjet",ebRecHit.isjet,"isjet[n]/O");
+
+  if(doBasicClusters_){
+     bcTree = fs->make<TTree>("bc","");
+     bcTree->Branch("n",&myBC.n,"n/I");
+     bcTree->Branch("e",myBC.e,"e[n]/F");
+     bcTree->Branch("et",myBC.et,"et[n]/F");
+     bcTree->Branch("eta",myBC.eta,"eta[n]/F");
+     bcTree->Branch("phi",myBC.phi,"phi[n]/F");
+     bcTree->Branch("jtpt",&myBC.jtpt,"jtpt/F");
+     bcTree->Branch("jteta",&myBC.jteta,"jteta/F");
+     bcTree->Branch("jtphi",&myBC.jtphi,"jtphi/F");
+     //     bcTree->Branch("isjet",bcRecHit.isjet,"isjet[n]/O");
+  }
+
+
 
 }
 

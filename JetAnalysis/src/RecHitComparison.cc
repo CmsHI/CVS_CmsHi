@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.5 2010/10/22 13:34:09 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.6 2010/10/24 14:39:32 yilmaz Exp $
 //
 //
 
@@ -55,6 +55,8 @@
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 
+#include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
+
 #include "TNtuple.h"
 
 using namespace std;
@@ -88,6 +90,10 @@ class RecHitComparison : public edm::EDAnalyzer {
   edm::Handle<HBHERecHitCollection> hbheHits1;
   edm::Handle<HBHERecHitCollection> hbheHits2;
 
+   edm::Handle<reco::BasicClusterCollection> bClusters1;
+   edm::Handle<reco::BasicClusterCollection> bClusters2;
+
+
    typedef vector<EcalRecHit>::const_iterator EcalIterator;
   typedef vector<HFRecHit>::const_iterator HFIterator;
   typedef vector<HBHERecHit>::const_iterator HBHEIterator;
@@ -102,8 +108,13 @@ class RecHitComparison : public edm::EDAnalyzer {
   edm::InputTag EBSrc2_;
   edm::InputTag EESrc1_;
   edm::InputTag EESrc2_;
+
+   edm::InputTag BCSrc1_;
+   edm::InputTag BCSrc2_;
+
    edm::InputTag signalTag_;
 
+   TNtuple* ntBC;
    TNtuple* ntEB;
   TNtuple* ntEE;
   TNtuple* ntHBHE;
@@ -112,6 +123,7 @@ class RecHitComparison : public edm::EDAnalyzer {
 
    double cone;
    bool jetsOnly_;
+   bool doBasicClusters_;
 
    edm::Service<TFileService> fs;
    CentralityProvider* centrality_;
@@ -136,6 +148,7 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
 {
    //now do what ever initialization is needed
    jetsOnly_ = iConfig.getUntrackedParameter<bool>("jetsOnly",false);
+   doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
    signalTag_ = iConfig.getUntrackedParameter<edm::InputTag>("signalJets",edm::InputTag("iterativeCone5CaloJets","","SIGNAL"));
 
   HcalRecHitHFSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc1",edm::InputTag("hfreco"));
@@ -146,7 +159,8 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
   EBSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","SIGNALONLY"));
   EESrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEE","RECO"));
   EESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEE","SIGNALONLY"));
-
+  BCSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
+  BCSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","SIGNALONLY"));
 }
 
 
@@ -186,6 +200,11 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
    ev.getByLabel(EESrc1_,eeHits1);
    ev.getByLabel(EESrc2_,eeHits2);
+
+   if(doBasicClusters_){
+      ev.getByLabel(BCSrc1_,bClusters1);
+      ev.getByLabel(BCSrc2_,bClusters2);
+   }
 
    centrality_->newEvent(ev,iSetup);
    double hf = centrality_->centralityValue(ev);
@@ -412,6 +431,9 @@ RecHitComparison::beginJob()
    ntEE = fs->make<TNtuple>("ntEE","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
    ntHBHE = fs->make<TNtuple>("ntHBHE","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
    ntHF = fs->make<TNtuple>("ntHF","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
+
+   ntBC = fs->make<TNtuple>("ntBC","","e1:et1:e2:et2:eta:phi:hf:bin:ptjet:drjet");
+
    ntjet = fs->make<TNtuple>("ntjet","","bin:pt:eta:ethit:f05:f1:f15:f2:f25:f3:em:emf");
    
 }
