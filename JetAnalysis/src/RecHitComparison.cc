@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.6 2010/10/24 14:39:32 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.7 2010/11/01 21:48:31 yilmaz Exp $
 //
 //
 
@@ -207,8 +207,8 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    }
 
    centrality_->newEvent(ev,iSetup);
-   double hf = centrality_->centralityValue(ev);
-   int bin = centrality_->getBin(ev);
+   double hf = centrality_->centralityValue();
+   int bin = centrality_->getBin();
 
    vector<double> fFull;
    vector<double> f05;
