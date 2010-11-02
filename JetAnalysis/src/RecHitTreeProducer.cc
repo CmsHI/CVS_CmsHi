@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.5 2010/10/22 14:08:05 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.6 2010/11/01 21:48:31 yilmaz Exp $
 //
 //
 
@@ -84,6 +84,12 @@ struct MyRecHit{
 };
 
 
+struct MyBkg{
+   int n;
+   float rho[50];
+   float sigma[50];
+};
+
 
 //
 // class declaration
@@ -122,6 +128,9 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   typedef vector<EcalRecHit>::const_iterator EcalIterator;
   
   edm::Handle<reco::CaloJetCollection> jets;
+
+   edm::Handle<std::vector<double> > rhos;
+   edm::Handle<std::vector<double> > sigmas;
   
   MyRecHit hbheRecHit;
   MyRecHit hfRecHit;
@@ -129,6 +138,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   MyRecHit eeRecHit;
    MyRecHit myBC;
    MyRecHit myTowers;
+   MyBkg bkg;
+
 
   TTree* hbheTree;
   TTree* hfTree;
@@ -136,6 +147,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   TTree* eeTree;
    TTree* bcTree;
    TTree* towerTree;
+   TTree* bkgTree;
 
   double cone;
 
@@ -148,14 +160,19 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   edm::InputTag EBSrc_;
   edm::InputTag EESrc_;
    edm::InputTag BCSrc_;
-
    edm::InputTag TowerSrc_;
 
   edm::InputTag JetSrc_;
 
+   edm::InputTag FastJetTag_;
+
   bool useJets_;
    bool doBasicClusters_;
+   bool doTowers_;
+   bool doEcal_;
+   bool doHcal_;
 
+   bool doFastJet_;
 };
 
 //
@@ -182,8 +199,13 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   BCSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
   TowerSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
   JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeCone5CaloJets"));
-  useJets_ = iConfig.getUntrackedParameter<bool>("useJets",false);
+  useJets_ = iConfig.getUntrackedParameter<bool>("useJets",true);
   doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
+  doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
+  doEcal_ = iConfig.getUntrackedParameter<bool>("doEcal",true);
+  doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
+  doFastJet_ = iConfig.getUntrackedParameter<bool>("doFastJet",true);
+  FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
 
 }
 
@@ -210,13 +232,18 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
   hbheRecHit.n = 0;
   ebRecHit.n = 0;
   eeRecHit.n = 0;
+  myBC.n = 0;
+   myTowers.n = 0;
+   bkg.n = 0;
 
+   if(doEcal_){
   ev.getByLabel(EBSrc_,ebHits);
   ev.getByLabel(EESrc_,eeHits);
-
+   }
+  if(doHcal_){
   ev.getByLabel(HcalRecHitHFSrc_,hfHits);
   ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
-
+  }
   if(useJets_) {
     ev.getByLabel(JetSrc_,jets);
   }
@@ -225,7 +252,19 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      ev.getByLabel(BCSrc_,bClusters);
   }
 
+  if(doTowers_){
+     ev.getByLabel(TowerSrc_,towers);
+  }
 
+  if(doFastJet_){
+     ev.getByLabel(edm::InputTag(FastJetTag_.label(),"rhos",FastJetTag_.process()),rhos);
+     ev.getByLabel(edm::InputTag(FastJetTag_.label(),"sigmas",FastJetTag_.process()),sigmas);
+     bkg.n = rhos->size();
+     for(unsigned int i = 0; i < rhos->size(); ++i){
+	bkg.rho[i] = (*rhos)[i];
+	bkg.sigma[i] = (*sigmas)[i];
+     }
+  }
   
   if(0 && !cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
@@ -235,6 +274,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       geo = pGeo.product();
    }
    
+   if(doHcal_){
    for(unsigned int i = 0; i < hfHits->size(); ++i){
      const HFRecHit & hit= (*hfHits)[i];
      hfRecHit.e[hfRecHit.n] = hit.energy();
@@ -242,7 +282,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.eta[hfRecHit.n] = getEta(hit.id());
      hfRecHit.phi[hfRecHit.n] = getPhi(hit.id());
      hfRecHit.isjet[hfRecHit.n] = false;
-     if(!useJets_){
+     if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(hfRecHit.eta[hfRecHit.n],hfRecHit.phi[hfRecHit.n],jet.eta(),jet.phi());
@@ -259,7 +299,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hbheRecHit.eta[hbheRecHit.n] = getEta(hit.id());
      hbheRecHit.phi[hbheRecHit.n] = getPhi(hit.id());
      hbheRecHit.isjet[hbheRecHit.n] = false; 
-     if(!useJets_){
+     if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(hbheRecHit.eta[hbheRecHit.n],hbheRecHit.phi[hbheRecHit.n],jet.eta(),jet.phi());
@@ -268,7 +308,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
      hbheRecHit.n++;
    }
-   
+   }
+   if(doEcal_){
    for(unsigned int i = 0; i < ebHits->size(); ++i){
      const EcalRecHit & hit= (*ebHits)[i];
      ebRecHit.e[ebRecHit.n] = hit.energy();
@@ -276,7 +317,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      ebRecHit.eta[ebRecHit.n] = getEta(hit.id());
      ebRecHit.phi[ebRecHit.n] = getPhi(hit.id());
      ebRecHit.isjet[ebRecHit.n] = false;
-     if(!useJets_){
+     if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(ebRecHit.eta[ebRecHit.n],ebRecHit.phi[ebRecHit.n],jet.eta(),jet.phi());
@@ -293,7 +334,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      eeRecHit.eta[eeRecHit.n] = getEta(hit.id());
      eeRecHit.phi[eeRecHit.n] = getPhi(hit.id());
      eeRecHit.isjet[eeRecHit.n] = false;
-     if(!useJets_){
+     if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 double dr = reco::deltaR(eeRecHit.eta[eeRecHit.n],eeRecHit.phi[eeRecHit.n],jet.eta(),jet.phi());
@@ -302,7 +343,28 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
      eeRecHit.n++;
    }
+   }
 
+   if(doTowers_){
+
+      for(unsigned int i = 0; i < towers->size(); ++i){
+      const CaloTower & hit= (*towers)[i];
+      myTowers.e[myTowers.n] = hit.energy();
+      myTowers.et[myTowers.n] = getEt(hit.id(),hit.energy());
+      myTowers.eta[myTowers.n] = getEta(hit.id());
+      myTowers.phi[myTowers.n] = getPhi(hit.id());
+      myTowers.isjet[myTowers.n] = false;
+      if(useJets_){
+	 for(unsigned int j = 0 ; j < jets->size(); ++j){
+	    const reco::Jet& jet = (*jets)[j];
+	    double dr = reco::deltaR(myTowers.eta[myTowers.n],myTowers.phi[myTowers.n],jet.eta(),jet.phi());
+	    if(dr < cone){ myTowers.isjet[myTowers.n] = true; }
+	 }
+      }
+      myTowers.n++;
+      }
+
+   }
 
    if(doBasicClusters_){
       for(unsigned int j = 0 ; j < jets->size(); ++j){
@@ -326,13 +388,15 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	 bcTree->Fill(); 
       }
    }
+
+   towerTree->Fill();
   
    eeTree->Fill();
    ebTree->Fill();
    
    hbheTree->Fill();
    hfTree->Fill();
-   
+   bkgTree->Fill();   
 }
 
 
@@ -373,6 +437,15 @@ RecHitTreeProducer::beginJob()
   ebTree->Branch("phi",ebRecHit.phi,"phi[n]/F");
   ebTree->Branch("isjet",ebRecHit.isjet,"isjet[n]/O");
 
+  towerTree = fs->make<TTree>("tower","");
+  towerTree->Branch("n",&myTowers.n,"n/I");
+  towerTree->Branch("e",myTowers.e,"e[n]/F");
+  towerTree->Branch("et",myTowers.et,"et[n]/F");
+  towerTree->Branch("eta",myTowers.eta,"eta[n]/F");
+  towerTree->Branch("phi",myTowers.phi,"phi[n]/F");
+  towerTree->Branch("isjet",myTowers.isjet,"isjet[n]/O");
+
+
   if(doBasicClusters_){
      bcTree = fs->make<TTree>("bc","");
      bcTree->Branch("n",&myBC.n,"n/I");
@@ -386,7 +459,12 @@ RecHitTreeProducer::beginJob()
      //     bcTree->Branch("isjet",bcRecHit.isjet,"isjet[n]/O");
   }
 
-
+  if(doFastJet_){
+     bkgTree = fs->make<TTree>("bkg","");
+     bkgTree->Branch("n",&bkg.n,"n/I");
+     bkgTree->Branch("rho",bkg.rho,"rho[n]/F");
+     bkgTree->Branch("sigma",bkg.sigma,"sigma[n]/F");
+  }
 
 }
 
