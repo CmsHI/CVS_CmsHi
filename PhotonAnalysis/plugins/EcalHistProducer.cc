@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.1 2010/11/03 12:29:46 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.2 2010/11/03 18:28:45 kimy Exp $
 //
 //
 
@@ -99,15 +99,15 @@ class EcalHistProducer : public edm::EDAnalyzer {
    
    TTree* theTree;
    int nPho, nBC, nRH, nSC; 
-   float energy[3000];
-   float et[3000];
-   float eta[3000];
-   float phi[3000];
+   float energy[5000];
+   float et[5000];
+   float eta[5000];
+   float phi[5000];
    
-   float SCenergy[100];
-   float SCet[100];
-   float SCeta[100];
-   float SCphi[100];
+   float SCenergy[1000];
+   float SCet[1000];
+   float SCeta[1000];
+   float SCphi[1000];
    
 
 };
