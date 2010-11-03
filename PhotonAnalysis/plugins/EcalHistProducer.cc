@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.3 2010/10/31 19:03:09 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.1 2010/11/03 12:29:46 kimy Exp $
 //
 //
 
@@ -60,6 +60,8 @@
 #include "RecoCaloTools/MetaCollections/interface/CaloRecHitMetaCollections.h"
 #include <Math/VectorUtil.h>
 #include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
+
 //
 // class declaration
 //
@@ -85,19 +87,28 @@ class EcalHistProducer : public edm::EDAnalyzer {
    
    edm::InputTag basicClusterBarrel_;
    edm::InputTag basicClusterEndcap_;
+   
+   edm::InputTag superClusterBarrel_;
+   edm::InputTag superClusterEndcap_;
+
+
    bool doSpikeClean_;
    TH1D*  NoE ;
    TH1D*  rhEE ;
    TH1D*  rhEB ;
    
    TTree* theTree;
-   int nPho, nBC, nRH; 
+   int nPho, nBC, nRH, nSC; 
    float energy[3000];
    float et[3000];
    float eta[3000];
    float phi[3000];
    
-
+   float SCenergy[100];
+   float SCet[100];
+   float SCeta[100];
+   float SCphi[100];
+   
 
 };
 
@@ -117,7 +128,9 @@ EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
    //now do what ever initialization is needed                                                                                                         
-   photonSrc_                       = iConfig.getParameter<edm::InputTag>("photonProducer"); // photons                                 
+   superClusterBarrel_                       = iConfig.getParameter<edm::InputTag>("superClusterBarrel"); // superclusters
+   superClusterEndcap_                       = iConfig.getParameter<edm::InputTag>("superClusterEndcap"); // superclusters
+   
    ebReducedRecHitCollection_       = iConfig.getParameter<edm::InputTag>("ebReducedRecHitCollection"); //,"reducedEcalRecHitsEB");            
    eeReducedRecHitCollection_       = iConfig.getParameter<edm::InputTag>("eeReducedRecHitCollection"); //,"reducedEcalRecHitsEE");        
    basicClusterBarrel_              = iConfig.getParameter<edm::InputTag>("basicClusterBarrel");
@@ -183,7 +196,8 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    for (reco::CaloClusterCollection::const_iterator bcItr = basicClusterE->begin(); bcItr != basicClusterE->end(); ++bcItr) {
       myBCs.push_back(*bcItr);
    }
-  
+
+   
    nBC=0;
    for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
       energy[nBC] = bcItr->energy();
@@ -195,10 +209,33 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    }
    
    
-   theTree->Fill();
+
+   //grab superClusters                                                                                                                      
+   Handle<reco::SuperClusterCollection> superClusterB;
+   iEvent.getByLabel(superClusterBarrel_, superClusterB);
+   Handle<reco::SuperClusterCollection> superClusterE;
+   iEvent.getByLabel(superClusterEndcap_, superClusterE);
+
+   reco::SuperClusterCollection mySCs;
+   for (reco::SuperClusterCollection::const_iterator scItr = superClusterB->begin(); scItr != superClusterB->end(); ++scItr) {
+      mySCs.push_back(*scItr);
+   }
+   for (reco::SuperClusterCollection::const_iterator scItr = superClusterE->begin(); scItr != superClusterE->end(); ++scItr) {
+      mySCs.push_back(*scItr);
+   }
    
-
-
+   
+   nSC=0;
+   for (reco::SuperClusterCollection::const_iterator scItr = mySCs.begin(); scItr != mySCs.end(); ++scItr) {
+      SCenergy[nSC] = scItr->energy();
+      SCeta[nSC]    = scItr->eta();
+      SCphi[nSC]    = scItr->phi();
+      SCet[nSC]     = SCenergy[nSC]/cosh(SCeta[nSC]);
+      
+      nSC++;
+   }
+   
+   theTree->Fill();
 
    /* how to remove the spikes? `
       const reco::CaloClusterPtr  seed = leadingPho->superCluster()->seed();
@@ -232,13 +269,20 @@ EcalHistProducer::beginJob()
    NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -100., 100. );
    rhEB     = fs->make<TH1D>( "rhEB"  , "", 10100,  -1., 100. );
    rhEE     = fs->make<TH1D>( "rhEE"  , "", 10100,  -1., 100. );
-   theTree  = fs->make<TTree>("basicCluster","Tree of Basic Clusters");
-   //   theTree->Branch("nPho",&nPho,"nPho/I");
+   theTree  = fs->make<TTree>("clusters","Tree of Basic Clusters");
+   theTree->Branch("nSC",&nSC,"nSC/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
-   theTree->Branch("e",energy,"e[nBC]/F");
-   theTree->Branch("et",et,"et[nBC]/F");
-   theTree->Branch("eta",eta,"eta[nBC]/F");
-   theTree->Branch("phi",phi,"phi[nBC]/F");
+ 
+   theTree->Branch("BCe",energy,"BCe[nBC]/F");
+   theTree->Branch("BCet",et,"BCet[nBC]/F");
+   theTree->Branch("BCeta",eta,"BCeta[nBC]/F");
+   theTree->Branch("BCphi",phi,"BCphi[nBC]/F");
+
+   theTree->Branch("SCe",SCenergy,"SCe[nSC]/F");
+   theTree->Branch("SCet",SCet,"SCet[nSC]/F");
+   theTree->Branch("SCeta",SCeta,"SCeta[nSC]/F");
+   theTree->Branch("SCphi",SCphi,"SCphi[nSC]/F");
+
 }
 
 // ------------ method called once each job just after ending the event loop  ------------

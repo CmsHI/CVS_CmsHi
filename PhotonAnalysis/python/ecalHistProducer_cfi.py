@@ -5,6 +5,8 @@ ecalHistProducer = cms.EDAnalyzer("EcalHistProducer",
                                   ebReducedRecHitCollection = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
                                   eeReducedRecHitCollection = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
                                   basicClusterBarrel        = cms.InputTag("islandBasicClusters","islandBarrelBasicClusters"),
-                                  basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters")
+                                  basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters"),
+                                  superClusterBarrel        = cms.InputTag("correctedIslandBarrelSuperClusters"),
+                                  superClusterEndcap        = cms.InputTag("correctedIslandEndcapSuperClusters")
                                   )
 
