@@ -28,6 +28,6 @@
 <flags EDM_PLUGIN=1>
 <export></export>
 <library name=UserCodeDataAnalyzers_plugins 
-file=IsoConeInspector.cc,EcalHistProducer.cc,SpikeInspector.cc>
+file=*.cc>
 </library>
 
