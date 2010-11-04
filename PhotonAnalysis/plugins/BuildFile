@@ -29,5 +29,6 @@
 <export></export>
 <library name=UserCodeDataAnalyzers_plugins 
 file=*.cc>
+ <use name=UserCode/HafHistogram>
 </library>
 
