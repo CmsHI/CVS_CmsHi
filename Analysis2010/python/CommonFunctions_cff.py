@@ -1,3 +1,5 @@
+import FWCore.ParameterSet.Config as cms
+
 # Turn of MC dependence in pat sequence
 def removePatMCMatch(process):
     process.prod.remove(process.genPartons)
