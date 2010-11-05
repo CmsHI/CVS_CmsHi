@@ -10,7 +10,7 @@
 //                                                                                                                                                                
 // Original Author:  Yongsun Kim                                                                                                                                    
 //         Created:  Sun Sep 20 05:04:32 EDT 2009                                                                                                                   
-// $Id: HiPatPhotonAna.cc,v 1.1 2010/04/08 14:00:42 kimy Exp $          
+// $Id: HiPatPhotonAna.cc,v 1.2 2010/09/29 15:57:36 yjlee Exp $          
 //                                                                                                                                                                       
 //                                                                                                                                                                       
 
@@ -47,7 +47,7 @@
 #include <string>
 #include "TNtuple.h"
 #include "TTree.h"
-#include <vector>
+//#include <vector>
 #include "CmsHi/PhotonAnalysis/interface/HiMCGammaJetSignalDef.h"
 #include "CmsHi/PhotonAnalysis/interface/HiPhotonMCTruth.h"
 
