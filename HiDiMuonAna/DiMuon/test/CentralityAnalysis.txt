@@ -1,0 +1,5 @@
+for centrality analysis first one should do 
+cvs co RecoHI/HiCentralityAlgos
+scram build
+
+Then all new centrality plots will work :)
