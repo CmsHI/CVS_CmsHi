@@ -1,5 +1,5 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.8 2010/10/27 15:56:48 kimy Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.9 2010/10/27 17:16:32 kimy Exp $
 # 
 
 import FWCore.ParameterSet.Config as cms
@@ -15,7 +15,7 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       GenParticleProducer       = cms.InputTag("hiGenParticles"),
                                       GenEventScale             = cms.InputTag("hiSignal"),
                                       PhotonProducer            = cms.InputTag("selectedPatPhotons"),
-                                      TrackProducer             = cms.InputTag("hiSelectedTracks"),
+                                      TrackProducer             = cms.InputTag("highPurityTracks"),
                                       JetProducer               = cms.InputTag("cleanLayer1Jets"),
                                       METProducer               = cms.InputTag("layer1METs"),
                                       VertexProducer            = cms.InputTag("offlinePrimaryVertices"),
