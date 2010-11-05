@@ -25,7 +25,7 @@ int muonkine()
   //const char *FNAME = "HydjetMBZ0Emb_final";
   stringstream sf;
   sf.str("");
-  sf << "C:\\root\\macros\\0720\\" << FNAME << ".root";
+  sf << FNAME << ".root";
   TFile *fdat = new TFile(sf.str().c_str());
   if(fdat->IsZombie()) { cout << "The root file cannot be openned.\n"; return 1; }
 
@@ -109,32 +109,32 @@ int muonkine()
 
   c->cd(); hmass->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_dimuon_mass.png";
+  sf << FNAME << "_dimuon_mass.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   c->cd(); hpt[0]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_dimuon_pt.png";
+  sf << FNAME << "_dimuon_pt.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   c->cd(); heta[0]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_dimuon_eta.png";
+  sf << FNAME << "_dimuon_eta.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   c->cd(); hphi[0]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_dimuon_phi.png";
+  sf << FNAME << "_dimuon_phi.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
 
   c->cd(); hpt[1]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_singlemuon_pt.png";
+  sf << FNAME << "_singlemuon_pt.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   c->cd(); heta[1]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_singlemuon_eta.png";
+  sf << FNAME << "_singlemuon_eta.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   c->cd(); hphi[1]->Draw("p");
   sf.str("");
-  sf << "C:\\root\\macros\\" << FNAME << "_singlemuon_phi.png";
+  sf << FNAME << "_singlemuon_phi.png";
   c->SaveAs(sf.str().c_str()); c->Clear();
   
   fdat->Close();
