@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id$
+// $Id: SpikeInspector.cc,v 1.1 2010/11/03 18:14:04 troxlo Exp $
 //
 //
 
@@ -66,7 +66,6 @@ Implementation:
 
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
 
-
 using namespace edm;
 using namespace std;
 using namespace reco;
@@ -103,6 +102,10 @@ class SpikeInspector : public edm::EDAnalyzer {
         TH2D *timingSwissMid;   //en2-en3
         TH2D *timingSwissHigh;  //en3+
 
+        TH2D *swissE2Low;
+        TH2D *swissE2Mid;
+        TH2D *swissE2High;
+
         TH1D *timingLow;
         TH1D *timingMid;
         TH1D *timingHigh;
@@ -110,6 +113,10 @@ class SpikeInspector : public edm::EDAnalyzer {
         TH1D *swissLow;
         TH1D *swissMid;
         TH1D *swissHigh;
+        
+        TH1D *e2e9Low;
+        TH1D *e2e9Mid;
+        TH1D *e2e9High;
 };
 
 //
@@ -146,6 +153,19 @@ SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
     timingSwissHigh->GetYaxis()->SetTitle("1-E4/E1");
     timingSwissHigh->Sumw2();
 
+    swissE2Low = fs->make<TH2D>("Swiss-E2E9 3-10 GeV","Swiss-E2/E9 3-10 GeV",120,0,1.2,120,0,1.2);
+    swissE2Low->GetYaxis()->SetTitle("E2/E9");
+    swissE2Low->GetXaxis()->SetTitle("1-E4/E1");
+    swissE2Low->Sumw2();
+    swissE2Mid = fs->make<TH2D>("Swiss-E2E9 10-15 GeV","Swiss-E2/E9 10-15 GeV",120,0,1.2,120,0,1.2);
+    swissE2Mid->GetYaxis()->SetTitle("E2/E9");
+    swissE2Mid->GetXaxis()->SetTitle("1-E4/E1");
+    swissE2Mid->Sumw2();
+    swissE2High = fs->make<TH2D>("Swiss-E2E9 15+ GeV","Swiss-E2/E9 15+ GeV",120,0,1.2,120,0,1.2);
+    swissE2High->GetYaxis()->SetTitle("E2/E9");
+    swissE2High->GetXaxis()->SetTitle("1-E4/E1");
+    swissE2High->Sumw2();
+
     timingLow = fs->make<TH1D>("timing 3-10 GeV","timing 3-10 GeV",80,-20,20);
     timingLow->GetXaxis()->SetTitle("Timing (ns)");
     timingMid = fs->make<TH1D>("timing 10-15 GeV","timing 10-15 GeV",80,-20,20);
@@ -159,6 +179,13 @@ SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
     swissMid->GetXaxis()->SetTitle("1-E4/E1");
     swissHigh = fs->make<TH1D>("swiss 15+ GeV","swiss 15+ GeV",120,0,1.2);
     swissHigh->GetXaxis()->SetTitle("1-E4/E1");
+
+    e2e9Low = fs->make<TH1D>("E2E9 3-10 GeV","E2/E9 3-10 GeV",120,0,1.2);
+    e2e9Low->GetXaxis()->SetTitle("1-E4/E1");
+    e2e9Mid = fs->make<TH1D>("E2E9 10-15 GeV","E2/E9 10-15 GeV",120,0,1.2);
+    e2e9Mid->GetXaxis()->SetTitle("1-E4/E1");
+    e2e9High = fs->make<TH1D>("E2E9 15+ GeV","E2/E9 15+ GeV",120,0,1.2);
+    e2e9High->GetXaxis()->SetTitle("1-E4/E1");
 }
 
 
@@ -199,25 +226,33 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if(superClusterCollection) {
         reco::SuperClusterCollection::const_iterator it;
         double swiss = 0;
+        double e2e9 = 0;
         for(it=superClusterCollection->begin(); it!=superClusterCollection->end(); it++) {
             DetId id = getMaximumRecHit(*(it->seed()),ecalRecHits);
 
             double time = recHitTime(id,ecalRecHits);
             swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
+            e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
             if(it->energy() >= en1 && it->energy() < en2) {
                 timingSwissLow->Fill(time,swiss);
+                swissE2Low->Fill(swiss,e2e9);
                 timingLow->Fill(time);
                 swissLow->Fill(swiss);
+                e2e9Low->Fill(e2e9);
             }
             else if(it->energy() >= en2 && it->energy() < en3) {
                 timingSwissMid->Fill(time,swiss);
+                swissE2Mid->Fill(swiss,e2e9);
                 timingMid->Fill(time);
                 swissMid->Fill(swiss);
+                e2e9Mid->Fill(e2e9);
             }
             else if(it->energy() >= en3) {
                 timingSwissHigh->Fill(time,swiss);
+                swissE2High->Fill(swiss,e2e9);
                 timingHigh->Fill(time);
                 swissHigh->Fill(swiss);
+                e2e9High->Fill(e2e9);
             }
         }
     }
