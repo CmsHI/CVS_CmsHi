@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from Z0Ana.ZToMuMu.patCandidatesForZMuMuSkim_cff import *
+from HiDiMuonAna.DiMuon.patCandidatesForDiMuonSkim_cff import *
 
 #goodMuons = cms.EDFilter("MuonViewRefSelector",
 goodMuons = cms.EDFilter("CandViewRefSelector",

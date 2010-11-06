@@ -23,7 +23,20 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
-'/store/express/HIRun2010/HIExpressPhysics/FEVT/Express-v1/000/150/064/E6333CC5-B5E8-DF11-8AEE-003048F118DE.root'
+
+
+    #'rfio:/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v1/000/150/063/78197C78-B4E8-DF11-ACE6-001D09F24259.root',
+    #'rfio:/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v1/000/150/026/5265C692-66E8-DF11-AAE0-000423D9A212.root',
+    #'rfio:/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v1/000/150/021/A0550AA0-45E8-DF11-9FED-0030487CD704.root'
+                
+
+
+
+
+
+##HI data express stream
+#'/store/express/HIRun2010/HIExpressPhysics/FEVT/Express-v1/000/150/064/E6333CC5-B5E8-DF11-8AEE-003048F118DE.root'
+##pp data
 #'/store/data/Run2010A/MinimumBias/RECO/v1/000/136/066/18F6DB82-5566-DF11-B289-0030487CAF0E.root'
 
     ),
@@ -87,7 +100,7 @@ process.output = cms.OutputModule("PoolOutputModule",
                                   dataset = cms.untracked.PSet(
     dataTier = cms.untracked.string('AOD'),
     filterName = cms.untracked.string('')),
-                                  fileName = cms.untracked.string('file:HI_expressStream_MuSkim.root'),
+                                  fileName = cms.untracked.string('file:HI_CorePhy_MuSkim.root'),
                                   SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('MuonSkim_Step')
                                                                     )
                                   )
