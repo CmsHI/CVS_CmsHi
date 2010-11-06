@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.1 2010/11/03 12:29:46 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.4 2010/11/05 11:51:47 troxlo Exp $
 //
 //
 
@@ -62,8 +62,10 @@ Implementation:
 #include "RecoCaloTools/MetaCollections/interface/CaloRecHitMetaCollections.h"
 #include <Math/VectorUtil.h>
 #include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 //
 // class declaration
@@ -91,7 +93,17 @@ class EcalHistProducer : public edm::EDAnalyzer {
         edm::InputTag basicClusterBarrel_;
         edm::InputTag basicClusterEndcap_;
         int centSource_;
+        bool RHCent_;
+        bool SCCent_;
+        bool BCCent_;
         bool doSpikeClean_;
+        bool RHetaCent_;
+        bool RHphiCent_;
+        bool SCetaCent_;
+        bool SCphiCent_;
+        bool BCetaCent_;
+        bool BCphiCent_;
+
         TH1D*  NoE ;
         TH1D*  rhEE ;
         TH1D*  rhEB ;
@@ -99,19 +111,31 @@ class EcalHistProducer : public edm::EDAnalyzer {
         TH1D   *rhEEcent[cBins], *rhEBcent[cBins];
         TH1D   *rhEtaCent[cBins], *rhPhiCent[cBins];
 
-        const CentralityBins *cbins_;
+        CentralityProvider *centrality_;
+
+        edm::InputTag superClusterBarrel_;   
+        edm::InputTag superClusterEndcap_;
 
         TTree* theTree;
-        int nPho, nBC, nRH; 
+        int nPho, nBC, nRH, nSC;
         int nBCcent[cBins];
-        float energy[3000];
-        float energyCent[cBins][3000];
-        float et[3000];
-        float etCent[cBins][3000];
-        float eta[3000];
-        float etaCent[cBins][3000];
-        float phi[3000];
-        float phiCent[cBins][3000];
+        int nSCcent[cBins];
+        float energy[5000];
+        float energyCent[cBins][5000];
+        float et[5000];
+        float etCent[cBins][5000];
+        float eta[5000];
+        float etaCent[cBins][5000];
+        float phi[5000];
+        float phiCent[cBins][5000];
+        float SCenergy[1000];    
+        float SCenergyCent[cBins][1000];
+        float SCet[1000];    
+        float SCetCent[cBins][1000];    
+        float SCeta[1000];   
+        float SCetaCent[cBins][1000];   
+        float SCphi[1000];
+        float SCphiCent[cBins][1000];
 
         double hf;
         double eb;
@@ -130,7 +154,7 @@ class EcalHistProducer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig) : cbins_(0)
+EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig)
 
 {
     //now do what ever initialization is needed
@@ -142,8 +166,20 @@ EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig) : cbins_(0)
 
     doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",false);
 
-    centSource_                      = iConfig.getUntrackedParameter<int>("centralitySource",1);
+    superClusterBarrel_                       = iConfig.getParameter<edm::InputTag>("superClusterBarrel"); // superclusters      
+    superClusterEndcap_                       = iConfig.getParameter<edm::InputTag>("superClusterEndcap"); // superclusters
 
+    RHCent_                         = iConfig.getUntrackedParameter<bool>("RHCent",true);
+    BCCent_                         = iConfig.getUntrackedParameter<bool>("BCCent",true);
+    SCCent_                         = iConfig.getUntrackedParameter<bool>("SCCent",true);
+
+    RHetaCent_                         = iConfig.getUntrackedParameter<bool>("RHetaCent",true);
+    BCetaCent_                         = iConfig.getUntrackedParameter<bool>("BCetaCent",true);
+    SCetaCent_                         = iConfig.getUntrackedParameter<bool>("SCetaCent",true);
+
+    RHphiCent_                         = iConfig.getUntrackedParameter<bool>("RHphiCent",true);
+    BCphiCent_                         = iConfig.getUntrackedParameter<bool>("BCphiCent",true);
+    SCphiCent_                         = iConfig.getUntrackedParameter<bool>("SCphiCent",true);
 }
 
 
@@ -164,12 +200,13 @@ EcalHistProducer::~EcalHistProducer()
     void
 EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+    std::cout<<"starting analyze"<<std::endl;
     using namespace edm;
 
-    if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+    if(!centrality_) centrality_ = new CentralityProvider(iSetup);
 
-    edm::Handle<reco::Centrality> cent;
-    iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
+    centrality_->newEvent(iEvent,iSetup);
+    const reco::Centrality *cent = centrality_->raw();
 
     hf = cent->EtHFhitSum();
     eb = cent->EtEBSum();
@@ -177,12 +214,7 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     nPixelTracks = cent->NpixelTracks();
 
     int bin = 0;
-    if(centSource_== 1)                 //1 = HF, 2 = EB
-        bin = cbins_->getBin(hf);
-    else if(centSource_ == 2)
-        bin = cbins_->getBin(eb);
-    else
-        LogDebug("EcalHistProducer") << "Error: Don't recognize centrality bin source!" << std::endl;
+    bin = centrality_->getBin();
 
     //grab the photon collection                                                                                                                        
     NoE->Fill(0);
@@ -237,12 +269,12 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
     nBC=0;
     for(int i=0; i<cBins; i++) {
-        nBCcent[i] = 0;
-        for(int j=0; j<3000; j++) {
-            energyCent[i][j] = -9999;
-            etCent[i][j] = -9999;
-            etaCent[i][j] = -9999;
-            phiCent[i][j] = -9999;
+        nBCcent[i] = -1;
+        for(int j=0; j<5000; j++) {
+            energyCent[i][j] = -1;
+            etCent[i][j] = -1;
+            etaCent[i][j] = -9;
+            phiCent[i][j] = -9;
         }
     }
     for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
@@ -253,10 +285,53 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         phi[nBC]    = bcItr->phi();
         phiCent[bin/cStep][nBCcent[bin/cStep]] = bcItr->phi();
         et[nBC]     = energy[nBC]/cosh(eta[nBC]);
-        etCent[bin/cStep][nBCcent[bin/cStep]] = energyCent[nBCcent[bin/cStep]][bin/cStep]/cosh(etaCent[nBCcent[bin/cStep]][bin/cStep]);
+        etCent[bin/cStep][nBCcent[bin/cStep]] = energyCent[bin/cStep][nBCcent[bin/cStep]]/cosh(etaCent[bin/cStep][nBCcent[bin/cStep]]);
 
         nBC++;
+        if(nBCcent[bin/cStep] < 0)
+            nBCcent[bin/cStep] = 0;
         nBCcent[bin/cStep]++;
+    }
+
+    //grab superClusters     
+    Handle<reco::SuperClusterCollection> superClusterB;      
+    iEvent.getByLabel(superClusterBarrel_, superClusterB);   
+    Handle<reco::SuperClusterCollection> superClusterE;      
+    iEvent.getByLabel(superClusterEndcap_, superClusterE);   
+
+    reco::SuperClusterCollection mySCs;      
+    for (reco::SuperClusterCollection::const_iterator scItr = superClusterB->begin(); scItr != superClusterB->end(); ++scItr) {   
+        mySCs.push_back(*scItr);      
+    }    
+    for (reco::SuperClusterCollection::const_iterator scItr = superClusterE->begin(); scItr != superClusterE->end(); ++scItr) {     
+        mySCs.push_back(*scItr);      
+    }    
+
+
+    nSC=0;   
+    for(int i=0; i<cBins; i++) {
+        nSCcent[i] = -1;
+        for(int j=0; j<1000; j++) {
+            SCenergyCent[i][j] = -1;
+            SCetCent[i][j] = -1;
+            SCetaCent[i][j] = -9;
+            SCphiCent[i][j] = -9;
+        }
+    }
+    for (reco::SuperClusterCollection::const_iterator scItr = mySCs.begin(); scItr != mySCs.end(); ++scItr) {    
+        SCenergy[nSC] = scItr->energy();      
+        SCenergyCent[bin/cStep][nSCcent[bin/cStep]] = scItr->energy();
+        SCeta[nSC]    = scItr->eta();     
+        SCetaCent[bin/cStep][nSCcent[bin/cStep]] = scItr->eta();
+        SCphi[nSC]    = scItr->phi();     
+        SCphiCent[bin/cStep][nSCcent[bin/cStep]] = scItr->phi();
+        SCet[nSC]     = SCenergy[nSC]/cosh(SCeta[nSC]);   
+        SCetCent[bin/cStep][nSCcent[bin/cStep]] = SCenergyCent[bin/cStep][nSCcent[bin/cStep]]/cosh(SCetaCent[bin/cStep][nSCcent[bin/cStep]]);
+
+        if(nSCcent[bin/cStep] < 0)
+            nSCcent[bin/cStep] = 0;
+        nSCcent[bin/cStep]++;
+        nSC++;
     }
 
     theTree->Fill();
@@ -279,6 +354,7 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        else
        finalFlag = true;
      */
+    std::cout<<"done analyze"<<std::endl;
 }
 
 
@@ -292,53 +368,97 @@ EcalHistProducer::beginJob()
 
     char name[200];
     char title[200];
-    for(int i=0; i<cBins; i++) {
-        sprintf(name,"NoEc%d",i);
-        sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-        NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
-        sprintf(name,"rhEBc%d",i);
-        sprintf(title,"rhEB Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-        rhEBcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
-        sprintf(name,"rhEEc%d",i);
-        sprintf(title,"rhEE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-        rhEEcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
-        sprintf(name,"rhEtac%d",i);
-        sprintf(title,"rhEta Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-        rhEtaCent[i] = fs->make<TH1D>(name,title,6000,-3.,3.);
-        sprintf(name,"rhPhic%d",i);
-        sprintf(title,"rhPhi Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-        rhPhiCent[i] = fs->make<TH1D>(name,title,6000,-3.2,3.2);
+    if(RHCent_) {
+        for(int i=0; i<cBins; i++) {
+            sprintf(name,"NoEc%d",i);
+            sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+            NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
+            sprintf(name,"rhEBc%d",i);
+            sprintf(title,"rhEB Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+            rhEBcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
+            sprintf(name,"rhEEc%d",i);
+            sprintf(title,"rhEE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+            rhEEcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
+            if(RHetaCent_) {
+                sprintf(name,"rhEtac%d",i);
+                sprintf(title,"rhEta Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+                rhEtaCent[i] = fs->make<TH1D>(name,title,6000,-3.,3.);
+            }
+            if(RHphiCent_) {
+                sprintf(name,"rhPhic%d",i);
+                sprintf(title,"rhPhi Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+                rhPhiCent[i] = fs->make<TH1D>(name,title,6000,-3.2,3.2);
+            }
+        }
     }
 
     theTree  = fs->make<TTree>("basicCluster","Tree of Basic Clusters");
     //   theTree->Branch("nPho",&nPho,"nPho/I");
     char format[200];
     theTree->Branch("nBC",&nBC,"nBC/I");
+    theTree->Branch("nSC",&nSC,"nSC/I");
     theTree->Branch("e",energy,"e[nBC]/F");
     theTree->Branch("et",et,"et[nBC]/F");
     theTree->Branch("eta",eta,"eta[nBC]/F");
     theTree->Branch("phi",phi,"phi[nBC]/F");
-    for(int i=0; i<cBins; i++) {
-        sprintf(name,"nBCcent%dto%d",i*cStep,(i+1)*cStep-1);
-        sprintf(format,"nBCcent/I");
-        theTree->Branch(name,&nBCcent[i],format);
-        sprintf(name,"eCent%dto%d",i*cStep,(i+1)*cStep-1);
-        sprintf(format,"energyCent[nBC]/F");
-        theTree->Branch(name,energyCent[i],format);
-        sprintf(name,"etCent%dto%d",i*cStep,(i+1)*cStep-1);
-        sprintf(format,"etCent[nBC]/F");
-        theTree->Branch(name,etCent[i],format);
-        sprintf(name,"etaCent%dto%d",i*cStep,(i+1)*cStep-1);
-        sprintf(format,"etaCent[nBC]/F");
-        theTree->Branch(name,etaCent[i],format);
-        sprintf(name,"phiCent%dto%d",i*cStep,(i+1)*cStep-1);
-        sprintf(format,"phiCent[nBC]/F");
-        theTree->Branch(name,phiCent[i],format);
+    if(BCCent_) {
+        for(int i=0; i<cBins; i++) {
+            sprintf(name,"nBCcent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"nBCcent/I");
+            theTree->Branch(name,&nBCcent[i],format);
+            sprintf(name,"eCent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"energyCent[nBC]/F");
+            theTree->Branch(name,energyCent[i],format);
+            sprintf(name,"etCent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"etCent[nBC]/F");
+            theTree->Branch(name,etCent[i],format);
+            if(BCetaCent_) {
+                sprintf(name,"etaCent%dto%d",i*cStep,(i+1)*cStep-1);
+                sprintf(format,"etaCent[nBC]/F");
+                theTree->Branch(name,etaCent[i],format);
+            }
+            if(BCphiCent_) {
+                sprintf(name,"phiCent%dto%d",i*cStep,(i+1)*cStep-1);
+                sprintf(format,"phiCent[nBC]/F");
+                theTree->Branch(name,phiCent[i],format);
+            }
+        }
     }
     theTree->Branch("hf",&hf,"hf/D");
     theTree->Branch("eb",&eb,"eb/D");
     theTree->Branch("multPixel",&multPixel,"multPixel/D");
     theTree->Branch("nPixelTracks",&nPixelTracks,"nPixelTracks/D");
+
+    theTree->Branch("SCe",SCenergy,"SCe[nSC]/F");      
+    theTree->Branch("SCet",SCet,"SCet[nSC]/F");      
+    theTree->Branch("SCeta",SCeta,"SCeta[nSC]/F");   
+    theTree->Branch("SCphi",SCphi,"SCphi[nSC]/F");
+    if(SCCent_) {
+        for(int i=0; i<cBins; i++) {
+            sprintf(name,"nSCcent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"nSCcent/I");
+            theTree->Branch(name,&nSCcent[i],format);
+            sprintf(name,"SCeCent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"SCenergyCent[nSC]/F");
+            theTree->Branch(name,energyCent[i],format);
+            sprintf(name,"SCetCent%dto%d",i*cStep,(i+1)*cStep-1);
+            sprintf(format,"SCetCent[nSC]/F");
+            theTree->Branch(name,etCent[i],format);
+            if(SCetaCent_) {
+                sprintf(name,"SCetaCent%dto%d",i*cStep,(i+1)*cStep-1);
+                sprintf(format,"SCetaCent[nSC]/F");
+                theTree->Branch(name,etaCent[i],format);
+            }
+            if(SCphiCent_) {
+                sprintf(name,"SCphiCent%dto%d",i*cStep,(i+1)*cStep-1);
+                sprintf(format,"SCphiCent[nSC]/F");
+                theTree->Branch(name,phiCent[i],format);
+            }
+        }
+    }
+
+    centrality_ = 0;
+    std::cout<<"done beginjob"<<std::endl;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
