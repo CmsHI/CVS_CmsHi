@@ -7,6 +7,16 @@ ecalHistProducer = cms.EDAnalyzer("EcalHistProducer",
                                   basicClusterBarrel        = cms.InputTag("islandBasicClusters","islandBarrelBasicClusters"),
                                   basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters"),
                                   superClusterBarrel        = cms.InputTag("correctedIslandBarrelSuperClusters"),
-                                  superClusterEndcap        = cms.InputTag("correctedIslandEndcapSuperClusters")
+                                  superClusterEndcap        = cms.InputTag("correctedIslandEndcapSuperClusters"),
+
+                                  RHCent    = cms.untracked.bool(True),
+                                  BCCent    = cms.untracked.bool(True),
+                                  SCCent    = cms.untracked.bool(True),
+                                  RHetaCent    = cms.untracked.bool(True),
+                                  BCetaCent    = cms.untracked.bool(True),
+                                  SCetaCent    = cms.untracked.bool(True),
+                                  RHphiCent    = cms.untracked.bool(True),
+                                  BCphiCent    = cms.untracked.bool(True),
+                                  SCphiCent    = cms.untracked.bool(True),
                                   )
 
