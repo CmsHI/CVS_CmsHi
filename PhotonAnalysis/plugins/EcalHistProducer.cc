@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.4 2010/11/05 11:51:47 troxlo Exp $
+// $Id: EcalHistProducer.cc,v 1.5 2010/11/06 12:22:27 troxlo Exp $
 //
 //
 
@@ -214,7 +214,7 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     nPixelTracks = cent->NpixelTracks();
 
     int bin = 0;
-    bin = centrality_->getBin();
+    bin = centrality_->getBin(iEvent);
 
     //grab the photon collection                                                                                                                        
     NoE->Fill(0);
