@@ -10,28 +10,36 @@ process = cms.Process("Demo")
 #        ),
 #                                    destinations = cms.untracked.vstring('cout')
 #                                    )
-
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'START39_V4::All' #for MC# Make sure you have the right global tag (*)
+'''
+from CmsHi.Analysis2010.CommonFunctions_cff import *
+overrideCentrality(process)
+'''
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-
+from QuickPlots.DimuonAnalyzer.HIExpressHIrun2010_v1_cfi import *
 process.source = cms.Source("PoolSource",
-                            noEventSort = cms.untracked.bool(True),
-                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
-                            fileNames = cms.untracked.vstring(
-                            "rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_01_1.root"
-                            )
+    noEventSort = cms.untracked.bool(True),
+    duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+   #                         fileNames = readFiles,
+    fileNames = cms.untracked.vstring('rfio:///castor/cern.ch/user/d/dmoon/cms390pre5/Hydjet_MinBias_2.76TeV_Z0_Flat_Emb_HLT_Reco/Hydjet_MinBias_2.76TeV_Z0_Flat_Emb_HLT_Reco_1.root' )
                            )
 
-#process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
-#process.load("CondCore.DBCommon.CondDBCommon_cfi")
-#process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/m/miheejo/scratch0/cms370v4/src/RecoHI/HiCentralityAlgos/data/CentralityTables.db"
 
-#process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-#                                        process.CondDBCommon,
-#                                        toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-#                                                                    tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
-#                                                                   )
-#                                                          )
-#                                       )
+process.HeavyIonGlobalParameters = cms.PSet(
+    centralityVariable = cms.string("HFhits"),
+    nonDefaultGlauberModel = cms.string("Hydjet_2760GeV"),
+    centralitySrc = cms.InputTag("hiCentrality")
+    )
+'''
+process.GlobalTag.toGet = cms.VPSet(
+    cms.PSet(record = cms.string("HeavyIonRcd"),
+             tag = cms.string("CentralityTable_HFhits40_Hydjet2760GeV_v1_mc"),
+             connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS")
+             )
+    )
+'''
+
 
 process.demo = cms.EDAnalyzer('DimuonAnalyzer',
                               genParticle  = cms.InputTag("hiGenParticles"),#no mixing:genParticles
@@ -45,25 +53,25 @@ process.demo = cms.EDAnalyzer('DimuonAnalyzer',
                               ptMinDimuon  = cms.double(0.),
                               etaMaxMuon   = cms.double(2.5),
                               etaMinMuon   = cms.double(-2.5),
-                              ptMinMuon    = cms.double(1.0), #Same as skim 0
+                              ptMinMuon    = cms.double(3.5),
                               etaMaxTrack  = cms.double(2.5),
                               etaMinTrack  = cms.double(-2.5),
                               ptMinTrack   = cms.double(1.),
-                              doRecoSingleMuon = cms.bool(True),
-                              doMC         = cms.bool(False),
-                              doReco       = cms.bool(True),
-                              doSim        = cms.bool(False),
-                              doSignal     = cms.bool(False),
-                              doZ0check    = cms.bool(False),
+                              doRecoSingleMuon = cms.bool(True),  #To check reconstructed muons = True
+                              doReco       = cms.bool(True),  #To check various reconstructed objects = True
+                              doMC         = cms.bool(False), #To read various generation level informations = True
+                              doSim        = cms.bool(False), #To do SimTrack checking = True
+                              doSignal     = cms.bool(False), #To see signal from generation = True
+                              doZ0check    = cms.bool(False), #To see mother of gen muons and daugher of gen Z0 = True
                               genSignal    = cms.untracked.InputTag("hiSignal"),
                               vertices     = cms.untracked.InputTag("hiSelectedVertex"),
                               simtracks    = cms.untracked.InputTag("mergedtruth","MergedTrackTruth")
                               )
+process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
 process.TFileService = cms.Service("TFileService", 
                                    fileName =
                                    cms.string("HydjetMBZ0Emb.root")
                                    )
 
-#process.p = cms.Path(process.demo*process.centralityFilter)
 process.p = cms.Path(process.demo)

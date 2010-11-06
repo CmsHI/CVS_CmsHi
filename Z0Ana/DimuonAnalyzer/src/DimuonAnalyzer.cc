@@ -11,7 +11,7 @@
 //
 // Original Author:  Camelia Mironov,40 1-A32,+41227679747,
 //         Created:  Sun Feb  7 15:25:05 CET 2010
-// $Id: DimuonAnalyzer.cc,v 1.2 2010/08/02 15:55:03 miheejo Exp $
+// $Id: DimuonAnalyzer.cc,v 1.3 2010/10/12 16:38:14 miheejo Exp $
 //
 //
 
@@ -65,6 +65,7 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 // root include files
 #include "TFile.h"
@@ -126,8 +127,11 @@ private:
   TH1D *phEta_otherMu;
   TH1D *phPhi_otherMu;
   TH1D *nOTH;
+  TH1D *eventCent;
   
   TH2D *phPtEta_recoTrack;
+  TH2D *nSTA_v_centBin;
+  TH2D *nGLB_v_centBin;
 
   edm::InputTag     genparticletag;
   edm::InputTag     muontracktag; 
@@ -170,7 +174,8 @@ private:
   void ShowDaughter(const Candidate* ptl);
   
   //for centrality
-  const  CentralityBins *cbins_;
+  CentralityProvider * centrality_;
+
   double bmean, bsigma;
   double npartmean, npartsigma;
   double ncollmean, ncollsigma;
@@ -220,7 +225,7 @@ DimuonAnalyzer::DimuonAnalyzer(const edm::ParameterSet& pset):
   doSim(pset.getParameter<bool>("doSim")),
   doSignal(pset.getParameter<bool>("doSignal")),
   doZ0check(pset.getParameter<bool>("doZ0check")),
-  cbins_(0)
+  centrality_(0)
 {
   // constructor
 }
@@ -228,6 +233,7 @@ DimuonAnalyzer::DimuonAnalyzer(const edm::ParameterSet& pset):
 
 //_________________________________________________________________
 DimuonAnalyzer::~DimuonAnalyzer()
+
 {
   // destructor
   // do anything here that needs to be done at desctruction time
@@ -243,7 +249,13 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
 
   // method called to for each event 
   edm::LogInfo("DimuonAnalyzer")<<"Start analyzing event ...";
+    // ---- Centrality
 
+    if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(ev,iSetup); // make sure you do this first in every event
+    double c = centrality_->centralityValue();
+    int bin = centrality_->getBin();
+    eventCent->Fill(bin);
   if(doReco)
   {
     //-------- Get vertices
@@ -285,19 +297,20 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
       ntracks = 0;
     }
    
-    // ---- Centrality
-    cbins_ = 0;
-    if (!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-    edm::Handle<reco::Centrality> cent;
-    ev.getByLabel(InputTag("hiCentrality"),cent);
-    hf = cent->EtHFhitSum();
-    bin = cbins_->getBin(hf);
-    bmean = cbins_->bMeanOfBin(bin);
-    bsigma = cbins_->bSigmaOfBin(bin);
-    npartmean = cbins_->NpartMeanOfBin(bin);
-    npartsigma = cbins_->NpartSigmaOfBin(bin);
-    ncollmean = cbins_->NcollMeanOfBin(bin);
-    ncollsigma = cbins_->NcollSigmaOfBin(bin);
+
+    //cbins_ = 0;
+    //if (!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+    //edm::Handle<reco::Centrality> cent;
+    //ev.getByLabel(InputTag("hiCentrality"),cent);
+    //hf = c.EtHFhitSum();
+    //hf = cent->EtHFhitSum();
+    //bin = cbins_->getBin(hf);
+    //bmean = cbins_->bMeanOfBin(bin);
+    //bsigma = cbins_->bSigmaOfBin(bin);
+    //npartmean = cbins_->NpartMeanOfBin(bin);
+    //npartsigma = cbins_->NpartSigmaOfBin(bin);
+    //ncollmean = cbins_->NcollMeanOfBin(bin);
+    //ncollsigma = cbins_->NcollSigmaOfBin(bin);
 
     // ----- reco::Track->MUON loop
     // for all reco muons info by Moon
@@ -321,8 +334,9 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
               double sigmaDxy = sqrt(muCandRef->globalTrack()->dxyError()*muCandRef->globalTrack()->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
               double dz = muCandRef->globalTrack()->dz(vtx->position());
               double sigmaDz = sqrt(muCandRef->globalTrack()->dzError()*muCandRef->globalTrack()->dzError()+vtx->zError()*vtx->zError());
-              
-              pnGLBmuInfo->Fill(pt,eta,phi,dxy,dz,sigmaDxy,sigmaDz); 
+              double nhits = muCandRef->globalTrack()->numberOfValidHits();
+	      //double nhits = muCandRef->globalTrack()->recHitsSize();
+              pnGLBmuInfo->Fill(pt,eta,phi,dxy,dz,sigmaDxy,sigmaDz,nhits); 
               ngMu++;
               
               // single muon cuts for histogram
@@ -339,8 +353,8 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
               double sigmaDxy = sqrt(muCandRef->standAloneMuon()->dxyError()*muCandRef->standAloneMuon()->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
               double dz = muCandRef->standAloneMuon()->dz(vtx->position());
               double sigmaDz = sqrt(muCandRef->standAloneMuon()->dzError()*muCandRef->standAloneMuon()->dzError()+vtx->zError()*vtx->zError());
-              
-              pnSTAmuInfo->Fill(pt,eta,phi,dxy,dz,sigmaDxy,sigmaDz);
+              double nhits = muCandRef->standAloneMuon()->numberOfValidHits();
+              pnSTAmuInfo->Fill(pt,eta,phi,dxy,dz,sigmaDxy,sigmaDz,nhits);
               nsMu++;
               
               // single muon cuts for histogram
@@ -359,6 +373,9 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
           }
       }// end of reco::Muon loop
       nTMuTrk->Fill(nTMu);nGLB->Fill(ngMu);nSTA->Fill(nsMu);nOTH->Fill(noMu);
+      nGLB_v_centBin->Fill(bin,ngMu);
+      nSTA_v_centBin->Fill(bin,nsMu);
+
       pnSinglemuRecoInfo->Fill(nTMu,ngMu,nsMu,noMu);
     }//end of doSingMu
 
@@ -790,19 +807,22 @@ void DimuonAnalyzer::beginJob()
   phPhi_otherMu       = fs->make<TH1D>("phPhi_otherMu",";#phi [rad]",100,-4,4);               phPhi_otherMu->Sumw2();
   phEta_otherMu       = fs->make<TH1D>("phEta_otherMu",";#eta [rad]",100,-4,4);               phEta_otherMu->Sumw2();
   
-  nTMuTrk             = fs->make<TH1D>("nTMuTrk",";number of all Muons",100,0,5);
-  nGLB                = fs->make<TH1D>("nGLB",";number of global Muons",100,0,5);
-  nSTA                = fs->make<TH1D>("nSTA",";number of sta Muons",100,0,5);
-  nOTH                = fs->make<TH1D>("nOTH",";number of other Muons",100,0,5);
+  nTMuTrk             = fs->make<TH1D>("nTMuTrk",";number of all Muons",10,-0.5,9.5);
+  nGLB                = fs->make<TH1D>("nGLB",";number of global Muons",10,-0.5,9.5);
+  nSTA                = fs->make<TH1D>("nSTA",";number of sta Muons",10,-0.5,9.5);
+  nOTH                = fs->make<TH1D>("nOTH",";number of other Muons",10,-0.5,9.5);
 
+  nSTA_v_centBin = fs->make<TH2D>("nSTA_v_cent",";number of sta Muons vs centrality",80,0,40,10,-0.5,9.5);
+  nGLB_v_centBin = fs->make<TH2D>("nGLB_v_cent",";number of glb Muons vs centrality",80,0,40,10,-0.5,9.5);
+  eventCent      = fs->make<TH1D>("eventCent",";event centrality",100,0,100);
   phPtEta_recoTrack   = fs->make<TH2D>("phPtEta_recoTrack",";p_{T}[GeV/c];#eta",200,0,100,50,-2.5,2.5) ;    
   phPtPhi_recoTrack   = fs->make<TH2D>("phPtPhi_recoTrack",";p_{T}[GeV/c];#phi",200,0,100,100,-4.,4.) ;    
 
   pnEventInfo         = fs->make<TNtuple>("pnEventInfo","pnEventInfo","ntrk:nmu:bmean:bsigma:npartmean:npartsigma:ncollmean:ncollsigma:bin:hf:b_gen:nvtx:vx:vy:vz");
   pnSinglemuRecoInfo  = fs->make<TNtuple>("pnSinglemuRecoInfo","pnSinglemuRecoInfo","nTotMu:nGLB:nSTA:nTRK");
   pnDimuRecoInfo      = fs->make<TNtuple>("pnDimuRecoInfo","pnDimuRecoInfo","mu1charge:mu1pt:mu1eta:dxy1:sigmaDxy1:dz1:sigmaDz1:mu2charge:mu2pt:mu2eta:dxy2:sigmaDxy2:dz2:sigmaDz2:dimupt:dimuy:dimum");
-  pnSTAmuInfo         = fs->make<TNtuple>("pnSTAmuInfo","pnSTAmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz");
-  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz");
+  pnSTAmuInfo         = fs->make<TNtuple>("pnSTAmuInfo","pnSTAmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz:nhits");
+  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz:nhits");
   pnDimuGenInfo       = fs->make<TNtuple>("pnDimuGenInfo","pnDimuGenInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:momid0_0:momstat0_0:momid0_1:momstat0_1:mu2pdgid:mu2pt:mu2pz:mu2eta:mu1phi:momid1_0:momstat1_0:momid1_1:momstat1_1:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
   pnSinglemuGenInfo   = fs->make<TNtuple>("pnSinglemuGenInfo","pnSinglemuGenInfo","pdgid:pt:pz:eta:phi");
   pnDimuGeneratorInfo = fs->make<TNtuple>("pnDimuGeneratorInfo","pnDimuGeneratorInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:mu2pdgid:mu2pt:mu2pz:mu2eta:mu2phi:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
