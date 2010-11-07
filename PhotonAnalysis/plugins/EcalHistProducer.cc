@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.8 2010/11/07 00:22:12 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.9 2010/11/07 12:46:19 kimy Exp $
 //
 //
 
@@ -239,16 +239,16 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         const GlobalPoint & position = caloGeom->getPosition(rh->id());
         rhEB->Fill(rh->energy());
         rhEBcent[bin/cStep]->Fill(rh->energy());
-        rhEtaCent[bin/cStep]->Fill(position.eta());
-        rhPhiCent[bin/cStep]->Fill(position.phi());
+        rhEtaCent[bin/cStep]->Fill(position.eta(),rh->energy());
+        rhPhiCent[bin/cStep]->Fill(position.phi(),rh->energy());
     }
     //Endcap
     for (rh = (*rechitsCollectionEndcap).begin(); rh!= (*rechitsCollectionEndcap).end(); rh++){
         const GlobalPoint & position = caloGeom->getPosition(rh->id());
         rhEE->Fill(rh->energy());
         rhEEcent[bin/cStep]->Fill(rh->energy());
-        rhEtaCent[bin/cStep]->Fill(position.eta());
-        rhPhiCent[bin/cStep]->Fill(position.phi());
+        rhEtaCent[bin/cStep]->Fill(position.eta(),rh->energy());
+        rhPhiCent[bin/cStep]->Fill(position.phi(),rh->energy());
     }
 
     //lazy tool                                                                                             
