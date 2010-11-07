@@ -40,7 +40,7 @@
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 
 using std::cout;
@@ -55,12 +55,13 @@ using namespace HepMC;
 // class declaration
 //
 
-class DiMuon2DPlots : public edm::EDAnalyzer {
+class DiMuonPlots : public edm::EDAnalyzer {
    public:
-  explicit DiMuon2DPlots(const edm::ParameterSet&);
-  ~DiMuon2DPlots();
+  explicit DiMuonPlots(const edm::ParameterSet&);
+  ~DiMuonPlots();
  
   const CentralityBins *cbins_;
+  CentralityProvider * centrality_;  
   std::string fOutputFileName;
   std::string fIsGenInfo;
   //edm::InputTag fdimuonCandTag;
@@ -129,7 +130,7 @@ private:
 //
 
 
-DiMuon2DPlots::DiMuon2DPlots(const edm::ParameterSet& iConfig):
+DiMuonPlots::DiMuonPlots(const edm::ParameterSet& iConfig):
   cbins_(0),fOutputFileName(iConfig.getUntrackedParameter<string>("OutputFileName")),fIsGenInfo(iConfig.getUntrackedParameter<string>("IsGenInfo")),
   Centrality(0),diMuonsGlobalInvMassVsPt(0),diMuonsGlobalInvMassVsY(0),diMuonsGlobalInvMassVsCen(0),diMuonsGlobalSTAInvMassVsPt(0),diMuonsGlobalSTAInvMassVsY(0),diMuonsGlobalSTAInvMassVsCen(0),diMuonsSTAInvMassVsPt(0),diMuonsSTAInvMassVsY(0),diMuonsSTAInvMassVsCen(0),diMuonsGlobalSameChargeInvMassVsPt(0),diMuonsGlobalSameChargeInvMassVsY(0),diMuonsGlobalSameChargeInvMassVsCen(0),diMuonsGlobalSTASameChargeInvMassVsPt(0),diMuonsGlobalSTASameChargeInvMassVsY(0),diMuonsGlobalSTASameChargeInvMassVsCen(0),diMuonsSTASameChargeInvMassVsPt(0),diMuonsSTASameChargeInvMassVsY(0),diMuonsSTASameChargeInvMassVsCen(0),diMuonsGenInvMassVsPt(0),diMuonsGenInvMassVsY(0),diMuonsGenInvMassVsCen(0),diMuonsGenInvMass(0),diMuonsGenPt(0),diMuonsGenRapidity(0)
    //fdimuonCandTag(iConfig.getUntrackedParameter<edm::InputTag>("dimuonCandTag")),
@@ -141,7 +142,7 @@ DiMuon2DPlots::DiMuon2DPlots(const edm::ParameterSet& iConfig):
 }
 
 
-DiMuon2DPlots::~DiMuon2DPlots()
+DiMuonPlots::~DiMuonPlots()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -156,36 +157,39 @@ DiMuon2DPlots::~DiMuon2DPlots()
 
 // ------------ method called to for each event  ------------
 void
-DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+DiMuonPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    using namespace std;
 
-   //if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-   //edm::Handle<reco::Centrality> cent;
-   //iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
+  if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
+  edm::Handle<reco::Centrality> cent;
+  iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
 
-   //double hf = cent->EtHFhitSum();
+   double hf = cent->EtHFhitSum();
    
-   //   double hftp = cent->EtHFtowerSumPlus();
-   //   double hftm = cent->EtHFtowerSumMinus();
-   //   double eb = cent->EtEBSum();
-   //   double eep = cent->EtEESumPlus();
-   //   double eem = cent->EtEESumMinus();
+      double hftp = cent->EtHFtowerSumPlus();
+      double hftm = cent->EtHFtowerSumMinus();
+      double eb = cent->EtEBSum();
+      double eep = cent->EtEESumPlus();
+      double eem = cent->EtEESumMinus();
 
-   //   cout<<"Centrality variables in the event:"<<endl;
-   //   cout<<"Total energy in HF hits : "<<hf<<endl;
-   //   cout<<"Asymmetry of HF towers : "<<fabs(hftp-hftm)/(hftp+hftm)<<endl;
-   //   cout<<"Total energy in EE basic clusters : "<<eep+eem<<endl;
-   //   cout<<"Total energy in EB basic clusters : "<<eb<<endl;
+      cout<<"Centrality variables in the event:"<<endl;
+      cout<<"Total energy in HF hits : "<<hf<<endl;
+      cout<<"Asymmetry of HF towers : "<<fabs(hftp-hftm)/(hftp+hftm)<<endl;
+      cout<<"Total energy in EE basic clusters : "<<eep+eem<<endl;
+      cout<<"Total energy in EB basic clusters : "<<eb<<endl;
 
-   //bin = cbins_->getBin(hf);
+   bin = cbins_->getBin(hf);
 
-   //Centrality ->Fill(bin);                                                                                                                                  
-   //int nbins = cbins_->getNbins();
-   //int binsize = 100/nbins;
-   //char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
-   //cout<<"The event falls into centrality bin : "<<binName<<" id : "<<bin<<endl;
+   Centrality ->Fill(bin);                                                                                                                                  
+   int nbins = cbins_->getNbins();
+   int binsize = 100/nbins;
+   char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
+   cout<<"The event falls into centrality bin : "<<binName<<" id : "<<bin<<endl;
+
+
+
 
 // get dimuonGlobal collection                                                                                   
    edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalCand;
@@ -227,7 +231,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      //histContainer2D["diMuonInvMassVsPt"]->Fill(p.mass(),p.pt());
      diMuonsSTAInvMassVsPt->Fill(p.mass(),p.pt());
      diMuonsSTAInvMassVsY->Fill(p.mass(),p.rapidity());
-     //diMuonsSTAInvMassVsCen->Fill(p.mass(),bin);
+     diMuonsSTAInvMassVsCen->Fill(p.mass(),bin);
    }
    
    SameChargePlots(iEvent, iSetup);
@@ -235,12 +239,10 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
 
-
-
 }
 
 
-void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void DiMuonPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
   using namespace std;
@@ -296,7 +298,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
 
 
 
-void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+void DiMuonPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   cout<<"gen info: "<<endl;
@@ -347,9 +349,15 @@ void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iS
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-DiMuon2DPlots::beginJob()
+DiMuonPlots::beginJob()
 {
-  edm::Service<TFileService> fs;
+  
+
+
+  
+
+
+edm::Service<TFileService> fs;
   fOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" );
   cout<<"begin job"<<endl;
   //if (!fOutputFile) cout<<"File not open "<<endl;
@@ -456,7 +464,7 @@ DiMuon2DPlots::beginJob()
 
 
 // ------------ method called once each job just after ending the event loop  ------------
-void DiMuon2DPlots::endJob() 
+void DiMuonPlots::endJob() 
 {
   cout<<"End Job"<<endl;
   fOutputFile->cd();
@@ -493,4 +501,4 @@ fOutputFile->Close();
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(DiMuon2DPlots);
+DEFINE_FWK_MODULE(DiMuonPlots);
