@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.6 2010/11/06 12:57:21 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.7 2010/11/06 17:09:46 troxlo Exp $
 //
 //
 
@@ -397,10 +397,12 @@ EcalHistProducer::beginJob()
     char format[200];
     theTree->Branch("nBC",&nBC,"nBC/I");
     theTree->Branch("nSC",&nSC,"nSC/I");
-    theTree->Branch("e",energy,"e[nBC]/F");
-    theTree->Branch("et",et,"et[nBC]/F");
-    theTree->Branch("eta",eta,"eta[nBC]/F");
-    theTree->Branch("phi",phi,"phi[nBC]/F");
+  
+    theTree->Branch("BCe",energy,"BCe[nBC]/F");
+    theTree->Branch("BCet",et,"BCet[nBC]/F");
+    theTree->Branch("BCeta",eta,"BCeta[nBC]/F");
+    theTree->Branch("BCphi",phi,"BCphi[nBC]/F");
+
     if(BCCent_) {
         for(int i=0; i<cBins; i++) {
             sprintf(name,"nBCcent%dto%d",i*cStep,(i+1)*cStep-1);
