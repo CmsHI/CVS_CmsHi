@@ -26,7 +26,7 @@ process.source = cms.Source("PoolSource",
 #'/store/data/Run2010A/MinimumBias/RECO/v1/000/136/066/18F6DB82-5566-DF11-B289-0030487CAF0E.root'
 #'rfio:///castor/cern.ch/user/m/mironov/cmssw370/digireco/root/z0_sgn_hitrk_f0.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_05_908.root',
-#'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_11_996.root',
+'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_11_996.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_11_997.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_11_989.root',
 #'rfio:/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco/Hydjet_MinBias_2.76TeV_Z0Emb_Reco_e10_11_99.root'
@@ -42,16 +42,10 @@ process.source = cms.Source("PoolSource",
 #    return file
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco")
 
-import PhysicsTools.PythonAnalysis.LumiList as LumiList
-import FWCore.ParameterSet.Types as CfgTypes
-myLumis = LumiList.LumiList(filename = 'goodList.json').getCMSSWString().split(',')
-process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
-process.source.lumisToProcess.extend(myLumis)
 
-
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
-process.load("Z0Ana.ZToMuMu.MuSkim_cff")            
+process.load("HiDiMuonAna.DiMuon.MuSkim_cff")            
 #Uncomment for HI reconstruction while PAT reco
 #process.patAODTrackCandsUnfiltered.src = cms.InputTag("hiSelectedTracks")
 #process.patAODTrackIsoDepositCtfTk.ExtractorPSet.inputTrackCollection = cms.InputTag("hiSelectedTracks")

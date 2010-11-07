@@ -15,16 +15,16 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 
 ##making a filter for centrality
-process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
-process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-                                      process.CondDBCommon,
-                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-                                                                 tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
-                                                                 )
-                                                        )
-                                      )
+#process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
+#process.load("CondCore.DBCommon.CondDBCommon_cfi")
+#process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
+#process.PoolDBESSource = cms.ESSource("PoolDBESSource",
+#                                      process.CondDBCommon,
+#                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
+#                                                                 tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
+#                                                                 )
+#                                                        )
+#                                      )
 
 
 
@@ -38,7 +38,7 @@ process.source = cms.Source("PoolSource",
                             noEventSort = cms.untracked.bool(True),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
-#'file:Hu_ZToMuMuSkim.root'
+'file:DiMuonSkimTest.root'
 #'file:Hu_JpsiToMuMuSkim.root'
 #'file:Hu_UpsilonToMuMuSkim.root'
 
@@ -46,7 +46,7 @@ process.source = cms.Source("PoolSource",
 
 #'rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/UpsilonMuSkim/RV_WTrk_UpsilonMuMuSkim.root'
 
-'rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim/RV_WTrk_ZMuMuSkim_1.root'
+#'rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim/RV_WTrk_ZMuMuSkim_1.root'
 
 #'rfio:/castor/cern.ch/user/h/hckim/JulyExercise10/JulyExercise10_MinimumBiasHI_dilepton_skim0/JulyExercise10_MinimumBiasHI_dilepton_skim0_95_1_E2H.root'
 #'file:ZToMuMuSkim_data_test.root'

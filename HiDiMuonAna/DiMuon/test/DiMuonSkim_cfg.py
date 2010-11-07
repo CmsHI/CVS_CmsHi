@@ -19,6 +19,11 @@ process.source = cms.Source("PoolSource",
 
    fileNames = cms.untracked.vstring(
 
+
+
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/HI_ExSt_MuSkim.root'
+
+
 #'rfio:/castor/cern.ch/user/h/hckim/TestJEX/crab/v3/SingleZ0mumu/test_Weisfile_SingleZ0mumu_CRAB_yesTRK_passHLT_CS_dimuonZ0HI_v3_9_1_pX8.root'
 #'rfio:/castor/cern.ch/user/h/hckim/TestJEX/crab/v3/SingleJPsimumu/test_Weisfile_SingleJPsimumu_CRAB_yesTRK_passHLT_CS_dimuonJPsiHI_v3_10_1_hPi.root'
 #'rfio:/castor/cern.ch/user/h/hckim/TestJEX/crab/v3/SingleUpsimumu/test_Weisfile_SingleUpsimumu_CRAB_yesTRK_passHLT_CS_dimuonUpsilonHI_v3_10_1_z09.root'    
@@ -31,17 +36,17 @@ process.source = cms.Source("PoolSource",
 )
 
 ##This should be uncommented to include all files from any castor directory automatically
-import os,commands
-def getCastorDirectoryList(path):
-    cmd  = 'nsls %s/ ' % (path)
-    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
-    return file
-process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim")
+#import os,commands
+#def getCastorDirectoryList(path):
+#    cmd  = 'nsls %s/ ' % (path)
+#    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+#    return file
+#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim")
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cmssw390/Z0/JPsiMuSkim")
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cmssw390/Z0/UpsilonMuSkim")
 
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # =============== Filter Path =====================
@@ -76,8 +81,8 @@ process.output = cms.OutputModule("PoolOutputModule",
     dataTier = cms.untracked.string('AOD'),
     filterName = cms.untracked.string('')),
                                   #fileName = cms.untracked.string('file:RV_UpsilonToMuMuSkim.root')
-                          fileName = cms.untracked.string('rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim/RV_ZMuMuSkim.root')
-                          #fileName = cms.untracked.string('rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/UpsilonMuSkim/RV_WTrk_UpsilonMuMuSkim.root')
+                          #fileName = cms.untracked.string('rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim/RV_ZMuMuSkim.root')
+                          fileName = cms.untracked.string('file:DiMuonSkimTest.root')
 
                                   )
 
@@ -89,7 +94,7 @@ process.outpath = cms.EndPath(process.output)
 
 
 # standard sequence
-#process.schedule=cms.Schedule(process.Dimuons_Step,process.DiMuonsGlobal_Step,process.DiMuonsGlobalSTA_Step,process.DiMuonsGlobalTrk_Step,process.DiMuonsSTA_Step,process.DiMuonsTrk_Step,process.DiMuonsSameCharge_Step,process.DiMuonsGlobalSameCharge_Step,process.DiMuonsGlobalSTASameCharge_Step,process.DiMuonsGlobalTrkSameCharge_Step,process.DiMuonsSTASameCharge_Step,process.DiMuonsTrkSameCharge_Step,process.outpath)
+process.schedule=cms.Schedule(process.Dimuons_Step,process.DiMuonsGlobal_Step,process.DiMuonsGlobalSTA_Step,process.DiMuonsGlobalTrk_Step,process.DiMuonsSTA_Step,process.DiMuonsTrk_Step,process.DiMuonsSameCharge_Step,process.DiMuonsGlobalSameCharge_Step,process.DiMuonsGlobalSTASameCharge_Step,process.DiMuonsGlobalTrkSameCharge_Step,process.DiMuonsSTASameCharge_Step,process.DiMuonsTrkSameCharge_Step,process.outpath)
 
-process.schedule=cms.Schedule(process.Dimuons_Step,process.DiMuonsGlobal_Step,process.DiMuonsGlobalSTA_Step,process.DiMuonsSTA_Step,process.DiMuonsSameCharge_Step,process.DiMuonsGlobalSameCharge_Step,process.DiMuonsGlobalSTASameCharge_Step,process.DiMuonsSTASameCharge_Step,process.outpath)
+#process.schedule=cms.Schedule(process.Dimuons_Step,process.DiMuonsGlobal_Step,process.DiMuonsGlobalSTA_Step,process.DiMuonsSTA_Step,process.DiMuonsSameCharge_Step,process.DiMuonsGlobalSameCharge_Step,process.DiMuonsGlobalSTASameCharge_Step,process.DiMuonsSTASameCharge_Step,process.outpath)
 
