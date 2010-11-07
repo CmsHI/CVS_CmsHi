@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.6 2010/11/01 21:48:31 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.7 2010/11/02 12:58:33 yilmaz Exp $
 //
 //
 
@@ -396,7 +396,10 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    
    hbheTree->Fill();
    hfTree->Fill();
-   bkgTree->Fill();   
+   
+   if (doFastJet_) {
+      bkgTree->Fill();  
+   } 
 }
 
 
