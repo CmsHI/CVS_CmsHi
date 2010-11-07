@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.9 2010/11/07 12:46:19 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.10 2010/11/07 13:08:57 kimy Exp $
 //
 //
 
@@ -66,6 +66,9 @@ Implementation:
 
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
+
+#include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
+
 
 //
 // class declaration
@@ -141,6 +144,11 @@ class EcalHistProducer : public edm::EDAnalyzer {
         double eb;
         double multPixel;
         double nPixelTracks;
+   
+        bool doSpikeRemoval_;
+        double timeCut_;
+        double swissCut_;
+   
 };
 
 //
@@ -164,11 +172,13 @@ EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig)
     basicClusterBarrel_              = iConfig.getParameter<edm::InputTag>("basicClusterBarrel");
     basicClusterEndcap_              = iConfig.getParameter<edm::InputTag>("basicClusterEndcap");
 
-    doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",false);
+    doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",true);
+    swissCut_                        = iConfig.getUntrackedParameter<double>("doSpikeClean",0.95);  
+    timeCut_                         = iConfig.getUntrackedParameter<double>("doSpikeClean",4.0);
 
     superClusterBarrel_                       = iConfig.getParameter<edm::InputTag>("superClusterBarrel"); // superclusters      
     superClusterEndcap_                       = iConfig.getParameter<edm::InputTag>("superClusterEndcap"); // superclusters
-
+    
     RHCent_                         = iConfig.getUntrackedParameter<bool>("RHCent",true);
     BCCent_                         = iConfig.getUntrackedParameter<bool>("BCCent",true);
     SCCent_                         = iConfig.getUntrackedParameter<bool>("SCCent",true);
@@ -180,6 +190,7 @@ EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig)
     RHphiCent_                         = iConfig.getUntrackedParameter<bool>("RHphiCent",true);
     BCphiCent_                         = iConfig.getUntrackedParameter<bool>("BCphiCent",true);
     SCphiCent_                         = iConfig.getUntrackedParameter<bool>("SCphiCent",true);
+    
 }
 
 
@@ -227,6 +238,8 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<EcalRecHitCollection> EEReducedRecHits;
     iEvent.getByLabel(eeReducedRecHitCollection_, EEReducedRecHits);
     const EcalRecHitCollection* rechitsCollectionEndcap = EEReducedRecHits.product();
+    //lazy tool                                                                                                                     
+    EcalClusterLazyTools lazyTool(iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_ );
 
     //get the rechit geometry
     edm::ESHandle<CaloGeometry> theCaloGeom;
@@ -236,23 +249,31 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     //Barrel 
     EcalRecHitCollection::const_iterator rh;
     for (rh = (*rechitsCollectionBarrel).begin(); rh!= (*rechitsCollectionBarrel).end(); rh++){
-        const GlobalPoint & position = caloGeom->getPosition(rh->id());
-        rhEB->Fill(rh->energy());
-        rhEBcent[bin/cStep]->Fill(rh->energy());
-        rhEtaCent[bin/cStep]->Fill(position.eta(),rh->energy());
-        rhPhiCent[bin/cStep]->Fill(position.phi(),rh->energy());
+       DetId id = rh->id();
+       double swissCrx = EcalSeverityLevelAlgo::swissCross(id, *rechitsCollectionBarrel, 0.,true);
+       double time     = rh->time();
+       if ( (doSpikeClean_==true) && (rh->energy()>3) && ((fabs(time) > timeCut_)||(swissCrx > swissCut_)) )  
+	  continue;  // This is a spike
+       const GlobalPoint & position = caloGeom->getPosition(rh->id());
+       double tempEt = rh->energy()/cosh(position.eta()) ;
+       rhEB->Fill(tempEt);
+       rhEBcent[bin/cStep]->Fill(tempEt);
+       rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
+       rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+       
     }
     //Endcap
     for (rh = (*rechitsCollectionEndcap).begin(); rh!= (*rechitsCollectionEndcap).end(); rh++){
         const GlobalPoint & position = caloGeom->getPosition(rh->id());
-        rhEE->Fill(rh->energy());
-        rhEEcent[bin/cStep]->Fill(rh->energy());
-        rhEtaCent[bin/cStep]->Fill(position.eta(),rh->energy());
-        rhPhiCent[bin/cStep]->Fill(position.phi(),rh->energy());
+	double tempEt = rh->energy()/cosh(position.eta()) ;
+		
+	rhEE->Fill(tempEt);
+        rhEEcent[bin/cStep]->Fill(tempEt);
+        rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
+        rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+
     }
 
-    //lazy tool                                                                                             
-    EcalClusterLazyTools lazyTool(iEvent, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_ );
     //grab basicClusters
     Handle<reco::CaloClusterCollection> basicClusterB;
     iEvent.getByLabel(basicClusterBarrel_, basicClusterB);
