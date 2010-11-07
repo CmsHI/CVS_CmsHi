@@ -28,7 +28,8 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load("RecoHI.HiEgammaAlgos.HiEgamma_cff")
 
-process.GlobalTag.globaltag = cms.string('START36_V10::All')
+#process.GlobalTag.globaltag = cms.string('START36_V10::All')
+process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 

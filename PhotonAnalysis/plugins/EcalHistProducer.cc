@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.10 2010/11/07 13:08:57 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.11 2010/11/07 20:07:10 kimy Exp $
 //
 //
 
@@ -173,8 +173,8 @@ EcalHistProducer::EcalHistProducer(const edm::ParameterSet& iConfig)
     basicClusterEndcap_              = iConfig.getParameter<edm::InputTag>("basicClusterEndcap");
 
     doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",true);
-    swissCut_                        = iConfig.getUntrackedParameter<double>("doSpikeClean",0.95);  
-    timeCut_                         = iConfig.getUntrackedParameter<double>("doSpikeClean",4.0);
+    swissCut_                        = iConfig.getUntrackedParameter<double>("swissCut",0.95);
+    timeCut_                         = iConfig.getUntrackedParameter<double>("timeCut",4.0);
 
     superClusterBarrel_                       = iConfig.getParameter<edm::InputTag>("superClusterBarrel"); // superclusters      
     superClusterEndcap_                       = iConfig.getParameter<edm::InputTag>("superClusterEndcap"); // superclusters
