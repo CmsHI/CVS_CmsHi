@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.7 2010/11/06 17:09:46 troxlo Exp $
+// $Id: EcalHistProducer.cc,v 1.8 2010/11/07 00:22:12 kimy Exp $
 //
 //
 
@@ -392,7 +392,7 @@ EcalHistProducer::beginJob()
         }
     }
 
-    theTree  = fs->make<TTree>("basicCluster","Tree of Basic Clusters");
+    theTree  = fs->make<TTree>("clusters","Tree of Basic Clusters");
     //   theTree->Branch("nPho",&nPho,"nPho/I");
     char format[200];
     theTree->Branch("nBC",&nBC,"nBC/I");
