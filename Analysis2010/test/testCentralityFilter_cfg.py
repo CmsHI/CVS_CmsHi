@@ -27,12 +27,15 @@ process.source = cms.Source("PoolSource",
     
                             )
 
-process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
+# Selecting 10% (out of 40 bins)
+process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
+process.centralityFilter.selectedBins = [0,1,2,3]
+
 process.analyze = cms.EDAnalyzer("AnalyzerWithCentrality")
 
 process.TFileService = cms.Service('TFileService',
-                                   fileName = cms.string("histogramsAndTable.root")
+                                   fileName = cms.string("filteredHistograms.root")
                                    )
 
-process.p = cms.Path(process.centralityBin*process.analyze)
+process.p = cms.Path(process.centralityFilter*process.analyze)
 
