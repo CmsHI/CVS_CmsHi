@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.9 2010/11/09 22:54:45 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.10 2010/11/09 22:55:50 yilmaz Exp $
 //
 //
 
@@ -216,8 +216,8 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
   doEbyEonly_ = iConfig.getUntrackedParameter<bool>("doEbyEonly",false);
   hfTowerThreshold_ = iConfig.getUntrackedParameter<double>("HFtowerMin",3.);
-  hfLongThreshold_ = iConfig.getUntrackedParameter<double>("HFlongMin",3.);
-  hfShortThreshold_ = iConfig.getUntrackedParameter<double>("HFshortMin",3.);
+  hfLongThreshold_ = iConfig.getUntrackedParameter<double>("HFlongMin",0.5);
+  hfShortThreshold_ = iConfig.getUntrackedParameter<double>("HFshortMin",0.85);
 }
 
 
