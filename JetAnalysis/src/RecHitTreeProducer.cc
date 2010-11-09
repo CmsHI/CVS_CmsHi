@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.8 2010/11/07 12:53:05 yjlee Exp $
+// $Id: RecHitTreeProducer.cc,v 1.9 2010/11/09 22:54:45 yilmaz Exp $
 //
 //
 
@@ -206,7 +206,7 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
   BCSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
   TowerSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
-  JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeCone5CaloJets"));
+  JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeConePu5CaloJets"));
   useJets_ = iConfig.getUntrackedParameter<bool>("useJets",true);
   doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
   doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
