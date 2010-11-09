@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.7 2010/11/02 12:58:33 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.8 2010/11/07 12:53:05 yjlee Exp $
 //
 //
 
@@ -68,7 +68,7 @@ using namespace std;
 #define MAXHITS 1000000
 
 struct MyRecHit{
-
+  int depth[MAXHITS];
   int n;
 
   float e[MAXHITS];
@@ -140,7 +140,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    MyRecHit myTowers;
    MyBkg bkg;
 
-
+  TNtuple* nt;
   TTree* hbheTree;
   TTree* hfTree;
   TTree* ebTree;
@@ -150,6 +150,12 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    TTree* bkgTree;
 
   double cone;
+  double hfTowerThreshold_;
+  double hfLongThreshold_;
+  double hfShortThreshold_;
+  double hbheThreshold_;
+  double ebThreshold_;
+  double eeThreshold_;
 
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
@@ -173,6 +179,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doHcal_;
 
    bool doFastJet_;
+
+  bool doEbyEonly_;
 };
 
 //
@@ -206,7 +214,10 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
   doFastJet_ = iConfig.getUntrackedParameter<bool>("doFastJet",true);
   FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
-
+  doEbyEonly_ = iConfig.getUntrackedParameter<bool>("doEbyEonly",false);
+  hfTowerThreshold_ = iConfig.getUntrackedParameter<double>("HFtowerMin",3.);
+  hfLongThreshold_ = iConfig.getUntrackedParameter<double>("HFlongMin",3.);
+  hfShortThreshold_ = iConfig.getUntrackedParameter<double>("HFshortMin",3.);
 }
 
 
@@ -273,6 +284,10 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       iSetup.get<CaloGeometryRecord>().get(pGeo);
       geo = pGeo.product();
    }
+
+   int nHFlong = 0;
+   int nHFshort = 0;
+   int nHFtower = 0;
    
    if(doHcal_){
    for(unsigned int i = 0; i < hfHits->size(); ++i){
@@ -282,6 +297,10 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.eta[hfRecHit.n] = getEta(hit.id());
      hfRecHit.phi[hfRecHit.n] = getPhi(hit.id());
      hfRecHit.isjet[hfRecHit.n] = false;
+     hfRecHit.depth[hfRecHit.n] = hit.id().depth();
+     if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshort++;
+     if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlong++;
+
      if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
@@ -291,7 +310,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
      hfRecHit.n++;
    }
-   
+   if(!doEbyEonly_){
    for(unsigned int i = 0; i < hbheHits->size(); ++i){
      const HBHERecHit & hit= (*hbheHits)[i];
      hbheRecHit.e[hbheRecHit.n] = hit.energy();
@@ -309,7 +328,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hbheRecHit.n++;
    }
    }
-   if(doEcal_){
+   }
+   if(doEcal_ && !doEbyEonly_){
    for(unsigned int i = 0; i < ebHits->size(); ++i){
      const EcalRecHit & hit= (*ebHits)[i];
      ebRecHit.e[ebRecHit.n] = hit.energy();
@@ -354,6 +374,9 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       myTowers.eta[myTowers.n] = getEta(hit.id());
       myTowers.phi[myTowers.n] = getPhi(hit.id());
       myTowers.isjet[myTowers.n] = false;
+
+      if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtower++;
+
       if(useJets_){
 	 for(unsigned int j = 0 ; j < jets->size(); ++j){
 	    const reco::Jet& jet = (*jets)[j];
@@ -366,7 +389,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
    }
 
-   if(doBasicClusters_){
+   if(doBasicClusters_ && !doEbyEonly_){
       for(unsigned int j = 0 ; j < jets->size(); ++j){
 	 const reco::Jet& jet = (*jets)[j];
 	 myBC.n = 0;
@@ -389,17 +412,22 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       }
    }
 
-   towerTree->Fill();
-  
-   eeTree->Fill();
-   ebTree->Fill();
+   if(!doEbyEonly_){
+     towerTree->Fill();
+     
+     eeTree->Fill();
+     ebTree->Fill();
+     
+     hbheTree->Fill();
+     hfTree->Fill();
+      
+     if (doFastJet_) {
+       bkgTree->Fill();
+     }
+   }
+
+   nt->Fill(nHFtower,nHFlong,nHFshort);
    
-   hbheTree->Fill();
-   hfTree->Fill();
-   
-   if (doFastJet_) {
-      bkgTree->Fill();  
-   } 
 }
 
 
@@ -422,6 +450,7 @@ RecHitTreeProducer::beginJob()
   hfTree->Branch("et",hfRecHit.et,"et[n]/F");
   hfTree->Branch("eta",hfRecHit.eta,"eta[n]/F");
   hfTree->Branch("phi",hfRecHit.phi,"phi[n]/F");
+  hfTree->Branch("depth",hfRecHit.depth,"depth[n]/I");
   hfTree->Branch("isjet",hfRecHit.isjet,"isjet[n]/O");
 
   eeTree = fs->make<TTree>("ee","");
@@ -468,6 +497,8 @@ RecHitTreeProducer::beginJob()
      bkgTree->Branch("rho",bkg.rho,"rho[n]/F");
      bkgTree->Branch("sigma",bkg.sigma,"sigma[n]/F");
   }
+  
+  nt = fs->make<TNtuple>("ntEvent","","nHF:nHFlong:nHFshort");
 
 }
 
