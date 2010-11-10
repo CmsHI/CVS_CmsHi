@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id: SpikeInspector.cc,v 1.1 2010/11/03 18:14:04 troxlo Exp $
+// $Id: SpikeInspector.cc,v 1.2 2010/11/06 13:56:11 troxlo Exp $
 //
 //
 
@@ -233,21 +233,22 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             double time = recHitTime(id,ecalRecHits);
             swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
             e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
-            if(it->energy() >= en1 && it->energy() < en2) {
+            double theEt = it->energy() / cosh(it->eta() ) ;
+	    if((theEt >= en1) && (theEt < en2)) {
                 timingSwissLow->Fill(time,swiss);
                 swissE2Low->Fill(swiss,e2e9);
                 timingLow->Fill(time);
                 swissLow->Fill(swiss);
                 e2e9Low->Fill(e2e9);
             }
-            else if(it->energy() >= en2 && it->energy() < en3) {
+            else if ( (theEt >= en2) && (theEt < en3)) {
                 timingSwissMid->Fill(time,swiss);
                 swissE2Mid->Fill(swiss,e2e9);
                 timingMid->Fill(time);
                 swissMid->Fill(swiss);
                 e2e9Mid->Fill(e2e9);
             }
-            else if(it->energy() >= en3) {
+            else if( theEt >= en3) {
                 timingSwissHigh->Fill(time,swiss);
                 swissE2High->Fill(swiss,e2e9);
                 timingHigh->Fill(time);
