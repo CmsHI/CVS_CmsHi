@@ -63,6 +63,7 @@ Implementation:
 #include "TH2D.h"
 
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
 
@@ -95,8 +96,12 @@ class SpikeInspector : public edm::EDAnalyzer {
         edm::InputTag ebSuperClusterCollection_;
         edm::InputTag ebReducedRecHitCollection_;
         edm::InputTag eeReducedRecHitCollection_;
+        edm::InputTag photonCollection_;
 
         double swissCut_;
+        int numEvents;
+
+        CentralityProvider *centrality_;
 
         TH2D *timingSwissLow;   //en1-en2
         TH2D *timingSwissMid;   //en2-en3
@@ -117,6 +122,43 @@ class SpikeInspector : public edm::EDAnalyzer {
         TH1D *e2e9Low;
         TH1D *e2e9Mid;
         TH1D *e2e9High;
+
+        TH1D *spikeEnergy;
+        TH1D *realEnergy;
+
+        TH1D *spikeEtaLow;
+        TH1D *realEtaLow;
+        TH1D *spikeEtaMid;
+        TH1D *realEtaMid;
+        TH1D *spikeEtaHigh;
+        TH1D *realEtaHigh;
+
+        TH1D *spikePhiLow;
+        TH1D *realPhiLow;
+        TH1D *spikePhiMid;
+        TH1D *realPhiMid;
+        TH1D *spikePhiHigh;
+        TH1D *realPhiHigh;
+
+        TH1D *spikeCentLow;
+        TH1D *realCentLow;
+        TH1D *spikeCentMid;
+        TH1D *realCentMid;
+        TH1D *spikeCentHigh;
+        TH1D *realCentHigh;
+
+        TH1D *spikeMultLow;
+        TH1D *realMultLow;
+        TH1D *spikeMultMid;
+        TH1D *realMultMid;
+        TH1D *spikeMultHigh;
+        TH1D *realMultHigh;
+
+        TH1D *NoECent;
+        TH1D *NoEMult;
+
+        TH1D *photonPtWithSpikes;
+        TH1D *photonPtNoSpikes;
 };
 
 //
@@ -133,10 +175,12 @@ class SpikeInspector : public edm::EDAnalyzer {
 SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
 
 {
+    numEvents = 0;
     //now do what ever initialization is needed
     ebSuperClusterCollection_        = iConfig.getUntrackedParameter<edm::InputTag>("ebSuperClusterCollection",edm::InputTag("correctedIslandBarrelSuperClusters"));
     ebReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("ebReducedRecHitCollection");
     eeReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("eeReducedRecHitCollection");
+    photonCollection_                = iConfig.getUntrackedParameter<edm::InputTag>("photonCollection");
     swissCut_                        = iConfig.getUntrackedParameter<double>("swissCut",0.95);
 
     edm::Service<TFileService> fs;
@@ -186,6 +230,94 @@ SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
     e2e9Mid->GetXaxis()->SetTitle("1-E4/E1");
     e2e9High = fs->make<TH1D>("E2E9 15+ GeV","E2/E9 15+ GeV",120,0,1.2);
     e2e9High->GetXaxis()->SetTitle("1-E4/E1");
+
+    spikeEnergy = fs->make<TH1D>("Spike Energy","Spike Energy",100,0,100);
+    spikeEnergy->GetXaxis()->SetTitle("E");
+    spikeEnergy->SetLineColor(kRed);
+    realEnergy = fs->make<TH1D>("real Energy","Non-Spike Energy",100,0,100);
+    realEnergy->GetXaxis()->SetTitle("E");
+
+    spikeEtaLow = fs->make<TH1D>("Spike Eta 3-10 GeV","Spike Eta 3-10 GeV",60,-1.5,1.5);
+    spikeEtaLow->GetXaxis()->SetTitle("#eta");
+    spikeEtaLow->SetLineColor(kRed);
+    realEtaLow = fs->make<TH1D>("real Eta 3-10 GeV","Non-Spike Eta 3-10 GeV",60,-1.5,1.5);
+    realEtaLow->GetXaxis()->SetTitle("#eta");
+
+    spikeEtaMid = fs->make<TH1D>("Spike Eta 10-15 GeV","Spike Eta 10-15 GeV",60,-1.5,1.5);
+    spikeEtaMid->GetXaxis()->SetTitle("#eta");
+    spikeEtaMid->SetLineColor(kRed);
+    realEtaMid = fs->make<TH1D>("real Eta 10-15 GeV","Non-Spike Eta 10-15 GeV",60,-1.5,1.5);
+    realEtaMid->GetXaxis()->SetTitle("#eta");
+
+    spikeEtaHigh = fs->make<TH1D>("Spike Eta 15+ GeV","Spike Eta 15+ GeV",60,-1.5,1.5);
+    spikeEtaHigh->GetXaxis()->SetTitle("#eta");
+    spikeEtaHigh->SetLineColor(kRed);
+    realEtaHigh = fs->make<TH1D>("real Eta 15+ GeV","Non-Spike Eta 15+ GeV",60,-1.5,1.5);
+    realEtaHigh->GetXaxis()->SetTitle("#eta");
+
+    spikePhiLow = fs->make<TH1D>("Spike Phi 3-10 GeV","Spike Phi 3-10 GeV",60,-3.15,3.15);
+    spikePhiLow->GetXaxis()->SetTitle("#phi");
+    spikePhiLow->SetLineColor(kRed);
+    realPhiLow = fs->make<TH1D>("real Phi 3-10 GeV","Non-Spike Phi 3-10 GeV",60,-3.15,3.15);
+    realPhiLow->GetXaxis()->SetTitle("#phi");
+
+    spikePhiMid = fs->make<TH1D>("Spike Phi 10-15 GeV","Spike Phi 10-15 GeV",60,-3.15,3.15);
+    spikePhiMid->GetXaxis()->SetTitle("#phi");
+    spikePhiMid->SetLineColor(kRed);
+    realPhiMid = fs->make<TH1D>("real Phi 10-15 GeV","Non-Spike Phi 10-15 GeV",60,-3.15,3.15);
+    realPhiMid->GetXaxis()->SetTitle("#phi");
+
+    spikePhiHigh = fs->make<TH1D>("Spike Phi 15+ GeV","Spike Phi 15+ GeV",60,-3.15,3.15);
+    spikePhiHigh->GetXaxis()->SetTitle("#phi");
+    spikePhiHigh->SetLineColor(kRed);
+    realPhiHigh = fs->make<TH1D>("real Phi 15+ GeV","Non-Spike Phi 15+ GeV",60,-3.15,3.15);
+    realPhiHigh->GetXaxis()->SetTitle("#phi");
+
+    spikeCentLow = fs->make<TH1D>("Spike Cent 3-10 GeV","Spike Cent 3-10 GeV",40,0,40);
+    spikeCentLow->GetXaxis()->SetTitle("Centrality Bin");
+    spikeCentLow->SetLineColor(kRed);
+    realCentLow = fs->make<TH1D>("real Cent 3-10 GeV","Non-Spike Cent 3-10 GeV",40,0,40);
+    realCentLow->GetXaxis()->SetTitle("Centrality Bin");
+
+    spikeCentMid = fs->make<TH1D>("Spike Cent 10-15 GeV","Spike Cent 10-15 GeV",40,0,40);
+    spikeCentMid->GetXaxis()->SetTitle("Centrality Bin");
+    spikeCentMid->SetLineColor(kRed);
+    realCentMid = fs->make<TH1D>("real Cent 10-15 GeV","Non-Spike Cent 10-15 GeV",40,0,40);
+    realCentMid->GetXaxis()->SetTitle("Centrality Bin");
+
+    spikeCentHigh = fs->make<TH1D>("Spike Cent 15+ GeV","Spike Cent 15+ GeV",40,0,40);
+    spikeCentHigh->GetXaxis()->SetTitle("Centrality Bin");
+    spikeCentHigh->SetLineColor(kRed);
+    realCentHigh = fs->make<TH1D>("real Cent 15+ GeV","Non-Spike Cent 15+ GeV",40,0,40);
+    realCentHigh->GetXaxis()->SetTitle("Centrality Bin");
+
+    spikeMultLow = fs->make<TH1D>("Spike Mult 3-10 GeV","Spike Mult 3-10 GeV",100,0,160000);
+    spikeMultLow->GetXaxis()->SetTitle("#sum E_{HF hits}");
+    spikeMultLow->SetLineColor(kRed);
+    realMultLow = fs->make<TH1D>("real Mult 3-10 GeV","Non-Spike Mult 3-10 GeV",100,0,160000);
+    realMultLow->GetXaxis()->SetTitle("#sum E_{HF hits}");
+
+    spikeMultMid = fs->make<TH1D>("Spike Mult 10-15 GeV","Spike Mult 10-15 GeV",100,0,160000);
+    spikeMultMid->GetXaxis()->SetTitle("#sum E_{HF hits}");
+    spikeMultMid->SetLineColor(kRed);
+    realMultMid = fs->make<TH1D>("real Mult 10-15 GeV","Non-Spike Mult 10-15 GeV",100,0,160000);
+    realMultMid->GetXaxis()->SetTitle("#sum E_{HF hits}");
+
+    spikeMultHigh = fs->make<TH1D>("Spike Mult 15+ GeV","Spike Mult 15+ GeV",100,0,160000);
+    spikeMultHigh->GetXaxis()->SetTitle("#sum E_{HF hits}");
+    spikeMultHigh->SetLineColor(kRed);
+    realMultHigh = fs->make<TH1D>("real Mult 15+ GeV","Non-Spike Mult 15+ GeV",100,0,160000);
+    realMultHigh->GetXaxis()->SetTitle("#sum E_{HF hits}");
+
+    NoECent = fs->make<TH1D>("#events Cent","#events Cent",40,0,40);
+    NoECent->GetXaxis()->SetTitle("Centrality Bin");
+    NoEMult = fs->make<TH1D>("#events Mult","#events Mult",100,0,160000);
+    NoEMult->GetXaxis()->SetTitle("#sum E_{HF hits}");
+
+    photonPtWithSpikes = fs->make<TH1D>("photon pt with spikes","Photon Pt with Spikes",100,0,100);
+    photonPtWithSpikes->GetXaxis()->SetTitle("P_{t}");
+    photonPtNoSpikes = fs->make<TH1D>("photon pt no spikes","Photon Pt no Spikes",100,0,100);
+    photonPtNoSpikes->GetXaxis()->SetTitle("P_{t}");
 }
 
 
@@ -205,6 +337,21 @@ SpikeInspector::~SpikeInspector()
     void
 SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+    numEvents++;
+    using namespace edm;
+    if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+
+    centrality_->newEvent(iEvent,iSetup);
+    const reco::Centrality *cent = centrality_->raw();
+
+    double hf = cent->EtHFhitSum();
+
+    int bin = 0;
+    bin = centrality_->getBin();
+
+    NoECent->Fill(bin);
+    NoEMult->Fill(hf);
+
     Handle<EcalRecHitCollection> barrelRecHitsHandle;
     iEvent.getByLabel(ebReducedRecHitCollection_,barrelRecHitsHandle);
     const EcalRecHitCollection* ecalRecHits = 0;
@@ -223,37 +370,107 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         superClusterCollection = superClusterHandle.product();
     }
 
+    Handle<reco::PhotonCollection> photonHandle;
+    iEvent.getByLabel(photonCollection_, photonHandle);
+    const reco::PhotonCollection* photonCollection = 0;
+    if(!photonHandle.isValid()) {
+        LogDebug("SpikeInspector") << "Error! Can't get photonHandle product!" << std::endl;
+    } else {
+        photonCollection = photonHandle.product();
+    }
+
+    double swiss = 0;
+    double e2e9 = 0;
+    bool spike = 0;
+    double time;
+    if(photonCollection) {
+        for(reco::PhotonCollection::const_iterator it=photonCollection->begin(); it!=photonCollection->end(); it++) {
+            DetId id = getMaximumRecHit(*(it->superCluster()->seed()),ecalRecHits);
+
+            time = recHitTime(id,ecalRecHits);
+            swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
+            e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
+            spike = (swiss > swissCut || abs(time) > 3);
+
+            if(it->isEB()) {
+                photonPtWithSpikes->Fill(it->pt());
+                if(!spike)
+                    photonPtNoSpikes->Fill(it->pt());
+            }
+        }
+    }
+
     if(superClusterCollection) {
         reco::SuperClusterCollection::const_iterator it;
-        double swiss = 0;
-        double e2e9 = 0;
         for(it=superClusterCollection->begin(); it!=superClusterCollection->end(); it++) {
             DetId id = getMaximumRecHit(*(it->seed()),ecalRecHits);
 
-            double time = recHitTime(id,ecalRecHits);
+            time = recHitTime(id,ecalRecHits);
             swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
             e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
-            double theEt = it->energy() / cosh(it->eta() ) ;
-	    if((theEt >= en1) && (theEt < en2)) {
+            spike = (swiss > swissCut || abs(time) > 3);
+            if(it->energy() >= en1 && it->energy() < en2) {
                 timingSwissLow->Fill(time,swiss);
                 swissE2Low->Fill(swiss,e2e9);
                 timingLow->Fill(time);
                 swissLow->Fill(swiss);
                 e2e9Low->Fill(e2e9);
+                if(spike) {
+                    spikeEtaLow->Fill(it->eta());
+                    spikePhiLow->Fill(it->phi());
+                    spikeCentLow->Fill(bin);
+                    spikeMultLow->Fill(hf);
+                }
+                else {
+                    realEtaLow->Fill(it->eta());
+                    realPhiLow->Fill(it->phi());
+                    realCentLow->Fill(bin);
+                    realMultLow->Fill(hf);
+                }
             }
-            else if ( (theEt >= en2) && (theEt < en3)) {
+            else if(it->energy() >= en2 && it->energy() < en3) {
                 timingSwissMid->Fill(time,swiss);
                 swissE2Mid->Fill(swiss,e2e9);
                 timingMid->Fill(time);
                 swissMid->Fill(swiss);
                 e2e9Mid->Fill(e2e9);
+                if(spike) {
+                    spikeEtaMid->Fill(it->eta());
+                    spikePhiMid->Fill(it->phi());
+                    spikeCentMid->Fill(bin);
+                    spikeMultMid->Fill(hf);
+                }
+                else {
+                    realEtaMid->Fill(it->eta());
+                    realPhiMid->Fill(it->phi());
+                    realCentMid->Fill(bin);
+                    realMultMid->Fill(hf);
+                }
             }
-            else if( theEt >= en3) {
+            else if(it->energy() >= en3) {
                 timingSwissHigh->Fill(time,swiss);
                 swissE2High->Fill(swiss,e2e9);
                 timingHigh->Fill(time);
                 swissHigh->Fill(swiss);
                 e2e9High->Fill(e2e9);
+                if(spike) {
+                    spikeEtaHigh->Fill(it->eta());
+                    spikePhiHigh->Fill(it->phi());
+                    spikeCentHigh->Fill(bin);
+                    spikeMultHigh->Fill(hf);
+                }
+                else {
+                    realEtaHigh->Fill(it->eta());
+                    realPhiHigh->Fill(it->phi());
+                    realCentHigh->Fill(bin);
+                    realMultHigh->Fill(hf);
+                }
+            }
+            if(spike) {
+                spikeEnergy->Fill(it->energy());
+            }
+            else {
+                realEnergy->Fill(it->energy());
             }
         }
     }
@@ -322,11 +539,36 @@ float recHitTime(DetId id, const EcalRecHitCollection *recHits) {
     void 
 SpikeInspector::beginJob()
 {
+    centrality_ = 0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
 SpikeInspector::endJob() {
+    spikeMultLow->Divide(NoEMult);
+    spikeMultMid->Divide(NoEMult);
+    spikeMultHigh->Divide(NoEMult);
+    realMultLow->Divide(NoEMult);
+    realMultMid->Divide(NoEMult);
+    realMultHigh->Divide(NoEMult);
+    spikeCentLow->Divide(NoECent);
+    spikeCentMid->Divide(NoECent);
+    spikeCentHigh->Divide(NoECent);
+    realCentLow->Divide(NoECent);
+    realCentMid->Divide(NoECent);
+    realCentHigh->Divide(NoECent);
+    spikeEtaLow->Scale(1./numEvents);
+    spikeEtaMid->Scale(1./numEvents);
+    spikeEtaHigh->Scale(1./numEvents);
+    realEtaLow->Scale(1./numEvents);
+    realEtaMid->Scale(1./numEvents);
+    realEtaHigh->Scale(1./numEvents);
+    spikePhiLow->Scale(1./numEvents);
+    spikePhiMid->Scale(1./numEvents);
+    spikePhiHigh->Scale(1./numEvents);
+    realPhiLow->Scale(1./numEvents);
+    realPhiMid->Scale(1./numEvents);
+    realPhiHigh->Scale(1./numEvents);
 }
 
 //define this as a plug-in
