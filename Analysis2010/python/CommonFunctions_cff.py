@@ -48,20 +48,20 @@ def overrideCentrality(process):
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-#                 tag = cms.string("CentralityTable_HFhits40_AMPTPiano_v0_offline"),
+                 #                 tag = cms.string("CentralityTable_HFhits40_AMPTPiano_v0_offline"),
                  tag = cms.string("CentralityTable_HFhits40_AMPTPiano_v0_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFhitsAMPT_Piano")
                  ),
         cms.PSet(record = cms.string("HeavyIonRcd"),
-#                 tag = cms.string("CentralityTable_PixelHits40_AMPTPiano_v0_offline"),
+                 #                 tag = cms.string("CentralityTable_PixelHits40_AMPTPiano_v0_offline"),
                  tag = cms.string("CentralityTable_PixelHits40_AMPTPiano_v0_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("PixelHitsAMPT_Piano")
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-#                 tag = cms.string("CentralityTable_HFhits40_HydjetGuitar_v0_offline"),
+                 #                 tag = cms.string("CentralityTable_HFhits40_HydjetGuitar_v0_offline"),
                  tag = cms.string("CentralityTable_HFhits40_HydjetGuitar_v0_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFhitsHydjet_Guitar")
@@ -74,6 +74,9 @@ def overrideCentrality(process):
                  label = cms.untracked.string("PixelHitsHydjet_Guitar")
                  ),
         
+
+#==================== DATA ONLY, FIXED RUN TAGS =====================================
+
         cms.PSet(record = cms.string("HeavyIonRcd"),
                  tag = cms.string("CentralityTable_HFhits40_AMPTOrgan_PreliminaryRun150476v0_mc"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
