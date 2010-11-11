@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id: SpikeInspector.cc,v 1.2 2010/11/06 13:56:11 troxlo Exp $
+// $Id: SpikeInspector.cc,v 1.4 2010/11/11 13:53:04 troxlo Exp $
 //
 //
 
@@ -159,6 +159,9 @@ class SpikeInspector : public edm::EDAnalyzer {
 
         TH1D *photonPtWithSpikes;
         TH1D *photonPtNoSpikes;
+
+        TH1D *numSpikesPerEvent;
+        TH1D *numSpikesPerEventCentral;
 };
 
 //
@@ -318,6 +321,9 @@ SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
     photonPtWithSpikes->GetXaxis()->SetTitle("P_{t}");
     photonPtNoSpikes = fs->make<TH1D>("photon pt no spikes","Photon Pt no Spikes",100,0,100);
     photonPtNoSpikes->GetXaxis()->SetTitle("P_{t}");
+
+    numSpikesPerEvent = fs->make<TH1D>("num spikes per event","num spikes per event",20,0,20);
+    numSpikesPerEventCentral = fs->make<TH1D>("num spikes per event 10% most central","num spikes per event 10% most central",20,0,20);
 }
 
 
@@ -338,6 +344,7 @@ SpikeInspector::~SpikeInspector()
 SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     numEvents++;
+    int numSpikes = 0;
     using namespace edm;
     if(!centrality_) centrality_ = new CentralityProvider(iSetup);
 
@@ -409,6 +416,8 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
             e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
             spike = (swiss > swissCut || abs(time) > 3);
+            if(spike)
+                numSpikes++;
             if(it->energy() >= en1 && it->energy() < en2) {
                 timingSwissLow->Fill(time,swiss);
                 swissE2Low->Fill(swiss,e2e9);
@@ -474,6 +483,10 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             }
         }
     }
+
+    numSpikesPerEvent->Fill(numSpikes);
+    if(bin < 4)
+        numSpikesPerEventCentral->Fill(numSpikes);
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
     Handle<ExampleData> pIn;
