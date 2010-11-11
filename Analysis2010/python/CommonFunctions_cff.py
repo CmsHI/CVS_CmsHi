@@ -84,7 +84,7 @@ def overrideCentrality(process):
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_AMPT2760GeV_PreliminaryData1107v2_mc"),
+                 tag = cms.string("CentralityTable_HFhits40_AMPTOrgan_PreliminaryRun150476v0_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),                 
                  label = cms.untracked.string("HFhits")
                  ),
