@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.10 2010/11/09 22:55:50 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.11 2010/11/09 22:57:31 yilmaz Exp $
 //
 //
 
@@ -123,7 +123,6 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
 
    edm::Handle<reco::BasicClusterCollection> bClusters;
    edm::Handle<CaloTowerCollection> towers;
-
 
   typedef vector<EcalRecHit>::const_iterator EcalIterator;
   
@@ -285,9 +284,14 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       geo = pGeo.product();
    }
 
-   int nHFlong = 0;
-   int nHFshort = 0;
-   int nHFtower = 0;
+   int nHFlongPlus = 0;
+   int nHFshortPlus = 0;
+   int nHFtowerPlus = 0;
+   int nHFlongMinus = 0;
+   int nHFshortMinus = 0;
+   int nHFtowerMinus = 0;
+
+
    
    if(doHcal_){
    for(unsigned int i = 0; i < hfHits->size(); ++i){
@@ -298,8 +302,14 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.phi[hfRecHit.n] = getPhi(hit.id());
      hfRecHit.isjet[hfRecHit.n] = false;
      hfRecHit.depth[hfRecHit.n] = hit.id().depth();
-     if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshort++;
-     if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlong++;
+
+     if(hit.id().ieta() > 0){
+     if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshortPlus++;
+     if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlongPlus++;
+     }else{
+       if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshortMinus++;
+       if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlongMinus++;
+     }
 
      if(useJets_){
        for(unsigned int j = 0 ; j < jets->size(); ++j){
@@ -375,7 +385,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       myTowers.phi[myTowers.n] = getPhi(hit.id());
       myTowers.isjet[myTowers.n] = false;
 
-      if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtower++;
+      if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtowerPlus++;
+      if(hit.ieta() < -29 && hit.energy() > hfTowerThreshold_) nHFtowerMinus++;
 
       if(useJets_){
 	 for(unsigned int j = 0 ; j < jets->size(); ++j){
@@ -426,7 +437,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
    }
 
-   nt->Fill(nHFtower,nHFlong,nHFshort);
+   nt->Fill(nHFtowerPlus,nHFtowerMinus,nHFlongPlus,nHFlongMinus,nHFshortPlus,nHFshortMinus);
    
 }
 
@@ -498,7 +509,7 @@ RecHitTreeProducer::beginJob()
      bkgTree->Branch("sigma",bkg.sigma,"sigma[n]/F");
   }
   
-  nt = fs->make<TNtuple>("ntEvent","","nHF:nHFlong:nHFshort");
+  nt = fs->make<TNtuple>("ntEvent","","nHFplus:nHFminus:nHFlongPlus:nHFlongMinus:nHFshortPlus:nHFshortMinus");
 
 }
 
