@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id: SpikeInspector.cc,v 1.4 2010/11/11 13:53:04 troxlo Exp $
+// $Id: SpikeInspector.cc,v 1.5 2010/11/11 14:37:06 troxlo Exp $
 //
 //
 
@@ -162,6 +162,8 @@ class SpikeInspector : public edm::EDAnalyzer {
 
         TH1D *numSpikesPerEvent;
         TH1D *numSpikesPerEventCentral;
+
+        TH2D *swissE1E9High;
 };
 
 //
@@ -324,6 +326,8 @@ SpikeInspector::SpikeInspector(const edm::ParameterSet& iConfig)
 
     numSpikesPerEvent = fs->make<TH1D>("num spikes per event","num spikes per event",20,0,20);
     numSpikesPerEventCentral = fs->make<TH1D>("num spikes per event 10% most central","num spikes per event 10% most central",20,0,20);
+
+    swissE1E9High = fs->make<TH2D>("Swiss vs E1E9","1-E4/E1 vs. E1/E9",120,0,1.2,120,0,1.2);
 }
 
 
@@ -388,8 +392,10 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     double swiss = 0;
     double e2e9 = 0;
+    double e1e9 = 0;
     bool spike = 0;
     double time;
+    double et;
     if(photonCollection) {
         for(reco::PhotonCollection::const_iterator it=photonCollection->begin(); it!=photonCollection->end(); it++) {
             DetId id = getMaximumRecHit(*(it->superCluster()->seed()),ecalRecHits);
@@ -415,10 +421,12 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             time = recHitTime(id,ecalRecHits);
             swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
             e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
+            e1e9 = EcalSeverityLevelAlgo::E1OverE9(id, *ecalRecHits, 0);
             spike = (swiss > swissCut || abs(time) > 3);
-            if(spike)
+            et = it->energy()/cosh(it->eta());
+            if(spike && et >= en3)
                 numSpikes++;
-            if(it->energy() >= en1 && it->energy() < en2) {
+            if(et >= en1 && it->energy() < en2) {
                 timingSwissLow->Fill(time,swiss);
                 swissE2Low->Fill(swiss,e2e9);
                 timingLow->Fill(time);
@@ -437,7 +445,7 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     realMultLow->Fill(hf);
                 }
             }
-            else if(it->energy() >= en2 && it->energy() < en3) {
+            else if(et >= en2 && it->energy() < en3) {
                 timingSwissMid->Fill(time,swiss);
                 swissE2Mid->Fill(swiss,e2e9);
                 timingMid->Fill(time);
@@ -456,9 +464,10 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                     realMultMid->Fill(hf);
                 }
             }
-            else if(it->energy() >= en3) {
+            else if(et >= en3) {
                 timingSwissHigh->Fill(time,swiss);
                 swissE2High->Fill(swiss,e2e9);
+                swissE1E9High->Fill(swiss,e1e9);
                 timingHigh->Fill(time);
                 swissHigh->Fill(swiss);
                 e2e9High->Fill(e2e9);
