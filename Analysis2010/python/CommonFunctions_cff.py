@@ -110,7 +110,7 @@ def overrideGlobalTag(process):
 
 
 def overrideCentrality(process):    
-    overrideGlobalTag(process):
+    overrideGlobalTag(process)
     return process
 
                               
