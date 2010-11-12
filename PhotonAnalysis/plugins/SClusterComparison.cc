@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: SClusterComparison.cc,v 1.12 2010/11/07 20:21:03 kimy Exp $
+// $Id: SClusterComparison.cc,v 1.1 2010/11/12 00:35:25 troxlo Exp $
 //
 //
 
@@ -152,7 +152,7 @@ SClusterComparison::SClusterComparison(const edm::ParameterSet& iConfig)
     hybrid_                         = iConfig.getParameter<edm::InputTag>("hybridSuperClusters");
     uncleanedHybrid_                = iConfig.getParameter<edm::InputTag>("uncleanedHybridSuperClusters");
 
-    islandBarrel_                   = iConfig.getParameter<edm::InputTag>("islandBarrelSuperClusters");
+    islandBarrel_                   = iConfig.getParameter<edm::InputTag>("cleanedIslandBarrelSuperClusters");   // This can be used as the cleanedSC
     correctedIslandBarrel_          = iConfig.getParameter<edm::InputTag>("correctedIslandBarrelSuperClusters");
 }
 
@@ -289,11 +289,11 @@ SClusterComparison::beginJob()
     theTree->Branch("uncleanedphi",uncleanedphi,"uncleanedphi[nUncl]/F");
     theTree->Branch("uncleanedet",uncleanedet,"uncleanedet[nUncl]/F");
 
-    theTree->Branch("nIsl",&nIsl,"nIsl/I");
-    theTree->Branch("islandenergy",islandenergy,"islandenergy[nIsl]/F");
-    theTree->Branch("islandeta",islandeta,"islandeta[nIsl]/F");
-    theTree->Branch("islandphi",islandphi,"islandphi[nIsl]/F");
-    theTree->Branch("islandet",islandet,"islandet[nIsl]/F");
+    theTree->Branch("nCleanIsl",&nIsl,"nCleanIsl/I");
+    theTree->Branch("cleanIslandenergy",islandenergy,"cleanIslandenergy[nCleanIsl]/F");
+    theTree->Branch("cleanIslandeta",islandeta,"cleanIslandeta[nCleanIsl]/F");
+    theTree->Branch("cleanIslandphi",islandphi,"cleanIslandphi[nCleanIsl]/F");
+    theTree->Branch("cleanIslandet",islandet,"cleanIslandet[nCleanIsl]/F");
 
     theTree->Branch("nCorIsl",&nCorIsl,"nCorIsl/I");
     theTree->Branch("correctedislandenergy",correctedislandenergy,"correctedislandenergy[nCorIsl]/F");
