@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: SClusterComparison.cc,v 1.1 2010/11/12 00:35:25 troxlo Exp $
+// $Id: SClusterComparison.cc,v 1.2 2010/11/12 12:13:35 kimy Exp $
 //
 //
 
@@ -98,9 +98,13 @@ class SClusterComparison : public edm::EDAnalyzer {
         int nClean, nCor, nNor, nUncl, nIsl, nCorIsl;
 
         float cleanedenergy[1000];
+        float cleanedrawE[1000];
+        float cleanedrawEt[1000];
         float cleanedet[1000];
         float cleanedeta[1000];
         float cleanedphi[1000];
+
+
         float cleanedpreshowerenergy[1000];
 
         float correctedenergy[1000];
@@ -123,7 +127,9 @@ class SClusterComparison : public edm::EDAnalyzer {
 
         float islandenergy[1000];
         float islandet[1000];
-        float islandeta[1000];
+        float islandrawE[1000];
+       float islandrawEt[1000];
+float islandeta[1000];
         float islandphi[1000];
         float islandpreshowerenergy[1000];
 
@@ -204,9 +210,12 @@ SClusterComparison::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     nClean = 0;
     for(SuperClusterCollection::const_iterator it=cleanedHybridCollection->begin(); it!=cleanedHybridCollection->end(); it++) {
         cleanedenergy[nClean] = it->energy();
+        cleanedrawE[nClean] = it->rawEnergy();
         cleanedeta[nClean] = it->eta();
         cleanedphi[nClean] = it->phi();
         cleanedet[nClean] = it->energy()/cosh(it->eta());
+        cleanedrawEt[nClean] = it->rawEnergy()/cosh(it->eta());
+
         nClean++;
     }
 
@@ -240,9 +249,11 @@ SClusterComparison::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     nIsl = 0;
     for(SuperClusterCollection::const_iterator it=islandBarrelCollection->begin(); it!=islandBarrelCollection->end(); it++) {
         islandenergy[nIsl] = it->energy();
+        islandrawE[nIsl]   = it->rawEnergy();
         islandeta[nIsl] = it->eta();
         islandphi[nIsl] = it->phi();
         islandet[nIsl] = it->energy()/cosh(it->eta());
+        islandrawEt[nIsl]   = it->rawEnergy()/cosh(it->eta());
         nIsl++;
     }
 
@@ -267,6 +278,9 @@ SClusterComparison::beginJob()
 
     theTree->Branch("nClean",&nClean,"nClean/I");
     theTree->Branch("cleanedenergy",cleanedenergy,"cleanedenergy[nClean]/F");
+    theTree->Branch("cleanedrawE",cleanedrawE,"cleanedrawE[nClean]/F");
+    theTree->Branch("cleanedrawEt",cleanedrawEt,"cleanedrawEt[nClean]/F");
+
     theTree->Branch("cleanedeta",cleanedeta,"cleanedeta[nClean]/F");
     theTree->Branch("cleanedphi",cleanedphi,"cleanedphi[nClean]/F");
     theTree->Branch("cleanedet",cleanedet,"cleanedet[nClean]/F");
@@ -291,6 +305,8 @@ SClusterComparison::beginJob()
 
     theTree->Branch("nCleanIsl",&nIsl,"nCleanIsl/I");
     theTree->Branch("cleanIslandenergy",islandenergy,"cleanIslandenergy[nCleanIsl]/F");
+    theTree->Branch("cleanIslandrawE",islandrawE,"cleanIslandrawE[nCleanIsl]/F");
+    theTree->Branch("cleanIslandrawEt",islandrawEt,"cleanIslandrawEt[nCleanIsl]/F");
     theTree->Branch("cleanIslandeta",islandeta,"cleanIslandeta[nCleanIsl]/F");
     theTree->Branch("cleanIslandphi",islandphi,"cleanIslandphi[nCleanIsl]/F");
     theTree->Branch("cleanIslandet",islandet,"cleanIslandet[nCleanIsl]/F");
