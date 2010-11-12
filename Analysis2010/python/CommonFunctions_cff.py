@@ -30,9 +30,16 @@ def hltFromREDIGI(process):
     process.hltanalysis.hltresults          = cms.InputTag("TriggerResults::REDIGI")   
     return process
 
-
-def overrideCentrality(process):
+def overrideGlobalTag(process):
     process.GlobalTag.toGet = cms.VPSet(
+        cms.PSet(record = cms.string("EcalSRSettingsRcd"),
+                 tag = cms.string("EcalSRSettings_fullreadout_v01_mc"),
+                 connect = cms.untracked.string("frontier://cms_orcoff_prep/CMS_COND_ECAL")
+                 ),        
+        cms.PSet(record = cms.string("BeamSpotObjectsRcd"),
+                 tag = cms.string("Realistic2.76ATeVCollisions_STARTUP_v0_mc"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_BEAMSPOT")
+                 ),        
         cms.PSet(record = cms.string("HeavyIonRcd"),
                  tag = cms.string("CentralityTable_HFhits40_AMPTOrgan_v0_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
@@ -101,5 +108,9 @@ def overrideCentrality(process):
     
     return process
 
+
+def overrideCentrality(process):    
+    overrideGlobalTag(process):
+    return process
 
                               
