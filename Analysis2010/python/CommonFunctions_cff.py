@@ -23,6 +23,14 @@ def disableMC(process):
     removePatMCMatch(process)
     return process
 
+def hltFromREDIGI(process):
+    process.hltanalysis.HLTProcessName      = "REDIGI"
+    process.hltanalysis.l1GtObjectMapRecord = cms.InputTag("hltL1GtObjectMap::REDIGI")
+    process.hltanalysis.l1GtReadoutRecord   = cms.InputTag("hltGtDigis::REDIGI")
+    process.hltanalysis.hltresults          = cms.InputTag("TriggerResults::REDIGI")   
+    return process
+
+
 def overrideCentrality(process):
     process.GlobalTag.toGet = cms.VPSet(
         cms.PSet(record = cms.string("HeavyIonRcd"),
