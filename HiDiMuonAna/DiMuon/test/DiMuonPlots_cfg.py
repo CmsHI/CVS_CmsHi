@@ -53,18 +53,19 @@ process.source = cms.Source("PoolSource",
 ##edSkim first Z0 Cand
     #'file:ZMuMudata_DiMuSkim.root'
 
-
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150431_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150436_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150442_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150457_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150476_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150590_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150593_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150619_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150883_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim.root',
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150887_HiCore_DiMuSkim.root'
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim_NC.root'
+#'rfio:/castor/cern.ch/user/e/edwenger/skims/mergeZMMall.root'
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150431_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150436_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150442_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150457_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150476_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150590_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150593_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150619_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150883_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150887_HiCore_DiMuSkim.root'
 
 
     )
@@ -84,7 +85,7 @@ process.TFileService = cms.Service(
     "TFileService",
     #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
 
-    fileName = cms.string("ZMuMu_Plots_150431_150887.root")
+    fileName = cms.string("ZMuMu_Plots_150431_150887_test.root")
     )
 
 
@@ -301,13 +302,12 @@ process.dimuonsTrkPlots = cms.EDAnalyzer(
 
 process.dimuons2DPlots = cms.EDAnalyzer(
     "DiMuon2DPlots",
-    OutputFileName = cms.untracked.string("ZMuMu_2DPlots_150431_150887.root"),
+    OutputFileName = cms.untracked.string("ZMuMu_2DPlots_150431_150887_test.root"),
     
     ##for generator info put IsGenInfo as TRUE
     ##IsGenInfo=cms.untracked.string("TRUE"),
     IsGenInfo=cms.untracked.string("FALSE"),
-
-
+    IsCuts = cms.untracked.bool(False)
     )
 
 
@@ -385,7 +385,15 @@ process.endPath = cms.EndPath(process.eventInfo)
 #process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
 ##Time optimization sequence
-process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.endPath)
+
+#process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.endPath)
+process.schedule=cms.Schedule(process.dimuons2DPlotsPath,process.endPath)
+
+
+
+
+
+
 
 ##process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
