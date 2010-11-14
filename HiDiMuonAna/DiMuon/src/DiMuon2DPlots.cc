@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.4 2010/11/14 11:07:09 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.5 2010/11/14 22:22:47 pshukla Exp $
 //
 //
 // system include files
@@ -101,6 +101,11 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH2F *diMuonsGlobalSameChargeInvMassVsPt;
   TH2F *diMuonsGlobalSameChargeInvMassVsY;
   TH2F *diMuonsGlobalSameChargeInvMassVsCen;
+
+  TH2F *diMuonsGlobalSameChargeInvMassVsPtBRL;
+  TH2F *diMuonsGlobalSameChargeInvMassVsYBRL;
+  TH2F *diMuonsGlobalSameChargeInvMassVsCenBRL;
+
 
   TH2F *diMuonsGlobalSTASameChargeInvMassVsPt;
   TH2F *diMuonsGlobalSTASameChargeInvMassVsY;
@@ -408,8 +413,14 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
       diMuonsGlobalSameChargeInvMassVsPt->Fill(p.mass(),p.pt());
       diMuonsGlobalSameChargeInvMassVsY->Fill(p.mass(),p.rapidity());
       diMuonsGlobalSameChargeInvMassVsCen->Fill(p.mass(),bin);
-    }
 
+      if ( mu0->eta() < 0.8 && mu1->eta() < 0.8 ) {
+	diMuonsGlobalSameChargeInvMassVsPt->Fill(p.mass(),p.pt());
+	diMuonsGlobalSameChargeInvMassVsY->Fill(p.mass(),p.rapidity());
+	diMuonsGlobalSameChargeInvMassVsCen->Fill(p.mass(),bin);
+      }
+    }
+    
   }
 
 
@@ -584,6 +595,23 @@ DiMuon2DPlots::beginJob()
   diMuonsGlobalSameChargeInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalSameChargeInvMassVsCen->SetYTitle("Centrality");
 
+  // Barrel 
+
+  diMuonsGlobalSameChargeInvMassVsPtBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsPtBRL", "diMuonsGlobalSameChargeInvMassVsPtBRL", 4000, 0, 200, 100,0,100);
+  diMuonsGlobalSameChargeInvMassVsPtBRL->SetYTitle("pT (GeV/c)");
+  diMuonsGlobalSameChargeInvMassVsPtBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
+
+  diMuonsGlobalSameChargeInvMassVsYBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsYBRL","diMuonsGlobalSameChargeInvMassVsYBRL",4000, 0, 200,100, -5, 5);
+  diMuonsGlobalSameChargeInvMassVsYBRL->SetYTitle("rapidity");
+  diMuonsGlobalSameChargeInvMassVsYBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
+
+  diMuonsGlobalSameChargeInvMassVsCenBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsCenBRL","diMuonsGlobalSameChargeInvMassVsCenBRL", 4000, 0, 200,100,0,100);
+  diMuonsGlobalSameChargeInvMassVsCenBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
+  diMuonsGlobalSameChargeInvMassVsCenBRL->SetYTitle("Centrality");
+
+  /////////
+
+
   diMuonsGlobalSTASameChargeInvMassVsPt = new TH2F("diMuonsGlobalSTASameChargeInvMassVsPt", "diMuonsGlobalSTASameChargeInvMassVsPt",4000, 0, 200,100, 0, 100);
   diMuonsGlobalSTASameChargeInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGlobalSTASameChargeInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
@@ -690,7 +718,6 @@ void DiMuon2DPlots::endJob()
   diMuonsGlobalInvMassVsYBRL->Write();
   diMuonsGlobalInvMassVsCenBRL->Write();
 
-
   diMuonsGlobalSTAInvMassVsPt->Write();
   diMuonsGlobalSTAInvMassVsY->Write();
   diMuonsGlobalSTAInvMassVsCen->Write();
@@ -701,6 +728,12 @@ void DiMuon2DPlots::endJob()
   diMuonsGlobalSameChargeInvMassVsPt->Write();
   diMuonsGlobalSameChargeInvMassVsY->Write();
   diMuonsGlobalSameChargeInvMassVsCen->Write();
+
+  diMuonsGlobalSameChargeInvMassVsPtBRL->Write();
+  diMuonsGlobalSameChargeInvMassVsYBRL->Write();
+  diMuonsGlobalSameChargeInvMassVsCenBRL->Write();
+
+
   diMuonsGlobalSTASameChargeInvMassVsPt->Write();
   diMuonsGlobalSTASameChargeInvMassVsY->Write();
   diMuonsGlobalSTASameChargeInvMassVsCen->Write();
