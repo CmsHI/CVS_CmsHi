@@ -20,19 +20,6 @@ from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 
 
-##making a filter for centrality
-##process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
-##process.load("CondCore.DBCommon.CondDBCommon_cfi")
-##process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
-##process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-##                                      process.CondDBCommon,
-##                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-##                                                                 tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
-##                                                                 )
-##                                                        )
-##                                      )
-
-
 process.HeavyIonGlobalParameters = cms.PSet(
         centralityVariable = cms.string("HFhits"),
             nonDefaultGlauberModel = cms.string("Hydjet_2760GeV"),
@@ -40,21 +27,48 @@ process.HeavyIonGlobalParameters = cms.PSet(
             )
 
 
+###############Vertex Filter#####################################################################
+process.primaryVertexFilter = cms.EDFilter("VertexSelector",
+                                   src = cms.InputTag("hiSelectedVertex"),
+                                   cut = cms.string("!isFake && abs(z) <= 25 && position.Rho <= 2 && ndof > 4"),
+                                   filter = cms.bool(True), # otherwise it won't filter the events, instead making an empty vertex collection
+                                   )
+
+
+##############################  HFMin Bais Filter  #############################################
+#process.load("UserCode.edwenger.Skims.hfCoincFilter_cff")
+#from HiDiMuonAna.DiMuon.hfCoinFilter_cff import *
+
+process.load("HiDiMuonAna.DiMuon.hfCoinFilter_cff")
+
+##############################################################################################
+
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(-1)
+    input = cms.untracked.int32(100)
     )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.source = cms.Source("PoolSource",
-                            noEventSort = cms.untracked.bool(True),
-                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+                            #noEventSort = cms.untracked.bool(True),
+                            #duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
-    
+
+   
 ##edSkim first Z0 Cand
     #'file:ZMuMudata_DiMuSkim.root'
+###OLD SKIM
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150431_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150436_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150442_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150457_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150476_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150590_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150593_HLT_DiMuSkim.root',
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy/DiMuSkim/run150619_HLT_DiMuSkim.root',
 
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim_NC.root'
-#'rfio:/castor/cern.ch/user/e/edwenger/skims/mergeZMMall.root'
+
+
+
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150431_HiCore_DiMuSkim.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150436_HiCore_DiMuSkim.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150442_HiCore_DiMuSkim.root',
@@ -66,10 +80,13 @@ process.source = cms.Source("PoolSource",
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150883_HiCore_DiMuSkim.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150887_HiCore_DiMuSkim.root'
+ 'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim_NC_1.root'
+ 
 
 
     )
                             )
+
 
 
 ##This should be uncommented to include all files from any castor directory automatically
@@ -81,11 +98,13 @@ process.source = cms.Source("PoolSource",
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseZMuMuSkim")
 
 
+
+
 process.TFileService = cms.Service(
     "TFileService",
     #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
 
-    fileName = cms.string("ZMuMu_Plots_150431_150887_test.root")
+    fileName = cms.string("DiMuonPlots_NewSkim_151022_vtxTest.root")
     )
 
 
@@ -241,11 +260,12 @@ DiMuPlots = cms.PSet(
     )
 
 
+
+
 process.GenDimuonsPlots = cms.EDAnalyzer(
     "CandViewHistoAnalyzer",
     DiMuPlots,
     src = cms.InputTag("dimuons"),
-    #src = cms.InputTag("GenDimuons"),
     filter = cms.bool(False)
     )
 
@@ -302,12 +322,12 @@ process.dimuonsTrkPlots = cms.EDAnalyzer(
 
 process.dimuons2DPlots = cms.EDAnalyzer(
     "DiMuon2DPlots",
-    OutputFileName = cms.untracked.string("ZMuMu_2DPlots_150431_150887_test.root"),
-    
+    OutputFileName = cms.untracked.string("DiMuon2DPlots_NewSkim_151022_vtxTest.root"),
     ##for generator info put IsGenInfo as TRUE
     ##IsGenInfo=cms.untracked.string("TRUE"),
     IsGenInfo=cms.untracked.string("FALSE"),
     IsCuts = cms.untracked.bool(False)
+
     )
 
 
@@ -365,15 +385,21 @@ process.eventInfo = cms.OutputModule (
     "AsciiOutputModule"
        )
  
+#process.primaryVertexFilterPath=cms.Path(process.primaryVertexFilter)
+#process.filter_step = cms.Path(process.hfCoincFilter)
 
-process.GenDimuonsPlotsPath = cms.Path(process.GenDimuonsPlots)
-process.dimuonsPlotsPath = cms.Path(process.dimuonsPlots)
-process.dimuonsGlobalPlotsPath = cms.Path(process.dimuonsGlobalPlots)
-process.dimuonsGlobalSTAPlotsPath = cms.Path(process.dimuonsGlobalSTAPlots)
-process.dimuonsGlobalTrkPlotsPath = cms.Path(process.dimuonsGlobalTrkPlots)
-process.dimuonsSTAPlotsPath = cms.Path(process.dimuonsSTAPlots)
-process.dimuonsTrkPlotsPath = cms.Path(process.dimuonsTrkPlots)
-process.dimuons2DPlotsPath = cms.Path(process.dimuons2DPlots)
+process.GenDimuonsPlotsPath = cms.Path(process.hfCoincFilter*process.primaryVertexFilter*process.GenDimuonsPlots)
+process.dimuonsPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsPlots)
+process.dimuonsGlobalPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalPlots)
+process.dimuonsGlobalSTAPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalSTAPlots)
+process.dimuonsGlobalTrkPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalTrkPlots)
+process.dimuonsSTAPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsSTAPlots)
+process.dimuonsTrkPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsTrkPlots)
+
+
+process.dimuons2DPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuons2DPlots)
+
+
 process.dimuonsSameChargePlotsPath = cms.Path(process.dimuonsSameChargePlots)
 process.dimuonsGlobalSameChargePlotsPath = cms.Path(process.dimuonsGlobalSameChargePlots)
 process.dimuonsGlobalSTASameChargePlotsPath = cms.Path(process.dimuonsGlobalSTASameChargePlots)
@@ -384,18 +410,10 @@ process.endPath = cms.EndPath(process.eventInfo)
 
 #process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
-##Time optimization sequence
-
-#process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.endPath)
 process.schedule=cms.Schedule(process.dimuons2DPlotsPath,process.endPath)
 
 
 
-
-
-
-
-##process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
 
 
