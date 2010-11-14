@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.9 2010/10/25 15:09:31 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.10 2010/10/27 15:56:48 kimy Exp $
  *
  */
 
@@ -364,13 +364,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int   flags=-1, severity = -1; 
     const EcalRecHitCollection & rechits = ( photon.isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
     EcalRecHitCollection::const_iterator it = rechits.find( id );
-    if( it != rechits.end() ) { 
+    //    if( it != rechits.end() ) { 
 	    time = it->time(); 
 	    outOfTimeChi2 = it->outOfTimeChi2();
 	    chi2 = it->chi2();
 	    flags = it->recoFlag();
 	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-    }
+	    //    }
 
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
