@@ -13,7 +13,6 @@ process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load('Configuration/EventContent/EventContent_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 
-
 #process.GlobalTag.globaltag = 'MC_37Y_V5::All'
 
 process.GlobalTag.globaltag = 'GR10_P_V5::All'
@@ -42,10 +41,10 @@ process.source = cms.Source("PoolSource",
 #    return file
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco")
 
-
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.load("HiDiMuonAna.DiMuon.MuSkim_cff")            
+
 #Uncomment for HI reconstruction while PAT reco
 #process.patAODTrackCandsUnfiltered.src = cms.InputTag("hiSelectedTracks")
 #process.patAODTrackIsoDepositCtfTk.ExtractorPSet.inputTrackCollection = cms.InputTag("hiSelectedTracks")

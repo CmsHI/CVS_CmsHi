@@ -20,10 +20,7 @@ from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 
 
-
-
 ##making a filter for centrality
-<<<<<<< DiMuonPlots_cfg.py
 ##process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
 ##process.load("CondCore.DBCommon.CondDBCommon_cfi")
 ##process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
@@ -43,22 +40,6 @@ process.HeavyIonGlobalParameters = cms.PSet(
             )
 
 
-=======
-#process.load("RecoHI.HiCentralityAlgos.CentralityFilter_cfi")
-#process.load("CondCore.DBCommon.CondDBCommon_cfi")
-#process.CondDBCommon.connect = "sqlite_file:/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_7_0/src/UserCode/CmsHi/JulyExercise/data/CentralityTables.db"
-#process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-#                                      process.CondDBCommon,
-#                                      toGet = cms.VPSet(cms.PSet(record = cms.string('HeavyIonRcd'),
-#                                                                 tag = cms.string('HFhits40_DataJulyExercise_AMPT2760GeV_MC_37Y_V5_NZS_v0')
-#                                                                 )
-#                                                        )
-#                                      )
->>>>>>> 1.2
-
-
-
-
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
     )
@@ -68,34 +49,26 @@ process.source = cms.Source("PoolSource",
                             noEventSort = cms.untracked.bool(True),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
-<<<<<<< DiMuonPlots_cfg.py
-=======
-'file:DiMuonSkimTest.root'
-#'file:Hu_JpsiToMuMuSkim.root'
-#'file:Hu_UpsilonToMuMuSkim.root'
->>>>>>> 1.2
-
-
-    #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/Ed500evt_1stDATA_noTRK_CS_DiMuHI_v5_allkeep.root'
-
-    #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/run150304_1stDATA_noTRK_CS_DiMuHI_v5.root',
-    #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/run150305_noTRK_CS_DiMuHI_v5_DiMuContent.root',
-
-<<<<<<< DiMuonPlots_cfg.py
-   # 'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/run150308_noTRK_CS_DiMuHI_v5_DiMuContent.root',
-##New Skim
-    'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/ExSt/run150308_noTRK_CS_DiMuHI_NewSkim_DiMuContent.root'
     
-=======
-#'rfio:/castor/cern.ch/user/k/kumarv/cmssw390/Z0/Z0MuSkim/RV_WTrk_ZMuMuSkim_1.root'
->>>>>>> 1.2
+##edSkim first Z0 Cand
+    #'file:ZMuMudata_DiMuSkim.root'
 
 
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150431_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150436_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150442_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150457_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150476_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150590_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150593_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150619_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150883_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150886_HiCore_DiMuSkim.root',
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_1/run150887_HiCore_DiMuSkim.root'
 
 
     )
                             )
-
 
 
 ##This should be uncommented to include all files from any castor directory automatically
@@ -107,14 +80,13 @@ process.source = cms.Source("PoolSource",
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseZMuMuSkim")
 
 
-
-
 process.TFileService = cms.Service(
     "TFileService",
     #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
 
-    fileName = cms.string("run_150308_noTRK_CS_NewSkim_DiMuPlot_keepall.root")
+    fileName = cms.string("ZMuMu_Plots_150431_150887.root")
     )
+
 
 DiMuPlots = cms.PSet(
     histograms = cms.VPSet(
@@ -328,8 +300,8 @@ process.dimuonsTrkPlots = cms.EDAnalyzer(
 
 
 process.dimuons2DPlots = cms.EDAnalyzer(
-    "DiMuon2DPlots_Test",
-    OutputFileName = cms.untracked.string("HI_ExSt_FEVTDEBUGHLToutput_DiMu2DPlots_V3.root"),
+    "DiMuon2DPlots",
+    OutputFileName = cms.untracked.string("ZMuMu_2DPlots_150431_150887.root"),
     
     ##for generator info put IsGenInfo as TRUE
     ##IsGenInfo=cms.untracked.string("TRUE"),
@@ -410,12 +382,12 @@ process.dimuonsSTASameChargePlotsPath = cms.Path(process.dimuonsSTASameChargePlo
 process.dimuonsTrkSameChargePlotsPath = cms.Path(process.dimuonsTrkSameChargePlots)
 process.endPath = cms.EndPath(process.eventInfo)
 
-process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
+#process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
+
+##Time optimization sequence
+process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsSTAPlotsPath,process.dimuons2DPlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.endPath)
 
 ##process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
-
-
-
 
 
 

@@ -1,8 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 MuSkimContent = cms.PSet(
-        outputCommands = cms.untracked.vstring(
-        #'keep *',
-
+  outputCommands = cms.untracked.vstring(
+    #'keep *',
+    
     'keep *_generator_*_*',
     'keep *_genParticles_*_*',
     'keep *_hiGenParticles_*_*',
@@ -16,5 +16,5 @@ MuSkimContent = cms.PSet(
     'keep *_goodGlobalMuons_*_*',
     'keep *_goodSTAMuons_*_*',
     'keep *_TriggerResults_*_*'
-    )
-        )
+  )
+)
