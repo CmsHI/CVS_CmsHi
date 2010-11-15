@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.10 2010/10/27 15:56:48 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.11 2010/11/14 16:35:43 kimy Exp $
  *
  */
 
@@ -588,9 +588,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     // IDs
     try { isLoose(nphotonscounter)=photon.photonID("PhotonCutBasedIDLoose"); } 
-    catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
+    catch (std::exception &e) {} // HeavyIon photons does not have photonID yet....edm::LogError("NotFound") << e.what();  }
     try { isTight(nphotonscounter)=photon.photonID("PhotonCutBasedIDTight"); } 
-    catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
+    catch (std::exception &e) {} //  edm::LogError("NotFound") << e.what();  }
     
     if ( (doStoreConversions_) && (photon.conversions().size() > 0)  ) {
        
