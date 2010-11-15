@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.22 2010/10/23 15:47:27 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.23 2010/10/23 18:27:24 nart Exp $
 //
 //
 
@@ -185,6 +185,7 @@ private:
   
   TNtuple* ntRandom;
   TNtuple* ntHits;
+  TNtuple* ntTowers;
   TRandom * rand;
   
 
@@ -437,7 +438,7 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
     for(unsigned int i = 0 ; i < towers->size(); ++i){
       const CaloTower& tower = (*towers)[i];
       hTowerptvsieta[bin]->Fill(tower.ieta(),tower.pt());
-      if(abs(tower.ieta())>iEtamax_) continue;
+      //      if(abs(tower.ieta())>iEtamax_) continue;
       
       numberofTower++;
       
@@ -445,7 +446,8 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
       double ieta = tower.ieta();
       double pt = tower.pt();
       double et = tower.et();
-      double phi = tower.phi();      
+      double phi = tower.phi();     
+      double iphi = tower.iphi();      
       double phiRel = reco::deltaPhi(phi,phi0_);
       bool recomatched = false;
       double rawJetEt = 0;
@@ -483,14 +485,15 @@ void MinBiasTowerAnalyzer::analyzeTowers(){
 	numberofNojetTower++;
 	T_nojet_ptsquare=T_nojet_ptsquare+pt*pt;
       }
-      
+      float entry[12] = {et,pt,eta,phi,phiRel,ieta,iphi,hf,sumET_,bin,recomatched,rawJetEt};
+      ntTowers->Fill(entry);
     }
     
     for(int i = 1; i < 12; ++i){
     hRemainPUTow[bin]->Fill(tm[i]);
     hRemainPUTow[bin]->Fill(tm[-i]);
     }
-
+    
     cout<<"Tower size at MR: "<<numberofTower<<endl;
     for(unsigned int k=0; k< (towersize_- numberofTower) ; k++)
       {	
@@ -550,7 +553,6 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
   int bin;
   if(!isSignal_) bin = cbins_->getBin(hf);
   if(isSignal_) bin = 0;
-
   for(unsigned int i = 0 ; i < fakejets->size(); ++i){
     const reco::CaloJet& fakejet = (*fakejets)[i];
     vector<edm::Ptr<CaloTower> > constits = fakejet.getCaloConstituents();
@@ -560,7 +562,8 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
     int ncons = constits.size();
     vector<int> used;    
     double area = fakejet.towersArea();
-    double sign = (int)((*directions)[i])*2 - 1;   
+    double sign = 1;
+    if(!isSignal_) sign = (int)((*directions)[i])*2 - 1;   
     double fpt = sign*fakejet.pt();    
     double fpu = fakejet.pileup();
     double eta = fakejet.eta();
@@ -573,16 +576,13 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
     if(doFastJets_) akRho = getRho(eta,*akRhos);
 
     int nc = 0;
-    
     int nTow = -1;
     while(nTow < 0 || nTow > ncons) nTow = (int)(fNtowers[bin]->GetRandom());
     for(int ic1 = 0; ic1 < nTow; ++ic1){
       int ic = -1; 
-
       while(find(used.begin(),used.end(), ic) != used.end() || ic < 0 || ic >= ncons){
 	
 	double r = rand->Rndm();
-
 	ic = (int)(ncons*r);
       }
       used.push_back(ic);
@@ -593,11 +593,9 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
       avphi += towphi*towpt;
       totpt += towpt;
       nc++;
-
     }
     aveta /= totpt;
     avphi /= totpt;
-    
     float entry[21] = {eta,phi,phiRel,fpt+fpu,totpt,bin,fpt+fpu,fpu,fpt,sign,njet,njet20,njet30,ncons,area,nc,sumET_,hf,ktRho,akRho};
     ntRandom->Fill(entry);
     
@@ -707,7 +705,9 @@ MinBiasTowerAnalyzer::beginJob()
   ntRandom = fs->make<TNtuple>("ntRandom","","eta:phi:phiRel:pt1:pt2:bin:et:pu:subt:sign:njet:njet20:njet30:ncons:area:nc:sumet:hf:kt:ak");
   
   ntHits = fs->make<TNtuple>("ntHits","","e:et:eta:phi:ieta:iphi:hf:sumet:bin:calo:isjet");
-  
+
+  ntTowers = fs->make<TNtuple>("ntTowers","","et:pt:eta:phi:phiRel:ieta:iphi:hf:sumet:bin:isjet:rawJetEt");
+
   rand = new TRandom();
   
    TH1::SetDefaultSumw2();
