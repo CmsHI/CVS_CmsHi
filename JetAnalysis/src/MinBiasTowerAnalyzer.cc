@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Wed Oct  3 08:07:18 EDT 2007
-// $Id: MinBiasTowerAnalyzer.cc,v 1.23 2010/10/23 18:27:24 nart Exp $
+// $Id: MinBiasTowerAnalyzer.cc,v 1.24 2010/11/15 14:26:39 nart Exp $
 //
 //
 
@@ -562,8 +562,7 @@ void MinBiasTowerAnalyzer::analyzeRandomCones(){
     int ncons = constits.size();
     vector<int> used;    
     double area = fakejet.towersArea();
-    double sign = 1;
-    if(!isSignal_) sign = (int)((*directions)[i])*2 - 1;   
+    double sign = (int)((*directions)[i])*2 - 1;
     double fpt = sign*fakejet.pt();    
     double fpu = fakejet.pileup();
     double eta = fakejet.eta();
