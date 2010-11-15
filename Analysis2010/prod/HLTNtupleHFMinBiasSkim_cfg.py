@@ -42,6 +42,15 @@ process.hltHighLevel.HLTPaths = ["HLT_HIMinBiasHF"]
 process.load("FWCore.Modules.preScaler_cfi")
 process.preScaler.prescaleFactor = 10
 
+# HF coincidence
+process.load("L1Trigger.Skimmer.l1Filter_cfi")
+process.L1HfOrBscCoinc = process.l1Filter.clone(
+      algorithms = cms.vstring("L1_BscMinBiasInnerThreshold1","L1_HcalHfCoincidencePm")
+      )
+
+# HI MB Event Selection
+process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
+
 # =============== Analysis modules =====================
 
 # ------------------- OpenHLT --------------------------
@@ -99,7 +108,7 @@ process.HIMinBiasHF.HLTPaths = ["HLT_HIMinBiasHF"]
 process.HIphoton15 = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
 process.HIphoton15.HLTPaths = ["HLT_HIPhoton15"]
 
-process.photon_filter_step = cms.Path(process.HIphoton15 * process.HIMinBiasHF )  #tilde means NOT
+process.photon_filter_step = cms.Path(process.HIphoton15 * process.L1HfOrBscCoinc*process.collisionEventSelection )  #tilde means NOT
 
 #===============================================================
 
@@ -150,7 +159,7 @@ process.ana_step = cms.Path(process.hiCentrality *
                             process.hltanalysis
                             )
 
-process.hlt_filter_step = cms.Path(process.hltHighLevel*process.preScaler)
+process.hlt_filter_step = cms.Path(process.L1HfOrBscCoinc*process.collisionEventSelection*process.preScaler)
 process.output_step = cms.EndPath(process.HLToutput*process.photonOutput)
 
 
