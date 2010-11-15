@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.5 2010/11/14 22:22:47 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.6 2010/11/14 22:45:23 pshukla Exp $
 //
 //
 // system include files
@@ -253,11 +253,11 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   double eep = cent->EtEESumPlus();
   double eem = cent->EtEESumMinus();
   
-  cout<<"Centrality variables in the event:"<<endl;
-  cout<<"Total energy in HF hits : "<<hf<<endl;
-  cout<<"Asymmetry of HF towers : "<<fabs(hftp-hftm)/(hftp+hftm)<<endl;
-  cout<<"Total energy in EE basic clusters : "<<eep+eem<<endl;
-  cout<<"Total energy in EB basic clusters : "<<eb<<endl;
+  //cout<<"Centrality variables in the event:"<<endl;
+  //cout<<"Total energy in HF hits : "<<hf<<endl;
+  //cout<<"Asymmetry of HF towers : "<<fabs(hftp-hftm)/(hftp+hftm)<<endl;
+  //cout<<"Total energy in EE basic clusters : "<<eep+eem<<endl;
+  //cout<<"Total energy in EB basic clusters : "<<eb<<endl;
   
   bin = cbins_->getBin(hf);
   
@@ -265,7 +265,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int nbins = cbins_->getNbins();
   int binsize = 100/nbins;
   char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
-  cout<<"The event falls into centrality bin : "<<binName<<" id : "<<bin<<endl;
+  //cout<<"The event falls into centrality bin : "<<binName<<" id : "<<bin<<endl;
 
 
   // Primary Vertex
@@ -301,7 +301,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("dimuonsGlobal", diMuonsGlobalCand);
   edm::View<reco::Candidate>dimuonsGlobalColl= *diMuonsGlobalCand;
   int dimuonsGlobalSize =dimuonsGlobalColl.size();
-  cout<<" no of dimuon Global  :" <<dimuonsGlobalSize <<endl;
+  //cout<<" no of dimuon Global  :" <<dimuonsGlobalSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalColl)[ii];
     
@@ -316,7 +316,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       diMuonsGlobalInvMassVsY->Fill(p.mass(),p.rapidity());
       diMuonsGlobalInvMassVsCen->Fill(p.mass(),bin);
       // Barrel
-      if (mu0->eta() < 0.8 && mu1->eta() < 0.8 ) {
+      if (fabs(mu0->eta()) < 0.8 && fabs(mu1->eta()) < 0.8 ) {
 	diMuonsGlobalInvMassVsPtBRL->Fill(p.mass(),p.pt());
 	diMuonsGlobalInvMassVsYBRL->Fill(p.mass(),p.rapidity());
 	diMuonsGlobalInvMassVsCenBRL->Fill(p.mass(),bin);
@@ -325,12 +325,12 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
   
   
-  // get dimuonGlobalSTA collection
+  // get dimuonGlobalSA collection
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSTACand;
   iEvent.getByLabel("dimuonsGlobalSTA", diMuonsGlobalSTACand);
   edm::View<reco::Candidate>dimuonsGlobalSTAColl= *diMuonsGlobalSTACand;
   int dimuonsGlobalSTASize =dimuonsGlobalSTAColl.size();
-  cout<<" no of dimuonsGlobalSTA  :" <<dimuonsGlobalSTASize <<endl;
+  //cout<<" no of dimuonsGlobalSTA  :" <<dimuonsGlobalSTASize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSTAColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSTAColl)[ii];
 
@@ -354,7 +354,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("dimuonsSTA", diMuonsSTACand);
   edm::View<reco::Candidate>dimuonsSTAColl= *diMuonsSTACand;
   int dimuonsSTASize =dimuonsSTAColl.size();
-  cout<<" no of dimuonsSTA  :" <<dimuonsSTASize <<endl;
+  //cout<<" no of dimuonsSTA  :" <<dimuonsSTASize <<endl;
   for(size_t ii = 0; ii <dimuonsSTAColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsSTAColl)[ii];
 
@@ -398,7 +398,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   iEvent.getByLabel("dimuonsGlobalSameCharge", diMuonsGlobalSameChargeCand);
   edm::View<reco::Candidate>dimuonsGlobalSameChargeColl= *diMuonsGlobalSameChargeCand;
   int dimuonsGlobalSameChargeSize =dimuonsGlobalSameChargeColl.size();
-  cout<<" no of dimuon Global same charge  :" <<dimuonsGlobalSameChargeSize <<endl;
+  //cout<<" no of dimuon Global same charge  :" <<dimuonsGlobalSameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSameChargeColl)[ii];
 
@@ -414,10 +414,10 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
       diMuonsGlobalSameChargeInvMassVsY->Fill(p.mass(),p.rapidity());
       diMuonsGlobalSameChargeInvMassVsCen->Fill(p.mass(),bin);
 
-      if ( mu0->eta() < 0.8 && mu1->eta() < 0.8 ) {
-	diMuonsGlobalSameChargeInvMassVsPt->Fill(p.mass(),p.pt());
-	diMuonsGlobalSameChargeInvMassVsY->Fill(p.mass(),p.rapidity());
-	diMuonsGlobalSameChargeInvMassVsCen->Fill(p.mass(),bin);
+      if ( fabs(mu0->eta()) < 0.8 && fabs(mu1->eta()) < 0.8 ) {
+	diMuonsGlobalSameChargeInvMassVsPtBRL->Fill(p.mass(),p.pt());
+	diMuonsGlobalSameChargeInvMassVsYBRL->Fill(p.mass(),p.rapidity());
+	diMuonsGlobalSameChargeInvMassVsCenBRL->Fill(p.mass(),bin);
       }
     }
     
@@ -429,7 +429,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   iEvent.getByLabel("dimuonsGlobalSTASameCharge", diMuonsGlobalSTASameChargeCand);
   edm::View<reco::Candidate>dimuonsGlobalSTASameChargeColl= *diMuonsGlobalSTASameChargeCand;
   int dimuonsGlobalSTASameChargeSize =dimuonsGlobalSTASameChargeColl.size();
-  cout<<" no of dimuon Global STA same charge  :" <<dimuonsGlobalSTASameChargeSize <<endl;
+  //cout<<" no of dimuon Global STA same charge  :" <<dimuonsGlobalSTASameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSTASameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSTASameChargeColl)[ii];
 
@@ -453,7 +453,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   iEvent.getByLabel("dimuonsSTASameCharge", diMuonsSTASameChargeCand);
   edm::View<reco::Candidate>dimuonsSTASameChargeColl= *diMuonsSTASameChargeCand;
   int dimuonsSTASameChargeSize =dimuonsSTASameChargeColl.size();
-  cout<<" no of dimuon STA same charge  :" <<dimuonsSTASameChargeSize <<endl;
+  //cout<<" no of dimuon STA same charge  :" <<dimuonsSTASameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsSTASameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsSTASameChargeColl)[ii];
     //histContainer2D["diMuonInvMassVsPt"]->Fill(p.mass(),p.pt());                                                                                                                                   
@@ -997,9 +997,9 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
 
     cout << " +ive = " << imuplus << "   -ive  " << imuminus << endl; 
 
-    cout << " No. of Global Muons = " << GMuon << endl;
-    cout << " No. of Tracker Muons = " << TMuon << endl;
-    cout << " No. of StandAlone Muons = " << SAMuon << endl << endl;
+    //cout << " No. of Global Muons = " << GMuon << endl;
+    //cout << " No. of Tracker Muons = " << TMuon << endl;
+    //cout << " No. of StandAlone Muons = " << SAMuon << endl << endl;
 
 }
 
