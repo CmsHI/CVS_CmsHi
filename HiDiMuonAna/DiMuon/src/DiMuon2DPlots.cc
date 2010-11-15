@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.6 2010/11/14 22:45:23 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.7 2010/11/15 13:01:43 pshukla Exp $
 //
 //
 // system include files
@@ -324,6 +324,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
   
+  return;
   
   // get dimuonGlobalSA collection
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSTACand;
@@ -423,6 +424,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
     
   }
 
+  return;
 
   // get dimuonGlobal STA same charge collection 
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSTASameChargeCand;
