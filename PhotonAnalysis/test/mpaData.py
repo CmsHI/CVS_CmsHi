@@ -23,7 +23,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
@@ -61,7 +61,7 @@ process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
 process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
 
 # spike cleaner for island superclsters
-process.cleanPhotons.maxHoverEBarrel = cms.double(1)
+process.cleanPhotons.maxHoverEBarrel = cms.double(100)
 photonObj = "cleanPhotons"
 process.patPhotons.photonSource = cms.InputTag(photonObj)
 process.photonMatch.src = cms.InputTag(photonObj)
@@ -79,23 +79,21 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 process.patHeavyIonDefaultSequence.remove(process.photonMatch)
 process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 
-
-# process.selectDigi 
+# trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
-process.HIMinBiasBSC = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.HIMinBiasBSC.HLTPaths = ["HLT_HIMinBiasBSC"]
-process.HIMinBiasBSC.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-#process.HIphotontrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-#process.HIphotontrig.HLTPaths = ["HLT_HIPhoton15"]
-#process.HIphotontrig.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
+process.HIphotontrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.HIphotontrig.HLTPaths = ["HLT_HIPhoton15"]
+process.HIphotontrig.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 
+# clean collision selection
+process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
+
+# the path! 
 process.p = cms.Path(
     process.HIMinBiasBSC * 
+    process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
     process.multiPhotonAnalyzer 
     )
-
-#process.e = cms.EndPath(process.out)    
-
