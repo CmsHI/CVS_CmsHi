@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.7 2010/10/21 10:59:52 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.8 2010/10/27 15:56:48 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -268,6 +268,7 @@ void SinglePhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& i
 }
 
 void SinglePhotonAnalyzer::beginJob() {
+   centrality_ = 0;
 
 }
 
@@ -300,12 +301,11 @@ void SinglePhotonAnalyzer::storeGeneral(const edm::Event& e, const edm::EventSet
 	 _ntupleMC->Column("event",(Int_t)e.id().event());
 	 
 	 // centrality
-         if (doStoreCentrality_) {
-   	    cbins_ = getCentralityBinsFromDB(iSetup);
-	 
-	    edm::Handle<reco::Centrality> cent;
-	    e.getByLabel(edm::InputTag("hiCentrality"),cent);
-	 
+
+	 if (doStoreCentrality_) {
+	    if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+	    centrality_->newEvent(e,iSetup);
+	    const reco::Centrality *cent = centrality_->raw();
 	    double hf = (double)cent->EtHFhitSum();
 
 	    _ntuple->Column("hf",(double)cent->EtHFhitSum());
@@ -314,17 +314,17 @@ void SinglePhotonAnalyzer::storeGeneral(const edm::Event& e, const edm::EventSet
             _ntuple->Column("eb",(double)cent->EtEBSum());
        	    _ntuple->Column("eep",(double)cent->EtEESumPlus());
             _ntuple->Column("eem",(double)cent->EtEESumMinus());
-	    _ntuple->Column("cBin",(int)cbins_->getBin(hf));
-	    _ntuple->Column("nbins",(int)cbins_->getNbins()); 
-	    _ntuple->Column("binsize",(int)(100/cbins_->getNbins() ));
-	    _ntuple->Column("npart",(double)cbins_->NpartMean(hf));
-	    _ntuple->Column("npartSigma",(double)cbins_->NpartSigma(hf));
-	    _ntuple->Column("ncoll",(double)cbins_->NcollMean(hf));
-	    _ntuple->Column("ncollSigma",(double)cbins_->NcollSigma(hf));
-	    _ntuple->Column("nhard",(double)cbins_->NhardMean(hf));
-	    _ntuple->Column("nhardSigma",(double)cbins_->NhardSigma(hf));
-	    _ntuple->Column("b",(double)cbins_->bMean(hf));
-	    _ntuple->Column("bSigma",(double)cbins_->bSigma(hf));
+	    _ntuple->Column("cBin",(int)centrality_->getBin());
+	    _ntuple->Column("nbins",(int)centrality_->getNbins()); 
+	    _ntuple->Column("binsize",(int)(100/centrality_->getNbins() ));
+	    _ntuple->Column("npart",(double)centrality_->NpartMean());
+	    _ntuple->Column("npartSigma",(double)centrality_->NpartSigma());
+	    _ntuple->Column("ncoll",(double)centrality_->NcollMean());
+	    _ntuple->Column("ncollSigma",(double)centrality_->NcollSigma());
+	    _ntuple->Column("nhard",(double)centrality_->NhardMean());
+	    _ntuple->Column("nhardSigma",(double)centrality_->NhardSigma());
+	    _ntuple->Column("b",(double)centrality_->bMean());
+	    _ntuple->Column("bSigma",(double)centrality_->bSigma());
 	 }
 }
 

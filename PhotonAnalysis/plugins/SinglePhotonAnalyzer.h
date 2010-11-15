@@ -11,6 +11,7 @@
 #include "UserCode/HafHistogram/interface/HColumn.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 #include "CmsHi/PhotonAnalysis/plugins/Limits.h"
 #if MPA_VERSION < 2
@@ -175,6 +176,7 @@ protected:
   // heavy ion stuffs
 
   const CentralityBins * cbins_;
+  CentralityProvider *centrality_;
 
 	
 };
