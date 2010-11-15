@@ -90,7 +90,7 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 # the path! 
 process.p = cms.Path(
-    process.HIMinBiasBSC * 
+    process.HIphotontrig *
     process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
