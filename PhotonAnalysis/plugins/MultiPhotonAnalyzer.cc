@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.11 2010/11/14 16:35:43 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.12 2010/11/15 16:30:29 kimy Exp $
  *
  */
 
@@ -123,7 +123,7 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
 	if (doStoreL1Trigger_) 	storeL1Trigger(e);
 	if (doStoreHLT_) 	storeHLT(e);
 	if (doStoreHF_)		storeHF(e);
-	analyzeMC(e);
+	analyzeMC(e,iSetup);
 	if (doStoreVertex_)	storeVertex(e);
 	if (doStoreMET_)	storeMET(e);
 	if (doStoreJets_)	storeJets(e);

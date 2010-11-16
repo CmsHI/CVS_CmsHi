@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.9 2010/11/15 13:00:31 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.10 2010/11/16 10:59:28 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -250,7 +250,7 @@ void SinglePhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& i
 	if (doStoreL1Trigger_) 	storeL1Trigger(e);
 	if (doStoreHLT_) 	storeHLT(e);
 	if (doStoreHF_)		storeHF(e);
-	analyzeMC(e);
+	analyzeMC(e,iSetup);
 	if (doStoreVertex_)	storeVertex(e);
 	if (doStoreMET_)	storeMET(e);
 	if (doStoreJets_)	storeJets(e);
@@ -540,7 +540,8 @@ void SinglePhotonAnalyzer::storeHF(const edm::Event& e){
   _ntuple->Column("nHfTowersN",     nHfTowersN);  // # of HF Tower > 3GeV in the negative side
 }	
 
-bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
+bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e, const edm::EventSetup& iSetup){
+
   /////////////////////////////////////////////////////////
   // Generator Section: Analyzing Monte Carlo Truth Info //                                  
   /////////////////////////////////////////////////////////
@@ -598,13 +599,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
     
     cout << "here a19" << endl;
-    
-    edm::Handle<reco::Centrality> cent;
-    // centrality         
-    if (doStoreCentrality_){                                                                                                                          
-       e.getByLabel(edm::InputTag("hiCentrality"),cent);
-    }    
-    for (reco::GenParticleCollection::const_iterator it_gen = 
+     for (reco::GenParticleCollection::const_iterator it_gen = 
    	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
        if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
@@ -642,38 +637,45 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
 
       cout << "here a113" << endl;
       if (doStoreCentrality_) {
-         double theHf = cent->EtHFhitSum();
-	 cout << "here a111" << endl;
-         _ntupleMC->Column("hf",theHf);
-         _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
-         _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
-         _ntupleMC->Column("eb",(double)cent->EtEBSum());
-         _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
-         _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
-	 cout << "here a10" << endl;
-         _ntupleMC->Column("cBin",(int)cbins_->getBin(theHf));
-         _ntupleMC->Column("nbins",(int)cbins_->getNbins());
-         _ntupleMC->Column("binsize",(int)(100/cbins_->getNbins() ));
-         _ntupleMC->Column("npart",(double)cbins_->NpartMean(theHf));
-         _ntupleMC->Column("npartSigma",(double)cbins_->NpartSigma(theHf));
-	 cout << "here a11" << endl;
-         _ntupleMC->Column("ncoll",(double)cbins_->NcollMean(theHf));
-         _ntupleMC->Column("ncollSigma",(double)cbins_->NcollSigma(theHf));  
+	 if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+	 centrality_->newEvent(e,iSetup);
+	 const reco::Centrality *cent = centrality_->raw();
+	 double hf = (double)cent->EtHFhitSum();
+	 
+	 _ntupleMC->Column("hf",(double)cent->EtHFhitSum());
+	 _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
+	 _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
+	 _ntupleMC->Column("eb",(double)cent->EtEBSum());
+	 _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
+	 _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
+	 _ntupleMC->Column("cBin",(int)centrality_->getBin());
+	 _ntupleMC->Column("nbins",(int)centrality_->getNbins());
+	 _ntupleMC->Column("binsize",(int)(100/centrality_->getNbins() ));
+	 _ntupleMC->Column("npart",(double)centrality_->NpartMean());
+	 _ntupleMC->Column("npartSigma",(double)centrality_->NpartSigma());
+	 _ntupleMC->Column("ncoll",(double)centrality_->NcollMean());
+	 _ntupleMC->Column("ncollSigma",(double)centrality_->NcollSigma());
+	 _ntupleMC->Column("nhard",(double)centrality_->NhardMean());
+	 _ntupleMC->Column("nhardSigma",(double)centrality_->NhardSigma());
+	 _ntupleMC->Column("b",(double)centrality_->bMean());
+	 _ntupleMC->Column("bSigma",(double)centrality_->bSigma());
       }
+      
+      
       
       // calculate isolation at the generator level
       _ntupleMC->Column("calIsoDR03", genCalIsoDR03);
-      _ntupleMC->Column("trkIsoDR03", genTrkIsoDR03);
-  
-      _ntupleMC->Column("calIsoDR04", genCalIsoDR04);
-      _ntupleMC->Column("trkIsoDR04", genTrkIsoDR04);
-  
-      // conversion MC truth
-      //   storeConvMCTruth(e, it_gen, _ntupleMC);   // turned off for HI.
-      
-      if(fillMCNTuple_)
+     _ntupleMC->Column("trkIsoDR03", genTrkIsoDR03);
+     
+     _ntupleMC->Column("calIsoDR04", genCalIsoDR04);
+     _ntupleMC->Column("trkIsoDR04", genTrkIsoDR04);
+     
+     // conversion MC truth
+     //   storeConvMCTruth(e, it_gen, _ntupleMC);   // turned off for HI.
+     
+     if(fillMCNTuple_)
 	_ntupleMC->DumpData();
-    }
+     }
   }
   return (isMCData_ && fillMCNTuple_);
 }	
