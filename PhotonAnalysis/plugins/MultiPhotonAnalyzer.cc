@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.12 2010/11/15 16:30:29 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.13 2010/11/16 11:35:05 kimy Exp $
  *
  */
 
@@ -108,7 +108,7 @@ using namespace ROOT::Math::VectorUtil;
 
 MultiPhotonAnalyzer::MultiPhotonAnalyzer(const edm::ParameterSet& ps):
    SinglePhotonAnalyzer(ps),
-   kMaxPhotons(ps.getUntrackedParameter<int>("MaxPhotons", 10))
+   kMaxPhotons(ps.getUntrackedParameter<int>("MaxPhotons", 50))
 {
 }
 
