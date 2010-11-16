@@ -26,7 +26,7 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_2/RelValPyquen_GammaJet_pt20_2760GeV/GEN-SIM-RECO/MC_39Y_V3-v1/0010/701C0201-44EB-DF11-832F-0030487C7E18.root'
+    'file:MCPhoton_392relval.root'
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
     )
@@ -53,7 +53,7 @@ process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
 process.multiPhotonAnalyzer.doStoreMET = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
-process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(False)
+process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -69,6 +69,11 @@ process.photonMatch.src = cms.InputTag(photonObj)
 process.PhotonIDProd.photonProducer  = cms.string(photonObj)
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
+# random Cone sequence
+process.load("RandomConeAna.Configuration.randomConeSequence_cff")
+process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
+
+
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 process.HIphotontrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
@@ -80,10 +85,11 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 # the path! 
 process.p = cms.Path(
-    process.HIphotontrig *
-    process.collisionEventSelection *
+#    process.HIphotontrig *
+#    process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
+    process.compleCleanPhotonSequence *
     process.multiPhotonAnalyzer 
     )
