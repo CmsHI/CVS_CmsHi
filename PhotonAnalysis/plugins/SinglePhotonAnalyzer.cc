@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.8 2010/10/27 15:56:48 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.9 2010/11/15 13:00:31 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -545,30 +545,37 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
   // Generator Section: Analyzing Monte Carlo Truth Info //                                  
   /////////////////////////////////////////////////////////
   
+  cout << "here a137" << endl;
   Handle<HepMCProduct> evtMC;
   e.getByLabel(hepMCProducer_,evtMC);
   if (evtMC.isValid())  isMCData_=kTRUE;
   edm::Handle<reco::GenParticleCollection> genParticles;
-  
+  cout << "here a362" << endl;
+
   if (isMCData_) {
      // get simulated vertex and store in ntuple
+    cout << "here a135" << endl;
      Float_t simVertexX(0), simVertexY(0), simVertexZ(0);
      if(evtMC->GetEvent()->signal_process_vertex() != NULL) {
 	simVertexX = evtMC->GetEvent()->signal_process_vertex()->position().x();
 	simVertexY = evtMC->GetEvent()->signal_process_vertex()->position().y();
       simVertexZ = evtMC->GetEvent()->signal_process_vertex()->position().z();
+      cout << "here a134" << endl;
       _vtxX->Fill(simVertexX);
       _vtxY->Fill(simVertexY);
       _vtxZ->Fill(simVertexZ);
     }
+     cout << "here a133" << endl;
     
     if( storePhysVectors_ ) {
       _ntuple->Column("simVertex", TVector3(simVertexX,simVertexY,simVertexZ));
     } else {
+      cout << "here a132" << endl;
       _ntuple->Column("simVertexX", simVertexX);
       _ntuple->Column("simVertexY", simVertexY);
       _ntuple->Column("simVertexZ", simVertexZ);     
     }
+    cout << "here a131" << endl;
 		
     // get pthat value and store in ntuple                                                                                 
     edm::Handle<GenEventInfoProduct>    genEventScale;
@@ -576,6 +583,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     Float_t  pthat(0);
     pthat = genEventScale->qScale();
     _ptHatHist->Fill(pthat);
+    cout << "here a1" << endl;
 
     //    if( genEventScale->hasBinningValues() ) {                                                                       
     //   pthat = genEventScale->binningValues()[0];                                                                    
@@ -589,6 +597,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
     int mothId(0), grandMothId(0), nSiblings(0);
     Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
     
+    cout << "here a19" << endl;
     
     edm::Handle<reco::Centrality> cent;
     // centrality         
@@ -599,6 +608,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
    	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
        if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
+       cout << "here a17" << endl;
       
       count++;
       _ptHist->Fill(p.pt()); 
@@ -607,6 +617,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       genCalIsoDR03 = getGenCalIso(genParticles, it_gen, 0.3);
       genTrkIsoDR03 = getGenTrkIso(genParticles, it_gen, 0.3);      
       genCalIsoDR04 = getGenCalIso(genParticles, it_gen, 0.4);
+      cout << "here a134" << endl;
       genTrkIsoDR04 = getGenTrkIso(genParticles, it_gen, 0.4);
 
       if( p.numberOfMothers() > 0 ) {
@@ -616,6 +627,7 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
 	}
 	nSiblings = p.mother()->numberOfDaughters();
 
+	cout << "here a14" << endl;
       }
 
       _ntupleMC->Column("ptHat",    pthat);
@@ -628,19 +640,23 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e){
       _ntupleMC->Column("nSiblings", nSiblings);
       _ntupleMC->Column("counts",   count); 
 
+      cout << "here a113" << endl;
       if (doStoreCentrality_) {
          double theHf = cent->EtHFhitSum();
+	 cout << "here a111" << endl;
          _ntupleMC->Column("hf",theHf);
          _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
          _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
          _ntupleMC->Column("eb",(double)cent->EtEBSum());
          _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
          _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
+	 cout << "here a10" << endl;
          _ntupleMC->Column("cBin",(int)cbins_->getBin(theHf));
          _ntupleMC->Column("nbins",(int)cbins_->getNbins());
          _ntupleMC->Column("binsize",(int)(100/cbins_->getNbins() ));
          _ntupleMC->Column("npart",(double)cbins_->NpartMean(theHf));
          _ntupleMC->Column("npartSigma",(double)cbins_->NpartSigma(theHf));
+	 cout << "here a11" << endl;
          _ntupleMC->Column("ncoll",(double)cbins_->NcollMean(theHf));
          _ntupleMC->Column("ncollSigma",(double)cbins_->NcollSigma(theHf));  
       }
