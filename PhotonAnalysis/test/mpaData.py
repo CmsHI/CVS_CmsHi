@@ -53,7 +53,7 @@ process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
 process.multiPhotonAnalyzer.doStoreMET = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
-process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(False)
+process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -67,6 +67,11 @@ process.patPhotons.photonSource = cms.InputTag(photonObj)
 process.photonMatch.src = cms.InputTag(photonObj)
 process.PhotonIDProd.photonProducer  = cms.string(photonObj)
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
+
+# random Cone sequence
+process.load("RandomConeAna.Configuration.randomConeSequence_cff")
+process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
+
 # turn off MC matching for data
 removeMCMatching(process, ['Photons'])
 removeMCMatching(process, ['Jets'])
@@ -94,6 +99,7 @@ process.p = cms.Path(
     process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
+    process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
     process.multiPhotonAnalyzer 
     )
