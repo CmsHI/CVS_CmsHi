@@ -52,7 +52,7 @@ protected:
   virtual void storeL1Trigger(const edm::Event&);
   virtual void storeHLT(const edm::Event&);
   virtual void storeHF(const edm::Event&);
-  virtual bool analyzeMC(const edm::Event&);
+  virtual bool analyzeMC(const edm::Event&,  const edm::EventSetup& );
   virtual void storeVertex(const edm::Event&);
   virtual bool storeMET(const edm::Event&);
   virtual int  storeJets(const edm::Event&);
