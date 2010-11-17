@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Wed Oct 27 23:56:49 CEST 2010
-// $Id: HiEcalRecHitSpikeFilter.cc,v 1.1 2010/10/28 16:02:06 kimy Exp $
+// $Id: HiEcalRecHitSpikeFilter.cc,v 1.1 2010/11/16 13:48:22 troxlo Exp $
 //
 //
 
@@ -79,6 +79,8 @@ class HiEcalRecHitSpikeFilter : public edm::EDFilter {
    edm::InputTag ebReducedRecHitCollection_;
    double minEt_;
    double swissThreshold_;
+   double timeThreshold_;
+   bool avoidIeta85_;
 
    
       // ----------member data ---------------------------
@@ -101,6 +103,8 @@ HiEcalRecHitSpikeFilter::HiEcalRecHitSpikeFilter(const edm::ParameterSet& iConfi
    ebReducedRecHitCollection_       = iConfig.getParameter<edm::InputTag>("ebReducedRecHitCollection"); //,"reducedEcalRecHitsEB");
     minEt_                          = iConfig.getParameter<double>("minEt");
     swissThreshold_                 = iConfig.getParameter<double>("swissThreshold");
+    timeThreshold_                 = iConfig.getParameter<double>("timeThreshold");
+    avoidIeta85_                    = iConfig.getParameter<bool>("avoidIeta85");
 }
 
 
@@ -132,8 +136,9 @@ HiEcalRecHitSpikeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 
    if(rechits) {
        for(EcalRecHitCollection::const_iterator it=rechits->begin(); it!=rechits->end(); it++) {
-           if(it->energy() > minEt_ && EcalSeverityLevelAlgo::swissCross(it->id(), *rechits,0,true) > swissThreshold_)
+           if(it->energy() > minEt_ && (EcalSeverityLevelAlgo::swissCross(it->id(), *rechits,0,avoidIeta85_) > swissThreshold_ || abs(it->time()) > timeThreshold_)) {
                return false;
+           }
        }
    }
    return true;
