@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.8 2010/11/15 13:08:40 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.9 2010/11/15 15:59:04 pshukla Exp $
 //
 //
 // system include files
@@ -53,6 +53,7 @@
 
 using std::cout;
 using std::endl;
+
 using namespace reco;
 using namespace edm;
 using namespace std;
@@ -72,6 +73,7 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   const CentralityBins *cbins_;
   CentralityProvider * centrality_;  
   std::string fOutputFileName;
+
   std::string fIsGenInfo;
   bool fisCuts;
 
@@ -125,6 +127,8 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
 
   // Global 
 
+  TH1F *diMuonsMass200;
+  TH1F *diMuonsMass200Cut;
   TH1F *gMuonChi2ndf;
   TH1F *gMuonnhits;
   TH1F *gMuonfound;
@@ -168,6 +172,20 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
 
   int bin;
 
+  // Cut histograms
+
+  TH1F *dimuFOUND;
+  TH1F *dimuGLCHI2;
+  TH1F *dimuHITS;
+  TH1F *dimuTRKCHI2;
+  TH1F *dimuARB;
+  TH1F *dimuLast;
+  TH1F *dimuPIX;
+  TH1F *dimuDXY;
+  TH1F *dimuDZ;
+  TH1F *dimuAll;
+
+
 private:
   
   virtual void beginJob() ;
@@ -182,12 +200,14 @@ private:
   virtual bool isMuonInAccept(const reco::Muon* aMuon); 
 
   virtual void MuAnalyze(const edm::Event&, const edm::EventSetup&);
-  
+  virtual void printGlobalMuon(const reco::Muon* aMuon);  
+  virtual void FillHistoCuts(double mass, const reco::Muon* Muon1, const reco::Muon* Muon2);
 
-
+  virtual bool allCutGlobal(const reco::Muon* aMuon); 
+    
   math::XYZPoint RefVtx;
   float nPV;
-
+  
 
  //edm::Service<TFileService> fs;
 
@@ -247,11 +267,11 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   double hf = cent->EtHFhitSum();
   
-  double hftp = cent->EtHFtowerSumPlus();
-  double hftm = cent->EtHFtowerSumMinus();
-  double eb = cent->EtEBSum();
-  double eep = cent->EtEESumPlus();
-  double eem = cent->EtEESumMinus();
+  //  double hftp = cent->EtHFtowerSumPlus();
+  //  double hftm = cent->EtHFtowerSumMinus();
+  //  double eb = cent->EtEBSum();
+  //  double eep = cent->EtEESumPlus();
+  //  double eem = cent->EtEESumMinus();
   
   //cout<<"Centrality variables in the event:"<<endl;
   //cout<<"Total energy in HF hits : "<<hf<<endl;
@@ -300,7 +320,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalCand;
   iEvent.getByLabel("dimuonsGlobal", diMuonsGlobalCand);
   edm::View<reco::Candidate>dimuonsGlobalColl= *diMuonsGlobalCand;
-  int dimuonsGlobalSize =dimuonsGlobalColl.size();
+  //  int dimuonsGlobalSize =dimuonsGlobalColl.size();
   //cout<<" no of dimuon Global  :" <<dimuonsGlobalSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalColl)[ii];
@@ -310,8 +330,30 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     const reco::Candidate *dau1 = p.daughter(1)->masterClone().get();
     const reco::Muon *mu1 = dynamic_cast<const reco::Muon *>(dau1);
-    
+
+    diMuonsMass200->Fill(p.mass());
+
+    if (p.mass() > 50.0) {
+      cout << " *************** High Mass Event ******************* " << endl;
+      cout << " Zvtx = " <<  RefVtx.Z()  << endl;
+      cout<< "centrality bin : " << binName << " id : " << bin <<endl;
+
+      cout << "   Mass,   pt,    eta,   rapidity " << endl;
+
+      cout << p.mass()<< "    " << p.pt() << "    " << p.eta() << "     " << p.rapidity()  << endl << endl;
+ 
+      cout << " properties of Muon 1 " << endl;
+      printGlobalMuon(mu0);
+      cout << endl;
+      cout << " properties of Muon 2 " << endl;
+      printGlobalMuon(mu1);
+    }  
+
+    // Fill cuts histos
+    FillHistoCuts(p.mass(), mu0, mu1);
+ 
     if ( selGlobalMuon(mu0) && selGlobalMuon(mu1)) {
+      diMuonsMass200Cut->Fill(p.mass());
       diMuonsGlobalInvMassVsPt->Fill(p.mass(),p.pt());
       diMuonsGlobalInvMassVsY->Fill(p.mass(),p.rapidity());
       diMuonsGlobalInvMassVsCen->Fill(p.mass(),bin);
@@ -324,11 +366,12 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }
   }
 
+
   // get dimuonGlobalSA collection
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSTACand;
   iEvent.getByLabel("dimuonsGlobalSTA", diMuonsGlobalSTACand);
   edm::View<reco::Candidate>dimuonsGlobalSTAColl= *diMuonsGlobalSTACand;
-  int dimuonsGlobalSTASize =dimuonsGlobalSTAColl.size();
+  //  int dimuonsGlobalSTASize =dimuonsGlobalSTAColl.size();
   //cout<<" no of dimuonsGlobalSTA  :" <<dimuonsGlobalSTASize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSTAColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSTAColl)[ii];
@@ -352,7 +395,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::View<reco::Candidate> > diMuonsSTACand;
   iEvent.getByLabel("dimuonsSTA", diMuonsSTACand);
   edm::View<reco::Candidate>dimuonsSTAColl= *diMuonsSTACand;
-  int dimuonsSTASize =dimuonsSTAColl.size();
+  //  int dimuonsSTASize =dimuonsSTAColl.size();
   //cout<<" no of dimuonsSTA  :" <<dimuonsSTASize <<endl;
   for(size_t ii = 0; ii <dimuonsSTAColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsSTAColl)[ii];
@@ -377,7 +420,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   SameChargePlots(iEvent, iSetup);
   /////////////////////////
 
-  cout<<"generator info " <<fIsGenInfo.c_str()<<endl;
+  //  cout<<"generator info " <<fIsGenInfo.c_str()<<endl;
   
   if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
 
@@ -396,7 +439,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSameChargeCand;
   iEvent.getByLabel("dimuonsGlobalSameCharge", diMuonsGlobalSameChargeCand);
   edm::View<reco::Candidate>dimuonsGlobalSameChargeColl= *diMuonsGlobalSameChargeCand;
-  int dimuonsGlobalSameChargeSize =dimuonsGlobalSameChargeColl.size();
+  //  int dimuonsGlobalSameChargeSize =dimuonsGlobalSameChargeColl.size();
   //cout<<" no of dimuon Global same charge  :" <<dimuonsGlobalSameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSameChargeColl)[ii];
@@ -427,7 +470,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalSTASameChargeCand;
   iEvent.getByLabel("dimuonsGlobalSTASameCharge", diMuonsGlobalSTASameChargeCand);
   edm::View<reco::Candidate>dimuonsGlobalSTASameChargeColl= *diMuonsGlobalSTASameChargeCand;
-  int dimuonsGlobalSTASameChargeSize =dimuonsGlobalSTASameChargeColl.size();
+  //  int dimuonsGlobalSTASameChargeSize =dimuonsGlobalSTASameChargeColl.size();
   //cout<<" no of dimuon Global STA same charge  :" <<dimuonsGlobalSTASameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsGlobalSTASameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsGlobalSTASameChargeColl)[ii];
@@ -451,7 +494,7 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<edm::View<reco::Candidate> > diMuonsSTASameChargeCand;
   iEvent.getByLabel("dimuonsSTASameCharge", diMuonsSTASameChargeCand);
   edm::View<reco::Candidate>dimuonsSTASameChargeColl= *diMuonsSTASameChargeCand;
-  int dimuonsSTASameChargeSize =dimuonsSTASameChargeColl.size();
+  //  int dimuonsSTASameChargeSize =dimuonsSTASameChargeColl.size();
   //cout<<" no of dimuon STA same charge  :" <<dimuonsSTASameChargeSize <<endl;
   for(size_t ii = 0; ii <dimuonsSTASameChargeColl.size(); ++ ii) {
     const reco::Candidate& p = (dimuonsSTASameChargeColl)[ii];
@@ -655,51 +698,68 @@ DiMuon2DPlots::beginJob()
 
   // Global Histos
 
+  diMuonsMass200 = new TH1F("diMuonsMass200", "diMuonsMass200", 4000, 0, 1000);
+  diMuonsMass200Cut = new TH1F("diMuonsMass200Cut", "diMuonsMass200Cut", 4000, 0, 1000);
+
   gMuonChi2ndf = new TH1F("gMuonChi2ndf", "gMuonChi2ndf", 100, 0, 100);
   gMuonnhits = new TH1F("gMuonnhits", "gMuonnhits", 100, 0, 100);
-  gMuonfound = new TH1F("gMuonfound", "gMuonfound ", 11, -1, 10);
+  gMuonfound = new TH1F("gMuonfound", "gMuonfound ", 200, 0, 100);
 
-  gMuonChi2ndfTrack = new TH1F("gMuonChi2ndfTrack", "gMuonChi2ndfTrack", 100, 0, 100);
+  gMuonChi2ndfTrack = new TH1F("gMuonChi2ndfTrack", "gMuonChi2ndfTrack", 200, 0, 100);
   gMuonPixel = new TH1F("gMuonPixel", "gMuonPixel", 100, 0, 100);
 
-  gMuonDxy = new TH1F("gMuonDxy", "gMuonDxy", 100, -50, 50);
-  gMuonZ = new TH1F("gMuonZ", "gMuonZ", 100, -50, 50);
+  gMuonDxy = new TH1F("gMuonDxy", "gMuonDxy", 200, -50, 50);
+  gMuonZ = new TH1F("gMuonZ", "gMuonZ", 200, -50, 50);
 
   gMuonArb = new TH1F("gMuonArb", "gMuonArb", 11, -1, 10);
   gMuonLastTight = new TH1F("gMuonLastTight", "gMuonLastTight", 11, -1, 10);
   gMuonLastLoose = new TH1F("gMuonLastLoose", "gMuonLastLoose", 11, -1, 10);
 
-  gMuonsPt = new TH1F("gMuonsPt", "gMuonsPt", 100, 0, 100);
+  gMuonsPt = new TH1F("gMuonsPt", "gMuonsPt", 200, 0, 100);
   gMuonsEta = new TH1F("gMuonsEta", " gMuonsEta", 100, -10, 10);
   gMuonsPhi = new TH1F("gMuonsPhi", "gMuonsPhi", 100, 0, 10);
 
   //Tracker Histos
 
-  tMuonfound = new TH1F("tMuonfound", "tMuonfound ", 11, -1, 10);
-  tMuonChi2ndfTrack = new TH1F("tMuonChi2ndfTrack", "tMuonChi2ndfTrack", 100, 0, 100);
+  tMuonfound = new TH1F("tMuonfound", "tMuonfound ", 200, 0, 100);
+  tMuonChi2ndfTrack = new TH1F("tMuonChi2ndfTrack", "tMuonChi2ndfTrack", 200, 0, 100);
   tMuonPixel = new TH1F("tMuonPixel", "tMuonPixel", 100, 0, 100);
-  tMuonDxy = new TH1F("tMuonDxy", "tMuonDxy", 100, -50, 50);
-  tMuonZ = new TH1F("tMuonZ", "tMuonZ", 100, -50, 50);
+  tMuonDxy = new TH1F("tMuonDxy", "tMuonDxy", 200, -50, 50);
+  tMuonZ = new TH1F("tMuonZ", "tMuonZ", 200, -50, 50);
 
-  tMuonsPt = new TH1F("tMuonsPt", "tMuonsPt", 100, 0, 100);
+  tMuonsPt = new TH1F("tMuonsPt", "tMuonsPt", 200, 0, 100);
   tMuonsEta = new TH1F("tMuonsEta", " tMuonsEta", 100, -10, 10);
   tMuonsPhi = new TH1F("tMuonsPhi", "tMuonsPhi", 100, 0, 10);
 
   // STA Histos
 
   sMuonnhits = new TH1F("sMuonnhits", "sMuonnhits", 100, 0, 100);
-  sMuonDxy = new TH1F("sMuonDxy", "sMuonDxy", 100, -50, 50);
-  sMuonZ = new TH1F("sMuonZ", "sMuonZ", 100, -50, 50);
+  sMuonDxy = new TH1F("sMuonDxy", "sMuonDxy", 200, -50, 50);
+  sMuonZ = new TH1F("sMuonZ", "sMuonZ", 200, -50, 50);
 
-  sMuonsPt = new TH1F("sMuonsPt", "sMuonsPt", 100, 0, 100);
+  sMuonsPt = new TH1F("sMuonsPt", "sMuonsPt", 200, 0, 100);
   sMuonsEta = new TH1F("sMuonsEta", " sMuonsEta", 100, -10, 10);
   sMuonsPhi = new TH1F("sMuonsPhi", "sMuonsPhi", 100, 0, 10);
 
   // Z vertex
   hZVtx = new TH1F("hZVtx", "hZVtx", 200, -100, 100);
 
+  // Cuts histos
+  dimuFOUND = new TH1F("dimuFOUND", "dimuFOUND", 4000, 0, 200);
+  dimuGLCHI2 = new TH1F("dimuGLCHI2", "dimuGLCHI2", 4000, 0, 200);
+  dimuHITS = new TH1F("dimuHITS", "dimuHITS", 4000, 0, 200);
+  dimuTRKCHI2 = new TH1F("dimuTRKCHI2", "dimuTRKCHI2", 4000, 0, 200);
+  dimuARB = new TH1F("dimuARB", "dimuARB", 4000, 0, 200);
+  dimuLast = new TH1F("dimuLast", "dimuLast", 4000, 0, 200);
+  dimuPIX = new TH1F("dimuPIX", "dimuPIX", 4000, 0, 200);
+  dimuDXY = new TH1F("dimuDXY", "dimuDXY", 4000, 0, 200);
+  dimuDZ = new TH1F("dimuDZ", "dimuDZ", 4000, 0, 200);
+  dimuAll = new TH1F("dimuAll", "dimuAll", 4000, 0, 200);
+
+
   //  h_ZetaGen_ = genParticleDir.make<TH1D>("generatedZeta","#eta of generated Z",100,-5.,5.); 
-  
+
+  // Write comments in a file
 }
 
 
@@ -748,6 +808,8 @@ void DiMuon2DPlots::endJob()
 
   // Global histos
 
+  diMuonsMass200->Write();
+  diMuonsMass200Cut->Write();
   gMuonChi2ndf->Write();
   gMuonnhits->Write();
   gMuonfound->Write();
@@ -789,6 +851,19 @@ void DiMuon2DPlots::endJob()
 
   hZVtx->Write();
 
+  // cuts histos
+  dimuFOUND->Write();
+  dimuGLCHI2->Write();
+  dimuHITS->Write();
+  dimuTRKCHI2->Write();
+  dimuARB->Write();
+  dimuLast->Write();
+  dimuPIX->Write();
+  dimuDXY->Write();
+  dimuDZ->Write();
+  dimuAll->Write();
+
+
   // Output file close
   fOutputFile->Close();
 
@@ -812,7 +887,7 @@ bool DiMuon2DPlots::selGlobalMuon(const reco::Muon* aMuon) {
   return (isMuonInAccept(aMuon) &&
 	  iTrack->found() > 11 &&
 	  aMuon->globalTrack()->chi2()/aMuon->globalTrack()->ndof() < 20.0 &&
-	  gTrack->chi2()/gTrack->ndof() < 20.0 &&
+	  //	  gTrack->chi2()/gTrack->ndof() < 20.0 &&
 	  q.numberOfValidMuonHits() > 0 &&
 	  //	  aMuon->numberOfChambers() > 2 &&
 	  iTrack->chi2()/iTrack->ndof() < 4.0 &&
@@ -895,13 +970,13 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   using reco::TrackCollection;
   using reco::MuonCollection;
-  cout <<" ----Single Muon properties-----" << endl;
+  //  cout <<" ----Single Muon properties-----" << endl;
 
   edm::Handle<edm::View<reco::Muon> >tmuons;
   iEvent.getByLabel("muons", tmuons);
   int rmuon =tmuons->size();
 
-  cout << "No. of reconstructed muons = " << rmuon  <<endl;
+  //  cout << "No. of reconstructed muons = " << rmuon  <<endl;
 
   //for (edm::View<reco::Muon>::const_iterator aMuon = tmuons->begin(); aMuon != tmuons->end(); ++aMuon) {
   
@@ -994,7 +1069,7 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
 
     ////  Print ///////
 
-    cout << " +ive = " << imuplus << "   -ive  " << imuminus << endl; 
+  //    cout << " +ive = " << imuplus << "   -ive  " << imuminus << endl; 
 
     //cout << " No. of Global Muons = " << GMuon << endl;
     //cout << " No. of Tracker Muons = " << TMuon << endl;
@@ -1003,6 +1078,101 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
 }
 
 
+void DiMuon2DPlots::printGlobalMuon(const reco::Muon* aMuon) {
+  //  if(!aMuon->isGlobalMuon())
+  //    return;
+
+  TrackRef iTrack = aMuon->innerTrack();
+  const reco::HitPattern& p = iTrack->hitPattern();
+
+  TrackRef gTrack = aMuon->globalTrack();
+  const reco::HitPattern& q = aMuon->globalTrack()->hitPattern();
+
+  cout << " pt       eta         phi        charge  "<< endl;
+
+  cout << aMuon->pt() << "   " <<  aMuon->eta() << "    " << aMuon->phi() << "    " << aMuon->charge() <<endl<< endl;
+  
+  if(allCutGlobal(aMuon) ) cout << "  passed all quality cuts " << endl << endl;
+  
+  cout << " iTrack->found() = " <<   iTrack->found() << endl;
+  cout << "  globalChi2/ndof = "  << aMuon->globalTrack()->chi2()/aMuon->globalTrack()->ndof() << endl;
+  cout << " q.numberOfValidMuonHits() = " <<  q.numberOfValidMuonHits() << endl;
+  cout << " aMuon->numberOfChambers() = " <<  aMuon->numberOfChambers()  << endl;
+  cout << " TrackChi2ndof = " <<  iTrack->chi2()/iTrack->ndof() << endl;
+  cout << " muon::TrackerMuonArbitrated = " <<  muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) << endl;
+  cout << " muon::TMLastStationAngTight = " <<  muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) << endl;
+  cout <<  " pixelLayersWithMeasurement() = " << p.pixelLayersWithMeasurement() << endl;
+  cout <<  " dxy = " << fabs(iTrack->dxy(RefVtx)) << endl;
+  cout <<  " dz = " << fabs(iTrack->dz(RefVtx))  << endl;
+
+}
+
+
+void DiMuon2DPlots::FillHistoCuts(double mass, const reco::Muon* Muon1, const reco::Muon* Muon2) {
+
+  TrackRef iTrack1 = Muon1->innerTrack();
+  const reco::HitPattern& p1 = iTrack1->hitPattern();
+  TrackRef gTrack1 = Muon1->globalTrack();
+  const reco::HitPattern& q1 = gTrack1->hitPattern();
+
+  TrackRef iTrack2 = Muon2->innerTrack();
+  const reco::HitPattern& p2 = iTrack2->hitPattern();
+  TrackRef gTrack2 = Muon2->globalTrack();
+  const reco::HitPattern& q2 = gTrack2->hitPattern();
+
+  if(iTrack1->found() > 11  &&  iTrack2->found() > 11)  dimuFOUND->Fill(mass);
+  if(gTrack1->chi2()/gTrack1->ndof() < 20.0  &&  gTrack2->chi2()/gTrack2->ndof() < 20.0) dimuGLCHI2->Fill(mass); 
+  if(q1.numberOfValidMuonHits() > 0  &&  q2.numberOfValidMuonHits() >0 ) dimuHITS->Fill(mass);
+  if(iTrack1->chi2()/iTrack1->ndof() < 4.0  &&  iTrack2->chi2()/iTrack2->ndof()) dimuTRKCHI2->Fill(mass);
+  if( muon::isGoodMuon(*Muon1, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) && 
+       muon::isGoodMuon(*Muon2, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) )  dimuARB->Fill(mass); 
+  if(muon::isGoodMuon(*Muon1, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+       muon::isGoodMuon(*Muon2, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) )  dimuLast->Fill(mass);
+  if(p1.pixelLayersWithMeasurement() > 1  &&  p2.pixelLayersWithMeasurement() > 1) dimuPIX->Fill(mass);
+  if(fabs(iTrack1->dxy(RefVtx)) < 3.0  &&  fabs(iTrack2->dxy(RefVtx)) < 3.0) dimuDXY->Fill(mass);
+  if(fabs(iTrack1->dz(RefVtx)) < 15.0  && fabs(iTrack2->dz(RefVtx)) < 15.0) dimuDZ->Fill(mass);
+  
+  if(allCutGlobal(Muon1) && allCutGlobal(Muon2)) dimuAll->Fill(mass);  
+  
+}
+
+
+
+bool DiMuon2DPlots::allCutGlobal(const reco::Muon* aMuon) {
+
+  if(!aMuon->isGlobalMuon())
+    return false;
+
+  TrackRef iTrack = aMuon->innerTrack();
+  const reco::HitPattern& p = iTrack->hitPattern();
+
+  TrackRef gTrack = aMuon->globalTrack();
+  const reco::HitPattern& q = aMuon->globalTrack()->hitPattern();
+
+
+  return (isMuonInAccept(aMuon) &&
+          iTrack->found() > 11 &&
+          aMuon->globalTrack()->chi2()/aMuon->globalTrack()->ndof() < 20.0 &&
+          //      gTrack->chi2()/gTrack->ndof() < 20.0 &&
+          q.numberOfValidMuonHits() > 0 &&
+          //      aMuon->numberOfChambers() > 2 &&
+          iTrack->chi2()/iTrack->ndof() < 4.0 &&
+          //      NoArbitration, SegmentArbitration, SegmentAndTrackArbitration, SegmentAndTrackArbitrationCleaned
+          muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) &&
+          muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+
+          p.pixelLayersWithMeasurement() > 1 &&
+          fabs(iTrack->dxy(RefVtx)) < 3.0 &&
+          fabs(iTrack->dz(RefVtx)) < 15.0 );
+}
+
+
+
+
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(DiMuon2DPlots);
+
+
+
