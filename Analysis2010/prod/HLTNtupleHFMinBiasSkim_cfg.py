@@ -37,10 +37,8 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # =============== Trigger selection ====================
-process.load("HLTrigger.HLTfilters.hltHighLevel_cfi")
-process.hltHighLevel.HLTPaths = ["HLT_HIMinBiasHF"]
 process.load("FWCore.Modules.preScaler_cfi")
-process.preScaler.prescaleFactor = 10
+process.preScaler.prescaleFactor = 30
 
 # HF coincidence
 process.load("L1Trigger.Skimmer.l1Filter_cfi")
@@ -99,11 +97,9 @@ process.hltanalysis.EndcapPhoton = "correctedIslandEndcapSuperClusters"
 #========================= Photons ====================================
 
 import HLTrigger.HLTfilters.hltHighLevel_cfi
-#process.HIMinBiasHFOR = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-#process.HIMinBiasHFOR.HLTPaths = ["HLT_ HIMinBiasHF_OR"]
-
-process.HIMinBiasHF = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.HIMinBiasHF.HLTPaths = ["HLT_HIMinBiasHF"]
+# Minimum bias trigger selection (Runs after 150882)
+process.HIMinBiasHFOrBsc = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.HIMinBiasHFOrBsc.HLTPaths = ["HLT_HIMinBiasHfOrBSC"]
 
 process.HIphoton15 = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
 process.HIphoton15.HLTPaths = ["HLT_HIPhoton15"]
@@ -139,14 +135,14 @@ process.TFileService = cms.Service('TFileService',
 process.HLToutput = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring('keep *'),
     SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('hlt_filter_step')),
-    fileName = cms.untracked.string("HLT_HIMinBiasHF.root")
+    fileName = cms.untracked.string("HLT_HIMinBiasHfOrBSC.root")
 )
 
 process.photonOutput = cms.OutputModule("PoolOutputModule",
         splitLevel = cms.untracked.int32(0),
         outputCommands = process.RECOEventContent.outputCommands,
         SelectEvents = cms.untracked.PSet(SelectEvents = cms.vstring('photon_filter_step')),
-        fileName = cms.untracked.string('HiPhoton15_HIMinBiasHF.root'),
+        fileName = cms.untracked.string('HiPhoton15_L1HfOrBsc.root'),
         dataset = cms.untracked.PSet(
             filterName = cms.untracked.string(''),
             dataTier = cms.untracked.string('GEN-SIM-RECO')
@@ -159,7 +155,7 @@ process.ana_step = cms.Path(process.hiCentrality *
                             process.hltanalysis
                             )
 
-process.hlt_filter_step = cms.Path(process.L1HfOrBscCoinc*process.collisionEventSelection*process.preScaler)
+process.hlt_filter_step = cms.Path(process.HIMinBiasHFOrBsc*process.collisionEventSelection*process.preScaler)
 process.output_step = cms.EndPath(process.HLToutput*process.photonOutput)
 
 
