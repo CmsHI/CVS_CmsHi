@@ -53,8 +53,8 @@ process.source = cms.Source("PoolSource",
                             #duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CorePhy_2/DiMuSkim/run151027_HLT_DiMuSkim.root'   
- 
+
+'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0Grid/Z0MC_DiMuonSkim_HLTDoubleMuOpen_9_1_tJV.root' 
 
 
     )
@@ -299,7 +299,9 @@ process.dimuons2DPlots = cms.EDAnalyzer(
     ##for generator info put IsGenInfo as TRUE
     ##IsGenInfo=cms.untracked.string("TRUE"),
     IsGenInfo=cms.untracked.string("FALSE"),
-    IsCuts = cms.untracked.bool(False)
+
+    #IsCuts = cms.untracked.bool(False)
+    IsCuts = cms.untracked.bool(True)
 
     )
 
@@ -364,7 +366,7 @@ process.eventInfo = cms.OutputModule (
 process.GenDimuonsPlotsPath = cms.Path(process.hfCoincFilter*process.primaryVertexFilter*process.GenDimuonsPlots)
 process.dimuonsPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsPlots)
 
-process.dimuonsGlobalPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalPlots)
+process.dimuonsGlobalPlotsPath = cms.Path(process.dimuonsGlobalPlots)
 
 
 process.dimuonsGlobalSTAPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalSTAPlots)
@@ -373,12 +375,12 @@ process.dimuonsSTAPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuo
 process.dimuonsTrkPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsTrkPlots)
 
 
-process.dimuons2DPlotsPath = cms.Path(process.primaryVertexFilter*process.dimuons2DPlots)
+process.dimuons2DPlotsPath = cms.Path(process.dimuons2DPlots)
 
 
 process.dimuonsSameChargePlotsPath = cms.Path(process.dimuonsSameChargePlots)
 
-process.dimuonsGlobalSameChargePlotsPath = cms.Path(process.primaryVertexFilter*process.dimuonsGlobalSameChargePlots)
+process.dimuonsGlobalSameChargePlotsPath = cms.Path(process.dimuonsGlobalSameChargePlots)
 process.dimuonsGlobalSTASameChargePlotsPath = cms.Path(process.dimuonsGlobalSTASameChargePlots)
 process.dimuonsGlobalTrkSameChargePlotsPath = cms.Path(process.dimuonsGlobalTrkSameChargePlots)
 process.dimuonsSTASameChargePlotsPath = cms.Path(process.dimuonsSTASameChargePlots)
@@ -387,7 +389,7 @@ process.endPath = cms.EndPath(process.eventInfo)
 
 #process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
-process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuons2DPlotsPath,process.endPath)
+process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuons2DPlotsPath,process.endPath)
 
 
 

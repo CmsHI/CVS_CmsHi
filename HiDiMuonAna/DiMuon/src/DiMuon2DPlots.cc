@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.9 2010/11/15 15:59:04 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.10 2010/11/17 13:07:51 pshukla Exp $
 //
 //
 // system include files
@@ -44,10 +44,8 @@
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
-
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include <DataFormats/VertexReco/interface/VertexFwd.h>
-
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 
 
@@ -92,6 +90,15 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH2F *diMuonsGlobalInvMassVsYBRL;
   TH2F *diMuonsGlobalInvMassVsCenBRL;
   
+  TH2F *diMuonsGlobalInvMassVsPtEtaCut;
+  TH2F *diMuonsGlobalInvMassVsPtPtCut;
+  TH2F *diMuonsGlobalInvMassVsYPtCut;
+  TH2F *diMuonsGlobalInvMassVsYEtaCut; 
+  
+  TH2F *diMuonsGlobalInvMassVsCenPtCut;
+  TH2F *diMuonsGlobalInvMassVsCenEtaCut;
+  
+
   TH2F *diMuonsGlobalSTAInvMassVsPt;
   TH2F *diMuonsGlobalSTAInvMassVsY;
   TH2F *diMuonsGlobalSTAInvMassVsCen;
@@ -107,6 +114,24 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH2F *diMuonsGlobalSameChargeInvMassVsPtBRL;
   TH2F *diMuonsGlobalSameChargeInvMassVsYBRL;
   TH2F *diMuonsGlobalSameChargeInvMassVsCenBRL;
+
+  TH2F *diMuonsGlobalSameChargeInvMassVsPtEtaCut; 
+  TH2F *diMuonsGlobalSameChargeInvMassVsPtPtCut;
+
+  TH2F *diMuonsGlobalSameChargeInvMassVsYPtCut; 
+  TH2F *diMuonsGlobalSameChargeInvMassVsYEtaCut; 
+
+  TH2F *diMuonsGlobalSameChargeInvMassVsCenPtCut;
+  TH2F *diMuonsGlobalSameChargeInvMassVsCenEtaCut; 
+
+
+
+
+
+
+
+
+
 
 
   TH2F *diMuonsGlobalSTASameChargeInvMassVsPt;
@@ -142,6 +167,11 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH1F *gMuonLastTight;
   TH1F *gMuonLastLoose;
 
+ TH1F *gMuonPtError;
+ TH1F *gMuonValidHits;
+
+
+
   TH1F *gMuonsPt;
   TH1F *gMuonsEta;
   TH1F *gMuonsPhi;
@@ -174,16 +204,27 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
 
   // Cut histograms
 
+  TH1F *dimu;
   TH1F *dimuFOUND;
   TH1F *dimuGLCHI2;
   TH1F *dimuHITS;
   TH1F *dimuTRKCHI2;
   TH1F *dimuARB;
-  TH1F *dimuLast;
+  TH2F *dimuLast;
+  TH2F *dimuLastLoose;
+  
   TH1F *dimuPIX;
   TH1F *dimuDXY;
   TH1F *dimuDZ;
+  TH1F *dimuPTERROR;
+  TH1F *dimuNOOFVALIDHITS;
+  TH1F *dimuD0;
+
+
+
   TH1F *dimuAll;
+
+
 
 
 private:
@@ -201,7 +242,7 @@ private:
 
   virtual void MuAnalyze(const edm::Event&, const edm::EventSetup&);
   virtual void printGlobalMuon(const reco::Muon* aMuon);  
-  virtual void FillHistoCuts(double mass, const reco::Muon* Muon1, const reco::Muon* Muon2);
+  virtual void FillHistoCuts(double mass, double pt, const reco::Muon* Muon1, const reco::Muon* Muon2);
 
   virtual bool allCutGlobal(const reco::Muon* aMuon); 
     
@@ -281,7 +322,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   bin = cbins_->getBin(hf);
   
-  Centrality ->Fill(bin);                                                                                                                                  
+  Centrality->Fill(bin);                                                                                                                                  
   int nbins = cbins_->getNbins();
   int binsize = 100/nbins;
   char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
@@ -300,7 +341,13 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   if ( privtxs->begin() != privtxs->end() ) {
     privtx=privtxs->begin();
     RefVtx = privtx->position();
-  } else {
+  
+    //float d0err = sqrt ( (privtxs->begin()->xError()*privtxs->begin()->yError()) );
+    //float dzerr = sqrt ( (privtxs->begin()->zError()*privtxs->begin()->zError()) );
+
+
+
+} else {
     RefVtx.SetXYZ(0.,0.,0.);
   }
 
@@ -350,7 +397,7 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     }  
 
     // Fill cuts histos
-    FillHistoCuts(p.mass(), mu0, mu1);
+    FillHistoCuts(p.mass(), p.pt(), mu0, mu1);
  
     if ( selGlobalMuon(mu0) && selGlobalMuon(mu1)) {
       diMuonsMass200Cut->Fill(p.mass());
@@ -362,6 +409,18 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	diMuonsGlobalInvMassVsPtBRL->Fill(p.mass(),p.pt());
 	diMuonsGlobalInvMassVsYBRL->Fill(p.mass(),p.rapidity());
 	diMuonsGlobalInvMassVsCenBRL->Fill(p.mass(),bin);
+      }
+      //eta < 1.2
+      if (fabs(mu0->eta()) < 1.2 && fabs(mu1->eta()) < 1.2 ) {
+	diMuonsGlobalInvMassVsPtEtaCut->Fill(p.mass(),p.pt());
+	diMuonsGlobalInvMassVsYEtaCut->Fill(p.mass(),p.rapidity());
+	diMuonsGlobalInvMassVsCenEtaCut->Fill(p.mass(),bin);
+      }
+      //pT>4
+      if (mu0->pt()> 4 && mu1->pt()> 4) {
+	diMuonsGlobalInvMassVsPtPtCut->Fill(p.mass(),p.pt());
+	diMuonsGlobalInvMassVsYPtCut->Fill(p.mass(),p.rapidity());
+	diMuonsGlobalInvMassVsCenPtCut->Fill(p.mass(),bin);
       }
     }
   }
@@ -461,6 +520,26 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
 	diMuonsGlobalSameChargeInvMassVsYBRL->Fill(p.mass(),p.rapidity());
 	diMuonsGlobalSameChargeInvMassVsCenBRL->Fill(p.mass(),bin);
       }
+      
+
+
+      //Cath suggested eta 1.2                                                                                                                                          
+
+      if (fabs(mu0->eta()) < 1.2 && fabs(mu1->eta()) < 1.2 ) {
+        diMuonsGlobalSameChargeInvMassVsPtEtaCut->Fill(p.mass(),p.pt());
+        diMuonsGlobalSameChargeInvMassVsYEtaCut->Fill(p.mass(),p.rapidity());
+        diMuonsGlobalSameChargeInvMassVsCenEtaCut->Fill(p.mass(),bin);
+      }
+
+
+      //Cath suggested pT>4                                                                                                                                                  
+      if (mu0->pt()> 4 && mu1->pt()> 4) {
+        diMuonsGlobalSameChargeInvMassVsPtPtCut->Fill(p.mass(),p.pt());
+        diMuonsGlobalSameChargeInvMassVsYPtCut->Fill(p.mass(),p.rapidity());
+        diMuonsGlobalSameChargeInvMassVsCenPtCut->Fill(p.mass(),bin);
+      }
+
+
     }
     
   }
@@ -570,136 +649,174 @@ DiMuon2DPlots::beginJob()
   //fOutputFile->cd();
   //diMuonInvMassVsPt = new TH2F(fhistName.c_str(), fhistName.c_str(), 100, 0, 100, 100, 0, 200);
 
-  diMuonsGlobalInvMassVsPt = new TH2F("diMuonsGlobalInvMassVsPt", "diMuonsGlobalInvMassVsPt", 4000, 0, 200, 100,0,100);
+  diMuonsGlobalInvMassVsPt = new TH2F("diMuonsGlobalInvMassVsPt", "diMuonsGlobalInvMassVsPt", 8000, 0, 200, 100,0,100);
   diMuonsGlobalInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGlobalInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGlobalInvMassVsY = new TH2F("diMuonsGlobalInvMassVsY","diMuonsGlobalInvMassVsY",4000, 0, 200,100, -5, 5);
+  diMuonsGlobalInvMassVsY = new TH2F("diMuonsGlobalInvMassVsY","diMuonsGlobalInvMassVsY",8000, 0, 200,100, -5, 5);
   diMuonsGlobalInvMassVsY->SetYTitle("rapidity");
   diMuonsGlobalInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalInvMassVsCen = new TH2F("diMuonsGlobalInvMassVsCen","diMuonsGlobalInvMassVsCen", 4000, 0, 200,100,0,100);
+  diMuonsGlobalInvMassVsCen = new TH2F("diMuonsGlobalInvMassVsCen","diMuonsGlobalInvMassVsCen", 8000, 0, 200,100,0,100);
   diMuonsGlobalInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalInvMassVsCen->SetYTitle("Centrality");
 
   // Barrel 
 
-  diMuonsGlobalInvMassVsPtBRL = new TH2F("diMuonsGlobalInvMassVsPtBRL", "diMuonsGlobalInvMassVsPtBRL", 4000, 0, 200, 100,0,100);
+  diMuonsGlobalInvMassVsPtBRL = new TH2F("diMuonsGlobalInvMassVsPtBRL", "diMuonsGlobalInvMassVsPtBRL", 8000, 0, 200, 100,0,100);
   diMuonsGlobalInvMassVsPtBRL->SetYTitle("pT (GeV/c)");
   diMuonsGlobalInvMassVsPtBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
+ 
 
-  diMuonsGlobalInvMassVsYBRL = new TH2F("diMuonsGlobalInvMassVsYBRL","diMuonsGlobalInvMassVsYBRL",4000, 0, 200,100, -5, 5);
-  diMuonsGlobalInvMassVsYBRL->SetYTitle("rapidity");
-  diMuonsGlobalInvMassVsYBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGlobalInvMassVsCenBRL = new TH2F("diMuonsGlobalInvMassVsCenBRL","diMuonsGlobalInvMassVsCenBRL", 4000, 0, 200,100,0,100);
+  diMuonsGlobalInvMassVsPtEtaCut = new TH2F("diMuonsGlobalInvMassVsPtEtaCut", "diMuonsGlobalInvMassVsPtEtaCut", 8000, 0, 200, 100,0,100);
+  diMuonsGlobalInvMassVsPtPtCut = new TH2F("diMuonsGlobalInvMassVsPtPtCut", "diMuonsGlobalInvMassVsPtPtCut", 8000, 0, 200, 100,0,100);
+
+
+
+  diMuonsGlobalInvMassVsYBRL = new TH2F("diMuonsGlobalInvMassVsYBRL","diMuonsGlobalInvMassVsYBRL",8000, 0, 200,100, -5, 5);
+
+
+  diMuonsGlobalInvMassVsYPtCut = new TH2F("diMuonsGlobalInvMassVsYPtCut","diMuonsGlobalInvMassVsYPtCut",8000, 0, 200,100, -5, 5);
+  diMuonsGlobalInvMassVsYEtaCut = new TH2F("diMuonsGlobalInvMassVsYEtaCut","diMuonsGlobalInvMassVsYEtaCut",8000, 0, 200,100, -5, 5);
+
+
+
+
+  diMuonsGlobalInvMassVsCenBRL = new TH2F("diMuonsGlobalInvMassVsCenBRL","diMuonsGlobalInvMassVsCenBRL", 8000, 0, 200,100,0,100);
   diMuonsGlobalInvMassVsCenBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalInvMassVsCenBRL->SetYTitle("Centrality");
+
+  diMuonsGlobalInvMassVsCenPtCut = new TH2F("diMuonsGlobalInvMassVsCenPtCut","diMuonsGlobalInvMassVsCenPtCut", 8000, 0, 200,100,0,100);
+  diMuonsGlobalInvMassVsCenEtaCut = new TH2F("diMuonsGlobalInvMassVsCenEtaCut","diMuonsGlobalInvMassVsCenEtaCut", 8000, 0, 200,100,0,100);
+
+
+
+
 
   ////////
 
  
-  diMuonsGlobalSTAInvMassVsPt = new TH2F("diMuonsGlobalSTAInvMassVsPt", "diMuonsGlobalSTAInvMassVsPt",4000, 0, 200,100, 0, 100);
+  diMuonsGlobalSTAInvMassVsPt = new TH2F("diMuonsGlobalSTAInvMassVsPt", "diMuonsGlobalSTAInvMassVsPt",8000, 0, 200,100, 0, 100);
   diMuonsGlobalSTAInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGlobalSTAInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSTAInvMassVsY = new TH2F("diMuonsGlobalSTAInvMassVsY","diMuonsGlobalSTAInvMassVsY", 4000, 0, 200, 100, -5, 5);
+  diMuonsGlobalSTAInvMassVsY = new TH2F("diMuonsGlobalSTAInvMassVsY","diMuonsGlobalSTAInvMassVsY", 8000, 0, 200, 100, -5, 5);
   diMuonsGlobalSTAInvMassVsY->SetYTitle("rapidity");
   diMuonsGlobalSTAInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSTAInvMassVsCen = new TH2F("diMuonsGlobalSTAInvMassVsCen","diMuonsGlobalSTAInvMassVsCen",4000, 0, 200,100,0,100);
+  diMuonsGlobalSTAInvMassVsCen = new TH2F("diMuonsGlobalSTAInvMassVsCen","diMuonsGlobalSTAInvMassVsCen",8000, 0, 200,100,0,100);
   diMuonsGlobalSTAInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalSTAInvMassVsCen->SetYTitle("Centrality");
   
-  diMuonsSTAInvMassVsPt = new TH2F("diMuonsSTAInvMassVsPt","diMuonsSTAInvMassVsPt", 4000, 0, 200, 100,0,100);
+  diMuonsSTAInvMassVsPt = new TH2F("diMuonsSTAInvMassVsPt","diMuonsSTAInvMassVsPt", 8000, 0, 200, 100,0,100);
   diMuonsSTAInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsSTAInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsSTAInvMassVsY = new TH2F("diMuonsSTAInvMassVsY","diMuonsSTAInvMassVsY",4000, 0, 200, 100, -5, 5);
+  diMuonsSTAInvMassVsY = new TH2F("diMuonsSTAInvMassVsY","diMuonsSTAInvMassVsY",8000, 0, 200, 100, -5, 5);
   diMuonsSTAInvMassVsY->SetYTitle("rapidity");
   diMuonsSTAInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsSTAInvMassVsCen = new TH2F("diMuonsSTAInvMassVsCen","diMuonsSTAInvMassVsCen", 4000, 0, 200,100,0,100);
+  diMuonsSTAInvMassVsCen = new TH2F("diMuonsSTAInvMassVsCen","diMuonsSTAInvMassVsCen", 8000, 0, 200,100,0,100);
   diMuonsSTAInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsSTAInvMassVsCen->SetYTitle("Centrality");
   
   Centrality = new TH1F("Centrality","Centrality", 100,0,100);
   
-  diMuonsGlobalSameChargeInvMassVsPt = new TH2F("diMuonsGlobalSameChargeInvMassVsPt", "diMuonsGlobalSameChargeInvMassVsPt", 4000, 0, 200, 100,0,100);
+  diMuonsGlobalSameChargeInvMassVsPt = new TH2F("diMuonsGlobalSameChargeInvMassVsPt", "diMuonsGlobalSameChargeInvMassVsPt", 8000, 0, 200, 100,0,100);
   diMuonsGlobalSameChargeInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGlobalSameChargeInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSameChargeInvMassVsY = new TH2F("diMuonsGlobalSameChargeInvMassVsY","diMuonsGlobalSameChargeInvMassVsY",4000, 0, 200,100, -5, 5);
+  diMuonsGlobalSameChargeInvMassVsY = new TH2F("diMuonsGlobalSameChargeInvMassVsY","diMuonsGlobalSameChargeInvMassVsY",8000, 0, 200,100, -5, 5);
   diMuonsGlobalSameChargeInvMassVsY->SetYTitle("rapidity");
   diMuonsGlobalSameChargeInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSameChargeInvMassVsCen = new TH2F("diMuonsGlobalSameChargeInvMassVsCen","diMuonsGlobalSameChargeInvMassVsCen", 4000, 0, 200,100,0,100);
+  diMuonsGlobalSameChargeInvMassVsCen = new TH2F("diMuonsGlobalSameChargeInvMassVsCen","diMuonsGlobalSameChargeInvMassVsCen", 8000, 0, 200,100,0,100);
   diMuonsGlobalSameChargeInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalSameChargeInvMassVsCen->SetYTitle("Centrality");
 
   // Barrel 
 
-  diMuonsGlobalSameChargeInvMassVsPtBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsPtBRL", "diMuonsGlobalSameChargeInvMassVsPtBRL", 4000, 0, 200, 100,0,100);
+  diMuonsGlobalSameChargeInvMassVsPtBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsPtBRL", "diMuonsGlobalSameChargeInvMassVsPtBRL", 8000, 0, 200, 100,0,100);
   diMuonsGlobalSameChargeInvMassVsPtBRL->SetYTitle("pT (GeV/c)");
   diMuonsGlobalSameChargeInvMassVsPtBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGlobalSameChargeInvMassVsYBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsYBRL","diMuonsGlobalSameChargeInvMassVsYBRL",4000, 0, 200,100, -5, 5);
+  diMuonsGlobalSameChargeInvMassVsYBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsYBRL","diMuonsGlobalSameChargeInvMassVsYBRL",8000, 0, 200,100, -5, 5);
   diMuonsGlobalSameChargeInvMassVsYBRL->SetYTitle("rapidity");
   diMuonsGlobalSameChargeInvMassVsYBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGlobalSameChargeInvMassVsCenBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsCenBRL","diMuonsGlobalSameChargeInvMassVsCenBRL", 4000, 0, 200,100,0,100);
+  diMuonsGlobalSameChargeInvMassVsCenBRL = new TH2F("diMuonsGlobalSameChargeInvMassVsCenBRL","diMuonsGlobalSameChargeInvMassVsCenBRL", 8000, 0, 200,100,0,100);
   diMuonsGlobalSameChargeInvMassVsCenBRL->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalSameChargeInvMassVsCenBRL->SetYTitle("Centrality");
+
+
+  diMuonsGlobalSameChargeInvMassVsPtEtaCut = new TH2F("diMuonsGlobalSameChargeInvMassVsPtEtaCut", "diMuonsGlobalSameChargeInvMassVsPtEtaCut", 8000, 0, 200, 100,0,100);
+  diMuonsGlobalSameChargeInvMassVsPtPtCut = new TH2F("diMuonsGlobalSameChargeInvMassVsPtPtCut", "diMuonsGlobalSameChargeInvMassVsPtPtCut", 8000, 0, 200, 100,0,100);
+  
+  diMuonsGlobalSameChargeInvMassVsYPtCut = new TH2F("diMuonsGlobalSameChargeInvMassVsYPtCut","diMuonsGlobalInvMassVsYPtCut",8000, 0, 200,100, -5, 5);
+  diMuonsGlobalSameChargeInvMassVsYEtaCut = new TH2F("diMuonsGlobalSameChargeInvMassVsYEtaCut","diMuonsGlobalInvMassVsYEtaCut",8000, 0, 200,100, -5, 5);
+
+  diMuonsGlobalSameChargeInvMassVsCenPtCut = new TH2F("diMuonsGlobalSameChargeInvMassVsCenPtCut","diMuonsGlobalInvMassVsCenPtCut", 8000, 0, 200,100,0,100);
+  diMuonsGlobalSameChargeInvMassVsCenEtaCut = new TH2F("diMuonsGlobalSameChargeInvMassVsCenEtaCut","diMuonsGlobalInvMassVsCenEtaCut", 8000, 0, 200,100,0,100);
+
+
+
+
+
+
+
+
+
 
   /////////
 
 
-  diMuonsGlobalSTASameChargeInvMassVsPt = new TH2F("diMuonsGlobalSTASameChargeInvMassVsPt", "diMuonsGlobalSTASameChargeInvMassVsPt",4000, 0, 200,100, 0, 100);
+  diMuonsGlobalSTASameChargeInvMassVsPt = new TH2F("diMuonsGlobalSTASameChargeInvMassVsPt", "diMuonsGlobalSTASameChargeInvMassVsPt",8000, 0, 200,100, 0, 100);
   diMuonsGlobalSTASameChargeInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGlobalSTASameChargeInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSTASameChargeInvMassVsY = new TH2F("diMuonsGlobalSTASameChargeInvMassVsY","diMuonsGlobalSTASameChargeInvMassVsY", 4000, 0, 200, 100, -5, 5);
+  diMuonsGlobalSTASameChargeInvMassVsY = new TH2F("diMuonsGlobalSTASameChargeInvMassVsY","diMuonsGlobalSTASameChargeInvMassVsY", 8000, 0, 200, 100, -5, 5);
   diMuonsGlobalSTASameChargeInvMassVsY->SetYTitle("rapidity");
   diMuonsGlobalSTASameChargeInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsGlobalSTASameChargeInvMassVsCen = new TH2F("diMuonsGlobalSTASameChargeInvMassVsCen","diMuonsGlobalSTASameChargeInvMassVsCen",4000, 0, 200,100,0,100);
+  diMuonsGlobalSTASameChargeInvMassVsCen = new TH2F("diMuonsGlobalSTASameChargeInvMassVsCen","diMuonsGlobalSTASameChargeInvMassVsCen",8000, 0, 200,100,0,100);
   diMuonsGlobalSTASameChargeInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGlobalSTASameChargeInvMassVsCen->SetYTitle("Centrality");
   
 
-  diMuonsSTASameChargeInvMassVsPt = new TH2F("diMuonsSTASameChargeInvMassVsPt","diMuonsSTASameChargeInvMassVsPt", 4000, 0, 200, 100,0,100);
+  diMuonsSTASameChargeInvMassVsPt = new TH2F("diMuonsSTASameChargeInvMassVsPt","diMuonsSTASameChargeInvMassVsPt", 8000, 0, 200, 100,0,100);
   diMuonsSTASameChargeInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsSTASameChargeInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsSTASameChargeInvMassVsY = new TH2F("diMuonsSTASameChargeInvMassVsY","diMuonsSTASameChargeInvMassVsY",4000, 0, 200, 100, -5, 5);
+  diMuonsSTASameChargeInvMassVsY = new TH2F("diMuonsSTASameChargeInvMassVsY","diMuonsSTASameChargeInvMassVsY",8000, 0, 200, 100, -5, 5);
   diMuonsSTASameChargeInvMassVsY->SetYTitle("rapidity");
   diMuonsSTASameChargeInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
   
-  diMuonsSTASameChargeInvMassVsCen = new TH2F("diMuonsSTASameChargeInvMassVsCen","diMuonsSTASameChargeInvMassVsCen", 4000, 0, 200,100,0,100);
+  diMuonsSTASameChargeInvMassVsCen = new TH2F("diMuonsSTASameChargeInvMassVsCen","diMuonsSTASameChargeInvMassVsCen", 8000, 0, 200,100,0,100);
   diMuonsSTASameChargeInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsSTASameChargeInvMassVsCen->SetYTitle("Centrality");
 
 
-  diMuonsGenInvMassVsPt = new TH2F("diMuonsGenInvMassVsPt", "diMuonsGenInvMassVsPt", 4000, 0, 200, 100,0,100);
+  diMuonsGenInvMassVsPt = new TH2F("diMuonsGenInvMassVsPt", "diMuonsGenInvMassVsPt", 8000, 0, 200, 100,0,100);
   diMuonsGenInvMassVsPt->SetYTitle("pT (GeV/c)");
   diMuonsGenInvMassVsPt->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGenInvMassVsY = new TH2F("diMuonsGenInvMassVsY","diMuonsGenInvMassVsY",4000, 0, 200,100, -5, 5);
+  diMuonsGenInvMassVsY = new TH2F("diMuonsGenInvMassVsY","diMuonsGenInvMassVsY",8000, 0, 200,100, -5, 5);
   diMuonsGenInvMassVsY->SetYTitle("rapidity");
   diMuonsGenInvMassVsY->SetXTitle("Invariant Mass (GeV/c^{2})");
 
-  diMuonsGenInvMassVsCen = new TH2F("diMuonsGenInvMassVsCen","diMuonsGenInvMassVsCen", 4000, 0, 200,100,0,100);
+  diMuonsGenInvMassVsCen = new TH2F("diMuonsGenInvMassVsCen","diMuonsGenInvMassVsCen", 8000, 0, 200,100,0,100);
   diMuonsGenInvMassVsCen->SetXTitle("Invariant Mass (GeV/c^{2})");
   diMuonsGenInvMassVsCen->SetYTitle("Centrality");
 
-  diMuonsGenInvMass = new TH1F("diMuonsGenInvMass","diMuonsGenInvMass", 4000,0,200);
+  diMuonsGenInvMass = new TH1F("diMuonsGenInvMass","diMuonsGenInvMass", 8000,0,200);
   diMuonsGenPt = new TH1F("diMuonsGenPt","diMuonsGenPt", 100,0,20);
   diMuonsGenRapidity = new TH1F("diMuonsGenRapidity","diMuonsGenRapidity", 100,-10,10);
 
   // Global Histos
 
-  diMuonsMass200 = new TH1F("diMuonsMass200", "diMuonsMass200", 4000, 0, 1000);
-  diMuonsMass200Cut = new TH1F("diMuonsMass200Cut", "diMuonsMass200Cut", 4000, 0, 1000);
+  diMuonsMass200 = new TH1F("diMuonsMass200", "diMuonsMass200", 8000, 0, 1000);
+  diMuonsMass200Cut = new TH1F("diMuonsMass200Cut", "diMuonsMass200Cut", 8000, 0, 1000);
 
   gMuonChi2ndf = new TH1F("gMuonChi2ndf", "gMuonChi2ndf", 100, 0, 100);
   gMuonnhits = new TH1F("gMuonnhits", "gMuonnhits", 100, 0, 100);
@@ -714,6 +831,11 @@ DiMuon2DPlots::beginJob()
   gMuonArb = new TH1F("gMuonArb", "gMuonArb", 11, -1, 10);
   gMuonLastTight = new TH1F("gMuonLastTight", "gMuonLastTight", 11, -1, 10);
   gMuonLastLoose = new TH1F("gMuonLastLoose", "gMuonLastLoose", 11, -1, 10);
+
+  gMuonPtError=new TH1F("gMuonsPtError", "gMuonsPtError", 200, 0, 10);
+  gMuonValidHits=new TH1F("gMuonValidHits", "gMuonValidHits", 200, 0, 100);
+  
+
 
   gMuonsPt = new TH1F("gMuonsPt", "gMuonsPt", 200, 0, 100);
   gMuonsEta = new TH1F("gMuonsEta", " gMuonsEta", 100, -10, 10);
@@ -745,19 +867,30 @@ DiMuon2DPlots::beginJob()
   hZVtx = new TH1F("hZVtx", "hZVtx", 200, -100, 100);
 
   // Cuts histos
-  dimuFOUND = new TH1F("dimuFOUND", "dimuFOUND", 4000, 0, 200);
-  dimuGLCHI2 = new TH1F("dimuGLCHI2", "dimuGLCHI2", 4000, 0, 200);
-  dimuHITS = new TH1F("dimuHITS", "dimuHITS", 4000, 0, 200);
-  dimuTRKCHI2 = new TH1F("dimuTRKCHI2", "dimuTRKCHI2", 4000, 0, 200);
-  dimuARB = new TH1F("dimuARB", "dimuARB", 4000, 0, 200);
-  dimuLast = new TH1F("dimuLast", "dimuLast", 4000, 0, 200);
-  dimuPIX = new TH1F("dimuPIX", "dimuPIX", 4000, 0, 200);
-  dimuDXY = new TH1F("dimuDXY", "dimuDXY", 4000, 0, 200);
-  dimuDZ = new TH1F("dimuDZ", "dimuDZ", 4000, 0, 200);
-  dimuAll = new TH1F("dimuAll", "dimuAll", 4000, 0, 200);
+  dimu = new TH1F("dimu", "dimu", 8000, 0, 200);
+  dimuFOUND = new TH1F("dimuFOUND", "dimuFOUND", 8000, 0, 200);
+  dimuGLCHI2 = new TH1F("dimuGLCHI2", "dimuGLCHI2", 8000, 0, 200);
+  dimuHITS = new TH1F("dimuHITS", "dimuHITS", 8000, 0, 200);
+  dimuTRKCHI2 = new TH1F("dimuTRKCHI2", "dimuTRKCHI2", 8000, 0, 200);
+  dimuARB = new TH1F("dimuARB", "dimuARB", 8000, 0, 200);
+  dimuLast = new TH2F("dimuLast", "dimuLast", 8000, 0, 200, 100, 0, 100);
+  dimuLastLoose = new TH2F("dimuLastLoose", "dimuLastLoose", 8000, 0, 200, 100, 0, 100);
+  
+  dimuPIX = new TH1F("dimuPIX", "dimuPIX", 8000, 0, 200);
+  dimuDXY = new TH1F("dimuDXY", "dimuDXY", 8000, 0, 200);
+  dimuDZ = new TH1F("dimuDZ", "dimuDZ", 8000, 0, 200);
+  dimuAll = new TH1F("dimuAll", "dimuAll", 8000, 0, 200);
+  //new cut histos
+  dimuPTERROR = new TH1F("dimuPTERROR", "dimuPTERROR", 8000, 0, 200);
+  dimuNOOFVALIDHITS = new TH1F("dimuNOOFVALIDHITS", "dimuNOOFVALIDHITS", 8000, 0, 200);
+  dimuD0 = new TH1F("dimuD0", "dimuD0", 8000, 0, 200);
 
 
-  //  h_ZetaGen_ = genParticleDir.make<TH1D>("generatedZeta","#eta of generated Z",100,-5.,5.); 
+
+
+
+
+//  h_ZetaGen_ = genParticleDir.make<TH1D>("generatedZeta","#eta of generated Z",100,-5.,5.); 
 
   // Write comments in a file
 }
@@ -777,6 +910,17 @@ void DiMuon2DPlots::endJob()
   diMuonsGlobalInvMassVsYBRL->Write();
   diMuonsGlobalInvMassVsCenBRL->Write();
 
+  diMuonsGlobalInvMassVsPtEtaCut->Write();
+  diMuonsGlobalInvMassVsPtPtCut->Write();
+  
+  diMuonsGlobalInvMassVsYPtCut->Write();
+  diMuonsGlobalInvMassVsYEtaCut->Write();
+  diMuonsGlobalInvMassVsCenPtCut->Write();
+  diMuonsGlobalInvMassVsCenEtaCut->Write();
+
+
+
+
   diMuonsGlobalSTAInvMassVsPt->Write();
   diMuonsGlobalSTAInvMassVsY->Write();
   diMuonsGlobalSTAInvMassVsCen->Write();
@@ -791,6 +935,14 @@ void DiMuon2DPlots::endJob()
   diMuonsGlobalSameChargeInvMassVsPtBRL->Write();
   diMuonsGlobalSameChargeInvMassVsYBRL->Write();
   diMuonsGlobalSameChargeInvMassVsCenBRL->Write();
+
+
+  diMuonsGlobalSameChargeInvMassVsPtEtaCut->Write();
+  diMuonsGlobalSameChargeInvMassVsPtPtCut->Write();
+  diMuonsGlobalSameChargeInvMassVsYPtCut->Write();
+  diMuonsGlobalSameChargeInvMassVsYEtaCut->Write();
+  diMuonsGlobalSameChargeInvMassVsCenPtCut->Write();
+  diMuonsGlobalSameChargeInvMassVsCenEtaCut->Write();
 
 
   diMuonsGlobalSTASameChargeInvMassVsPt->Write();
@@ -823,6 +975,11 @@ void DiMuon2DPlots::endJob()
   gMuonLastTight->Write();
   gMuonLastLoose->Write();
 
+  gMuonPtError->Write();
+  gMuonValidHits->Write();
+
+
+
   gMuonsPt->Write();
   gMuonsEta->Write();
   gMuonsPhi->Write();
@@ -852,15 +1009,23 @@ void DiMuon2DPlots::endJob()
   hZVtx->Write();
 
   // cuts histos
+  dimu->Write();
   dimuFOUND->Write();
   dimuGLCHI2->Write();
   dimuHITS->Write();
   dimuTRKCHI2->Write();
   dimuARB->Write();
   dimuLast->Write();
+  dimuLastLoose->Write();
+  
   dimuPIX->Write();
   dimuDXY->Write();
   dimuDZ->Write();
+  
+  dimuPTERROR->Write(); 
+  dimuNOOFVALIDHITS->Write();
+  dimuD0->Write();
+
   dimuAll->Write();
 
 
@@ -892,9 +1057,14 @@ bool DiMuon2DPlots::selGlobalMuon(const reco::Muon* aMuon) {
 	  //	  aMuon->numberOfChambers() > 2 &&
 	  iTrack->chi2()/iTrack->ndof() < 4.0 &&
 
+	  p.numberOfValidHits() > 12 &&
+
+	  iTrack->ptError()/iTrack->pt() < 0.05 &&
+
 	  //	  NoArbitration, SegmentArbitration, SegmentAndTrackArbitration, SegmentAndTrackArbitrationCleaned 
 	  muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) &&
-	  muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+	  //muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+	  muon::isGoodMuon(*aMuon, muon::TMLastStationAngLoose, reco::Muon::NoArbitration) &&
 	  
 	  p.pixelLayersWithMeasurement() > 1 &&
 	  fabs(iTrack->dxy(RefVtx)) < 3.0 &&
@@ -974,7 +1144,7 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   edm::Handle<edm::View<reco::Muon> >tmuons;
   iEvent.getByLabel("muons", tmuons);
-  int rmuon =tmuons->size();
+  //int rmuon =tmuons->size();
 
   //  cout << "No. of reconstructed muons = " << rmuon  <<endl;
 
@@ -1021,6 +1191,12 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
       gMuonDxy->Fill(iTrack->dxy(RefVtx));
       gMuonZ->Fill(iTrack->dz(RefVtx));
       
+     
+      gMuonPtError->Fill(iTrack->ptError()/iTrack->pt());
+      gMuonValidHits->Fill(p.numberOfValidHits());
+
+
+
       //      gMuonZ->Fill(aMuon->numberOfChambers());
 
       gMuonArb->Fill(muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration));
@@ -1101,14 +1277,23 @@ void DiMuon2DPlots::printGlobalMuon(const reco::Muon* aMuon) {
   cout << " TrackChi2ndof = " <<  iTrack->chi2()/iTrack->ndof() << endl;
   cout << " muon::TrackerMuonArbitrated = " <<  muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) << endl;
   cout << " muon::TMLastStationAngTight = " <<  muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) << endl;
+  cout << " muon::TMLastStationAngLoose = " <<  muon::isGoodMuon(*aMuon, muon::TMLastStationAngLoose, reco::Muon::NoArbitration) << endl;
+  
   cout <<  " pixelLayersWithMeasurement() = " << p.pixelLayersWithMeasurement() << endl;
   cout <<  " dxy = " << fabs(iTrack->dxy(RefVtx)) << endl;
   cout <<  " dz = " << fabs(iTrack->dz(RefVtx))  << endl;
 
+
+
+
+
 }
 
 
-void DiMuon2DPlots::FillHistoCuts(double mass, const reco::Muon* Muon1, const reco::Muon* Muon2) {
+void DiMuon2DPlots::FillHistoCuts(double mass, double pt, const reco::Muon* Muon1, const reco::Muon* Muon2) {
+
+  
+  cout<<"fill cut histo"<<endl;
 
   TrackRef iTrack1 = Muon1->innerTrack();
   const reco::HitPattern& p1 = iTrack1->hitPattern();
@@ -1117,23 +1302,45 @@ void DiMuon2DPlots::FillHistoCuts(double mass, const reco::Muon* Muon1, const re
 
   TrackRef iTrack2 = Muon2->innerTrack();
   const reco::HitPattern& p2 = iTrack2->hitPattern();
+  
   TrackRef gTrack2 = Muon2->globalTrack();
   const reco::HitPattern& q2 = gTrack2->hitPattern();
+
+  dimu->Fill(mass);
 
   if(iTrack1->found() > 11  &&  iTrack2->found() > 11)  dimuFOUND->Fill(mass);
   if(gTrack1->chi2()/gTrack1->ndof() < 20.0  &&  gTrack2->chi2()/gTrack2->ndof() < 20.0) dimuGLCHI2->Fill(mass); 
   if(q1.numberOfValidMuonHits() > 0  &&  q2.numberOfValidMuonHits() >0 ) dimuHITS->Fill(mass);
   if(iTrack1->chi2()/iTrack1->ndof() < 4.0  &&  iTrack2->chi2()/iTrack2->ndof()) dimuTRKCHI2->Fill(mass);
   if( muon::isGoodMuon(*Muon1, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) && 
-       muon::isGoodMuon(*Muon2, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) )  dimuARB->Fill(mass); 
+      muon::isGoodMuon(*Muon2, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) )  dimuARB->Fill(mass); 
+  
   if(muon::isGoodMuon(*Muon1, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
-       muon::isGoodMuon(*Muon2, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) )  dimuLast->Fill(mass);
+     muon::isGoodMuon(*Muon2, muon::TMLastStationAngTight, reco::Muon::NoArbitration) )  dimuLast->Fill(mass, pt);
+  
+
+
+  cout<<" last loose "<<endl;
+  if(muon::isGoodMuon(*Muon1, muon::TMLastStationAngLoose, reco::Muon::NoArbitration) && muon::isGoodMuon(*Muon2, muon::TMLastStationAngLoose, reco::Muon::NoArbitration) ) dimuLastLoose->Fill(mass, pt);
+
+
+  //gMuonLastLoose->Fill(muon::isGoodMuon(*aMuon, muon::TMLastStationAngLoose, reco::Muon::NoArbitration));
+
+
   if(p1.pixelLayersWithMeasurement() > 1  &&  p2.pixelLayersWithMeasurement() > 1) dimuPIX->Fill(mass);
+  
   if(fabs(iTrack1->dxy(RefVtx)) < 3.0  &&  fabs(iTrack2->dxy(RefVtx)) < 3.0) dimuDXY->Fill(mass);
+  
   if(fabs(iTrack1->dz(RefVtx)) < 15.0  && fabs(iTrack2->dz(RefVtx)) < 15.0) dimuDZ->Fill(mass);
   
   if(allCutGlobal(Muon1) && allCutGlobal(Muon2)) dimuAll->Fill(mass);  
+
+  if(iTrack1->ptError()/iTrack1->pt() < 0.05 && iTrack2->ptError()/iTrack2->pt() < 0.05) dimuPTERROR->Fill(mass);
+
+  if(p1.numberOfValidHits() > 12  &&  p2.numberOfValidHits() >12 )dimuNOOFVALIDHITS->Fill(mass);					  
   
+  if(fabs(iTrack1->dxy(RefVtx)) < 3.0  && fabs(iTrack2->dxy(RefVtx)) < 3.0) dimuD0->Fill(mass);
+
 }
 
 
@@ -1157,11 +1364,17 @@ bool DiMuon2DPlots::allCutGlobal(const reco::Muon* aMuon) {
           q.numberOfValidMuonHits() > 0 &&
           //      aMuon->numberOfChambers() > 2 &&
           iTrack->chi2()/iTrack->ndof() < 4.0 &&
-          //      NoArbitration, SegmentArbitration, SegmentAndTrackArbitration, SegmentAndTrackArbitrationCleaned
+          
+	  //      NoArbitration, SegmentArbitration, SegmentAndTrackArbitration, SegmentAndTrackArbitrationCleaned
           muon::isGoodMuon(*aMuon, muon::TrackerMuonArbitrated, reco::Muon::NoArbitration) &&
-          muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+          
+	  //muon::isGoodMuon(*aMuon, muon::TMLastStationAngTight, reco::Muon::NoArbitration) &&
+	  muon::isGoodMuon(*aMuon, muon::TMLastStationAngLoose, reco::Muon::NoArbitration) &&
 
-          p.pixelLayersWithMeasurement() > 1 &&
+          p.numberOfValidHits() > 12 &&
+          iTrack->ptError()/iTrack->pt() < 0.05 &&  
+
+	  p.pixelLayersWithMeasurement() > 1 &&
           fabs(iTrack->dxy(RefVtx)) < 3.0 &&
           fabs(iTrack->dz(RefVtx)) < 15.0 );
 }
