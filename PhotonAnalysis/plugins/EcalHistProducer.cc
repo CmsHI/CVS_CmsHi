@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.11 2010/11/07 20:07:10 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.12 2010/11/07 20:21:03 kimy Exp $
 //
 //
 
@@ -211,7 +211,6 @@ EcalHistProducer::~EcalHistProducer()
     void
 EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-    std::cout<<"starting analyze"<<std::endl;
     using namespace edm;
 
     if(!centrality_) centrality_ = new CentralityProvider(iSetup);
@@ -257,20 +256,28 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        const GlobalPoint & position = caloGeom->getPosition(rh->id());
        double tempEt = rh->energy()/cosh(position.eta()) ;
        rhEB->Fill(tempEt);
-       rhEBcent[bin/cStep]->Fill(tempEt);
-       rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
-       rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+       if(RHCent_) {
+           rhEBcent[bin/cStep]->Fill(tempEt);
+           if(RHetaCent_)
+               rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
+           if(RHphiCent_)
+               rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+       }
        
     }
     //Endcap
     for (rh = (*rechitsCollectionEndcap).begin(); rh!= (*rechitsCollectionEndcap).end(); rh++){
         const GlobalPoint & position = caloGeom->getPosition(rh->id());
-	double tempEt = rh->energy()/cosh(position.eta()) ;
-		
-	rhEE->Fill(tempEt);
-        rhEEcent[bin/cStep]->Fill(tempEt);
-        rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
-        rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+        double tempEt = rh->energy()/cosh(position.eta()) ;
+
+        rhEE->Fill(tempEt);
+        if(RHCent_) {
+            rhEEcent[bin/cStep]->Fill(tempEt);
+            if(RHetaCent_)
+                rhEtaCent[bin/cStep]->Fill(position.eta(),tempEt);
+            if(RHphiCent_)
+                rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
+        }
 
     }
 
@@ -375,7 +382,6 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
        else
        finalFlag = true;
      */
-    std::cout<<"done analyze"<<std::endl;
 }
 
 
@@ -389,11 +395,11 @@ EcalHistProducer::beginJob()
 
     char name[200];
     char title[200];
-    if(RHCent_) {
-        for(int i=0; i<cBins; i++) {
-            sprintf(name,"NoEc%d",i);
-            sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-            NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
+    for(int i=0; i<cBins; i++) {
+        sprintf(name,"NoEc%d",i);
+        sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+        NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
+        if(RHCent_) {
             sprintf(name,"rhEBc%d",i);
             sprintf(title,"rhEB Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
             rhEBcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
@@ -463,19 +469,19 @@ EcalHistProducer::beginJob()
             theTree->Branch(name,&nSCcent[i],format);
             sprintf(name,"SCeCent%dto%d",i*cStep,(i+1)*cStep-1);
             sprintf(format,"SCenergyCent[nSC]/F");
-            theTree->Branch(name,energyCent[i],format);
+            theTree->Branch(name,SCenergyCent[i],format);
             sprintf(name,"SCetCent%dto%d",i*cStep,(i+1)*cStep-1);
             sprintf(format,"SCetCent[nSC]/F");
-            theTree->Branch(name,etCent[i],format);
+            theTree->Branch(name,SCetCent[i],format);
             if(SCetaCent_) {
                 sprintf(name,"SCetaCent%dto%d",i*cStep,(i+1)*cStep-1);
                 sprintf(format,"SCetaCent[nSC]/F");
-                theTree->Branch(name,etaCent[i],format);
+                theTree->Branch(name,SCetaCent[i],format);
             }
             if(SCphiCent_) {
                 sprintf(name,"SCphiCent%dto%d",i*cStep,(i+1)*cStep-1);
                 sprintf(format,"SCphiCent[nSC]/F");
-                theTree->Branch(name,phiCent[i],format);
+                theTree->Branch(name,SCphiCent[i],format);
             }
         }
     }
