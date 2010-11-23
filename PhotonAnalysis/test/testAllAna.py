@@ -13,8 +13,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    # 'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_6_3/RelValPhotonJets_Pt_10/GEN-SIM-RECO/START36_V10-v1/0005/780848E8-0978-DF11-9D44-00261894389C.root'  # pp
-    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_1/RelValHydjetQ_MinBias_2760GeV/GEN-SIM-RECO/MC_39Y_V3-v1/0062/E062CB6E-49E4-DF11-B10A-00261894397D.root' # hi
+    'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
     ),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
@@ -45,16 +44,18 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
 
 
-# Centrality 
+# Centrality
 process.load("RecoHI.HiCentralityAlgos.HiCentrality_cfi")
+process.HeavyIonGlobalParameters = cms.PSet(
+        centralitySrc = cms.InputTag("hiCentrality"),
+        centralityVariable = cms.string("HFhits"),
+        nonDefaultGlauberModel = cms.string("")
+            )
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
+from CmsHi.Analysis2010.CommonFunctions_cff import *
+overrideCentrality(process)
 
-# Heavyion
-process.GlobalTag.toGet = cms.VPSet(
-    cms.PSet(record = cms.string("HeavyIonRcd"),
-             tag = cms.string("CentralityTable_HFhits40_AMPT2760GeV_v3_mc"),
-             connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS")
-             )
-    )
 
 #ecal filter
 process.goodPhotons = cms.EDFilter("PhotonSelector",
@@ -87,8 +88,8 @@ process.p = cms.Path(
     #   process.goodPhotons *
     #    process.photonFilter*
     # process.hiEcalSpikeFilter    
-    process.isoConeMap  *
-    process.ecalHistProducer *
+  #  process.isoConeMap  *
+    process.ecalHistProducer * 
     process.spikeInspector
     )
 
