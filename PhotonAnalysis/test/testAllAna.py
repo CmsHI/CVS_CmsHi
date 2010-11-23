@@ -5,7 +5,7 @@ process = cms.Process("PAT")
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.Timing = cms.Service("Timing")
+process.Timing = cms.Service("Timing")
 
 ## Options and Output Report
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -19,7 +19,7 @@ process.source = cms.Source("PoolSource",
                             )
 
 ## Maximal Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300) )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -77,12 +77,28 @@ process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
 process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
 process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
 
+# Clean the supercluster
+process.cleanedIslandBarrelSuperClusters  = cms.EDProducer("HiSpikeCleaner",
+                                                           recHitProducerBarrel = cms.InputTag("ecalRecHit","EcalRecHitsEB"),
+                                                           recHitProducerEndcap = cms.InputTag("ecalRecHit","EcalRecHitsEE"),
+                                                           originalSuperClusterProducer = cms.InputTag("correctedIslandBarrelSuperClusters"),
+                                                           outputColl  = cms.string( "" ),
+                                                           etCut          = cms.double(8),
+                                                           TimingCut    = cms.untracked.double(9999999.0),
+                                                           swissCutThr    = cms.untracked.double(0.95)
+                                                           )
+
+# Ajust it..
+process.ecalHistProducer.superClusterBarrel = cms.InputTag("cleanedIslandBarrelSuperClusters")
+
+
 process.isoConeMap.etCut = 5;  # For hydjet
 
 process.p = cms.Path(
     process.hltMinBiasHFOrBSC *
     process.collisionEventSelection * 
     #  process.isoConeMap  *
+    process.cleanedIslandBarrelSuperClusters  * 
     process.ecalHistProducer 
     #process.spikeInspector
     )

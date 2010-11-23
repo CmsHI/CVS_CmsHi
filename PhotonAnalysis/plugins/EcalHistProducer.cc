@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.13 2010/11/23 11:45:46 troxlo Exp $
+// $Id: EcalHistProducer.cc,v 1.14 2010/11/23 16:09:13 kimy Exp $
 //
 //
 
@@ -143,7 +143,7 @@ class EcalHistProducer : public edm::EDAnalyzer {
         float SCphiCent[cBins][1000];
    int nBCIsc;
    float eSCIsc, etaSCIsc, phiSCIsc;
-   float rawESCIsc;
+   float rawESCIsc, rawEtSCIsc;
    float energyIsc[5000];
    float etIsc[5000];
    float etaIsc[5000];
@@ -359,8 +359,10 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     float maxEt(0);
     for (reco::SuperClusterCollection::const_iterator scItr = mySCs.begin(); scItr != mySCs.end(); ++scItr) {    
        if ( maxEt < scItr->rawEnergy()/cosh(scItr->eta()))
-	  maxScItr = scItr;
-       
+	  {
+	     maxEt = scItr->rawEnergy()/cosh(scItr->eta());
+	     maxScItr = scItr;
+	  }
        SCenergy[nSC] = scItr->energy();      
        SCenergyCent[bin/cStep][nSCcent[bin/cStep]] = scItr->energy();
        SCeta[nSC]    = scItr->eta();     
@@ -381,12 +383,12 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     // Now fill the basiccluster tree of the leading supercluster
     
     nBCIsc=0;
-    if (maxEt>10) {
+    if ( maxEt > 0 ) {
        eSCIsc = maxScItr->energy();
        rawESCIsc = maxScItr->rawEnergy();
        etaSCIsc  = maxScItr->eta();
        phiSCIsc = maxScItr->phi();
-       
+       rawEtSCIsc = rawESCIsc/cosh(etaSCIsc);
        for (reco::CaloCluster_iterator bcItr = maxScItr->clustersBegin(); bcItr != maxScItr->clustersEnd(); ++bcItr) {
 	  energyIsc[nBCIsc] = (*bcItr)->energy();
 	  etaIsc[nBCIsc]    = (*bcItr)->eta();
@@ -449,6 +451,7 @@ EcalHistProducer::beginJob()
     bcTree->Branch("nBCIsc",&nBCIsc,"nBCIsc/I");
     bcTree->Branch("eSCIsc",&eSCIsc,"eSCIsc/F");
     bcTree->Branch("rawESCIsc",&rawESCIsc,"rawESCIsc/F");
+    bcTree->Branch("rawEtSCIsc",&rawEtSCIsc,"rawEtSCIsc/F");
     bcTree->Branch("etaSCIsc",&etaSCIsc,"etaSCIsc/F");
     bcTree->Branch("phiSCIsc",&phiSCIsc,"phiSCIsc/F");
     bcTree->Branch("cBinIsc",&bin,"cBinIsc/I");
