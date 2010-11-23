@@ -13,7 +13,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
+    "/store/hidata/HIRun2010/HIAllPhysics/RECO/PromptReco-v3/000/151/935/029A130C-AEF5-DF11-9BC7-003048F1C58C.root", 
     ),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
@@ -56,21 +56,18 @@ process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global r
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 
+process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
+process.filter_step = cms.Path(process.collisionEventSelection)
 
-#ecal filter
-process.goodPhotons = cms.EDFilter("PhotonSelector",
-                           src = cms.InputTag("photons"),
-                           cut = cms.string('et > 40 && hadronicOverEm < 0.1 && r9 > 0.8')
-                           )
-# leading photon E_T filter
-process.photonFilter = cms.EDFilter("EtMinPhotonCountFilter",
-                            src = cms.InputTag("goodPhotons"),
-                            etMin = cms.double(40.0),
-                            minNumber = cms.uint32(1)
-                            )
+# minbias events
+process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
+process.load("HLTrigger.HLTfilters.hltHighLevel_cfi")
+process.hltMinBiasHFOrBSC = process.hltHighLevel.clone()
+process.hltMinBiasHFOrBSC.HLTPaths = ["HLT_HIMinBiasHfOrBSC_Core"]
+
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('isoRecHitTree.root'),
+                                   fileName = cms.string('hltAna_spikeCleanIsland_5.root'),
                                    closeFileFast = cms.untracked.bool(True)
                                    )
 
@@ -82,15 +79,12 @@ process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
 
 process.isoConeMap.etCut = 5;  # For hydjet
 
-
-
 process.p = cms.Path(
-    #   process.goodPhotons *
-    #    process.photonFilter*
-    # process.hiEcalSpikeFilter    
-  #  process.isoConeMap  *
-    process.ecalHistProducer * 
-    process.spikeInspector
+    process.hltMinBiasHFOrBSC *
+    process.collisionEventSelection * 
+    #  process.isoConeMap  *
+    process.ecalHistProducer 
+    #process.spikeInspector
     )
 
 
