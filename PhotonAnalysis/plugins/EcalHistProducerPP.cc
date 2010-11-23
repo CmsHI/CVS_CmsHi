@@ -13,11 +13,11 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducerPP.cc,v 1.1 2010/11/23 10:50:02 kimy Exp $
+// $Id: EcalHistProducerPP.cc,v 1.15 2010/11/23 16:36:42 kimy Exp $
 //
 //
 
-#define cBins 1
+#define cBins 10
 #define cStep 4
 
 // system include files
@@ -119,6 +119,8 @@ class EcalHistProducerPP : public edm::EDAnalyzer {
         edm::InputTag superClusterEndcap_;
 
         TTree* theTree;
+        TTree* bcTree;
+
         int nPho, nBC, nRH, nSC;
         int nBCcent[cBins];
         int nSCcent[cBins];
@@ -138,16 +140,23 @@ class EcalHistProducerPP : public edm::EDAnalyzer {
         float SCetaCent[cBins][1000];   
         float SCphi[1000];
         float SCphiCent[cBins][1000];
-
-        double hf;
-        double eb;
-        double multPixel;
-        double nPixelTracks;
+   int nBCIsc;
+   float eSCIsc, etaSCIsc, phiSCIsc;
+   float rawESCIsc, rawEtSCIsc;
+   float energyIsc[5000];
+   float etIsc[5000];
+   float etaIsc[5000];
+   float phiIsc[5000];
    
-        bool doSpikeRemoval_;
-        double timeCut_;
-        double swissCut_;
+   double hf;
+   double eb;
+   double multPixel;
+   double nPixelTracks;
    
+   bool doSpikeRemoval_;
+   double timeCut_;
+   double swissCut_;
+   int bin;   
 };
 
 //
@@ -210,10 +219,10 @@ EcalHistProducerPP::~EcalHistProducerPP()
     void
 EcalHistProducerPP::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-    std::cout<<"starting analyze"<<std::endl;
     using namespace edm;
 
-    int bin = 0;
+
+    bin = 0;
 
     //grab the photon collection                                                                                                                        
     NoE->Fill(0);
@@ -252,6 +261,7 @@ EcalHistProducerPP::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
            if(RHphiCent_)
                rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
        }
+       
     }
     //Endcap
     for (rh = (*rechitsCollectionEndcap).begin(); rh!= (*rechitsCollectionEndcap).end(); rh++){
@@ -266,6 +276,7 @@ EcalHistProducerPP::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
             if(RHphiCent_)
                 rhPhiCent[bin/cStep]->Fill(position.phi(),tempEt);
         }
+
     }
 
     //grab basicClusters
@@ -333,43 +344,50 @@ EcalHistProducerPP::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
             SCphiCent[i][j] = -9;
         }
     }
+    reco::SuperClusterCollection::const_iterator maxScItr ;
+    float maxEt(0);
     for (reco::SuperClusterCollection::const_iterator scItr = mySCs.begin(); scItr != mySCs.end(); ++scItr) {    
-        SCenergy[nSC] = scItr->energy();      
-        SCenergyCent[bin/cStep][nSCcent[bin/cStep]] = scItr->energy();
-        SCeta[nSC]    = scItr->eta();     
-        SCetaCent[bin/cStep][nSCcent[bin/cStep]] = scItr->eta();
-        SCphi[nSC]    = scItr->phi();     
-        SCphiCent[bin/cStep][nSCcent[bin/cStep]] = scItr->phi();
-        SCet[nSC]     = SCenergy[nSC]/cosh(SCeta[nSC]);   
-        SCetCent[bin/cStep][nSCcent[bin/cStep]] = SCenergyCent[bin/cStep][nSCcent[bin/cStep]]/cosh(SCetaCent[bin/cStep][nSCcent[bin/cStep]]);
-
-        if(nSCcent[bin/cStep] < 0)
-            nSCcent[bin/cStep] = 0;
-        nSCcent[bin/cStep]++;
+       if ( maxEt < scItr->rawEnergy()/cosh(scItr->eta()))
+	  {
+	     maxEt = scItr->rawEnergy()/cosh(scItr->eta());
+	     maxScItr = scItr;
+	  }
+       SCenergy[nSC] = scItr->energy();      
+       SCenergyCent[bin/cStep][nSCcent[bin/cStep]] = scItr->energy();
+       SCeta[nSC]    = scItr->eta();     
+       SCetaCent[bin/cStep][nSCcent[bin/cStep]] = scItr->eta();
+       SCphi[nSC]    = scItr->phi();     
+       SCphiCent[bin/cStep][nSCcent[bin/cStep]] = scItr->phi();
+       SCet[nSC]     = SCenergy[nSC]/cosh(SCeta[nSC]);   
+       SCetCent[bin/cStep][nSCcent[bin/cStep]] = SCenergyCent[bin/cStep][nSCcent[bin/cStep]]/cosh(SCetaCent[bin/cStep][nSCcent[bin/cStep]]);
+       
+       if(nSCcent[bin/cStep] < 0)
+	  nSCcent[bin/cStep] = 0;
+       nSCcent[bin/cStep]++;
         nSC++;
     }
-
+    
     theTree->Fill();
-
-    /* how to remove the spikes? `
-       const reco::CaloClusterPtr  seed = leadingPho->superCluster()->seed();
-       DetId id = lazyTool.getMaximum(*seed).first;
-       const EcalRecHitCollection & rechits = ( leadingPho->isEB() ? *EBReducedRecHits : *EEReducedRecHits);
-       EcalRecHitCollection::const_iterator it = rechits.find( id );
-
-       int severity(-100), recoFlag(-100);
-
-       if( it != rechits.end() ) {
-       severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-       recoFlag = it->recoFlag();
+    
+    // Now fill the basiccluster tree of the leading supercluster
+    
+    nBCIsc=0;
+    if ( maxEt > 0 ) {
+       eSCIsc = maxScItr->energy();
+       rawESCIsc = maxScItr->rawEnergy();
+       etaSCIsc  = maxScItr->eta();
+       phiSCIsc = maxScItr->phi();
+       rawEtSCIsc = rawESCIsc/cosh(etaSCIsc);
+       for (reco::CaloCluster_iterator bcItr = maxScItr->clustersBegin(); bcItr != maxScItr->clustersEnd(); ++bcItr) {
+	  energyIsc[nBCIsc] = (*bcItr)->energy();
+	  etaIsc[nBCIsc]    = (*bcItr)->eta();
+	  phiIsc[nBCIsc]    = (*bcItr)->phi();
+	  etIsc[nBCIsc]     = energyIsc[nBCIsc]/cosh(etaIsc[nBCIsc]);
+	  nBCIsc++;
        }
-       bool finalFlag = true;
-       if ( (severity==3) || (severity==4) || (recoFlag ==2) )
-       finalFlag = false;
-       else
-       finalFlag = true;
-     */
-    std::cout<<"done analyze"<<std::endl;
+    }
+    bcTree->Fill();
+    
 }
 
 
@@ -383,11 +401,11 @@ EcalHistProducerPP::beginJob()
 
     char name[200];
     char title[200];
-    if(RHCent_) {
-        for(int i=0; i<cBins; i++) {
-            sprintf(name,"NoEc%d",i);
-            sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
-            NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
+    for(int i=0; i<cBins; i++) {
+        sprintf(name,"NoEc%d",i);
+        sprintf(title,"NoE Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
+        NoEcent[i] = fs->make<TH1D>(name,title,1,-100.,100.);
+        if(RHCent_) {
             sprintf(name,"rhEBc%d",i);
             sprintf(title,"rhEB Centrality Bins %d-%d",i*cStep,(i+1)*cStep-1);
             rhEBcent[i] = fs->make<TH1D>(name,title,10100,-1.,100.);
@@ -418,6 +436,21 @@ EcalHistProducerPP::beginJob()
     theTree->Branch("BCeta",eta,"BCeta[nBC]/F");
     theTree->Branch("BCphi",phi,"BCphi[nBC]/F");
 
+    bcTree  = fs->make<TTree>("clustersInSC","Tree of Basic Clusters in leading raw et SC");
+    bcTree->Branch("nBCIsc",&nBCIsc,"nBCIsc/I");
+    bcTree->Branch("eSCIsc",&eSCIsc,"eSCIsc/F");
+    bcTree->Branch("rawESCIsc",&rawESCIsc,"rawESCIsc/F");
+    bcTree->Branch("rawEtSCIsc",&rawEtSCIsc,"rawEtSCIsc/F");
+    bcTree->Branch("etaSCIsc",&etaSCIsc,"etaSCIsc/F");
+    bcTree->Branch("phiSCIsc",&phiSCIsc,"phiSCIsc/F");
+    bcTree->Branch("cBinIsc",&bin,"cBinIsc/I");
+    bcTree->Branch("eIsc",energyIsc,"eIsc[nBCIsc]/F");
+    bcTree->Branch("etIsc",etIsc,"etIsc[nBCIsc]/F");
+    bcTree->Branch("etaIsc",etaIsc,"etaIsc[nBCIsc]/F");
+    bcTree->Branch("phiIsc",phiIsc,"phiIsc[nBCIsc]/F");
+
+
+    
     if(BCCent_) {
         for(int i=0; i<cBins; i++) {
             sprintf(name,"nBCcent%dto%d",i*cStep,(i+1)*cStep-1);
@@ -443,6 +476,8 @@ EcalHistProducerPP::beginJob()
     }
     theTree->Branch("hf",&hf,"hf/D");
     theTree->Branch("eb",&eb,"eb/D");
+    theTree->Branch("cBin",&bin,"cBin/I");
+
     theTree->Branch("multPixel",&multPixel,"multPixel/D");
     theTree->Branch("nPixelTracks",&nPixelTracks,"nPixelTracks/D");
 
