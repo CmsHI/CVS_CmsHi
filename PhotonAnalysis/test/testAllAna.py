@@ -5,7 +5,7 @@ process = cms.Process("PAT")
 
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.Timing = cms.Service("Timing")
+#process.Timing = cms.Service("Timing")
 
 ## Options and Output Report
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
@@ -13,13 +13,13 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 ## Source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    "/store/hidata/HIRun2010/HIAllPhysics/RECO/PromptReco-v3/000/151/935/029A130C-AEF5-DF11-9BC7-003048F1C58C.root", 
+    "/store/hidata/HIRun2010/HIAllPhysics/RECO/PromptReco-v3/000/151/935/029A130C-AEF5-DF11-9BC7-003048F1C58C.root"
     ),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
 
 ## Maximal Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load("Configuration.StandardSequences.Geometry_cff")
