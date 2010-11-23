@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.13 2010/11/16 11:35:05 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.14 2010/11/16 13:19:14 kimy Exp $
  *
  */
 
@@ -174,8 +174,8 @@ int MultiPhotonAnalyzer::selectStorePhotons(const edm::Event& e,const edm::Event
   // Sort photons according to pt
   std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
   std::sort(myCompPhotons.begin(), myCompPhotons.end(), pTComparator_);
-  
-  
+ 
+ 
   return storePhotons(e,iSetup,myphotons,myCompPhotons, prefx);
   
 }
@@ -453,14 +453,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     float sumCompHIso=0;
     float sumCompTIso=0;
     
+  
     for (reco::PhotonCollection::const_iterator compItr = myCompPhotons.begin(); compItr != myCompPhotons.end(); ++compItr) {
        allcomps++;
        if(compItr->pt() < ptMin_ || fabs(compItr->p4().eta()) > etaMax_) continue;
        
        //       cout << " et of photon = " << photon.superCluster()->energy() << "        and et of the comp photon = " << compItr->superCluster()->energy() << endl;
        //  cout << " eta of photon = " << photon.superCluster()->eta() <<   "       and eta of the comp photon = " << compItr->superCluster()->eta() <<endl;
-       
-       
        if(compItr->superCluster()->energy() != photon.superCluster()->energy() ) continue;
        
        
@@ -473,7 +472,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
        
     }
     
-    cout << " Number of compl cones = " << nComp << endl;
+    cout << " Number of matched compl cones = " << nComp << endl;
     
     if ( nComp > 0 ) {
        compTrackIso(nphotonscounter) = sumCompTIso/(double)nComp;
