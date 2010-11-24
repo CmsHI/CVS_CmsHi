@@ -20,7 +20,7 @@ process.HeavyIonGlobalParameters = cms.PSet(
     nonDefaultGlauberModel = cms.string("")
     )
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
+process.GlobalTag.globaltag = cms.string('MC_39Y_V3::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
