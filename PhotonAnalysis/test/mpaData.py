@@ -50,8 +50,6 @@ process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
 process.multiPhotonAnalyzer.GenParticleProducer = cms.InputTag("hiGenParticles")
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
-process.multiPhotonAnalyzer.doStoreMET = cms.untracked.bool(False)
-process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
@@ -86,16 +84,19 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
-process.HIphotontrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-process.HIphotontrig.HLTPaths = ["HLT_HIPhoton15"]
-process.HIphotontrig.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
+# =============== Trigger selection ====================
+process.HIphotonTrig = hltHighLevel.clone(
+    HLTPaths = cms.vstring('HLT_HIPhoton20_Cleaned_Core',
+                           HLT_HIPhoton20_Core),
+    andOr = cms.bool(True)
+    )
 
 # clean collision selection
 process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 # the path! 
 process.p = cms.Path(
-    #    process.HIphotontrig *
+    process.HIphotonTrig * 
     process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
