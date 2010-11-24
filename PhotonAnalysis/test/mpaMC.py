@@ -26,7 +26,7 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:MCPhoton_392relval.root'
+    'file:/d101/kimy/recoFiles/gammaJet_Hydjet_gensimreco_MC_39Y_V3.root'
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
     )

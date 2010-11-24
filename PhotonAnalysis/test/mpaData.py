@@ -23,7 +23,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
@@ -95,7 +95,7 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 # the path! 
 process.p = cms.Path(
-    process.HIphotontrig *
+    #    process.HIphotontrig *
     process.collisionEventSelection *
     process.highPurityTracks *
     process.hiPhotonCleaningSequence *
