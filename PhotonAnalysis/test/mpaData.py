@@ -85,9 +85,9 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 # =============== Trigger selection ====================
-process.HIphotonTrig = hltHighLevel.clone(
+process.HIphotonTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
     HLTPaths = cms.vstring('HLT_HIPhoton20_Cleaned_Core',
-                           HLT_HIPhoton20_Core),
+                           'HLT_HIPhoton20_Core'),
     andOr = cms.bool(True)
     )
 
