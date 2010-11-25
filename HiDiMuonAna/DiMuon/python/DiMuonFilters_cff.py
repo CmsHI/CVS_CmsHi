@@ -4,7 +4,6 @@ import FWCore.ParameterSet.Config as cms
 #
 from HiDiMuonAna.DiMuon.patCandidatesForDiMuonSkim_cff import *
 
-# Generated 
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
                         src = cms.InputTag("hiGenParticles"),
@@ -24,7 +23,7 @@ GenDimuonsFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 
-# Reco dimuons
+# muons
 dimuons = cms.EDProducer("CandViewShallowCloneCombiner",
                          checkCharge = cms.bool(True),
                          cut = cms.string(' mass > 0 & mass < 10000 & charge=0'),
@@ -35,9 +34,21 @@ dimuons = cms.EDProducer("CandViewShallowCloneCombiner",
 
 dimuonsMassCut = cms.EDProducer("CandViewShallowCloneCombiner",
                                 checkCharge = cms.bool(True),
-                                cut = cms.string(' mass > 88 & mass < 92 & charge=0'),
+                                cut = cms.string(' (mass > 60 & mass < 120 & charge=0) & (daughter(0).isGlobalMuon = 1 & daughter(1).isGlobalMuon = 1)'),
                                 decay = cms.string("muons@+ muons@-")
                                 )
+
+
+dimuonsMassCutFilter = cms.EDFilter("CandViewCountFilter",
+                                src = cms.InputTag("dimuonsMassCut"),
+                                minNumber = cms.uint32(1)
+                                )
+
+
+
+
+
+
 
 #Ditracks
 trackCands = cms.EDProducer("ConcreteChargedCandidateProducer",
@@ -52,12 +63,13 @@ ditracksSiliconTrk = cms.EDProducer("CandViewShallowCloneCombiner",
 #=================================
 
 
-#dimuon Global STA
+
 dimuonsGlobalSTA = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("dimuons"),
-                                cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 & daughter(1).isTimeValid() > 1   ))' ),
+                                cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
                                 filter = cms.bool(True)
                                 )
+
 
 dimuonsGlobalSTAFilter = cms.EDFilter("CandViewCountFilter",
                                       src = cms.InputTag("dimuonsGlobalSTA"),
@@ -65,19 +77,29 @@ dimuonsGlobalSTAFilter = cms.EDFilter("CandViewCountFilter",
                                       )
 
 
-#dimuon Global Track
+
 dimuonsGlobalTrk = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("dimuons"),
                                 cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isTrackerMuon = 1 &  daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isTrackerMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
+#cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isTrackerMuon = 1 & daughter(1).globalTrack()->normalizedChi2() < 10 & daughter(1).isGlobalMuon = 1)  || (daughter(1).isGlobalMuon = 0 & daughter(1).isTrackerMuon = 1 &  daughter(0).isGlobalMuon = 1 ))' ),
+
+
+
+
+
                                 filter = cms.bool(True)
                                 )
+
 
 dimuonsGlobalTrkFilter = cms.EDFilter("CandViewCountFilter",
                                       src = cms.InputTag("dimuonsGlobalTrk"),
                                       minNumber = cms.uint32(1)
                                       )
 
-#dimuon Global Global 
+
+
+
+
 dimuonsGlobal = cms.EDFilter("CandViewRefSelector",
                              src = cms.InputTag("dimuons"),
                              #cut = cms.string('(daughter(0).pt>10 & daughter(1).pt>10) & (daughter(0).isGlobalMuon = 1 &  daughter(1).isGlobalMuon = 1 )' ),
@@ -97,7 +119,8 @@ dimuonsGlobalFilter = cms.EDFilter("CandViewCountFilter",
                                    minNumber = cms.uint32(1)
                                    )
 
-# dimuon STA STA 
+
+
 dimuonsSTA = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("dimuons"),
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1) ' ),
@@ -111,7 +134,7 @@ dimuonsSTAFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 
-# dimuon STA Track
+
 dimuonsTrk = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("dimuons"),
                           cut = cms.string('(daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 0 & daughter(0).isTrackerMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 0 & daughter(1).isTrackerMuon = 1) ' ),
@@ -126,17 +149,26 @@ dimuonsTrkFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 
-# dimuon Same charges
+
+
+
 dimuonsSameCharge = cms.EDProducer("CandViewShallowCloneCombiner",
                                                   checkCharge = cms.bool(False),
                                                   cut = cms.string(' (mass > 0)'),
                                                   decay = cms.string("muons@+ muons@-")
                                                   )
 
+
+
 dimuonsSameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                        src = cms.InputTag("dimuonsSameCharge"),
                                        minNumber = cms.uint32(1)
                                        )
+
+
+
+
+
 
 dimuonsGlobalSameCharge = cms.EDFilter("CandViewRefSelector",
                                        src = cms.InputTag("dimuonsSameCharge"),
@@ -144,10 +176,16 @@ dimuonsGlobalSameCharge = cms.EDFilter("CandViewRefSelector",
                              filter = cms.bool(True)
                              )
 
+
+
 dimuonsGlobalSameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                       src = cms.InputTag("dimuonsGlobalSameCharge"),
                                       minNumber = cms.uint32(1)
                                       )
+
+
+
+
 
 dimuonsGlobalSTASameCharge = cms.EDFilter("CandViewRefSelector",
                                 src = cms.InputTag("dimuonsSameCharge"),
@@ -156,11 +194,14 @@ dimuonsGlobalSTASameCharge = cms.EDFilter("CandViewRefSelector",
                                                                
                                 )
 
+
 dimuonsGlobalSTASameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                       src = cms.InputTag("dimuonsGlobalSTASameCharge"),
                                       minNumber = cms.uint32(1)
                                       )
 
+                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                  
 dimuonsSTASameCharge = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("dimuonsSameCharge"),
                                     cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1)) & (charge != 0) '),
@@ -173,6 +214,11 @@ dimuonsSTASameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                           minNumber = cms.uint32(1)
                                           )
 
+
+
+
+
+
 dimuonsTrkSameCharge = cms.EDFilter("CandViewRefSelector",
                                     src = cms.InputTag("dimuonsSameCharge"),
                                     cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 0 & daughter(0).isTrackerMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 0 & daughter(1).isTrackerMuon = 1)& (charge != 0))' ),
@@ -183,6 +229,8 @@ dimuonsTrkSameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                           src = cms.InputTag("dimuonsTrkSameCharge"),
                                           minNumber = cms.uint32(1)
                                           )
+
+                                                                                                                            
 
 
 dimuonsGlobalTrkSameCharge = cms.EDFilter("CandViewRefSelector",
@@ -204,6 +252,7 @@ goodSTAMuons = cms.EDFilter("CandViewRefSelector",
                             cut = cms.string('isStandAloneMuon = 1  & abs(eta)<2.5'), 
                             filter = cms.bool(True)                                
                             )
+
 
 #goodGlobalMuons = cms.EDFilter("MuonViewRefSelector",
 goodGlobalMuons = cms.EDFilter("CandViewRefSelector",
