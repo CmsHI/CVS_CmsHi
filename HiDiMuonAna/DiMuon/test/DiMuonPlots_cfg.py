@@ -11,7 +11,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-process.GlobalTag.globaltag = cms.string('GR_R_39X_V1::All')
+process.GlobalTag.globaltag = 'GR10_P_V12::All'
+
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
@@ -22,7 +23,7 @@ overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
         centralityVariable = cms.string("HFhits"),
-            nonDefaultGlauberModel = cms.string("Hydjet_2760GeV"),
+            nonDefaultGlauberModel = cms.string(""),
             centralitySrc = cms.InputTag("hiCentrality")
             )
 
@@ -39,22 +40,22 @@ process.primaryVertexFilter = cms.EDFilter("VertexSelector",
 #process.load("UserCode.edwenger.Skims.hfCoincFilter_cff")
 #from HiDiMuonAna.DiMuon.hfCoinFilter_cff import *
 
-process.load("HiDiMuonAna.DiMuon.hfCoinFilter_cff")
+process.load("HeavyIonsAnalysis.Configuration.hfCoincFilter_cff")
 
 ##############################################################################################
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
     )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.source = cms.Source("PoolSource",
                             #noEventSort = cms.untracked.bool(True),
-                            #duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
-
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0Grid/Z0MC_DiMuonSkim_HLTDoubleMuOpen_9_1_tJV.root' 
+#"file:../../Configuration/test/Zskim_CorePhysics_GoodCollison.root"
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0Grid/Z0MC_DiMuonSkim_HLTDoubleMuOpen_9_1_tJV.root' 
 
 
     )
@@ -63,12 +64,12 @@ process.source = cms.Source("PoolSource",
 
 
 ##This should be uncommented to include all files from any castor directory automatically
-#import os,commands
-#def getCastorDirectoryList(path):
-#    cmd  = 'nsls %s/ ' % (path)
-#    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
-#    return file
-#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/JulyExerciseZMuMuSkim")
+import os,commands
+def getCastorDirectoryList(path):
+    cmd  = 'nsls %s/ ' % (path)
+    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+    return file
+process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/caf/user/silvest/HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim")
 
 
 
@@ -77,7 +78,7 @@ process.TFileService = cms.Service(
     "TFileService",
     #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
 
-    fileName = cms.string("DiMuonPlots_NewSkim_151022_vtxTest.root")
+    fileName = cms.string("/tmp/silvest/HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim.root")
     )
 
 
@@ -295,7 +296,7 @@ process.dimuonsTrkPlots = cms.EDAnalyzer(
 
 process.dimuons2DPlots = cms.EDAnalyzer(
     "DiMuon2DPlots",
-    OutputFileName = cms.untracked.string("DiMuon2DPlots_NewSkim_151022_vtxTest.root"),
+    OutputFileName = cms.untracked.string("/tmp/silvest/DiMuon2DPlots_HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim.root"),
     ##for generator info put IsGenInfo as TRUE
     ##IsGenInfo=cms.untracked.string("TRUE"),
     IsGenInfo=cms.untracked.string("FALSE"),
