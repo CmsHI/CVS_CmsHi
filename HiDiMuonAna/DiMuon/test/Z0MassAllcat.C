@@ -26,7 +26,7 @@
 
 #include "FitFunctions.h"
 
-void Z0MassAllCat(int isData=2, int nff = 1, int yieldInt = 1, int iSpec = 1)
+void Z0MassAllcat(int isData=1, int nff = 1, int yieldInt = 1, int iSpec = 1)
 {
 
   ////////  definitions of Switches   ///////////
@@ -150,7 +150,7 @@ void Z0MassAllCat(int isData=2, int nff = 1, int yieldInt = 1, int iSpec = 1)
   // Open the file 
 
   //  TFile *fil1 = new TFile("RV_WTrk_ZToMuMu_2DPlot.root");   // 1000 Flat 
-  TFile *fil1 = new TFile("RV_ZMuMu_2DPlot.root");   // 5000 Flat 
+  TFile *fil1 = new TFile("/castor/cern.ch/cms/store/caf/user/silvest/HICorePhysics_PromptReco_RECO_ZmumuPaperSkim_DiMuon2DPlots_merged.root");   // 5000 Flat 
   //  TFile *fil1 = new TFile("Hu_Z0ToMuMu_2DPlot.root");  // 500 Flat 
   //  TFile *fil1 = new TFile("ZMuMu_2DDataSameCharge.root"); // JEX
   //ZMuMu_2DPlotNew.root");
