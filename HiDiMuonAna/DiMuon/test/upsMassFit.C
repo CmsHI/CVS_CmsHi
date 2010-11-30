@@ -57,17 +57,23 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
 
 
   // Low mass range Upsilon
-  MassZ0 = 9.46; WidthZ0 = 0.030;
-  mass_low = 8.0; mass_high = 11.0;  // Fit ranges
-  mlow = 6.0; mhigh = 15.0; nrebin = 8, isLog = 0; isFit = 0; // draw ranges
+  MassZ0 = 9.46; WidthZ0 = 0.060;
+  mass_low = 5.0; mass_high = 15.0;  // Fit ranges
+  mlow = 6.0; mhigh = 14.0; nrebin = 6; isLog = 0; isFit = 0; // draw ranges
 
-  int whis = 1; // 1 for all eta, 2 for barrel
+  int whis = 21; // 1 for all eta, 2 for barrel
+                //21 for Pt cut of 4 on single muons 
                 //  3 for  |y| < 2
                 //  4 for  |y| < 2
                 //  5 for  1 < |y| < 2
   
   // Open the file 
-  if (isData == 1) TFile *fil1 = new TFile("PromtRecoV2V3_DiMuonPlot_WithCut_26Nov_All.root");  // With cut
+
+  if (isData == 1) TFile *fil1 = new TFile("PromtRecoV3_DiMuonPlot_WithCut_Nov30All.root");  // With cut
+
+
+  //  if (isData == 1) TFile *fil1 = new TFile("PromtRecoV2V3_DiMuonPlot_WithCut_26Nov_All.root");  // With cut
+
   
   //  if (isData == 1) TFile *fil1 = new TFile("PromtRecoV2V3_DiMuonPlot_WithCut_All.root");  // With cut
   if (isData == 2) TFile *fil1 = new TFile("MCJPsi_Grid_DiMuonPlot_All.root");
@@ -87,7 +93,7 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
   if(iSpec == 1) { 
     GenRange = 20;
     Nptbin = 1;
-    double pt_bound[10] = {7.5, 30.0};
+    double pt_bound[10] = {0.0, 30.0};
     if (whis == 3) {
       Nptbin = 3.0;
       double pt_bound[10] = {0, 5.0, 10.0, 30.0};      // |y| < 2 
@@ -134,6 +140,8 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
 
   char *name_fit[] = {"  ", "RBWPol1", "GausPol1", "RBWGausPol1"};
 
+
+
   if(nff == 1) TF1 *RBWPOL = new TF1("RBWPOL", RBWPol2, 0, 200, 6);
   if(nff == 2) TF1 *RBWPOL = new TF1("RBWPOL", GausPol2, 0, 200, 6);
   if(nff == 3) TF1 *RBWPOL = new TF1("RBWPOL", RBWGausPol2, 0, 200, 7);
@@ -146,7 +154,7 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
   RBWPOL->SetParLimits(1, 0.9*MassZ0, 1.1*MassZ0);
   RBWPOL->SetParLimits(2, 0.1*WidthZ0, 5.0*WidthZ0);
   
-  if(nff == 1 || nff == 2) RBWPOL->FixParameter(5, 0);
+  //  if(nff == 1 || nff == 2) RBWPOL->FixParameter(5, 0);
 
   if(nff == 3) {
     RBWPOL->SetParameter(3, WidthZ0);
@@ -158,8 +166,8 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
   // Efficiency
   float Eff_cat_1[10], Eff_cat_2[10], Eff_cat_3[10]; 
   float errEff_cat_1[10], errEff_cat_2[10], errEff_cat_3[10]; 
-  char *Xname[] = {" ", "p_{T} (GeV/c)", "rapidity", "centrality"};
-
+  char *Xname[] = {" ", "p_{T}^{#Upsilon} (GeV/c)", "rapidity", "centrality"};
+  
   double yld_cat_1[10], yld_cat_2[10], yld_cat_3[10];
   double cyld_cat_1[10], cyld_cat_2[10], cyld_cat_3[10];
   double eyld_cat_1[10], eyld_cat_2[10], eyld_cat_3[10];
@@ -180,29 +188,36 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
   ///////////////////////////////////////////////////////////////////////
   // Category _1 
   TLegend *lcat_1;
-  lcat_1 = new TLegend(.55, .85, .92, .92);
+  lcat_1 = new TLegend(.1, .82, .50, .93);
   lcat_1->SetName("lcat_1");
   lcat_1->SetBorderSize(0);
   lcat_1->SetFillStyle(0);
   lcat_1->SetFillColor(0);
   lcat_1->SetTextSize(0.032);
+  lcat_1->AddEntry(RBWPOL," CMS Preliminary", " ");
   lcat_1->AddEntry(RBWPOL," PbPb at  #sqrt{s_{NN}} = 2.76 TeV ", " ");
-  lcat_1->AddEntry(RBWPOL," Global-Global ", "");
+  //  lcat_1->AddEntry(RBWPOL," Global-Global ", "");
   //  lcat_1->AddEntry(RBWPOL," |y| < 2.4 ", "P");
   //  lcat_1->AddEntry(RBWPOL," Run# 150431-151027 ", "P");
 
   TLegend *legend_1[12];
   for(int i=0; i<12; i++) { 
-    legend_1[i] = new TLegend(.55, .60, .92, 0.85 );
+    if(isFit) legend_1[i] = new TLegend(.65, .52, .91, 0.93 );
+    if(!isFit) legend_1[i] = new TLegend(.65, .66, .91, 0.93 );
+
     legend_1[i]->SetBorderSize(0);
     legend_1[i]->SetFillStyle(0);
     legend_1[i]->SetFillColor(0);
     legend_1[i]->SetTextSize(0.032);
   }
 
+
   TH2D *Z0Mass_1;
 
   if(whis == 1 && iSpec == 1 ) Z0Mass_1 = (TH2D*)fil1->Get("diMuonsGlobalInvMassVsPt");
+  if(whis == 21 && iSpec == 1 ) Z0Mass_1 = (TH2D*)fil1->Get("diMuonsGlobalInvMassVsPtPtCut");
+
+
   if(whis == 2 && iSpec == 1) Z0Mass_1 = (TH2D*)fil1->Get("diMuonsGlobalInvMassVsPtBRL");
 
   if(whis == 3 && iSpec == 1) Z0Mass_1 = (TH2D*)fil1->Get("diMuonsGlobalInvMassVsPt20");
@@ -222,6 +237,8 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
   TH2D *Z0Mass_1S;
 
   if(whis == 1 && iSpec == 1) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsPt");
+  if(whis == 21 && iSpec == 1) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsPtPtCut");
+
   if(whis == 2 && iSpec ==1) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsPtBRL");
 
   if(whis == 3 && iSpec == 1) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsPt20");
@@ -237,7 +254,7 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
 
   if(iSpec == 2) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsY");
   if(iSpec == 3) Z0Mass_1S = (TH2D*)fil1->Get("diMuonsGlobalSameChargeInvMassVsCen");
-
+  
 
   TH1D *service = (TH1D*)Z0Mass_1->ProjectionY("service");
 
@@ -260,26 +277,26 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
     CanvPt_1->cd(ih+1);
     gPad->SetTickx();
     gPad->SetTicky();
-
+    
     // Project 1 D 
     pt_bin_bound[ih] = service->FindBin(pt_bound[ih]+0.0000001);
     pt_bin_bound[ih+1] = service->FindBin(pt_bound[ih+1]+0.0000001);
     sprintf(namePt_1,"Z0_1_pt_%d",ih);
     sprintf(namePt_1S,"Z0_1S_pt_%d",ih);
-
+    
     dimuonsGlobalInvMassVsPt[ih] = (TH1D*)Z0Mass_1->ProjectionX(namePt_1, pt_bin_bound[ih], pt_bin_bound[ih+1]-1, "e");
-
+    
     //h1->ProjectionX("m",1,h1->GetNbinsY()+1,"e")
-
-
+    
+    
     dimuonsGlobalInvMassVsPtS[ih] = (TH1D*)Z0Mass_1S->ProjectionX(namePt_1S, pt_bin_bound[ih], pt_bin_bound[ih+1]-1);
-
+    
     sprintf(text," %s [%.1f, %.1f]", Xname[iSpec], service->GetBinLowEdge(pt_bin_bound[ih]), 
 	      service->GetBinLowEdge(pt_bin_bound[ih+1]-1)+service->GetBinWidth(pt_bin_bound[ih+1]));
 
     dimuonsGlobalInvMassVsPt[ih]->Rebin(nrebin);
     dimuonsGlobalInvMassVsPtS[ih]->Rebin(nrebin);
-
+    
     //Fit Function + Bkg Function
     if(isFit)  dimuonsGlobalInvMassVsPt[ih]->Fit("RBWPOL","RQWW", "", mass_low, mass_high);
     double par[20];
@@ -302,8 +319,12 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
 
 
     // Integrated Yield 
-    float m_low =GGZ0Mass-(2.5*GGZ0Width);
-    float m_high =GGZ0Mass+(2.5*GGZ0Width);
+    //    float m_low =GGZ0Mass-(3.0*GGZ0Width);
+    //    float m_high =GGZ0Mass+(3.0*GGZ0Width);
+
+    float m_low =9.0;;
+    float m_high =10.0;
+
     
     TAxis *axs   = dimuonsGlobalInvMassVsPt[ih]->GetXaxis();
     
@@ -333,12 +354,18 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
 
     if(isLog) gPad->SetLogy(1);
 
+    // color schemes
+    TColor *pal = new TColor();
+    Int_t kblue = pal->GetColor(9,0,200);
+    Int_t korange  = pal->GetColor(101, 42,  0);
 
-    dimuonsGlobalInvMassVsPt[ih]->SetMarkerStyle(kFullCircle);
-    dimuonsGlobalInvMassVsPt[ih]->SetMarkerColor(4);
+
+    dimuonsGlobalInvMassVsPt[ih]->SetMarkerStyle(21);
+    dimuonsGlobalInvMassVsPt[ih]->SetMarkerColor(kblue);
+    dimuonsGlobalInvMassVsPt[ih]->SetLineColor(kblue);
     dimuonsGlobalInvMassVsPt[ih]->SetMarkerSize(0.8);
-    dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetTitle("Dimuon invariant mass (GeV/c^{2})");
-    dimuonsGlobalInvMassVsPt[ih]->GetYaxis()->SetTitle("counts");
+    dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetTitle("#mu^{+} #mu^{-} mass (GeV/c^{2})");
+    dimuonsGlobalInvMassVsPt[ih]->GetYaxis()->SetTitle("Uncorrected yield");
 
     dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetRangeUser(mlow,mhigh);
 
@@ -347,34 +374,33 @@ void upsMassFit(int isData = 1, int nff = 2, int yieldInt = 2, int iSpec = 1)
     dimuonsGlobalInvMassVsPt[ih]->DrawCopy("EPL");
 
     // same charge
-    dimuonsGlobalInvMassVsPtS[ih]->SetMarkerStyle(kFullCircle);
-    dimuonsGlobalInvMassVsPtS[ih]->SetMarkerColor(2);
+    dimuonsGlobalInvMassVsPtS[ih]->SetMarkerStyle(8);
+    dimuonsGlobalInvMassVsPtS[ih]->SetMarkerColor(46);
+    dimuonsGlobalInvMassVsPtS[ih]->SetLineColor(46);
+
     dimuonsGlobalInvMassVsPtS[ih]->SetMarkerSize(0.8);
     dimuonsGlobalInvMassVsPtS[ih]->DrawCopy("EPsame");
-
-    backfun_1->SetLineColor(kRed);
+	    
+    backfun_1->SetLineColor(46);
     backfun_1->SetLineWidth(2);
     if(isFit) backfun_1->Draw("same");
-
+	    
     lcat_1->Draw("same"); 
-
-
-    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], text, "");
-
+	    
+    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih]," Global-Global", " ");
+    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih]," |y| < 2.4 ", "");  
+    //    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], text, "");
+    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], " p_{T}^{#mu} > 4 GeV ",  "");
     legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih]," Opposite Charge ", "LP");
-    
     legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPtS[ih]," Same Charge ", "LP");
-    
 
     char label_1[512], label_2[512], label_3[512] ;
-    sprintf(label_1, "N=%1.3f #pm %1.3f (%s) ", yld_cat_1[ih], eyld_cat_1[ih], name_fit[nff]);
+    sprintf(label_1, "N=%1.2f #pm %1.2f ", yld_cat_1[ih], eyld_cat_1[ih]);
     if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_1, "");
-
-    sprintf(label_2, "Mass=%1.3f #pm %1.3f", RBWPOL->GetParameter(1), RBWPOL->GetParError(1));
+    sprintf(label_2, "m=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(1), RBWPOL->GetParError(1));
     if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_2, "");
-
-    sprintf(label_3, "Width=%1.3f #pm %1.3f", RBWPOL->GetParameter(2), RBWPOL->GetParError(2));
-    if(nff==3) sprintf(label_3, "Width=%1.3f #pm %1.3f", RBWPOL->GetParameter(3), RBWPOL->GetParError(3));
+    sprintf(label_3, "#sigma=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(2), RBWPOL->GetParError(2));
+    if(nff==3) sprintf(label_3, "#sigma=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(3), RBWPOL->GetParError(3));
     if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_3, "");
 
     legend_1[ih]->Draw("same");
