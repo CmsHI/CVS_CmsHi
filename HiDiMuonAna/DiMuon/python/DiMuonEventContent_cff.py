@@ -6,7 +6,7 @@ from RecoHI.HiMuonAlgos.RecoHiMuon_EventContent_cff import *
 
 
 hiCommon = cms.PSet(
-    outputCommands = cms.untracked.vstring('drop *',
+    outputCommands = cms.untracked.vstring(#'drop *',
                                            'keep *_TriggerResults_*_HLT',
                                            'keep L1GlobalTriggerReadoutRecord_gtDigis_*_*',
                                            'keep recoVertexs_hiSelectedVertex_*_*',
