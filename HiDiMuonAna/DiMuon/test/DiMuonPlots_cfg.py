@@ -8,11 +8,20 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.threshold = ''
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
+
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
+<<<<<<< DiMuonPlots_cfg.py
+#process.GlobalTag.globaltag = cms.string('GR_R_39X_V1::All')
+
+
+process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')
+
+=======
 process.GlobalTag.globaltag = 'GR10_P_V12::All'
 
+>>>>>>> 1.9
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
@@ -23,9 +32,18 @@ overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
         centralityVariable = cms.string("HFhits"),
+<<<<<<< DiMuonPlots_cfg.py
+          #nonDefaultGlauberModel = cms.string(""),
+=======
             nonDefaultGlauberModel = cms.string(""),
+>>>>>>> 1.9
             centralitySrc = cms.InputTag("hiCentrality")
             )
+
+
+
+
+
 
 
 ###############Vertex Filter#####################################################################
@@ -50,12 +68,25 @@ process.maxEvents = cms.untracked.PSet(
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.source = cms.Source("PoolSource",
+<<<<<<< DiMuonPlots_cfg.py
+                            noEventSort = cms.untracked.bool(True),
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+=======
                             #noEventSort = cms.untracked.bool(True),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
+>>>>>>> 1.9
                             fileNames = cms.untracked.vstring(
 
+<<<<<<< DiMuonPlots_cfg.py
+
+'rfio:/castor/cern.ch/cms/store/caf/user/silvest/HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim/Zskim_CorePhysics_GoodCollison_86_1_sVL.root'
+
+    #'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/PureZ0/PythiaZ0_DiMuSkim.root'
+    #'rfio:/castor/cern.ch/user/k/kumarv/cms391/HiData/CathV3_2/PromtRecoV3_DiMuonSkim_85.root'
+=======
 #"file:../../Configuration/test/Zskim_CorePhysics_GoodCollison.root"
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0Grid/Z0MC_DiMuonSkim_HLTDoubleMuOpen_9_1_tJV.root' 
+>>>>>>> 1.9
 
 
     )
@@ -64,12 +95,21 @@ process.source = cms.Source("PoolSource",
 
 
 ##This should be uncommented to include all files from any castor directory automatically
+<<<<<<< DiMuonPlots_cfg.py
+#import os,commands
+##def getCastorDirectoryList(path):
+#    cmd  = 'nsls %s/ ' % (path)
+#    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+#    return file
+#process.source.fileNames= getCastorDirectoryList("")
+=======
 import os,commands
 def getCastorDirectoryList(path):
     cmd  = 'nsls %s/ ' % (path)
     file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
     return file
 process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/caf/user/silvest/HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim")
+>>>>>>> 1.9
 
 
 
@@ -78,7 +118,11 @@ process.TFileService = cms.Service(
     "TFileService",
     #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
 
+<<<<<<< DiMuonPlots_cfg.py
+    fileName = cms.string("DiMuonPlots_PureZ0.root")
+=======
     fileName = cms.string("/tmp/silvest/HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim.root")
+>>>>>>> 1.9
     )
 
 
@@ -296,12 +340,15 @@ process.dimuonsTrkPlots = cms.EDAnalyzer(
 
 process.dimuons2DPlots = cms.EDAnalyzer(
     "DiMuon2DPlots",
+<<<<<<< DiMuonPlots_cfg.py
+    OutputFileName = cms.untracked.string("DiMuon2DPlots_PureZ0.root"),
+=======
     OutputFileName = cms.untracked.string("/tmp/silvest/DiMuon2DPlots_HICorePhysics_PromptReco-v3_RECO_ZmumuPaperSkim.root"),
+>>>>>>> 1.9
     ##for generator info put IsGenInfo as TRUE
-    ##IsGenInfo=cms.untracked.string("TRUE"),
+    #IsGenInfo=cms.untracked.string("TRUE"),
     IsGenInfo=cms.untracked.string("FALSE"),
-
-    #IsCuts = cms.untracked.bool(False)
+    IsPATInfo=cms.untracked.string("TRUE"),
     IsCuts = cms.untracked.bool(True)
 
     )
@@ -391,6 +438,8 @@ process.endPath = cms.EndPath(process.eventInfo)
 #process.schedule=cms.Schedule(process.dimuonsPlotsPath,process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSTAPlotsPath,process.dimuonsGlobalTrkPlotsPath,process.dimuonsSTAPlotsPath,process.dimuonsTrkPlotsPath,process.dimuons2DPlotsPath,process.dimuonsSameChargePlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuonsGlobalSTASameChargePlotsPath,process.dimuonsGlobalTrkSameChargePlotsPath,process.dimuonsSTASameChargePlotsPath,process.dimuonsTrkSameChargePlotsPath,process.endPath)
 
 process.schedule=cms.Schedule(process.dimuonsGlobalPlotsPath,process.dimuonsGlobalSameChargePlotsPath,process.dimuons2DPlotsPath,process.endPath)
+
+
 
 
 
