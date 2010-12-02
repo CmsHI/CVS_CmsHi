@@ -85,9 +85,9 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
   
   // Low mass range J/psi
   MassZ0 = 3.096; WidthZ0 = 0.040;
-  mass_low = 2.6; mass_high = 3.6;  // Fit ranges
+  mass_low = 2.6; mass_high = 3.7;  // Fit ranges
   mlow = 2.6; mhigh = 3.7;   // Draw ranges
-  nrebin = 1; isLog = 0; isFit = 0; // draw ranges
+  nrebin = 1; isLog = 0; isFit = 1; // draw ranges
   
     
   // Open the file 
@@ -174,7 +174,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
   if(nff == 2) TF1 *RBWPOL = new TF1("RBWPOL", GausPol2, 0, 200, 6);
   if(nff == 3) TF1 *RBWPOL = new TF1("RBWPOL", RBWGausPol2, 0, 200, 7);
 
-  //  RBWPOL->SetLineWidth(1);
+  RBWPOL->SetLineWidth(1.4);
 
 
   RBWPOL->SetParameter(1, MassZ0);
@@ -183,7 +183,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
   RBWPOL->SetParLimits(1, 0.9*MassZ0, 1.1*MassZ0);
   RBWPOL->SetParLimits(2, 0.1*WidthZ0, 5.0*WidthZ0);
   
-  if(nff == 1 || nff == 2) RBWPOL->FixParameter(5, 0);
+  //  if(nff == 1 || nff == 2) RBWPOL->FixParameter(5, 0);
 
   if(nff == 3) {
     RBWPOL->SetParameter(3, WidthZ0);
@@ -195,7 +195,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
   // Efficiency
   float Eff_cat_1[10], Eff_cat_2[10], Eff_cat_3[10]; 
   float errEff_cat_1[10], errEff_cat_2[10], errEff_cat_3[10]; 
-  char *Xname[] = {" ", "p_{T}^{J/#psi} (GeV/c)", "rapidity", "centrality"};
+  char *Xname[] = {" ", "p_{T}^{Dimuon} (GeV/c)", "rapidity", "centrality"};
 
   double yld_cat_1[10], yld_cat_2[10], yld_cat_3[10];
   double cyld_cat_1[10], cyld_cat_2[10], cyld_cat_3[10];
@@ -231,8 +231,9 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
 
   TLegend *legend_1[12];
   for(int i=0; i<12; i++) { 
-    if(isFit) legend_1[i] = new TLegend(.65, .52, .91, 0.93 );
-    if(!isFit) legend_1[i] = new TLegend(.65, .66, .91, 0.93 );
+    if(isFit) legend_1[i] = new TLegend(.63, .52, .91, 0.93 );
+    if(!isFit) legend_1[i] = new TLegend(.63, .66, .91, 0.93 );
+    //    legend_1[i] = new TLegend(.63, .66, .91, 0.93 );
 
     legend_1[i]->SetBorderSize(0);
     legend_1[i]->SetFillStyle(0);
@@ -340,7 +341,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
     dimuonsGlobalInvMassVsPtS[ih]->Rebin(nrebin);
 
     //Fit Function + Bkg Function
-    if(isFit)  dimuonsGlobalInvMassVsPt[ih]->Fit("RBWPOL","RQWW", "", mass_low, mass_high);
+    if(isFit)  dimuonsGlobalInvMassVsPt[ih]->Fit("RBWPOL","LEQ", "", mass_low, mass_high);
     double par[20];
     RBWPOL->GetParameters(par);
     sprintf(namePt_1B,"pt_1B_%d",ih);
@@ -404,8 +405,8 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
     dimuonsGlobalInvMassVsPt[ih]->SetMarkerColor(kblue);
     dimuonsGlobalInvMassVsPt[ih]->SetLineColor(kblue);
     dimuonsGlobalInvMassVsPt[ih]->SetMarkerSize(0.8);
-    dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetTitle("#mu^{+} #mu^{-} mass (GeV/c^{2})");
-    dimuonsGlobalInvMassVsPt[ih]->GetYaxis()->SetTitle("Uncorrected yield");
+    dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetTitle("Dimuon mass (GeV/c^{2})");
+    dimuonsGlobalInvMassVsPt[ih]->GetYaxis()->SetTitle("Events/( 25 MeV/c^{2})");
 
     dimuonsGlobalInvMassVsPt[ih]->GetXaxis()->SetRangeUser(mlow,mhigh);
 
@@ -423,7 +424,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
 
     //    RBWPOL->SetLineColor(kblue);
     backfun_1->SetLineColor(46);
-    backfun_1->SetLineWidth(2);
+    backfun_1->SetLineWidth(1.4);
     if(isFit) backfun_1->Draw("same");
 
     lcat_1->Draw("same"); 
@@ -435,14 +436,23 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
     legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih]," Opposite Charge ", "LP");
     legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPtS[ih]," Same Charge ", "LP");
     
-    char label_1[512], label_2[512], label_3[512] ;
-    sprintf(label_1, "N=%1.2f #pm %1.2f ", yld_cat_1[ih], eyld_cat_1[ih]);
-    if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_1, "");
+    char label_1[512], label_2[512], label_3[512], label_4[512];
+
+    //    isFit = 0;
+
+    if(isFit) sprintf(label_1, "N=%1.2f #pm %1.2f ", yld_cat_1[ih], eyld_cat_1[ih]);
+
+    if(!isFit) sprintf(label_1, "N_{J/#psi} #approx 200");
+
+    legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_1, "");
     sprintf(label_2, "m=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(1), RBWPOL->GetParError(1));
     if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_2, "");
     sprintf(label_3, "#sigma=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(2), RBWPOL->GetParError(2));
     if(nff==3) sprintf(label_3, "#sigma=%1.3f #pm %1.3f GeV/c^{2}", RBWPOL->GetParameter(3), RBWPOL->GetParError(3));
     if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_3, "");
+
+    sprintf(label_4, "#chi^{2}/ndf = %1.2f / %d ", chisq, ndf);
+    if(isFit) legend_1[ih]->AddEntry(dimuonsGlobalInvMassVsPt[ih], label_4, "");
 
     legend_1[ih]->Draw("same");
     
@@ -534,7 +544,7 @@ void jpsiMassFit(int isData = 1, int nff = 2, int yieldInt = 1, int iSpec = 1)
   Z0ptC_cat_1->SetMarkerColor(2);
   Z0ptC_cat_1->GetXaxis()->SetTitle(Xname[iSpec]);
   Z0ptC_cat_1->GetYaxis()->SetTitle("counts");
-  //  if(part == 2) Z0ptC_cat_1->Fit("EXPA","RQWW", "", 7, 16);
+  //  if(part == 2) Z0ptC_cat_1->Fit("EXPA","LEQ", "", 7, 16);
 
 
   new TCanvas;
