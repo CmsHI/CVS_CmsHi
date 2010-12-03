@@ -627,12 +627,18 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       pileUp[ijet] = 0;
    }
 
+
+   for(unsigned int iy = 0; iy < inputs_.size(); ++iy){
+
+     /*
    for (vector<fastjet::PseudoJet>::const_iterator input_object = fjInputs_.begin (),
 	   fjInputsEnd = fjInputs_.end();
 	input_object != fjInputsEnd; ++input_object) {
+     */
 
-      const reco::CandidatePtr & tower=inputs_[input_object->user_index()];
-      const CaloTower* ctc = dynamic_cast<const CaloTower*>(tower.get());
+     const reco::CandidatePtr & tower=inputs_[iy];
+     const CaloTower* ctc = dynamic_cast<const CaloTower*>(tower.get());
+
       int ieta = ctc->id().ieta();
       int iphi = ctc->id().iphi();
       CaloTowerDetId id(ieta,iphi);
