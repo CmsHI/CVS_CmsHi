@@ -364,9 +364,9 @@ void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int
      if(ieta == 0) continue;
        CaloTowerDetId id(ieta,1);
        const GlobalPoint& hitpoint = geo->getPosition(id);
-       cout<<"iETA "<<ieta<<endl;
+       //  cout<<"iETA "<<ieta<<endl;
        double eta = hitpoint.eta();
-       cout<<"eta "<<eta<<endl;
+       //  cout<<"eta "<<eta<<endl;
        math::PtEtaPhiMLorentzVector p4(1,eta,1.,1.);
        GlobalPoint pos(1,1,1);
        CaloTower c(id,1.,1.,1.,1,1, p4, pos,pos);      
@@ -548,7 +548,7 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
    // Write jets and constitutents. Will use fjJets_, inputs_                          
    // and fjClusterSeq_                                                                
 
-   cout<<"output running "<<endl;
+  //  cout<<"output running "<<endl;
 
    switch( jetTypeE ) {
    case JetType::CaloJet :
@@ -625,6 +625,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       had[ijet] = 0;
       em[ijet] = 0;
       pileUp[ijet] = 0;
+      mean[ijet]=0;
+      rms[ijet]=0;
    }
 
 
@@ -651,16 +653,16 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
 	 constituents_[ir].push_back(tower);
 
-	 double towet = tower->et();
 	 if(sumRecHits_){
 	    const GlobalPoint& pos=geo->getPosition(ctc->id());
 	    double energy = ctc->emEnergy() + ctc->hadEnergy();
 	    double ang = sin(pos.theta());
-	    towet = energy*ang;
+	    // towet = energy*ang;
 	    em[ir] += ctc->emEnergy()*ang;
             had[ir] += ctc->hadEnergy()*ang;
 	 }
 
+	 double towet = tower->et();
 	 double putow = subtractor_->getPileUpAtTower(tower);
 	 double etadd = towet - putow; 
 	 if(avoidNegative_ && etadd < 0.) etadd = 0;
@@ -684,7 +686,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	//         cout<<"Keep vector same"<<endl;
          (*directions)[ir] = true;
       }
-      cout<<"Lorentz"<<endl;
+      // cout<<"Lorentz"<<endl;
 
       math::PtEtaPhiMLorentzVector p(et[ir],etaRandom[ir],phiRandom[ir],0);
       fastjet::PseudoJet jet(p.px(),p.py(),p.pz(),p.energy());
