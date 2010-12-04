@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
-from HiDiMuonAna.DiMuon.patCandidatesForDiMuonSkim_cff import *
+from HeavyIonsAnalysis.DiMuon.patCandidatesForDiMuonSkim_cff import *
 
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
@@ -134,6 +134,18 @@ dimuonsSTAFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 
+dimuonsSTAinclusive = cms.EDFilter("CandViewRefSelector",
+                          src = cms.InputTag("dimuons"),
+                          cut = cms.string('(daughter(0).isStandAloneMuon = 1) & ( daughter(1).isStandAloneMuon = 1) ' ),
+                          filter = cms.bool(True)
+                          )
+                                                                                                        
+
+dimuonsSTAFilterInclusive = cms.EDFilter("CandViewCountFilter",
+                                src = cms.InputTag("dimuonsSTAinclusive"),
+                                minNumber = cms.uint32(1)
+                                )
+
 
 dimuonsTrk = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("dimuons"),
@@ -214,6 +226,20 @@ dimuonsSTASameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                           minNumber = cms.uint32(1)
                                           )
 
+
+
+                          
+dimuonsSTASameChargeInclusive = cms.EDFilter("CandViewRefSelector",
+                          src = cms.InputTag("dimuonsSameCharge"),
+                                    cut = cms.string('((daughter(0).isStandAloneMuon = 1) & (daughter(1).isStandAloneMuon = 1)) & (charge != 0) '),
+                          filter = cms.bool(True)
+                          )
+
+
+dimuonsSTASameChargeFilterInclusive = cms.EDFilter("CandViewCountFilter",
+                                          src = cms.InputTag("dimuonsSTASameChargeInclusive"),
+                                          minNumber = cms.uint32(1)
+                                          )
 
 
 

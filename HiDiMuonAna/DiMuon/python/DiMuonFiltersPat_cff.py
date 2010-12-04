@@ -135,6 +135,18 @@ patdimuonsSTAFilter = cms.EDFilter("CandViewCountFilter",
                                 )
 
 
+patdimuonsSTAinclusive = cms.EDFilter("CandViewRefSelector",
+                          src = cms.InputTag("patdimuons"),
+                          cut = cms.string('(daughter(0).isStandAloneMuon = 1) & (daughter(1).isStandAloneMuon = 1) ' ),
+                          filter = cms.bool(True)
+                          )
+                                                                                                        
+
+patdimuonsSTAFilterInclusive = cms.EDFilter("CandViewCountFilter",
+                                src = cms.InputTag("patdimuonsSTAinclusive"),
+                                minNumber = cms.uint32(1)
+                                )
+
 
 dimuonsTrk = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("patdimuons"),
@@ -202,8 +214,7 @@ patdimuonsGlobalSTASameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                       minNumber = cms.uint32(1)
                                       )
 
-                                                                                                                                                                                                                                                                                                                                  
-                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                     
 patdimuonsSTASameCharge = cms.EDFilter("CandViewRefSelector",
                           src = cms.InputTag("patdimuonsSameCharge"),
                                     cut = cms.string('((daughter(0).isGlobalMuon = 0 & daughter(0).isStandAloneMuon = 1) & (daughter(1).isGlobalMuon = 0 & daughter(1).isStandAloneMuon = 1)) & (charge != 0) '),
@@ -216,6 +227,19 @@ patdimuonsSTASameChargeFilter = cms.EDFilter("CandViewCountFilter",
                                           minNumber = cms.uint32(1)
                                           )
 
+
+                                                              
+patdimuonsSTASameChargeInclusive = cms.EDFilter("CandViewRefSelector",
+                          src = cms.InputTag("patdimuonsSameCharge"),
+                                    cut = cms.string('((daughter(0).isStandAloneMuon = 1) & (daughter(1).isStandAloneMuon = 1)) & (charge != 0) '),
+                          filter = cms.bool(True)
+                          )
+
+
+patdimuonsSTASameChargeFilterInclusive = cms.EDFilter("CandViewCountFilter",
+                                          src = cms.InputTag("patdimuonsSTASameChargeInclusive"),
+                                          minNumber = cms.uint32(1)
+                                          )
 
 
 
