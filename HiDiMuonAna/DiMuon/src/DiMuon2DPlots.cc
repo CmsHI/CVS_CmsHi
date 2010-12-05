@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuon2DPlots.cc,v 1.13 2010/11/30 12:32:31 pshukla Exp $
+// $Id: DiMuon2DPlots.cc,v 1.14 2010/12/05 13:30:24 pshukla Exp $
 //
 //
 // system include files
@@ -1387,7 +1387,7 @@ void DiMuon2DPlots::MuAnalyze(const edm::Event& iEvent, const edm::EventSetup& i
       TrackRef gTrack = aMuon->globalTrack();
       const reco::HitPattern& q = aMuon->globalTrack()->hitPattern();
       
-      TrackRef iTrack = aMuon->globalTrack();
+      TrackRef iTrack = aMuon->innerTrack();
       const reco::HitPattern& p = iTrack->hitPattern();
       
       if(aMuon->globalTrack()->chi2()/aMuon->globalTrack()->ndof() < 10.0 && q.numberOfValidMuonHits() > 0 
@@ -1493,7 +1493,7 @@ void DiMuon2DPlots::printGlobalMuon(const reco::Muon* aMuon) {
   //  if(!aMuon->isGlobalMuon())
   //    return;
 
-  TrackRef iTrack = aMuon->globalTrack();
+  TrackRef iTrack = aMuon->innerTrack();
   const reco::HitPattern& p = iTrack->hitPattern();
 
   TrackRef gTrack = aMuon->globalTrack();
@@ -1532,12 +1532,14 @@ void DiMuon2DPlots::FillHistoCuts(double mass, double pt, const reco::Muon* Muon
   //You can study here effect of cuts on dimuons
   //cout<<"fill cut histo"<<endl;
 
-  TrackRef iTrack1 = Muon1->globalTrack();
+  TrackRef iTrack1 = Muon1->innerTrack();
   const reco::HitPattern& p1 = iTrack1->hitPattern();
-  TrackRef gTrack1 = Muon1->globalTrack();
-  // const reco::HitPattern& q1 = gTrack1->hitPattern();
 
-  TrackRef iTrack2 = Muon2->globalTrack();
+
+  TrackRef gTrack1 = Muon1->globalTrack();
+  //const reco::HitPattern& q1 = gTrack1->hitPattern();
+
+  TrackRef iTrack2 = Muon2->innerTrack();
   const reco::HitPattern& p2 = iTrack2->hitPattern();
   
   TrackRef gTrack2 = Muon2->globalTrack();
@@ -1798,7 +1800,7 @@ bool DiMuon2DPlots::selPATMuon(const pat::Muon* aMuon) {
           p.numberOfValidHits() > 12 &&
 	  aMuon->globalTrack()->chi2()/aMuon->globalTrack()->ndof() < 10.0 &&
           q.numberOfValidMuonHits() > 0 &&
-          iTrack->ptError()/iTrack->pt() < 0.05 &&
+          //iTrack->ptError()/iTrack->pt() < 0.05 &&
           fabs(iTrack->dxy(RefVtx)) < 3.0 &&
           fabs(iTrack->dz(RefVtx)) < 15.0 &&
           iTrack->chi2()/iTrack->ndof() < 4.0
