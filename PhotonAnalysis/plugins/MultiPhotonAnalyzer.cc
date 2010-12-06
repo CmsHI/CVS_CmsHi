@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.14 2010/11/16 13:19:14 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.15 2010/11/23 16:09:13 kimy Exp $
  *
  */
 
@@ -120,22 +120,22 @@ MultiPhotonAnalyzer::~MultiPhotonAnalyzer(){
 void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
    
    if (doStoreGeneral_) 	storeGeneral(e, iSetup);
-	if (doStoreL1Trigger_) 	storeL1Trigger(e);
-	if (doStoreHLT_) 	storeHLT(e);
-	if (doStoreHF_)		storeHF(e);
-	analyzeMC(e,iSetup);
-	if (doStoreVertex_)	storeVertex(e);
-	if (doStoreMET_)	storeMET(e);
-	if (doStoreJets_)	storeJets(e);
-       
-	bool foundPhotons = selectStorePhotons(e,iSetup,"");
+   if (doStoreL1Trigger_) 	storeL1Trigger(e);
+   if (doStoreHLT_) 	storeHLT(e);
+   if (doStoreHF_)		storeHF(e);
+   analyzeMC(e,iSetup);
+   if (doStoreVertex_)	storeVertex(e);
+   if (doStoreMET_)	storeMET(e);
+   if (doStoreJets_)	storeJets(e);
+   
+   bool foundPhotons = selectStorePhotons(e,iSetup,"");
         cout <<"Found photons? "<<foundPhotons<<endl;
 	if (foundPhotons){
-		// Dump analysis ntuple 
-		// NOTE: dump ntuple only if at least one photon detected in a given acceptance
-		//       number of entries in ntuple does not correspond to the number of analyzed events
-		//       number of entries in certain histograms like "NumJets", "NumVtx" corresponds to the number of analyzed events  
-		_ntuple->DumpData();   
+	   // Dump analysis ntuple 
+	   // NOTE: dump ntuple only if at least one photon detected in a given acceptance
+	   //       number of entries in ntuple does not correspond to the number of analyzed events
+	   //       number of entries in certain histograms like "NumJets", "NumVtx" corresponds to the number of analyzed events  
+	   _ntuple->DumpData();   
 	}
 	
 }
@@ -472,7 +472,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
        
     }
     
-    cout << " Number of matched compl cones = " << nComp << endl;
+    //    cout << " Number of matched compl cones = " << nComp << endl;
     
     if ( nComp > 0 ) {
        compTrackIso(nphotonscounter) = sumCompTIso/(double)nComp;
