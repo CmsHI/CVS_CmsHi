@@ -6,11 +6,11 @@ process = cms.Process("PAT")
 ## Magnet, geometry, detector condition ( needed for patTuple )
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
-process.load('Configuration.StandardSequences.Reconstruction_cff')
+process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff')
 process.load("RecoHI.HiEgammaAlgos.HiEgamma_cff")
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-#process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 #process.Tracer = cms.Service("Tracer")
 # Centrality
 process.load("RecoHI.HiCentralityAlgos.HiCentrality_cfi")
@@ -23,7 +23,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
@@ -52,6 +52,7 @@ process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
 process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
+process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -87,7 +88,6 @@ import HLTrigger.HLTfilters.hltHighLevel_cfi
 # =============== Trigger selection ====================
 process.HIphotonTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
     HLTPaths = cms.vstring('HLT_HIPhoton20')
-    andOr = cms.bool(True)
     )
 
 # clean collision selection
