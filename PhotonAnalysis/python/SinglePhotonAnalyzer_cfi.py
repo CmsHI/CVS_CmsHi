@@ -1,8 +1,10 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.11 2010/11/24 11:20:25 yjlee Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.12 2010/11/24 15:30:47 kimy Exp $
 # 
 
 import FWCore.ParameterSet.Config as cms
+
+from RecoHI.HiEgammaAlgos.HiIsolationCommonParameters_cff import *
 
 singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       verbose                   = cms.untracked.bool(False),
@@ -15,7 +17,7 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       GenParticleProducer       = cms.InputTag("hiGenParticles"),
                                       GenEventScale             = cms.InputTag("hiSignal"),
                                       PhotonProducer            = cms.InputTag("selectedPatPhotons"),
-                                      TrackProducer             = cms.InputTag("highPurityTracks"),
+                                      TrackProducer             = isolationInputParameters.track,
                                       JetProducer               = cms.InputTag("icPu5patJets"),
                                       METProducer               = cms.InputTag("layer1METs"),
                                       VertexProducer            = cms.InputTag("offlinePrimaryVertices"),
