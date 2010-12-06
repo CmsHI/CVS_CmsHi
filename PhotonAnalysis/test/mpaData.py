@@ -54,6 +54,9 @@ process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
+# HiGoodTrack
+process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
+
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
 process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
@@ -97,7 +100,7 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 process.p = cms.Path(
     process.HIphotonTrig * 
     process.collisionEventSelection *
-    process.highPurityTracks *
+    process.hiGoodTracksSelection * 
     process.hiPhotonCleaningSequence *
     process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
