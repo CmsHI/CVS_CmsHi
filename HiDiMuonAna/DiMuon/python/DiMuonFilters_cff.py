@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 ######################################################
 # A set of filters for  Z To Mu Mu skimming:
 #
-from HeavyIonsAnalysis.DiMuon.patCandidatesForDiMuonSkim_cff import *
+from HiDiMuonAna.DiMuon.patCandidatesForDiMuonSkim_cff import *
 
 GenMuons = cms.EDFilter("CandViewRefSelector",
                         #src = cms.InputTag("genParticles"),
