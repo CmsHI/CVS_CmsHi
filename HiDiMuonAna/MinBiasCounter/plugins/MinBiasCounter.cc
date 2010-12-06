@@ -13,7 +13,7 @@
 //
 // Original Author:  Torsten Dahms,40 4-A32,+41227671635,
 //         Created:  Mon Dec  6 15:52:57 CET 2010
-// $Id$
+// $Id: MinBiasCounter.cc,v 1.1 2010/12/06 17:17:41 tdahms Exp $
 //
 //
 
@@ -110,18 +110,17 @@ MinBiasCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    int runNb = iEvent.id().run();
    int eventNb = iEvent.id().event();
    int lumiSection = iEvent.luminosityBlock();
-   std::cout << "HELLO" << std::endl;
-   /// Combined L1T (pair.first) and HLT (pair.second) prescales per HLT path
+
    int isPrescaleSet = hltConfig.prescaleSet(iEvent, iSetup);
    if (isPrescaleSet<0) {
      std::cerr << "Warning: Prescale for event " << eventNb << " in LS " <<  lumiSection << " of run " << runNb << " not set" << std::endl;
      std::cerr << "HLT prescaleSet = " << isPrescaleSet  << std::endl;
    }
-   std::cout << "HELLO2" << std::endl;
    
-   std::pair<int,int> prescales = hltConfig.prescaleValues(iEvent, iSetup, _iConfig.getParameter< std::string > ("triggerFilterName"));
+   /// Combined L1T (pair.first) and HLT (pair.second) prescales per HLT path
+   std::pair<int,int> prescales = hltConfig.prescaleValues(iEvent, iSetup, _iConfig.getParameter< std::string > ("triggerName"));
    // any one negative => error in retrieving this (L1T or HLT) prescale
-   std::cout << "L1 prescale = " << prescales.first << "\t HLT prescale = " << prescales.second << std::endl;
+
    if (prescales.first<0 || prescales.second<0) {
      std::cerr << "Warning: Prescale for event " << eventNb << " in LS " <<  lumiSection << " of run " << runNb << " not found" << std::endl;
      std::cerr << "L1 prescale = " << prescales.first << "\t HLT prescale = " << prescales.second  << std::endl;
@@ -129,10 +128,7 @@ MinBiasCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      return;
    }
 
-
-   prescale = prescales.first * prescales.second;
-
-   nScaledEvents += prescale;
+   nScaledEvents += prescales.first * prescales.second;
 
    return;
 }
@@ -155,7 +151,7 @@ MinBiasCounter::beginJob()
 void 
 MinBiasCounter::endJob() {
   std::cout << "Summary:" << std::endl;
-  std::cout << "HLT filter name: " << _iConfig.getParameter< std::string > ("triggerFilterName") << std::endl;
+  std::cout << "HLT filter name: " << _iConfig.getParameter< std::string > ("triggerName") << std::endl;
   std::cout << "Number of recorded events: " << nRawEvents << std::endl;
   std::cout << "Number of sampled events: " << nScaledEvents << std::endl;
 }
