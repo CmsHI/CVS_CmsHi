@@ -11,7 +11,7 @@
 //
 // Original Author:  Camelia Mironov,40 1-A32,+41227679747,
 //         Created:  Sun Feb  7 15:25:05 CET 2010
-// $Id: DimuonAnalyzer.cc,v 1.3 2010/10/12 16:38:14 miheejo Exp $
+// $Id: DimuonAnalyzer.cc,v 1.4 2010/11/06 10:31:54 miheejo Exp $
 //
 //
 
@@ -108,33 +108,28 @@ private:
   TH1D *phPt_recoDimuon;
   TH1D *phY_recoDimuon;
   TH1D *phM_recoDimuon;
-  TH2D *phPtPhi_recoTrack;
 
-  // By moon
   TH1D *nTMuTrk;
 
+  //single reco::muon information
   TH1D *phPt_globalMu;
   TH1D *phEta_globalMu;
   TH1D *phPhi_globalMu;
   TH1D *nGLB;
-
   TH1D *phPt_staMu;
   TH1D *phEta_staMu;
   TH1D *phPhi_staMu;
   TH1D *nSTA;
-
   TH1D *phPt_otherMu;
   TH1D *phEta_otherMu;
   TH1D *phPhi_otherMu;
   TH1D *nOTH;
   TH1D *eventCent;
   
-  TH2D *phPtEta_recoTrack;
   TH2D *nSTA_v_centBin;
   TH2D *nGLB_v_centBin;
 
   edm::InputTag     genparticletag;
-  edm::InputTag     muontracktag; 
   edm::InputTag     muontag; 
   edm::InputTag     tracktag;
   edm::InputTag     simtracktag;  //For the MC studies
@@ -170,7 +165,6 @@ private:
   Bool_t acceptDimuon(Float_t pt, Float_t m);
   Bool_t acceptMuon(Float_t pt, Float_t eta);
   Bool_t acceptTrack(Float_t pt, Float_t eta);
-
   void ShowDaughter(const Candidate* ptl);
   
   //for centrality
@@ -191,19 +185,19 @@ private:
   TNtuple                      *pnDimuRecoInfo;       //RECO dimuon
   TNtuple                      *pnSinglemuRecoInfo;    //RECO single muon
   TNtuple                      *pnSTAmuInfo;          //RECO STA muon
-  TNtuple                      *pnGLBmuInfo;          //RECO GLB muon
+  TNtuple                      *pnGLBmuInfo;          //RECO GLB muon with quality cut
   TNtuple                      *pnDimuSimInfo;        //SIM dimuon
   TNtuple                      *pnDimuGenInfo;        //GEN dimuon
   TNtuple                      *pnSinglemuGenInfo;    //GEN single muon
   TNtuple                      *pnDimuGeneratorInfo;  //GEN dimuon (bkg only)
   TNtuple                      *pnZ0hiSignalInfo;     //GEN Z0 (signal only)
+  TNtuple                      *pnSinglemuQualInfo;   //Quality cut single reco::track
 };
 
 
 //_________________________________________________________________
 DimuonAnalyzer::DimuonAnalyzer(const edm::ParameterSet& pset):
   genparticletag(pset.getParameter<edm::InputTag>("genParticle") ),
-  muontracktag(pset.getUntrackedParameter<edm::InputTag>("muonTracks") ),
   muontag(pset.getUntrackedParameter<edm::InputTag>("muons") ),
   tracktag(pset.getUntrackedParameter<edm::InputTag>("trackTracks") ),
   simtracktag(pset.getUntrackedParameter<edm::InputTag>("simtracks") ),
@@ -276,74 +270,57 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
     
     const reco::Vertex *vtx = &(vertices->at(0));
 
-    //------- reco::Track loop
-    edm::Handle<edm::View<reco::Track> >  trackCollection;
-    ev.getByLabel(tracktag, trackCollection); 
-    if( trackCollection.isValid() )
-    {
-      for(edm::View<reco::Track> ::size_type i=0; i < trackCollection.product()->size(); i++)
-      {
-        edm::RefToBase<reco::Track> recTrack(trackCollection, i);
-        if ( recTrack.isNull() ) continue;
-        if( !( acceptTrack(recTrack->pt(),recTrack->eta()) ) ) continue;
-        phPtEta_recoTrack->Fill(recTrack->pt(),recTrack->eta());
-        phPtPhi_recoTrack->Fill(recTrack->pt(),recTrack->phi());
-      }
-      ntracks = trackCollection.product()->size(); 
-    }
-    else
-    {
-      LogDebug("DimuonAnalyzer::analyze()") << "##### NO TrackCollection found for reconstructed tracks!";
-      ntracks = 0;
-    }
-   
-
-    //cbins_ = 0;
-    //if (!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
-    //edm::Handle<reco::Centrality> cent;
-    //ev.getByLabel(InputTag("hiCentrality"),cent);
-    //hf = c.EtHFhitSum();
-    //hf = cent->EtHFhitSum();
-    //bin = cbins_->getBin(hf);
-    //bmean = cbins_->bMeanOfBin(bin);
-    //bsigma = cbins_->bSigmaOfBin(bin);
-    //npartmean = cbins_->NpartMeanOfBin(bin);
-    //npartsigma = cbins_->NpartSigmaOfBin(bin);
-    //ncollmean = cbins_->NcollMeanOfBin(bin);
-    //ncollsigma = cbins_->NcollSigmaOfBin(bin);
-
     // ----- reco::Track->MUON loop
-    // for all reco muons info by Moon
     if (doSingMu)
     {
-     // edm::Handle<CandidateView> muons;
       edm::Handle<edm::View<reco::Muon> >muons;
       ev.getByLabel(muontag,muons);
       int nTMu = 0; int ngMu = 0; int nsMu = 0; int noMu = 0;
       for(unsigned int j = 0; j < muons->size(); ++j){
-       //   CandidateBaseRef muCandRef = muons->refAt(j);
           edm::RefToBase<reco::Muon> muCandRef(muons, j);
           if ( muCandRef.isNull() ) continue;
       
           nTMu++;   // count number of total muons
           if(muCandRef->isGlobalMuon()){
-              double pt = muCandRef->globalTrack()->pt();
-              double eta = muCandRef->globalTrack()->eta();
-              double phi = muCandRef->globalTrack()->phi();
-              double dxy = muCandRef->globalTrack()->dxy(vtx->position());
-              double sigmaDxy = sqrt(muCandRef->globalTrack()->dxyError()*muCandRef->globalTrack()->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
-              double dz = muCandRef->globalTrack()->dz(vtx->position());
-              double sigmaDz = sqrt(muCandRef->globalTrack()->dzError()*muCandRef->globalTrack()->dzError()+vtx->zError()*vtx->zError());
-              double nhits = muCandRef->globalTrack()->numberOfValidHits();
-	      //double nhits = muCandRef->globalTrack()->recHitsSize();
-              pnGLBmuInfo->Fill(pt,eta,phi,dxy,dz,sigmaDxy,sigmaDz,nhits); 
+              edm::RefToBase<reco::Track> glbMu = edm::RefToBase<reco::Track>(muCandRef->globalTrack());
+              edm::RefToBase<reco::Track> innerMu = edm::RefToBase<reco::Track>(muCandRef->innerTrack());
+              const reco::HitPattern &glbHp = glbMu.get()->hitPattern();
+              const reco::HitPattern &innerHp = innerMu.get()->hitPattern();
+
+              double qPt = glbMu->pt();
+              double qEta = glbMu->eta();
+              double qPhi = glbMu->phi();
+              double qNorChi2 = glbMu->normalizedChi2();
+              double qDxy = glbMu->dxy(vtx->position());
+              double qSigmaDxy = sqrt(glbMu->dxyError()*glbMu->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
+              double qDz = muCandRef->globalTrack()->dz(vtx->position());
+              double qSigmaDz = sqrt(glbMu->dzError()*glbMu->dzError()+vtx->zError()*vtx->zError());
+              double qSigmaPt = glbMu->ptError()/glbMu->pt();
+              double qNValidMuonHits = glbHp.numberOfValidHits();
+
+              double qSegMatch = muCandRef->numberOfMatches(reco::Muon::SegmentArbitration);
+              int qIsTMuon = muCandRef->isTrackerMuon();
+              double qInnerNorChi2 = -1;
+              double qNinnerValidHits = -1;
+              double qNpixLayerWMeas = -1;
+              double qPixelHits = -1; 
+          
+              if (qIsTMuon)
+              {
+                qInnerNorChi2 = innerMu->normalizedChi2();
+                qNinnerValidHits = innerMu->numberOfValidHits();
+                qNpixLayerWMeas = innerHp.pixelLayersWithMeasurement();
+                qPixelHits = innerHp.numberOfValidPixelHits();
+              }
+              
+              pnGLBmuInfo->Fill(qPt,qEta,qPhi,qNorChi2,qDxy,qSigmaDxy,qDz,qSigmaDz,qSigmaPt,qNValidMuonHits,qSegMatch,qIsTMuon,qInnerNorChi2,qNpixLayerWMeas,qPixelHits);
               ngMu++;
               
               // single muon cuts for histogram
-              if( !( acceptMuon(pt,eta)) ) continue;
-              phPt_globalMu->Fill(pt);
-              phEta_globalMu->Fill(eta);
-              phPhi_globalMu->Fill(phi);
+              if( !( acceptMuon(qPt,qEta)) ) continue;
+              phPt_globalMu->Fill(qPt);
+              phEta_globalMu->Fill(qEta);
+              phPhi_globalMu->Fill(qPhi);
           }
           if(muCandRef->isStandAloneMuon()){
               double pt = muCandRef->standAloneMuon()->pt();
@@ -381,24 +358,51 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
 
     //------ Get muon track's closest vertex distance (dxy, dz)
     edm::Handle<edm::View<reco::Track> >muonCollection;
-    ev.getByLabel(muontracktag,muonCollection);
+    ev.getByLabel(tracktag, muonCollection); 
     if(muonCollection.isValid() && muonCollection.product()->size() >1 )
     {
       nmuons = muonCollection.product()->size();
-      for(edm::View<reco::Track> ::size_type i=0; i < muonCollection.product()->size()-1; i++)
+      for(edm::View<reco::Track>::size_type i=0; i < muonCollection.product()->size(); i++)
       {
         edm::RefToBase<reco::Track> muTrack1(muonCollection, i);
         if ( muTrack1.isNull() ) continue;
 
         // single muon cuts
         if( !( acceptMuon(muTrack1->pt(),muTrack1->eta()) ) ) continue;
+    
+        // Quality cut for muons
+        const reco::HitPattern &hp1 = muTrack1.get()->hitPattern();
+        double qEta1 = muTrack1->eta();
+        double qPt1 = muTrack1->pt();
+        double qNValidHits1 = muTrack1->numberOfValidHits();
+        double qNValidMuonHits1 = hp1.numberOfValidMuonHits();
+        double qNpixLayerWMeas1 = hp1.pixelLayersWithMeasurement();
+        double qNorChi21 = muTrack1->normalizedChi2();
+        double qSigmaPt1 = muTrack1->ptError()/muTrack1->pt();
+        double qDxy1 = muTrack1->dxy(vtx->position());
+        double qDz1 = muTrack1->dz(vtx->position());
+        
+        pnSinglemuQualInfo->Fill(qEta1,qPt1,qNValidHits1,qNValidMuonHits1,qNpixLayerWMeas1,qNorChi21,qSigmaPt1,qDxy1,qDz1);
 
-        for(edm::View<reco::Track> ::size_type j=i+1; j < muonCollection.product()->size(); j++)
+        for(edm::View<reco::Track>::size_type j=i+1; j < muonCollection.product()->size(); j++)
         {
           edm::RefToBase<reco::Track> muTrack2(muonCollection, j);
           if ( muTrack2.isNull() ) continue;
+          
           // single muon cuts
           if( !( acceptMuon(muTrack2->pt(),muTrack2->eta()) ) ) continue;
+        
+          // Quality cut for muons
+          const reco::HitPattern &hp2 = muTrack2.get()->hitPattern();
+          double qEta2 = muTrack2->eta();
+          double qPt2 = muTrack2->pt();
+          double qNValidHits2 = muTrack2->numberOfValidHits();
+          double qNValidMuonHits2 = hp2.numberOfValidMuonHits();
+          double qNpixLayerWMeas2 = hp2.pixelLayersWithMeasurement();
+          double qNorChi22 = muTrack2->normalizedChi2();
+          double qSigmaPt2 = muTrack2->ptError()/muTrack2->pt();
+          double qDxy2 = muTrack2->dxy(vtx->position());
+          double qDz2 = muTrack2->dz(vtx->position());
           
           TLorentzVector kid1, kid2;
           double en1 = sqrt(muTrack1->p()*muTrack1->p()+m_mu*m_mu);
@@ -411,30 +415,37 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
           dimuon = kid1 + kid2;
           
           // Save single muon's closest vertex distance
-          double dxy1 = muTrack1->dxy(vtx->position());
           double sigmadxy1 = sqrt(muTrack1->dxyError()*muTrack1->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
-          double dz1 = muTrack1->dz(vtx->position());
           double sigmadz1 = sqrt(muTrack1->dzError()*muTrack1->dzError()+vtx->zError()*vtx->zError());
-          double dxy2 = muTrack2->dxy(vtx->position());
           double sigmadxy2 = sqrt(muTrack2->dxyError()*muTrack2->dxyError() + vtx->yError()*vtx->yError()+vtx->xError()*vtx->xError());
-          double dz2 = muTrack2->dz(vtx->position());
           double sigmadz2 = sqrt(muTrack2->dzError()*muTrack2->dzError()+vtx->zError()*vtx->zError());
 
           vector<float> dimupair;
           dimupair.push_back(muTrack1->charge());
-          dimupair.push_back(muTrack1->pt());
-          dimupair.push_back(muTrack1->eta());
-          dimupair.push_back(dxy1);
+          dimupair.push_back(qEta1);
+          dimupair.push_back(qPt1);
+          dimupair.push_back(qNValidHits1);
+          dimupair.push_back(qNValidMuonHits1);
+          dimupair.push_back(qNpixLayerWMeas1);
+          dimupair.push_back(qNorChi21);
+          dimupair.push_back(qSigmaPt1);
+          dimupair.push_back(qDxy1);
           dimupair.push_back(sigmadxy1);
-          dimupair.push_back(dz1);
+          dimupair.push_back(qDz1);
           dimupair.push_back(sigmadz1);
           dimupair.push_back(muTrack2->charge());
-          dimupair.push_back(muTrack2->pt());
-          dimupair.push_back(muTrack2->eta());
-          dimupair.push_back(dxy2);
+          dimupair.push_back(qEta2);
+          dimupair.push_back(qPt2);
+          dimupair.push_back(qNValidHits2);
+          dimupair.push_back(qNValidMuonHits2);
+          dimupair.push_back(qNpixLayerWMeas2);
+          dimupair.push_back(qNorChi22);
+          dimupair.push_back(qSigmaPt2);
+          dimupair.push_back(qDxy2);
           dimupair.push_back(sigmadxy2);
-          dimupair.push_back(dz2);
+          dimupair.push_back(qDz2);
           dimupair.push_back(sigmadz2);
+
           dimupair.push_back(dimuon.Pt());
           dimupair.push_back(dimuon.Rapidity());
           dimupair.push_back(dimuon.M());
@@ -812,17 +823,16 @@ void DimuonAnalyzer::beginJob()
   nSTA                = fs->make<TH1D>("nSTA",";number of sta Muons",10,-0.5,9.5);
   nOTH                = fs->make<TH1D>("nOTH",";number of other Muons",10,-0.5,9.5);
 
-  nSTA_v_centBin = fs->make<TH2D>("nSTA_v_cent",";number of sta Muons vs centrality",80,0,40,10,-0.5,9.5);
-  nGLB_v_centBin = fs->make<TH2D>("nGLB_v_cent",";number of glb Muons vs centrality",80,0,40,10,-0.5,9.5);
-  eventCent      = fs->make<TH1D>("eventCent",";event centrality",100,0,100);
-  phPtEta_recoTrack   = fs->make<TH2D>("phPtEta_recoTrack",";p_{T}[GeV/c];#eta",200,0,100,50,-2.5,2.5) ;    
-  phPtPhi_recoTrack   = fs->make<TH2D>("phPtPhi_recoTrack",";p_{T}[GeV/c];#phi",200,0,100,100,-4.,4.) ;    
+  nSTA_v_centBin      = fs->make<TH2D>("nSTA_v_cent",";number of sta Muons vs centrality",80,0,40,10,-0.5,9.5);
+  nGLB_v_centBin      = fs->make<TH2D>("nGLB_v_cent",";number of glb Muons vs centrality",80,0,40,10,-0.5,9.5);
+  eventCent           = fs->make<TH1D>("eventCent",";event centrality",100,0,100);
 
   pnEventInfo         = fs->make<TNtuple>("pnEventInfo","pnEventInfo","ntrk:nmu:bmean:bsigma:npartmean:npartsigma:ncollmean:ncollsigma:bin:hf:b_gen:nvtx:vx:vy:vz");
   pnSinglemuRecoInfo  = fs->make<TNtuple>("pnSinglemuRecoInfo","pnSinglemuRecoInfo","nTotMu:nGLB:nSTA:nTRK");
-  pnDimuRecoInfo      = fs->make<TNtuple>("pnDimuRecoInfo","pnDimuRecoInfo","mu1charge:mu1pt:mu1eta:dxy1:sigmaDxy1:dz1:sigmaDz1:mu2charge:mu2pt:mu2eta:dxy2:sigmaDxy2:dz2:sigmaDz2:dimupt:dimuy:dimum");
+  pnSinglemuQualInfo  = fs->make<TNtuple>("pnSinglemuQualInfo","pnSinglemuQualInfo","eta:pt:NValidHits:NValidMuonHits:NpixLayerWMeas:NorChi2:SigmaPt:Dxy:Dz");
+  pnDimuRecoInfo      = fs->make<TNtuple>("pnDimuRecoInfo","pnDimuRecoInfo","q1:Eta1:Pt1:NValidHits1:NValidMuonHits1:NpixLayerWMeas1:NorChi21:SigmaPt1:Dxy1:sigmaDxy1:Dz1:sigmaDz1:q2:Eta2:Pt2:NValidHits2:NValidMuonHits2:NpixLayerWMeas2:NorChi22:SigmaPt2:Dxy2:sigmaDxy2:Dz2:sigmaDz2:dimupt:dimuy:dimum");
   pnSTAmuInfo         = fs->make<TNtuple>("pnSTAmuInfo","pnSTAmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz:nhits");
-  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz:nhits");
+  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:norChi2:dxy:sigmaDxy:dz:sigmaDz:sigmaPt:nValidMuonHits:segMatch:isTMuon:innerNorChi2:npixLayerWMeas:pixelHits");
   pnDimuGenInfo       = fs->make<TNtuple>("pnDimuGenInfo","pnDimuGenInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:momid0_0:momstat0_0:momid0_1:momstat0_1:mu2pdgid:mu2pt:mu2pz:mu2eta:mu1phi:momid1_0:momstat1_0:momid1_1:momstat1_1:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
   pnSinglemuGenInfo   = fs->make<TNtuple>("pnSinglemuGenInfo","pnSinglemuGenInfo","pdgid:pt:pz:eta:phi");
   pnDimuGeneratorInfo = fs->make<TNtuple>("pnDimuGeneratorInfo","pnDimuGeneratorInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:mu2pdgid:mu2pt:mu2pz:mu2eta:mu2phi:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
@@ -889,6 +899,8 @@ void DimuonAnalyzer::ShowDaughter(const Candidate* ptl)
   
   for (int i=0; i<dnum; i++) ShowDaughter(ptl->daughter(i));
 }
+
+
 //_________________________________________________________________
 //define this as a plug-in
 DEFINE_FWK_MODULE(DimuonAnalyzer);
