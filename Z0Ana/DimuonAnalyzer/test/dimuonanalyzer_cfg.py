@@ -25,8 +25,8 @@ process.source = cms.Source("PoolSource",
     duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
    #                         fileNames = readFiles,
     fileNames = cms.untracked.vstring(
-"file:/tmp/jrobles/hiRecoDM_RECO.root")
-#'rfio:///castor/cern.ch/user/d/dmoon/cms390pre5/Hydjet_MinBias_2.76TeV_Z0_Flat_Emb_HLT_Reco/Hydjet_MinBias_2.76TeV_Z0_Flat_Emb_HLT_Reco_1.root' )
+#"file:/tmp/jrobles/hiRecoDM_RECO.root")
+                            )
                            )
 
 
@@ -39,8 +39,6 @@ process.HeavyIonGlobalParameters = cms.PSet(
 
 process.demo = cms.EDAnalyzer('DimuonAnalyzer',
                               genParticle  = cms.InputTag("genParticles"),
-                              muonTracks   = cms.untracked.InputTag("globalMuons"),
-#                              trackTracks  = cms.untracked.InputTag("hiGlobalPrimTracks"), # pp reco: "generalTracks"),   
                               trackTracks  = cms.untracked.InputTag("hiSelectedTracks"), # pp reco: "generalTracks"),   
                               muons        = cms.untracked.InputTag("muons"),
                               massMaxDimuon= cms.double(200),
@@ -55,8 +53,8 @@ process.demo = cms.EDAnalyzer('DimuonAnalyzer',
                               ptMinTrack   = cms.double(1.),
                               doRecoSingleMuon = cms.bool(True),  #To check reconstructed muons = True
                               doReco       = cms.bool(True),  #To check various reconstructed objects = True
-                              doMC         = cms.bool(True), #To read various generation level informations = True
-                              doSim        = cms.bool(True), #To do SimTrack checking = True
+                              doMC         = cms.bool(False), #To read various generation level informations = True
+                              doSim        = cms.bool(False), #To do SimTrack checking = True
                               doSignal     = cms.bool(False), #To see signal from generation = True
                               doZ0check    = cms.bool(False), #To see mother of gen muons and daugher of gen Z0 = True
                               genSignal    = cms.untracked.InputTag("hiSignal"),
@@ -67,7 +65,7 @@ process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
 process.TFileService = cms.Service("TFileService", 
                                    fileName =
-                                   cms.string("HydjetMBZ0Emb.root")
+                                   cms.string("test.root")
                                    )
 
 process.p = cms.Path(process.demo)
