@@ -299,7 +299,7 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
               double qNValidMuonHits = glbHp.numberOfValidHits();
 
               double qSegMatch = muCandRef->numberOfMatches(reco::Muon::SegmentArbitration);
-              int qIsTMuon = muCandRef->isTrackerMuon();
+              double qIsTMuon = muCandRef->isTrackerMuon();
               double qInnerNorChi2 = -1;
               double qNinnerValidHits = -1;
               double qNpixLayerWMeas = -1;
@@ -312,8 +312,26 @@ void DimuonAnalyzer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup
                 qNpixLayerWMeas = innerHp.pixelLayersWithMeasurement();
                 qPixelHits = innerHp.numberOfValidPixelHits();
               }
+              vector<float> pnglb;
+              pnglb.push_back(qPt);
+              pnglb.push_back(qEta);
+              pnglb.push_back(qPhi);
+              pnglb.push_back(qNorChi2);
+              pnglb.push_back(qDxy);
+              pnglb.push_back(qSigmaDxy);
+              pnglb.push_back(qDz);
+              pnglb.push_back(qSigmaDz);
+              pnglb.push_back(qSigmaPt);
+              pnglb.push_back(qNValidMuonHits);
+              pnglb.push_back(qSegMatch);
+              pnglb.push_back(qIsTMuon);
+              pnglb.push_back(qInnerNorChi2);
+              pnglb.push_back(qNinnerValidHits);
+              pnglb.push_back(qNpixLayerWMeas);
+              pnglb.push_back(qPixelHits);
+              pnGLBmuInfo->Fill(&pnglb[0]);
               
-              pnGLBmuInfo->Fill(qPt,qEta,qPhi,qNorChi2,qDxy,qSigmaDxy,qDz,qSigmaDz,qSigmaPt,qNValidMuonHits,qSegMatch,qIsTMuon,qInnerNorChi2,qNpixLayerWMeas,qPixelHits);
+//              pnGLBmuInfo->Fill(qPt,qEta,qPhi,qNorChi2,qDxy,qSigmaDxy,qDz,qSigmaDz,qSigmaPt,qNValidMuonHits,qSegMatch,qIsTMuon,qInnerNorChi2,qNinnerValidHits,qNpixLayerWMeas,qPixelHits);
               ngMu++;
               
               // single muon cuts for histogram
@@ -832,7 +850,7 @@ void DimuonAnalyzer::beginJob()
   pnSinglemuQualInfo  = fs->make<TNtuple>("pnSinglemuQualInfo","pnSinglemuQualInfo","eta:pt:NValidHits:NValidMuonHits:NpixLayerWMeas:NorChi2:SigmaPt:Dxy:Dz");
   pnDimuRecoInfo      = fs->make<TNtuple>("pnDimuRecoInfo","pnDimuRecoInfo","q1:Eta1:Pt1:NValidHits1:NValidMuonHits1:NpixLayerWMeas1:NorChi21:SigmaPt1:Dxy1:sigmaDxy1:Dz1:sigmaDz1:q2:Eta2:Pt2:NValidHits2:NValidMuonHits2:NpixLayerWMeas2:NorChi22:SigmaPt2:Dxy2:sigmaDxy2:Dz2:sigmaDz2:dimupt:dimuy:dimum");
   pnSTAmuInfo         = fs->make<TNtuple>("pnSTAmuInfo","pnSTAmuInfo","pt:eta:phi:dxy:dz:sigmaDxy:sigmaDz:nhits");
-  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:norChi2:dxy:sigmaDxy:dz:sigmaDz:sigmaPt:nValidMuonHits:segMatch:isTMuon:innerNorChi2:npixLayerWMeas:pixelHits");
+  pnGLBmuInfo         = fs->make<TNtuple>("pnGLBmuInfo","pnGLBmuInfo","pt:eta:phi:norChi2:dxy:sigmaDxy:dz:sigmaDz:sigmaPt:nValidMuonHits:segMatch:isTMuon:innerNorChi2:ninnerValidHits:npixLayerWMeas:pixelHits");
   pnDimuGenInfo       = fs->make<TNtuple>("pnDimuGenInfo","pnDimuGenInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:momid0_0:momstat0_0:momid0_1:momstat0_1:mu2pdgid:mu2pt:mu2pz:mu2eta:mu1phi:momid1_0:momstat1_0:momid1_1:momstat1_1:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
   pnSinglemuGenInfo   = fs->make<TNtuple>("pnSinglemuGenInfo","pnSinglemuGenInfo","pdgid:pt:pz:eta:phi");
   pnDimuGeneratorInfo = fs->make<TNtuple>("pnDimuGeneratorInfo","pnDimuGeneratorInfo","mu1pdgid:mu1pt:mu1pz:mu1eta:mu1phi:mu2pdgid:mu2pt:mu2pz:mu2eta:mu2phi:dimupt:dimupz:dimuy:dimueta:dimuphi:dimum");
