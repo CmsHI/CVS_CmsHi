@@ -6,6 +6,7 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 #include "TNtuple.h"
@@ -87,6 +88,9 @@ protected:
    TNtuple* ntPU;
    TNtuple* ntRandom;
 
+  edm::Handle<reco::Centrality> cent;
+  edm::Handle<pat::JetCollection> patjets;
+
   std::vector<TH2D*> hTowers;
   std::vector<TH2D*> hJetTowers;
 
@@ -144,7 +148,6 @@ protected:
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 #include "DataFormats/Candidate/interface/LeafCandidate.h"
 #include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/PatCandidates/interface/Jet.h"
 
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 
@@ -238,7 +241,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matched:rawJetEt");
+     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:rawJetEt");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -405,9 +408,6 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       iSetup.get<CaloGeometryRecord>().get(pGeo);
       geo = pGeo.product();
    }
-
-   edm::Handle<reco::Centrality> cent;
-   edm::Handle<pat::JetCollection> patjets;
 
    iEvent.getByLabel(PatJetSrc_,patjets);
    iEvent.getByLabel(centTag_,cent);
@@ -603,7 +603,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    vector<double> pileUp;
    vector<double> mean;
    vector<double> rms;
-   vector<double> rawJetEt;
+   vector<double> rawJetPt;
    vector<double> dr;
    vector<bool> matched;
 
@@ -620,7 +620,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    em.reserve(nFill_);
    had.reserve(nFill_);
    matched.reserve(nFill_);
-   rawJetEt.reserve(nFill_);
+   rawJetPt.reserve(nFill_);
    dr.reserve(nFill_);
 
    fjFakeJets_.reserve(nFill_);
@@ -643,8 +643,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       pileUp[ijet] = 0;
       mean[ijet]=0;
       rms[ijet]=0;
-      rawJetEt[ijet]=0;
-      dr[ijet]=0;
+      rawJetPt[ijet]=-99;
+      dr[ijet]=-99;
       matched[ijet]=false;
    }
 
@@ -683,14 +683,15 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 		 
 	 for(unsigned int j = 0 ; j < patjets->size(); ++j){
 	   const pat::Jet& jet = (*patjets)[j];
-	   rawJetEt[ir] = 0;
-	   rawJetEt[ir] = jet.correctedJet("raw").et();
-	   dr[ir] = reco::deltaR(etaRandom[ir],phiRandom[ir],jet.eta(),jet.phi());
-	   if(dr[ir] < cone_ ){
+	   rawJetPt[ir] = -99;
+	   double thisdr = reco::deltaR(etaRandom[ir],phiRandom[ir],jet.eta(),jet.phi());
+	   if(thisdr < cone_  && jet.correctedJet("raw").pt() > rawJetPt[ir]){
+	     dr[ir] = thisdr;
+	     rawJetPt[ir] = jet.correctedJet("raw").pt();
 	     matched[ir] = true;
 	   }
 	 }
-
+	 
 	 double towet = tower->et();
 	 double putow = subtractor_->getPileUpAtTower(tower);
 	 double etadd = towet - putow; 
@@ -706,7 +707,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
    for(int ir = 0; ir < nFill_; ++ir){
       double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
-      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],matched[ir],rawJetEt[ir]);
+      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir]);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
