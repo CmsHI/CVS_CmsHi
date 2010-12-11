@@ -82,7 +82,7 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   
   std::string fIsGenInfo;
   std::string fIsPATInfo;
-
+  TFile *In;
 
   TH1F *Centrality;
   TFile *fOutputFile ;
@@ -97,6 +97,12 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
 
   TH2F *diMuonsGlobalInvMassVsY;   
   TH2F *diMuonsGlobalInvMassVsCen;
+
+  TH2F *diMuonsGlobalInvMassVsPtW;
+  TH2F *diMuonsGlobalInvMassVsYW;
+  TH2F *diMuonsGlobalInvMassVsCenW;
+
+
 
   TH2F *diMuonsGlobalInvMassVsPtBRL;
   TH2F *diMuonsGlobalInvMassVsYBRL;
@@ -157,6 +163,11 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH2F *diMuonsGenInvMassVsY;
   TH2F *diMuonsGenInvMassVsCen;
   
+  TH2F *diMuonsGenInvMassVsPtW;
+  TH2F *diMuonsGenInvMassVsYW;
+  TH2F *diMuonsGenInvMassVsCenW;
+
+
   TH1F *diMuonsGenInvMass;
   TH1F *diMuonsGenPt;
   TH1F *diMuonsGenRapidity;
@@ -182,9 +193,6 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
 
  TH1F *gMuonPtError;
  TH1F *gMuonValidHits;
-
-
-
 
 
   TH1F *gMuonsPt;
@@ -219,6 +227,9 @@ class DiMuon2DPlots : public edm::EDAnalyzer {
   TH1F *hZVtx;
 
   int bin;
+  float W;
+  float NColl;
+
 
   // Cut histograms
 
@@ -305,6 +316,10 @@ private:
   virtual bool allCutGlobal(const reco::Muon* aMuon); 
   virtual bool allButOneCutGlobal(const reco::Muon* aMuon, int x);    
 
+  virtual float FindWeight(float pt, float y);
+  virtual float FindCenWeight(int Bin);
+
+
   math::XYZPoint RefVtx;
   float nPV;
   
@@ -372,22 +387,23 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    bin = cbins_->getBin(hf);
   
   
+   cout<<" bin in cent "<<bin<<endl; 
+
    //bin =10;
   
   //  cout << bin << endl;
 
   Centrality->Fill(bin);
                                                                                                                                 
-  int nbins = cbins_->getNbins();
+  //int nbins = cbins_->getNbins();
   
   //cout<<nbins<<endl;
-
   //int nbins =10;
  
 
   
-  int binsize = 100/nbins;
-  char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
+  //int binsize = 100/nbins;
+  //char* binName = Form("%d to % d",bin*binsize,(bin+1)*binsize);
 
   
   // Primary Vertex
@@ -414,6 +430,12 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Fill single muon histos
   MuAnalyze(iEvent, iSetup);
   
+  //cout<<"generator info " <<fIsGenInfo.c_str()<<endl;                                                                                          
+  if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}                                                                          
+
+  //if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenAnalyze(iEvent, iSetup);}    
+
+
 
   // get dimuonGlobal collection
   edm::Handle<edm::View<reco::Candidate> > diMuonsGlobalCand;
@@ -432,21 +454,21 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     diMuonsMass200->Fill(p.mass());
 
-    if (p.mass() > 50.0) {
-      cout << " *************** High Mass Event ******************* " << endl;
-      cout << " Zvtx = " <<  RefVtx.Z()  << endl;
-      cout<< "centrality bin : " << binName << " id : " << bin <<endl;
+    
+    //if (p.mass() > 50.0) {
+    // cout << " *************** High Mass Event ******************* " << endl;
+    //cout << " Zvtx = " <<  RefVtx.Z()  << endl;
+    //cout<< "centrality bin : " << binName << " id : " << bin <<endl;
 
-      cout << "   Mass,   pt,    eta,   rapidity " << endl;
+    //cout << "   Mass,   pt,    eta,   rapidity " << endl;
 
-      cout << p.mass()<< "    " << p.pt() << "    " << p.eta() << "     " << p.rapidity()  << endl << endl;
- 
+    //cout << p.mass()<< "    " << p.pt() << "    " << p.eta() << "     " << p.rapidity()  << endl << endl;
       //cout << " properties of Muon 1 " << endl;
       //printGlobalMuon(mu0);
       //cout << endl;
       //cout << " properties of Muon 2 " << endl;
       //printGlobalMuon(mu1);
-    }  
+    //}  
 
     // Fill cuts histos
     FillHistoCuts(p.mass(), p.pt(), mu0, mu1);
@@ -456,6 +478,15 @@ DiMuon2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       diMuonsGlobalInvMassVsPt->Fill(p.mass(),p.pt());
       diMuonsGlobalInvMassVsY->Fill(p.mass(),p.rapidity());
       diMuonsGlobalInvMassVsCen->Fill(p.mass(),bin);
+
+      cout<<" weight while rec level histo: "<<W<<endl;
+      cout<<" bin & NColl while rec level histo: "<<bin<<"   "<<NColl<<endl;
+     
+      diMuonsGlobalInvMassVsPtW->Fill(p.mass(),p.pt(),W*NColl);
+      diMuonsGlobalInvMassVsYW->Fill(p.mass(),p.rapidity(),W*NColl);
+      diMuonsGlobalInvMassVsCenW->Fill(p.mass(),bin,NColl*W);
+
+
       
       if(abs(p.rapidity())<0.8)diMuonsGlobalInvMassVsPtY08->Fill(p.mass(),p.pt());
       if(abs(p.rapidity())<1.0)diMuonsGlobalInvMassVsPtY10->Fill(p.mass(),p.pt());
@@ -564,13 +595,17 @@ cout<<" both muon trigger matches"<<endl;
   //PATDiMuAnalyze(iEvent,iSetup);
   if(!strcmp(fIsPATInfo.c_str(),"TRUE")){PATDiMuAnalyze(iEvent,iSetup);}
   if(!strcmp(fIsPATInfo.c_str(),"TRUE")){PATDiMuSameChargeAnalyze(iEvent,iSetup);}
-   /////////////////////////
+   
+
+
+  //Move upper near Mu analyze
+/////////////////////////
 
   //cout<<"generator info " <<fIsGenInfo.c_str()<<endl;
   
-  //if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
+  //  if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
     
-    if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenAnalyze(iEvent, iSetup);}
+  //if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenAnalyze(iEvent, iSetup);}
 
   cout << " --------------------------------------------------------- " << endl;  
 
@@ -697,11 +732,14 @@ void DiMuon2DPlots::SameChargePlots(const edm::Event& iEvent, const edm::EventSe
 
 
 
+
+
+
 void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   
   float mumass =0.105658389;
-  //cout<<"gen info: "<<endl;
+  cout<<"gen info: "<<endl;
   using namespace edm;
   using namespace std;
   
@@ -718,10 +756,22 @@ void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iS
   for(size_t i = 0; i < genParticles.size(); ++ i) {
     const reco::GenParticle& part = (*genPar)[i];
     const  Candidate *mom = part.mother();
-    if (part.numberOfMothers()!=1) continue;
+   
+    if(part.pdgId()==23 ){
+      diMuonsGenInvMass->Fill(part.mass());
+      diMuonsGenPt->Fill(part.pt());
+      diMuonsGenRapidity->Fill(part.rapidity());
+    }
+
+
+
+ if (part.numberOfMothers()!=1) continue;
     int momId = mom->pdgId();
     
-    if (abs(part.pdgId()) == 13 &&  momId == 23){
+
+
+
+   if (abs(part.pdgId()) == 13 &&  momId == 23){
       if(part.pdgId() == 13 ){
 	px1[nplus] = part.px();
 	py1[nplus] = part.py();
@@ -735,7 +785,6 @@ void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iS
 	pz2[nminus] = part.pz();
 	nminus++;
       }
-      
     }
   }
   
@@ -756,14 +805,28 @@ void DiMuon2DPlots::GenPlots(const edm::Event& iEvent, const edm::EventSetup& iS
       
       float GenDiMuonY=genvector3.Rapidity();
       float GenDiMuonMinv=genvector3.M();
-      //cout<<" gen Inv Mass "<<GenDiMuonMinv<<endl;
       float GenDiMuonPt =genvector3.Pt();
+      
       diMuonsGenInvMassVsPt->Fill(GenDiMuonMinv,GenDiMuonPt);
       diMuonsGenInvMassVsY->Fill(GenDiMuonMinv,GenDiMuonY);
       diMuonsGenInvMassVsCen->Fill(GenDiMuonMinv,bin);
-      diMuonsGenInvMass->Fill(GenDiMuonMinv);
-      diMuonsGenPt->Fill(GenDiMuonPt);
-      diMuonsGenRapidity->Fill(GenDiMuonY);
+     
+
+      W=FindWeight(GenDiMuonPt,GenDiMuonY);
+      NColl=FindCenWeight(bin);
+      
+      cout<<" weight while gen level histo: "<<W<<endl;
+      cout<<"Gen Level bin "<<bin<<" NColl "<<NColl<<endl;
+
+
+      diMuonsGenInvMassVsPtW->Fill(GenDiMuonMinv,GenDiMuonPt,W*NColl);
+      diMuonsGenInvMassVsYW->Fill(GenDiMuonMinv,GenDiMuonY,W*NColl);
+      diMuonsGenInvMassVsCenW->Fill(GenDiMuonMinv,bin,NColl*W);
+ 
+
+      // diMuonsGenInvMass->Fill(GenDiMuonMinv);
+      //diMuonsGenPt->Fill(GenDiMuonPt);
+      //diMuonsGenRapidity->Fill(GenDiMuonY);
     }
   }
 }
@@ -775,8 +838,8 @@ void DiMuon2DPlots::GenAnalyze(const edm::Event& iEvent, const edm::EventSetup& 
   edm::Handle<HepMCProduct> evt;
   
   //iEvent.getByLabel("source", evt);
-  //iEvent.getByLabel("generator", evt);
-  iEvent.getByLabel("hiSignal", evt);
+  iEvent.getByLabel("generator", evt);
+  //iEvent.getByLabel("hiSignal", evt);
   
   const HepMC::GenEvent *genEvent = evt->GetEvent();
   int gcnt = genEvent->particles_size();
@@ -802,8 +865,7 @@ void DiMuon2DPlots::GenAnalyze(const edm::Event& iEvent, const edm::EventSetup& 
     float pz = (*p)->momentum().pz();
     float ener=sqrt((px*px+py*py+pz*pz+muonmass*muonmass));
    
-    //if(eta < -2.4 || eta > 2.4) continue;                                                                                                                           
-
+    
     if(ID==-13) {
       pt1[imuplus] = pt;
       eta1[imuplus] = eta;
@@ -847,6 +909,21 @@ void DiMuon2DPlots::GenAnalyze(const edm::Event& iEvent, const edm::EventSetup& 
         diMuonsGenInvMass->Fill(minv);
         diMuonsGenPt->Fill(genupt);
         diMuonsGenRapidity->Fill(genuy);
+      
+	W=FindWeight(genupt,genuy);
+	NColl=FindCenWeight(bin);
+
+	cout<<" weight while gen level histo: "<<W<<endl;
+	cout<<"Gen Level bin "<<bin<<" NColl "<<NColl<<endl;
+
+
+	diMuonsGenInvMassVsPtW->Fill(minv,genupt,W*NColl);
+	diMuonsGenInvMassVsYW->Fill(minv,genuy,W*NColl);
+	diMuonsGenInvMassVsCenW->Fill(minv,bin,NColl*W);
+
+
+
+
       } // for j                                                                                                                                                        
     } // for i                                                                                                                                                          
   }// if
@@ -857,6 +934,10 @@ void DiMuon2DPlots::GenAnalyze(const edm::Event& iEvent, const edm::EventSetup& 
 void 
 DiMuon2DPlots::beginJob()
 {
+
+
+  In = new TFile("/afs/cern.ch/user/k/kumarv/scratch0/CMSSW_3_9_4/src/HiDiMuonAna/DiMuon/src/pythiaZ0_nofilter_CTEQ6L1_re6_totevt100000_2DAllDimu.root");
+
   edm::Service<TFileService> fs;
   fOutputFile   = new TFile( fOutputFileName.c_str(), "RECREATE" );
   cout<<"begin job"<<endl;
@@ -875,6 +956,14 @@ DiMuon2DPlots::beginJob()
   diMuonsGlobalInvMassVsY = new TH2F("diMuonsGlobalInvMassVsY","diMuonsGlobalInvMassVsY",8000, 0, 200,100, -5, 5);
   diMuonsGlobalInvMassVsCen = new TH2F("diMuonsGlobalInvMassVsCen","diMuonsGlobalInvMassVsCen", 8000, 0, 200,100,0,100);
   
+  //histo with weight
+  diMuonsGlobalInvMassVsPtW = new TH2F("diMuonsGlobalInvMassVsPtW", "diMuonsGlobalInvMassVsPtW", 8000, 0, 200, 200,0,100);
+  diMuonsGlobalInvMassVsPtW->Sumw2();
+  diMuonsGlobalInvMassVsYW = new TH2F("diMuonsGlobalInvMassVsYW","diMuonsGlobalInvMassVsYW",8000, 0, 200,100, -5, 5);
+  diMuonsGlobalInvMassVsYW->Sumw2();
+  diMuonsGlobalInvMassVsCenW = new TH2F("diMuonsGlobalInvMassVsCenW","diMuonsGlobalInvMassVsCenW", 8000, 0, 200,100,0,100);
+  diMuonsGlobalInvMassVsCenW->Sumw2();
+
   // Barrel 
 
   diMuonsGlobalInvMassVsPtBRL = new TH2F("diMuonsGlobalInvMassVsPtBRL", "diMuonsGlobalInvMassVsPtBRL", 8000, 0, 200, 200,0,100);
@@ -951,6 +1040,16 @@ DiMuon2DPlots::beginJob()
   diMuonsGenInvMassVsY = new TH2F("diMuonsGenInvMassVsY","diMuonsGenInvMassVsY",8000, 0, 200,100, -5, 5);
   diMuonsGenInvMassVsCen = new TH2F("diMuonsGenInvMassVsCen","diMuonsGenInvMassVsCen", 8000, 0, 200,100,0,100);
   
+
+
+  diMuonsGenInvMassVsPtW = new TH2F("diMuonsGenInvMassVsPtW", "diMuonsGenInvMassVsPtW", 8000, 0, 200, 200,0,100);
+  diMuonsGenInvMassVsPtW->Sumw2();
+  diMuonsGenInvMassVsYW = new TH2F("diMuonsGenInvMassVsYW","diMuonsGenInvMassVsYW",8000, 0, 200,100, -5, 5);
+  diMuonsGenInvMassVsYW->Sumw2();
+  diMuonsGenInvMassVsCenW = new TH2F("diMuonsGenInvMassVsCenW","diMuonsGenInvMassVsCenW", 8000, 0, 200,100,0,100);
+  diMuonsGenInvMassVsCenW->Sumw2();
+
+
   diMuonsGenInvMass = new TH1F("diMuonsGenInvMass","diMuonsGenInvMass", 8000,0,200);
   diMuonsGenPt = new TH1F("diMuonsGenPt","diMuonsGenPt", 100,0,20);
   diMuonsGenRapidity = new TH1F("diMuonsGenRapidity","diMuonsGenRapidity", 100,-10,10);
@@ -959,12 +1058,6 @@ DiMuon2DPlots::beginJob()
 
   diMuonsMass200 = new TH1F("diMuonsMass200", "diMuonsMass200", 8000, 0, 1000);
   diMuonsMass200Cut = new TH1F("diMuonsMass200Cut", "diMuonsMass200Cut", 8000, 0, 1000);
-
-  //gmuon valid hits 0 50
-  //gmuon chi2ndf track 0 50
-  //dxy -10 10
-  //dz -10 10
-  //pixel 0 10
 
 
   gMuonChi2ndf = new TH1F("gMuonChi2ndf", "gMuonChi2ndf", 100, 0, 100);
@@ -1098,6 +1191,9 @@ DiMuon2DPlots::beginJob()
 // ------------ method called once each job just after ending the event loop  ------------
 void DiMuon2DPlots::endJob() 
 {
+
+
+  In->Close();
   cout<<"End Job"<<endl;
   fOutputFile->cd();
   diMuonsGlobalInvMassVsPt->Write();
@@ -1110,6 +1206,11 @@ void DiMuon2DPlots::endJob()
 
   diMuonsGlobalInvMassVsY->Write();
   diMuonsGlobalInvMassVsCen->Write();
+
+  diMuonsGlobalInvMassVsPtW->Write();
+  diMuonsGlobalInvMassVsYW->Write();
+  diMuonsGlobalInvMassVsCenW->Write();
+
 
   diMuonsGlobalInvMassVsPtBRL->Write();
   diMuonsGlobalInvMassVsYBRL->Write();
@@ -1159,9 +1260,17 @@ void DiMuon2DPlots::endJob()
   diMuonsSTASameChargeInvMassVsPt->Write();
   diMuonsSTASameChargeInvMassVsY->Write();
   diMuonsSTASameChargeInvMassVsCen->Write();
+  
   diMuonsGenInvMassVsPt->Write();
   diMuonsGenInvMassVsY->Write();
   diMuonsGenInvMassVsCen->Write();
+  
+  diMuonsGenInvMassVsPtW->Write();
+  diMuonsGenInvMassVsYW->Write();
+  diMuonsGenInvMassVsCenW->Write();
+
+
+
   diMuonsGenInvMass->Write(); 
   diMuonsGenPt->Write(); 
   diMuonsGenRapidity->Write();
@@ -1282,21 +1391,21 @@ void DiMuon2DPlots::endJob()
 bool DiMuon2DPlots::selGlobalMuon(const reco::Muon* aMuon) {
   //Imp subrutine used to fill histogram which are used to fill histograms any cut to be studied should not be put here 
 
-  cout<<"sel global "<<endl;
+  //cout<<"sel global "<<endl;
 
   if(!fisCuts) return true;
   if(!(aMuon->isGlobalMuon() && aMuon->isTrackerMuon()))
   return false;
 
-  cout<<" befor asking iTrack"<<endl;
+  //cout<<" befor asking iTrack"<<endl;
   TrackRef iTrack = aMuon->innerTrack();
   
   if(!iTrack.isAvailable()) return false;
-  cout<<" after return false "<<endl;
+  //cout<<" after return false "<<endl;
 
   const reco::HitPattern& p = iTrack->hitPattern();
 
-  cout<<" after asking hit pattern "<<endl;
+  //cout<<" after asking hit pattern "<<endl;
   TrackRef gTrack = aMuon->globalTrack();
   const reco::HitPattern& q = aMuon->globalTrack()->hitPattern();
 
@@ -1906,6 +2015,55 @@ bool DiMuon2DPlots::selPATSTAMuon(const pat::Muon* aMuon) {
  	  );
 }
 	  
+
+float DiMuon2DPlots::FindWeight(float pt, float y)
+{
+
+  In->cd();  
+
+  
+
+  TH2D *WeightHisto = (TH2D*)In->Get("TwoDenDimuYPt");
+
+  float wptbin= WeightHisto->GetYaxis()->FindBin(pt);
+  float wrapbin= WeightHisto->GetXaxis()->FindBin(y);
+
+
+  float w=WeightHisto->GetBinContent(wrapbin,wptbin);
+  cout<<" weight in function "<<w<<endl;
+
+  return(w);
+
+ 
+}
+
+
+float DiMuon2DPlots::FindCenWeight(int Bin)
+{
+
+  //float NCollArray[50];
+
+  float NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
+		  522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
+		  112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
+		  13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851, };
+
+
+  cout<<" in funct ncoll & bin  " << Bin<<" are "<< NCollArray[Bin]<<endl;    
+
+  return(
+            
+	  NCollArray[Bin]
+
+
+	 );
+  //for(int i=0;i<40,i++){return(NCollArray[i])}
+
+
+}
+
+
+
 
 
 
