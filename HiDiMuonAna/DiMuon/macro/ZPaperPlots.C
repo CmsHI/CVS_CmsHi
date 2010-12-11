@@ -156,6 +156,7 @@ void ZPaperPlots()
   Ivan_graf->Draw("P");
   Ivaniso_graf->Draw("P");
 
+
   // Our data, in dN/dy
   Double_t x_rap[3] = {0.25,0.75,1.7};
   Double_t Z_rap[3] = {4.22E-07,
@@ -182,6 +183,8 @@ void ZPaperPlots()
   Zrap_graf->SetMarkerColor(ColUs);
   Zrap_graf->SetMarkerSize(SizUs);
   Zrap_graf->Draw("P");
+  C1->Print("ZY.pdf"); 
+
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C2 = new TCanvas("ZPT","Z versus transverse momentum",500,500);
@@ -239,6 +242,7 @@ void ZPaperPlots()
   Zpt_graf->SetMarkerColor(ColUs);
   Zpt_graf->SetMarkerSize(SizUs);
   Zpt_graf->Draw("P");
+  C2->Print("ZPT.pdf"); 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C3 = new TCanvas("ZColl","Z versus centrality",500,500);
@@ -250,7 +254,7 @@ void ZPaperPlots()
   for (i=0;i<3;i++) {
     Ivan_cent[i] *= 43264 ; Ivan_cent[i] /= 7.65E12 ; // Bring it back to dN/Ncoll
     Ivan_hard_cent[i] *= 43264 ; Ivan_hard_cent[i] /= 7.65E12 ;
-    cout << Ivan_cent[i] << " " << Ivan_hard_cent[i] << endl;;
+    cout << "Ivan cent" << Ivan_cent[i] << " " << Ivan_hard_cent[i] << endl;;
   }
 
   TGraphErrors *Ivan_cent_graf = new TGraphErrors(3,Npart,Ivan_cent,0,0); 
@@ -288,6 +292,7 @@ void ZPaperPlots()
   Zcent_graf->SetMarkerStyle(MarkUs);
   Zcent_graf->SetMarkerColor(ColUs);
   Zcent_graf->Draw("P");
+ C3->Print("ZNpart.pdf"); 
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C4 = new TCanvas("RaaZ","RaaZ",500,500);
@@ -300,6 +305,7 @@ void ZPaperPlots()
 
   for (int i=0;i<4;i++) {
     Z_RAA[i] = Z_cent[i] / 8.48E-10 ; Z_RAA_e[i] = Z_cent_e[i] / 8.48E-10  ;
+    cout << " Z_RAA[i]" <<  Z_RAA[i] <<endl;
   }
 
   Double_t Npart_30_50[1] ; Npart_30_50[0] = 108 ; 
@@ -312,7 +318,7 @@ void ZPaperPlots()
 
   TH1F *dummy = new TH1F("","",50,0.,400.);
   dummy->SetMinimum(0.);
-  dummy->SetMaximum(1.2);
+  dummy->SetMaximum(2);
   dummy->SetXTitle("N_{part}");
   dummy->SetYTitle("R_{AA} (Z)");
   dummy->Draw();
@@ -351,4 +357,5 @@ void ZPaperPlots()
   Legend->AddEntry(ZRAA_0_50_graf,"Same Z as MB -> 0-50 %","p"); 
   Legend->Draw();
 //
+  C4->Print("RaaZ.pdf"); 
 }
