@@ -683,7 +683,6 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 		 
 	 for(unsigned int j = 0 ; j < patjets->size(); ++j){
 	   const pat::Jet& jet = (*patjets)[j];
-	   rawJetPt[ir] = -99;
 	   double thisdr = reco::deltaR(etaRandom[ir],phiRandom[ir],jet.eta(),jet.phi());
 	   if(thisdr < cone_  && jet.correctedJet("raw").pt() > rawJetPt[ir]){
 	     dr[ir] = thisdr;
