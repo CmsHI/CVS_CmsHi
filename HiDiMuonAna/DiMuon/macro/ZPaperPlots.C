@@ -1,4 +1,4 @@
-void ZPlots()
+void ZPaperPlots()
 {
 // Matt's rootlogon
   gStyle->SetErrorX(0);
@@ -92,7 +92,7 @@ void ZPlots()
   Double_t CT10_sig[20] = {62.12,62.07,61.93,61.67,61.27,60.73,59.94,58.85,57.36,55.31,52.52,48.97,44.12,38.23,31.22,23.4,15.5,8.52,3.47,0.83};
   Double_t CT10_err[20] = {3.12,3.09,3.00,2.85,2.68,2.51,2.35,2.22,2.14,2.08,2.02,1.93,1.80,1.61,1.36,1.07,0.77,0.49,0.27,0.14};
 
-// Scale by AxA
+  // Scale by AxA
   for (int i=0;i<20;i++) {
     EPS09_sig[i] *= 43264 ;    EPS09_sig[i] /= 1E6 ;
     EPS09_err[i] *= 43264 ;    EPS09_err[i] /= 1E6 ;
@@ -156,6 +156,27 @@ void ZPlots()
   Ivan_graf->Draw("P");
   Ivaniso_graf->Draw("P");
 
+  // Our data, in dN/dy
+  Double_t x_rap[3] = {0.25,0.75,1.7};
+  Double_t Z_rap[3] = {3.64E-7,3.41E-7,1.67E-7};
+  Double_t Z_rap_e[3] = {1.01E-7,1.03E-7,4.63E-8};
+  Double_t e_rap[3] = {0.25,0.25,0.7};
+
+  // 
+  for (int i=0;i<3;i++) {
+    Z_rap[i] *= 7.650E6 ; Z_rap_e[i] *= 7.650E6 ;
+  }
+
+  int MarkUs = 21 ; 
+  int ColUs = kGreen +2;
+  int SizUs = 1.5 ;
+
+  TGraphErrors *Zrap_graf = new TGraphErrors(3,x_rap,Z_rap,e_rap,Z_rap_e); 
+  Zrap_graf->SetMarkerStyle(MarkUs);
+  Zrap_graf->SetMarkerColor(ColUs);
+  Zrap_graf->SetMarkerSize(SizUs);
+  Zrap_graf->Draw("P");
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C2 = new TCanvas("ZPT","Z versus transverse momentum",500,500);
   C2->SetLogy();
@@ -168,8 +189,8 @@ void ZPlots()
   Double_t Ivaniso_sig_pt[50] = {4895.43,35837.4,17001.6,10240.7,6935.48,5027.13,3843.81,2988.97,2431.89,1978.87,1639.69,1378.93,1164.79,1013.45,873.330,750.752,658.838,587.341,509.177,455.536,414.566,355.557,322.083,292.399,260.906,235.761,211.652,194.367,174.420,157.444,141.644,130.159,116.344,106.940,100.338,90.4371,80.8616,71.8951,67.1495,62.4207,56.8685,51.7799,46.6831,44.6836,39.9829,36.7482,34.2372,30.4509,28.8633,26.9952};
 
   for (int i=0;i<49;i++) {
-    Ivan_sig_pt[i] *= 43264 ;     Ivan_sig_pt[i] /= 1E9 ;
-    Ivaniso_sig_pt[i] *= 43264 ;    Ivaniso_sig_pt[i] /= 1E9 ;
+    Ivan_sig_pt[i] *= 43264 ; Ivan_sig_pt[i] /= 1E9 ; Ivan_sig_pt[i] /= 4.8 ;
+    Ivaniso_sig_pt[i] *= 43264 ; Ivaniso_sig_pt[i] /= 1E9 ; Ivaniso_sig_pt[i] /= 4.8 ; 
   }
 
   TGraphErrors *Ivan_pt_graf = new TGraphErrors(49,Ivan_pt,Ivan_sig_pt,0,0); 
@@ -181,14 +202,32 @@ void ZPlots()
   Ivaniso_pt_graf->SetMarkerColor(ColIso); 
 
   TH1F *dummy = new TH1F("","",50,0.,50.);
-  dummy->SetMinimum(0.01);
-  dummy->SetMaximum(5.);
+  dummy->SetMinimum(0.002);
+  dummy->SetMaximum(1.);
   dummy->SetXTitle("Transverse momentum (GeV/c)");
-  dummy->SetYTitle("d#sigma/dydp_{T} (#mub/GeV)");
+  dummy->SetYTitle("d^{2}#sigma/dydp_{T} (#mub/GeV)");
   dummy->Draw();
 
   Ivan_pt_graf->Draw("P");
   Ivaniso_pt_graf->Draw("P");
+
+  // Our data, in dN/dydpt
+  Double_t x_pt[3] = {3,9,31};
+  Double_t e_pt[3] = {3,3,19};
+  Double_t Z_pt[3] = {1.08E-8,1.78E-8,1.93E-9};
+  Double_t Z_pt_e[3] = {4.45E-9,4.59E-9,5.81E-10};
+
+  // 
+  for (int i=0;i<3;i++) {
+    Z_pt[i] *= 7.650E6 ; Z_pt_e[i] *= 7.650E6 ;
+  }
+
+  TGraphErrors *Zpt_graf = new TGraphErrors(3,x_pt,Z_pt,e_pt,Z_pt_e); 
+  Zpt_graf->SetMarkerStyle(MarkUs);
+  Zpt_graf->SetMarkerColor(ColUs);
+  Zpt_graf->SetMarkerSize(SizUs);
+  Zpt_graf->Draw("P");
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C3 = new TCanvas("ZColl","Z versus centrality",500,500);
 
@@ -220,4 +259,80 @@ void ZPlots()
   Ivan_cent_graf->Draw("P");
   Ivan_hard_cent_graf->Draw("P");
 
+  // Our data, in d2N/dydpt
+  Double_t x_part[4] = {356,224,46,113}; //Npart
+  Double_t e_cent[4] = {10,10,10,10};
+  Double_t Z_cent[4] = {7.74E-10,6.58E-10,5.37E-10,6.23E-10};
+  Double_t Z_cent_e[4] = {1.88E-10,1.76E-10,2.19E-10,1.02E-10};
+  Double_t ncoll[4] = {1486,744,93,363};
+
+  // 
+
+  TGraphErrors *Zcent_graf = new TGraphErrors(4,x_part,Z_cent,e_cent,Z_cent_e); 
+  Zcent_graf->SetMarkerStyle(MarkUs);
+  Zcent_graf->SetMarkerColor(ColUs);
+  Zcent_graf->Draw("P");
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  TCanvas *C4 = new TCanvas("RaaZ","RaaZ",500,500);
+
+  Double_t Z_RAA[3] ; Double_t Z_RAA_e[3] ;
+
+  Double_t Npart_MB[1] ; Npart_MB[0] = x_part[3] ;
+  Double_t Z_RAA_MB[1] ; Z_RAA_MB[0] = Z_cent[3] / 8.48E-10 ; 
+  Double_t Z_RAA_MB_e[1] ; Z_RAA_MB_e[0] = Z_cent_e[3] / 8.48E-10 ;  
+
+  for (int i=0;i<4;i++) {
+    Z_RAA[i] = Z_cent[i] / 8.48E-10 ; Z_RAA_e[i] = Z_cent_e[i] / 8.48E-10  ;
+  }
+
+  Double_t Npart_30_50[1] ; Npart_30_50[0] = 108 ; 
+  Double_t Z_RAA_30_50[1] ; Z_RAA_30_50[0] = Z_RAA[2] * 1.3 ; // ratio of bin width and Ncoll
+  Double_t Z_RAA_30_50_e[1] ; Z_RAA_30_50_e[0] = Z_RAA_e[2] * 1.3 ; // ratio of bin width and Ncoll
+
+  Double_t Npart_0_50[1] ; Npart_0_50[0] = 204 ; 
+  Double_t Z_RAA_0_50[1] ; Z_RAA_0_50[0] = Z_RAA_MB[0] * 1.045 ; // ratio of bin width and Ncoll, miss axe
+  Double_t Z_RAA_0_50_e[1] ; Z_RAA_0_50_e[0] = Z_RAA_MB_e[0] * 1.045 ; // ratio of bin width and Ncoll, miss axe
+
+  TH1F *dummy = new TH1F("","",50,0.,400.);
+  dummy->SetMinimum(0.);
+  dummy->SetMaximum(1.2);
+  dummy->SetXTitle("N_{part}");
+  dummy->SetYTitle("R_{AA} (Z)");
+  dummy->Draw();
+
+  TGraphErrors *ZRAA_graf = new TGraphErrors(3,x_part,Z_RAA,e_cent,Z_RAA_e); 
+  ZRAA_graf->SetMarkerStyle(MarkUs);
+  ZRAA_graf->SetMarkerColor(ColUs);
+  ZRAA_graf->SetMarkerSize(SizUs);
+  ZRAA_graf->Draw("P");
+
+  TGraphErrors *ZRAA_MB_graf = new TGraphErrors(1,Npart_MB,Z_RAA_MB,e_cent,Z_RAA_MB_e); 
+  ZRAA_MB_graf->SetMarkerStyle(20);
+  ZRAA_MB_graf->SetMarkerColor(4);
+  ZRAA_MB_graf->SetMarkerSize(SizUs);
+  ZRAA_MB_graf->Draw("P");
+
+  TGraphErrors *ZRAA_30_50_graf = new TGraphErrors(1,Npart_30_50,Z_RAA_30_50,e_cent,Z_RAA_30_50_e); 
+  ZRAA_30_50_graf->SetMarkerStyle(25);
+  ZRAA_30_50_graf->SetMarkerColor(ColUs);
+  ZRAA_30_50_graf->SetMarkerSize(SizUs);
+  ZRAA_30_50_graf->Draw("P");
+
+  TGraphErrors *ZRAA_0_50_graf = new TGraphErrors(1,Npart_0_50,Z_RAA_0_50,e_cent,Z_RAA_0_50_e); 
+  ZRAA_0_50_graf->SetMarkerStyle(24);
+  ZRAA_0_50_graf->SetMarkerColor(4);
+  ZRAA_0_50_graf->SetMarkerSize(SizUs);
+  ZRAA_0_50_graf->Draw("P");
+
+  TLegend* Legend = new TLegend(0.25,0.2,0.9,0.4);
+  Legend->SetFillColor(0);
+  Legend->SetTextSize(0.037);
+  Legend->SetBorderSize(0);
+  Legend->AddEntry(ZRAA_graf,"30-100, 10-30, 0-30 %","p"); 
+  Legend->AddEntry(ZRAA_MB_graf,"Minimum bias 0-100 %","p"); 
+  Legend->AddEntry(ZRAA_30_50_graf,"Same Z as 30-100 -> 30-50 %","p"); 
+  Legend->AddEntry(ZRAA_0_50_graf,"Same Z as MB -> 0-50 %","p"); 
+  Legend->Draw();
+//
 }
