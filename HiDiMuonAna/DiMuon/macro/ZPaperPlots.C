@@ -158,8 +158,14 @@ void ZPaperPlots()
 
   // Our data, in dN/dy
   Double_t x_rap[3] = {0.25,0.75,1.7};
-  Double_t Z_rap[3] = {3.64E-7,3.41E-7,1.67E-7};
-  Double_t Z_rap_e[3] = {1.01E-7,1.03E-7,4.63E-8};
+  Double_t Z_rap[3] = {4.22E-07,
+		       3.63E-07,
+		       2.60E-07
+		       };
+  Double_t Z_rap_e[3] = {1.17E-07,
+			 1.09E-07,
+			 7.22E-08
+  };
   Double_t e_rap[3] = {0.25,0.25,0.7};
 
   // 
@@ -214,8 +220,14 @@ void ZPaperPlots()
   // Our data, in dN/dydpt
   Double_t x_pt[3] = {3,9,31};
   Double_t e_pt[3] = {3,3,19};
-  Double_t Z_pt[3] = {1.08E-8,1.78E-8,1.93E-9};
-  Double_t Z_pt_e[3] = {4.45E-9,4.59E-9,5.81E-10};
+  Double_t Z_pt[3] = {1.53E-08,
+		      2.05E-08,
+2.52E-09
+};
+  Double_t Z_pt_e[3] = {4.85E-09,
+			5.29E-09,
+			7.61E-10
+};
 
   // 
   for (int i=0;i<3;i++) {
@@ -262,8 +274,12 @@ void ZPaperPlots()
   // Our data, in d2N/dydpt
   Double_t x_part[4] = {356,224,46,113}; //Npart
   Double_t e_cent[4] = {10,10,10,10};
-  Double_t Z_cent[4] = {7.74E-10,6.58E-10,5.37E-10,6.23E-10};
-  Double_t Z_cent_e[4] = {1.88E-10,1.76E-10,2.19E-10,1.02E-10};
+  Double_t Z_cent[4] = {1.06E-09,
+			8.07E-10,
+			7.46E-10,8.95E-10};
+  Double_t Z_cent_e[4] = {2.58E-10,
+			  2.16E-10,
+			  3.05E-10,1.47E-10};
   Double_t ncoll[4] = {1486,744,93,363};
 
   // 
