@@ -246,7 +246,7 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:rawJetEt");
+     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -628,6 +628,15 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    rawJetPt.reserve(nFill_);
    dr.reserve(nFill_);
 
+   double evtJetPt = 0;
+   
+   for(unsigned int j = 0 ; j < patjets->size(); ++j){
+      const pat::Jet& jet = (*patjets)[j];
+      if(jet.pt() > evtJetPt){
+	 evtJetPt = jet.pt();
+      }
+   }
+      
    fjFakeJets_.reserve(nFill_);
    constituents_.reserve(nFill_);
 
@@ -689,9 +698,9 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 	 for(unsigned int j = 0 ; j < patjets->size(); ++j){
 	   const pat::Jet& jet = (*patjets)[j];
 	   double thisdr = reco::deltaR(etaRandom[ir],phiRandom[ir],jet.eta(),jet.phi());
-	   if(thisdr < cone_  && jet.correctedJet("raw").pt() > rawJetPt[ir]){
+	   if(thisdr < cone_  && jet.pt() > rawJetPt[ir]){
 	     dr[ir] = thisdr;
-	     rawJetPt[ir] = jet.correctedJet("raw").pt();
+	     rawJetPt[ir] = jet.pt();
 	     matched[ir] = true;
 	   }
 	 }
@@ -711,7 +720,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
    for(int ir = 0; ir < nFill_; ++ir){
       double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
-      ntRandom->Fill(etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir]);
+      float entry[100] = {etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir],evtJetPt};
+      ntRandom->Fill(entry);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
