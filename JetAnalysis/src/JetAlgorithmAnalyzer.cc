@@ -62,6 +62,7 @@ protected:
    
    bool doAnalysis_;
 
+  bool backToBack_;
   bool doMC_;
    bool doRecoEvtPlane_;
    bool doRandomCones_;
@@ -184,7 +185,7 @@ CLHEP::HepRandomEngine* randomEngine;
 JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
    : MyVirtualJetProducer( iConfig ),
      phi0_(0),
-     nFill_(2),
+     nFill_(5),
      etaMax_(3),
      iev_(0),
      geo(0),
@@ -200,6 +201,10 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
    doAnalysis_  = iConfig.getUntrackedParameter<bool>("doAnalysis",true);
    doRandomCones_  = iConfig.getUntrackedParameter<bool>("doRandomCones",true);
+
+   backToBack_ = iConfig.getUntrackedParameter<bool>("doBackToBack",false);
+   if(backToBack_) nFill_ = 2;
+
    doFullCone_  = iConfig.getUntrackedParameter<bool>("doFullCone",true);
 
    doMC_  = iConfig.getUntrackedParameter<bool>("doMC",true);
@@ -636,7 +641,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    for(int ijet = 0; ijet < nFill_; ++ijet){
       phiRandom[ijet] = 2*pi*randomEngine->flat() - pi;
       etaRandom[ijet] = 2*etaMax_*randomEngine->flat() - etaMax_;
-      if(ijet>0) phiRandom[ijet] = - phiRandom[0];
+      if(ijet>0 && backToBack_) phiRandom[ijet] = - phiRandom[0];
       et[ijet] = 0;
       had[ijet] = 0;
       em[ijet] = 0;
