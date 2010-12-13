@@ -158,7 +158,15 @@ void ZPaperPlots()
 
 
   // Our data, in dN/dy
-  Double_t x_rap[3] = {0.25,0.75,1.7};
+  Double_t x_rap[3] = {0.25,0.77,1.38};
+  //7.65041421460216475e-01
+  //-7.75279206724072356e-01
+
+  //(-1.36801846815796035e+00)
+  //1.38989807134389642e+00
+
+
+  //  Double_t x_rap[3] = {0.25,0.75,1.7};
   Double_t Z_rap[3] = {4.22E-07,
 		       3.63E-07,
 		       2.60E-07
@@ -167,9 +175,8 @@ void ZPaperPlots()
 			 1.09E-07,
 			 7.22E-08
   };
-  Double_t e_rap[3] = {0.25,0.25,0.7};
+  Double_t e_rap[3] = {0.11,0.11,0.26};
 
-  // 
   for (int i=0;i<3;i++) {
     Z_rap[i] *= 7.650E6 ; Z_rap_e[i] *= 7.650E6 ;
   }
@@ -221,8 +228,11 @@ void ZPaperPlots()
   Ivaniso_pt_graf->Draw("P");
 
   // Our data, in dN/dydpt
-  Double_t x_pt[3] = {3,9,31};
-  Double_t e_pt[3] = {3,3,19};
+  //  Double_t x_pt[3] = {3,9,31};
+  Double_t x_pt[3] = {4.31,8.30,17.72};
+
+  Double_t e_pt[3] = {1.37,1.89,4.62};
+
   Double_t Z_pt[3] = {1.53E-08,
 		      2.05E-08,
 2.52E-09
