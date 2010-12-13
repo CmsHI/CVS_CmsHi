@@ -236,21 +236,15 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   TLegendEntry *entry=leg->AddEntry("NULL","Centrality","h");
-   entry->SetLineColor(1);
-   entry->SetLineStyle(1);
-   entry->SetLineWidth(1);
-   entry->SetMarkerColor(1);
-   entry->SetMarkerStyle(21);
-   entry->SetMarkerSize(1);
-   entry->SetTextFont(62);
-   entry=leg->AddEntry("hMB","HLT_MinBiasHForBSC_Core","l");
+   TLegendEntry *entry;
+
+   entry=leg->AddEntry("hMB","Minimum Bias Trigger","l");
    entry->SetLineColor(1);
    entry->SetLineWidth(1);
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("hJ","HLT_HiJet50U","l");
+   entry=leg->AddEntry("hJ","Jet Trigger","l");
 
    ci = TColor::GetColor("#ff0000");
    entry->SetLineColor(ci);
@@ -264,8 +258,12 @@ tex->SetNDC();
    tex->SetTextFont(63);
    tex->SetTextSize(16);
    tex->SetLineWidth(2);
-   tex->Draw();
+   //   tex->Draw();
    c1->Modified();
    c1->cd();
    c1->SetSelected(c1);
+
+   c1->Print("CentralityBinning_d20101129.gif");
+   c1->Print("CentralityBinning_d20101129.eps");
+
 }

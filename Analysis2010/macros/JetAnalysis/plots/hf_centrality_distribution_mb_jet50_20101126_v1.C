@@ -107,15 +107,23 @@
    hhfMB->GetZaxis()->SetLabelSize(0.045);
    hhfMB->GetZaxis()->SetTitleFont(42);
    hhfMB->Draw("");
-   TLine *line = new TLine(0.511,1e-05,0.511,0.2322967);
+
+   TLine *line = new TLine(13.09786621093750,1e-05, 13.09786621093750 , hhfMB->GetBinContent(hhfMB->FindBin(13.09786621093750)));
    line->SetLineStyle(7);
    line->Draw();
-   line = new TLine(35.397,1e-05,35.397,0.01549695);
+
+   line = new TLine(35.39267968750,1e-05,35.39267968750,0.01549695);
    line->SetLineStyle(7);
    line->Draw();
+
+   line = new TLine(53.47901953125,1e-05, 53.47901953125,hhfMB->GetBinContent(hhfMB->FindBin(53.47901953125)));
+   line->SetLineStyle(7);
+   line->Draw();
+
    line = new TLine(79.37,1e-05,79.37,0.007259929);
    line->SetLineStyle(7);
    line->Draw();
+
    
    TH1 *hhfJET = new TH1D("hhfJET","",70,0,160);
    hhfJET->SetBinContent(1,7.721288e-06);
@@ -177,7 +185,9 @@
    hhfJET->SetBinContent(57,2.573763e-06);
    hhfJET->SetEntries(4599);
    hhfJET->SetDirectory(0);
-   hhfJET->SetFillColor(2);
+
+   int ci = TColor::GetColor("#ff9999");
+   hhfJET->SetFillColor(ci);
    hhfJET->SetFillStyle(3544);
    hhfJET->SetLineColor(2);
    hhfJET->SetLineStyle(0);
@@ -210,21 +220,14 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   TLegendEntry *entry=leg->AddEntry("NULL","Centrality","h");
-   entry->SetLineColor(1);
-   entry->SetLineStyle(1);
-   entry->SetLineWidth(1);
-   entry->SetMarkerColor(1);
-   entry->SetMarkerStyle(21);
-   entry->SetMarkerSize(1);
-   entry->SetTextFont(62);
-   entry=leg->AddEntry("hhfMB","HLT_MinBiasHForBSC_Core","l");
+   TLegendEntry *entry;
+   entry=leg->AddEntry("hhfMB","Minimum Bias Trigger","l");
    entry->SetLineColor(1);
    entry->SetLineWidth(2);
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("hhfJET","HLT_HiJet50U","l");
+   entry=leg->AddEntry("hhfJET","Jet Trigger","l");
    entry->SetLineColor(2);
    entry->SetLineWidth(2);
    entry->SetMarkerColor(1);
@@ -232,7 +235,7 @@
    entry->SetMarkerSize(1);
    leg->Draw();
    
-   leg = new TLegend(0.1767677,0.3876344,0.4267677,0.5865591,NULL,"brNDC");
+   leg = new TLegend(0.199,0.3123,0.4497,0.510,NULL,"brNDC");
    leg->SetBorderSize(0);
    leg->SetTextFont(62);
    leg->SetLineColor(1);
@@ -240,7 +243,9 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   entry=leg->AddEntry("NULL","30%-90%","h");
+
+   leg->SetTextAngle(90);
+   entry=leg->AddEntry("NULL","50% - 100%","h");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -250,7 +255,9 @@
    entry->SetTextFont(62);
    leg->Draw();
    
-   leg = new TLegend(0.3611111,0.3876344,0.6111111,0.5865591,NULL,"brNDC");
+
+   leg = new TLegend(0.2777,0.3123,0.52777,0.51,NULL,"brNDC");
+   leg->SetTextAngle(90);
    leg->SetBorderSize(0);
    leg->SetTextFont(62);
    leg->SetLineColor(1);
@@ -258,7 +265,46 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   entry=leg->AddEntry("NULL","10%-30%","h");
+   entry=leg->AddEntry("NULL","30% - 50%","h");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(21);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(62);
+   leg->Draw();
+
+
+   leg = new TLegend(0.3838,0.3123,0.6338,0.51,NULL,"brNDC");
+   leg->SetTextAngle(90);
+   leg->SetBorderSize(0);
+   leg->SetTextFont(62);
+   leg->SetLineColor(1);
+   leg->SetLineStyle(1);
+   leg->SetLineWidth(1);
+   leg->SetFillColor(0);
+   leg->SetFillStyle(0);
+   entry=leg->AddEntry("NULL","20% - 30%","h");
+   entry->SetLineColor(1);
+   entry->SetLineStyle(1);
+   entry->SetLineWidth(1);
+   entry->SetMarkerColor(1);
+   entry->SetMarkerStyle(21);
+   entry->SetMarkerSize(1);
+   entry->SetTextFont(62);
+   leg->Draw();
+
+   leg = new TLegend(0.487,0.3123,0.73737,0.51,NULL,"brNDC");
+   leg->SetTextAngle(90);
+   leg->SetBorderSize(0);
+   leg->SetTextFont(62);
+   leg->SetLineColor(1);
+   leg->SetLineStyle(1);
+   leg->SetLineWidth(1);
+   leg->SetFillColor(0);
+   leg->SetFillStyle(0);
+   entry=leg->AddEntry("NULL","10% - 20%","h");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -268,7 +314,9 @@
    entry->SetTextFont(62);
    leg->Draw();
    
-   leg = new TLegend(0.5606061,0.3876344,0.8106061,0.5865591,NULL,"brNDC");
+
+   leg = new TLegend(0.636,0.3123,0.886,0.51,NULL,"brNDC");
+   leg->SetTextAngle(90);
    leg->SetBorderSize(0);
    leg->SetTextFont(62);
    leg->SetLineColor(1);
@@ -276,7 +324,7 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   entry=leg->AddEntry("NULL"," 0%-10%","h");
+   entry=leg->AddEntry("NULL"," 0% - 10%","h");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -290,8 +338,14 @@ tex->SetNDC();
    tex->SetTextFont(63);
    tex->SetTextSize(16);
    tex->SetLineWidth(2);
-   tex->Draw();
+   //   tex->Draw();
    c1_anaPixelHitJet50U->Modified();
    c1_anaPixelHitJet50U->cd();
    c1_anaPixelHitJet50U->SetSelected(c1_anaPixelHitJet50U);
+
+   c1_anaPixelHitJet50U->Print("hf_centrality_distribution_mb_jet50_20101126_v1.gif");
+   c1_anaPixelHitJet50U->Print("hf_centrality_distribution_mb_jet50_20101126_v1.eps");
+
+
+
 }
