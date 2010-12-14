@@ -13,7 +13,7 @@
 //
 // Original Author:  Torsten Dahms,40 4-A32,+41227671635,
 //         Created:  Mon Dec  6 15:52:57 CET 2010
-// $Id: MinBiasCounter.cc,v 1.2 2010/12/06 18:57:21 tdahms Exp $
+// $Id: MinBiasCounter.cc,v 1.3 2010/12/14 11:26:40 tdahms Exp $
 //
 //
 
@@ -66,7 +66,7 @@ class MinBiasCounter : public edm::EDAnalyzer {
   edm::InputTag _triggerresults;
   std::string _histfilename;
   const edm::ParameterSet _iConfig;
-  
+  std::vector<std::string> _hltString ;
   // centrality
   TH1F *hCent;
 
@@ -96,6 +96,9 @@ MinBiasCounter::MinBiasCounter(const edm::ParameterSet& iConfig) :
   nScaledEvents=0;
   isHLTChanged=false;
   centrality_ = 0;
+
+  _hltString  = iConfig.getParameter< std::vector<std::string > >("triggerName") ;
+  
 }
 
 
@@ -128,15 +131,24 @@ MinBiasCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      std::cerr << "HLT prescaleSet = " << isPrescaleSet  << std::endl;
    }
    
+   std::pair<int,int> prescales = std::make_pair(0,0) ;
    /// Combined L1T (pair.first) and HLT (pair.second) prescales per HLT path
-   std::pair<int,int> prescales = hltConfig.prescaleValues(iEvent, iSetup, _iConfig.getParameter< std::string > ("triggerName"));
-   // any one negative => error in retrieving this (L1T or HLT) prescale
+   for(unsigned int i=0;i < _hltString.size(); i++) {
+     
+     try { hltConfig.prescaleValues(iEvent, iSetup,_hltString.at(i));} 
+     catch (...) {continue;}
 
-   if (prescales.first<0 || prescales.second<0) {
-     std::cerr << "Warning: Prescale for event " << eventNb << " in LS " <<  lumiSection << " of run " << runNb << " not found" << std::endl;
-     std::cerr << "L1 prescale = " << prescales.first << "\t HLT prescale = " << prescales.second  << std::endl;
-
-     return;
+     /// Combined L1T (pair.first) and HLT (pair.second) prescales per HLT path
+     prescales = hltConfig.prescaleValues(iEvent, iSetup,_hltString.at(i));
+     // any one negative => error in retrieving this (L1T or HLT) prescale
+     
+     if (prescales.first<0 || prescales.second<0) {
+       std::cerr << "Warning: Prescale for event " << eventNb << " in LS " <<  lumiSection << " of run " << runNb << " not found" << std::endl;
+       std::cerr << "L1 prescale = " << prescales.first << "\t HLT prescale = " << prescales.second  << std::endl;
+       
+       return;
+     }
+     break;
    }
 
    nScaledEvents += prescales.first * prescales.second;
@@ -169,7 +181,9 @@ MinBiasCounter::beginJob()
 void 
 MinBiasCounter::endJob() {
   std::cout << "Summary:" << std::endl;
-  std::cout << "HLT filter name: " << _iConfig.getParameter< std::string > ("triggerName") << std::endl;
+ for(unsigned int i=0;i < _hltString.size(); i++) {
+   std::cout << "HLT filter name: " <<_hltString.at(i) << std::endl;
+ }
   std::cout << "Number of recorded events: " << nRawEvents << std::endl;
   std::cout << "Number of sampled events: " << nScaledEvents << std::endl;
 
