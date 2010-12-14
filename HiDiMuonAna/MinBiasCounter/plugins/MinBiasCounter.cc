@@ -13,7 +13,7 @@
 //
 // Original Author:  Torsten Dahms,40 4-A32,+41227671635,
 //         Created:  Mon Dec  6 15:52:57 CET 2010
-// $Id: MinBiasCounter.cc,v 1.1 2010/12/06 17:17:41 tdahms Exp $
+// $Id: MinBiasCounter.cc,v 1.2 2010/12/06 18:57:21 tdahms Exp $
 //
 //
 
@@ -22,6 +22,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <TH1F.h>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -35,6 +36,8 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "FWCore/Framework/interface/Run.h"
+
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 //
 // class declaration
@@ -61,8 +64,14 @@ class MinBiasCounter : public edm::EDAnalyzer {
   bool isHLTChanged;
 
   edm::InputTag _triggerresults;
+  std::string _histfilename;
   const edm::ParameterSet _iConfig;
   
+  // centrality
+  TH1F *hCent;
+
+  CentralityProvider* centrality_;
+  int centBin;
 };
 
 //
@@ -78,6 +87,7 @@ class MinBiasCounter : public edm::EDAnalyzer {
 //
 MinBiasCounter::MinBiasCounter(const edm::ParameterSet& iConfig) :
   _triggerresults(iConfig.getParameter<edm::InputTag>("TriggerResultsLabel")),
+  _histfilename(iConfig.getParameter<std::string>("histFileName")),
   _iConfig(iConfig)
 {
    //now do what ever initialization is needed
@@ -85,6 +95,7 @@ MinBiasCounter::MinBiasCounter(const edm::ParameterSet& iConfig) :
   prescale=0;
   nScaledEvents=0;
   isHLTChanged=false;
+  centrality_ = 0;
 }
 
 
@@ -129,6 +140,11 @@ MinBiasCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    nScaledEvents += prescales.first * prescales.second;
+   
+   if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+   centrality_->newEvent(iEvent,iSetup); // make sure you do this first in every event
+   centBin = centrality_->getBin();
+   hCent->Fill(centBin);
 
    return;
 }
@@ -145,6 +161,8 @@ MinBiasCounter::beginRun(const edm::Run& run, const edm::EventSetup& iSetup)
 void 
 MinBiasCounter::beginJob()
 {
+  hCent = new TH1F("hCent","hCent;centrality bin;Number of Events",40,0,40);
+  hCent->Sumw2();
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -154,6 +172,10 @@ MinBiasCounter::endJob() {
   std::cout << "HLT filter name: " << _iConfig.getParameter< std::string > ("triggerName") << std::endl;
   std::cout << "Number of recorded events: " << nRawEvents << std::endl;
   std::cout << "Number of sampled events: " << nScaledEvents << std::endl;
+
+  TFile *outf = new TFile(_histfilename.c_str(), "RECREATE");
+  hCent->Write();
+  outf->Close();
 }
 
 //define this as a plug-in

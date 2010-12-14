@@ -2,5 +2,6 @@
    <use name="FWCore/Framework">
    <use name="FWCore/ParameterSet">
    <use name="HLTrigger/HLTcore">
+   <use name=DataFormats/HeavyIonEvent>
    <flags EDM_PLUGIN=1>
 </library>

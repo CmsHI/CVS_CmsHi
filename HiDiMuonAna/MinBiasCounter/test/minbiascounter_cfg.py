@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("Demo")
+process = cms.Process("MBCounter")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.destinations = ['cout', 'cerr']
@@ -12,6 +12,16 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'GR10_P_V12::All'
+
+from CmsHi.Analysis2010.CommonFunctions_cff import *
+overrideCentrality(process)
+
+process.HeavyIonGlobalParameters = cms.PSet(
+    centralityVariable = cms.string("HFhits"),
+    nonDefaultGlauberModel = cms.string(""),
+    centralitySrc = cms.InputTag("hiCentrality")
+    )
+
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -26,11 +36,11 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC")
+process.mbcounter = cms.EDAnalyzer('MinBiasCounter',
+                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC"),
+                              histFileName = cms.string("MinBiasCentrality_Histo.root")
                               #hltPreHIMinBiasBSCCore ||hltPreHIMinBiasHF_Core
 )
 
 
-process.p = cms.Path(process.demo)
+process.p = cms.Path(process.mbcounter)
