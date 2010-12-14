@@ -22,25 +22,43 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'GR10_P_V12::All'
 
 
+from CmsHi.Analysis2010.CommonFunctions_cff import *
+overrideCentrality(process)
+
+
+process.HeavyIonGlobalParameters = cms.PSet(
+    centralityVariable = cms.string("HFhits"),
+    nonDefaultGlauberModel = cms.string(""), 
+    centralitySrc = cms.InputTag("hiCentrality")
+    )
+
+
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('centralSkimsHI nevts:1'),
     name = cms.untracked.string('PyReleaseValidation')
 )
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-'rfio:/castor/cern.ch/user/e/edwenger/skims/mergeZMM_run151058.root'
+#'rfio:/castor/cern.ch/user/e/edwenger/skims/mergeZMMall.root'
 ),
                             )
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
     )
+import os,commands
+def getCastorDirectoryList(path):
+    cmd  = 'nsls %s/ ' % (path)
+    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+    return file
+process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v2/000/150/590/")
+
 
 #process.Timing = cms.Service("Timing")
 
@@ -103,38 +121,20 @@ process.muonFilter = cms.EDFilter("MuonCountFilter",
     src = cms.InputTag("muonSelector"),
     minNumber = cms.uint32(2)
     )
-process.dimuonMassCut = cms.EDProducer("CandViewShallowCloneCombiner",
-    checkCharge = cms.bool(False),
-    cut = cms.string(' 30 < mass '),
-    decay = cms.string("muonSelector@+ muonSelector@-")
-    )
-
-process.dimuonMassCutFilter = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("dimuonMassCut"),
-    minNumber = cms.uint32(1)
-    )
 
 
 
-process.MinBiasCounterHIMinBiasHfOrBSC = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC_Core")
-)
+
 process.MinBiasCounterHIMinBiasHf = cms.EDAnalyzer('MinBiasCounter',
                               TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasHf_Core")
+                              triggerName = cms.vstring("HLT_HIMinBiasHf_Core","HLT_HIMinBiasBSC_Core"),
+                             histFileName = cms.string("MinBiasCentrality_Histo.root")
 )
-process.MinBiasCounterHIMinBiasBSC = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasBSC_Core")
-)
-process.MinBiasCounterHIL2DoubleMu3 = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIL2DoubleMu3_Core")
-)
+
 process.MinBiasCounterHIL1DoubleMuOpen = cms.EDAnalyzer('MinBiasCounter',
                               TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIL1DoubleMuOpen_Core")
+                              triggerName = cms.vstring("HLT_HIL1DoubleMuOpen_Core"),
+                              histFileName = cms.string("DoubleMuCentrality_Histo.root")
 )
 
 process.minbiasPath = cms.Path(
@@ -153,9 +153,7 @@ process.zMMSkimPath = cms.Path(
     process.bscOrHfCoinc*
     process.collisionEventSelection*
     process.muonSelector *
-    process.muonFilter*
-    process.dimuonMassCut *
-    process.dimuonMassCutFilter
+    process.muonFilter
     )
 
 #================== PAT sequences

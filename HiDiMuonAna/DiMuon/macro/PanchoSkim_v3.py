@@ -22,6 +22,18 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.globaltag = 'GR10_P_V12::All'
 
 
+from CmsHi.Analysis2010.CommonFunctions_cff import *
+overrideCentrality(process)
+
+
+process.HeavyIonGlobalParameters = cms.PSet(
+    centralityVariable = cms.string("HFhits"),
+    nonDefaultGlauberModel = cms.string(""), 
+    centralitySrc = cms.InputTag("hiCentrality")
+    )
+
+
+
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('centralSkimsHI nevts:1'),
@@ -103,45 +115,25 @@ process.muonFilter = cms.EDFilter("MuonCountFilter",
     src = cms.InputTag("muonSelector"),
     minNumber = cms.uint32(2)
     )
-process.dimuonMassCut = cms.EDProducer("CandViewShallowCloneCombiner",
-    checkCharge = cms.bool(False),
-    cut = cms.string(' 30 < mass '),
-    decay = cms.string("muonSelector@+ muonSelector@-")
-    )
 
-process.dimuonMassCutFilter = cms.EDFilter("CandViewCountFilter",
-    src = cms.InputTag("dimuonMassCut"),
-    minNumber = cms.uint32(1)
-    )
+
 
 
 
 process.MinBiasCounterHIMinBiasHfOrBSC = cms.EDAnalyzer('MinBiasCounter',
                               TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC_Core")
-)
-process.MinBiasCounterHIMinBiasHf = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasHf_Core")
-)
-process.MinBiasCounterHIMinBiasBSC = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIMinBiasBSC_Core")
+                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC_Core"),
+                             histFileName = cms.string("MinBiasCentrality_Histo.root")
 )
 process.MinBiasCounterHIL2DoubleMu3 = cms.EDAnalyzer('MinBiasCounter',
                               TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIL2DoubleMu3_Core")
-)
-process.MinBiasCounterHIL1DoubleMuOpen = cms.EDAnalyzer('MinBiasCounter',
-                              TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
-                              triggerName = cms.string("HLT_HIL1DoubleMuOpen_Core")
+                              triggerName = cms.string("HLT_HIL2DoubleMu3_Core"),
+                              histFileName = cms.string("DoubleMuCentrality_Histo.root")
 )
 
 process.minbiasPath = cms.Path(
     process.hltMinBiasHFOrBSC*
-   process.MinBiasCounterHIMinBiasHfOrBSC*
-   # process.MinBiasCounterHIMinBiasHf*
-  #  process.MinBiasCounterHIMinBiasBSC*
+    process.MinBiasCounterHIMinBiasHfOrBSC*
     process.collisionEventSelection
     )
 
@@ -151,11 +143,8 @@ process.zMMSkimPath = cms.Path(
     process.MinBiasCounterHIL2DoubleMu3*
     process.bscOrHfCoinc*
     process.collisionEventSelection*
-  #  process.MinBiasCounterHIL1DoubleMuOpen*
     process.muonSelector *
-    process.muonFilter*
-    process.dimuonMassCut *
-    process.dimuonMassCutFilter
+    process.muonFilter
     )
 
 #================== PAT sequences
