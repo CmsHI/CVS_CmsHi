@@ -334,7 +334,8 @@ void Z0MassFit(int isData = 1, int nff = 3, int yieldInt = 1, int iSpec = 1)
     dimuonsGlobalInvMassVsPtS[ih]->Rebin(nrebin);
 
     //Fit Function + Bkg Function
-    if(isFit)  dimuonsGlobalInvMassVsPt[ih]->Fit("RBWPOL","LEQ", "", mass_low, mass_high);
+    if(isFit)  TFitResultPtr r = dimuonsGlobalInvMassVsPt[ih]->Fit("RBWPOL","LEQS", "", mass_low, mass_high);
+    r->Print();
     double par[20];
     RBWPOL->GetParameters(par);
     sprintf(namePt_1B,"pt_1B_%d",ih);
