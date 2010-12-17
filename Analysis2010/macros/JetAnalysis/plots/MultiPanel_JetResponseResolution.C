@@ -1,6 +1,6 @@
 {
 //=========Macro generated from canvas: c1/
-//=========  (Mon Dec 13 11:04:47 2010) by ROOT version5.22/00d
+//=========  (Mon Dec 13 13:23:04 2010) by ROOT version5.22/00d
    TCanvas *c1 = new TCanvas("c1", "",5,24,900,600);
    gStyle->SetOptStat(0);
    c1->Range(0,0,1,1);
@@ -20,7 +20,7 @@
    TPad *p_0_0 = new TPad("p_0_0", "p_0_0",0,0.5568182,0.388211,1);
    p_0_0->Draw();
    p_0_0->cd();
-   p_0_0->Range(4.871793,0.7,210,1.720408);
+   p_0_0->Range(5.512819,0.7,210,1.720408);
    p_0_0->SetFillColor(0);
    p_0_0->SetBorderMode(0);
    p_0_0->SetBorderSize(0);
@@ -35,7 +35,7 @@
    p_0_0->SetFrameLineColor(0);
    p_0_0->SetFrameBorderMode(0);
    
-   TH1 *pRES = new TH1D("pRES","",100,50,210);
+   TH1 *pRES = new TH1D("pRES","",100,50.5,210);
    pRES->SetMinimum(0.7);
    pRES->SetMaximum(1.7);
    pRES->SetStats(0);
@@ -444,8 +444,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -634,8 +634,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -660,7 +660,7 @@
    p_1_0 = new TPad("p_1_0", "p_1_0",0.388211,0.5568182,0.6910157,1);
    p_1_0->Draw();
    p_1_0->cd();
-   p_1_0->Range(50,0.7,210,1.720408);
+   p_1_0->Range(50.5,0.7,210,1.720408);
    p_1_0->SetFillColor(0);
    p_1_0->SetBorderMode(0);
    p_1_0->SetBorderSize(0);
@@ -675,7 +675,7 @@
    p_1_0->SetFrameLineColor(0);
    p_1_0->SetFrameBorderMode(0);
    
-   TH1 *pRES = new TH1D("pRES","",100,50,210);
+   TH1 *pRES = new TH1D("pRES","",100,50.5,210);
    pRES->SetMinimum(0.7);
    pRES->SetMaximum(1.7);
    pRES->SetStats(0);
@@ -1070,8 +1070,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -1260,8 +1260,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -1286,7 +1286,7 @@
    p_2_0 = new TPad("p_2_0", "p_2_0",0.6910157,0.5568182,1,1);
    p_2_0->Draw();
    p_2_0->cd();
-   p_2_0->Range(50,0.7,213.2653,1.720408);
+   p_2_0->Range(50.5,0.7,213.2551,1.720408);
    p_2_0->SetFillColor(0);
    p_2_0->SetBorderMode(0);
    p_2_0->SetBorderSize(0);
@@ -1301,7 +1301,7 @@
    p_2_0->SetFrameLineColor(0);
    p_2_0->SetFrameBorderMode(0);
    
-   TH1 *pRES = new TH1D("pRES","",100,50,210);
+   TH1 *pRES = new TH1D("pRES","",100,50.5,210);
    pRES->SetMinimum(0.7);
    pRES->SetMaximum(1.7);
    pRES->SetStats(0);
@@ -1731,8 +1731,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -1921,8 +1921,8 @@
    fres->SetFillColor(19);
    fres->SetFillStyle(0);
    fres->SetMarkerStyle(20);
-   fres->SetLineWidth(3);
-   fres->SetLineStyle(7);
+   fres->SetLineWidth(1);
+   fres->SetLineStyle(2);
    fres->GetXaxis()->SetLabelFont(42);
    fres->GetXaxis()->SetLabelOffset(0.01);
    fres->GetXaxis()->SetLabelSize(0.045);
@@ -1965,8 +1965,8 @@
    entry->SetMarkerSize(1);
    entry=leg->AddEntry("fres","Resolution in p+p","l");
    entry->SetLineColor(1);
-   entry->SetLineStyle(7);
-   entry->SetLineWidth(3);
+   entry->SetLineStyle(2);
+   entry->SetLineWidth(1);
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
