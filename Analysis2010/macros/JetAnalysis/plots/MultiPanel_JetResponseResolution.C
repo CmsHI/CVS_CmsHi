@@ -1480,7 +1480,7 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   TLegendEntry *entry=leg->AddEntry("hJESNr2D_1","Embedded Pythia","");
+   TLegendEntry *entry=leg->AddEntry("hJESNr2D_1","Embedded PYTHIA","");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -1976,4 +1976,9 @@
    c1->Modified();
    c1->cd();
    c1->SetSelected(c1);
+
+   c1->Print("MultiPanel_JetResponseResolution.gif");
+   c1->Print("MultiPanel_JetResponseResolution.eps");
+
+
 }
