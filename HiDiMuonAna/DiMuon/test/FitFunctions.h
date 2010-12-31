@@ -211,11 +211,11 @@ Double_t RBWGausPol3(Double_t *x, Double_t *par)
 }
 
 
-Double_t RBWC(Double_t x, Double_t par1, Double_t par2)
+Double_t RBWGausExp(Double_t *x, Double_t *par)
 {
-  Double_t rbw = x*par1*par2*0.5/TMath::Pi()/TMath::Max(1.e-10,(x*x-par1*par1) * (x*x-par1*par1) + par1*par1*par2*par2);
- return rbw;
+  return RBWGaus(x,par) + Exp(x,&par[4]);
 }
+
 
 Double_t GausC(Double_t x, Double_t par1, Double_t par2)
 {
@@ -223,4 +223,19 @@ Double_t GausC(Double_t x, Double_t par1, Double_t par2)
   Double_t arg = 0;
   if (par2) arg = (x - par1)/par2;
   return TMath::Exp(-0.5*arg*arg)*invsq2pi/par2;
+}
+
+
+Double_t RBWCaprox(Double_t x, Double_t par1, Double_t par2)
+{
+  Double_t rbw = x*par1*par2*0.5/TMath::Pi()/TMath::Max(1.e-10,(x*x-par1*par1) * (x*x-par1*par1) + par1*par1*par2*par2);
+ return rbw;
+}
+
+
+Double_t RBWC(Double_t x, Double_t par1, Double_t par2)
+// Full form 
+{
+  Double_t rbw = x*x*par2/TMath::Max(1.e-10,(x*x-par1*par1) * (x*x-par1*par1) + pow(x*x/par1,2)*par2*par2);
+  return rbw;
 }
