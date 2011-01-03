@@ -1480,7 +1480,7 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(0);
    leg->SetFillStyle(0);
-   TLegendEntry *entry=leg->AddEntry("hJESNr2D_1","Embedded PYTHIA","");
+   TLegendEntry *entry=leg->AddEntry("hJESNr2D_1","PYTHIA+DATA","");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -1493,7 +1493,7 @@
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(20);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("NULL","Sub-Leading Jet Response","pl");
+   entry=leg->AddEntry("NULL","Subleading Jet Response","pl");
    entry->SetLineColor(2);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
@@ -1956,7 +1956,7 @@
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(20);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("NULL","Sub-Leading Jet Resolution","pl");
+   entry=leg->AddEntry("NULL","Subleading Jet Resolution","pl");
    entry->SetLineColor(2);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);

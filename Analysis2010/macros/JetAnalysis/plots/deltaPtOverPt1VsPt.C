@@ -50,7 +50,7 @@
    hTmp->GetXaxis()->SetLabelSize(22);
    hTmp->GetXaxis()->SetTitleSize(0.055);
    hTmp->GetXaxis()->SetTitleFont(42);
-   hTmp->GetYaxis()->SetTitle("(p_{T}^{1}-p_{T}^{2})/p_{T}^{1}");
+   hTmp->GetYaxis()->SetTitle("#LT p_{T,1} - p_{T,2} #GT / p_{T,1}");
    hTmp->GetYaxis()->CenterTitle(true);
    hTmp->GetYaxis()->SetLabelFont(42);
    hTmp->GetYaxis()->SetLabelOffset(0.01);
@@ -405,7 +405,7 @@ tex->SetNDC();
    hTmp->GetXaxis()->SetLabelSize(22);
    hTmp->GetXaxis()->SetTitleSize(0.055);
    hTmp->GetXaxis()->SetTitleFont(42);
-   hTmp->GetYaxis()->SetTitle("(p_{T}^{1}-p_{T}^{2})/p_{T}^{1}");
+   hTmp->GetYaxis()->SetTitle("(p_{T,1}-p_{T,2})/p_{T,1}");
    hTmp->GetYaxis()->CenterTitle(true);
    hTmp->GetYaxis()->SetLabelFont(42);
    hTmp->GetYaxis()->SetLabelOffset(0.01);
@@ -769,7 +769,7 @@ tex->SetNDC();
    hTmp->GetXaxis()->SetLabelSize(22);
    hTmp->GetXaxis()->SetTitleSize(0.055);
    hTmp->GetXaxis()->SetTitleFont(42);
-   hTmp->GetYaxis()->SetTitle("(p_{T}^{1}-p_{T}^{2})/p_{T}^{1}");
+   hTmp->GetYaxis()->SetTitle("(p_{T,1}-p_{T,2})/p_{T,1}");
    hTmp->GetYaxis()->CenterTitle(true);
    hTmp->GetYaxis()->SetLabelFont(42);
    hTmp->GetYaxis()->SetLabelOffset(0.01);
@@ -1089,7 +1089,7 @@ tex->SetNDC();
    entry->SetMarkerColor(4);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("gMix","embedded PYTHIA","pl");
+   entry=leg->AddEntry("gMix","PYTHIA+DATA","pl");
    entry->SetLineColor(2);
    entry->SetLineWidth(1);
    entry->SetMarkerColor(2);
@@ -1152,9 +1152,24 @@ tex->SetNDC();
    tex->SetTextFont(63);
    tex->SetTextSize(22);
    tex->Draw();
+
+
+   p_1_0->cd();
+  TLatex tsel;
+  tsel.SetNDC();
+  tsel.SetTextFont(63);
+  tsel.SetTextSize(15);
+  tsel.DrawLatex(0.55,0.90,"p_{T,1} > 120 GeV/c");
+  tsel.DrawLatex(0.55,0.85,"p_{T,2} > 50 GeV/c");
+  tsel.DrawLatex(0.55,0.80,"#Delta#phi_{12} > #frac{2}{3}#pi rad");
+
+
    p_2_0->Modified();
    c1->cd();
    c1->Modified();
    c1->cd();
    c1->SetSelected(c1);
+
+
+
 }
