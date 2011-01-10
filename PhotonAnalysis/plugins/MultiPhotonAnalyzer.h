@@ -20,9 +20,10 @@
  * \author Pasquale Musella,    LIP, PT
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
- * \version $Id: MultiPhotonAnalyzer.h,v 1.2 2010/09/29 11:27:03 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.h,v 1.3 2010/09/29 15:51:01 yjlee Exp $
  *
  */
+//  HEAVY ION VERSION
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
 
 #ifndef CmsHi_PhotonAnalysis_MultiPhotonAnalyzer_h
