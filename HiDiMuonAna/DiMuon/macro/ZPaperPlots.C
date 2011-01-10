@@ -138,28 +138,15 @@ void ZPaperPlots()
 
 // Same per rapidity bins and in 60-120 and with nDS too
 
-  Double_t EPS09_bin[4] = {69.2,66.1,108.6,264.6};
-  Double_t EPS09_ber[4] = {5.7,4.5,6.8,15.0};
-  Double_t nDS_bin[4] = {64.5,63.0,109.1,236.5};
+  Double_t EPS09_bin[4] = {69.2,66.1,108.6,41.0};
+  Double_t EPS09_ber[4] = {5.7,4.5,6.8,3.2};
+  Double_t nDS_bin[4] = {64.5,63.0,109.1,43.8};
   Double_t nDS_ber[4] = {0,0,0,0};
-  Double_t CT10_bin[4] = {66.8,65.7,116.6,277.7};
-  Double_t CT10_ber[4] = {3.3,2.7,4.0,9.3};
+  Double_t CT10_bin[4] = {66.8,65.7,116.6,49.9};
+  Double_t CT10_ber[4] = {3.3,2.7,4.0,1.8};
 
   // Scale by AxA
   for (int i=0;i<4;i++) {
-    if (i<3) { // Compute sigma |y| > 2
-      EPS09_bin[3] -= EPS09_bin[i]; // error ? 
-      nDS_bin[3] -= nDS_bin[i]; // error ? 
-      CT10_bin[3] -= CT10_bin[i]; // error ? 
-      cout << "i" << EPS09_bin[3] << endl;
-    } else { // Renormalize wide bins 
-    EPS09_bin[2] /= 2 ;    EPS09_bin[3] /= 2 ;
-    EPS09_ber[2] /= 2 ;    EPS09_ber[3] /= 2 ;
-    nDS_bin[2]  /= 2 ;    nDS_bin[3]  /= 2 ;
-    nDS_ber[2]  /= 2 ;    nDS_ber[3]  /= 2 ;
-    CT10_bin[2] /= 2 ;    CT10_bin[3] /= 2 ;
-    CT10_ber[2] /= 2 ;    CT10_ber[3] /= 2 ;
-    }
     EPS09_bin[i] *= 43264 / 1E6 ;
     EPS09_ber[i] *= 43264 / 1E6 ;
     nDS_bin[i] *= 43264 / 1E6 ;
@@ -167,9 +154,16 @@ void ZPaperPlots()
     CT10_bin[i] *= 43264 / 1E6 ;
     CT10_ber[i] *= 43264 / 1E6 ;
   }
+  // Scale by bin width
+  EPS09_bin[2] /= 2 ;    EPS09_bin[3] /= 2 ;
+  EPS09_ber[2] /= 2 ;    EPS09_ber[3] /= 2 ;
+  nDS_bin[2]  /= 2 ;    nDS_bin[3]  /= 2 ;
+  nDS_ber[2]  /= 2 ;    nDS_ber[3]  /= 2 ;
+  CT10_bin[2] /= 2 ;    CT10_bin[3] /= 2 ;
+  CT10_ber[2] /= 2 ;    CT10_ber[3] /= 2 ;
 
   double xbins[] = {0,0.5,1.0,2.0,3.0};
-  TH1F *EP09 = new TH1F("EPS09","EPS09",4,xbins);
+  TH1F *EPS09 = new TH1F("EPS09","EPS09",4,xbins);
   TH1F *nDS = new TH1F("nDS","nDS",4,xbins);
   TH1F *CT10 = new TH1F("CT10","CT10",4,xbins);
   EPS09->SetLineWidth(SizTh);
@@ -221,19 +215,46 @@ void ZPaperPlots()
   Ivan_iso_graf->SetLineColor(ColIso);
   Ivan_iso_graf->SetLineStyle(StyIso);
 
-
   TGraphErrors *Ivan_el_graf = new TGraphErrors(20,Ivan_rap,Ivan_el,0,0); 
   Ivan_el_graf->SetLineWidth(SizTh);
   Ivan_el_graf->SetLineColor(ColEl);
   Ivan_el_graf->SetLineStyle(StyEl);
+
+  // From Pythia
+  Double_t pythia_y[] = {1038,1020,947,623};
+  TH1F *Pythia_y = new TH1F("Pythia y","Pythia y",4,xbins);
+  for (int i=1;i<5;i++) {
+    Pythia_y->SetBinContent(i,pythia_y[i-1]);
+  }
+  Pythia_y->SetLineWidth(SizTh);
+  Pythia_y->Scale(1/333.); // arbitrary
+  // Pythia_y->SetLineColor();
+  // Pythia_y->SetLineStyle();  
+
+  // POWHEG
+  TFile *powheg_file = new TFile("Acc/POWHEG.root");
+  TH1F *Powheg_y = new TH1F("Powheg_y","Powheg_y",4,xbins);
+  Events->Project("Powheg_y","zy","dimumass<120&&dimumass>60");
+  Powheg_y->Scale(578.4/Events->GetEntries()*43264/1E6); // pb de normalization
+  // Total xsection is 578.4 pb according to EWK, scale it to our range
+  cout << "N " << Powheg_y->GetEntries() << " " << Events->GetEntries() << endl;
+  for (int i=1;i<5;i++) {
+    cout << i << " " << Powheg_y->GetBinContent(i) ;
+    Powheg_y->SetBinContent(i,Powheg_y->GetBinContent(i)/Powheg_y->GetBinWidth(i)); // 
+    cout << " " << Powheg_y->GetBinContent(i) << endl;
+  }
+
+  Powheg_y->SetLineStyle(4); 
+  Powheg_y->SetLineWidth(SizTh); 
+  Powheg_y->Draw("same");
 
   // Our data, in dN/dy
   Double_t x_rap[3] = {0.25,0.77,1.38}; // Main
   //  Double_t x_rap[3] = {0.25,0.75,1.7};
   Double_t x_rap_min[3] = {0,0.5,1}; 
   Double_t x_rap_max[3] = {0.5,1,2.4}; 
-  Double_t Z_rap[3] = { 4.13E-07 , 3.55E-07 , 2.55E-07};
-  Double_t Z_rap_e[3] = { 1.15E-07 , 1.08E-07 , 7.24E-08};
+  Double_t Z_rap[3] = { 4.00E-07 , 3.73E-07 , 2.48E-07};
+  Double_t Z_rap_e[3] = { 1.12E-07 , 1.09E-07 , 6.95E-08};
   Double_t Z_rap_syst_plus[3] ; Double_t Z_rap_syst_minus[3] ; 
   Double_t e_rap[3] = {0.11,0.11,0.26}; // RMS ? 
 
@@ -273,6 +294,8 @@ void ZPaperPlots()
     Legend->AddEntry(Ivan_iso_graf,"Vitev, MSTW+isospin","l"); 
     Legend->AddEntry(Ivan_el_graf,"Vitev, idem+eloss","l"); 
   }
+  Legend->AddEntry(Pythia_y,"Pythia, arbitrary scale","l");
+  Legend->AddEntry(Powheg_y,"POWHEG","l");
   Legend->Draw(); 
 
   write_tex(0.9,3.6,"CMS Pb+Pb #sqrt{s_{NN}} = 2.76 TeV",C1);
@@ -292,6 +315,7 @@ void ZPaperPlots()
     Ivan_el_graf->Draw("L");
   }
   if (dodata) Zrap_graf->Draw("P");
+  Pythia_y->Draw("same,h");
 
   C1->Print("ZY.pdf"); 
 //
@@ -299,7 +323,7 @@ void ZPaperPlots()
   TCanvas *C2 = new TCanvas("ZPT","Z versus transverse momentum",500,500);
   C2->SetLogy();
 
-  TH1F *dummy = new TH1F("","",30,0.,30.);
+  TH1F *dummy = new TH1F("","",30,0.,50.);
   dummy->SetMinimum(0.01); // 0.002
   dummy->SetMaximum(0.5); // 1. 
   dummy->SetXTitle("Transverse momentum (GeV/c)");
@@ -332,7 +356,7 @@ void ZPaperPlots()
   }
 
   // Now in bins
-  double xbins[] = {0,6,12,30};
+  double xbins[] = {0,6,12,50};
   TH1F *IsoPt = new TH1F("IsoPt","IsoPt",3,xbins);
   IsoPt->SetLineWidth(SizTh);
   IsoPt->SetLineColor(ColIso);
@@ -393,14 +417,57 @@ void ZPaperPlots()
     if (doivan) Ivan_el_pt_graf->Draw("L");
   }
 
+  // Pythia
+  Double_t pythia[4] = {2977,2001,645}; // 146 for pt above 30
+  TH1F *Pythia = new TH1F("Pythia","Pythia",3,xbins);
+  for (int i=1;i<4;i++) {
+    Pythia->SetBinContent(i,pythia[i-1]);    
+  }
+  Pythia->Scale(1/18000.); // Arbitrary
+  Pythia->SetLineWidth(SizTh); 
+  Pythia->Draw("same");
+
+  // NLO
+  Double_t nlo[4] = {4996,3585,1161}; // 245 for pt above 30
+  TH1F *Nlo = new TH1F("Nlo","Nlo",3,xbins);
+  for (int i=1;i<4;i++) {
+    Nlo->SetBinContent(i,nlo[i-1]);    
+  }
+  Nlo->Scale(1/35850.); // Arbitrary
+  Nlo->SetLineStyle(2); 
+  Nlo->SetLineWidth(SizTh); 
+
+  Nlo->Draw("same");
+
+  // POWHEG
+  TFile *powheg_file = new TFile("Acc/POWHEG.root");
+  TH1F *Powheg = new TH1F("Powheg","Powheg",3,xbins);
+  Events->Project("Powheg","zpt","dimumass<120&&dimumass>60&&zy>-2.4&&zy<2.4");
+  for (int i=1;i<4;i++) {
+    cout << i << " " << Powheg->GetBinContent(i) << endl ;
+  }
+  Powheg->Scale(578.4/Events->GetEntries()*43264/1E6/4.8); // pb de normalization
+  // Total xsection is 578.4 pb according to EWK, scale it to our range
+  cout << "N " << Powheg->GetEntries() << " " << Events->GetEntries() << endl;
+  for (int i=1;i<4;i++) {
+    cout << i << " " << Powheg->GetBinContent(i) ;
+    Powheg->SetBinContent(i,Powheg->GetBinContent(i)/Powheg->GetBinWidth(i));
+    cout << " " << Powheg->GetBinContent(i) << endl;
+  }
+
+  Powheg->SetLineStyle(4); 
+  Powheg->SetLineWidth(SizTh); 
+  Powheg->Draw("same");
+
+
   // Our data, in dN/dydpt
   // Double_t x_pt[3] = {3,9,31};
   Double_t x_pt[3] = {4.31,8.30,17.72}; // Mean
   Double_t x_pt_min[3] = {0,6,12}; // Mean
   Double_t x_pt_max[3] = {6,12,50}; // Mean
   Double_t e_pt[3] = {1.37,1.89,4.62}; // RMS
-  Double_t Z_pt[3] = {1.51E-08,2.00E-08,2.47E-09};
-  Double_t Z_pt_e[3] = {4.85E-09,5.29E-09,7.61E-10};
+  Double_t Z_pt[3] = {1.47E-08,1.94E-08,2.61E-09};
+  Double_t Z_pt_e[3] = {4.71E-09,5.08E-09,7.55E-10};
   Double_t Z_pt_syst_plus[3]; Double_t Z_pt_syst_minus[3]; 
 
   // 
@@ -424,7 +491,7 @@ void ZPaperPlots()
   Zpt_graf->SetLineWidth(2);
   if (dodata)  Zpt_graf->Draw("P");
 
-  TLegend* Legend = new TLegend(0.5,0.66,0.9,0.82);
+  TLegend* Legend = new TLegend(0.5,0.5,0.9,0.82);
   Legend->SetFillColor(0);
   Legend->SetTextSize(0.037);
   Legend->SetBorderSize(0);
@@ -433,13 +500,17 @@ void ZPaperPlots()
   //  Legend->AddEntry(EPS09_graf,"EPS09, shadowing","f"); 
   if (doivan) Legend->AddEntry(IsoPt,"Vitev, MSTW+isospin","l"); 
   if (doivan) Legend->AddEntry(ElPt,"Vitev, idem+eloss","l"); 
+  Legend->AddEntry(Pythia,"Pythia, arbitrary scale","l");
+  Legend->AddEntry(Nlo,"MC@NLO, arbitrary scale","l");
+  Legend->AddEntry(Powheg,"POWHEG","l");
   Legend->Draw(); 
 
   write_tex(9,0.32,"CMS Pb+Pb #sqrt{s_{NN}} = 2.76 TeV",C2);
   write_tex(0.8,0.013,"#int Ldt = 6.6 #mub^{-1}", C2,18);
 
   C2->Print("ZPT.pdf"); 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C3 = new TCanvas("ZColl","Z versus centrality",500,500);
 
   Double_t Npart[3] = {356,224,46};
@@ -471,12 +542,12 @@ void ZPaperPlots()
   // Our data, in dN/dy / Ncoll
   Double_t x_part[4] = {356,224,46,113}; //Npart
   Double_t e_cent[4] = {10,10,10,10};
-  Double_t Z_cent[4] = {1.04E-09,
-			7.90E-10,
-			7.30E-10,8.75E-10};
-  Double_t Z_cent_e[4] = {2.57E-10,
-			  2.13E-10,
-			  2.99E-10,1.45E-10};
+  Double_t Z_cent[4] = {1.08E-09,
+			7.62E-10,
+			7.30E-10,8.78E-10};
+  Double_t Z_cent_e[4] = {2.59E-10,
+			  2.05E-10,
+			  2.88E-10,1.43E-10};
   Double_t ncoll[4] = {1486,744,93,363};
 
   // 
