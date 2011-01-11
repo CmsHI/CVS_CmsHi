@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: evtCounter.cc,v 1.1 2011/01/11 13:06:41 kimy Exp $
+// $Id: evtCounter.cc,v 1.2 2011/01/11 14:00:50 kimy Exp $
 //
 //
 
@@ -153,7 +153,7 @@ evtCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    var[idx] = eb;   idx++;
    var[idx] = nPix;   idx++;
    var[idx] = nPixelTracks;   idx++;
-   var[idx] = cbin;    idx++;
+   var[idx] = (float)cbin;    idx++;
    nt->Fill(var);
    
    
