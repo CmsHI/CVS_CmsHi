@@ -26,7 +26,7 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:/d101/kimy/recoFiles/gammaJet_Hydjet_gensimreco_MC_39Y_V3.root'
+    'rfio:/castor/cern.ch/cms/store/relval/CMSSW_3_9_2/RelValPyquen_GammaJet_pt20_2760GeV/GEN-SIM-RECO/MC_39Y_V3-v1/0010/701C0201-44EB-DF11-832F-0030487C7E18.root'
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
     )
@@ -86,11 +86,16 @@ process.HIphotontrig.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 # clean collision selection
 process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
+
+# event counter
+process.load("CmsHi.PhotonAnalysis.evtCounter_cfi")
+
 # the path! 
 process.p = cms.Path(
     #    process.HIphotontrig *
     #    process.collisionEventSelection *
     #    process.highPurityTracks *
+    process.evtCounter *
     process.hiGoodTracksSelection *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
