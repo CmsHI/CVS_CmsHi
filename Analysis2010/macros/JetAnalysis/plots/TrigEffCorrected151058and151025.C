@@ -29,7 +29,7 @@
    hTmp->SetLineStyle(0);
    hTmp->SetMarkerStyle(20);
    hTmp->SetMarkerSize(0.8);
-   hTmp->GetXaxis()->SetTitle("Leading p_{T}^{Jet,Corr} (GeV/c)");
+   hTmp->GetXaxis()->SetTitle("Corrected leading jet p_{T} (GeV/c)");
    hTmp->GetXaxis()->CenterTitle(true);
    hTmp->GetXaxis()->SetNdivisions(505);
    hTmp->GetXaxis()->SetLabelFont(42);
@@ -37,7 +37,7 @@
    hTmp->GetXaxis()->SetLabelSize(0.045);
    hTmp->GetXaxis()->SetTitleSize(0.055);
    hTmp->GetXaxis()->SetTitleFont(42);
-   hTmp->GetYaxis()->SetTitle("Eff. (Trigger/MB)");
+   hTmp->GetYaxis()->SetTitle("Efficiency (Trigger / Minimum Bias)");
    hTmp->GetYaxis()->CenterTitle(true);
    hTmp->GetYaxis()->SetNdivisions(505);
    hTmp->GetYaxis()->SetLabelFont(42);
@@ -180,12 +180,12 @@
    Graph1->GetZaxis()->SetTitleFont(42);
    grae->SetHistogram(Graph1);
    
-   grae->Draw("p");
+   grae->Draw("pz");
    TLine *line = new TLine(0,1,300,1);
    line->SetLineStyle(2);
    line->Draw();
    
-   TLegend *leg = new TLegend(0.51,0.17,0.98,0.3,NULL,"brNDC");
+   TLegend *leg = new TLegend(0.42,0.1,0.98,0.5,NULL,"brNDC");
    leg->SetBorderSize(0);
    leg->SetTextFont(62);
    leg->SetLineColor(1);
@@ -193,13 +193,14 @@
    leg->SetLineWidth(1);
    leg->SetFillColor(19);
    leg->SetFillStyle(0);
-   TLegendEntry *entry=leg->AddEntry("NULL","#splitline{Jet Trigger}{(p_{T}^{uncorr} > 50 GeV, |#eta|<3)}","h");
+   TLegendEntry *entry=leg->AddEntry("NULL","#splitline{Jet Trigger}{(uncorrected p_{T} > 50 GeV/c, |#eta|<3)}","h");
    entry->SetLineColor(1);
    entry->SetLineStyle(1);
    entry->SetLineWidth(1);
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
+   entry->SetTextSize(0.038);
    entry->SetTextFont(62);
    leg->Draw();
    TLatex *   tex = new TLatex(0.53,0.883,"CMS PbPb  #sqrt{s_{NN}} = 2.76 TeV");
@@ -211,4 +212,8 @@ tex->SetNDC();
    cTrigEff->Modified();
    cTrigEff->cd();
    cTrigEff->SetSelected(cTrigEff);
+
+   cTrigEff->Print("TrigEffCorrected151058and151025.gif");
+   cTrigEff->Print("TrigEffCorrected151058and151025.eps");
+
 }

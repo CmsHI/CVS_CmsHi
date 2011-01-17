@@ -227,7 +227,7 @@
    entry->SetMarkerColor(1);
    entry->SetMarkerStyle(21);
    entry->SetMarkerSize(1);
-   entry=leg->AddEntry("hhfJET","Jet Trigger","l");
+   entry=leg->AddEntry("hhfJET","Jet Trigger","lf");
    entry->SetLineColor(2);
    entry->SetLineWidth(2);
    entry->SetMarkerColor(1);
@@ -333,15 +333,16 @@
    entry->SetMarkerSize(1);
    entry->SetTextFont(62);
    leg->Draw();
-   TLatex *   tex = new TLatex(0.6013,0.89,"CMS Preliminary");
-tex->SetNDC();
-   tex->SetTextFont(63);
-   tex->SetTextSize(16);
-   tex->SetLineWidth(2);
-   //   tex->Draw();
-   c1_anaPixelHitJet50U->Modified();
+
+   TLatex *cms = new TLatex(0.28,0.87,"CMS PbPb  #sqrt{s_{NN}}=2.76 TeV");
+   cms->SetTextFont(63);
+   cms->SetTextSize(16);
+   cms->SetNDC();
+   cms->Draw();
+
    c1_anaPixelHitJet50U->cd();
    c1_anaPixelHitJet50U->SetSelected(c1_anaPixelHitJet50U);
+
 
    c1_anaPixelHitJet50U->Print("hf_centrality_distribution_mb_jet50_20101126_v1.gif");
    c1_anaPixelHitJet50U->Print("hf_centrality_distribution_mb_jet50_20101126_v1.eps");
