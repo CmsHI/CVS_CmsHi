@@ -3,11 +3,11 @@
  * \author Philip Allfrey, University of Auckland
  * Modified from MCTrackMatcher.cc
  *
- * \version $Id: HiMCTrackMatcher.cc,v 1.5 2009/08/12 16:15:33 cerati Exp $
+ * \version $Id: HiMCTrackMatcher.cc,v 1.1 2009/09/07 23:00:44 allfrey Exp $
  *
  */
 #include "FWCore/Framework/interface/EDProducer.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Association.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
