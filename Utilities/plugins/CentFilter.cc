@@ -13,7 +13,7 @@
 //
 // Original Author:  Yongsun Kim
 //         Created:  Fri May 22 12:57:09 EDT 2009
-// $Id: CentFilter.cc,v 1.3 2009/06/25 12:21:42 yilmaz Exp $
+// $Id: CentFilter.cc,v 1.4 2009/08/19 11:42:41 yilmaz Exp $
 //
 //
 
@@ -34,6 +34,8 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+
+
 #include "HepMC/GenEvent.h"
 #include "HepMC/HeavyIon.h"
 
@@ -44,7 +46,7 @@ int getBin(double input, vector<double>& edges, int sign = 1){
    int bin = -9;
    int ibin = -9;
 
-   for(int i = 0; i< edges.size(); i++){
+   for(unsigned int i = 0; i< edges.size(); i++){
       double min = edges[i];
 
       if(input >= min) ibin  = i+1;
@@ -84,6 +86,9 @@ class CentFilter : public edm::EDFilter {
    vector<double> hfGenCuts_;
    vector<double> nPartCuts_;
    vector<int> selectedBins_;
+
+   bool simpleCut_;
+   double cut_;
 };
 
 //
@@ -101,6 +106,8 @@ CentFilter::CentFilter(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
 
+   cutBase_ = iConfig.getParameter<string>("cutBase");
+
    if(cutBase_ == "b"){
       bCuts_  = iConfig.getParameter<vector<double> >("bCuts");
    }
@@ -115,7 +122,9 @@ CentFilter::CentFilter(const edm::ParameterSet& iConfig)
    }
 
    selectedBins_ = iConfig.getParameter<vector<int> >("selectBins");
-  
+   simpleCut_  = iConfig.getUntrackedParameter<bool>("simpleCut",true);
+   cut_ = iConfig.getUntrackedParameter<double>("cut",305);
+
 } 
 
 
@@ -142,24 +151,29 @@ CentFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
    using namespace HepMC;
    
    int bin = -1;
-
    if(cutBase_ == "b" || cutBase_ == "npart"){
       const GenEvent *evt;
-
    Handle<HepMCProduct> mc;
    iEvent.getByLabel("generator",mc);
    evt = mc->GetEvent();
-
    const HeavyIon* hi = evt->heavy_ion();
    //int nPart = hi->Npart_proj()+hi->Npart_targ();
    double b = hi->impact_parameter();
    double npart = hi->Npart_proj()+hi->Npart_targ();
-
-   if(cutBase_ == "b")
+   cout<<"npart : "<<npart<<endl;
+   if(cutBase_ == "b"){
       bin = getBin(b,bCuts_);
-   if(cutBase_ == "npart")
+   }
+   if(cutBase_ == "npart"){
+      if(simpleCut_){
+	 if(npart >= cut_){
+	    return true;
+	 }else{
+	    return false;
+	 }
+      }
       bin = getBin(npart,nPartCuts_);
-   
+   }  
    }else{
       Handle<CentralityCollection> cent;
       if(cutBase_ == "gen"){
@@ -172,7 +186,7 @@ CentFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
    }
    
-   for(int i = 0; i < selectedBins_.size(); ++i){
+   for(unsigned int i = 0; i < selectedBins_.size(); ++i){
       if(bin == selectedBins_[i]) return true;
    }
 
