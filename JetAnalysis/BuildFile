@@ -23,7 +23,7 @@
 <use name=DataFormats/PatCandidates>
 <use name=RecoJets/JetProducers>
 <use name=DataFormats/HeavyIonEvent>
-
+<use name=CondFormats/JetMETObjects>
 <flags EDM_PLUGIN=1>
 <export>
  <lib name=CmsHiJetAnalysis>

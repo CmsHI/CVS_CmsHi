@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.8 2010/10/21 16:24:04 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.9 2010/10/24 14:39:32 yilmaz Exp $
 //
 //
 
@@ -40,13 +40,21 @@
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DataFormats/Math/interface/deltaR.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
+#include "FWCore/Framework/interface/ESWatcher.h"
 
+#include "CmsHi/JetAnalysis/interface/RhoGetter.h"
 #include "TTree.h"
 
 using namespace std;
+using namespace edm;
 
 static const int MAXJETS = 500;
 
@@ -55,8 +63,9 @@ struct etdr{
    double dr;
 };
 
-struct JRA{
+class JRA{
 
+public:
    int nref;
    int bin;
    float b;
@@ -68,6 +77,11 @@ struct JRA{
    float refeta[MAXJETS];
    float jtphi[MAXJETS];
    float refphi[MAXJETS];
+   float l2[MAXJETS];
+   float l3[MAXJETS];
+   float area[MAXJETS];
+   float pu[MAXJETS];
+   float rho[MAXJETS];
 
    float weight;
 };
@@ -82,6 +96,11 @@ struct JRAV{
   float refeta;
   float jtphi;
   float refphi;
+   float l2;
+   float l3;
+   float area;
+   float pu;
+   float rho;
  
 };
 
@@ -113,6 +132,7 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
   bool matchNew_;
   bool sortJets_;
   bool correctJets_;
+   bool getFastJets_;
 
   double matchR_;  
    double genPtMin_;
@@ -135,9 +155,26 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
 
    edm::Handle<reco::JetView> jets;
    edm::Handle<pat::JetCollection> patjets;
-  edm::Handle<reco::JetView> matchedJets;
+
+   FactorizedJetCorrector* jetCorrector_;
+   edm::ESWatcher<JetCorrectionsRecord> watchJetCorrectionsRecord_;
+
+   std::string tags_;
+   std::string levels_;
+   std::string algo_;
 
    edm::Service<TFileService> fs;
+
+   edm::Handle<vector<double> > ktRhos;
+   edm::Handle<vector<double> > akRhos;
+   bool doFastJets_;
+
+   vector<int> doMatchedFastJets_;
+   vector<int> correctMatchedJets_;
+  
+   InputTag ktSrc_;
+   InputTag akSrc_;
+
 
 };
 
@@ -171,6 +208,22 @@ bool HiJetResponseAnalyzer::selectJet(int i){
 HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
 
 {
+
+   levels_ = iConfig.getUntrackedParameter<string>("corrLevels","L2Relative:L3Absolute");
+
+   algo_ = iConfig.getUntrackedParameter<string>("algo","IC5Calo");
+   tags_ = "";
+
+   string l[2] = {"L2Relative","L3Absolute"};
+
+   for(int i = 0; i <2; ++i){
+      edm::FileInPath fip("CondFormats/JetMETObjects/data/Spring10_"+l[i]+"_"+algo_+".txt");
+      tags_ += fip.fullPath();
+      if(i < 2 - 1)tags_ +=":";
+   }
+
+   jetCorrector_ = new FactorizedJetCorrector(levels_, tags_);
+
    //now do what ever initialization is needed
   matchR_ = iConfig.getUntrackedParameter<double>("matchR",0.25);
 
@@ -193,9 +246,23 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
    sortJets_ = iConfig.getUntrackedParameter<bool>("sortJets",true);
    correctJets_ = iConfig.getUntrackedParameter<bool>("correctJets",false);
 
+   correctMatchedJets_ = iConfig.getUntrackedParameter<std::vector<int> >("correctMatchedJets",std::vector<int>(0));
+   doMatchedFastJets_ = iConfig.getUntrackedParameter<std::vector<int> >("doMatchedFastJets",std::vector<int>(0));
+
    jetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("src",edm::InputTag("selectedPatJets"));
    matchTag_ = iConfig.getUntrackedParameter<edm::InputTag>("match",edm::InputTag("selectedPatJets"));
    matchTags_ = iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("matches",std::vector<edm::InputTag>(0));
+
+   ktSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("ktSrc",edm::InputTag("kt4CaloJets"));
+   akSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("akSrc",edm::InputTag("ak5CaloJets"));
+   doFastJets_ = iConfig.getUntrackedParameter<bool>("doFastJets",false);
+
+   getFastJets_ = true;
+   for(unsigned int i = 0; i < doMatchedFastJets_.size(); ++i){
+      getFastJets_ = getFastJets_ || (bool)doMatchedFastJets_[i];
+   }
+
+
 }
 
 
@@ -222,6 +289,11 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    if(usePat_)iEvent.getByLabel(jetTag_,patjets);
    std::vector<JRAV> jraV;
 
+   if(getFastJets_){
+      iEvent.getByLabel(edm::InputTag(ktSrc_.label(),"rhos"),ktRhos);
+      iEvent.getByLabel(edm::InputTag(akSrc_.label(),"rhos"),akRhos);
+   }
+
    for(unsigned int j = 0 ; j < jets->size(); ++j){
      if(filterJets_ && !selectJet(j)) continue;
      const reco::Jet& jet = (*jets)[j];
@@ -230,7 +302,30 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jv.jteta = jet.eta();
      jv.jtphi = jet.phi();
      jv.jtcorpt = jet.pt();
+     jv.area = jet.jetArea();
+     jv.pu  = jet.pileup();
      jv.index = j;
+
+     double pt = jet.pt();
+     double ktRho = getRho(jv.jteta,*ktRhos);
+     double akRho = getRho(jv.jteta,*akRhos);
+
+     jv.rho = ktRho;
+     if(correctJets_){
+	if(doFastJets_){
+	   jv.pu = jet.jetArea()*ktRho;
+	   pt -= jv.pu;
+	}
+
+	jetCorrector_->setJetEta(jet.eta());
+	jetCorrector_->setJetPt(pt);
+	//	jetCorrector_->setJetE(jet.energy()); 
+	vector<float> corrs = jetCorrector_->getSubCorrections();
+	jv.l2 = corrs[0];
+        jv.l3 = corrs[1];
+	jv.jtcorpt = pt*jv.l2*jv.l3;
+
+     }
      if(usePat_){
        const pat::Jet& patjet = (*patjets)[j];
 
@@ -248,7 +343,6 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	 jv.refphi = -99;
        }
      }
-
      jraV.push_back(jv);
    }
 
@@ -263,15 +357,52 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      
      if(matchNew_){
        for(unsigned int im = 0; im < matchTags_.size(); ++im){
-         iEvent.getByLabel(matchTags_[im],matchedJets);
+	  edm::Handle<reco::JetView> matchedJets;
+	  iEvent.getByLabel(matchTags_[im],matchedJets);
+	 jraMatch_[im].jtcorpt[i] = -99;
+	 jraMatch_[im].jtpt[i] = -99;
+	 jraMatch_[im].jteta[i] = -99;
+	 jraMatch_[im].jtphi[i] = -99;
+	 jraMatch_[im].area[i] = -99;
+	 jraMatch_[im].l2[i] = -99;
+	 jraMatch_[im].l3[i] = -99;
+         jraMatch_[im].pu[i] = -99;
          for(unsigned int m = 0 ; m < matchedJets->size(); ++m){
            const reco::Jet& match = (*matchedJets)[m];
            double dr = reco::deltaR(jet.eta(),jet.phi(),match.eta(),match.phi());
-           if(dr < matchR_){
+           if(dr < matchR_ && match.pt() > genPtMin_){
              jraMatch_[im].jtcorpt[i] = -99;
              jraMatch_[im].jtpt[i] = match.pt();
              jraMatch_[im].jteta[i] = match.eta();
              jraMatch_[im].jtphi[i] = match.phi();
+             jraMatch_[im].area[i] = match.jetArea();
+
+	     double  ktRho = getRho(jraMatch_[im].jteta[i],*ktRhos);
+	     double akRho  = getRho(jraMatch_[im].jteta[i],*akRhos);
+
+             jraMatch_[im].rho[i] = ktRho;
+
+	     if((bool)correctMatchedJets_[im]){
+
+		double ktRho;
+                double pt = jraMatch_[im].jtpt[i];
+
+		if((bool)doMatchedFastJets_[im]){
+		   jraMatch_[im].pu[i] = jraMatch_[im].area[i]*ktRho;
+		   pt -= jraMatch_[im].pu[i];
+		}
+		jetCorrector_->setJetEta(jraMatch_[im].jteta[i]);
+		jetCorrector_->setJetPt(pt);
+		//		jetCorrector_->setJetE(match.energy());
+		vector<float> corrs = jetCorrector_->getSubCorrections();
+		jraMatch_[im].l2[i] = corrs[0];
+		// Should it be re-set for L3???
+		jraMatch_[im].l3[i] = corrs[1];
+		jraMatch_[im].jtcorpt[i] = pt*jraMatch_[im].l2[i]*jraMatch_[im].l3[i];
+
+	     }
+
+
            }
          }
        }
@@ -284,6 +415,13 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jra_.refpt[i] = jv.refpt;
      jra_.refeta[i] = jv.refeta;
      jra_.refphi[i] = jv.refphi;
+
+     jra_.area[i] = jv.area;
+     jra_.pu[i] = jv.pu;
+     jra_.rho[i] = jv.rho;
+     jra_.l2[i] = jv.l2;
+     jra_.l3[i] = jv.l3;
+
    }
    jra_.nref = jraV.size();
    
@@ -299,21 +437,45 @@ HiJetResponseAnalyzer::beginJob(){
   t= fs->make<TTree>("t","Jet Response Analyzer");
   t->Branch("nref",&jra_.nref,"nref/I");
   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
-  t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
   t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
   t->Branch("jtphi",jra_.jtphi,"jtphi[nref]/F");
+
+  if(correctJets_){
+     t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
+     t->Branch("l2",jra_.l2,"l2[nref]/F");
+     t->Branch("l3",jra_.l3,"l3[nref]/F");
+  }
+  t->Branch("area",jra_.area,"area[nref]/F");
+  t->Branch("pu",jra_.pu,"pu[nref]/F");
+  t->Branch("rho",jra_.rho,"rho[nref]/F");
+
   t->Branch("refpt",jra_.refpt,"refpt[nref]/F");
   t->Branch("refcorpt",jra_.refpt,"refcorpt[nref]/F");
    t->Branch("refeta",jra_.refeta,"refeta[nref]/F");
    t->Branch("refphi",jra_.refphi,"refphi[nref]/F");
    t->Branch("weight",&jra_.weight,"weight/F");
+
+   jraMatch_.clear();
    for(unsigned int im = 0; im < matchTags_.size(); ++im){
      JRA jrm;
      jraMatch_.push_back(jrm);
+   }
+
+   for(unsigned int im = 0; im < matchTags_.size(); ++im){
      t->Branch(Form("jtpt%d",im),jraMatch_[im].jtpt,Form("jtpt%d[nref]/F",im));
-     t->Branch(Form("jtcorpt%d",im),jraMatch_[im].jtcorpt,Form("jtcorpt%d[nref]/F",im));
      t->Branch(Form("jteta%d",im),jraMatch_[im].jteta,Form("jteta%d[nref]/F",im));
      t->Branch(Form("jtphi%d",im),jraMatch_[im].jtphi,Form("jtphi%d[nref]/F",im));
+
+     if((bool)correctMatchedJets_[im]){
+	t->Branch(Form("jtcorpt%d",im),jraMatch_[im].jtcorpt,Form("jtcorpt%d[nref]/F",im));
+	t->Branch(Form("l2_%d",im),jraMatch_[im].l2,Form("l2_%d[nref]/F",im));
+	t->Branch(Form("l3_%d",im),jraMatch_[im].l3,Form("l3_%d[nref]/F",im));
+     }
+     
+     t->Branch(Form("area%d",im),jraMatch_[im].area,Form("area%d[nref]/F",im));
+     t->Branch(Form("pu%d",im),jraMatch_[im].pu,Form("pu%d[nref]/F",im));
+     t->Branch(Form("rho%d",im),jraMatch_[im].rho,Form("rho%d[nref]/F",im));
+
    }
    
 }
