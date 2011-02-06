@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.3 2010/10/31 19:03:09 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.4 2010/10/31 20:03:15 kimy Exp $
 //
 //
 
@@ -96,6 +96,7 @@ class IsoConeInspector : public edm::EDAnalyzer {
    float BCeta[1000];
    float BCphi[1000];
    float RHet[5000];
+   float RHe[5000];
    float RHdEta[5000];
    float RHdPhi[5000];
 
@@ -189,7 +190,7 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    RecHitsEndcap = std::auto_ptr<CaloRecHitMetaCollectionV>(new EcalRecHitMetaCollection(*rechitsCollectionEndcap));
 
    
-   double extRadius_ = 0.45;
+   double extRadius_ = 0.42;
    
    nPho = 0;
    nRH  = 0;
@@ -224,6 +225,7 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    double etrh    = energyrh/cosh(etarh);
 	    
 	    RHet[nRH]   = etrh;
+            RHe[nRH]   = energyrh;
 	    RHdEta[nRH] = etaDiff;
 	    RHdPhi[nRH] = phiDiff;
 	    nRH++;
@@ -277,6 +279,7 @@ IsoConeInspector::beginJob()
    //  theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
 
    theTree->Branch("RHet",RHet,"RHet[nRH]/F");
+   theTree->Branch("RHe",RHe,"RHe[nRH]/F");
    theTree->Branch("RHdEta",RHdEta,"RHdEta[nRH]/F");
    theTree->Branch("RHdPhi",RHdPhi,"RHdPhi[nRH]/F");
 
