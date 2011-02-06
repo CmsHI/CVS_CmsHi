@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.5 2011/02/06 15:34:05 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.6 2011/02/06 15:37:00 kimy Exp $
 //
 //
 
@@ -192,10 +192,10 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    
    double extRadius_ = 0.42;
    
-   nPho = 0;
    nRH  = 0;
    nBC  = 0;
-   
+   nPho = (*photons).size();
+      
    for (pho = (*photons).begin(); pho!= (*photons).end(); pho++){
       et       = (float)pho->et();
       eta      = (float)pho->superCluster()->eta();
@@ -232,7 +232,6 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	 }
       }
       theTree->Fill();
-      
    }
    
    /* how to remove the spikes? 
@@ -266,7 +265,7 @@ IsoConeInspector::beginJob()
 {
    NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -100., 100. );
    theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
-   //   theTree->Branch("nPho",&nPho,"nPho/I");
+   theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
    theTree->Branch("nRH",&nRH,"nRH/I");
 
