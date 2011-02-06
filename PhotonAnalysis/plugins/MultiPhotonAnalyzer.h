@@ -23,7 +23,6 @@
  * \version $Id: MultiPhotonAnalyzer.h,v 1.3 2010/09/29 15:51:01 yjlee Exp $
  *
  */
-//  HEAVY ION VERSION
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
 
 #ifndef CmsHi_PhotonAnalysis_MultiPhotonAnalyzer_h
