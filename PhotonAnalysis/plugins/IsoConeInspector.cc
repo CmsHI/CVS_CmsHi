@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.4 2010/10/31 20:03:15 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.5 2011/02/06 15:34:05 kimy Exp $
 //
 //
 
@@ -217,12 +217,12 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	 j=RecHitsBarrel->find(*i); // find selected cell among rechits
 	 if( j!=RecHitsBarrel->end()){ // add rechit only if available 
 	    const  GlobalPoint & position = theCaloGeom.product()->getPosition(*i);
-	    double etarh = position.eta();
-	    double phirh = position.phi();
-	    double etaDiff = etarh - eta;
-	    double phiDiff= deltaPhi(phirh,phi);
-	    double energyrh = j->energy();
-	    double etrh    = energyrh/cosh(etarh);
+	    float etarh = position.eta();
+	    float phirh = position.phi();
+	    float etaDiff = etarh - eta;
+	    float phiDiff= deltaPhi(phirh,phi);
+	    float energyrh = j->energy();
+	    float etrh    = energyrh/cosh(etarh);
 	    
 	    RHet[nRH]   = etrh;
             RHe[nRH]   = energyrh;
@@ -278,10 +278,10 @@ IsoConeInspector::beginJob()
    //  theTree->Branch("BCeta",BCeta,"BCeta[nBC]/F");
    //  theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
 
-   theTree->Branch("RHet",RHet,"RHet[nRH]/F");
-   theTree->Branch("RHe",RHe,"RHe[nRH]/F");
-   theTree->Branch("RHdEta",RHdEta,"RHdEta[nRH]/F");
-   theTree->Branch("RHdPhi",RHdPhi,"RHdPhi[nRH]/F");
+   theTree->Branch("rhet",RHet,"rhet[nRH]/F");
+   theTree->Branch("rhe",RHe,"rhe[nRH]/F");
+   theTree->Branch("rhdEta",RHdEta,"rhdEta[nRH]/F");
+   theTree->Branch("rhdPhi",RHdPhi,"rhdPhi[nRH]/F");
 
     
 }
