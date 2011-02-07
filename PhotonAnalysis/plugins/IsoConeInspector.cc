@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.6 2011/02/06 15:37:00 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.7 2011/02/06 16:00:08 kimy Exp $
 //
 //
 
@@ -61,6 +61,10 @@
 #include "RecoCaloTools/MetaCollections/interface/CaloRecHitMetaCollections.h"
 #include <Math/VectorUtil.h>
 #include "DataFormats/Math/interface/deltaPhi.h"
+#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
+
+
 //
 // class declaration
 //
@@ -89,6 +93,7 @@ class IsoConeInspector : public edm::EDAnalyzer {
    TH1D*  NoE ;
    TTree* theTree;
    int nPho, nBC, nRH; 
+  int cBin;
    float et;
    float eta;
    float phi;
@@ -99,8 +104,10 @@ class IsoConeInspector : public edm::EDAnalyzer {
    float RHe[5000];
    float RHdEta[5000];
    float RHdPhi[5000];
-
-
+  bool doStoreCentrality_;
+  CentralityProvider *centrality_;
+  const CentralityBins * cbins_;
+  
 
 };
 
@@ -126,7 +133,8 @@ IsoConeInspector::IsoConeInspector(const edm::ParameterSet& iConfig)
    doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",false);
    etCut_                           = iConfig.getUntrackedParameter<double>("etCut",15);
    etaCut_                           = iConfig.getUntrackedParameter<double>("etaCut",1.479);
-   
+   doStoreCentrality_                  = iConfig.getUntrackedParameter<bool>("doStoreCentrality",true);
+
 }
 
 
@@ -188,6 +196,14 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    RecHitsBarrel = std::auto_ptr<CaloRecHitMetaCollectionV>(new EcalRecHitMetaCollection(*rechitsCollectionBarrel));
    std::auto_ptr<CaloRecHitMetaCollectionV> RecHitsEndcap(0);
    RecHitsEndcap = std::auto_ptr<CaloRecHitMetaCollectionV>(new EcalRecHitMetaCollection(*rechitsCollectionEndcap));
+   
+   cBin = -10;
+   if (doStoreCentrality_) {
+     if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+     centrality_->newEvent(iEvent,iSetup);
+     cBin = (int)centrality_->getBin();
+   }
+   
 
    
    double extRadius_ = 0.42;
@@ -263,12 +279,15 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 void 
 IsoConeInspector::beginJob() 
 {
+  centrality_ = 0;
+
    NoE      = fs->make<TH1D>( "NoE"  , "", 1,  -100., 100. );
    theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
    theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
    theTree->Branch("nRH",&nRH,"nRH/I");
-
+   theTree->Branch("cBin",&cBin,"cBin/I");
+   
    theTree->Branch("et",&et,"et/F");
    theTree->Branch("eta",&eta,"eta/F");
    theTree->Branch("phi",&phi,"phi/F");
