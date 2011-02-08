@@ -41,10 +41,8 @@ def overrideBeamSpot(process):
 
 def overrideGlobalTag(process):
     process.GlobalTag.toGet = cms.VPSet(
-        cms.PSet(record = cms.string("EcalSRSettingsRcd"),
-                 tag = cms.string("EcalSRSettings_fullreadout_v01_mc"),
-                 connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_ECAL")
-                 ),        
+
+        #==================== MC Tables ====================
         cms.PSet(record = cms.string("HeavyIonRcd"),
                  tag = cms.string("CentralityTable_HFhits40_AMPTOrgan_v0_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
@@ -94,25 +92,24 @@ def overrideGlobalTag(process):
                  label = cms.untracked.string("PixelHitsHydjet_Guitar")
                  ),
         
-
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
 
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_AMPTOrgan_v0_Run151076n151153n151350_AMPTOrgan_offline"),
+                 tag = cms.string("CentralityTable_PixelHits40_Glauber2010A_v0_effA_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
                  label = cms.untracked.string("PixelHits")
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_Glauber2010A_Run151076n151153n151350_v2_offline"),
+                 tag = cms.string("CentralityTable_HFhits40_Glauber2010A_v0_effA_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),                 
                  label = cms.untracked.string("HFhits")
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v1_0Tesla_eff97_offline"),
+                 tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v0_effA_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
-                 label = cms.untracked.string("HFtowers0Tesla")
+                 label = cms.untracked.string("HFtowers")
                  ),
 
         )
