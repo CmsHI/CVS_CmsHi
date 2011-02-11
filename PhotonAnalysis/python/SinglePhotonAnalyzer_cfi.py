@@ -1,5 +1,5 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.13 2010/12/06 14:52:10 kimy Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.14 2011/02/11 17:27:57 kimy Exp $
 # 
 
 import FWCore.ParameterSet.Config as cms
@@ -38,11 +38,11 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       L1NonIsolTag              = cms.InputTag("l1extraParticles","NonIsolated"),
                                       # The results of these trigger paths will get stored in the TTree by their name
                                       TriggerPathsToStore       = cms.vstring("HLT_MinBias", "HLT_MinBiasBSC", "HLT_MinBiasBSC_NoBPTX", "HLT_MinBiasBSC_OR",
-                                            "HLT_L1SingleEG5",
-                                            "HLT_L1SingleEG8",
-                                            "HLT_Photon10_L1R",
-                                            "HLT_Photon15_L1R",
-                                            "HLT_Photon20_L1R"),
+                                                                              "HLT_L1SingleEG5",
+                                                                              "HLT_L1SingleEG8",
+                                                                              "HLT_Photon10_L1R",
+                                                                              "HLT_Photon15_L1R",
+                                                                              "HLT_Photon20_L1R"),
                                       GammaPtMin                = cms.untracked.double(15),
                                       GammaEtaMax               = cms.untracked.double(3.0),
                                       McPtMin                   = cms.untracked.double(10),
@@ -59,7 +59,7 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       doStoreHF                 = cms.untracked.bool(True),
                                       doStoreVertex             = cms.untracked.bool(True),
                                       doStoreMET                = cms.untracked.bool(False),
-                                      doStoreJets               = cms.untracked.bool(True),
+                                      doStoreJets               = cms.untracked.bool(False),
                                       doStoreCompCone           = cms.untracked.bool(True),
                                       doStoreConversions        = cms.untracked.bool(False)
                                       )
