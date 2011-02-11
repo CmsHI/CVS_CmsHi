@@ -1,4 +1,3 @@
-
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("PAT")
@@ -26,14 +25,14 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:/net/hidsk0001/d00/scratch/jazzitup/temp/ppZeeRAW-RECO.root'
+    ___inf___
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
     )
                             )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('ecalRechit_photon15trig.root'),
+                                   fileName = cms.string('___TFoutf___'),
                                    closeFileFast = cms.untracked.bool(True)
                                    )
 ########################################################################################
@@ -47,7 +46,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(500)
 
 # Modification for HI
 process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
-process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
+process.multiPhotonAnalyzer.OutputFile = cms.string('___outf1___')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
@@ -102,10 +101,10 @@ process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("offlinePrimaryVertice
 process.multiPhotonAnalyzer.doStoreCentrality = False
 process.multiPhotonAnalyzer.TrackProducer     = cms.InputTag('generalTracks')
 
-process.cleanPhotons.primaryVertexProducer = cms.string('offlinePrimaryVerticesWithBS')
+process.cleanPhotons.primaryVertexProducer = cms.InputTag('offlinePrimaryVerticesWithBS')
 process.cleanPhotons.isolationSumsCalculatorSet.trackProducer = cms.InputTag('generalTracks')
-process.complePhoton.primaryVertexProducer = cms.string('offlinePrimaryVerticesWithBS')
-process.complePhoton.isolationSumsCalculatorSet.trackProducer = cms.InputTag('generalTracks')
+process.compleCleanPhoton.primaryVertexProducer = cms.InputTag('offlinePrimaryVerticesWithBS')
+process.compleCleanPhoton.isolationSumsCalculatorSet.trackProducer = cms.InputTag('generalTracks')
 
 process.gamIsoDepositTk.ExtractorPSet.inputTrackCollection   =  cms.InputTag("generalTracks")
 process.isolationInputParameters.track = cms.InputTag("generalTracks")
