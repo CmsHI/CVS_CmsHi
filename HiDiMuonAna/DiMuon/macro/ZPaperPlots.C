@@ -82,7 +82,7 @@ void ZPaperPlots()
 
   // Their predictions
   int ColCT= kGreen+2 ; int StyCT = 2 ;
-  int ColEPS = kAzure ; int StyEPS = 4 ;
+  int ColEPS = kAzure ; int StyEPS = 4 ; int FilEPS = 3003;
   int ColnDS = kMagenta ; int StynDS = 4 ;
   int ColIso = kOrange+3 ; int StyIso = 3 ;
   int ColEl = kRed ; int StyEl = 5 ;
@@ -92,7 +92,7 @@ void ZPaperPlots()
   // Our points
   int MarkUs = 20; 
   int ColUs = kRed;
-  float SizUs = 2.2;
+  float SizUs = 2.8;
   int SystSiz = 12;
   int SystCol = kOrange+2;
 
@@ -101,15 +101,16 @@ void ZPaperPlots()
   float yt = 0.895;
 
   // Systematic uncertanity
-  float Syst =0.12;
+  float Syst =0.13;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   TCanvas *C1 = new TCanvas("ZY","Z versus rapidity",500,500);
 
-  TH1F *dummy = new TH1F("","",30,0.,2.1);
+  TH1F *dummy = new TH1F("","",30,0.,2.0);
   dummy->SetMinimum(0.);
-  dummy->SetMaximum(6E-7);
+  dummy->SetMaximum(60);
+  //  TGaxis->SetMaxDigits(2);
   dummy->SetXTitle("Rapidity");
   dummy->SetYTitle("dN/dy");
   dummy->Draw();
@@ -138,9 +139,9 @@ void ZPaperPlots()
   Double_t CT10_sig[21] = {62.12,62.07,61.93,61.67,61.27,60.73,59.94,58.85,57.36,55.31,52.52,48.97,44.12,38.23,31.22,23.4,15.5,8.52,3.47,0.83,0.83};
   Double_t CT10_err[21] = {3.12,3.09,3.00,2.85,2.68,2.51,2.35,2.22,2.14,2.08,2.02,1.93,1.80,1.61,1.36,1.07,0.77,0.49,0.27,0.14,0.14};
 
-  // Scale by AxA and 7.65 barns
+  // Scale by AxA and 7.65 barns (and by artificial factor for the scale)
 
-  float Norm = 208*208/7.65E12;
+  float Norm = 208*208/7.65E12*1E8;
  
   for (int i=0;i<21;i++) {
     EPS09_sig[i] *= Norm ;
@@ -281,6 +282,8 @@ void ZPaperPlots()
   Double_t Z_rap_syst_plus[3] ; Double_t Z_rap_syst_minus[3] ; 
   Double_t e_rap[3] = {0.11,0.11,0.26}; // RMS ? 
   for (int i=0;i<3;i++) {
+    Z_rap[i] *= 1E8;
+    Z_rap_e[i] *= 1E8;
     x_rap_min[i] = x_rap[i] - x_rap_min[i];
     x_rap_max[i] = x_rap_max[i] - x_rap[i];    
     // Z_rap[i] *= 7.650E6 ; Z_rap_e[i] *= 7.650E6 ;
@@ -300,7 +303,7 @@ void ZPaperPlots()
 
   TH1F *h2 = (TH1F*) EPS09->Clone("EPS09bis");
   h2->SetFillColor(ColEPS-4);
-  h2->SetFillStyle(3001);
+  h2->SetFillStyle(FilEPS);
   h2->SetMarkerSize(0); 
 
   TLegend* Legend = new TLegend(0.18,0.18,0.6,0.48);
@@ -325,7 +328,8 @@ void ZPaperPlots()
 
   Legend->Draw(); 
 
-  write_tex(xt*3.0,yt*0.6E-6,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C1,16);
+  write_tex(xt*2.0,yt*60,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C1,16);
+  write_tex(0,60*1.008,"x10^{-8}",C1,18);
   //  write_tex(0.9,5.2E-7,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C1,16);
   //  write_tex(1.75,4.4E-7,"#int Ldt = 7.2 #mub^{-1}", C1,16);
 
@@ -362,13 +366,13 @@ void ZPaperPlots()
   TCanvas *C2 = new TCanvas("ZPT","Z versus transverse momentum",500,500);
   if (dolog) C2->SetLogy();
 
-  TH1F *dummy = new TH1F("","",30,0.,38.);
+  TH1F *dummy = new TH1F("","",30,0.,36.);
   if (dolog) {
     dummy->SetMinimum(2E-9); // 0.002
     dummy->SetMaximum(1E-7); // 1. 
   } else {
     dummy->SetMinimum(0); // 0.002
-    dummy->SetMaximum(0.33E-7); // 1. 
+    dummy->SetMaximum(3.3); // 1. 
   }
   
   dummy->SetXTitle("Transverse momentum (GeV/c)");
@@ -513,6 +517,8 @@ void ZPaperPlots()
   for (int i=0;i<3;i++) {
     x_pt_min[i] = x_pt[i] - x_pt_min[i];
     x_pt_max[i] = x_pt_max[i] - x_pt[i];
+    Z_pt[i] *= 1E8;
+    Z_pt_e[i] *= 1E8;
     // Z_pt[i] *= 7.650E6 ; Z_pt_e[i] *= 7.650E6 ;
     Z_pt_syst_plus[i] = Syst * Z_pt[i] ;
     Z_pt_syst_minus[i] = Syst * Z_pt[i] ;
@@ -546,7 +552,8 @@ void ZPaperPlots()
     write_tex(9,6E-8,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C2,16);
     write_tex(0.8,0.013,"#int Ldt = 7.2 #mub^{-1}", C2,16);
   } else {
-    write_tex(xt*40,yt*33E-9,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C2,16);
+    write_tex(xt*36,yt*3.3,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C2,16);
+    write_tex(0,3.3*1.008,"x10^{-8}",C1,18);
     // write_tex(12,26E-9,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C2,16);
     // write_tex(22,15E-9,"#int Ldt = 7.2 #mub^{-1}", C2,16);
   }
@@ -570,14 +577,14 @@ void ZPaperPlots()
   float top = 110; 
 
   Double_t Npart[3] = {356,224,46}; // from most central to most peripheral
-  Double_t TAB[3] = {23.1,11.6,1.45} ; // TAB (aka Ncoll / sigma_pp in mb )
-  Double_t TAB_e[3] = {1.9,0.63,0.13} ;
+  Double_t TAB[3] = {23.2,11.6,1.45} ; // TAB (aka Ncoll / sigma_pp in mb )
+  Double_t TAB_e[3] = {1.0,0.71,0.18} ;
   Double_t Z_cent[3] = {1.65E-6, 5.95E-7, 7.92E-8} ; // dN/dy
   Double_t Z_cent_e[3] = {4.0E-7, 1.6E-7, 3.00E-8} ; 
   Double_t Z_cent_syst_plus[3] ; Double_t Z_cent_syst_minus[3] ;
 
   Double_t Npart_MB[1] ; Npart_MB[0] = 113 ;
-  Double_t TAB_MB = 5.67 ;
+  Double_t TAB_MB = 5.66 ;
   Double_t TAB_MB_e = 0.30 ;
   Double_t Z_MB[1] ; Z_MB[0] = 3.46E-7 / (TAB_MB*1E-9) ; // in pb 
   Double_t Z_MB_e[1] ; Z_MB_e[0] = 5.67E-8 / (TAB_MB*1E-9) ; // in pb
@@ -595,7 +602,7 @@ void ZPaperPlots()
     cout << " Z_cent[i] = " <<  Z_cent[i] <<endl;
   }
 
-  TH1F *dummy = new TH1F("","",50,0.,400.);
+  TH1F *dummy = new TH1F("","",50,0.,416.);
   dummy->SetMinimum(0.);
   dummy->SetMaximum(top);
   dummy->SetXTitle("N_{part}");
@@ -625,16 +632,21 @@ void ZPaperPlots()
   Z_MB_graf_syst->Print();
 
   TGraphErrors *Z_MB_graf = new TGraphErrors(1,Npart_MB,Z_MB,0,Z_MB_e); 
-  Z_MB_graf->SetMarkerStyle(21);
+  Z_MB_graf->SetMarkerStyle(25);
   Z_MB_graf->SetMarkerColor(kBlue);
   Z_MB_graf->SetMarkerSize(SizUs);
   Z_MB_graf->SetLineWidth(2);
   cout << " == MB RAA and systematic error" << endl;
   Z_MB_graf->Print();
 
+  TGraphErrors *Z_MB_graf_bis = new TGraphErrors(1,Npart_MB,Z_MB,0,0); 
+  Z_MB_graf_bis->SetMarkerStyle(21);
+  Z_MB_graf_bis->SetMarkerColor(kWhite);
+  Z_MB_graf_bis->SetMarkerSize(SizUs);
+
   // POWHEG
   TFile *powheg_file = new TFile("Acc/POWHEG.root");
-  TH1F *Powheg_cent = new TH1F("Powheg_cent","Powheg_cent",1,0.,400.);
+  TH1F *Powheg_cent = new TH1F("Powheg_cent","Powheg_cent",1,0.,416.);
   // Trick to get the entries, since we cut on mass and the dum histo is 0 to 400, ok !   
   Events->Project("Powheg_cent","dimumass","dimumass<120&&dimumass>60&&zy>-2.0&&zy<2.0");
   Powheg_cent->Scale(578.4/Events->GetEntries()/4); 
@@ -646,21 +658,21 @@ void ZPaperPlots()
 
   cout << "POWHEG Integrated " << Powheg_cent->GetBinContent(1) << endl;  
 
-  TH1F *EPS09_cent = new TH1F("EPS09_cent","EPS09_cent",1,0.,400.);
+  TH1F *EPS09_cent = new TH1F("EPS09_cent","EPS09_cent",1,0.,416.);
   EPS09_cent->SetBinContent(1,243.9/4.0);
   EPS09_cent->SetBinError(1,15./4.0);
   EPS09_cent->SetLineStyle(StyEPS); 
   EPS09_cent->SetLineColor(ColEPS); 
   EPS09_cent->SetLineWidth(SizTh); 
 
-  TH1F *CT10_cent = new TH1F("CT10_cent","CT10_cent",1,0.,400.);
+  TH1F *CT10_cent = new TH1F("CT10_cent","CT10_cent",1,0.,416.);
   CT10_cent->SetBinContent(1,249.0/4.0);
   // CT10_cent->SetBinError(1,9.3/4.0);
   CT10_cent->SetLineStyle(StyCT); 
   CT10_cent->SetLineColor(ColCT); 
   CT10_cent->SetLineWidth(SizTh); 
 
-  TH1F *IvIso_cent = new TH1F("IvIso_cent","IvIso_cent",1,0.,400.);
+  TH1F *IvIso_cent = new TH1F("IvIso_cent","IvIso_cent",1,0.,416.);
   IvIso_cent->SetBinContent(1,62.8);
   // CT10_cent->SetBinError(1,9.3/4.0);
   IvIso_cent->SetLineStyle(StyIso); 
@@ -672,7 +684,7 @@ void ZPaperPlots()
   cbins[0] = 0;
   cbins[1] = (Npart[2]+Npart[1])/2;
   cbins[2] = (Npart[1]+Npart[0])/2;
-  cbins[3] = 400;
+  cbins[3] = 416;
 //
   TH1F *IvEl_cent = new TH1F("IvEl_cent","IvEl_cent",3,cbins);
   IvEl_cent->SetBinContent(1,62.2);
@@ -684,7 +696,7 @@ void ZPaperPlots()
 
   TH1F *h3 = (TH1F*) EPS09_cent->Clone("EPS09ter");
   h3->SetFillColor(ColEPS-4);
-  h3->SetFillStyle(3001);
+  h3->SetFillStyle(FilEPS);
   h3->SetMarkerSize(0); 
 
   TLegend* Legend1 = new TLegend(0.20,0.72,0.88,0.82);
@@ -694,7 +706,7 @@ void ZPaperPlots()
   Legend1->AddEntry(Zcent_graf,"Centrality 30-100, 10-30, 0-10%","p"); 
   Legend1->AddEntry(Z_MB_graf,"Minimum bias 0-100%","p"); 
 
-  TLegend* Legend = new TLegend(0.28,0.18,0.88,0.43);
+  TLegend* Legend = new TLegend(0.25,0.18,0.88,0.43);
   Legend->SetFillColor(0);
   Legend->SetTextSize(0.037);
   Legend->SetBorderSize(0);
@@ -715,15 +727,16 @@ void ZPaperPlots()
   IvEl_cent->Draw("same");
   Powheg_cent->Draw("same");
 
-
   if (dodata) { 
     Zcent_graf_syst->Draw("E");
     Zcent_graf->Draw("P");
     Z_MB_graf_syst->Draw("E"); 
+    Z_MB_graf_bis->Draw("P");
     Z_MB_graf->Draw("P");
+
   }
 
-  write_tex(xt*400,yt*top,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C3,16);
+  write_tex(xt*416,yt*top,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C3,16);
   //  write_tex(300,80,"#int Ldt = 7.2 #mub^{-1}",C3,16);
 
   C3->Print("RaaZ.pdf"); 
