@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.15 2010/11/23 16:09:13 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.16 2010/12/06 13:45:35 kimy Exp $
  *
  */
 
@@ -221,6 +221,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   // Photon shower shape parameters 
   HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons);
+  
+  // sigmaIetaIet with various cuts.
+  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie40(kMaxPhotons), sieie55(kMaxPhotons);
+
   HTValVector<Float_t> r1x5(kMaxPhotons), r2x5(kMaxPhotons), e1x5(kMaxPhotons), e2x5(kMaxPhotons), e3x3(kMaxPhotons);
   // with lazyTool
   HTValVector<Float_t> eMax(kMaxPhotons), e2nd(kMaxPhotons), e2x2(kMaxPhotons), e3x2(kMaxPhotons), e4x4(kMaxPhotons), e5x5(kMaxPhotons);
@@ -428,6 +432,17 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     maxEnergyXtal(nphotonscounter) =  photon.maxEnergyXtal();
     sigmaEtaEta  (nphotonscounter) =  photon.sigmaEtaEta();
     sigmaIetaIeta(nphotonscounter) =  photon.sigmaIetaIeta();
+    
+    // other sieie values;
+    vector<float> lCov47 = lazyTool.localCovariances(*seed, 4.7 );
+    sieie47(nphotonscounter) = sqrt(lCov47[0]);
+    vector<float> lCov40 = lazyTool.localCovariances(*seed, 4.0 );
+    sieie40(nphotonscounter) = sqrt(lCov40[0]);
+    vector<float> lCov55 = lazyTool.localCovariances(*seed, 5.5 );
+    sieie55(nphotonscounter) = sqrt(lCov55[0]);
+
+
+
     r1x5         (nphotonscounter) =  photon.r1x5();
     r2x5         (nphotonscounter) =  photon.r2x5();
     e1x5         (nphotonscounter) =  photon.e1x5();
@@ -776,6 +791,14 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"maxEnergyXtal",maxEnergyXtal, pfx+"nPhotons");
   _ntuple->Column(pfx+"sigmaEtaEta",  sigmaEtaEta,   pfx+"nPhotons");
   _ntuple->Column(pfx+"sigmaIetaIeta",sigmaIetaIeta, pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"sieie47",sieie47, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie40",sieie40, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie55",sieie55, pfx+"nPhotons");
+
+
+
+
   _ntuple->Column(pfx+"r1x5",         r1x5,          pfx+"nPhotons");
   _ntuple->Column(pfx+"r2x5",         r2x5,          pfx+"nPhotons");
   _ntuple->Column(pfx+"e1x5",         e1x5,          pfx+"nPhotons");
