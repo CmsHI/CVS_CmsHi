@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.16 2010/12/06 13:45:35 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.17 2011/02/18 10:49:21 kimy Exp $
  *
  */
 
@@ -223,7 +223,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons);
   
   // sigmaIetaIet with various cuts.
-  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie40(kMaxPhotons), sieie55(kMaxPhotons);
+  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
 
   HTValVector<Float_t> r1x5(kMaxPhotons), r2x5(kMaxPhotons), e1x5(kMaxPhotons), e2x5(kMaxPhotons), e3x3(kMaxPhotons);
   // with lazyTool
@@ -436,10 +436,22 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     // other sieie values;
     vector<float> lCov47 = lazyTool.localCovariances(*seed, 4.7 );
     sieie47(nphotonscounter) = sqrt(lCov47[0]);
-    vector<float> lCov40 = lazyTool.localCovariances(*seed, 4.0 );
-    sieie40(nphotonscounter) = sqrt(lCov40[0]);
-    vector<float> lCov55 = lazyTool.localCovariances(*seed, 5.5 );
-    sieie55(nphotonscounter) = sqrt(lCov55[0]);
+    vector<float> lCov50 = lazyTool.localCovariances(*seed, 5.0 );
+    sieie50(nphotonscounter) = sqrt(lCov50[0]);
+    vector<float> lCov46 = lazyTool.localCovariances(*seed, 4.6 );
+    sieie46(nphotonscounter) = sqrt(lCov46[0]);
+    vector<float> lCov45 = lazyTool.localCovariances(*seed, 4.5 );
+    sieie45(nphotonscounter) = sqrt(lCov45[0]);
+    vector<float> lCov44 = lazyTool.localCovariances(*seed, 4.4 );
+    sieie44(nphotonscounter) = sqrt(lCov44[0]);
+    vector<float> lCov43 = lazyTool.localCovariances(*seed, 4.3 );
+    sieie43(nphotonscounter) = sqrt(lCov43[0]);
+    vector<float> lCov42 = lazyTool.localCovariances(*seed, 4.2 );
+    sieie42(nphotonscounter) = sqrt(lCov42[0]);
+    vector<float> lCov39 = lazyTool.localCovariances(*seed, 3.9 );
+    sieie39(nphotonscounter) = sqrt(lCov39[0]);
+    
+    //  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
 
 
 
@@ -793,8 +805,15 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"sigmaIetaIeta",sigmaIetaIeta, pfx+"nPhotons");
 
   _ntuple->Column(pfx+"sieie47",sieie47, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie40",sieie40, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie55",sieie55, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie50",sieie50, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie46",sieie46, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie45",sieie45, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie44",sieie44, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie43",sieie43, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie42",sieie42, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie39",sieie39, pfx+"nPhotons");
+
+  //  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
 
 
 
