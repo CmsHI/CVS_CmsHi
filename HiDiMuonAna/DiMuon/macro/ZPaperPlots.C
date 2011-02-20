@@ -97,7 +97,7 @@ void ZPaperPlots()
   int SystCol = kOrange+2;
 
   // Title
-  float xt = 0.0375;
+  float xt = 0.18;
   float yt = 0.895;
 
   // Systematic uncertanity
@@ -295,7 +295,7 @@ void ZPaperPlots()
   Zrap_graf_syst->SetLineWidth(SystSiz);
   Zrap_graf_syst->SetLineColor(SystCol);
 
-  TGraphAsymmErrors *Zrap_graf = new TGraphAsymmErrors(3,x_rap,Z_rap,x_rap_min,x_rap_max,Z_rap_e,Z_rap_e); 
+  TGraphAsymmErrors *Zrap_graf = new TGraphAsymmErrors(3,x_rap,Z_rap,0,0,Z_rap_e,Z_rap_e); 
   Zrap_graf->SetMarkerStyle(MarkUs);
   Zrap_graf->SetMarkerColor(ColUs);
   Zrap_graf->SetMarkerSize(SizUs);
@@ -327,8 +327,9 @@ void ZPaperPlots()
   //  Legend->AddEntry(Pythia_y,"Pythia, arbitrary scale","l");
 
   Legend->Draw(); 
-
-  write_tex(xt*2.0,yt*60,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C1,16);
+  write_tex(0.05*2.0,yt*60,"b)",C1,24);
+  write_tex(xt*2.0,yt*60,"CMS PbPb 7.2 #mub^{-1} at #sqrt{s_{NN}} = 2.76 TeV",C1,16);
+  //  write_tex(xt*2.0,yt*60,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C1,16);
   write_tex(0,60*1.008,"x10^{-8}",C1,18);
   //  write_tex(0.9,5.2E-7,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C1,16);
   //  write_tex(1.75,4.4E-7,"#int Ldt = 7.2 #mub^{-1}", C1,16);
@@ -528,7 +529,7 @@ void ZPaperPlots()
   Zpt_syst->SetLineWidth(SystSiz);
   Zpt_syst->SetLineColor(SystCol);
 
-  TGraphAsymmErrors *Zpt_graf = new TGraphAsymmErrors(3,x_pt,Z_pt,x_pt_min,x_pt_max,Z_pt_e,Z_pt_e); 
+  TGraphAsymmErrors *Zpt_graf = new TGraphAsymmErrors(3,x_pt,Z_pt,0,0,Z_pt_e,Z_pt_e); 
   Zpt_graf->SetMarkerStyle(MarkUs);
   Zpt_graf->SetMarkerColor(ColUs);
   Zpt_graf->SetMarkerSize(SizUs);
@@ -552,7 +553,9 @@ void ZPaperPlots()
     write_tex(9,6E-8,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C2,16);
     write_tex(0.8,0.013,"#int Ldt = 7.2 #mub^{-1}", C2,16);
   } else {
-    write_tex(xt*36,yt*3.3,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C2,16);
+    write_tex(0.05*36,yt*3.3,"c)",C2,24);
+    write_tex(xt*36,yt*3.3,"CMS PbPb 7.2 #mub^{-1} at #sqrt{s_{NN}} = 2.76 TeV",C2,16);
+    //    write_tex(xt*36,yt*3.3,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C2,16);
     write_tex(0,3.3*1.008,"x10^{-8}",C1,18);
     // write_tex(12,26E-9,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV",C2,16);
     // write_tex(22,15E-9,"#int Ldt = 7.2 #mub^{-1}", C2,16);
@@ -574,7 +577,7 @@ void ZPaperPlots()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TCanvas *C3 = new TCanvas("ZColl","Z versus centrality",500,500);
 
-  float top = 110; 
+  float top = 100; 
 
   Double_t Npart[3] = {356,224,46}; // from most central to most peripheral
   Double_t TAB[3] = {23.2,11.6,1.45} ; // TAB (aka Ncoll / sigma_pp in mb )
@@ -716,7 +719,7 @@ void ZPaperPlots()
   Legend->AddEntry(IvIso_cent,"Neufeld et al., MSTW+isospin","l"); 
   Legend->AddEntry(IvEl_cent,"Neufeld et al., idem+eloss","l"); 
 
-  Legend1->Draw();
+  //  Legend1->Draw();
   Legend->Draw();
   dummy->Draw("same");
 
@@ -736,8 +739,16 @@ void ZPaperPlots()
 
   }
 
-  write_tex(xt*416,yt*top,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C3,16);
+  write_tex(0.05*416,yt*top,"a)",C3,24);
+  write_tex(xt*416,yt*top,"CMS PbPb 7.2 #mub^{-1} at #sqrt{s_{NN}} = 2.76 TeV",C3,16);
+  //  write_tex(xt*416,yt*top,"CMS PbPb #sqrt{s_{NN}} = 2.76 TeV, #int Ldt = 7.2 #mub^{-1}",C3,16);
   //  write_tex(300,80,"#int Ldt = 7.2 #mub^{-1}",C3,16);
+
+  float shift = 4;
+  write_tex(Npart[2]-30,80,"[30-100]%",C3,16); 
+  write_tex(Npart[1]-32,70,"[10-30]%",C3,16);
+  write_tex(Npart[0]-26,44,"[0-10]%",C3,16);
+  write_tex(Npart_MB[0]-32,44,"[0-100]%",C3,16);
 
   C3->Print("RaaZ.pdf"); 
   C3->Print("RaaZ.jpg"); 
