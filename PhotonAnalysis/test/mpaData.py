@@ -56,13 +56,13 @@ process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
 # HiGoodMergedTrack
 process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
-process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
-process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
-process.hiGoodMergTrackSequence = cms.Sequence(
-    process.hiGoodTracksSelection*
-    process.conformalPixelTrackReco *
-    process.hiGoodMergedTracks
-    )
+#process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
+#process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
+#process.hiGoodMergTrackSequence = cms.Sequence(
+#    process.hiGoodTracksSelection*
+#    process.conformalPixelTrackReco *
+#    process.hiGoodMergedTracks
+#    )
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -107,7 +107,7 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 process.p = cms.Path(
     process.HIphotonTrig * 
     process.collisionEventSelection *
-    process.hiGoodMergTrackSequence *
+    process.hiGoodTracksSelection *  # process.hiGoodMergTrackSequence *
     process.hiPhotonCleaningSequence *
     process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
