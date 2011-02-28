@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.17 2011/02/18 10:49:21 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.18 2011/02/19 01:16:15 kimy Exp $
  *
  */
 
@@ -52,10 +52,8 @@
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 
-
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
 
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
@@ -222,8 +220,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   // Photon shower shape parameters 
   HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons);
   
-  // sigmaIetaIet with various cuts.
+  // sigmaIetaIet with various relative cuts.
   HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
+
+  // sigmaIetaIet with various absolute cuts.                                                                                    
+  HTValVector<Float_t>  sieie02a(kMaxPhotons), sieie03a(kMaxPhotons), sieie04a(kMaxPhotons), sieie06a(kMaxPhotons), sieie08a(kMaxPhotons), sieie10a(kMaxPhotons) ;       
 
   HTValVector<Float_t> r1x5(kMaxPhotons), r2x5(kMaxPhotons), e1x5(kMaxPhotons), e2x5(kMaxPhotons), e3x3(kMaxPhotons);
   // with lazyTool
@@ -451,6 +452,28 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     vector<float> lCov39 = lazyTool.localCovariances(*seed, 3.9 );
     sieie39(nphotonscounter) = sqrt(lCov39[0]);
     
+    // absolute cuts.   cut = eMax * exp(-v)   so, v = -log(cut/eMax)
+    float  theSeedE = eMax(nphotonscounter);
+    vector<float> lCov02a = lazyTool.localCovariances(*seed, -log(0.2/theSeedE) );
+    sieie02a(nphotonscounter) = sqrt(lCov02a[0]);
+    cout << "theSeedE = " << theSeedE << "    and cut = 0.2 " << "log (cut/theSeedE) = " << -log( 0.2 / theSeedE )  << endl;
+    vector<float> lCov03a = lazyTool.localCovariances(*seed, -log( 0.3 / theSeedE ) );
+    sieie03a(nphotonscounter) = sqrt(lCov03a[0]);
+    cout << "theSeedE = " << theSeedE << "    and cut = 0.3 " << "log (cut/theSeedE) = " << -log( 0.3 / theSeedE )  << endl;
+    vector<float> lCov04a = lazyTool.localCovariances(*seed, -log( 0.4 / theSeedE ) );
+    sieie04a(nphotonscounter) = sqrt(lCov04a[0]);
+    cout << "theSeedE = " << theSeedE << "    and cut = 0.4 " << "log (cut/theSeedE) = " << -log( 0.4 / theSeedE )  << endl;
+    vector<float> lCov06a = lazyTool.localCovariances(*seed, -log( 0.6 / theSeedE ) );
+    sieie06a(nphotonscounter) = sqrt(lCov06a[0]);
+    vector<float> lCov08a = lazyTool.localCovariances(*seed, -log( 0.8 / theSeedE ) );
+    sieie08a(nphotonscounter) = sqrt(lCov08a[0]);
+    vector<float> lCov10a = lazyTool.localCovariances(*seed, -log( 1.0 / theSeedE ) );
+    sieie10a(nphotonscounter) = sqrt(lCov10a[0]);
+
+    
+    
+
+
     //  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
 
 
@@ -812,6 +835,14 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"sieie43",sieie43, pfx+"nPhotons");
   _ntuple->Column(pfx+"sieie42",sieie42, pfx+"nPhotons");
   _ntuple->Column(pfx+"sieie39",sieie39, pfx+"nPhotons");
+
+  // absolute cuts
+  _ntuple->Column(pfx+"sieie02a",sieie02a, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie03a",sieie03a, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie04a",sieie04a, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie06a",sieie06a, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie08a",sieie08a, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sieie10a",sieie10a, pfx+"nPhotons");
 
   //  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
 
