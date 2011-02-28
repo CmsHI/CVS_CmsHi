@@ -54,8 +54,15 @@ process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 process.multiPhotonAnalyzer.OutputFile = cms.string('___outf___')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
-# HiGoodTrack
+# HiGoodMergedTrack
 process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
+process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
+process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
+process.hiGoodMergTrackSequence = cms.Sequence(
+    process.hiGoodTracksSelection*
+    process.conformalPixelTrackReco *
+    process.hiGoodMergedTracks
+    )
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -114,7 +121,7 @@ process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
     process.hiGenParticles * 
-    process.hiGoodTracksSelection * # process.highPurityTracks *
+    process.hiGoodMergTrackSequence *   # process.hiGoodTracksSelection * # process.highPurityTracks *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence *
