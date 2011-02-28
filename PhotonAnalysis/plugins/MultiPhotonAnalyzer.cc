@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.18 2011/02/19 01:16:15 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.19 2011/02/28 08:02:33 kimy Exp $
  *
  */
 
@@ -456,13 +456,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     float  theSeedE = eMax(nphotonscounter);
     vector<float> lCov02a = lazyTool.localCovariances(*seed, -log(0.2/theSeedE) );
     sieie02a(nphotonscounter) = sqrt(lCov02a[0]);
-    cout << "theSeedE = " << theSeedE << "    and cut = 0.2 " << "log (cut/theSeedE) = " << -log( 0.2 / theSeedE )  << endl;
+    //    cout << "theSeedE = " << theSeedE << "    and cut = 0.2 " << "log (cut/theSeedE) = " << -log( 0.2 / theSeedE )  << endl;
     vector<float> lCov03a = lazyTool.localCovariances(*seed, -log( 0.3 / theSeedE ) );
     sieie03a(nphotonscounter) = sqrt(lCov03a[0]);
-    cout << "theSeedE = " << theSeedE << "    and cut = 0.3 " << "log (cut/theSeedE) = " << -log( 0.3 / theSeedE )  << endl;
     vector<float> lCov04a = lazyTool.localCovariances(*seed, -log( 0.4 / theSeedE ) );
     sieie04a(nphotonscounter) = sqrt(lCov04a[0]);
-    cout << "theSeedE = " << theSeedE << "    and cut = 0.4 " << "log (cut/theSeedE) = " << -log( 0.4 / theSeedE )  << endl;
     vector<float> lCov06a = lazyTool.localCovariances(*seed, -log( 0.6 / theSeedE ) );
     sieie06a(nphotonscounter) = sqrt(lCov06a[0]);
     vector<float> lCov08a = lazyTool.localCovariances(*seed, -log( 0.8 / theSeedE ) );
