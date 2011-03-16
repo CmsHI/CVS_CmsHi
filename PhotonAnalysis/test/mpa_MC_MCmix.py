@@ -92,7 +92,7 @@ process.patHeavyIonDefaultSequence.remove(process.heavyIonCleanedGenJets)
 process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 # change the genEventScale to calculate the pT hat 
-process.multiPhotonAnalyzer.GenEventScale = cms.InputTag("generator")
+process.multiPhotonAnalyzer.GenEventScale = cms.InputTag("hiSignal")
 ############################################################
 
 ####################### tune ##############
@@ -113,7 +113,7 @@ process.patHeavyIonDefaultSequence.remove(process.selectedPatMuons)
 process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
-    #    process.hiGenParticles *                    
+ #   process.hiGenParticles * 
     process.hiGoodTracksSelection * # process.highPurityTracks *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
