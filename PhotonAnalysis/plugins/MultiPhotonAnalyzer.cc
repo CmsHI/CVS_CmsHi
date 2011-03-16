@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.20 2011/02/28 15:18:16 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.21 2011/03/15 16:29:52 kimy Exp $
  *
  */
 
@@ -95,6 +95,7 @@
 //Include Heavy Ion isolation variable calculator
 #include "RecoHI/HiEgammaAlgos/interface/CxCalculator.h"
 #include "RecoHI/HiEgammaAlgos/interface/RxCalculator.h"
+#include "RecoHI/HiEgammaAlgos/interface/TxCalculator.h"
 #include "RecoHI/HiEgammaAlgos/interface/TxyCalculator.h"
 #include "RecoHI/HiEgammaAlgos/interface/dRxyCalculator.h"
 
@@ -201,6 +202,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   // Heavy Ion variable calculator
   CxCalculator CxC(e,iSetup, basicClusterBarrel_, basicClusterEndcap_);
   RxCalculator RxC(e,iSetup, hbhe_, hf_, ho_);
+  TxCalculator TxC(e,iSetup, trackProducer_);
   TxyCalculator Txy(e,iSetup,trackProducer_);
   dRxyCalculator dRxy(e,iSetup,trackProducer_);
   
@@ -263,6 +265,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   // Heavy Ion Variables
   HTValVector<Float_t> c1(kMaxPhotons), c2(kMaxPhotons),c3(kMaxPhotons),c4(kMaxPhotons),c5(kMaxPhotons);
   HTValVector<Float_t> cc1(kMaxPhotons), cc2(kMaxPhotons),cc3(kMaxPhotons),cc4(kMaxPhotons),cc5(kMaxPhotons);
+  HTValVector<Float_t> t1(kMaxPhotons), t2(kMaxPhotons),t3(kMaxPhotons),t4(kMaxPhotons),t5(kMaxPhotons);
+  HTValVector<Float_t> ct1(kMaxPhotons), ct2(kMaxPhotons),ct3(kMaxPhotons),ct4(kMaxPhotons),ct5(kMaxPhotons);
+  HTValVector<Float_t> t1PtCut(kMaxPhotons), t2PtCut(kMaxPhotons),t3PtCut(kMaxPhotons),t4PtCut(kMaxPhotons),t5PtCut(kMaxPhotons);
+  HTValVector<Float_t> ct1PtCut(kMaxPhotons), ct2PtCut(kMaxPhotons),ct3PtCut(kMaxPhotons),ct4PtCut(kMaxPhotons),ct5PtCut(kMaxPhotons);
   HTValVector<Float_t> r1(kMaxPhotons), r2(kMaxPhotons),r3(kMaxPhotons),r4(kMaxPhotons),r5(kMaxPhotons);
   HTValVector<Float_t> cr1(kMaxPhotons), cr2(kMaxPhotons),cr3(kMaxPhotons),cr4(kMaxPhotons),cr5(kMaxPhotons);
   HTValVector<Float_t> dr11(kMaxPhotons),dr12(kMaxPhotons),dr13(kMaxPhotons),dr14(kMaxPhotons);
@@ -577,11 +583,24 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     c4                          (nphotonscounter)   =  CxC.getCx(photon.superCluster(),4,0);
     c5                          (nphotonscounter)   =  CxC.getCx(photon.superCluster(),5,0);
 
+    t1                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),1,0);
+    t2                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),2,0);
+    t3                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),3,0);
+    t4                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4,0);
+    t5                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),5,0);
+
     r1                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),1,0);
     r2                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),2,0);
     r3                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),3,0);
     r4                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),4,0);
     r5                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),5,0);
+
+    t1PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),1,2); // 2 GeV cut
+    t2PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),2,2);
+    t3PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),3,2);
+    t4PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4,2);
+    t5PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),5,2);
+
 
     cc1                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),1,0);
     cc2                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),2,0);
@@ -589,11 +608,24 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     cc4                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),4,0);
     cc5                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),5,0);
 
+    ct1                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),1,0);
+    ct2                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),2,0);
+    ct3                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),3,0);
+    ct4                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,0);
+    ct5                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,0);
+
     cr1                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),1,0);
     cr2                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),2,0);
     cr3                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),3,0);
     cr4                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),4,0);
     cr5                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),5,0);
+
+    ct1PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),1,2); // 2 GeV cut
+    ct2PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),2,2); 
+    ct3PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),3,2);
+    ct4PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,2);
+    ct5PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,2);
+
 
     dr11                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,1);
     dr12                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,2);
@@ -963,11 +995,37 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"r4",                           r4,                           pfx+"nPhotons");
   _ntuple->Column(pfx+"r5",                           r5,                           pfx+"nPhotons");
 
+  _ntuple->Column(pfx+"t1",                           t1,                           pfx+"nPhotons");
+  _ntuple->Column(pfx+"t2",                           t2,                           pfx+"nPhotons");
+  _ntuple->Column(pfx+"t3",                           t3,                           pfx+"nPhotons");
+  _ntuple->Column(pfx+"t4",                           t4,                           pfx+"nPhotons");
+  _ntuple->Column(pfx+"t5",                           t5,                           pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"t1PtCut",                      t1PtCut,			    pfx+"nPhotons");
+  _ntuple->Column(pfx+"t2PtCut",                      t2PtCut,			    pfx+"nPhotons");
+  _ntuple->Column(pfx+"t3PtCut",                      t3PtCut,			    pfx+"nPhotons");
+  _ntuple->Column(pfx+"t4PtCut",                      t4PtCut,			    pfx+"nPhotons");
+  _ntuple->Column(pfx+"t5PtCut",                      t5PtCut,			    pfx+"nPhotons");
+
+
   _ntuple->Column(pfx+"cc1",                          cc1,                          pfx+"nPhotons");
   _ntuple->Column(pfx+"cc2",                          cc2,                          pfx+"nPhotons");
   _ntuple->Column(pfx+"cc3",                          cc3,                          pfx+"nPhotons");
   _ntuple->Column(pfx+"cc4",                          cc4,                          pfx+"nPhotons");
   _ntuple->Column(pfx+"cc5",                          cc5,                          pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"ct1",                          ct1,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct2",                          ct2,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct3",                          ct3,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct4",                          ct4,                          pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct5",                          ct5,                          pfx+"nPhotons");
+
+  _ntuple->Column(pfx+"ct1PtCut",                      ct1PtCut,		    pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct2PtCut",                      ct2PtCut,		    pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct3PtCut",                      ct3PtCut,		    pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct4PtCut",                      ct4PtCut,		    pfx+"nPhotons");
+  _ntuple->Column(pfx+"ct5PtCut",                      ct5PtCut,		    pfx+"nPhotons");
+
 
   _ntuple->Column(pfx+"cr1",                          cr1,                          pfx+"nPhotons");
   _ntuple->Column(pfx+"cr2",                          cr2,                          pfx+"nPhotons");
