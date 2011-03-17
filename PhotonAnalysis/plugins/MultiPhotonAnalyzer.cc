@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.21 2011/03/15 16:29:52 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.22 2011/03/16 15:25:22 yjlee Exp $
  *
  */
 
@@ -269,6 +269,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> ct1(kMaxPhotons), ct2(kMaxPhotons),ct3(kMaxPhotons),ct4(kMaxPhotons),ct5(kMaxPhotons);
   HTValVector<Float_t> t1PtCut(kMaxPhotons), t2PtCut(kMaxPhotons),t3PtCut(kMaxPhotons),t4PtCut(kMaxPhotons),t5PtCut(kMaxPhotons);
   HTValVector<Float_t> ct1PtCut(kMaxPhotons), ct2PtCut(kMaxPhotons),ct3PtCut(kMaxPhotons),ct4PtCut(kMaxPhotons),ct5PtCut(kMaxPhotons);
+
+  HTValVector<Float_t> trackIsohi10(kMaxPhotons), trackIsohi15(kMaxPhotons), trackIsohi20(kMaxPhotons);
+  
   HTValVector<Float_t> r1(kMaxPhotons), r2(kMaxPhotons),r3(kMaxPhotons),r4(kMaxPhotons),r5(kMaxPhotons);
   HTValVector<Float_t> cr1(kMaxPhotons), cr2(kMaxPhotons),cr3(kMaxPhotons),cr4(kMaxPhotons),cr5(kMaxPhotons);
   HTValVector<Float_t> dr11(kMaxPhotons),dr12(kMaxPhotons),dr13(kMaxPhotons),dr14(kMaxPhotons);
@@ -626,6 +629,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     ct4PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,2);
     ct5PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,2);
 
+    trackIsohi10                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 1.0, 0.04);
+    trackIsohi15                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 1.5, 0.04);
+    trackIsohi20                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 2.0, 0.04);
 
     dr11                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,1);
     dr12                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,2);
@@ -1025,6 +1031,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"ct3PtCut",                      ct3PtCut,		    pfx+"nPhotons");
   _ntuple->Column(pfx+"ct4PtCut",                      ct4PtCut,		    pfx+"nPhotons");
   _ntuple->Column(pfx+"ct5PtCut",                      ct5PtCut,		    pfx+"nPhotons");
+
+
+  _ntuple->Column(pfx+"trackIsohi10",                  trackIsohi10,                pfx+"nPhotons");
+  _ntuple->Column(pfx+"trackIsohi15",                  trackIsohi15,                pfx+"nPhotons");
+  _ntuple->Column(pfx+"trackIsohi20",                  trackIsohi20,                pfx+"nPhotons");
 
 
   _ntuple->Column(pfx+"cr1",                          cr1,                          pfx+"nPhotons");
