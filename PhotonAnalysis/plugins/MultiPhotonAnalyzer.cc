@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.22 2011/03/16 15:25:22 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.23 2011/03/17 13:32:15 kimy Exp $
  *
  */
 
@@ -629,9 +629,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     ct4PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,2);
     ct5PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,2);
 
-    trackIsohi10                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 1.0, 0.04);
-    trackIsohi15                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 1.5, 0.04);
-    trackIsohi20                 (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4, 2.0, 0.04);
+    trackIsohi10                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 1.0, 0.04);
+    trackIsohi15                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 1.5, 0.04);
+    trackIsohi20                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 2.0, 0.04);
 
     dr11                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,1);
     dr12                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,2);
