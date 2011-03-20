@@ -29,7 +29,12 @@ process.source = cms.Source("PoolSource",
     'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
-    )
+    ),
+                            inputCommands = cms.untracked.vstring(
+    'keep *',
+    'drop recoSuperClusters_*_*_*',
+    'drop recoPhotons_*_*_*',
+    'drop recoPhotonCores_*_*_*')
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -43,7 +48,7 @@ process.load('PhysicsTools.PatAlgos.patHeavyIonSequences_cff')
 from PhysicsTools.PatAlgos.tools.heavyIonTools import *
 configureHeavyIons(process)
 from PhysicsTools.PatAlgos.tools.coreTools import *
-process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(500)
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(100)
 
 # Modification for HI
 process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
@@ -54,8 +59,15 @@ process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
-# HiGoodTrack
+# HiGoodMergedTrack
 process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
+#process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
+#process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
+#process.hiGoodMergTrackSequence = cms.Sequence(
+#    process.hiGoodTracksSelection*
+#    process.conformalPixelTrackReco *
+#    process.hiGoodMergedTracks
+#    )
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -89,26 +101,19 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 # =============== Trigger selection ====================
-process.HIphotonTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
-    HLTPaths = cms.vstring('HLT_HIPhoton20')
-    ) 
 process.HIminbiasTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
     HLTPaths = cms.vstring('HLT_HIMinBiasHfOrBSC_Core')
     )
-
-
-# event counter
-process.load("CmsHi.PhotonAnalysis.evtCounter_cfi")
 
 # clean collision selection
 process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 # the path! 
 process.p = cms.Path(
-    process.HIminbiasTrig *
+    process.HIminbiasTrig * #    process.HIphotonTrig * 
     process.collisionEventSelection *
-    process.evtCounter *
-    process.hiGoodTracksSelection * 
+    process.hiGoodTracksSelection *  # process.hiGoodMergTrackSequence *
+    process.hiEcalClusteringSequence *
     process.hiPhotonCleaningSequence *
     process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
