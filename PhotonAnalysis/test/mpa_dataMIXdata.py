@@ -80,6 +80,12 @@ photonObj = "cleanPhotons"
 process.patPhotons.photonSource = cms.InputTag(photonObj)
 process.photonMatch.src = cms.InputTag(photonObj)
 process.PhotonIDProd.photonProducer  = cms.string(photonObj)
+process.gamIsoDepositTk.src = cms.InputTag(photonObj)
+process.gamIsoDepositEcalFromHits.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalFromTowers.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalDepth1FromTowers.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
+
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
 
