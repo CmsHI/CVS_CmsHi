@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.23 2011/03/17 13:32:15 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.24 2011/03/17 14:02:10 kimy Exp $
  *
  */
 
@@ -238,7 +238,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> e2overe8(kMaxPhotons); //NEW
   HTValVector<Float_t> covPhiPhi(kMaxPhotons), covEtaPhi(kMaxPhotons), covEtaEta(kMaxPhotons);
 
-  HTValVector<Float_t> seedTime(kMaxPhotons), seedChi2(kMaxPhotons), seedOutOfTimeChi2(kMaxPhotons);
+  HTValVector<Float_t> seedTime(kMaxPhotons), seedChi2(kMaxPhotons), seedOutOfTimeChi2(kMaxPhotons), seedEnergy(kMaxPhotons);
   HTValVector<Float_t> tLef(kMaxPhotons), tRight(kMaxPhotons), tTop(kMaxPhotons), tBottom(kMaxPhotons);  
   HTValVector<Int_t>   seedRecoFlag(kMaxPhotons), seedSeverity(kMaxPhotons);
   
@@ -386,6 +386,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	    chi2 = it->chi2();
 	    flags = it->recoFlag();
 	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
+            seedEnergy (nphotonscounter) = it->energy();
 	    //    }
 
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
@@ -920,6 +921,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"seedOutOfTimeChi2",seedOutOfTimeChi2, pfx+"nPhotons");
   _ntuple->Column(pfx+"seedRecoFlag",seedRecoFlag, pfx+"nPhotons");
   _ntuple->Column(pfx+"seedSeverity",seedSeverity, pfx+"nPhotons");
+  _ntuple->Column(pfx+"seedEnergy",seedEnergy, pfx+"nPhotons");
 
   _ntuple->Column(pfx+"tRight",    tRight,     pfx+"nPhotons");
   _ntuple->Column(pfx+"tLeft",     tLef,       pfx+"nPhotons");
