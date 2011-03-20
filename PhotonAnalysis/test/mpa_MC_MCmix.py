@@ -28,7 +28,13 @@ process.source = cms.Source("PoolSource",
     ___inf___
         # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
-    )
+    ),
+                            inputCommands = cms.untracked.vstring(
+    'keep *',
+    'drop recoSuperClusters_*_*_*',
+    'drop recoPhotons_*_*_*',
+    'drop recoPhotonCores_*_*_*')
+                            
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -115,6 +121,7 @@ process.p = cms.Path(
     #    process.collisionEventSelection *
  #   process.hiGenParticles * 
     process.hiGoodTracksSelection * # process.highPurityTracks *
+    process.hiEcalClusteringSequence *
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence *

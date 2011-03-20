@@ -29,7 +29,12 @@ process.source = cms.Source("PoolSource",
     'file:/d101/kimy/recoFiles/HiPhoton15_HIMinBiasHF_skim_99_1_LVg-151027.root'
     # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
-    )
+    ),
+                            inputCommands = cms.untracked.vstring(
+    'keep *',
+    'drop recoSuperClusters_*_*_*',
+    'drop recoPhotons_*_*_*',
+    'drop recoPhotonCores_*_*_*')
                             )
 
 process.TFileService = cms.Service("TFileService",
@@ -108,6 +113,7 @@ process.p = cms.Path(
     process.HIphotonTrig * 
     process.collisionEventSelection *
     process.hiGoodTracksSelection *  # process.hiGoodMergTrackSequence *
+    process.hiEcalClusteringSequence *
     process.hiPhotonCleaningSequence *
     process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
