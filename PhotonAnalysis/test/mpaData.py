@@ -113,7 +113,7 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 # =============== Trigger selection ====================
 process.HIphotonTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
-    HLTPaths = cms.vstring('HLT_HIPhoton20')
+    HLTPaths = cms.vstring('HLT_HIPhoton15')
     )
 
 # clean collision selection
