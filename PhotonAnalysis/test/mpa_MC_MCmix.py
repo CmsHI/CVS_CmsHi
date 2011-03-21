@@ -26,14 +26,17 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     ___inf___
-        # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
+    # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
     # '150431:1-150431:1000'
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
     'drop recoSuperClusters_*_*_*',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*')
+    'drop recoPhotonCores_*_*_*',
+    'drop recoCaloClusters_*_*_*'
+    ),
+                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
 
 process.TFileService = cms.Service("TFileService",
