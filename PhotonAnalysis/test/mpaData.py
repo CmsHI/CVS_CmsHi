@@ -34,8 +34,13 @@ process.source = cms.Source("PoolSource",
     'keep *',
     'drop recoSuperClusters_*_*_*',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*')
+    'drop recoPhotonCores_*_*_*',
+    'drop recoCaloClusters_*_*_*'
+    ),
+                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
+
+
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('ecalRechit_photon15trig.root'),
