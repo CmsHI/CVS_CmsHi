@@ -103,16 +103,21 @@ process.load("RandomConeAna.Configuration.randomConeSequence_cff")
 process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
 
 # turn off MC matching for data
+
+####################### tune ##############
+removeMCMatching(process, ['Photons'])
+removeMCMatching(process, ['Jets'])
+removeMCMatching(process, ['Muons'])
 removeMCMatching(process, ['Photons'])
 removeMCMatching(process, ['Jets'])
 removeMCMatching(process, ['Muons'])
 process.patHeavyIonDefaultSequence.remove(process.heavyIon)
-process.patHeavyIonDefaultSequence.remove(process.genPartons)
-process.patHeavyIonDefaultSequence.remove(process.hiPartons)
-process.patHeavyIonDefaultSequence.remove(process.heavyIonCleanedGenJets)
-process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
-process.patHeavyIonDefaultSequence.remove(process.photonMatch)
-process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
+process.patHeavyIonDefaultSequence.remove(process.makeHeavyIonJets)
+process.patHeavyIonDefaultSequence.remove(process.makeHeavyIonMuons)
+process.patHeavyIonDefaultSequence.remove(process.selectedPatJets)
+process.patHeavyIonDefaultSequence.remove(process.selectedPatMuons)
+########################################################################
+
 
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
