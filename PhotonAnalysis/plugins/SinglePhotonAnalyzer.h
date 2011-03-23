@@ -113,6 +113,9 @@ protected:
   edm::TriggerNames triggerNames_;    // TriggerNames class
 	
 
+  edm::InputTag EleTag_;  // gsf electrons
+  
+
   // HepMC switch for HI July Exercise.
   bool         isMC_; 
   

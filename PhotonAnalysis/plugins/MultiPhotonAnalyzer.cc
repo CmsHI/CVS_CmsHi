@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.24 2011/03/17 14:02:10 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.25 2011/03/20 07:52:14 yjlee Exp $
  *
  */
 
@@ -98,6 +98,12 @@
 #include "RecoHI/HiEgammaAlgos/interface/TxCalculator.h"
 #include "RecoHI/HiEgammaAlgos/interface/TxyCalculator.h"
 #include "RecoHI/HiEgammaAlgos/interface/dRxyCalculator.h"
+
+// Electron
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
+
+
 
 using namespace pat;
 using namespace edm;
@@ -197,6 +203,12 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   EcalClusterLazyTools lazyTool(e, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_ );   
 
+  // Tools to get electron informations.
+  edm::Handle<reco::GsfElectronCollection> EleHandle ;
+  iEvent.getByLabel (EleTag_.label(),EleHandle) ;
+  bool isEleRecoed = false;
+  if (EleHandle.isValid())  isEleRecoed=true;
+  
   // Tools to get the Track informations.
 
   // Heavy Ion variable calculator
@@ -284,7 +296,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> t41(kMaxPhotons),t42(kMaxPhotons),t43(kMaxPhotons),t44(kMaxPhotons);
   HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
 
-
+  HTValVector<> isElectron(
+			   // stopped here
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
   
