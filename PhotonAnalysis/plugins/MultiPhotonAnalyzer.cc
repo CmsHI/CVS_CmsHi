@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.25 2011/03/20 07:52:14 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.26 2011/03/23 17:32:34 kimy Exp $
  *
  */
 
@@ -164,10 +164,10 @@ int MultiPhotonAnalyzer::selectStorePhotons(const edm::Event& e,const edm::Event
   reco::PhotonCollection myCompPhotons;
 
   if (doStoreCompCone_) {
-
+     
      Handle<reco::PhotonCollection> compPhotons;
      e.getByLabel(compPhotonProducer_, compPhotons);
-
+     
      for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr) {
         myCompPhotons.push_back(*phoItr);
      }
@@ -205,9 +205,18 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 
   // Tools to get electron informations.
   edm::Handle<reco::GsfElectronCollection> EleHandle ;
-  iEvent.getByLabel (EleTag_.label(),EleHandle) ;
+  e.getByLabel (EleTag_.label(),EleHandle) ;
+  reco::GsfElectronCollection myEle;
+  
   bool isEleRecoed = false;
-  if (EleHandle.isValid())  isEleRecoed=true;
+  if (EleHandle.isValid())  
+     isEleRecoed=true;
+  
+  if ( isEleRecoed) {
+     for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr)	{
+	myEle.push_back(*eleItr);
+     }
+  }
   
   // Tools to get the Track informations.
 
@@ -296,8 +305,8 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> t41(kMaxPhotons),t42(kMaxPhotons),t43(kMaxPhotons),t44(kMaxPhotons);
   HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
 
-  HTValVector<> isElectron(
-			   // stopped here
+  HTValVector<bool> isElectron(kMaxPhotons);
+  
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
   
@@ -519,9 +528,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     e2x5         (nphotonscounter) =  photon.e2x5();
 
 
-
-// AOD isolation and identification
-
+    
+    // AOD isolation and identification
+    
     hadronicOverEm      (nphotonscounter)   =  photon.hadronicOverEm();
     hadronicDepth1OverEm(nphotonscounter)   =  photon.hadronicDepth1OverEm();
     hadronicDepth2OverEm(nphotonscounter)   =  photon.hadronicDepth2OverEm();
@@ -529,9 +538,23 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     caloIso             (nphotonscounter)   =  photon.caloIso();
     ecalIso             (nphotonscounter)   =  photon.ecalIso();
     hcalIso             (nphotonscounter)   =  photon.hcalIso();
+    
+    // electron id
+    bool isEleTemp = false;
+    if ( isEleRecoed ) {
+       for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
+	  if ( photon.superCluster()->energy() == eleItr->superCluster()->energy()) {
+	     cout << " this is electron " << endl;
+	     isEleTemp = true;
+	  }
+       }
+    }
+    
+    isElectron         (nphotonscounter)    =  isEleTemp;
+    
 
-    // Compl cones. 
-
+    
+    // comp cones;
     int nComp = 0;
     int allcomps = 0;
     float sumCompEIso=0;
@@ -1003,6 +1026,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"nTrkSolidConeDR03",            nTrkSolidConeDR03,            pfx+"nPhotons");
   _ntuple->Column(pfx+"nTrkHollowConeDR03",           nTrkHollowConeDR03,           pfx+"nPhotons");
 
+  // electron?
+  _ntuple->Column(pfx+"isEle",                        isElectron,                   pfx+"nPhotons");
+  
   // Heavy Ion stuffs
   _ntuple->Column(pfx+"c1",                           c1,                           pfx+"nPhotons");
   _ntuple->Column(pfx+"c2",                           c2,                           pfx+"nPhotons");

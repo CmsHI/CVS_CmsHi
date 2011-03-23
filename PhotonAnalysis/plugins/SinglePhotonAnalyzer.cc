@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.11 2010/11/16 11:35:05 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.12 2010/11/16 11:39:15 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -190,6 +190,11 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",true);
   doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",true);
   doStoreConversions_              = ps.getUntrackedParameter<bool>("doStoreConversions",false);
+
+  // electorn collection
+  EleTag_                          = ps.getUntrackedParameter<edm::InputTag>("gsfElectronCollection");
+  
+  
   
   // book ntuples; columns are defined dynamically later
   tplmgr = new HTupleManager(outputFile_.c_str(),"RECREATE");
