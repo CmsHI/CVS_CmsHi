@@ -32,7 +32,8 @@
 #include "FitFunctions.h"
 #include "TObjArray.h"
 bool IsAccept(Double_t pt, Double_t eta); //you can define acceptance here 
-void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
+float FindCenWeight(int Bin);//gives you weight according to cent
+void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
@@ -77,9 +78,9 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   double pt_bound[100] = {0};
   
   if(iSpec == 1) { 
-    Nptbin = 6;
+    Nptbin = 1;
     pt_bound[0] = 0;
-    pt_bound[1] = 5.0;
+    pt_bound[1] = 30.0;
     pt_bound[2] = 10.0;
     pt_bound[3] = 13.0;
     pt_bound[4] = 20.0;
@@ -92,15 +93,24 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   }
   
   if(iSpec == 2) { 
-    Nptbin = 7;
+    Nptbin = 13;
     pt_bound[0] = -2.4; 
-    pt_bound[1] = -1.9; 
-    pt_bound[2] = -1.6; 
-    pt_bound[3] = -0.8; 
-    pt_bound[4] = 0.8; 
-    pt_bound[5] = 1.6; 
-    pt_bound[6] = 1.9; 
-    pt_bound[7] = 2.4; 
+    pt_bound[1] = -2.1; 
+    pt_bound[2] = -1.9; 
+    pt_bound[3] = -1.6; 
+    pt_bound[4] = -1.2; 
+    pt_bound[5] = -0.8; 
+    pt_bound[6] = -0.4; 
+    pt_bound[7] = 0.4; 
+    pt_bound[8] = 0.8; 
+    pt_bound[9] = 1.2; 
+    pt_bound[10] = 1.6; 
+    pt_bound[11] = 1.9; 
+    pt_bound[12] = 2.1; 
+    pt_bound[13] = 2.4; 
+
+
+
 }
   
   if(iSpec == 3) {
@@ -139,7 +149,7 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   
   char nameGen[10][500], nameRec[10][500], nameGenPt[10][500], nameRecPt[10][500];
   
-  for (int ifile = 0; ifile <= 4; ifile++) {
+  for (int ifile = 0; ifile <= 5; ifile++) {
     for (Int_t ih = 0; ih < Nptbin; ih++) {
       sprintf(nameGen[ifile],"DiMuonMassGen_pt_%d_%d",ih,ifile);
       sprintf(nameRec[ifile],"DiMuonMassRec_pt_%d_%d",ih,ifile);
@@ -148,8 +158,15 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
       sprintf(nameRecPt[ifile],"DiMuonPtRec_pt_%d_%d",ih,ifile);
       
       diMuonsInvMass_GenA[ifile][ih]= new TH1D(nameGen[ifile],nameGen[ifile],  100,2.6,3.5); //for eff Gen;
+      diMuonsInvMass_GenA[ifile][ih]->SetMarkerStyle(7);
+      diMuonsInvMass_GenA[ifile][ih]->SetMarkerColor(4);
+      diMuonsInvMass_GenA[ifile][ih]->SetLineColor(4);
+                                   
       diMuonsInvMass_RecA[ifile][ih] = new TH1D(nameRec[ifile],nameRec[ifile], 100,2.6,3.5); //for eff Rec;
-      
+      diMuonsInvMass_RecA[ifile][ih]->SetMarkerStyle(8);
+      diMuonsInvMass_RecA[ifile][ih]->SetMarkerColor(4);
+      diMuonsInvMass_RecA[ifile][ih]->SetLineColor(4);
+
       diMuonsPt_GenA[ifile][ih]= new TH1D(nameGenPt[ifile],nameGenPt[ifile],  100,0,40); //for eff Gen;
       diMuonsPt_RecA[ifile][ih]= new TH1D(nameRecPt[ifile],nameRecPt[ifile],  100,0,40); //for eff Rec;
       //cout<< "  ifile "<< nameGen[ifile]<<endl;
@@ -160,12 +177,13 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   char fileName[10][500];
   //scales for different pT bins
   double scale[10]={0};  
-  //scale[0]=(0.0257069/0.00005571);
-  scale[0]=(0.0146199/0.00005571);
-  scale[1]=(0.00393391/0.00005571);
-  scale[2]=(0.000669658/0.00005571);
-  scale[3]=(0.000164187/0.00005571);
-  scale[4]=(0.00005571/0.00005571);
+  
+  scale[0]=(0.0257069/0.00005571);
+  scale[1]=(0.0146199/0.00005571);
+  scale[2]=(0.00393391/0.00005571);
+  scale[3]=(0.000669658/0.00005571);
+  scale[4]=(0.000164187/0.00005571);
+  scale[5]=(0.00005571/0.00005571);
   
   //0.000139274
   // scale[0]=(0.0257069/0.0257069);
@@ -177,12 +195,12 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   
 
   //Prompt JPsi
-  //sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
-  sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
-  sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
-  sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
-  sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
-  sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
+  sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
+  sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
+  sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
+  sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
+  sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
+  sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
     
   //Non Prompt JPsi
   //sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
@@ -200,7 +218,9 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
   TTree *tree;
   TTree *gentree;
   
-  for(int ifile =0; ifile<=4; ifile++){
+  //======================  File loop Starts ============================
+  for(int ifile =0; ifile<=5; ifile++){
+    
     infile=new TFile(fileName[ifile],"R");
     tree=(TTree*)infile->Get("SingleMuonTree");
     gentree=(TTree*)infile->Get("SingleGenMuonTree");
@@ -325,8 +345,9 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
  
 
       for (Int_t ih = 0; ih < Nptbin; ih++) {
+	
 	//adding pT of all pt bins to see diss is cont
-	if(iSpec == 1) {diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt);}
+	if(iSpec == 1) if (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1]) {diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt);}
 	
 
 	//if(iSpec == 1)  if( (GenPosIn==1 && GenNegIn==1) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
@@ -335,6 +356,9 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
 	
 	if(iSpec == 1)  if((GenPosIn==1 && GenNegIn==1 ) &&(TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
 	if(iSpec == 2)  if( (GenPosIn==1 && GenNegIn==1 )&& (GenJpsiPt<30.0) && (GenJpsiRap > pt_bound[ih] && GenJpsiRap<=pt_bound[ih+1]+0.0001)){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}	
+	
+	//cout<<"weight "<<FindCenWeight(gbin)<<endl;
+
 	if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1 ) && (gbin>pt_bound[ih] && gbin<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
       }
 
@@ -424,15 +448,15 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
     }
   
     
-    new TCanvas;
-    if(ifile==0){diMuonsRap_Gen0->Draw();new TCanvas; diMuonsRap_Rec0->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen0.png");}
-    if(ifile==1){diMuonsRap_Gen1->Draw();new TCanvas; diMuonsRap_Rec1->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen1.png");}
-    if(ifile==2){diMuonsRap_Gen2->Draw();new TCanvas; diMuonsRap_Rec2->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen2.png");}
-    if(ifile==3){diMuonsRap_Gen3->Draw();new TCanvas; diMuonsRap_Rec3->Draw();  gPad->Print("plots/NPdiMuonsRap_Gen3.png");}
-    if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw();  gPad->Print("plots/NPdiMuonsRap_Gen4.png");}
-    if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw();   gPad->Print("plots/NPdiMuonsRap_Gen5.png");}
+    //new TCanvas;
+    //if(ifile==0){diMuonsRap_Gen0->Draw();gPad->Print("plots/diMuonsRap_Gen0_Pt03.png"); new TCanvas; diMuonsRap_Rec0->Draw(); gPad->Print("plots/diMuonsRap_Rec0_Pt03.png");}
+    //if(ifile==1){diMuonsRap_Gen1->Draw();new TCanvas; diMuonsRap_Rec1->Draw(); gPad->Print("plots/diMuonsRap_Rec1.png");}
+    //if(ifile==2){diMuonsRap_Gen2->Draw();new TCanvas; diMuonsRap_Rec2->Draw(); gPad->Print("plots/diMuonsRap_Rec2.png");}
+    //if(ifile==3){diMuonsRap_Gen3->Draw();new TCanvas; diMuonsRap_Rec3->Draw();  gPad->Print("plots/diMuonsRap_Rec3.png");}
+    //if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw();  gPad->Print("plots/diMuonsRap_Rec4.png");}
+    //if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw();   gPad->Print("plots/diMuonsRap_Rec5.png");}
         
-  }  // file loop 
+  }  // file loop ends
 
   ///////////////////////////////////////////////////////////////////
   cout<< " adding "<<endl;
@@ -446,23 +470,27 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
     diMuonsInvMass_RecA[0][ih]->Sumw2();
     diMuonsInvMass_GenA[0][ih]->Sumw2();
 
+    diMuonsInvMass_RecA[0][ih]->Scale(scale[0]);
+    diMuonsInvMass_GenA[0][ih]->Scale(scale[0]);
 
     diMuonsInvMass_RecA1[ih] = diMuonsInvMass_RecA[0][ih];
     diMuonsInvMass_GenA1[ih] = diMuonsInvMass_GenA[0][ih];
 
-
+    diMuonsPt_GenA[0][ih]->Scale(scale[0]);
+    diMuonsPt_RecA[0][ih]->Scale(scale[0]);
+    
     diMuonsPt_GenA1[ih] = diMuonsPt_GenA[0][ih];
     diMuonsPt_RecA1[ih] = diMuonsPt_RecA[0][ih];
     
-    for (int ifile = 1; ifile <= 4; ifile++) {
+    for (int ifile = 1; ifile <= 5; ifile++) {
 
       diMuonsInvMass_RecA[ifile][ih]->Sumw2();
       diMuonsInvMass_GenA[ifile][ih]->Sumw2();
      
-
       //scale[ifile] =1;      
       diMuonsInvMass_RecA1[ih]->Add(diMuonsInvMass_RecA[ifile][ih],scale[ifile]);
       diMuonsInvMass_GenA1[ih]->Add(diMuonsInvMass_GenA[ifile][ih],scale[ifile]);     
+      
       diMuonsPt_GenA1[ih]->Add(diMuonsPt_GenA[ifile][ih],scale[ifile]); 
       diMuonsPt_RecA1[ih]->Add(diMuonsPt_RecA[ifile][ih],scale[ifile]); 
     
@@ -471,19 +499,13 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
  
  //===========================Fitting=================================================================================//
   // Fit ranges
-  float mass_low, mass_high, mlow, mhigh;
-  int nrebin;
-  bool isLog, isFit;
+  float mass_low, mass_high;
   double MassJPsi, WidthJPsi;
   
   // Low mass range J/psi
   MassJPsi = 3.096; WidthJPsi = 0.030;
-  mass_low = 2.6; mass_high = 3.7;  // Fit ranges
-  mlow = 2.6; mhigh = 3.7;   // Draw ranges
-  nrebin = 1; isLog = 0; isFit = 1; 
-   
-  //New Fit Functon
-  //TF1 *f1 = new TF1("f1","[0]*TMath::Gaus(x,[1],[2],1) + TMath::Pol2(x,[3],[4])",2.6,3.5);
+  mass_low = 2.9; mass_high = 3.3;  // Fit ranges
+  
   // Fit Function RBW + Pol2
   TF1 *GAUSPOL = new TF1("GAUSPOL", GausPol2, 2.6, 3.5, 6);
   
@@ -521,16 +543,40 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
     int binhi =diMuonsInvMass_RecA1[ih]->GetXaxis()->FindBin(MassHigh);
     double binwidth=diMuonsInvMass_RecA1[ih]->GetBinWidth(1);
         
+    
     //yield by function 
-    rec_pt[ih] = JPsiYield/binwidth;
-    rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
-      
+    //rec_pt[ih] = JPsiYield/binwidth;
+    //rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
+        
     //yield by histogram integral
     rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
     rec_ptError[ih]= recError;
     
+    //calculate Eff and error        
+    Eff_cat_1[ih] = rec_pt[ih]/gen_pt[ih]; 
+    Err_Eff_cat_1[ih]= Eff_cat_1[ih]*TMath::Sqrt(gen_ptError[ih]*gen_ptError[ih]/(gen_pt[ih]*gen_pt[ih]) + rec_ptError[ih]*rec_ptError[ih]/(rec_pt[ih]* rec_pt[ih]));
+
+
+
+    cout<<"=================================== This is bin "<<ih<<"================================================="<<endl;
+    cout<<"JPsi Yield by integral of histo:  "<< diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError) <<"  error "<< rec_ptError[ih]<<endl; 
+    cout<<"JPsiYield by Gauss yield determ:     "<< JPsiYield/binwidth << " JPsiWidth "<< JPsiWidth<<" JPsiMass "<<JPsiMass <<endl;
+    cout<<"JPsi Yield by Function integral:  "<< GAUSPOL->Integral(MassLow,MassHigh)/binwidth <<endl;
+    cout<<" Bin "<<ih<< " Reco Jpsi  "<<  rec_pt[ih] <<" Gen Jpsi "<<gen_pt[ih]<<endl;
+    cout<<" Eff "<< Eff_cat_1[ih]<<" Error "<<Err_Eff_cat_1[ih]<<endl;
+    
+
+    dataFile<<"=================================== This is bin "<<ih<<"============================================="<<endl;
+    dataFile<<"JPsi Yield by integral of histo:  "<< diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError) <<"  error "<< rec_ptError[ih]<<endl; 
+    dataFile<<"JPsiYield by Gauss yield det:     "<< JPsiYield/binwidth << " JPsiWidth "<< JPsiWidth<<" JPsiMass "<<JPsiMass <<endl;
+    dataFile<<"JPsi Yield by Function integral:  "<< GAUSPOL->Integral(MassLow,MassHigh)/binwidth <<endl;
+    dataFile<<" Bin "<<ih<< " Reco Jpsi  "<<  rec_pt[ih] <<" Gen Jpsi "<<gen_pt[ih]<<endl;
+    dataFile<<" Eff "<< Eff_cat_1[ih]<<" Error "<<Err_Eff_cat_1[ih]<<endl;
+   
+
+    //Drawing histo
     new TCanvas;
-    diMuonsInvMass_GenA1[ih]->Draw();
+    diMuonsInvMass_GenA1[ih]->Draw("EPL");
 
     
     if (iSpec==1){
@@ -540,22 +586,8 @@ void JPsiMassFit_All(int iSpec = 2) //iSpec =1 pT, =2 Rap, =3 Cent
       diMuonsPt_RecA1[ih]->Draw();
     }
 
-        
-    cout<<"JPsi Yield by integral of histo:  "<< diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError) <<"  error "<< rec_ptError[ih]<<endl; 
-    cout<<"JPsiYield by Gauss yield det:     "<< JPsiYield/binwidth << " JPsiWidth "<< JPsiWidth<<" JPsiMass "<<JPsiMass <<endl;
-    cout<<"JPsi Yield by Function integral:  "<< GAUSPOL->Integral(MassLow,MassHigh)/binwidth <<endl;
-    
-    cout<<" rec_pt[ih]  "<<  rec_pt[ih] <<" gen_pt[ih] "<<gen_pt[ih]<<endl;
-    dataFile<<" rec_pt[ih]  "<<  rec_pt[ih] <<" gen_pt[ih] "<<gen_pt[ih]<<endl;
-    
-    Eff_cat_1[ih] = rec_pt[ih]/gen_pt[ih]; 
-    Err_Eff_cat_1[ih]= Eff_cat_1[ih]*TMath::Sqrt(gen_ptError[ih]*gen_ptError[ih]/(gen_pt[ih]*gen_pt[ih]) + rec_ptError[ih]*rec_ptError[ih]/(rec_pt[ih]* rec_pt[ih]));
-
-    //simple error
-    //Err_Eff_cat_1[ih]= rec_ptError[ih]/gen_pt[ih];
-    cout<<" eff "<< Eff_cat_1[ih]<<" error "<<Err_Eff_cat_1[ih]<<endl;
-    dataFile<<" eff "<< Eff_cat_1[ih]<<" error "<<Err_Eff_cat_1[ih]<<endl;
   }
+
   dataFile.close();
 
   TGraphErrors *Eff_JPsi = new TGraphErrors(Nptbin, PT, Eff_cat_1, mom_err,Err_Eff_cat_1);
@@ -592,4 +624,13 @@ bool IsAccept(Double_t pt, Double_t eta)
 }
 
 
+
+float FindCenWeight(int Bin)
+{
+  float NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
+			522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
+			112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
+			13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851, };
+  return(NCollArray[Bin]);
+}
 

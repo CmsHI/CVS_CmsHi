@@ -29,7 +29,7 @@
 #include "FitFunctions.h"
 #include "TObjArray.h"
 bool IsAccept(Double_t pt, Double_t eta, Double_t p);
-void UpsilonMassFit_All(int isData = 2, int iSpec = 3)
+void UpsilonMassFit_All(int isData = 2, int iSpec = 1)
 {
   //gStyle->SetOptStat(1);
   //gStyle->SetOptFit(0000);
@@ -85,9 +85,9 @@ void UpsilonMassFit_All(int isData = 2, int iSpec = 3)
   if(iSpec == 1) { 
     if(isData == 2) {
       
-      Nptbin = 6;
+      Nptbin = 1;
       pt_bound[0] = 0;
-      pt_bound[1] = 5.0;
+      pt_bound[1] = 30.0;
       pt_bound[2] = 10.0;
       pt_bound[3] = 13.0;
       pt_bound[4] = 20.0;
@@ -467,9 +467,9 @@ void UpsilonMassFit_All(int isData = 2, int iSpec = 3)
     if(ifile==0){diMuonsRap_Gen0->Draw();new TCanvas; diMuonsRap_Rec0->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen0.png");}
     if(ifile==1){diMuonsRap_Gen1->Draw();new TCanvas; diMuonsRap_Rec1->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen1.png");}
     if(ifile==2){diMuonsRap_Gen2->Draw();new TCanvas; diMuonsRap_Rec2->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen2.png");}
-    if(ifile==3){diMuonsRap_Gen3->Draw();new TCanvas; diMuonsRap_Rec3->Draw();  gPad->Print("plots/NPdiMuonsRap_Gen3.png");}
-    if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw();  gPad->Print("plots/NPdiMuonsRap_Gen4.png");}
-    if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw();   gPad->Print("plots/NPdiMuonsRap_Gen5.png");}
+    if(ifile==3){diMuonsRap_Gen3->Draw();new TCanvas; diMuonsRap_Rec3->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen3.png");}
+    if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen4.png");}
+    if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen5.png");}
     
   }  // file loop 
 
@@ -484,17 +484,28 @@ void UpsilonMassFit_All(int isData = 2, int iSpec = 3)
 
   for(Int_t ih = 0; ih < Nptbin; ih++){
     
+    diMuonsInvMass_RecA[0][ih]->Sumw2();
+    diMuonsInvMass_GenA[0][ih]->Sumw2();
+    diMuonsInvMass_RecA[0][ih]->Scale(scale[0]);
+    diMuonsInvMass_GenA[0][ih]->Scale(scale[0]);
+    
     diMuonsInvMass_RecA1[ih] = diMuonsInvMass_RecA[0][ih];
     diMuonsInvMass_GenA1[ih] = diMuonsInvMass_GenA[0][ih];
+    
+     diMuonsPt_GenA[0][ih]->Scale(scale[0]);
+    diMuonsPt_RecA[0][ih]->Scale(scale[0]);
+
     diMuonsPt_GenA1[ih] = diMuonsPt_GenA[0][ih];
     diMuonsPt_RecA1[ih] = diMuonsPt_RecA[0][ih];
 
+    
+
     for (int ifile = 1; ifile <= 5; ifile++) {
 
-      //scale[ifile] =1;      
+      diMuonsInvMass_RecA[ifile][ih]->Sumw2();
+      diMuonsInvMass_GenA[ifile][ih]->Sumw2();
 
       diMuonsInvMass_RecA1[ih]->Add(diMuonsInvMass_RecA[ifile][ih],scale[ifile]);
-      //cout<<" scale1 "<<scale[ifile]<<endl;
       diMuonsInvMass_GenA1[ih]->Add(diMuonsInvMass_GenA[ifile][ih],scale[ifile]);     
       
       diMuonsPt_GenA1[ih]->Add(diMuonsPt_GenA[ifile][ih],scale[ifile]); 
