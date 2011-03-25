@@ -32,10 +32,15 @@ process.source = cms.Source("PoolSource",
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
-    'drop recoSuperClusters_*_*_*',
+    'drop recoSuperClusters_islandSuperClusters_*_*',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*')
+    'drop recoPhotonCores_*_*_*',
+    'drop recoCaloClusters_*_*_*'
+    ),
+                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
+
+
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('___TFoutf___'),
