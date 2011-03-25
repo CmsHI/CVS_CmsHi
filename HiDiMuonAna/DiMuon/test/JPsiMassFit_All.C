@@ -33,7 +33,7 @@
 #include "TObjArray.h"
 bool IsAccept(Double_t pt, Double_t eta); //you can define acceptance here 
 float FindCenWeight(int Bin);//gives you weight according to cent
-void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
+void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
@@ -78,11 +78,12 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
   double pt_bound[100] = {0};
   
   if(iSpec == 1) { 
-    Nptbin = 1;
+    Nptbin = 3;
     pt_bound[0] = 0;
-    pt_bound[1] = 30.0;
+    pt_bound[1] = 6.5;
     pt_bound[2] = 10.0;
-    pt_bound[3] = 13.0;
+    pt_bound[3] = 30.0;
+    
     pt_bound[4] = 20.0;
     pt_bound[5] = 25.0;
     pt_bound[6] = 30.0;
@@ -93,13 +94,13 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
   }
   
   if(iSpec == 2) { 
-    Nptbin = 13;
-    pt_bound[0] = -2.4; 
-    pt_bound[1] = -2.1; 
-    pt_bound[2] = -1.9; 
-    pt_bound[3] = -1.6; 
-    pt_bound[4] = -1.2; 
-    pt_bound[5] = -0.8; 
+    Nptbin = 3;
+    pt_bound[0] = 0.0; 
+    pt_bound[1] = 1.2; 
+    pt_bound[2] = 1.6; 
+    pt_bound[3] = 2.4; 
+    pt_bound[4] = 1.6; 
+    pt_bound[5] = 2.4; 
     pt_bound[6] = -0.4; 
     pt_bound[7] = 0.4; 
     pt_bound[8] = 0.8; 
@@ -108,18 +109,16 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
     pt_bound[11] = 1.9; 
     pt_bound[12] = 2.1; 
     pt_bound[13] = 2.4; 
-
-
-
-}
+  }
   
   if(iSpec == 3) {
-    Nptbin = 9;
+    Nptbin = 1;
     pt_bound[0] = 0.0;//0
-    pt_bound[1] = 5.0;//10
+    pt_bound[1] = 40.0;//10
     pt_bound[2] = 8.0;//15
-    pt_bound[3] = 12.0;//25
-    pt_bound[4] = 16.0;//50
+    pt_bound[3] = 16.0;//25
+    pt_bound[4] = 40.0;//50
+    
     pt_bound[5] = 20.0;//100
     pt_bound[6] = 24.0;
     pt_bound[7] = 28.0;
@@ -158,11 +157,13 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
       sprintf(nameRecPt[ifile],"DiMuonPtRec_pt_%d_%d",ih,ifile);
       
       diMuonsInvMass_GenA[ifile][ih]= new TH1D(nameGen[ifile],nameGen[ifile],  100,2.6,3.5); //for eff Gen;
+      diMuonsInvMass_GenA[ifile][ih]->Sumw2();
       diMuonsInvMass_GenA[ifile][ih]->SetMarkerStyle(7);
       diMuonsInvMass_GenA[ifile][ih]->SetMarkerColor(4);
       diMuonsInvMass_GenA[ifile][ih]->SetLineColor(4);
-                                   
+      
       diMuonsInvMass_RecA[ifile][ih] = new TH1D(nameRec[ifile],nameRec[ifile], 100,2.6,3.5); //for eff Rec;
+      diMuonsInvMass_RecA[ifile][ih]->Sumw2();
       diMuonsInvMass_RecA[ifile][ih]->SetMarkerStyle(8);
       diMuonsInvMass_RecA[ifile][ih]->SetMarkerColor(4);
       diMuonsInvMass_RecA[ifile][ih]->SetLineColor(4);
@@ -236,7 +237,7 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
     double muPos_nchi2In, muPos_dxy, muPos_dz, muPos_nchi2Gl;
     int muPos_found, muPos_pixeLayers, muPos_nValidMuHits;
     Char_t muPos_matches;
-    //(2).Negative Muon                                     
+     //(2).Negative Muon                                     
     double muNeg_nchi2In, muNeg_dxy, muNeg_dz, muNeg_nchi2Gl;
     int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits;
     Char_t muNeg_matches;
@@ -329,6 +330,7 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
       
       diMuonsInvMass_Gen->Fill(GenJpsiMass);
       diMuonsPt_Gen->Fill(GenJpsiPt);
+      
       if(IsAccept(GenmuPosPt, GenmuPosEta)) {GenPosIn=1;}
       if(IsAccept(GenmuNegPt, GenmuNegEta)) {GenNegIn=1;}
       if(GenPosIn && GenNegIn ) NAccep++;
@@ -343,25 +345,15 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
 	if(ifile==5){diMuonsRap_Gen5->Fill(GenJpsiRap);}
       }
  
-
+      float GenCenWeight =FindCenWeight(gbin);	  
+      
       for (Int_t ih = 0; ih < Nptbin; ih++) {
-	
 	//adding pT of all pt bins to see diss is cont
-	if(iSpec == 1) if (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1]) {diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt);}
-	
-
-	//if(iSpec == 1)  if( (GenPosIn==1 && GenNegIn==1) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
-	//if(iSpec == 2)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiRap> pt_bound[ih] && GenJpsiRap<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
-	//if(iSpec == 3)  if( (GenPosIn==1 && GenNegIn==1) && (gbin>pt_bound[ih] && gbin<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
-	
-	if(iSpec == 1)  if((GenPosIn==1 && GenNegIn==1 ) &&(TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
-	if(iSpec == 2)  if( (GenPosIn==1 && GenNegIn==1 )&& (GenJpsiPt<30.0) && (GenJpsiRap > pt_bound[ih] && GenJpsiRap<=pt_bound[ih+1]+0.0001)){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}	
-	
-	//cout<<"weight "<<FindCenWeight(gbin)<<endl;
-
-	if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1 ) && (gbin>pt_bound[ih] && gbin<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
+	if(iSpec == 1) if(GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1]){diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt);}
+	if(iSpec == 1) if((GenPosIn==1 && GenNegIn==1)&&(TMath::Abs(GenJpsiRap)>1.6 && TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}
+	if(iSpec == 2) if((GenPosIn==1 && GenNegIn==1)&& (GenJpsiPt> 0 && GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap) > pt_bound[ih] && TMath::Abs(GenJpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}	
+	if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (gbin>pt_bound[ih] && gbin<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}
       }
-
     }//gen loop end
     
     cout<<" accepted no "<< NAccep<<endl;
@@ -412,10 +404,11 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
 	 && muPos_nValidMuHits > 6){PosPass=1;}	  
       if( (muNeg_found >10 && muNeg_pixeLayers >0 && muNeg_nchi2In <4.0 && muNeg_dxy < 3 && muNeg_dz < 15 && muNeg_nchi2Gl < 6 
 	   && muNeg_nValidMuHits >6)){NegPass=1;}
-      
       if((PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
       
-      if(i%100000==0){
+     float RecCenWeight=FindCenWeight(rbin);	  
+	  
+     if(i%100000==0){
 	cout<<" eff loop for reco "<<endl;
       }
 
@@ -427,26 +420,20 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
 	if(ifile==4){diMuonsRap_Rec4->Fill(JpsiRap);}
 	if(ifile==5){diMuonsRap_Rec5->Fill(JpsiRap);}
       }
-
+      
       //Eff loop for reco
-      if((JpsiCharge == 0) && (JpsiVprob > 0.01)) {
-	for (Int_t ih = 0; ih < Nptbin; ih++) {
+      
+	
+      for (Int_t ih = 0; ih < Nptbin; ih++) {
+	if((JpsiCharge == 0) && (JpsiVprob > 0.01)) {	  
 	  //to see cont reco pT
-	  if(iSpec == 1) diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt);
-	  
-	  //if(iSpec == 1) if((AllCut==1)  && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
-	  //if(iSpec == 2) if((AllCut==1)  && (JpsiRap>pt_bound[ih] && JpsiRap<=pt_bound[ih+1])) {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
-	  //if(iSpec == 3) if((AllCut==1)  && (rbin>pt_bound[ih]    && rbin<=pt_bound[ih+1]))    {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
-	  
-	  //cout<< "pt bound "<<pt_bound[ih] <<"  "<<pt_bound[ih+1]<<endl;
-
-	  if(iSpec == 1) if((AllCut==1) &&(TMath::Abs(JpsiRap)<2.4) && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
-	  if(iSpec == 2) if((AllCut==1) && (JpsiPt<30.0) && (JpsiRap > pt_bound[ih] && JpsiRap<=pt_bound[ih+1]+0.0001 )) {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
-	  if(iSpec == 3) if((AllCut==1)  && (rbin>pt_bound[ih]    && rbin<=pt_bound[ih+1]))    {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass);}
+	  if(iSpec == 1) if(JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1])diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt);
+	  if(iSpec == 1) if((AllCut==1) && (TMath::Abs(JpsiRap)>1.6 && TMath::Abs(JpsiRap)<2.4) && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight);}
+	  if(iSpec == 2) if((AllCut==1) && (  JpsiPt > 0 &&  JpsiPt<30.0) && (TMath::Abs(JpsiRap) > pt_bound[ih] && TMath::Abs(JpsiRap) <=pt_bound[ih+1])) {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight);}
+	  if(iSpec == 3) if((AllCut==1) &&(rbin>pt_bound[ih]  && rbin<=pt_bound[ih+1]))    {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight);}
 	}
       }
     }
-  
     
     //new TCanvas;
     //if(ifile==0){diMuonsRap_Gen0->Draw();gPad->Print("plots/diMuonsRap_Gen0_Pt03.png"); new TCanvas; diMuonsRap_Rec0->Draw(); gPad->Print("plots/diMuonsRap_Rec0_Pt03.png");}
@@ -456,7 +443,7 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
     //if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw();  gPad->Print("plots/diMuonsRap_Rec4.png");}
     //if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw();   gPad->Print("plots/diMuonsRap_Rec5.png");}
         
-  }  // file loop ends
+}  // file loop ends
 
   ///////////////////////////////////////////////////////////////////
   cout<< " adding "<<endl;
@@ -467,8 +454,8 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
   
   for(Int_t ih = 0; ih < Nptbin; ih++){
 
-    diMuonsInvMass_RecA[0][ih]->Sumw2();
-    diMuonsInvMass_GenA[0][ih]->Sumw2();
+    //diMuonsInvMass_RecA[0][ih]->Sumw2();
+    //diMuonsInvMass_GenA[0][ih]->Sumw2();
 
     diMuonsInvMass_RecA[0][ih]->Scale(scale[0]);
     diMuonsInvMass_GenA[0][ih]->Scale(scale[0]);
@@ -484,8 +471,8 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
     
     for (int ifile = 1; ifile <= 5; ifile++) {
 
-      diMuonsInvMass_RecA[ifile][ih]->Sumw2();
-      diMuonsInvMass_GenA[ifile][ih]->Sumw2();
+      //diMuonsInvMass_RecA[ifile][ih]->Sumw2();
+      //diMuonsInvMass_GenA[ifile][ih]->Sumw2();
      
       //scale[ifile] =1;      
       diMuonsInvMass_RecA1[ih]->Add(diMuonsInvMass_RecA[ifile][ih],scale[ifile]);
@@ -493,7 +480,6 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
       
       diMuonsPt_GenA1[ih]->Add(diMuonsPt_GenA[ifile][ih],scale[ifile]); 
       diMuonsPt_RecA1[ih]->Add(diMuonsPt_RecA[ifile][ih],scale[ifile]); 
-    
     }
   }
  
@@ -545,8 +531,8 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
         
     
     //yield by function 
-    //rec_pt[ih] = JPsiYield/binwidth;
-    //rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
+    // rec_pt[ih] = JPsiYield/binwidth;
+    // rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
         
     //yield by histogram integral
     rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
@@ -577,24 +563,20 @@ void JPsiMassFit_All(int iSpec = 1) //iSpec =1 pT, =2 Rap, =3 Cent
     //Drawing histo
     new TCanvas;
     diMuonsInvMass_GenA1[ih]->Draw("EPL");
-
     
-    if (iSpec==1){
-      new TCanvas;
-      diMuonsPt_GenA1[ih]->Draw();
-      new TCanvas;
-      diMuonsPt_RecA1[ih]->Draw();
-    }
-
+    if (iSpec==1){ new TCanvas; diMuonsPt_GenA1[ih]->Draw(); new TCanvas; diMuonsPt_RecA1[ih]->Draw();}
+  
   }
+  
 
   dataFile.close();
-
   TGraphErrors *Eff_JPsi = new TGraphErrors(Nptbin, PT, Eff_cat_1, mom_err,Err_Eff_cat_1);
   Eff_JPsi->SetMarkerStyle(21);
   Eff_JPsi->SetMarkerColor(2);
   Eff_JPsi->GetYaxis()->SetTitle("Reco Eff");
-  
+  if(iSpec==1) Eff_JPsi->GetXaxis()->SetTitle("pT (GeV/c^{2})");
+  if(iSpec==2) Eff_JPsi->GetXaxis()->SetTitle("rapidity");
+  if(iSpec==3) Eff_JPsi->GetXaxis()->SetTitle("bin");
   Eff_JPsi->GetYaxis()->SetRangeUser(0,1.0);
 
   TLegend *legend_GP = new TLegend( 0.50,0.79,0.80,0.89);
@@ -630,7 +612,7 @@ float FindCenWeight(int Bin)
   float NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
 			522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
 			112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
-			13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851, };
+			13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851,};
   return(NCollArray[Bin]);
 }
 
