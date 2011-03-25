@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.27 2011/03/23 19:32:24 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.28 2011/03/25 14:47:55 kimy Exp $
  *
  */
 
@@ -307,8 +307,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> t41(kMaxPhotons),t42(kMaxPhotons),t43(kMaxPhotons),t44(kMaxPhotons);
   HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
 
+  // Electron ID
   HTValVector<bool> isElectron(kMaxPhotons);
-  
+  HTValVector<Float_t>  dphiEle(kMaxPhotons), detaEle(kMaxPhotons) ; 
+
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
   
@@ -543,7 +545,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     // electron id
     bool isEleTemp = false;
+    float dphiTemp(100), detaTemp(100);
+    
+    
     if ( isEleRecoed ) {
+       cout << " start electron search " << endl;
        for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
 	  if ( eleItr->superCluster()->energy() < 10 ) continue;
 	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
@@ -553,8 +559,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	  if ( dphi < -3.141592 ) dphi = dphi + 2* 3.141592;
 	  if ( abs(dphi) > 0.03 )  continue;
 	  
+	  dphiTemp = dphi;  
+	  detaTemp = eleItr->superCluster()->eta() - photon.superCluster()->eta() ;
 	  cout << " this is electron " << endl;
 	  isEleTemp = true;
+	  break;
        }
        
        if ( isEleTemp == false)  
@@ -562,8 +571,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     }
     
     isElectron         (nphotonscounter)    =  isEleTemp;
-    
+    detaEle            (nphotonscounter)    =  detaTemp;
+    dphiEle            (nphotonscounter)    =  dphiTemp;
 
+    
     
     // comp cones;
     int nComp = 0;
@@ -1039,7 +1050,9 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 
   // electron?
   _ntuple->Column(pfx+"isEle",                        isElectron,                   pfx+"nPhotons");
-  
+  _ntuple->Column(pfx+"detaEle",                      detaEle,                      pfx+"nPhotons");
+  _ntuple->Column(pfx+"dphiEle",                      dphiEle,                      pfx+"nPhotons");
+
   // Heavy Ion stuffs
   _ntuple->Column(pfx+"c1",                           c1,                           pfx+"nPhotons");
   _ntuple->Column(pfx+"c2",                           c2,                           pfx+"nPhotons");
