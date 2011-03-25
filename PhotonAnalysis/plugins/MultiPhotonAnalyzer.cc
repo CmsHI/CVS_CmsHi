@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.26 2011/03/23 17:32:34 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.27 2011/03/23 19:32:24 kimy Exp $
  *
  */
 
@@ -209,8 +209,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   reco::GsfElectronCollection myEle;
   
   bool isEleRecoed = false;
-  if (EleHandle.isValid())  
-     isEleRecoed=true;
+  if (EleHandle.isValid()) {
+     cout << " electron was reconstructed! " << endl;
+     isEleRecoed = true;
+  }
   
   if ( isEleRecoed) {
      for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr)	{
@@ -543,11 +545,20 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     bool isEleTemp = false;
     if ( isEleRecoed ) {
        for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
-	  if ( photon.superCluster()->energy() == eleItr->superCluster()->energy()) {
-	     cout << " this is electron " << endl;
-	     isEleTemp = true;
-	  }
+	  if ( eleItr->superCluster()->energy() < 10 ) continue;
+	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
+	  
+	  float dphi = eleItr->superCluster()->phi() - photon.superCluster()->phi();
+	  if ( dphi >  3.141592 ) dphi = dphi - 2* 3.141592;
+	  if ( dphi < -3.141592 ) dphi = dphi + 2* 3.141592;
+	  if ( abs(dphi) > 0.03 )  continue;
+	  
+	  cout << " this is electron " << endl;
+	  isEleTemp = true;
        }
+       
+       if ( isEleTemp == false)  
+	  cout << " this is not an electron" << endl;
     }
     
     isElectron         (nphotonscounter)    =  isEleTemp;
