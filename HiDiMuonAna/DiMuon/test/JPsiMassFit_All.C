@@ -32,7 +32,7 @@
 #include "FitFunctions.h"
 #include "TObjArray.h"
 bool IsAccept(Double_t pt, Double_t eta); //you can define acceptance here 
-float FindCenWeight(int Bin);//gives you weight according to cent
+double FindCenWeight(int Bin);//gives you weight according to cent
 void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
 {
   gROOT->SetStyle("Plain");
@@ -196,20 +196,20 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
   
 
   //Prompt JPsi
-  sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
-  sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
-  sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
-  sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
-  sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
-  sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
+  sprintf(fileName[0],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
+  sprintf(fileName[1],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
+  sprintf(fileName[2],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
+  sprintf(fileName[3],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
+  sprintf(fileName[4],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
+  sprintf(fileName[5],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
     
   //Non Prompt JPsi
-  //sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
-  //sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt36.root");
-  //sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt69.root");
-  //sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt912.root");
-  //sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1215.root");
-  //sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1530.root");
+  //sprintf(fileName[0],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
+  //sprintf(fileName[1],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt36.root");
+  //sprintf(fileName[2],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt69.root");
+  //sprintf(fileName[3],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt912.root");
+  //sprintf(fileName[4],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1215.root");
+  //sprintf(fileName[5],"/media/49FD-4149/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1530.root");
   
   //for(int ifile =0; ifile <=5; ifile++){
   //cout<<fileName[ifile]<<endl;
@@ -345,7 +345,7 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
 	if(ifile==5){diMuonsRap_Gen5->Fill(GenJpsiRap);}
       }
  
-      float GenCenWeight =FindCenWeight(gbin);	  
+      double GenCenWeight =FindCenWeight(gbin);	  
       
       for (Int_t ih = 0; ih < Nptbin; ih++) {
 	//adding pT of all pt bins to see diss is cont
@@ -406,7 +406,7 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
 	   && muNeg_nValidMuHits >6)){NegPass=1;}
       if((PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
       
-     float RecCenWeight=FindCenWeight(rbin);	  
+     double RecCenWeight=FindCenWeight(rbin);	  
 	  
      if(i%100000==0){
 	cout<<" eff loop for reco "<<endl;
@@ -485,7 +485,7 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
  
  //===========================Fitting=================================================================================//
   // Fit ranges
-  float mass_low, mass_high;
+  double mass_low, mass_high;
   double MassJPsi, WidthJPsi;
   
   // Low mass range J/psi
@@ -504,10 +504,19 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
 
 
   //=====================Loop for eff===========================================================
-  //new TCanvas;
- 
-  for (Int_t ih = 0; ih < Nptbin; ih++) {
+  //define stuff here for error on weighted samples
+  double GenNo[100]={0};
+  double Eff[100]={0};
+  double GenError[100]={0};
+  double RecError[100]={0};
+  double errEff_cat_S1[100]={0};
+  double errEff_cat_S2[100]={0};
+  double errEff_cat_S1_1[100]={0},errEff_cat_S1_2[100]={0};
+  double errEff_cat_S2_1[100]={0},errEff_cat_S2_2[100]={0};
     
+
+    for (Int_t ih = 0; ih < Nptbin; ih++) {
+      
     //int gbinlow= diMuonsInvMass_GenA1[ih]->GetXaxis()->FindBin(3.0);
     //int gbinhi= diMuonsInvMass_GenA1[ih]->GetXaxis()->FindBin(3.2);
 
@@ -531,16 +540,40 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
         
     
     //yield by function 
-    // rec_pt[ih] = JPsiYield/binwidth;
-    // rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
+    //rec_pt[ih] = JPsiYield/binwidth;
+    //rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
         
     //yield by histogram integral
     rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
     rec_ptError[ih]= recError;
     
-    //calculate Eff and error        
+    //calculate Eff         
     Eff_cat_1[ih] = rec_pt[ih]/gen_pt[ih]; 
-    Err_Eff_cat_1[ih]= Eff_cat_1[ih]*TMath::Sqrt(gen_ptError[ih]*gen_ptError[ih]/(gen_pt[ih]*gen_pt[ih]) + rec_ptError[ih]*rec_ptError[ih]/(rec_pt[ih]* rec_pt[ih]));
+    
+    //calculate error on eff
+    GenNo[ih]=gen_pt[ih];
+    Eff[ih]= Eff_cat_1[ih];
+    GenError[ih]=gen_ptError[ih];
+    RecError[ih]=rec_ptError[ih];
+
+    //error    
+    errEff_cat_S1_1[ih]= ( (Eff[ih] * Eff[ih]) /(GenNo[ih] * GenNo[ih]) );
+    errEff_cat_S1_2[ih]= (GenError[ih] * GenError[ih] ) - ( RecError[ih] * RecError[ih] );
+    errEff_cat_S1[ih]= (errEff_cat_S1_1[ih] * errEff_cat_S1_2[ih]);
+    errEff_cat_S2_1[ih]= ( (1 - Eff[ih])* (1 - Eff[ih]) ) / ( GenNo[ih] * GenNo[ih]);
+    errEff_cat_S2_2[ih]= (RecError[ih] * RecError[ih]);
+    errEff_cat_S2[ih]=errEff_cat_S2_1[ih]*errEff_cat_S2_2[ih];
+    Err_Eff_cat_1[ih]=sqrt(errEff_cat_S1[ih] + errEff_cat_S2[ih]);
+
+
+
+    //error without weight
+ //Err_Eff_cat_1[ih]= Eff_cat_1[ih]*TMath::Sqrt(gen_ptError[ih]*gen_ptError[ih]/(gen_pt[ih]*gen_pt[ih]) + rec_ptError[ih]*rec_ptError[ih]/(rec_pt[ih]* rec_pt[ih]));
+
+
+
+    
+
 
 
 
@@ -574,8 +607,8 @@ void JPsiMassFit_All(int iSpec = 3) //iSpec =1 pT, =2 Rap, =3 Cent
   Eff_JPsi->SetMarkerStyle(21);
   Eff_JPsi->SetMarkerColor(2);
   Eff_JPsi->GetYaxis()->SetTitle("Reco Eff");
-  if(iSpec==1) Eff_JPsi->GetXaxis()->SetTitle("pT (GeV/c^{2})");
-  if(iSpec==2) Eff_JPsi->GetXaxis()->SetTitle("rapidity");
+  if(iSpec==1) Eff_JPsi->GetXaxis()->SetTitle("J/#psi pT (GeV/c^{2})");
+  if(iSpec==2) Eff_JPsi->GetXaxis()->SetTitle("J/#psi rapidity");
   if(iSpec==3) Eff_JPsi->GetXaxis()->SetTitle("bin");
   Eff_JPsi->GetYaxis()->SetRangeUser(0,1.0);
 
@@ -607,9 +640,9 @@ bool IsAccept(Double_t pt, Double_t eta)
 
 
 
-float FindCenWeight(int Bin)
+double FindCenWeight(int Bin)
 {
-  float NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
+  double NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
 			522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
 			112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
 			13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851,};
