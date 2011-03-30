@@ -28,7 +28,7 @@
 #include "TObjArray.h"
 bool IsAccept(Double_t pt, Double_t eta);
 double FindCenWeight(int Bin);
-void UpsilonMassFit_All(int iSpec = 2)
+void UpsilonMassFit_All(int iSpec = 3, int PutWeight=1)
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
@@ -75,11 +75,11 @@ void UpsilonMassFit_All(int iSpec = 2)
   int Nptbin=1;
   double pt_bound[100] = {0};
   if(iSpec == 1) { 
-    Nptbin = 6;
+    Nptbin = 3;
     pt_bound[0] = 0;
-    pt_bound[1] = 5.0;
+    pt_bound[1] = 6.5;
     pt_bound[2] = 10.0;
-    pt_bound[3] = 13.0;
+    pt_bound[3] = 20.0;
     pt_bound[4] = 20.0;
     pt_bound[5] = 25.0;
     pt_bound[6] = 30.0;
@@ -90,10 +90,10 @@ void UpsilonMassFit_All(int iSpec = 2)
   }
   
   if(iSpec == 2) { 
-    Nptbin = 3;
+    Nptbin = 2;
     pt_bound[0] = 0.0; 
     pt_bound[1] = 1.2; 
-    pt_bound[2] = 1.6; 
+    pt_bound[2] = 2.4; 
     pt_bound[3] = 2.4; 
     pt_bound[4] = 2.4; 
     pt_bound[5] = 1.2; 
@@ -103,12 +103,12 @@ void UpsilonMassFit_All(int iSpec = 2)
   
   
   if(iSpec == 3) {
-    Nptbin = 9;
+    Nptbin = 3;
     //for plots
     pt_bound[0] = 0.0;//0
-    pt_bound[1] = 5.0;//10
-    pt_bound[2] = 8.0;//15
-    pt_bound[3] = 12.0;//25
+    pt_bound[1] = 4.0;//10
+    pt_bound[2] = 8.0;//20
+    pt_bound[3] = 100.0;//25
     pt_bound[4] = 16.0;//50
     pt_bound[5] = 20.0;//100
     pt_bound[6] = 24.0;
@@ -178,12 +178,12 @@ void UpsilonMassFit_All(int iSpec = 2)
   scale[5]=(0.001105276/0.001105276);
   
   
-  sprintf(fileName[0],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt03.root");
-  sprintf(fileName[1],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt36.root");
-  sprintf(fileName[2],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt69.root");
-  sprintf(fileName[3],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt912.root");
-  sprintf(fileName[4],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt1215.root");
-  sprintf(fileName[5],"/media/49FD-4149/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt1530.root");
+  sprintf(fileName[0],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt03.root");
+  sprintf(fileName[1],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt36.root");
+  sprintf(fileName[2],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt69.root");
+  sprintf(fileName[3],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt912.root");
+  sprintf(fileName[4],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt1215.root");
+  sprintf(fileName[5],"/home/vineet/HiData/UpsilonData/UpsilonEff/DimuonOnia2Dplots_UpsilonPt1530.root");
   
   TFile *infile;
   TTree *tree;
@@ -307,10 +307,13 @@ void UpsilonMassFit_All(int iSpec = 2)
       if(IsAccept(GenmuNegPt, GenmuNegEta)) {GenNegIn=1;}
       
       if(GenPosIn && GenNegIn ) NAccep++;
-     
-      double GenCenWeight=FindCenWeight(gbin);
+      
+      double GenCenWeight=0,GenWeight=0;
+      GenCenWeight=FindCenWeight(gbin);
       Bin_Gen->Fill(gbin);
-    
+      GenWeight=GenCenWeight*scale[ifile];
+      if(PutWeight==0){GenWeight=1;}
+
       if(GenPosIn && GenNegIn){
 	if(ifile==0){diMuonsRap_Gen0->Fill(GenJpsiRap);}
 	if(ifile==1){diMuonsRap_Gen1->Fill(GenJpsiRap);}
@@ -323,19 +326,10 @@ void UpsilonMassFit_All(int iSpec = 2)
 
       for (Int_t ih = 0; ih < Nptbin; ih++) {
 	//adding pT of all pt bins to see diss is cont
-	if(iSpec == 1)  if((GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt);}
-	
-
-	if(iSpec == 1)  if( (GenPosIn==1 && GenNegIn==1) && (TMath::Abs(GenJpsiRap)<2.4 )&&(GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}
-	
-
-	if(iSpec == 2)  if((GenPosIn==1 && GenNegIn==1) && (TMath::Abs(GenJpsiRap)> pt_bound[ih] &&TMath::Abs(GenJpsiRap)<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}
-
-
-
-	//if(iSpec == 2)  if( (GenPosIn && GenNegIn) && (GenJpsiPt > 6.5 && GenJpsiPt< 30.0) && (GenJpsiRap> pt_bound[ih] && GenJpsiRap<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass);}
-
-	if(iSpec == 3)  if( (GenPosIn==1 && GenNegIn==1) && (gbin>pt_bound[ih] && gbin<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight);}
+	if(iSpec == 1)  if((GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt,GenWeight);}
+	if(iSpec == 1)  if( (GenPosIn==1 && GenNegIn==1) && (TMath::Abs(GenJpsiRap)<2.4 )&&(GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}
+	if(iSpec == 2)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt<30.0) &&    (TMath::Abs(GenJpsiRap)> pt_bound[ih] &&TMath::Abs(GenJpsiRap)<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}
+	if(iSpec == 3)  if( (GenPosIn==1 && GenNegIn==1) && (gbin>=pt_bound[ih] && gbin<pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}
       
       }
 
@@ -387,13 +381,17 @@ void UpsilonMassFit_All(int iSpec = 2)
       if(IsAccept(muNegPt, muNegEta)){NegIn=1;}
 
       if(muPos_found > 10 && muPos_pixeLayers > 0 && muPos_nchi2In < 4.0 && muPos_dxy < 3 && muPos_dz < 15 && muPos_nchi2Gl < 6 
-	 && muPos_nValidMuHits > 6){PosPass=1;}	  
+	 && muPos_nValidMuHits > 6 && muPosPt>4.0){PosPass=1;}	  
       
       if( (muNeg_found >10 && muNeg_pixeLayers >0 && muNeg_nchi2In <4.0 && muNeg_dxy < 3 && muNeg_dz < 15 && muNeg_nchi2Gl < 6 
-	   && muNeg_nValidMuHits >6)){NegPass=1;}
+	   && muNeg_nValidMuHits >6 &&  muNegPt>4.0)){NegPass=1;}
 
       if( (PosIn==1 && NegIn==1 )  &&   (PosPass==1 && NegPass==1)){AllCut=1;}
-      double RecCenWeight=FindCenWeight(rbin);
+    
+      double RecCenWeight=0,RecWeight=0;
+      RecCenWeight=FindCenWeight(rbin);
+      RecWeight=RecCenWeight*scale[ifile];
+      if(PutWeight==0){RecWeight=1;}
      
       if(i%100000==0){
 	cout<<" eff loop for reco "<<endl;
@@ -412,15 +410,15 @@ void UpsilonMassFit_All(int iSpec = 2)
       if((JpsiCharge == 0) && (JpsiVprob > 0.01)) {
 	for (Int_t ih = 0; ih < Nptbin; ih++) {
 	  //to see cont reco pT
-	  if(iSpec == 1)if(JpsiPt>pt_bound[ih] && JpsiPt<=pt_bound[ih+1]){diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt);}
-	  if(iSpec == 1)if((AllCut) && (TMath::Abs(JpsiRap)<2.4 ) && (JpsiPt>pt_bound[ih] && JpsiPt<=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass, RecCenWeight);}
-
-	  if(iSpec == 2) if( (AllCut) && (TMath::Abs(JpsiRap)>pt_bound[ih] &&TMath::Abs(JpsiRap)<=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight);}
-	  if(iSpec == 3) if((AllCut) && (rbin>pt_bound[ih] && rbin<=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight);}
+	  if(iSpec == 1)if(JpsiPt>pt_bound[ih] && JpsiPt<=pt_bound[ih+1]){diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt,RecWeight);}
+	  if(iSpec == 1)if((AllCut) && (TMath::Abs(JpsiRap)<2.4 ) && (JpsiPt>pt_bound[ih] && JpsiPt<=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass, RecWeight);}
+	  if(iSpec == 2) if( (AllCut) &&  (JpsiPt<30.0) && (TMath::Abs(JpsiRap)>pt_bound[ih] &&TMath::Abs(JpsiRap)<=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight);}
+	  if(iSpec == 3) if((AllCut) && (rbin>=pt_bound[ih] &&  rbin < pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight);}
 	}
       }
     }
   
+    /*
     new TCanvas;
     if(ifile==0){diMuonsRap_Gen0->Draw();new TCanvas; diMuonsRap_Rec0->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen0.png");}
     if(ifile==1){diMuonsRap_Gen1->Draw();new TCanvas; diMuonsRap_Rec1->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen1.png");}
@@ -428,7 +426,7 @@ void UpsilonMassFit_All(int iSpec = 2)
     if(ifile==3){diMuonsRap_Gen3->Draw();new TCanvas; diMuonsRap_Rec3->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen3.png");}
     if(ifile==4){diMuonsRap_Gen4->Draw();new TCanvas; diMuonsRap_Rec4->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen4.png");}
     if(ifile==5){diMuonsRap_Gen5->Draw();new TCanvas; diMuonsRap_Rec5->Draw(); gPad->Print("plots/NPdiMuonsRap_Gen5.png");}
-    
+    */
   }  // file loop 
 
   ///////////////////////////////////////////////////////////////////
@@ -440,25 +438,18 @@ void UpsilonMassFit_All(int iSpec = 2)
   TH1D *diMuonsPt_RecA1[100];
   
   for(Int_t ih = 0; ih < Nptbin; ih++){
-    
-    diMuonsInvMass_RecA[0][ih]->Scale(scale[0]);
-    diMuonsInvMass_GenA[0][ih]->Scale(scale[0]);
     diMuonsInvMass_RecA1[ih] = diMuonsInvMass_RecA[0][ih];
     diMuonsInvMass_GenA1[ih] = diMuonsInvMass_GenA[0][ih];
-    diMuonsPt_GenA[0][ih]->Scale(scale[0]);
-    diMuonsPt_RecA[0][ih]->Scale(scale[0]);
     diMuonsPt_GenA1[ih] = diMuonsPt_GenA[0][ih];
     diMuonsPt_RecA1[ih] = diMuonsPt_RecA[0][ih];
-
+    
     for (int ifile = 1; ifile <= 5; ifile++) {
-      
-      diMuonsInvMass_RecA1[ih]->Add(diMuonsInvMass_RecA[ifile][ih],scale[ifile]);
-      diMuonsInvMass_GenA1[ih]->Add(diMuonsInvMass_GenA[ifile][ih],scale[ifile]);     
-      diMuonsPt_GenA1[ih]->Add(diMuonsPt_GenA[ifile][ih],scale[ifile]); 
-      diMuonsPt_RecA1[ih]->Add(diMuonsPt_RecA[ifile][ih],scale[ifile]); 
-   }
+      diMuonsInvMass_RecA1[ih]->Add(diMuonsInvMass_RecA[ifile][ih]);
+      diMuonsInvMass_GenA1[ih]->Add(diMuonsInvMass_GenA[ifile][ih]);     
+      diMuonsPt_GenA1[ih]->Add(diMuonsPt_GenA[ifile][ih]); 
+      diMuonsPt_RecA1[ih]->Add(diMuonsPt_RecA[ifile][ih]); 
+    }
   }
-  
   
   //===========================Fitting=================================================================================//
   // Fit ranges
@@ -469,16 +460,16 @@ void UpsilonMassFit_All(int iSpec = 2)
   MassUpsilon = 9.46; WidthUpsilon = 0.054;
   mass_low = 8.5; mass_high = 10.5;  // Fit ranges
   
-  
   // Fit Function RBW + Pol2
   TF1 *GAUSPOL = new TF1("GAUSPOL", GausPol2, 8.0, 12.0, 6);
   
   GAUSPOL->SetLineWidth(2.0);
   GAUSPOL->SetLineColor(2.0);
+  
   GAUSPOL->SetParameter(1, MassUpsilon);
   GAUSPOL->SetParameter(2, WidthUpsilon);
   GAUSPOL->SetParLimits(1, 0.8*MassUpsilon, 1.2*MassUpsilon);
-  GAUSPOL->SetParLimits(2, 0.01*WidthUpsilon, 5.0*WidthUpsilon);
+  GAUSPOL->SetParLimits(2, 0.01*WidthUpsilon, 2.0*WidthUpsilon);
 
 
   //=====================Loop for eff===========================================================
@@ -490,15 +481,26 @@ void UpsilonMassFit_All(int iSpec = 2)
   double errEff_cat_S2[100]={0};
   double errEff_cat_S1_1[100]={0},errEff_cat_S1_2[100]={0};
   double errEff_cat_S2_1[100]={0},errEff_cat_S2_2[100]={0};
- 
+  char PlotName[500],PlotName1[500]; 
+
   for (Int_t ih = 0; ih < Nptbin; ih++) {
     gen_pt[ih] = diMuonsInvMass_GenA1[ih]->IntegralAndError(1,100,genError);
     gen_ptError[ih]= genError;
-    cout<<" gen_pt[ih] "<< gen_pt[ih] <<" error   "<<  gen_ptError[ih]<<endl;
     
-    new TCanvas;
+    if(iSpec==1) sprintf(PlotName,"plots/DiMuonMass_PtBin_%d.png",ih);
+    if(iSpec==2) sprintf(PlotName,"plots/DiMuonMass_RapBin_%d.png",ih);
+    if(iSpec==3) sprintf(PlotName,"plots/DiMuonMass_CentBin_%d.png",ih);
+    
+    if(iSpec==1) sprintf(PlotName1,"plots/DiMuonMass_PtBin_%d.pdf",ih);
+    if(iSpec==2) sprintf(PlotName1,"plots/DiMuonMass_RapBin_%d.pdf",ih);
+    if(iSpec==3) sprintf(PlotName1,"plots/DiMuonMass_CentBin_%d.pdf",ih);
+    
+    new TCanvas; 
     diMuonsInvMass_RecA1[ih]->Fit("GAUSPOL","LEQ", "", mass_low, mass_high);
-    
+    gPad->Print(PlotName);
+    gPad->Print(PlotName1);
+
+ 
     double UpsilonYield = GAUSPOL->GetParameter(0);
     double UpsilonMass = GAUSPOL->GetParameter(1);
     double UpsilonWidth = GAUSPOL->GetParameter(2);
@@ -511,14 +513,13 @@ void UpsilonMassFit_All(int iSpec = 2)
     double binwidth=diMuonsInvMass_RecA1[ih]->GetBinWidth(1);
         
     //yield by function 
-    rec_pt[ih] = UpsilonYield/binwidth;
-    rec_ptError[ih]= TMath::Sqrt((UpsilonYield/binwidth));
+    //rec_pt[ih] = UpsilonYield/binwidth;
+    //rec_ptError[ih]= TMath::Sqrt((UpsilonYield/binwidth));
       
     //yield by histogram integral
-    //rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
-    //rec_ptError[ih]= recError;
-    
-   
+    rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
+    rec_ptError[ih]= recError;
+       
     //Cal eff 
     Eff_cat_1[ih] = rec_pt[ih]/gen_pt[ih]; 
    
@@ -546,8 +547,10 @@ void UpsilonMassFit_All(int iSpec = 2)
     cout<<" eff "<< Eff_cat_1[ih]<<" error "<<Err_Eff_cat_1[ih]<<endl;
     dataFile<<" eff "<< Eff_cat_1[ih]<<" error "<<Err_Eff_cat_1[ih]<<endl;
     
+           
     new TCanvas;
     diMuonsInvMass_GenA1[ih]->Draw();
+
     //new TCanvas;
     //diMuonsPt_GenA1[ih]->Draw();
     //new TCanvas;
@@ -595,9 +598,25 @@ bool IsAccept(Double_t pt, Double_t eta)
 
 double FindCenWeight(int Bin)
 {
-  double NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
-			522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
-			112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
-			13.5661,10.6604,8.31383,6.37662,5.12347,3.73576,3.07268,2.41358,2.10707,1.76851,};
+  double NCollArray[50]={1563.03, 1370.41, 1204.05, 1063.45, 943.5,
+834.12, 736.223, 654.913, 576.466, 507.757, 443.05, 386.802, 334.48,
+290.097, 247.779, 211.762, 179.834, 153.509, 127.75, 106.59, 88.1189,
+72.3836, 59.1049, 47.3574, 37.7951, 30.1705, 23.6861, 18.6918, 14.2287,
+10.9705, 8.76148, 6.57459, 5.01557, 3.78525, 2.9123, 2.12377, 1.5,
+			 0.922951, 0.581967, 0.503279,};
   return(NCollArray[Bin]);
 }
+
+
+
+
+
+
+// mu_innerTrack_Hits > 10
+//mu_pixelLayers > 0
+//mu_innerTrack_chi2NDOF < 4.0
+//mu_dxy < 3.0 cm
+// mu_dz < 15. cm
+//mu_globalTrack_chi2NDOF < 6
+//mu_validMuHits > 6
+//vProb > 0.01
