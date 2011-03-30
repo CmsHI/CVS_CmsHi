@@ -1,6 +1,6 @@
 
-#ifndef __RHOGetter__h__
-#define __RHOGetter__h__
+#ifndef __RHOyyy__
+#define __RHOyyy__
 
 #include <vector>
 

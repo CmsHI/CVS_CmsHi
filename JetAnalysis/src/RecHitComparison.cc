@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.7 2010/11/01 21:48:31 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.8 2010/11/02 13:19:06 yilmaz Exp $
 //
 //
 
@@ -124,6 +124,7 @@ class RecHitComparison : public edm::EDAnalyzer {
    double cone;
    bool jetsOnly_;
    bool doBasicClusters_;
+  bool doJetCone_;
 
    edm::Service<TFileService> fs;
    CentralityProvider* centrality_;
@@ -149,7 +150,11 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
    //now do what ever initialization is needed
    jetsOnly_ = iConfig.getUntrackedParameter<bool>("jetsOnly",false);
    doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
+
+   doJetCone_ = iConfig.getUntrackedParameter<bool>("doJetCone",false);
    signalTag_ = iConfig.getUntrackedParameter<edm::InputTag>("signalJets",edm::InputTag("iterativeCone5CaloJets","","SIGNAL"));
+
+   if(!doJetCone_) jetsOnly_ = 0;
 
   HcalRecHitHFSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc1",edm::InputTag("hfreco"));
   HcalRecHitHFSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc2",edm::InputTag("hfreco"));
@@ -161,6 +166,7 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
   EESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEE","SIGNALONLY"));
   BCSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
   BCSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","SIGNALONLY"));
+
 }
 
 
@@ -191,7 +197,8 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    using namespace edm;
    ev.getByLabel(EBSrc1_,ebHits1);
    ev.getByLabel(EBSrc2_,ebHits2);
-   ev.getByLabel(signalTag_,signalJets);
+
+   if(doJetCone_) ev.getByLabel(signalTag_,signalJets);
 
    ev.getByLabel(HcalRecHitHFSrc1_,hfHits1);
    ev.getByLabel(HcalRecHitHFSrc2_,hfHits2);
@@ -252,18 +259,19 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       bool isjet = false;
       int matchedJet = -1;
 
-      for(unsigned int j = 0 ; j < signalJets->size(); ++j){
-	 const reco::CaloJet & jet = (*signalJets)[j];
-	 double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
-	 if(dr < cone){
+      if(doJetCone_){
+	for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+	  const reco::CaloJet & jet = (*signalJets)[j];
+	  double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+	  if(dr < cone){
 	    jetpt = jet.pt();
 	    drjet = dr;
 	    isjet = true;
 	    matchedJet = j;
 	    fFull[j] += et1;
-
+	    
 	    if(et1 > 0.5){
-	       f05[j] += et1;
+	      f05[j] += et1;
 	    }
 	    if(et1 > 1.){
                f1[j] += et1;
@@ -280,8 +288,9 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	    if(et1 > 3.){
                f3[j] += et1;
             }
-	 }
-      }
+	  }
+	}
+      }   
       
       GlobalPoint pos2;
       double e2 = -1;
@@ -311,16 +320,19 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double jetpt = -1;
      bool isjet = false;
      int matchedJet = -1;
-     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
-       const reco::CaloJet & jet = (*signalJets)[j];
-       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
-       if(dr < cone){
-         jetpt = jet.pt();
-         drjet = dr;
-         isjet = true;
-         matchedJet = j;
+     if(doJetCone_){
+       for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+	 const reco::CaloJet & jet = (*signalJets)[j];
+	 double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+	 if(dr < cone){
+	   jetpt = jet.pt();
+	   drjet = dr;
+	   isjet = true;
+	   matchedJet = j;
+	 }
        }
      }
+     
      GlobalPoint pos2;
      double e2 = -1;
      EcalIterator hitit = eeHits2->find(jet1.id());
@@ -348,16 +360,19 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double jetpt = -1;
      bool isjet = false;
      int matchedJet = -1;
-     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
-       const reco::CaloJet & jet = (*signalJets)[j];
-       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
-       if(dr < cone){
-         jetpt = jet.pt();
-         drjet = dr;
-         isjet = true;
-         matchedJet = j;
+     if(doJetCone_){
+       for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+	 const reco::CaloJet & jet = (*signalJets)[j];
+	 double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+	 if(dr < cone){
+	   jetpt = jet.pt();
+	   drjet = dr;
+	   isjet = true;
+	   matchedJet = j;
+	 }
        }
      }
+
      GlobalPoint pos2;
      double e2 = -1;
      HBHEIterator hitit = hbheHits2->find(jet1.id());
@@ -385,14 +400,16 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      double jetpt = -1;
      bool isjet = false;
      int matchedJet = -1;
-     for(unsigned int j = 0 ; j < signalJets->size(); ++j){
-       const reco::CaloJet & jet = (*signalJets)[j];
-       double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
-       if(dr < cone){
-	 jetpt = jet.pt();
-	 drjet = dr;
-	 isjet = true;
-	 matchedJet = j;
+     if(doJetCone_){
+       for(unsigned int j = 0 ; j < signalJets->size(); ++j){
+	 const reco::CaloJet & jet = (*signalJets)[j];
+	 double dr = reco::deltaR(eta1,phi1,jet.eta(),jet.phi());
+	 if(dr < cone){
+	   jetpt = jet.pt();
+	   drjet = dr;
+	   isjet = true;
+	   matchedJet = j;
+	 }
        }
      }
      GlobalPoint pos2;
