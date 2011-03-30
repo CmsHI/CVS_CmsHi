@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitComparison.cc,v 1.8 2010/11/02 13:19:06 yilmaz Exp $
+// $Id: RecHitComparison.cc,v 1.9 2011/03/30 12:13:22 yilmaz Exp $
 //
 //
 
@@ -160,8 +160,8 @@ RecHitComparison::RecHitComparison(const edm::ParameterSet& iConfig) :
   HcalRecHitHFSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc2",edm::InputTag("hfreco"));
   HcalRecHitHBHESrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc1",edm::InputTag("hbhereco"));
   HcalRecHitHBHESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc2",edm::InputTag("hbhereco"));
-  EBSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
-  EBSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","SIGNALONLY"));
+  EBSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECOBKG"));
+  EBSrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEB","S"));
   EESrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEE","RECO"));
   EESrc2_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc2",edm::InputTag("ecalRecHit","EcalRecHitsEE","SIGNALONLY"));
   BCSrc1_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
@@ -204,7 +204,6 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    ev.getByLabel(HcalRecHitHFSrc2_,hfHits2);
    ev.getByLabel(HcalRecHitHBHESrc1_,hbheHits1);
    ev.getByLabel(HcalRecHitHBHESrc2_,hbheHits2);
-
    ev.getByLabel(EESrc1_,eeHits1);
    ev.getByLabel(EESrc2_,eeHits2);
 
@@ -214,6 +213,7 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    }
 
    centrality_->newEvent(ev,iSetup);
+
    double hf = centrality_->centralityValue();
    int bin = centrality_->getBin();
 
@@ -225,7 +225,9 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    vector<double> f25;
    vector<double> f3;
 
-   int njets = signalJets->size();
+   int njets = 0;
+
+   if(doJetCone_) njets = signalJets->size();
    fFull.reserve(njets);
    f05.reserve(njets);
    f1.reserve(njets);
@@ -234,14 +236,16 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    f25.reserve(njets);
    f3.reserve(njets);
 
-   for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
-      fFull.push_back(0);
-      f05.push_back(0);
-      f1.push_back(0);
-      f15.push_back(0);
-      f2.push_back(0);
-      f25.push_back(0);
-      f3.push_back(0);
+   if(doJetCone_){
+     for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
+       fFull.push_back(0);
+       f05.push_back(0);
+       f1.push_back(0);
+       f15.push_back(0);
+       f2.push_back(0);
+       f25.push_back(0);
+       f3.push_back(0);
+     }
    }
 
    for(unsigned int j1 = 0 ; j1 < ebHits1->size(); ++j1){
@@ -428,13 +432,15 @@ RecHitComparison::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      if(!jetsOnly_ || isjet) ntHF->Fill(e1,et1,e2,et2,eta2,phi2,hf,bin,jetpt,drjet);
    }
 
-   for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
-      const reco::CaloJet & jet = (*signalJets)[j1];
-      double em = (jet.emEnergyInEB() + jet.emEnergyInEE()) * sin(jet.theta());
-      double emf = jet.emEnergyFraction(); 
-      double pt = jet.pt();
-      double eta = jet.eta();
-      ntjet->Fill(bin,pt,eta,fFull[j1],f05[j1],f1[j1],f15[j1],f2[j1],f25[j1],f3[j1],em,emf);
+   if(doJetCone_){
+     for(unsigned int j1 = 0 ; j1 < signalJets->size(); ++j1){
+       const reco::CaloJet & jet = (*signalJets)[j1];
+       double em = (jet.emEnergyInEB() + jet.emEnergyInEE()) * sin(jet.theta());
+       double emf = jet.emEnergyFraction(); 
+       double pt = jet.pt();
+       double eta = jet.eta();
+       ntjet->Fill(bin,pt,eta,fFull[j1],f05[j1],f1[j1],f15[j1],f2[j1],f25[j1],f3[j1],em,emf);
+     }
    }
 
 }
