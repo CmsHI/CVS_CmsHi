@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.9 2010/10/24 14:39:32 yilmaz Exp $
+// $Id: HiJetResponseAnalyzer.cc,v 1.10 2011/01/20 19:41:10 yilmaz Exp $
 //
 //
 
@@ -71,7 +71,7 @@ public:
    float b;
    float hf;
    float jtpt[MAXJETS];
-   float jtcorpt[MAXJETS];
+   float jtrawpt[MAXJETS];
    float refpt[MAXJETS];
    float jteta[MAXJETS];
    float refeta[MAXJETS];
@@ -89,7 +89,7 @@ public:
 struct JRAV{
   int index;
   float jtpt;
-  float jtcorpt;
+  float jtrawpt;
   float refpt;
   float refcorpt;
   float jteta;
@@ -107,7 +107,6 @@ struct JRAV{
 //
 // class declaration
 //
-bool compareCorPt(JRAV a, JRAV b) {return a.jtcorpt > b.jtcorpt;}
 bool comparePt(JRAV a, JRAV b) {return a.jtpt > b.jtpt;}
 
 class HiJetResponseAnalyzer : public edm::EDAnalyzer {
@@ -257,7 +256,8 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
    akSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("akSrc",edm::InputTag("ak5CaloJets"));
    doFastJets_ = iConfig.getUntrackedParameter<bool>("doFastJets",false);
 
-   getFastJets_ = true;
+   getFastJets_ = iConfig.getUntrackedParameter<bool>("getFastJets",false);
+
    for(unsigned int i = 0; i < doMatchedFastJets_.size(); ++i){
       getFastJets_ = getFastJets_ || (bool)doMatchedFastJets_[i];
    }
@@ -301,36 +301,42 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jv.jtpt = jet.pt();
      jv.jteta = jet.eta();
      jv.jtphi = jet.phi();
-     jv.jtcorpt = jet.pt();
+     jv.jtrawpt = jet.pt();
      jv.area = jet.jetArea();
      jv.pu  = jet.pileup();
      jv.index = j;
 
      double pt = jet.pt();
-     double ktRho = getRho(jv.jteta,*ktRhos);
-     double akRho = getRho(jv.jteta,*akRhos);
+     double ktRho = -1, akRho = -1;
+     if(getFastJets_){
+	ktRho = getRho(jv.jteta,*ktRhos);
+	akRho = getRho(jv.jteta,*akRhos);
+     }
 
-     jv.rho = ktRho;
+     jv.rho = akRho;
+
+     if(doFastJets_){
+	jv.pu = jet.jetArea()*akRho;
+	pt -= jv.pu;
+     }
+     jv.jtpt = pt;     
+
      if(correctJets_){
-	if(doFastJets_){
-	   jv.pu = jet.jetArea()*ktRho;
-	   pt -= jv.pu;
-	}
-
 	jetCorrector_->setJetEta(jet.eta());
 	jetCorrector_->setJetPt(pt);
 	//	jetCorrector_->setJetE(jet.energy()); 
 	vector<float> corrs = jetCorrector_->getSubCorrections();
 	jv.l2 = corrs[0];
         jv.l3 = corrs[1];
-	jv.jtcorpt = pt*jv.l2*jv.l3;
-
+	jv.jtpt = pt*jv.l2*jv.l3;
      }
+
+
      if(usePat_){
        const pat::Jet& patjet = (*patjets)[j];
 
-       jv.jtpt = patjet.correctedJet("raw").pt();
-       jv.jtcorpt = patjet.pt();
+       jv.jtrawpt = patjet.correctedJet("raw").pt();
+       jv.jtpt = patjet.pt();
 
        if(doMC_ && matchPatGen_ && patjet.genJet() != 0){
 	 if(patjet.genJet()->pt() < genPtMin_) continue;
@@ -347,8 +353,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
    }
 
    if(sortJets_){
-     if(usePat_ || correctJets_) std::sort(jraV.begin(),jraV.end(),compareCorPt);
-     else std::sort(jraV.begin(),jraV.end(),comparePt);
+      std::sort(jraV.begin(),jraV.end(),comparePt);
    }
 
    for(unsigned int i = 0; i < jraV.size(); ++i){
@@ -359,7 +364,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
        for(unsigned int im = 0; im < matchTags_.size(); ++im){
 	  edm::Handle<reco::JetView> matchedJets;
 	  iEvent.getByLabel(matchTags_[im],matchedJets);
-	 jraMatch_[im].jtcorpt[i] = -99;
+	 jraMatch_[im].jtrawpt[i] = -99;
 	 jraMatch_[im].jtpt[i] = -99;
 	 jraMatch_[im].jteta[i] = -99;
 	 jraMatch_[im].jtphi[i] = -99;
@@ -371,26 +376,30 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
            const reco::Jet& match = (*matchedJets)[m];
            double dr = reco::deltaR(jet.eta(),jet.phi(),match.eta(),match.phi());
            if(dr < matchR_ && match.pt() > genPtMin_){
-             jraMatch_[im].jtcorpt[i] = -99;
-             jraMatch_[im].jtpt[i] = match.pt();
+	      jraMatch_[im].jtpt[i] = match.pt();
+             jraMatch_[im].jtrawpt[i] = match.pt();
              jraMatch_[im].jteta[i] = match.eta();
              jraMatch_[im].jtphi[i] = match.phi();
              jraMatch_[im].area[i] = match.jetArea();
 
-	     double  ktRho = getRho(jraMatch_[im].jteta[i],*ktRhos);
-	     double akRho  = getRho(jraMatch_[im].jteta[i],*akRhos);
+	     double ktRhoM = -1, akRhoM = -1;
+	     if(getFastJets_){
+		ktRhoM = getRho(jraMatch_[im].jteta[i],*ktRhos);
+		akRhoM = getRho(jraMatch_[im].jteta[i],*akRhos);
+	     }
 
-             jraMatch_[im].rho[i] = ktRho;
-
+             jraMatch_[im].rho[i] = akRhoM;
+	     double pt = jraMatch_[im].jtpt[i];
+	     
+	     if((bool)doMatchedFastJets_[im]){
+		jraMatch_[im].pu[i] = jraMatch_[im].area[i]*akRhoM;
+		pt -= jraMatch_[im].pu[i];
+	     }
+	     
+	     jraMatch_[im].jtpt[i] = pt;
+	     
 	     if((bool)correctMatchedJets_[im]){
-
-		double ktRho;
-                double pt = jraMatch_[im].jtpt[i];
-
-		if((bool)doMatchedFastJets_[im]){
-		   jraMatch_[im].pu[i] = jraMatch_[im].area[i]*ktRho;
-		   pt -= jraMatch_[im].pu[i];
-		}
+		
 		jetCorrector_->setJetEta(jraMatch_[im].jteta[i]);
 		jetCorrector_->setJetPt(pt);
 		//		jetCorrector_->setJetE(match.energy());
@@ -398,10 +407,8 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		jraMatch_[im].l2[i] = corrs[0];
 		// Should it be re-set for L3???
 		jraMatch_[im].l3[i] = corrs[1];
-		jraMatch_[im].jtcorpt[i] = pt*jraMatch_[im].l2[i]*jraMatch_[im].l3[i];
-
+		jraMatch_[im].jtpt[i] = pt*jraMatch_[im].l2[i]*jraMatch_[im].l3[i];
 	     }
-
 
            }
          }
@@ -411,7 +418,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
      jra_.jtpt[i] = jv.jtpt;
      jra_.jteta[i] = jv.jteta;
      jra_.jtphi[i] = jv.jtphi;
-     jra_.jtcorpt[i] = jv.jtcorpt;
+     jra_.jtrawpt[i] = jv.jtrawpt;
      jra_.refpt[i] = jv.refpt;
      jra_.refeta[i] = jv.refeta;
      jra_.refphi[i] = jv.refphi;
@@ -439,9 +446,9 @@ HiJetResponseAnalyzer::beginJob(){
   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
   t->Branch("jteta",jra_.jteta,"jteta[nref]/F");
   t->Branch("jtphi",jra_.jtphi,"jtphi[nref]/F");
+  t->Branch("jtrawpt",jra_.jtrawpt,"jtrawpt[nref]/F");
 
   if(correctJets_){
-     t->Branch("jtcorpt",jra_.jtcorpt,"jtcorpt[nref]/F");
      t->Branch("l2",jra_.l2,"l2[nref]/F");
      t->Branch("l3",jra_.l3,"l3[nref]/F");
   }
@@ -465,9 +472,9 @@ HiJetResponseAnalyzer::beginJob(){
      t->Branch(Form("jtpt%d",im),jraMatch_[im].jtpt,Form("jtpt%d[nref]/F",im));
      t->Branch(Form("jteta%d",im),jraMatch_[im].jteta,Form("jteta%d[nref]/F",im));
      t->Branch(Form("jtphi%d",im),jraMatch_[im].jtphi,Form("jtphi%d[nref]/F",im));
+     t->Branch(Form("jtrawpt%d",im),jraMatch_[im].jtrawpt,Form("jtrawpt%d[nref]/F",im));
 
      if((bool)correctMatchedJets_[im]){
-	t->Branch(Form("jtcorpt%d",im),jraMatch_[im].jtcorpt,Form("jtcorpt%d[nref]/F",im));
 	t->Branch(Form("l2_%d",im),jraMatch_[im].l2,Form("l2_%d[nref]/F",im));
 	t->Branch(Form("l3_%d",im),jraMatch_[im].l3,Form("l3_%d[nref]/F",im));
      }
