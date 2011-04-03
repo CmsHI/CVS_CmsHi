@@ -32,7 +32,7 @@ process.source = cms.Source("PoolSource",
                             inputCommands = cms.untracked.vstring(
     'keep *',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*',
+    'drop recoPhotonCores_*_*_*'
     ),
                             dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
