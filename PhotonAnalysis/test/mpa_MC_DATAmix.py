@@ -31,11 +31,15 @@ process.source = cms.Source("PoolSource",
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
-    'drop recoSuperClusters_*_*_*',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*')
-                            
+    'drop recoPhotonCores_*_*_*',
+    'drop recoCaloClusters_*_*_*'
+    ),
+                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
+)
+
+
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('___TFoutf___'),
@@ -82,12 +86,6 @@ photonObj = "cleanPhotons"
 process.patPhotons.photonSource = cms.InputTag(photonObj)
 process.photonMatch.src = cms.InputTag(photonObj)
 process.PhotonIDProd.photonProducer  = cms.string(photonObj)
-process.gamIsoDepositTk.src = cms.InputTag(photonObj)
-process.gamIsoDepositEcalFromHits.src = cms.InputTag(photonObj)
-process.gamIsoDepositHcalFromTowers.src = cms.InputTag(photonObj)
-process.gamIsoDepositHcalDepth1FromTowers.src = cms.InputTag(photonObj)
-process.gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
-
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
 # random Cone sequence
@@ -133,8 +131,7 @@ process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
     process.hiGenParticles * 
-    process.hiGoodTracksSelection #*    process.hiGoodMergTrackSequence
-    process.hiEcalClusteringSequence*
+    process.hiGoodTracksSelection * #   process.hiGoodMergTrackSequence
     process.hiPhotonCleaningSequence *
     process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence *
