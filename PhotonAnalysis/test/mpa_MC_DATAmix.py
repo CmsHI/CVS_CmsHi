@@ -22,21 +22,19 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('MC_39Y_V3::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     ___inf___
-    # lumisToProcess =  cms.untracked.VLuminosityBlockRange(
-    # '150431:1-150431:1000'
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
     'drop recoPhotons_*_*_*',
     'drop recoPhotonCores_*_*_*'
     ),
+                            
                             dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
-)
 
 
 
@@ -79,12 +77,19 @@ process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
 process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
 
 # spike cleaner for island superclsters
+# spike cleaner for island superclsters
 process.cleanPhotons.maxHoverEBarrel = cms.double(1)
 process.cleanPhotons.maxHoverEBarrel = cms.double(1)
 photonObj = "cleanPhotons"
 process.patPhotons.photonSource = cms.InputTag(photonObj)
 process.photonMatch.src = cms.InputTag(photonObj)
 process.PhotonIDProd.photonProducer  = cms.string(photonObj)
+process.gamIsoDepositTk.src = cms.InputTag(photonObj)
+process.gamIsoDepositEcalFromHits.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalFromTowers.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalDepth1FromTowers.src = cms.InputTag(photonObj)
+process.gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
+
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
 # random Cone sequence
