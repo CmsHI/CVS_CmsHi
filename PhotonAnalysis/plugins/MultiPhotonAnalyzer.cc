@@ -134,7 +134,7 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
    if (doStoreJets_)	storeJets(e);
    
    bool foundPhotons = selectStorePhotons(e,iSetup,"");
-   //cout <<"Found photons? "<<foundPhotons<<endl;
+        cout <<"Found photons? "<<foundPhotons<<endl;
 	if (foundPhotons){
 	   // Dump analysis ntuple 
 	   // NOTE: dump ntuple only if at least one photon detected in a given acceptance
@@ -207,22 +207,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   edm::Handle<reco::GsfElectronCollection> EleHandle ;
   e.getByLabel (EleTag_.label(),EleHandle) ;
   reco::GsfElectronCollection myEle;
-  reco::SuperClusterRef sclRef;
-  reco::HitPattern hp;
-
-
-  HTValVector<TLorentzVector> ele_p4(kMaxPhotons);
-  HTValVector<Float_t> ele_p(kMaxPhotons),  ele_et(kMaxPhotons),  ele_energy(kMaxPhotons);
-  HTValVector<Float_t> ele_px(kMaxPhotons), ele_py(kMaxPhotons),  ele_pz(kMaxPhotons);
-  HTValVector<Float_t> ele_pt(kMaxPhotons), ele_eta(kMaxPhotons), ele_phi(kMaxPhotons);
-
-  HTValVector<Float_t>	ele_pin_mode(kMaxPhotons),ele_pout_mode(kMaxPhotons), ele_pin_mean(kMaxPhotons), ele_pout_mean(kMaxPhotons);
-  HTValVector<Float_t>	ele_he(kMaxPhotons), ele_fbrem(kMaxPhotons), ele_ep(kMaxPhotons), ele_echarge(kMaxPhotons);      
-  HTValVector<Float_t> ele_eseedpout(kMaxPhotons), ele_mva(kMaxPhotons), ele_eseedp(kMaxPhotons); 
-  HTValVector<Float_t> ele_deltaetaseed(kMaxPhotons), ele_deltaphiseed(kMaxPhotons), ele_deltaetaele(kMaxPhotons), ele_deltaphiele(kMaxPhotons), ele_deltaetain(kMaxPhotons), ele_deltaphiin(kMaxPhotons); 
-
-  HTValVector<Int_t> isbarrel(kMaxPhotons), isendcap(kMaxPhotons);   
-  HTValVector<Int_t> numHits(kMaxPhotons), numTrackerHits(kMaxPhotons), numPixelHits(kMaxPhotons), numStripHits(kMaxPhotons);
+  
   bool isEleRecoed = false;
   if (EleHandle.isValid()) {
      cout << " electron was reconstructed! " << endl;
@@ -230,56 +215,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   }
   
   if ( isEleRecoed) {
- int nelectronscounter=0;
-     for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr) {
-       
-       ele_p4    (nelectronscounter) =  TLorentzVector(eleItr->px(),eleItr->py(),eleItr->pz(),eleItr->energy());
-       ele_p     (nelectronscounter) =  eleItr->p();
-       ele_et    (nelectronscounter) =  eleItr->et();
-       ele_energy(nelectronscounter) =  eleItr->energy();
-       ele_px    (nelectronscounter) =  eleItr->px();
-       ele_py    (nelectronscounter) =  eleItr->py();
-       ele_pz    (nelectronscounter) =  eleItr->pz();
-       ele_pt    (nelectronscounter) =  eleItr->pt();
-       ele_eta   (nelectronscounter) =  eleItr->eta();
-       ele_phi   (nelectronscounter) =  eleItr->phi();
-
-       ele_deltaetaseed(nelectronscounter) = eleItr->deltaEtaSeedClusterTrackAtCalo() ; 
-       ele_deltaphiseed(nelectronscounter) = eleItr->deltaPhiSeedClusterTrackAtCalo() ;  
-       ele_deltaetaele(nelectronscounter)  = eleItr->deltaEtaEleClusterTrackAtCalo() ;  
-       ele_deltaphiele(nelectronscounter)  = eleItr->deltaPhiEleClusterTrackAtCalo() ; 
-       ele_deltaetain(nelectronscounter)   = eleItr->deltaEtaSuperClusterTrackAtVtx();
-       ele_deltaphiin(nelectronscounter)   = eleItr->deltaPhiSuperClusterTrackAtVtx();  
-       
-    if (eleItr->isEB()) isbarrel(nelectronscounter) = 1;
-    else isbarrel(nelectronscounter) = 0;
-    if (eleItr->isEE()) isendcap(nelectronscounter) = 1;
-    else isendcap(nelectronscounter) = 0;
-    ele_echarge(nelectronscounter) = eleItr->charge(); 
-    ele_he(nelectronscounter)      = eleItr->hadronicOverEm() ;
-    
-    ele_eseedpout(nelectronscounter) = eleItr->eSeedClusterOverPout();
-    ele_ep(nelectronscounter)        = eleItr->eSuperClusterOverP() ;        
-    ele_eseedp(nelectronscounter)    = eleItr->eSeedClusterOverP() ;         
-    
-    ele_fbrem(nelectronscounter) = eleItr->fbrem() ;
-    ele_mva(nelectronscounter)   = eleItr->mva() ;
-    
-    ele_pin_mode(nelectronscounter) = eleItr->trackMomentumAtVtx().R();
-    ele_pout_mode(nelectronscounter)   = eleItr->trackMomentumOut().R() ; 
-
-       
-	edm::Handle<edm::View<reco::Track> >  recCollection;
- 	e.getByLabel("electronGsfTracks", recCollection);	
-
-	int size = recCollection->size();
-	
-	hp = edm::RefToBase<reco::Track>(recCollection,nelectronscounter)->hitPattern();	
-	numHits(nelectronscounter) = hp.numberOfValidHits();
-	numTrackerHits(nelectronscounter) = hp.numberOfValidTrackerHits();
-	numPixelHits(nelectronscounter) = hp.numberOfValidPixelHits();
-	numStripHits(nelectronscounter) = hp.numberOfValidStripHits();
-	nelectronscounter++;
+     for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr)	{
 	myEle.push_back(*eleItr);
      }
   }
@@ -613,7 +549,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     
     if ( isEleRecoed ) {
-      //cout << " start electron search " << endl;
+       cout << " start electron search " << endl;
        for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
 	  if ( eleItr->superCluster()->energy() < 10 ) continue;
 	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
@@ -625,13 +561,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	  
 	  dphiTemp = dphi;  
 	  detaTemp = eleItr->superCluster()->eta() - photon.superCluster()->eta() ;
-	  //cout << " this is electron " << endl;
+	  cout << " this is electron " << endl;
 	  isEleTemp = true;
 	  break;
        }
        
        if ( isEleTemp == false)  
-	 //cout << " this is not an electron" << endl;
+	  cout << " this is not an electron" << endl;
     }
     
     isElectron         (nphotonscounter)    =  isEleTemp;
