@@ -28,9 +28,12 @@
 #include <string.h>
 #include "FitFunctions.h"
 #include "TObjArray.h"
+//iSpec =1 pT, =2 Rap, =3 Cent PutWeight = 1 means put weight
+// Prompt =1 prompt JPsi prompt =2 non prompt Jpsi
+
 bool IsAccept(Double_t pt, Double_t eta); //you can define acceptance here 
 double FindCenWeight(int Bin);//gives you weight according to cent
-void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3 Cent PutWeight = 1 means put weight
+void JPsiMassFit_All(int Prompt =1, int iSpec = 3, int PutWeight = 1)   
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
@@ -78,8 +81,9 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
     pt_bound[1] = 30.0;
     pt_bound[2] = 10.0;
     pt_bound[3] = 30.0;
-    pt_bound[4] = 25.0;
-    pt_bound[5] = 30.0;
+
+    pt_bound[4] = 30.0;
+    pt_bound[5] = 15.0;
     pt_bound[6] = 30.0;
     pt_bound[7] = 35;
     pt_bound[8] = 40;
@@ -107,12 +111,11 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
   
   if(iSpec == 3) {
     Nptbin = 1;
-    pt_bound[0] = 0.0;//0
-    pt_bound[1] = 40.0;//10
-    pt_bound[2] = 8.0;//20
-    pt_bound[3] = 16.0;//40
-    // pt_bound[4] = 16.0;//100
-    pt_bound[4] = 32.0;//100
+    pt_bound[0] = 0.0;  //0
+    pt_bound[1] = 40.0;  //10
+    pt_bound[2] = 8.0;  //20
+    pt_bound[3] = 16.0; //40
+    pt_bound[4] = 40.0; //100
     pt_bound[5] = 40.0;
     pt_bound[6] = 28.0;
     pt_bound[7] = 40.0;
@@ -168,44 +171,55 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
   char fileName[10][500];
   //scales for different pT bins
   double scale[10]={0};  
-  scale[0]=(0.0257069/0.00005571);
-  scale[1]=(0.0146199/0.00005571);
+  
+if(Prompt==1){
+  cout<<" prompt weight "<<endl;
+  scale[0]=(1.285345e-02/0.00005571);
+  scale[1]=(7.309949e-03/0.00005571);
   scale[2]=(0.00393391/0.00005571);
   scale[3]=(0.000669658/0.00005571);
   scale[4]=(0.000164187/0.00005571);
   scale[5]=(0.00005571/0.00005571);
   
+ }
+  
+  //non prompt JPSi 0.000227562  0.000578402 0.000259902 3.84506e-05 2.18806e-05   1.0847e-05 
+  //0.000227562/2 = 1.13781000000000000e-04
+  //0.000578402/2=  2.89200999999999998e-04
+  //0.000010847*2/5= 4.33879999999999986e-06
+
+if(Prompt==2){
+  cout<<" Non prompt weight "<<endl;
+  scale[0]=(1.137e-04/4.339e-06);
+  scale[1]=(2.892e-04/4.339e-06);
+  scale[2]=(2.59902e-04/4.339e-06);
+  scale[3]=(3.84506e-05/4.339e-06);
+  scale[4]=(2.18806e-05/4.339e-06);
+  scale[5]=(4.339e-06/4.339e-06);
+
+ }
   if(PutWeight==0){scale[0]=(1);scale[1]=(1);scale[2]=(1);scale[3]=(1);scale[4]=(1);scale[5]=(1);}
-  
-  //78.83 41.99  11.30  1.92  0.47  1.00
-  //0.000139274
-  //scale[0]=(78.83);
-  //scale[1]=(41.99);
-  //scale[2]=(11.30);
-  //scale[3]=(1.92);
-  //scale[4]=(0.47);
-  //scale[5]=(1.0);
-  
-  //Prompt JPsi
+
+  if(Prompt ==1){
+    cout<<"==================Prompt JPsi================================================"<<endl;
   sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
   sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
   sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
   sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
   sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
   sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
+  }
+  
+if(Prompt ==2){
+   cout<<"================== Non Prompt JPsi============================================="<<endl;
+  sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
+  sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt36.root");
+  sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt69.root");
+  sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt912.root");
+  sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1215.root");
+  sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1530.root");
+ }
     
-  //Non Prompt JPsi
-  //sprintf(fileName[0],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
-  //sprintf(fileName[1],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt36.root");
-  //sprintf(fileName[2],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt69.root");
-  //sprintf(fileName[3],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt912.root");
-  //sprintf(fileName[4],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1215.root");
-  //sprintf(fileName[5],"/home/vineet/HiData/JPsiData/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1530.root");
-  
-  //for(int ifile =0; ifile <=5; ifile++){
-  //cout<<fileName[ifile]<<endl;
-  //}
-  
   TFile *infile;
   TTree *tree;
   TTree *gentree;
@@ -333,16 +347,19 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
 	if(ifile==5){diMuonsRap_Gen5->Fill(GenJpsiRap);}
       }
       
-      double GenCenWeight =0;
+      double GenCenWeight =0, GenWeight =0;
       GenCenWeight=FindCenWeight(gbin);	  
-      if(PutWeight==0) GenCenWeight=1;
+      GenWeight=GenCenWeight*scale[ifile];
+     
+      if(PutWeight==0) GenWeight=1; 
       
+
       for (Int_t ih = 0; ih < Nptbin; ih++) {
 	//adding pT of all pt bins to see diss is cont
-	if(iSpec == 1) if((GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt,scale[ifile]);}
-	if(iSpec == 1) if((GenPosIn==1 && GenNegIn==1)&&(TMath::Abs(GenJpsiRap)>0.0 && TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight*scale[ifile]);}
-	if(iSpec == 2) if((GenPosIn==1 && GenNegIn==1)&& (GenJpsiPt> 0.0 && GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap) > pt_bound[ih] && TMath::Abs(GenJpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight*scale[ifile]);}	
-	if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (gbin >= pt_bound[ih] && gbin< pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenCenWeight*scale[ifile]);}
+	if(iSpec == 1) if((GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsPt_GenA[ifile][ih]->Fill(GenJpsiPt,GenWeight);}
+	if(iSpec == 1) if((GenPosIn==1 && GenNegIn==1)&&(TMath::Abs(GenJpsiRap)>0.0 && TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}
+	if(iSpec == 2) if((GenPosIn==1 && GenNegIn==1)&& (GenJpsiPt> 0.0 && GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap) > pt_bound[ih] && TMath::Abs(GenJpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}	
+	if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) &&  (GenJpsiPt<30.0) &&   (TMath::Abs(GenJpsiRap)<2.4) && (gbin >= pt_bound[ih] && gbin< pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight);}
       }
     }//gen loop end
     
@@ -394,9 +411,11 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
 	   && muNeg_nValidMuHits >6)){NegPass=1;}
       if((PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
       
-      double RecCenWeight=0;
+      
+      double RecCenWeight=0,RecWeight=0;
       RecCenWeight=FindCenWeight(rbin);	  
-      if(PutWeight==0)RecCenWeight=1;
+      RecWeight=RecCenWeight*scale[ifile];
+      if(PutWeight==0)RecWeight=1;
       
       if(AllCut==1){
 	if(ifile==0){diMuonsRap_Rec0->Fill(JpsiRap);}
@@ -411,10 +430,10 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
       for (Int_t ih = 0; ih < Nptbin; ih++) {
 	if((JpsiCharge == 0) && (JpsiVprob > 0.01)) {	  
 	  //to see cont reco pT
-	  if(iSpec == 1) if((JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt,scale[ifile]);
-	  if(iSpec == 1) if((AllCut==1) && (TMath::Abs(JpsiRap)>0.0 && TMath::Abs(JpsiRap)<2.4) && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight*scale[ifile]);}
-	  if(iSpec == 2) if((AllCut==1) && (  JpsiPt > 0.0 &&  JpsiPt<30.0) && (TMath::Abs(JpsiRap) > pt_bound[ih] && TMath::Abs(JpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight*scale[ifile]);}
-	  if(iSpec == 3) if((AllCut==1) &&(rbin>=pt_bound[ih]  && rbin<pt_bound[ih+1]))    {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecCenWeight*scale[ifile]);}
+	  if(iSpec == 1) if((JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt,RecWeight);
+	  if(iSpec == 1) if((AllCut==1) && (TMath::Abs(JpsiRap)>0.0 && TMath::Abs(JpsiRap)<2.4) && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight);}
+	  if(iSpec == 2) if((AllCut==1) && (JpsiPt > 0.0 &&  JpsiPt<30.0) && (TMath::Abs(JpsiRap) > pt_bound[ih] && TMath::Abs(JpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight);}
+	  if(iSpec == 3) if( (AllCut==1) && (JpsiPt<30.0) &&  (TMath::Abs(JpsiRap)<2.4) && (rbin>=pt_bound[ih]  && rbin<pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight);}
 	}
       }
     }//rec tree loop ends
@@ -453,26 +472,42 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
   //===========================Fitting=================================================================================//
   // Fit ranges
   double mass_low, mass_high;
-  double MassJPsi, WidthJPsi;
+  double MassJPsi, WeidthJPsi;
   
   // Low mass range J/psi
-  MassJPsi = 3.096; WidthJPsi = 0.040;
-  mass_low = 2.92; mass_high = 3.24;  // Fit ranges
+  MassJPsi = 3.096; WeidthJPsi = 0.080;
+  mass_low = 2.9; mass_high = 3.26;  // Fit ranges
+   
+  // Fit Function crystall ball
+  TF1 *GAUSPOL = new TF1("GAUSPOL",CrystalBall,2.6,3.5,5);
+  GAUSPOL->SetParNames("#alpha","n","Mean","#sigma","N");
+
+  // Fit Function Gaus + Pol2
+  //TF1 *GAUSPOL = new TF1("GAUSPOL", GausPol2, 2.6, 3.5,6);
+  //GAUSPOL->SetParameters(1,1,3.1,0.08,1000000);
   
-  // Fit Function RBW + Pol2
-  TF1 *GAUSPOL = new TF1("GAUSPOL", GausPol2, 2.6, 3.5,6);
-  
+
   GAUSPOL->SetLineWidth(2.0);
   GAUSPOL->SetLineColor(2);
   
-  GAUSPOL->SetParameter(1, MassJPsi);
-  GAUSPOL->SetParameter(2, WidthJPsi);
-  GAUSPOL->FixParameter(5, 0);
+  GAUSPOL->SetParameter(0, 1);
+  GAUSPOL->SetParameter(1, 1);
+  GAUSPOL->SetParameter(2, MassJPsi);
+  GAUSPOL->SetParameter(3, WeidthJPsi);
   
-  GAUSPOL->SetParLimits(1, 0.8*MassJPsi, 1.1*MassJPsi);
-  GAUSPOL->SetParLimits(2, 0.1*WidthJPsi, 1.3*WidthJPsi);
+  //for three pT bins
+   GAUSPOL->SetParameter(4, 1000000);
   
-  //=====================Loop for eff===========================================================
+  
+
+
+
+
+   //GAUSPOL->SetParLimits(3, 0.4*MassJPsi, 2*MassJPsi);
+  //GAUSPOL->SetParLimits(4, 100, 100000);
+  
+  
+//=====================Loop for eff========================================================================================//
   //define stuff here for error on weighted samples
   double GenNo[100]={0};
   double Eff[100]={0};
@@ -482,16 +517,57 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
   double errEff_cat_S2[100]={0};
   double errEff_cat_S1_1[100]={0},errEff_cat_S1_2[100]={0};
   double errEff_cat_S2_1[100]={0},errEff_cat_S2_2[100]={0};
- 
+  char PlotName[500],PlotName1[500], PlotName2[500];
+  char GPlotName[500],GPlotName1[500], GPlotName2[500];
+  
   for (Int_t ih = 0; ih < Nptbin; ih++) {
     gen_pt[ih] = diMuonsInvMass_GenA1[ih]->IntegralAndError(1, 100, genError);
     gen_ptError[ih]= genError;
     cout<<" gen_pt[ih] "<< gen_pt[ih] <<" error   "<<  gen_ptError[ih]<<endl;
+   
+    if(Prompt ==1){
+
+      if(iSpec==1) sprintf(PlotName,"plots/DiMuonMass_PtBin_%d.png",ih);
+      if(iSpec==2) sprintf(PlotName,"plots/DiMuonMass_RapBin_%d.png",ih);
+      if(iSpec==3) sprintf(PlotName,"plots/DiMuonMass_CentBin_%d.png",ih);
+      
+      if(iSpec==1) sprintf(PlotName1,"plots/DiMuonMass_PtBin_%d.pdf",ih);
+      if(iSpec==2) sprintf(PlotName1,"plots/DiMuonMass_RapBin_%d.pdf",ih);
+      if(iSpec==3) sprintf(PlotName1,"plots/DiMuonMass_CentBin_%d.pdf",ih);
+    
+      if(iSpec==1) sprintf(PlotName2,"plots/DiMuonMass_PtBin_%d.eps",ih);
+      if(iSpec==2) sprintf(PlotName2,"plots/DiMuonMass_RapBin_%d.eps",ih);
+      if(iSpec==3) sprintf(PlotName2,"plots/DiMuonMass_CentBin_%d.eps",ih); 
+    }
+
+    if(Prompt ==2){
+
+      if(iSpec==1) sprintf(PlotName,"npplots/DiMuonMass_PtBin_%d.png",ih);
+      if(iSpec==2) sprintf(PlotName,"npplots/DiMuonMass_RapBin_%d.png",ih);
+      if(iSpec==3) sprintf(PlotName,"npplots/DiMuonMass_CentBin_%d.png",ih);
+      
+      if(iSpec==1) sprintf(PlotName1,"npplots/DiMuonMass_PtBin_%d.pdf",ih);
+      if(iSpec==2) sprintf(PlotName1,"npplots/DiMuonMass_RapBin_%d.pdf",ih);
+      if(iSpec==3) sprintf(PlotName1,"npplots/DiMuonMass_CentBin_%d.pdf",ih);
+      
+      if(iSpec==1) sprintf(PlotName2,"npplots/DiMuonMass_PtBin_%d.eps",ih);
+      if(iSpec==2) sprintf(PlotName2,"npplots/DiMuonMass_RapBin_%d.eps",ih);
+      if(iSpec==3) sprintf(PlotName2,"npplots/DiMuonMass_CentBin_%d.eps",ih); 
+    }
+
+
     new TCanvas;
     diMuonsInvMass_RecA1[ih]->Fit("GAUSPOL","LEQ", "", mass_low, mass_high);
-    double JPsiYield = GAUSPOL->GetParameter(0);
-    double JPsiMass = GAUSPOL->GetParameter(1);
-    double JPsiWidth = GAUSPOL->GetParameter(2);
+    gPad->Print(PlotName);
+    gPad->Print(PlotName1);
+    gPad->Print(PlotName2);
+    
+    
+    double JPsiMass = GAUSPOL->GetParameter(2);
+    double JPsiWidth = GAUSPOL->GetParameter(3);
+    
+    double JPsiYield = GAUSPOL->GetParameter(4); 
+
     double par[20];
     GAUSPOL->GetParameters(par);
     sprintf(namePt_1B,"pt_1B_%d",ih);
@@ -501,8 +577,11 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
     double MassLow=(JPsiMass-3*JPsiWidth);
     double MassHigh=(JPsiMass+3*JPsiWidth);
     
+    
+
     int binlow =diMuonsInvMass_RecA1[ih]->GetXaxis()->FindBin(MassLow);
     int binhi =diMuonsInvMass_RecA1[ih]->GetXaxis()->FindBin(MassHigh);
+    
     double binwidth=diMuonsInvMass_RecA1[ih]->GetBinWidth(1);
         
     
@@ -542,6 +621,8 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
     cout<<"JPsi Yield by integral of histo:  "<< diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError) <<"  error "<< rec_ptError[ih]<<endl; 
     cout<<"JPsiYield by Gauss yield determ:     "<< JPsiYield/binwidth << " JPsiWidth "<< JPsiWidth<<" JPsiMass "<<JPsiMass <<endl;
     cout<<"JPsi Yield by Function integral:  "<< GAUSPOL->Integral(MassLow,MassHigh)/binwidth <<endl;
+    
+
     cout<<" Bin "<<ih<< " Reco Jpsi  "<<  rec_pt[ih] <<" Gen Jpsi "<<gen_pt[ih]<<endl;
     cout<<" Eff "<< Eff_cat_1[ih]<<" Error "<<Err_Eff_cat_1[ih]<<endl;
     
@@ -555,13 +636,48 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
    
     backfun_1->SetLineColor(4);
     backfun_1->SetLineWidth(1);
-    backfun_1->Draw("same");
+    //backfun_1->Draw("same");
+   
+
+    if (Prompt==1){ 
+      if(iSpec==1) sprintf(GPlotName,"plots/DiMuonGenMass_PtBin_%d.png",ih);
+      if(iSpec==2) sprintf(GPlotName,"plots/DiMuonGenMass_RapBin_%d.png",ih);
+      if(iSpec==3) sprintf(GPlotName,"plots/DiMuonGenMass_CentBin_%d.png",ih);
+      
+      if(iSpec==1) sprintf(GPlotName1,"plots/DiMuonGenMass_PtBin_%d.pdf",ih);
+      if(iSpec==2) sprintf(GPlotName1,"plots/DiMuonGenMass_RapBin_%d.pdf",ih);
+      if(iSpec==3) sprintf(GPlotName1,"plots/DiMuonGenMass_CentBin_%d.pdf",ih);
+      
+      if(iSpec==1) sprintf(GPlotName2,"plots/DiMuonGenMass_PtBin_%d.eps",ih);
+      if(iSpec==2) sprintf(GPlotName2,"plots/DiMuonGenMass_RapBin_%d.eps",ih);
+      if(iSpec==3) sprintf(GPlotName2,"plots/DiMuonGenMass_CentBin_%d.eps",ih);
+    }
+
+    if (Prompt==2){ 
+      if(iSpec==1) sprintf(GPlotName,"npplots/DiMuonGenMass_PtBin_%d.png",ih);
+      if(iSpec==2) sprintf(GPlotName,"npplots/DiMuonGenMass_RapBin_%d.png",ih);
+      if(iSpec==3) sprintf(GPlotName,"npplots/DiMuonGenMass_CentBin_%d.png",ih);
+      
+      if(iSpec==1) sprintf(GPlotName1,"npplots/DiMuonGenMass_PtBin_%d.pdf",ih);
+      if(iSpec==2) sprintf(GPlotName1,"npplots/DiMuonGenMass_RapBin_%d.pdf",ih);
+      if(iSpec==3) sprintf(GPlotName1,"npplots/DiMuonGenMass_CentBin_%d.pdf",ih);
+      
+      if(iSpec==1) sprintf(GPlotName2,"npplots/DiMuonGenMass_PtBin_%d.eps",ih);
+      if(iSpec==2) sprintf(GPlotName2,"npplots/DiMuonGenMass_RapBin_%d.eps",ih);
+      if(iSpec==3) sprintf(GPlotName2,"npplots/DiMuonGenMass_CentBin_%d.eps",ih);
+    }
+
+
 
     //Drawing histo
     new TCanvas;
     diMuonsInvMass_GenA1[ih]->Draw("EPL");
-    
-    if (iSpec==1){ new TCanvas; diMuonsPt_GenA1[ih]->Draw(); new TCanvas; diMuonsPt_RecA1[ih]->Draw();}
+    gPad->Print(GPlotName);
+    gPad->Print(GPlotName1);
+    gPad->Print(GPlotName2);
+  
+
+  //if (iSpec==1){ new TCanvas; diMuonsPt_GenA1[ih]->Draw(); new TCanvas; diMuonsPt_RecA1[ih]->Draw();}
   
   }
   
@@ -586,20 +702,31 @@ void JPsiMassFit_All(int iSpec = 1, int PutWeight = 1) //iSpec =1 pT, =2 Rap, =3
   new TCanvas;
   Eff_JPsi->Draw("AP");
   legend_GP->Draw("Same");
-    
-  if(iSpec==1){ gPad->Print("plots/Eff_JPsi_Pt.pdf");gPad->Print("plots/Eff_JPsi_Pt.png");}
-  if(iSpec==2){ gPad->Print("plots/Eff_JPsi_Rap_Pt330.pdf");gPad->Print("plots/Eff_JPsi_Rap_Pt330.png");}
-  if(iSpec==3){ gPad->Print("plots/Eff_JPsi_Cent.pdf");gPad->Print("plots/Eff_JPsi_Cent.png");}
+
+  if(Prompt==1){    
+    if(iSpec==1){ gPad->Print("plots/Eff_JPsi_Pt.pdf");gPad->Print("plots/Eff_JPsi_Pt.png");}
+    if(iSpec==2){ gPad->Print("plots/Eff_JPsi_Rap.pdf");gPad->Print("plots/Eff_JPsi_Rap.png");}
+    if(iSpec==3){ gPad->Print("plots/Eff_JPsi_Cent.pdf");gPad->Print("plots/Eff_JPsi_Cent.png");}
+  }
+  
+ if(Prompt==2){   
+   if(iSpec==1){ gPad->Print("npplots/Eff_JPsi_Pt.pdf");gPad->Print("npplots/Eff_JPsi_Pt.png");}
+   if(iSpec==2){ gPad->Print("npplots/Eff_JPsi_Rap.pdf");gPad->Print("npplots/Eff_JPsi_Rap.png");}
+   if(iSpec==3){ gPad->Print("npplots/Eff_JPsi_Cent.pdf");gPad->Print("npplots/Eff_JPsi_Cent.png");}
+ }
 
 }
 
 
 bool IsAccept(Double_t pt, Double_t eta)
 {
+  
+  //return (fabs(eta) < 2.4); 
+
   return (fabs(eta) < 2.4 &&
-	  (    ( fabs(eta) < 1.0 && pt >= 3.4 ) ||
-	       (  1.0 <= fabs(eta) && fabs(eta) < 1.5 && pt >= 5.8-2.4*fabs(eta) ) ||
-	       (  1.5 <= fabs(eta) && pt >= 3.3667 - 7.0/9.0*fabs(eta)) ));
+  	  (    ( fabs(eta) < 1.0 && pt >= 3.4 ) ||
+  	       (  1.0 <= fabs(eta) && fabs(eta) < 1.5 && pt >= 5.8-2.4*fabs(eta) ) ||
+  	       (  1.5 <= fabs(eta) && pt >= 3.3667 - 7.0/9.0*fabs(eta)) ));
 }
 
 
