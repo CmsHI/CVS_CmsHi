@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.29 2011/03/25 16:53:58 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.31 2011/04/04 08:53:27 kimy Exp $
  *
  */
 
@@ -645,11 +645,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     c4                          (nphotonscounter)   =  CxC.getCx(photon.superCluster(),4,0);
     c5                          (nphotonscounter)   =  CxC.getCx(photon.superCluster(),5,0);
 
-    t1                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),1,0);
-    t2                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),2,0);
-    t3                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),3,0);
-    t4                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4,0);
-    t5                          (nphotonscounter)   =  TxC.getTx(photon.superCluster(),5,0);
+    t1                          (nphotonscounter)   =  TxC.getTx(photon,1,0);
+    t2                          (nphotonscounter)   =  TxC.getTx(photon,2,0);
+    t3                          (nphotonscounter)   =  TxC.getTx(photon,3,0);
+    t4                          (nphotonscounter)   =  TxC.getTx(photon,4,0);
+    t5                          (nphotonscounter)   =  TxC.getTx(photon,5,0);
 
     r1                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),1,0);
     r2                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),2,0);
@@ -657,11 +657,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     r4                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),4,0);
     r5                          (nphotonscounter)   =  RxC.getRx(photon.superCluster(),5,0);
 
-    t1PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),1,2); // 2 GeV cut
-    t2PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),2,2);
-    t3PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),3,2);
-    t4PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4,2);
-    t5PtCut                     (nphotonscounter)   =  TxC.getTx(photon.superCluster(),5,2);
+    t1PtCut                     (nphotonscounter)   =  TxC.getTx(photon,1,2); // 2 GeV cut
+    t2PtCut                     (nphotonscounter)   =  TxC.getTx(photon,2,2);
+    t3PtCut                     (nphotonscounter)   =  TxC.getTx(photon,3,2);
+    t4PtCut                     (nphotonscounter)   =  TxC.getTx(photon,4,2);
+    t5PtCut                     (nphotonscounter)   =  TxC.getTx(photon,5,2);
 
 
     cc1                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),1,0);
@@ -670,11 +670,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     cc4                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),4,0);
     cc5                          (nphotonscounter)   =  CxC.getCCx(photon.superCluster(),5,0);
 
-    ct1                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),1,0);
-    ct2                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),2,0);
-    ct3                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),3,0);
-    ct4                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,0);
-    ct5                          (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,0);
+    ct1                          (nphotonscounter)   =  TxC.getCTx(photon,1,0);
+    ct2                          (nphotonscounter)   =  TxC.getCTx(photon,2,0);
+    ct3                          (nphotonscounter)   =  TxC.getCTx(photon,3,0);
+    ct4                          (nphotonscounter)   =  TxC.getCTx(photon,4,0);
+    ct5                          (nphotonscounter)   =  TxC.getCTx(photon,5,0);
 
     cr1                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),1,0);
     cr2                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),2,0);
@@ -682,58 +682,58 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     cr4                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),4,0);
     cr5                          (nphotonscounter)   =  RxC.getCRx(photon.superCluster(),5,0);
 
-    ct1PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),1,2); // 2 GeV cut
-    ct2PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),2,2); 
-    ct3PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),3,2);
-    ct4PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),4,2);
-    ct5PtCut                     (nphotonscounter)   =  TxC.getCTx(photon.superCluster(),5,2);
+    ct1PtCut                     (nphotonscounter)   =  TxC.getCTx(photon,1,2); // 2 GeV cut
+    ct2PtCut                     (nphotonscounter)   =  TxC.getCTx(photon,2,2); 
+    ct3PtCut                     (nphotonscounter)   =  TxC.getCTx(photon,3,2);
+    ct4PtCut                     (nphotonscounter)   =  TxC.getCTx(photon,4,2);
+    ct5PtCut                     (nphotonscounter)   =  TxC.getCTx(photon,5,2);
 
-    trackIsohi10                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 1.0, 0.04);
-    trackIsohi15                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 1.5, 0.04);
-    trackIsohi20                 (nphotonscounter)   =  TxC.getTx(photon.superCluster(),4, 2.0, 0.04);
+    trackIsohi10                 (nphotonscounter)   =  TxC.getTx(photon,4, 1.0, 0.04);
+    trackIsohi15                 (nphotonscounter)   =  TxC.getTx(photon,4, 1.5, 0.04);
+    trackIsohi20                 (nphotonscounter)   =  TxC.getTx(photon,4, 2.0, 0.04);
 
-    dr11                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,1);
-    dr12                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,2);
-    dr13                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,3);
-    dr14                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),1,4);
+    dr11                         (nphotonscounter)   =  dRxy.getDRxy(photon,1,1);
+    dr12                         (nphotonscounter)   =  dRxy.getDRxy(photon,1,2);
+    dr13                         (nphotonscounter)   =  dRxy.getDRxy(photon,1,3);
+    dr14                         (nphotonscounter)   =  dRxy.getDRxy(photon,1,4);
   
-    dr21                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),2,1);
-    dr22                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),2,2);
-    dr23                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),2,3);
-    dr24                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),2,4);
+    dr21                         (nphotonscounter)   =  dRxy.getDRxy(photon,2,1);
+    dr22                         (nphotonscounter)   =  dRxy.getDRxy(photon,2,2);
+    dr23                         (nphotonscounter)   =  dRxy.getDRxy(photon,2,3);
+    dr24                         (nphotonscounter)   =  dRxy.getDRxy(photon,2,4);
   
-    dr31                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),3,1);
-    dr32                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),3,2);
-    dr33                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),3,3);
-    dr34                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),3,4);
+    dr31                         (nphotonscounter)   =  dRxy.getDRxy(photon,3,1);
+    dr32                         (nphotonscounter)   =  dRxy.getDRxy(photon,3,2);
+    dr33                         (nphotonscounter)   =  dRxy.getDRxy(photon,3,3);
+    dr34                         (nphotonscounter)   =  dRxy.getDRxy(photon,3,4);
 
-    dr41                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),4,1);
-    dr42                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),4,2);
-    dr43                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),4,3);
-    dr44                         (nphotonscounter)   =  dRxy.getDRxy(photon.superCluster(),4,4);
+    dr41                         (nphotonscounter)   =  dRxy.getDRxy(photon,4,1);
+    dr42                         (nphotonscounter)   =  dRxy.getDRxy(photon,4,2);
+    dr43                         (nphotonscounter)   =  dRxy.getDRxy(photon,4,3);
+    dr44                         (nphotonscounter)   =  dRxy.getDRxy(photon,4,4);
 
-    t11                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),1,1);
-    t12                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),1,2);
-    t13                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),1,3);
-    t14                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),1,4);
+    t11                         (nphotonscounter)   =  Txy.getTxy(photon,1,1);
+    t12                         (nphotonscounter)   =  Txy.getTxy(photon,1,2);
+    t13                         (nphotonscounter)   =  Txy.getTxy(photon,1,3);
+    t14                         (nphotonscounter)   =  Txy.getTxy(photon,1,4);
 
-    t21                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),2,1);
-    t22                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),2,2);
-    t23                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),2,3);
-    t24                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),2,4);
+    t21                         (nphotonscounter)   =  Txy.getTxy(photon,2,1);
+    t22                         (nphotonscounter)   =  Txy.getTxy(photon,2,2);
+    t23                         (nphotonscounter)   =  Txy.getTxy(photon,2,3);
+    t24                         (nphotonscounter)   =  Txy.getTxy(photon,2,4);
 
-    t31                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),3,1);
-    t32                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),3,2);
-    t33                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),3,3);
-    t34                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),3,4);
+    t31                         (nphotonscounter)   =  Txy.getTxy(photon,3,1);
+    t32                         (nphotonscounter)   =  Txy.getTxy(photon,3,2);
+    t33                         (nphotonscounter)   =  Txy.getTxy(photon,3,3);
+    t34                         (nphotonscounter)   =  Txy.getTxy(photon,3,4);
 
-    t41                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,1);
-    t42                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,2);
-    t43                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,3);
-    t44                         (nphotonscounter)   =  Txy.getTxy(photon.superCluster(),4,4);
+    t41                         (nphotonscounter)   =  Txy.getTxy(photon,4,1);
+    t42                         (nphotonscounter)   =  Txy.getTxy(photon,4,2);
+    t43                         (nphotonscounter)   =  Txy.getTxy(photon,4,3);
+    t44                         (nphotonscounter)   =  Txy.getTxy(photon,4,4);
     
     nAllTracks                  (nphotonscounter)   =  (float)Txy.getNumAllTracks(1);   // pt Cut of the track = 1GeV
-    nLocalTracks                (nphotonscounter)   =  (float)Txy.getNumLocalTracks(photon.superCluster(),0.5,1); // dEta cut = 0.5     and    pt Cut = 1GeV                                                                               
+    nLocalTracks                (nphotonscounter)   =  (float)Txy.getNumLocalTracks(photon,0.5,1); // dEta cut = 0.5     and    pt Cut = 1GeV                                                                               
 
 
     
