@@ -13,12 +13,9 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: evtCounter.cc,v 1.2 2011/01/11 14:00:50 kimy Exp $
+// $Id: evtCounter.cc,v 1.3 2011/01/11 14:28:42 kimy Exp $
 //
 //
-
-#define cBins 10
-#define cStep 4
 
 // system include files
 #include <memory>
