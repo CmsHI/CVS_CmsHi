@@ -22,10 +22,10 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    '___inf___'
+    'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/hidata/HIRun2010/HIAllPhysics/RECO/SDmaker_3SD_1CS_PDHIAllPhysicsZSv2_SD_PhotonHI-v1/0049/3EAFC902-B34C-E011-A649-003048F1BFB0.root'
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
