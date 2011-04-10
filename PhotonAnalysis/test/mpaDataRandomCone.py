@@ -102,6 +102,12 @@ process.load("RandomConeAna.Configuration.randomConeSequence_cff")
 process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
 process.compleCleanSuperCluster.photonProducer= cms.untracked.InputTag(photonObj)
 
+# random number generator
+process.load('Configuration/StandardSequences/SimulationRandomNumberGeneratorSeeds_cff')
+from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
+randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
+randSvc.populate()
+
 # turn off MC matching for data
 
 ####################### tune ##############
