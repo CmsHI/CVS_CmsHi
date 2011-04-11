@@ -6,7 +6,7 @@ process = cms.Process("PAT")
 ## Magnet, geometry, detector condition ( needed for patTuple )
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
-process.load('Configuration.StandardSequences.Reconstruction_cff')
+process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff')
 process.load("RecoHI.HiEgammaAlgos.HiEgamma_cff")
 ## MessageLogger
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -22,7 +22,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('MC_39Y_V3::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     ___inf___
@@ -62,19 +62,13 @@ process.multiPhotonAnalyzer.OutputFile = cms.string('___outf___')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 
 # HiGoodMergedTrack
-process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
-#process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
-#process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
-#process.hiGoodMergTrackSequence = cms.Sequence(
-#    process.hiGoodTracksSelection*
-#    process.conformalPixelTrackReco *
-#    process.hiGoodMergedTracks
-#    )
+process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff") 
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
 process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
 process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
+process.load("CmsHi.PhotonAnalysis.evtCounter_cfi")
 
 # spike cleaner for island superclsters
 # spike cleaner for island superclsters
@@ -134,6 +128,7 @@ process.patHeavyIonDefaultSequence.remove(process.selectedPatMuons)
 process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
+    process.evtCounter *
     process.hiGenParticles * 
     process.hiGoodTracksSelection * #   process.hiGoodMergTrackSequence
     process.hiPhotonCleaningSequence *
