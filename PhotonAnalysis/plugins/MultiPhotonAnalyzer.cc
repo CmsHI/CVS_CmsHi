@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.32 2011/04/05 16:02:56 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.33 2011/04/11 15:45:45 kimy Exp $
  *
  */
 
@@ -134,15 +134,18 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
    if (doStoreJets_)	storeJets(e);
    
    bool foundPhotons = selectStorePhotons(e,iSetup,"");
-        cout <<"Found photons? "<<foundPhotons<<endl;
-	if (foundPhotons){
-	   // Dump analysis ntuple 
-	   // NOTE: dump ntuple only if at least one photon detected in a given acceptance
-	   //       number of entries in ntuple does not correspond to the number of analyzed events
-	   //       number of entries in certain histograms like "NumJets", "NumVtx" corresponds to the number of analyzed events  
-	   _ntuple->DumpData();   
-	}
-	
+   cout <<"Found photons? "<<foundPhotons<<endl;
+   
+
+   foundPhotons = true;
+   if (foundPhotons){
+      // Dump analysis ntuple 
+      // NOTE: dump ntuple only if at least one photon detected in a given acceptance
+      //       number of entries in ntuple does not correspond to the number of analyzed events
+      //       number of entries in certain histograms like "NumJets", "NumVtx" corresponds to the number of analyzed events  
+      _ntuple->DumpData();   
+   }
+   
 }
 
 
