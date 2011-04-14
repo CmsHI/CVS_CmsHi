@@ -112,6 +112,13 @@ def overrideGlobalTag(process):
                  label = cms.untracked.string("HFtowers")
                  ),
 
+        # JEC 
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("HI_PFTowers_hiGoodTracks"),
+                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
+                 label = cms.untracked.string("AK3PF")
+                 ),
+        
         )
     
     return process
