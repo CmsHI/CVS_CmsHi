@@ -113,11 +113,22 @@ def overrideGlobalTag(process):
                  ),
 
         # JEC 
-#        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-#                 tag = cms.string("HI_PFTowers_hiGoodTracks"),
-#                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
-#                 label = cms.untracked.string("AK3PF")
-#                 ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK3PF"),
+                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
+                 label = cms.untracked.string("AK3PF")
+                 ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK4PF"),
+                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
+                 label = cms.untracked.string("AK4PF")
+                 ),
+        
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK5PF"),
+                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
+                 label = cms.untracked.string("AK5PF")
+                 ),
         
         )
     
