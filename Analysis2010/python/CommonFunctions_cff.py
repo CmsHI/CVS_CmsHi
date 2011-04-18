@@ -110,28 +110,7 @@ def overrideGlobalTag(process):
                  tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v0_effA_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFtowers")
-                 ),
-
-        # JEC 
-'''
-        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK3PF"),
-                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
-                 label = cms.untracked.string("AK3PF")
-                 ),
-        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK4PF"),
-                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
-                 label = cms.untracked.string("AK4PF")
-                 ),
-        
-        cms.PSet(record = cms.string("JetCorrectionsRecord"),
-                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTracks_AK5PF"),
-                 connect = cms.untracked.string("sqlite_file:JEC_HI_2011.db"),
-                 label = cms.untracked.string("AK5PF")
-                 ),
-'''
-        
+                 )
         )
     
     return process
