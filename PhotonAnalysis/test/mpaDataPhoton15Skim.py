@@ -26,29 +26,29 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    ___inf___
-    ),
-                            inputCommands = cms.untracked.vstring(
-    'keep *',
-    'drop recoSuperClusters_*_*_*',
-    'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*',
-    'drop recoCaloClusters_*_*_*'
-    ),
-                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
+    '___inf___'
+    )
+                            #inputCommands = cms.untracked.vstring(
+                            #   'keep *',
+                            #   'drop recoSuperClusters_correctedIslandBarrelSuperClusters_*_*',
+                            #   'drop recoPhotons_*_*_*',
+                            #   'drop recoPhotonCores_*_*_*',
+                            #    'drop recoCaloClusters_*_*_*'
+                            #                           ),
+                            #dropDescendantsOfDroppedBranches = cms.untracked.bool( False )           ## for re-reco samples, we don't need this.
                             )
 
-# USE JASON FILE For local jobs
-import PhysicsTools.PythonAnalysis.LumiList as LumiList
-import FWCore.ParameterSet.Types as CfgTypes
-myLumis = LumiList.LumiList(filename = 'Cert_150436-152957_HI7TeV_StreamExpress_Collisions10_JSON.txt').getCMSSWString().split(',')
-process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
-process.source.lumisToProcess.extend(myLumis)
-
+#################### USE JASON FILE For local jobs #############
+#import PhysicsTools.PythonAnalysis.LumiList as LumiList
+#import FWCore.ParameterSet.Types as CfgTypes
+#myLumis = LumiList.LumiList(filename = 'Cert_150436-152957_HI7TeV_StreamExpress_Collisions10_JSON.txt').getCMSSWString().split(',')
+#process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
+#process.source.lumisToProcess.extend(myLumis)
+################################################################
 
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('___TFoutf___'),
+                                   fileName = cms.string('___TFoutf___.root'),
                                    closeFileFast = cms.untracked.bool(True)
                                    )
 ########################################################################################
@@ -65,7 +65,7 @@ process.load("CmsHi.PhotonAnalysis.MultiPhotonAnalyzer_cfi")
 process.multiPhotonAnalyzer.GenParticleProducer = cms.InputTag("hiGenParticles")
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.VertexProducer = cms.InputTag("hiSelectedVertex")
-process.multiPhotonAnalyzer.OutputFile = cms.string('___outf___')
+process.multiPhotonAnalyzer.OutputFile = cms.string('mpa.root')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
@@ -83,6 +83,7 @@ process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
 process.load("CmsHi.PhotonAnalysis.ecalHistProducer_cfi")
 process.load("CmsHi.PhotonAnalysis.SpikeInspector_cfi")
+process.load("CmsHi.PhotonAnalysis.evtCounter_cfi")
 
 # spike cleaner for island superclsters
 process.cleanPhotons.maxHoverEBarrel = cms.double(100)
@@ -103,8 +104,6 @@ process.load("RandomConeAna.Configuration.randomConeSequence_cff")
 process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
 
 # turn off MC matching for data
-
-####################### tune ##############
 removeMCMatching(process, ['Photons'])
 removeMCMatching(process, ['Jets'])
 removeMCMatching(process, ['Muons'])
@@ -116,8 +115,6 @@ process.patHeavyIonDefaultSequence.remove(process.makeHeavyIonJets)
 process.patHeavyIonDefaultSequence.remove(process.makeHeavyIonMuons)
 process.patHeavyIonDefaultSequence.remove(process.selectedPatJets)
 process.patHeavyIonDefaultSequence.remove(process.selectedPatMuons)
-########################################################################
-
 
 # trigger selection
 import HLTrigger.HLTfilters.hltHighLevel_cfi
@@ -133,8 +130,8 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 process.p = cms.Path(
     process.HIphotonTrig * 
     process.collisionEventSelection *
-    process.hiGoodTracksSelection *  # process.hiGoodMergTrackSequence *
-    process.hiEcalClusteringSequence *
+    process.evtCounter *
+    process.hiGoodTracksSelection *
     process.hiPhotonCleaningSequence *
     process.compleCleanPhotonSequence *
     process.patHeavyIonDefaultSequence *
