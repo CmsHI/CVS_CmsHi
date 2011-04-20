@@ -40,7 +40,7 @@ process.source = cms.Source("PoolSource",
                             dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
                             )
 
-
+)
 
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('ecalRechit_photon15trig.root'),
@@ -113,7 +113,7 @@ process.patHeavyIonDefaultSequence.remove(process.patJetGenJetMatch)
 import HLTrigger.HLTfilters.hltHighLevel_cfi
 # =============== Trigger selection ====================
 process.HIphotonTrig = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
-    HLTPaths = cms.vstring('HLT_HIPhoton15')
+    HLTPaths = cms.vstring('HLT_HIPhoton20')
     )
 
 # clean collision selection
