@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.12 2010/11/16 11:39:15 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.13 2011/03/23 19:32:24 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -160,6 +160,10 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   hbhe_                            = ps.getParameter<edm::InputTag>("hbhe");
   hf_                              = ps.getParameter<edm::InputTag>("hf");
   ho_                              = ps.getParameter<edm::InputTag>("ho");
+
+
+  //event plance
+  evtPlaneLabel                    =  ps.getParameter<edm::InputTag>("hiEvtPlane");
 
 
   // for July exercise

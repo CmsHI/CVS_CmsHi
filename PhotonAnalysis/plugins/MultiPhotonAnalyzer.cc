@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.35 2011/04/11 18:34:11 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.36 2011/04/25 23:37:05 kimy Exp $
  *
  */
 
@@ -103,6 +103,8 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 
+// event plane
+#include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 
 
 using namespace pat;
@@ -223,8 +225,30 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
      }
   }
   
-  // Tools to get the Track informations.
-
+  
+  // event plane//////////////////////////////////////////////////
+  int kMaxEvtPlane = 100;
+  HTValVector<Float_t> evtPlane(kMaxPhotons);
+  
+  Handle<reco::EvtPlaneCollection> evtPlanes;
+  e.getByLabel(evtPlaneLabel, evtPlanes);
+  
+  int nEvtPlanes = 0;
+  if(evtPlanes.isValid()){
+     nEvtPlanes = evtPlanes->size();
+     for(unsigned int i = 0; i < evtPlanes->size(); ++i){
+	evtPlane(i)  = (*evtPlanes)[i].angle();     
+     }
+     
+     _ntuple->Column(pfx+"nEvtPlane",     (Int_t) nEvtPlanes);
+     _ntuple->Column(pfx+"evtPlane",evtPlane, pfx+"nEvtPlanes");
+     
+  }
+  
+  /////////////////////////////////////////////////////////////
+  
+  
+  
   // Heavy Ion variable calculator
   CxCalculator CxC(e,iSetup, basicClusterBarrel_, basicClusterEndcap_);
   RxCalculator RxC(e,iSetup, hbhe_, hf_, ho_);

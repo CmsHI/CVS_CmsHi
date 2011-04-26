@@ -112,7 +112,7 @@ protected:
 	
   edm::TriggerNames triggerNames_;    // TriggerNames class
 	
-
+  edm::InputTag evtPlaneLabel;
   edm::InputTag EleTag_;  // gsf electrons
   
 
