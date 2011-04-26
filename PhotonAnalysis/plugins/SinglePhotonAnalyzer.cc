@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.13 2011/03/23 19:32:24 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.14 2011/04/26 15:06:45 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -105,6 +105,8 @@
 #include "SimDataFormats/Vertex/interface/SimVertex.h"
 #include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 
+#include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
+
 // Histograms, ntuples
 #include "UserCode/HafHistogram/interface/HTupleManager.h"
 #include "UserCode/HafHistogram/interface/HHistogram.h"
@@ -163,7 +165,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
 
 
   //event plance
-  evtPlaneLabel                    =  ps.getParameter<edm::InputTag>("hiEvtPlane");
+  evtPlaneLabel                    =  ps.getParameter<edm::InputTag>("hiEvtPlane_");
 
 
   // for July exercise
@@ -675,6 +677,28 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e, const edm::EventSetup&
   }
   return (isMCData_ && fillMCNTuple_);
 }	
+
+
+void SinglePhotonAnalyzer::storeEvtPlane(const edm::Event& e){
+  int kMaxEvtPlane = 100;
+  HTValVector<Float_t> evtPlane(kMaxEvtPlane);
+  
+  Handle<reco::EvtPlaneCollection> evtPlanes;
+  e.getByLabel(evtPlaneLabel, evtPlanes);
+  
+  int nEvtPlanes = 0;
+  cout << " event plane is valid?? " <<endl;
+  if(evtPlanes.isValid()){
+    cout << " event plane is valid. " << endl;
+    nEvtPlanes = evtPlanes->size();
+    for(unsigned int i = 0; i < evtPlanes->size(); ++i){
+      evtPlane(i)  = (*evtPlanes)[i].angle();
+    }
+  }
+  _ntuple->Column("nEvtPlane",     (Int_t) nEvtPlanes);
+  _ntuple->Column("evtPlane",  evtPlane, "nEvtPlane");
+  
+}
 
 void SinglePhotonAnalyzer::storeVertex(const edm::Event& e){
 	///////////////////////////////////////////////////////////////////////

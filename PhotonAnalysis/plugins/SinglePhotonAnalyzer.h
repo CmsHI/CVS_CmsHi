@@ -57,7 +57,8 @@ protected:
   virtual bool storeMET(const edm::Event&);
   virtual int  storeJets(const edm::Event&);
   virtual bool selectStorePhoton(const edm::Event&,const edm::EventSetup&);
-	       	
+  virtual void storeEvtPlane(const edm::Event&);
+
 	
   virtual void storePhotonAOD(pat::Photon *photon, const edm::Event& e, const edm::EventSetup &es, HTuple *tpl, const char* prefx = "PHO1_");
   virtual bool storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx = "PHO1_");	

@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.36 2011/04/25 23:37:05 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.37 2011/04/26 15:06:45 kimy Exp $
  *
  */
 
@@ -103,8 +103,6 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 
-// event plane
-#include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 
 
 using namespace pat;
@@ -134,7 +132,7 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
    if (doStoreVertex_)	storeVertex(e);
    if (doStoreMET_)	storeMET(e);
    if (doStoreJets_)	storeJets(e);
-   
+   storeEvtPlane(e);
    bool foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
    
@@ -226,26 +224,6 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   }
   
   
-  // event plane//////////////////////////////////////////////////
-  int kMaxEvtPlane = 100;
-  HTValVector<Float_t> evtPlane(kMaxPhotons);
-  
-  Handle<reco::EvtPlaneCollection> evtPlanes;
-  e.getByLabel(evtPlaneLabel, evtPlanes);
-  
-  int nEvtPlanes = 0;
-  if(evtPlanes.isValid()){
-     nEvtPlanes = evtPlanes->size();
-     for(unsigned int i = 0; i < evtPlanes->size(); ++i){
-	evtPlane(i)  = (*evtPlanes)[i].angle();     
-     }
-     
-     _ntuple->Column(pfx+"nEvtPlane",     (Int_t) nEvtPlanes);
-     _ntuple->Column(pfx+"evtPlane",evtPlane, pfx+"nEvtPlanes");
-     
-  }
-  
-  /////////////////////////////////////////////////////////////
   
   
   
