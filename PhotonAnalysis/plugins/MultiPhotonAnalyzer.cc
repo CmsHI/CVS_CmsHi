@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.37 2011/04/26 15:06:45 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.38 2011/04/26 16:16:25 kimy Exp $
  *
  */
 
@@ -248,7 +248,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Int_t>   scSize(kMaxPhotons);
   
   // Photon shower shape parameters 
-  HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons);
+  HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons), sigmaIphiIphi(kMaxPhotons);
   
   // sigmaIetaIet with various relative cuts.
   HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
@@ -480,10 +480,14 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     maxEnergyXtal(nphotonscounter) =  photon.maxEnergyXtal();
     sigmaEtaEta  (nphotonscounter) =  photon.sigmaEtaEta();
     sigmaIetaIeta(nphotonscounter) =  photon.sigmaIetaIeta();
-    
+
+    // see http://cmslxr.fnal.gov/lxr/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h#076
     // other sieie values;
     vector<float> lCov47 = lazyTool.localCovariances(*seed, 4.7 );
     sieie47(nphotonscounter) = sqrt(lCov47[0]);
+    sigmaIphiIphi(nphotonscounter) =  sqrt(lCov47[2]);
+    
+    
     vector<float> lCov50 = lazyTool.localCovariances(*seed, 5.0 );
     sieie50(nphotonscounter) = sqrt(lCov50[0]);
     vector<float> lCov46 = lazyTool.localCovariances(*seed, 4.6 );
@@ -963,6 +967,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"maxEnergyXtal",maxEnergyXtal, pfx+"nPhotons");
   _ntuple->Column(pfx+"sigmaEtaEta",  sigmaEtaEta,   pfx+"nPhotons");
   _ntuple->Column(pfx+"sigmaIetaIeta",sigmaIetaIeta, pfx+"nPhotons");
+  _ntuple->Column(pfx+"sigmaIphiIphi",sigmaIphiIphi, pfx+"nPhotons");
 
   _ntuple->Column(pfx+"sieie47",sieie47, pfx+"nPhotons");
   _ntuple->Column(pfx+"sieie50",sieie50, pfx+"nPhotons");
