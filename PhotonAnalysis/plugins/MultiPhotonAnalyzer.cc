@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.38 2011/04/26 16:16:25 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.39 2011/04/28 13:37:44 kimy Exp $
  *
  */
 
@@ -213,7 +213,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   bool isEleRecoed = false;
   if (EleHandle.isValid()) {
-     cout << " electron was reconstructed! " << endl;
+    //     cout << " electron was reconstructed! " << endl;
      isEleRecoed = true;
   }
   
@@ -562,7 +562,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     
     if ( isEleRecoed ) {
-       cout << " start electron search " << endl;
+      //   cout << " start electron search " << endl;
        for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
 	  if ( eleItr->superCluster()->energy() < 10 ) continue;
 	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
@@ -574,7 +574,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	  
 	  dphiTemp = dphi;  
 	  detaTemp = eleItr->superCluster()->eta() - photon.superCluster()->eta() ;
-	  cout << " this is electron " << endl;
+	  //	  cout << " this is electron " << endl;
 	  isEleTemp = true;
 	  break;
        }
