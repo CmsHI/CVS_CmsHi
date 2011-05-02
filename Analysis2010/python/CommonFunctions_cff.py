@@ -95,19 +95,19 @@ def overrideGlobalTag(process):
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
 
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_Glauber2010A_v0_effA_offline"),
+                 tag = cms.string("CentralityTable_PixelHits40_Glauber2010A_v1_effB_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
                  label = cms.untracked.string("PixelHits")
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_Glauber2010A_v0_effA_offline"),
+                 tag = cms.string("CentralityTable_HFhits40_Glauber2010A_v1_effB_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),                 
                  label = cms.untracked.string("HFhits")
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v0_effA_offline"),
+                 tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v1_effB_offline"),
                  connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFtowers")
                  )
