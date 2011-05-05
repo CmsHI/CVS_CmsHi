@@ -274,11 +274,12 @@ private:
 
   //Tree variables defined here  
   int eventNb,runNb,lumiBlock;
+
   //1.) J/psi variables RECO                                                                                                                                     
   //init events                                                                                                                                             
   //int RecJPsiSize, RecMuPlusSize, RecMuMinusSize;
 
-  double JpsiCharge , JpsiMass , JpsiPt , JpsiRap ,JpsiVprob ;
+  double JpsiCharge,JpsiNo , JpsiMass , JpsiPt , JpsiRap ,JpsiVprob ;
   double JpsiPx , JpsiPy , JpsiPz ;
 
 
@@ -287,27 +288,29 @@ private:
   //TLorentzVector* JpsiP;
  
   //2.) muon variables RECO                                                                                                                                                                                  
-  double muPosPx, muPosPy, muPosPz,  muPosEta;
-  double muNegPx, muNegPy, muNegPz,  muNegEta;
+  double muPosPx, muPosPy, muPosPz,  muPosEta,  muPosPhi;
+  double muNegPx, muNegPy, muNegPz,  muNegEta,  muNegPhi;
 
   //3.) cut variables
 
   //(i). Positive Muon                                                                                                            
   double muPos_nchi2In, muPos_dxy, muPos_dz, muPos_nchi2Gl;
-  int muPos_found, muPos_pixeLayers, muPos_nValidMuHits;
-  bool muPos_matches;  
+  int muPos_found, muPos_pixeLayers, muPos_nValidMuHits,muPos_arbitrated;
+  bool muPos_matches, muPos_tracker;  
   //(ii).Negative Muon                                                                                                             
   double muNeg_nchi2In, muNeg_dxy, muNeg_dz, muNeg_nchi2Gl;
-  int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits;
-  bool muNeg_matches;  
+  int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits,muNeg_arbitrated;
+  bool muNeg_matches, muNeg_tracker;  
 
+  int GeventNb,GrunNb,GlumiBlock;
   //Gen JPsi Variables
   double GenJpsiMass, GenJpsiPt, GenJpsiRap;
   double GenJpsiPx, GenJpsiPy, GenJpsiPz;
 
-  //2.) muon variables RECO                                                                                                                                                          
-  double GenmuPosPx, GenmuPosPy, GenmuPosPz,  GenmuPosEta;
-  double GenmuNegPx, GenmuNegPy, GenmuNegPz,  GenmuNegEta;
+  //2.) muon variables Gen                                         
+                                                                                                                 
+  double GenmuPosPx, GenmuPosPy, GenmuPosPz,  GenmuPosEta, GenmuPosPhi;
+  double GenmuNegPx, GenmuNegPy, GenmuNegPz,  GenmuNegEta, GenmuNegPhi;
 
 
 
@@ -370,8 +373,9 @@ DiMuonOnia2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   centrality_->newEvent(iEvent,iSetup);
   bin = centrality_->getBin();
   Centrality->Fill(bin);
-  rbin=bin;
-  gbin=bin;
+  //cout<<" bin "<<bin<<endl;
+  //rbin=bin;
+  //gbin=bin;
 
 
   // Primary Vertex
@@ -393,7 +397,7 @@ DiMuonOnia2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   //MuAnalyze(iEvent, iSetup);
   
   //  cout<<"generator info " <<fIsGenInfo.c_str()<<endl;
-  //if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
+  if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenPlots(iEvent, iSetup);}
   
   //if(!strcmp(fIsGenInfo.c_str(),"TRUE")){GenAnalyze(iEvent, iSetup);}    
   //Fill cuts histos
@@ -403,7 +407,7 @@ DiMuonOnia2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   // cout<<" PAT info "<<fIsPATInfo.c_str()<<endl;  
   
 
-  if(!strcmp(fIsPATInfo.c_str(),"TRUE")){PATDiMuAnalyze(iEvent,iSetup);}
+  //if(!strcmp(fIsPATInfo.c_str(),"TRUE")){PATDiMuAnalyze(iEvent,iSetup);}
   
   if(!strcmp(fIsPATInfo.c_str(),"TRUE")){FillTree(iEvent,iSetup);}
 
@@ -655,6 +659,7 @@ DiMuonOnia2DPlots::beginJob()
 
   //RecJPsiSize                                                                                                                                                                                    
   SingleMuonTree->Branch("JpsiCharge", &JpsiCharge,  "JpsiCharge/D");
+  SingleMuonTree->Branch("JpsiNo", &JpsiNo,  "JpsiNo/D");
   SingleMuonTree->Branch("JpsiMass",   &JpsiMass,  "JpsiMass/D");
   SingleMuonTree->Branch("JpsiPt",     &JpsiPt,    "JpsiPt/D");
   SingleMuonTree->Branch("JpsiRap",    &JpsiRap,   "JpsiRap/D");
@@ -668,20 +673,18 @@ DiMuonOnia2DPlots::beginJob()
 
 
 
-
-
-
-
-
   //muon variable
   SingleMuonTree->Branch("muPosPx",    &muPosPx,   "muPosPx/D");
   SingleMuonTree->Branch("muPosPy",    &muPosPy,   "muPosPy/D");
   SingleMuonTree->Branch("muPosPz",    &muPosPz,   "muPosPz/D");
-  SingleMuonTree->Branch("muPosEta",    &muPosEta,   "muPosEta/D");
+  SingleMuonTree->Branch("muPosEta",    &muPosEta,  "muPosEta/D");
+  SingleMuonTree->Branch("muPosPhi",    &muPosPhi,  "muPosPhi/D");
+  
   SingleMuonTree->Branch("muNegPx",    &muNegPx,   "muNegPx/D");
   SingleMuonTree->Branch("muNegPy",    &muNegPy,   "muNegPy/D");
   SingleMuonTree->Branch("muNegPz",    &muNegPz,   "muNegPz/D");
-  SingleMuonTree->Branch("muNegEta",    &muNegEta,   "muNegEta/D");
+  SingleMuonTree->Branch("muNegEta",   &muNegEta,   "muNegEta/D");
+  SingleMuonTree->Branch("muNegPhi",   &muNegPhi,   "muNegPhi/D");
  
 
   //1). Positive Muon                                                                                                                                                                          
@@ -692,7 +695,9 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("muPos_found", &muPos_found, "muPos_found/I");
   SingleMuonTree->Branch("muPos_pixeLayers", &muPos_pixeLayers, "muPos_pixeLayers/I");
   SingleMuonTree->Branch("muPos_nValidMuHits", &muPos_nValidMuHits, "muPos_nValidMuHits/I");
-  SingleMuonTree->Branch("muPos_matches", &muPos_matches, "muPos_matches/B");
+  SingleMuonTree->Branch("muPos_arbitrated", &muPos_arbitrated, "muPos_arbitrated/I");
+  SingleMuonTree->Branch("muPos_matches", &muPos_matches, "muPos_matches/O");
+  SingleMuonTree->Branch("muPos_tracker", &muPos_tracker, "muPos_tracker/O");
   
 
 
@@ -705,8 +710,9 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("muNeg_found", &muNeg_found, "muNeg_found/I");
   SingleMuonTree->Branch("muNeg_pixeLayers", &muNeg_pixeLayers, "muNeg_pixeLayers/I");
   SingleMuonTree->Branch("muNeg_nValidMuHits", &muNeg_nValidMuHits, "muNeg_nValidMuHits/I");
-  SingleMuonTree->Branch("muNeg_matches", &muNeg_matches, "muNeg_matches/B");
-
+  SingleMuonTree->Branch("muNeg_arbitrated", &muNeg_arbitrated, "muNeg_arbitrated/I");
+  SingleMuonTree->Branch("muNeg_matches", &muNeg_matches, "muNeg_matches/O");
+  SingleMuonTree->Branch("muNeg_tracker", &muNeg_tracker, "muNeg_tracker/O");
 
 
 
@@ -715,6 +721,13 @@ DiMuonOnia2DPlots::beginJob()
 
   SingleGenMuonTree = new TTree("SingleGenMuonTree","SingleGenMuonTree");
 
+
+  // Event variables                                                              
+                                                          
+  SingleGenMuonTree->Branch("GeventNb",   &GeventNb,       "GeventNb/I");
+  SingleGenMuonTree->Branch("GrunNb",     &GrunNb,         "GrunNb/I");
+  SingleGenMuonTree->Branch("GlumiBlock", &GlumiBlock,     "GlumiBlock/I");
+
   //Gen Jpsi Variables                                                                                                                                                        
   SingleGenMuonTree->Branch("GenJpsiMass",   &GenJpsiMass,  "GenJpsiMass/D");
   SingleGenMuonTree->Branch("GenJpsiPt",     &GenJpsiPt,    "GenJpsiPt/D");
@@ -722,17 +735,20 @@ DiMuonOnia2DPlots::beginJob()
   SingleGenMuonTree->Branch("GenJpsiPx",     &GenJpsiPx,    "GenJpsiPx/D");
   SingleGenMuonTree->Branch("GenJpsiPy",     &GenJpsiPy,    "GenJpsiPy/D");
   SingleGenMuonTree->Branch("GenJpsiPz",     &GenJpsiPz,    "GenJpsiPz/D");
-  SingleGenMuonTree->Branch("gbin",                 &gbin,                  "gbin/I");
+  SingleGenMuonTree->Branch("gbin",          &gbin,             "gbin/I");
 
   //muon variable
   SingleGenMuonTree->Branch("GenmuPosPx",    &GenmuPosPx,   "GenmuPosPx/D");
   SingleGenMuonTree->Branch("GenmuPosPy",    &GenmuPosPy,   "GenmuPosPy/D");
   SingleGenMuonTree->Branch("GenmuPosPz",    &GenmuPosPz,   "GenmuPosPz/D");
   SingleGenMuonTree->Branch("GenmuPosEta",    &GenmuPosEta,   "GenmuPosEta/D");
+  SingleGenMuonTree->Branch("GenmuPosPhi",    &GenmuPosPhi,   "GenmuPosPhi/D");
+  
   SingleGenMuonTree->Branch("GenmuNegPx",    &GenmuNegPx,   "GenmuNegPx/D");
   SingleGenMuonTree->Branch("GenmuNegPy",    &GenmuNegPy,   "GenmuNegPy/D");
   SingleGenMuonTree->Branch("GenmuNegPz",    &GenmuNegPz,   "GenmuNegPz/D");
   SingleGenMuonTree->Branch("GenmuNegEta",    &GenmuNegEta,   "GenmuNegEta/D");
+  SingleGenMuonTree->Branch("GenmuNegPhi",    &GenmuNegPhi,   "GenmuNegPhi/D");
 
 
 
@@ -740,7 +756,7 @@ DiMuonOnia2DPlots::beginJob()
 
 
   //Histograms       
-  Centrality = new TH1F("Centrality","Centrality", 100,0,100);
+  Centrality = new TH1F("Centrality","Centrality", 60,-10,50);
    
   diMuonsGenInvMassVsPt = new TH2F("diMuonsGenInvMassVsPt", "diMuonsGenInvMassVsPt", 800, 0, 20, 200,0,100);
   diMuonsGenInvMassVsY = new TH2F("diMuonsGenInvMassVsY","diMuonsGenInvMassVsY",800, 0, 20,100, -5, 5);
@@ -1213,15 +1229,14 @@ bool DiMuonOnia2DPlots::allCutGlobal(const reco::Muon* aMuon) {
 bool DiMuonOnia2DPlots::matchPATMuon(const pat::Muon *pMuon) {
   
 
-  //cout<<" hlt filter name : "<<fHLTFilterName<<endl;
-
 return(
 	 
-	 (
-	  
-	  !pMuon->triggerObjectMatchesByFilter(fHLTFilterName).empty())  
-	
-	  );
+       (!pMuon->triggerObjectMatchesByFilter(fHLTFilterName).empty())  
+       //!pMuon->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()
+
+
+
+	 );
 
 
  
@@ -1393,8 +1408,6 @@ float DiMuonOnia2DPlots::FindWeight(float pt, float y)
 float DiMuonOnia2DPlots::FindCenWeight(int Bin)
 {
 
-  //float NCollArray[50];
-
   float NCollArray[50]={1747.49,1566.92,1393.97,1237.02,1095.03,979.836,863.228,765.968,677.894,594.481,
 		  522.453,456.049,399.178,347.174,299.925,258.411,221.374,188.676,158.896,135.117,
 		  112.481,93.5697,77.9192,63.2538,52.0938,42.3553,33.7461,27.3213,21.8348,17.1722,
@@ -1419,8 +1432,8 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   
 
   //reset J/psi RECO variables
-  
-  
+  JpsiNo=-9999.;
+  JpsiCharge=-9999.;
   JpsiMass=-9999.;
   JpsiPt=-9999.;
   JpsiRap=-9999.;
@@ -1438,10 +1451,13 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muPosPy=-9999.;
   muPosPz=-9999.;
   muPosEta=-9999.;
+  muPosPhi=-9999.;
+  
   muNegPx=-9999.;
   muNegPy=-9999.;
   muNegPz=-9999.;
   muNegEta=-9999.;
+  muNegPhi=-9999.;
 
   
 //1).Positive Muon                                                                                                                                                                                                                         
@@ -1452,8 +1468,9 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muPos_found=-9999;
   muPos_pixeLayers=-9999;
   muPos_nValidMuHits=-9999;
+  muPos_arbitrated=-9999;
   muPos_matches=0;
-
+  muPos_tracker=0;
 
   //2).Negtive Muon                                                                                                                                                                                                                          
   muNeg_nchi2In=-9999.;
@@ -1463,23 +1480,29 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muNeg_found=-9999;
   muNeg_pixeLayers=-9999;
   muNeg_nValidMuHits=-9999;
+  muNeg_arbitrated=-9999;
   muNeg_matches=0;
-
+  muNeg_tracker=0;
 
 
   //reset EVENT information                                                                                                                                                                                                                    
   eventNb= 0 ;
   runNb= 0 ;
-  nPV = 0 ;
   lumiBlock= 0 ;
-  
+  rbin=0;
 
  // Event related infos
   eventNb= iEvent.id().event();
   runNb=iEvent.id().run();
   lumiBlock= iEvent.luminosityBlock();
 
- //--------------------------------------Reco DimuonGlobal ---------------------------------------------------------------------
+  centrality_ = new CentralityProvider(iSetup);
+  centrality_->newEvent(iEvent,iSetup);
+  rbin = centrality_->getBin();
+  
+  //cout<<" rbin "<<rbin<<endl;
+
+  //--------------------------------------Reco DimuonGlobal ---------------------------------------------------------------------
 
   using namespace edm;
   using namespace std;
@@ -1492,6 +1515,8 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 
   edm::View<pat::CompositeCandidate>dimuonsPATColl= *diMuonsPATCand;
 
+  JpsiNo=dimuonsPATColl.size();
+
   //cout<<" reco Jpsi size : "<<dimuonsPATColl.size()<<endl;
                                                                                                                                                
   
@@ -1503,11 +1528,21 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
     const reco::Candidate *dau1 = p.daughter(1); 
     const pat::Muon *mu1 = dynamic_cast<const pat::Muon *>(dau1);
     const pat::Muon *muonPos = 0, *muonNeg = 0;
+    
     if(mu0->charge() > 0){ muonPos = mu0; muonNeg = mu1;}
     else if(mu0->charge() < 0){ muonPos = mu1; muonNeg = mu0;}
-    //Trigger matches                                                                                                                                                                                                                          
+    //Trigger matches        
+    //cout<<matchPATMuon(muonPos)<<" matches "<<matchPATMuon(muonNeg)<<endl;                                                                                                                                                                                                                  
     if(matchPATMuon(muonPos)) {muPos_matches=1;}
     if(matchPATMuon(muonNeg)) {muNeg_matches=1;}
+
+    if(muonPos->isTrackerMuon()){muPos_tracker=1;}
+    if(muonNeg->isTrackerMuon()){muNeg_tracker=1;}
+
+    //cout<<muPos_tracker<<"    "<<muNeg_tracker<<endl;
+    cout<<"muPos_matches "<<muPos_matches<<" muNeg_matches "<<muNeg_matches<<endl; 
+    
+
 
     // cout<<"JpsiCharge " <<p.charge()<<endl;
     // write out JPsi RECO information
@@ -1527,25 +1562,32 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 
     
     // write out Muon RECO information                                                                                                                                                                                                     
-    float f_muPosPx, f_muPosPy, f_muPosPz, f_muPosEta;
-    float f_muNegPx, f_muNegPy, f_muNegPz, f_muNegEta;
+    float f_muPosPx, f_muPosPy, f_muPosPz, f_muPosEta, f_muPosPhi;
+    float f_muNegPx, f_muNegPy, f_muNegPz, f_muNegEta, f_muNegPhi;
+    
     f_muPosPx = muonPos->px();
     f_muPosPy = muonPos->py();
     f_muPosPz = muonPos->pz();
     f_muPosEta = muonPos->eta();
+    f_muPosPhi= muonPos->phi();
+
     f_muNegPx = muonNeg->px();
     f_muNegPy = muonNeg->py();
     f_muNegPz = muonNeg->pz();
     f_muNegEta = muonNeg->eta();
+    f_muNegPhi = muonNeg->phi();
 
     muPosPx= f_muPosPx ;
     muPosPy= f_muPosPy ;
     muPosPz= f_muPosPz ;
     muPosEta= f_muPosEta;
+    muPosPhi= f_muPosPhi;
+    
     muNegPx= f_muNegPx ;
     muNegPy= f_muNegPy ;
     muNegPz= f_muNegPz ;
     muNegEta= f_muNegEta;
+    muNegPhi= f_muNegPhi;
 
     //-----------------------------------------------------                                                                                                                                                                                
     //-----------additional Reco Muon Variables------------                                                                                                                                                                                
@@ -1560,6 +1602,7 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 	const reco::HitPattern& p1=iTrack->hitPattern();
 	muPos_found=iTrack->found();
 	muPos_nchi2In=iTrack->chi2()/iTrack->ndof();
+	muPos_arbitrated=muonPos->muonID("TrackerMuonArbitrated");
 	muPos_pixeLayers=p1.pixelLayersWithMeasurement();
 	muPos_dxy=iTrack->dxy(RefVtx);
 	muPos_dz=iTrack->dz(RefVtx);
@@ -1581,9 +1624,11 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 	const reco::HitPattern& p2=iTrack->hitPattern();
 	muNeg_found=iTrack->found();
 	muNeg_nchi2In=iTrack->chi2()/iTrack->ndof();
+	muNeg_arbitrated=muonNeg->muonID("TrackerMuonArbitrated");
 	muNeg_pixeLayers=p2.pixelLayersWithMeasurement();
 	muNeg_dxy=iTrack->dxy(RefVtx);
 	muNeg_dz=iTrack->dz(RefVtx);
+	
 	if(muonNeg->isGlobalMuon())
 	  {
 	    TrackRef gTrack =muonNeg->globalTrack();
@@ -1615,15 +1660,37 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
   GenJpsiPy=-9999.;
   GenJpsiPz=-9999.;
 
-
   GenmuPosPx=-9999.;
   GenmuPosPy=-9999.;
   GenmuPosPz=-9999.;
   GenmuPosEta=-9999.;
+  GenmuPosPhi=-9999.;
+  
   GenmuNegPx=-9999.;
   GenmuNegPy=-9999.;
   GenmuNegPz=-9999.;
   GenmuNegEta=-9999.; 
+  GenmuNegPhi=-9999.; 
+
+
+  //reset EVENT information  
+    GeventNb= 0 ;
+    GrunNb= 0 ;
+    GlumiBlock= 0 ;
+    gbin=0;
+
+    // Event related infos 
+                                                                                                                    
+    GeventNb= iEvent.id().event();
+    GrunNb=iEvent.id().run();
+    GlumiBlock= iEvent.luminosityBlock();
+
+
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    gbin = centrality_->getBin();
+    //cout<<" gbin "<<gbin<<endl;
+
 
   //-----------------------------------------------------hiGenParticle----------------------------------------------------------------------
 
@@ -1634,7 +1701,7 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
   edm::Handle<edm::View<reco::GenParticle> >genPar;
   iEvent.getByLabel("hiGenParticles",genPar) ;
   //iEvent.getByLabel("genMuons",genPar) ;
-  
+ 
 
   if(!(genPar.isValid())) return;
 
@@ -1652,10 +1719,17 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
    
     if (part.numberOfMothers()!=1) continue;
     int momId = mom->pdgId();
-
-    // if (abs(part.pdgId()) == 13 &&  momId == 443){
+    //cout<<"momId "<<momId<<endl;
+    //JPsi
+    //    if (abs(part.pdgId()) == 13 &&  momId == 443){
     
-    if (abs(part.pdgId()) == 13 &&  momId == 553){
+      //Upsilon 1s
+    // if (abs(part.pdgId()) == 13 &&  momId == 553){
+    
+    //Upsilon 2s
+    if (abs(part.pdgId()) == 13 &&  momId == 100553){
+
+
 
       if(part.pdgId() == 13 ){
         px1[nplus] = part.px();
@@ -1667,6 +1741,8 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
 	GenmuNegPy=part.py();
 	GenmuNegPz=part.pz();
 	GenmuNegEta=part.eta();
+	GenmuNegPhi=part.phi();
+      
       }
       
       if(part.pdgId()== -13) {
@@ -1679,13 +1755,14 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
 	GenmuPosPy=part.py();
 	GenmuPosPz=part.pz();
 	GenmuPosEta=part.eta();
+	GenmuPosPhi=part.phi();
 
       }
     }
   }
   
   
-cout<<" nplus : "<<nplus<<"  "<<nminus<<endl;
+  //cout<<" nplus : "<<nplus<<"  "<<nminus<<endl;
 for(size_t i = 0; i < nplus; i++) {
     double en1 = sqrt(px1[i]*px1[i] + py1[i]*py1[i] + pz1[i]*pz1[i] + mumass*mumass);
    
@@ -1711,22 +1788,12 @@ for(size_t i = 0; i < nplus; i++) {
       GenJpsiPx=GenDiMuonPx;
       GenJpsiPy=GenDiMuonPy;
       GenJpsiPz=GenDiMuonPz;
-    
-
+      
       SingleGenMuonTree->Fill();
-      cout<<"gen Tree Filled "<<endl;
-
-
+      //cout<<"gen Tree Filled "<<endl;
 
     }
-  
-
-
-
-}
-
-  //  SingleGenMuonTree->Fill();
-  //cout<<"gen Tree Filled "<<endl;
+ }
 
 }
 
