@@ -33,7 +33,8 @@
 
 bool IsAccept(Double_t pt, Double_t eta); //you can define acceptance here 
 double FindCenWeight(int Bin);//gives you weight according to cent
-void JPsiMassFit_ShapeWeight(int Prompt =2, int iSpec = 3, int PutWeight = 1)   
+
+void JPsiMassFit_ShapeWeight(int Prompt =1, int iSpec = 1, int PutWeight = 1)   
 {
   gROOT->SetStyle("Plain");
   gStyle->SetPalette(1);
@@ -84,15 +85,14 @@ void JPsiMassFit_ShapeWeight(int Prompt =2, int iSpec = 3, int PutWeight = 1)
   int Nptbin;
   double pt_bound[100] = {0};
   if(iSpec == 1) { 
-    Nptbin = 5;
+    Nptbin = 4;
     pt_bound[0] = 0.0;
     pt_bound[1] = 30.0;
-    pt_bound[2] = 0.0;
-    pt_bound[3] = 6.5;
-    pt_bound[4] = 10.0;
-    pt_bound[5] = 30.0;
+    pt_bound[2] = 6.5;
+    pt_bound[3] = 10.0;
+    pt_bound[4] = 30.0;
     
-
+    pt_bound[5] = 30.0;
     pt_bound[6] = 30.0;
     pt_bound[7] = 35;
     pt_bound[8] = 40;
@@ -119,21 +119,15 @@ void JPsiMassFit_ShapeWeight(int Prompt =2, int iSpec = 3, int PutWeight = 1)
   }
   
   if(iSpec == 3) {
-    Nptbin = 4;
-    pt_bound[0] = 0.0;  //0
-    pt_bound[1] = 4.0;  //10
-    pt_bound[2] = 8.0;  //20
-    pt_bound[3] = 16.0; //40
-    pt_bound[4] = 40.0; //100
-   
-
-    pt_bound[5] = 20.0;
-    pt_bound[6] = 24.0;
-    pt_bound[7] = 28.0;
-    pt_bound[8] = 32.0;
-    pt_bound[9] = 40.0;
-    pt_bound[10] = 40.0;
-  
+    Nptbin = 2;
+    pt_bound[0] = 0.0;//0
+    pt_bound[1] = 20.0;//10
+    pt_bound[2] = 40.0;//20
+    pt_bound[3] = 12.0;//30
+    pt_bound[4] = 16.0;//40
+    pt_bound[5] = 20.0;//50
+    pt_bound[6] = 40.0;//100
+    
 
   }
   //X Axis error on Eff graph 
@@ -189,50 +183,57 @@ void JPsiMassFit_ShapeWeight(int Prompt =2, int iSpec = 3, int PutWeight = 1)
   
 if(Prompt==1){
   cout<<" prompt weight "<<endl;
-  scale[0]=(1.285345e-02/0.00005571);
-  scale[1]=(7.309949e-03/0.00005571);
-  scale[2]=(0.00393391/0.00005571);
-  scale[3]=(0.000669658/0.00005571);
-  scale[4]=(0.000164187/0.00005571);
-  scale[5]=(0.00005571/0.00005571);
-  
+  scale[0]=(8.7897); // pT [0-3]
+  scale[1]=(6.4009); // pT [3-6]
+  scale[2]=(4.0352); // pT [6-9]
+  scale[3]=(0.7755); // pT [9-12] 
+  scale[4]=(2.9473); // pT [12-15] 
+  scale[5]=(1.0000); // pT [15-30]
+
  }
-  
-  //non prompt JPSi 0.000227562  0.000578402 0.000259902 3.84506e-05 2.18806e-05   1.0847e-05 
-  //0.000227562/2 = 1.13781000000000000e-04
-  //0.000578402/2=  2.89200999999999998e-04
-  //0.000010847*2/5= 4.33879999999999986e-06
 
 if(Prompt==2){
   cout<<" Non prompt weight "<<endl;
-  scale[0]=(1.137e-04/4.339e-06);
-  scale[1]=(2.892e-04/4.339e-06);
-  scale[2]=(2.59902e-04/4.339e-06);
-  scale[3]=(3.84506e-05/4.339e-06);
-  scale[4]=(2.18806e-05/4.339e-06);
-  scale[5]=(4.339e-06/4.339e-06);
+  scale[0]=(0.9990); // pT [0-3]
+  scale[1]=(2.7773); // pT [3-6]
+  scale[2]=(3.8646); // pT [6-9]
+ 
+  scale[3]=(2*0.6330); // pT [9-12] 
+  //scale[3]=(0.6330); // pT [9-12] original
+  
+  scale[4]=(5.0430); // pT [12-15] 
+  scale[5]=(1.0000); // pT [15-30]
+
+  //scale[0]=(5*0.000227562/105)/1.08E-05;     
+  //scale[1]=(5*0.000578402/96)/1.08E-05;   
+  //scale[2]=(5*0.000259902/31)/1.08E-05;    
+  //scale[3]=(10*3.85E-05/28)/1.08E-05;         
+  //scale[4]=(5*2.19E-05/2)/1.08E-05;         
+  //scale[5]=(1.08E-05/1.08E-05);       
+
 
  }
+
   if(PutWeight==0){scale[0]=(1);scale[1]=(1);scale[2]=(1);scale[3]=(1);scale[4]=(1);scale[5]=(1);}
 
   if(Prompt ==1){
     cout<<"==================Prompt JPsi================================================"<<endl;
-  sprintf(fileName[0],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt03.root");
-  sprintf(fileName[1],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt36.root");
-  sprintf(fileName[2],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt69.root");
-  sprintf(fileName[3],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt912.root");
-  sprintf(fileName[4],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt1215.root");
-  sprintf(fileName[5],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_JPsiPt1530.root");
+sprintf(fileName[0],"rootFiles/JPsi_SkimV9_OniaPlots_Pt03_All27Apr.root");
+  sprintf(fileName[1],"rootFiles/JPsi_SkimV9_OniaPlots_Pt36_All27Apr.root");
+  sprintf(fileName[2],"rootFiles/JPsi_SkimV9_OniaPlots_Pt69_All27Apr.root");
+  sprintf(fileName[3],"rootFiles/JPsi_SkimV9_OniaPlots_Pt912_All27Apr.root");
+  sprintf(fileName[4],"rootFiles/JPsi_SkimV9_OniaPlots_Pt1215_All27Apr.root");
+  sprintf(fileName[5],"rootFiles/JPsi_SkimV9_OniaPlots_Pt1530_All27Apr.root");
   }
   
 if(Prompt ==2){
    cout<<"================== Non Prompt JPsi============================================="<<endl;
-  sprintf(fileName[0],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt03.root");
-  sprintf(fileName[1],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt36.root");
-  sprintf(fileName[2],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt69.root");
-  sprintf(fileName[3],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt912.root");
-  sprintf(fileName[4],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1215.root");
-  sprintf(fileName[5],"/media/Transcend/JPsiEff/DimuonOnia2Dplots_NPJPsiPt1530.root");
+ sprintf(fileName[0],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt03_All27Apr.root");
+  sprintf(fileName[1],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt36_All27Apr.root");
+  sprintf(fileName[2],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt69_All27Apr.root");
+  sprintf(fileName[3],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt912_All27Apr.root");
+  sprintf(fileName[4],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt1215_All27Apr.root");
+  sprintf(fileName[5],"rootFiles/NPJPsi_SkimV9_OniaPlots_Pt1530_All27Apr.root");
  }
     
   TFile *infile;
@@ -255,12 +256,12 @@ if(Prompt ==2){
     double muNegPx, muNegPy, muNegPz,  muNegEta, muNegPt,muNegP;
     //(1).Positive Muon                                     
     double muPos_nchi2In, muPos_dxy, muPos_dz, muPos_nchi2Gl;
-    int muPos_found, muPos_pixeLayers, muPos_nValidMuHits;
-    bool muPos_matches;
+    int muPos_found, muPos_pixeLayers, muPos_nValidMuHits,muPos_arbitrated;;
+    bool muPos_matches,muPos_tracker;
      //(2).Negative Muon                                     
     double muNeg_nchi2In, muNeg_dxy, muNeg_dz, muNeg_nchi2Gl;
-    int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits;
-    bool muNeg_matches;
+    int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits,muNeg_arbitrated;
+    bool muNeg_matches,muNeg_tracker;
     //Gen Level variables
     //Gen JPsi Variables
     double GenJpsiMass, GenJpsiPt, GenJpsiRap;
@@ -304,6 +305,9 @@ if(Prompt ==2){
     tree->SetBranchAddress("muPos_pixeLayers", &muPos_pixeLayers);
     tree->SetBranchAddress("muPos_nValidMuHits", &muPos_nValidMuHits);
     tree->SetBranchAddress("muPos_matches", &muPos_matches);
+    tree->SetBranchAddress("muPos_tracker", &muPos_tracker);
+    tree->SetBranchAddress("muPos_arbitrated", &muPos_arbitrated);
+
     //2). Negative Muon                                                                            
     tree->SetBranchAddress("muNeg_nchi2In", &muNeg_nchi2In);
     tree->SetBranchAddress("muNeg_dxy", &muNeg_dxy);
@@ -313,6 +317,9 @@ if(Prompt ==2){
     tree->SetBranchAddress("muNeg_pixeLayers", &muNeg_pixeLayers);
     tree->SetBranchAddress("muNeg_nValidMuHits", &muNeg_nValidMuHits);
     tree->SetBranchAddress("muNeg_matches", &muNeg_matches);
+    tree->SetBranchAddress("muNeg_tracker", &muNeg_tracker);
+    tree->SetBranchAddress("muNeg_arbitrated", &muNeg_arbitrated);
+
     
     //====================================Gen Variables=========================================================
     //Gen Jpsi Variables
@@ -379,13 +386,16 @@ if(Prompt ==2){
       
       diMuonsPt_Gen->Fill(GenJpsiPt,GenWeight);
       
-      double sys_shape_pT= (1 +  (0.02 * GenJpsiPt-0.3));
+      double sys_shape_pT= (1 -  (0.02 * GenJpsiPt-0.3));
       diMuonsPt_GenW1->Fill(GenJpsiPt,GenWeight*sys_shape_pT);
      
-      double sys_shape_y= (1 + (0.3*(TMath::Abs(GenJpsiRap)-1.0)));
+      double sys_shape_y= (1 - (0.3*(TMath::Abs(GenJpsiRap)-1.0)));
       
       diMuonsRap_Gen->Fill(GenJpsiRap,GenWeight);
       diMuonsRap_GenW1->Fill(GenJpsiRap,GenWeight*sys_shape_y);
+
+      sys_shape_y=1;
+
 
 
  for (Int_t ih = 0; ih < Nptbin; ih++) {
@@ -395,8 +405,9 @@ if(iSpec == 1) if((GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuons
 
 if(iSpec == 1) if((GenPosIn==1 && GenNegIn==1)&& (TMath::Abs(GenJpsiRap)> 0.0 && TMath::Abs(GenJpsiRap)<2.4) && (GenJpsiPt>pt_bound[ih] && GenJpsiPt<=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight*sys_shape_y);}
 
-if(iSpec == 2) if((GenPosIn==1 && GenNegIn==1)&& (GenJpsiPt > 0.0 && GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap) > pt_bound[ih] && TMath::Abs(GenJpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight*sys_shape_y);}	
-if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt<30.0) &&   (TMath::Abs(GenJpsiRap)<2.4) && (gbin >= pt_bound[ih] && gbin< pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight*sys_shape_y);}
+if(iSpec == 2) if((GenPosIn==1 && GenNegIn==1)&& (GenJpsiPt > 6.5 && GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap) > pt_bound[ih] && TMath::Abs(GenJpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight*sys_shape_y);}	
+
+if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt<30.0) && (TMath::Abs(GenJpsiRap)>=0.0 && TMath::Abs(GenJpsiRap)<2.4) && (gbin >= pt_bound[ih] && gbin< pt_bound[ih+1])){diMuonsInvMass_GenA[ifile][ih]->Fill(GenJpsiMass,GenWeight*sys_shape_y);}
       
  }
     }//gen loop end
@@ -434,7 +445,7 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
     for(int i=0; i<nRecEntries; i++)  {	    
       tree->GetEntry(i);
       //Only printing 
-      if(i%1000==0){
+      if(i%100000==0){
 	cout<<" processing record "<<i<<endl;
 	cout<<" processing Run  " <<runNb <<" event "<<eventNb<<" lum block "<<lumiBlock<<endl;    
 	cout<<" Mass "<< JpsiMass<< " pT "<< JpsiPt << " Y " <<JpsiRap<<"  "<<JpsiVprob<<" charge "<<JpsiCharge<<" rbin "<<rbin<<endl; 
@@ -452,13 +463,22 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
       //if(muPos_matches==1 && muNeg_matches==1) cout << " he he " <<endl;
       //return;
       
-      if(muPos_found > 10 && muPos_pixeLayers > 0 && muPos_nchi2In < 4.0 && muPos_dxy < 3 && muPos_dz < 15 && muPos_nchi2Gl < 6 
-	 && muPos_nValidMuHits > 6){PosPass=1;}	  
-      if( (muNeg_found >10 && muNeg_pixeLayers >0 && muNeg_nchi2In <4.0 && muNeg_dxy < 3 && muNeg_dz < 15 && muNeg_nchi2Gl < 6 
-	   && muNeg_nValidMuHits >6)){NegPass=1;}
-      
+     if(muPos_found > 10 && muPos_pixeLayers > 0 && muPos_nchi2In < 4.0 && muPos_dxy < 3 && muPos_dz < 15 && muPos_nchi2Gl < 20 
+      && muPos_arbitrated==1 && muPos_tracker==1){PosPass=1;}	  
 
-      if( (muPos_matches==1 && muNeg_matches==1) && (PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
+      if(muNeg_found >10 && muNeg_pixeLayers >0 && muNeg_nchi2In <4.0 && muNeg_dxy < 3 && muNeg_dz < 15 && muNeg_nchi2Gl < 20
+      && muNeg_arbitrated==1 && muNeg_tracker==1){NegPass=1;}
+        
+
+
+
+
+
+
+      //if( (muPos_matches==1 && muNeg_matches==1) && (PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
+     
+      //without trigger
+       if((PosIn==1 &&NegIn==1) && (PosPass==1 && NegPass==1)){AllCut=1;}
       
       
       double RecCenWeight=0,RecWeight=0;
@@ -466,9 +486,11 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
       RecWeight=RecCenWeight*scale[ifile];
       if(PutWeight==0)RecWeight=1;
       
-      double sys_shape_recpT= (1 + (0.02 *JpsiPt-0.3));
-      double sys_shape_recy= (1  + (0.3*(TMath::Abs(JpsiRap)-1.0)));
+      double sys_shape_recpT= (1 - (0.02 *JpsiPt-0.3));
+      double sys_shape_recy= (1  - (0.3*(TMath::Abs(JpsiRap)-1.0)));
      
+      sys_shape_recy=1;
+
 
       if(AllCut==1){
 	if(ifile==0){diMuonsRap_Rec0->Fill(JpsiRap);}
@@ -483,14 +505,14 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
       for (Int_t ih = 0; ih < Nptbin; ih++) {
 	if((JpsiCharge == 0) && (JpsiVprob > 0.01)) {	  
 	  //to see cont reco pT
-	  if(iSpec == 1) if((JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt, RecWeight*sys_shape_recpT);
+	  if(iSpec == 1) if((JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))diMuonsPt_RecA[ifile][ih]->Fill(JpsiPt, RecWeight*sys_shape_recy);
 
 	  if(iSpec == 1) if((AllCut==1) && (TMath::Abs(JpsiRap)> 0.0 && TMath::Abs(JpsiRap)<2.4) && (JpsiPt>pt_bound[ih]  && JpsiPt<=pt_bound[ih+1]))  {diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight*sys_shape_recy);}
 	 
-	  if(iSpec == 2) if((AllCut==1) && (JpsiPt > 0.0 &&  JpsiPt< 30.0) && (TMath::Abs(JpsiRap) > pt_bound[ih] && TMath::Abs(JpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight*sys_shape_recy);}
+	  if(iSpec == 2) if((AllCut==1) && (JpsiPt > 3.0 &&  JpsiPt< 30.0) && (TMath::Abs(JpsiRap) > pt_bound[ih] && TMath::Abs(JpsiRap) <=pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight*sys_shape_recy);}
 	  
 
-	  if(iSpec == 3) if( (AllCut==1) && (JpsiPt> 6.5 && JpsiPt<30.0) &&  (TMath::Abs(JpsiRap)<2.4) && (rbin>=pt_bound[ih]  && rbin<pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight*sys_shape_recy);}
+	  if(iSpec == 3) if( (AllCut==1) && (JpsiPt> 6.5 && JpsiPt<30.0) &&  (TMath::Abs(JpsiRap)>=0.0 && TMath::Abs(JpsiRap)<2.4) && (rbin>=pt_bound[ih]  && rbin<pt_bound[ih+1])){diMuonsInvMass_RecA[ifile][ih]->Fill(JpsiMass,RecWeight*sys_shape_recy);}
 	}
       }
     }//rec tree loop ends
@@ -549,22 +571,22 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
   
    
   // Fit Function crystall ball
-  TF1 *GAUSPOL = new TF1("GAUSPOL",CrystalBall,2.6,3.5,5);
-  GAUSPOL->SetParNames("#alpha","n","Mean","#sigma","N");
+  TF1 *GAUSPOL = new TF1("GAUSPOL",CrystalBall,2.4,3.8,6);
+  GAUSPOL->SetParNames("Yield (J/#psi)","BinWidth","Mean","Sigma","#alpha","n");
  
  
    // Low mass range J/psi
-  MassJPsi = 3.096; WeidthJPsi = 0.020;
-   mass_low = 2.965; mass_high = 3.24;  // Fit ranges
-  //mass_low = 2.86; mass_high = 3.2;  // Fit ranges
+  MassJPsi = 3.096; WeidthJPsi = 0.022;
+  mass_low = 2.945; mass_high = 3.22;  // Fit ranges
+  
 
-  GAUSPOL->SetParameter(0, 1.29);
-  GAUSPOL->SetParameter(1, 147.0);
+  // mass_low = 2.9; mass_high = 3.3;  // Fit ranges
+
   GAUSPOL->SetParameter(2, MassJPsi);
   GAUSPOL->SetParameter(3, WeidthJPsi);
-  GAUSPOL->SetParLimits(3, 0.1*WeidthJPsi,1.5*WeidthJPsi);
- 
-
+  //GAUSPOL->SetParLimits(3, 0.1*WeidthJPsi,2.0*WeidthJPsi);
+  GAUSPOL->SetParameter(4, 1.2);
+  GAUSPOL->SetParameter(5, 19.0);
   
   GAUSPOL->SetLineWidth(2.0);
   GAUSPOL->SetLineColor(2);
@@ -618,10 +640,13 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
     // cout<<" *********************** "<<diMuonsInvMass_RecA1[ih]->GetMaximum()<<endl;
     //giving inetial value for crystall ball fourth parameter 
     diMuonsInvMass_RecA1[ih]->Rebin(2);
-    GAUSPOL->SetParameter(4, diMuonsInvMass_RecA1[ih]->GetMaximum());
+    GAUSPOL->SetParameter(0, diMuonsInvMass_RecA1[ih]->Integral(0,50));
+    GAUSPOL->FixParameter(1, diMuonsInvMass_RecA1[ih]->GetBinWidth(1));
     
     new TCanvas;
-    diMuonsInvMass_RecA1[ih]->Fit("GAUSPOL","LEQM", "", mass_low, mass_high);
+    // diMuonsInvMass_RecA1[ih]->Fit("GAUSPOL","LLMER", "", mass_low, mass_high);
+    diMuonsInvMass_RecA1[ih]->Fit("GAUSPOL","LLMERQ", "", mass_low, mass_high);
+   
     gPad->Print(PlotName);
     gPad->Print(PlotName1);
     gPad->Print(PlotName2);
@@ -636,7 +661,9 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
     double JPsiMass = GAUSPOL->GetParameter(2);
     double JPsiWidth = GAUSPOL->GetParameter(3);
    
-    double JPsiYield = GAUSPOL->GetParameter(4); 
+    double JPsiYield = GAUSPOL->GetParameter(0); 
+    double JPsiYieldError = GAUSPOL->GetParError(0);
+
 
     double par[20];
     GAUSPOL->GetParameters(par);
@@ -656,8 +683,8 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
         
     
     //yield by function 
-    //rec_pt[ih] = JPsiYield/binwidth;
-    //rec_ptError[ih]= TMath::Sqrt((JPsiYield/binwidth));
+    //rec_pt[ih] = JPsiYield;
+    //rec_ptError[ih]= JPsiYieldError;
     
     //yield by histogram integral
     rec_pt[ih] = diMuonsInvMass_RecA1[ih]->IntegralAndError(binlow, binhi,recError);
@@ -753,7 +780,7 @@ if(iSpec == 3)  if((GenPosIn==1 && GenNegIn==1) && (GenJpsiPt> 6.5 &&  GenJpsiPt
 
 
 
-    //if (iSpec==1){ new TCanvas; diMuonsPt_GenA1[ih]->Draw(); new TCanvas; diMuonsPt_RecA1[ih]->Draw();}
+  if (iSpec==1){ new TCanvas; diMuonsPt_GenA1[ih]->Draw(); new TCanvas; diMuonsPt_RecA1[ih]->Draw();}
   
   }
   
