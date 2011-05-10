@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.39 2011/04/28 13:37:44 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.40 2011/04/30 16:31:01 kimy Exp $
  *
  */
 
@@ -319,7 +319,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   // Electron ID
   HTValVector<bool> isElectron(kMaxPhotons);
   HTValVector<Float_t>  dphiEle(kMaxPhotons), detaEle(kMaxPhotons) ; 
-
+  HTValVector<Float_t>  deltaEtaEleCT(kMaxPhotons), deltaPhiEleCT(kMaxPhotons) ;
+  HTValVector<Int_t>  eleCharge(kMaxPhotons);
+  HTValVector<Float_t>  eleEoverP(kMaxPhotons);
+  
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
   
@@ -559,10 +562,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     // electron id
     bool isEleTemp = false;
     float dphiTemp(100), detaTemp(100);
-    
+    float deltaPhiEleCTTemp(100), deltaEtaEleCTTemp(100);
+    int eleChargeTemp(100);
+    float eleEpTemp(100);
     
     if ( isEleRecoed ) {
       //   cout << " start electron search " << endl;
+       // We will find the smallest e/p electron canddiates.
        for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
 	  if ( eleItr->superCluster()->energy() < 10 ) continue;
 	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
@@ -572,11 +578,20 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	  if ( dphi < -3.141592 ) dphi = dphi + 2* 3.141592;
 	  if ( abs(dphi) > 0.03 )  continue;
 	  
+	  float iEp = eleItr->eSuperClusterOverP() ;   
+	
+	  // We should match with higher momentum electron candidates. 
+	  if ( eleEpTemp > iEp )  continue;
+	  
+	  eleEpTemp = iEp;
+	  eleChargeTemp =  eleItr->charge();
+	  deltaPhiEleCTTemp =  eleItr->deltaPhiEleClusterTrackAtCalo() ; 
+	  deltaEtaEleCTTemp =  eleItr->deltaEtaEleClusterTrackAtCalo() ;
 	  dphiTemp = dphi;  
 	  detaTemp = eleItr->superCluster()->eta() - photon.superCluster()->eta() ;
+	  
 	  //	  cout << " this is electron " << endl;
 	  isEleTemp = true;
-	  break;
        }
        
        if ( isEleTemp == false)  
@@ -586,6 +601,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     isElectron         (nphotonscounter)    =  isEleTemp;
     detaEle            (nphotonscounter)    =  detaTemp;
     dphiEle            (nphotonscounter)    =  dphiTemp;
+    deltaEtaEleCT      (nphotonscounter)    =  deltaEtaEleCTTemp;
+    deltaPhiEleCT      (nphotonscounter)    =  deltaPhiEleCTTemp;
+    eleCharge          (nphotonscounter)    =  eleChargeTemp;
+    eleEoverP          (nphotonscounter)    =  eleEpTemp;
+
 
     
     
@@ -1085,6 +1105,11 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"isEle",                        isElectron,                   pfx+"nPhotons");
   _ntuple->Column(pfx+"detaEle",                      detaEle,                      pfx+"nPhotons");
   _ntuple->Column(pfx+"dphiEle",                      dphiEle,                      pfx+"nPhotons");
+  _ntuple->Column(pfx+"eleCharge",                    eleCharge,                    pfx+"nPhotons");
+  _ntuple->Column(pfx+"deltaEtaEleCT",      deltaEtaEleCT,      pfx+"nPhotons");
+  _ntuple->Column(pfx+"deltaPhiEleCT",      deltaPhiEleCT,      pfx+"nPhotons");
+  _ntuple->Column(pfx+"eleEoverP",                    eleEoverP,                    pfx+"nPhotons");
+  
 
   // Heavy Ion stuffs
   _ntuple->Column(pfx+"c1",                           c1,                           pfx+"nPhotons");
