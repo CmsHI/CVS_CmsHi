@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.7 2011/02/06 16:00:08 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.8 2011/02/07 17:27:52 kimy Exp $
 //
 //
 
@@ -73,9 +73,9 @@ class IsoConeInspector : public edm::EDAnalyzer {
    public:
       explicit IsoConeInspector(const edm::ParameterSet&);
       ~IsoConeInspector();
-
-
-   private:
+   
+   
+private:
       virtual void beginJob() ;
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
@@ -206,8 +206,8 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    
 
    
-   double extRadius_ = 0.42;
-   
+   double extRadius_ = 100.42;
+   double etaWidth_ = 0.5;
    nRH  = 0;
    nBC  = 0;
    nPho = (*photons).size();
@@ -240,6 +240,8 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    float energyrh = j->energy();
 	    float etrh    = energyrh/cosh(etarh);
 	    
+	    if ( fabs(etaDiff) > etaWidth_)  
+	       continue;
 	    RHet[nRH]   = etrh;
             RHe[nRH]   = energyrh;
 	    RHdEta[nRH] = etaDiff;
