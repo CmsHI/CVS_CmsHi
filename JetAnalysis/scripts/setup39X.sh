@@ -20,7 +20,7 @@ addpkg           RecoHI/Configuration
 cvs co          CondFormats/HIObjects
 cvs co          DataFormats/HeavyIonEvent
 cvs co          RecoHI/HiCentralityAlgos
-cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
+cvs co -r cmssw39x_branch -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
 cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
