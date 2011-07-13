@@ -1,12 +1,19 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process('JetAna')
+
+# setup runtime options
+options = VarParsing.VarParsing ('standard')
+options.register('sampleType', 1, # by default
+    VarParsing.VarParsing.multiplicity.singleton,
+    VarParsing.VarParsing.varType.int,
+    "0: non-embedded, 1: embedded")
+options.parseArguments()
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
 )
-
-isEmbedded = True
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -71,15 +78,14 @@ process.load('CmsHi.JetAnalysis.PatAna_cff')
 process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
 
 
-
-if isEmbedded:
-    process.hiGenParticles.srcVector = cms.vstring('hiSignal')
-    process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-else:
-    process.hiGenParticles.srcVector = cms.vstring('generator')
-    process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("generator")
-
-
+if options.sampleType == 0:
+  print "Running on non-embedded sample"
+  process.hiGenParticles.srcVector = cms.vstring('generator')
+  process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("generator")
+elif options.sampleType == 1:
+  print "Running on embedded sample"
+  process.hiGenParticles.srcVector = cms.vstring('hiSignal')
+  process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
 
 process.reco_extra = cms.Path( process.hiGen )
 process.reco_extra_jet = cms.Path( process.iterativeConePu5CaloJets )
