@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.40 2011/04/30 16:31:01 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.41 2011/05/10 13:54:04 kimy Exp $
  *
  */
 
@@ -325,6 +325,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   // Conversion
   HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
+  
   
   // ID
   HTValVector<bool> isLoose(kMaxPhotons), isTight(kMaxPhotons);
@@ -786,10 +787,6 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     
     nAllTracks                  (nphotonscounter)   =  (float)Txy.getNumAllTracks(1);   // pt Cut of the track = 1GeV
     nLocalTracks                (nphotonscounter)   =  (float)Txy.getNumLocalTracks(photon,0.5,1); // dEta cut = 0.5     and    pt Cut = 1GeV                                                                               
-
-
-    
-    
     // Conversion
     
     if (doStoreConversions_)
@@ -1218,6 +1215,10 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   _ntuple->Column(pfx+"nAllTracks",                  nAllTracks,                  pfx+"nPhotons");
   _ntuple->Column(pfx+"nLocalTracks",                nLocalTracks,                pfx+"nPhotons");
 
+
+  // pixel seed? 
+  _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");
+  
   
 
 
@@ -1225,7 +1226,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   if (doStoreConversions_) {
 
   _ntuple->Column(pfx+"hasConversionTracks", hasConversionTracks, pfx+"nPhotons");
-  _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");
+  //  _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");  used for others.... moved to above.
 
   _ntuple->Column(pfx+"isLoose",  isLoose, pfx+"nPhotons" );
   _ntuple->Column(pfx+"isTight",  isTight, pfx+"nPhotons" );
