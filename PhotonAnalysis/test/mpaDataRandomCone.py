@@ -13,34 +13,35 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 #process.Tracer = cms.Service("Tracer")
 # Centrality
 process.load("RecoHI.HiCentralityAlgos.HiCentrality_cfi")
+process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff'),
 process.HeavyIonGlobalParameters = cms.PSet(
     centralitySrc = cms.InputTag("hiCentrality"),
     centralityVariable = cms.string("HFhits"),
     nonDefaultGlauberModel = cms.string("")
     )
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')  # for data global run.
+process.GlobalTag.globaltag = cms.string('GR_R_39X_V6B::All')  # for data global run.
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/hidata/HIRun2010/HIAllPhysics/RECO/SDmaker_3SD_1CS_PDHIAllPhysicsZSv2_SD_PhotonHI-v1/0049/3EAFC902-B34C-E011-A649-003048F1BFB0.root'
+    'dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/hidata/HIRun2010/HIAllPhysics/RECO/SDmaker_3SD_1CS_PDHIAllPhysicsZSv2_SD_PhotonHI-v1/0048/000E18FD-B24C-E011-8820-003048C9C1D4.root'
     ),
                             inputCommands = cms.untracked.vstring(
     'keep *',
-    'drop recoSuperClusters_*_*_*',
+    #    'drop recoSuperClusters_*_*_*',
     'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*',
-    'drop recoCaloClusters_*_*_*'
+    'drop recoPhotonCores_*_*_*'
+    #    'drop recoCaloClusters_*_*_*'
     ),
-                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
-                            )
-
+    dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
+    )
+                            
 # USE JASON FILE For local jobs
 import PhysicsTools.PythonAnalysis.LumiList as LumiList
 import FWCore.ParameterSet.Types as CfgTypes
-myLumis = LumiList.LumiList(filename = 'Cert_150436-152957_HI7TeV_StreamExpress_Collisions10_JSON.txt').getCMSSWString().split(',')
+myLumis = LumiList.LumiList(filename = 'Cert_150436-152957_HI7TeV_StreamExpress_Collisions10_JSON_v2.txt').getCMSSWString().split(',')
 process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
 process.source.lumisToProcess.extend(myLumis)
 
@@ -68,15 +69,15 @@ process.multiPhotonAnalyzer.OutputFile = cms.string('___outf___')
 process.multiPhotonAnalyzer.doStoreCompCone = cms.untracked.bool(True)
 process.multiPhotonAnalyzer.doStoreJets = cms.untracked.bool(False)
 
-# HiGoodMergedTrack
-process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")    #process.trksel_step  = cms.Path(process.hiGoodTracksSelection)
-#process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
-#process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
-#process.hiGoodMergTrackSequence = cms.Sequence(
-#    process.hiGoodTracksSelection*
-#    process.conformalPixelTrackReco *
-#    process.hiGoodMergedTracks
-#    )
+############ Make HiGoodTrack tight!!
+process.load("edwenger.HiTrkEffAnalyzer.TrackSelections_cff")
+process.hiGoodTracks.src = cms.InputTag("hiPostGlobalPrimTracks")
+process.hiGoodTracks.keepAllTracks = cms.bool(False)
+process.hiGoodTracks.qualityBit = cms.string('highPurity')
+process.hiGoodTracks.min_nhits = cms.uint32(13)
+process.hiGoodTracks.chi2n_par = cms.double(0.15)
+
+
 
 # detector responce
 process.load("CmsHi.PhotonAnalysis.isoConeInspector_cfi")
@@ -95,6 +96,9 @@ process.gamIsoDepositHcalFromTowers.src = cms.InputTag(photonObj)
 process.gamIsoDepositHcalDepth1FromTowers.src = cms.InputTag(photonObj)
 process.gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
 
+
+
+
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
 # random Cone sequence
@@ -102,8 +106,19 @@ process.load("RandomConeAna.Configuration.randomConeSequence_cff")
 process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
 process.compleCleanSuperCluster.photonProducer= cms.untracked.InputTag(photonObj)
 
-# random number generator
+
+# random number generator for mpa
 process.load('Configuration/StandardSequences/SimulationRandomNumberGeneratorSeeds_cff')
+process.RandomNumberGeneratorService.multiPhotonAnalyzer = cms.PSet(
+        engineName = cms.untracked.string("TRandom3"),
+                        initialSeed = cms.untracked.uint32(982346)
+                        )
+
+process.RandomNumberGeneratorService.randomSuperCluster = cms.PSet(
+    engineName = cms.untracked.string("TRandom3"),
+    initialSeed = cms.untracked.uint32(982346)
+    )
+
 from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
 randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
 randSvc.populate()
@@ -142,21 +157,56 @@ process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 process.p = cms.Path(
     process.HIminbiasTrig *
     process.collisionEventSelection *
-    process.hiGoodTracksSelection *
-    process.patHeavyIonDefaultSequence *
+    #  process.siPixelRecHits*
+    process.hiPostGlobalPrimTracks * process.hiGoodTracks *
     process.randomConeSqeunceWithCalo *
+    process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence * 
     process.multiPhotonAnalyzer
     )       
 
-######### mpa path
-#process.p = cms.Path(
-#    process.HIminbiasTrig *
-#    process.collisionEventSelection *
-#    process.hiGoodTracksSelection * 
-#    process.hiEcalClusteringSequence *
-#    process.hiPhotonCleaningSequence *
-#    process.compleCleanPhotonSequence *
-#    process.patHeavyIonDefaultSequence *
-#    process.multiPhotonAnalyzer 
-#    )
+
+process.isoCC1.photons = cms.InputTag(photonObj)
+process.isoCC2.photons = cms.InputTag(photonObj)
+process.isoCC3.photons = cms.InputTag(photonObj)
+process.isoCC4.photons = cms.InputTag(photonObj)
+process.isoCC5.photons = cms.InputTag(photonObj)
+process.isoCR1.photons = cms.InputTag(photonObj)
+process.isoCR2.photons = cms.InputTag(photonObj)
+process.isoCR3.photons = cms.InputTag(photonObj)
+process.isoCR4.photons = cms.InputTag(photonObj)
+process.isoCR5.photons = cms.InputTag(photonObj)
+
+process.isoT11.photons = cms.InputTag(photonObj)
+process.isoT12.photons = cms.InputTag(photonObj)
+process.isoT13.photons = cms.InputTag(photonObj)
+process.isoT14.photons = cms.InputTag(photonObj)
+process.isoT21.photons = cms.InputTag(photonObj)
+process.isoT22.photons = cms.InputTag(photonObj)
+process.isoT23.photons = cms.InputTag(photonObj)
+process.isoT24.photons = cms.InputTag(photonObj)
+process.isoT31.photons = cms.InputTag(photonObj)
+process.isoT32.photons = cms.InputTag(photonObj)
+process.isoT33.photons = cms.InputTag(photonObj)
+process.isoT34.photons = cms.InputTag(photonObj)
+process.isoT41.photons = cms.InputTag(photonObj)
+process.isoT42.photons = cms.InputTag(photonObj)
+process.isoT43.photons = cms.InputTag(photonObj)
+process.isoT44.photons = cms.InputTag(photonObj)
+process.isoDR11.photons = cms.InputTag(photonObj)
+process.isoDR12.photons = cms.InputTag(photonObj)
+process.isoDR13.photons = cms.InputTag(photonObj)
+process.isoDR14.photons = cms.InputTag(photonObj)
+process.isoDR21.photons = cms.InputTag(photonObj)
+process.isoDR22.photons = cms.InputTag(photonObj)
+process.isoDR23.photons = cms.InputTag(photonObj)
+process.isoDR24.photons = cms.InputTag(photonObj)
+process.isoDR31.photons = cms.InputTag(photonObj)
+process.isoDR32.photons = cms.InputTag(photonObj)
+process.isoDR33.photons = cms.InputTag(photonObj)
+process.isoDR34.photons = cms.InputTag(photonObj)
+process.isoDR41.photons = cms.InputTag(photonObj)
+process.isoDR42.photons = cms.InputTag(photonObj)
+process.isoDR43.photons = cms.InputTag(photonObj)
+process.isoDR44.photons = cms.InputTag(photonObj)
+
