@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.14 2011/04/26 15:06:45 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.15 2011/04/26 16:16:25 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -164,6 +164,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   ho_                              = ps.getParameter<edm::InputTag>("ho");
 
 
+  
   //event plance
   evtPlaneLabel                    =  ps.getParameter<edm::InputTag>("hiEvtPlane_");
 
@@ -177,7 +178,9 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   ecalEndcapMinEta_                = ps.getUntrackedParameter<double>("EcalEndcapMinEta",1.55);
 
   ptJetMin_                        = ps.getUntrackedParameter<double>("JetPtMin", 20);
-
+  ptTrackMin_                      = ps.getUntrackedParameter<double>("TrackPtMin",1.5);
+  etaTrackMax_                     = ps.getUntrackedParameter<double>("TrackEtaMax",1.75);
+  
   pdgId_                           = ps.getUntrackedParameter<int>("pdgId", 22);
   otherPdgIds_                     = ps.getUntrackedParameter<vector<int> >("OtherPdgIds", vector<int>(1,11) );
   mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 10);
@@ -196,6 +199,8 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",true);
   doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",true);
   doStoreConversions_              = ps.getUntrackedParameter<bool>("doStoreConversions",false);
+  
+  doStoreTracks_                   = ps.getUntrackedParameter<bool>("doStoreTracks",true);
 
   // electorn collection
   EleTag_                          = ps.getUntrackedParameter<edm::InputTag>("gsfElectronCollection");
@@ -265,6 +270,7 @@ void SinglePhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& i
 	if (doStoreVertex_)	storeVertex(e);
 	if (doStoreMET_)	storeMET(e);
 	if (doStoreJets_)	storeJets(e);
+	if (doStoreTracks_)     storeTracks(e);
 	bool foundPhoton = selectStorePhoton(e,iSetup);
 
 	if (foundPhoton){
@@ -687,14 +693,16 @@ void SinglePhotonAnalyzer::storeEvtPlane(const edm::Event& e){
   e.getByLabel(evtPlaneLabel, evtPlanes);
   
   int nEvtPlanes = 0;
-  cout << " event plane is valid?? " <<endl;
+  cout << " event plane is valid?? " ;
   if(evtPlanes.isValid()){
-    cout << " event plane is valid. " << endl;
+    cout << "   yes " << endl;
     nEvtPlanes = evtPlanes->size();
     for(unsigned int i = 0; i < evtPlanes->size(); ++i){
       evtPlane(i)  = (*evtPlanes)[i].angle();
     }
   }
+  else
+    cout << "    no " << endl;
   _ntuple->Column("nEvtPlane",     (Int_t) nEvtPlanes);
   _ntuple->Column("evtPlane",  evtPlane, "nEvtPlane");
   
@@ -777,6 +785,9 @@ void SinglePhotonAnalyzer::storeVertex(const edm::Event& e){
 	
 }
 
+
+
+
 bool SinglePhotonAnalyzer::storeMET(const edm::Event& e){
 	/////////////////////////////////////////
 	// MET Section: store MET the event    //
@@ -824,6 +835,45 @@ bool SinglePhotonAnalyzer::storeMET(const edm::Event& e){
   }
 	return (!(mets->empty()));
 }
+
+
+bool SinglePhotonAnalyzer::storeTracks(const edm::Event& e){
+  /////////////////////////////////////////                                                                                                                                                                 
+  // MET Section: store MET the event    //                                                                                                                                                                 
+  /////////////////////////////////////////                                                                                                                                                                 
+
+  // Get Missing ET          
+  edm::Handle<reco::TrackCollection>  recCollection;
+  e.getByLabel(trackProducer_, recCollection);
+  const int kMaxTracks = 100;
+  
+  HTValVector<Float_t> trackPt(kMaxTracks), trackEta(kMaxTracks), trackPhi(kMaxTracks);
+  size_t nTrackCounter = 0;
+  
+  for(reco::TrackCollection::const_iterator
+	recTrack = recCollection->begin(); recTrack!= recCollection->end(); recTrack++)
+    {
+      if ( (recTrack->pt() > ptTrackMin_) && ( fabs(recTrack->eta()) < etaTrackMax_) ) {
+	trackPt(nTrackCounter) =  recTrack->pt();
+	trackEta(nTrackCounter) =  recTrack->eta();
+	trackPhi(nTrackCounter) =  recTrack->phi();
+	
+	nTrackCounter++;
+      }
+      if (nTrackCounter>kMaxTracks-1) break;
+    }
+  
+  
+  _ntuple->Column("nRecTracks", (Int_t) nTrackCounter);
+  _ntuple->Column("trackPt",    trackPt,  "nRecTracks");
+  _ntuple->Column("trackEta",   trackEta, "nRecTracks");
+  _ntuple->Column("trackPhi",   trackPhi, "nRecTracks");
+  
+  return (!(recCollection->empty()));
+}
+
+
+
 
 int SinglePhotonAnalyzer::storeJets(const edm::Event& e){
 	///////////////////////////////////////////////////////////////////////

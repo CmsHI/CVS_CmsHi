@@ -58,7 +58,8 @@ protected:
   virtual int  storeJets(const edm::Event&);
   virtual bool selectStorePhoton(const edm::Event&,const edm::EventSetup&);
   virtual void storeEvtPlane(const edm::Event&);
-
+  virtual bool storeTracks(const edm::Event&);
+  
 	
   virtual void storePhotonAOD(pat::Photon *photon, const edm::Event& e, const edm::EventSetup &es, HTuple *tpl, const char* prefx = "PHO1_");
   virtual bool storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx = "PHO1_");	
@@ -132,6 +133,8 @@ protected:
   double       ecalBarrelMaxEta_; // Begining of ECAL Barrel/Endcap gap
   double       ecalEndcapMinEta_; // End of ECAL Barrel/Endcap gap
   double       ptJetMin_;         // Jet pt threshold
+  double       ptTrackMin_;
+  double       etaTrackMax_;
   int          pdgId_;            // PDG ID of expected MC particle
   std::vector<int> otherPdgIds_;  // PDG ID of other MC particles to match
   double       mcPtMin_;          // min MC particle pt
@@ -173,7 +176,7 @@ protected:
   bool 	doStoreJets_;		 // Store Jets
   bool  doStoreConversions_;
   bool  doStoreCompCone_;
-
+  bool doStoreTracks_;
   HTuple         *_ntuple;        // Analysis ntuple
   HTuple         *_ntupleMC;      // MC truth ntuple
 

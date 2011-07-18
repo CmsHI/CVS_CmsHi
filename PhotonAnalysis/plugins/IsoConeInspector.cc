@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: IsoConeInspector.cc,v 1.8 2011/02/07 17:27:52 kimy Exp $
+// $Id: IsoConeInspector.cc,v 1.9 2011/05/16 20:51:55 kimy Exp $
 //
 //
 
@@ -63,6 +63,12 @@
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
+#include "RecoCaloTools/MetaCollections/interface/CaloRecHitMetaCollections.h"
+
+
+#include "Geometry/Records/interface/IdealGeometryRecord.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
 
 //
@@ -84,15 +90,24 @@ private:
 
    edm::Service<TFileService> fs;
 
-   edm::InputTag photonSrc_;
+  edm::InputTag basicClusterBarrel_;
+  edm::InputTag basicClusterEndcap_;
+  edm::InputTag hbhe_;
+  
+  edm::InputTag photonSrc_;
    edm::InputTag ebReducedRecHitCollection_;
    edm::InputTag eeReducedRecHitCollection_;
-   bool doSpikeClean_;
+  const CaloGeometry                 *geometry_;
+  bool doSpikeClean_;
    double etCut_;
-   double etaCut_;
+  double hoeCutMin_;
+  double hoeCutMax_;
+  
+  double sieieCut_;
+  double etaCut_;
    TH1D*  NoE ;
    TTree* theTree;
-   int nPho, nBC, nRH; 
+  int nPho, nBC, nRH, nHC; 
   int cBin;
    float et;
    float eta;
@@ -100,10 +115,17 @@ private:
    float BCet[1000];
    float BCeta[1000];
    float BCphi[1000];
-   float RHet[5000];
-   float RHe[5000];
-   float RHdEta[5000];
-   float RHdPhi[5000];
+  float HCet[5000];
+  float HCeta[5000];
+  float HCphi[5000];
+  
+   float RHet[70000];
+   float RHe[70000];
+   float RHdEta[70000];
+   float RHdPhi[70000];
+  float RHeta[70000];
+  float RHphi[70000];
+  
   bool doStoreCentrality_;
   CentralityProvider *centrality_;
   const CentralityBins * cbins_;
@@ -131,10 +153,17 @@ IsoConeInspector::IsoConeInspector(const edm::ParameterSet& iConfig)
    ebReducedRecHitCollection_       = iConfig.getParameter<edm::InputTag>("ebReducedRecHitCollection"); //,"reducedEcalRecHitsEB");            
    eeReducedRecHitCollection_       = iConfig.getParameter<edm::InputTag>("eeReducedRecHitCollection"); //,"reducedEcalRecHitsEE");        
    doSpikeClean_                    = iConfig.getUntrackedParameter<bool>("doSpikeClean",false);
-   etCut_                           = iConfig.getUntrackedParameter<double>("etCut",15);
+   etCut_                           = iConfig.getUntrackedParameter<double>("etCut",40);
    etaCut_                           = iConfig.getUntrackedParameter<double>("etaCut",1.479);
    doStoreCentrality_                  = iConfig.getUntrackedParameter<bool>("doStoreCentrality",true);
+   hoeCutMin_                           = iConfig.getUntrackedParameter<double>("hoeCutMin",0.0);
+   hoeCutMax_                           = iConfig.getUntrackedParameter<double>("hoeCutMax",0.2);
+   sieieCut_                           = iConfig.getUntrackedParameter<double>("sieieCut",0.01);
 
+   basicClusterBarrel_              = iConfig.getParameter<edm::InputTag>("basicClusterBarrel");
+   hbhe_                            = iConfig.getParameter<edm::InputTag>("bhbe");
+
+   
 }
 
 
@@ -158,6 +187,14 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    using namespace edm;
    //grab the photon collection
    NoE->Fill(0);
+
+
+   ESHandle<CaloGeometry> geometryHandle;
+   iSetup.get<CaloGeometryRecord>().get(geometryHandle);
+   if(geometryHandle.isValid())
+     geometry_ = geometryHandle.product();
+   else
+     geometry_ = NULL;
 
 
    Handle<reco::PhotonCollection> photonColl;
@@ -204,20 +241,50 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
      cBin = (int)centrality_->getBin();
    }
    
+   
+   //grab basicClusters                                                                                                                
+   Handle<reco::CaloClusterCollection> basicClusterB;
+   iEvent.getByLabel(basicClusterBarrel_, basicClusterB);
+
+   reco::CaloClusterCollection myBCs;
+   for (reco::CaloClusterCollection::const_iterator bcItr = basicClusterB->begin(); bcItr != basicClusterB->end(); ++bcItr) {
+     myBCs.push_back(*bcItr);
+   }
+   
+   
+   Handle<HBHERecHitCollection> hehbhandle;
+   iEvent.getByLabel(hbhe_, hehbhandle);
+   const HBHERecHitCollection         *fHBHERecHits_;
+   if(hehbhandle.isValid())
+     fHBHERecHits_ = hehbhandle.product();
+   else
+     fHBHERecHits_ = NULL;
+
+
 
    
-   double extRadius_ = 100.42;
-   double etaWidth_ = 0.5;
+   
+   double extRadius_ = 100.;
+   double etaWidth_ = 2.0;
    nRH  = 0;
    nBC  = 0;
+   nHC = 0;
    nPho = (*photons).size();
       
    for (pho = (*photons).begin(); pho!= (*photons).end(); pho++){
-      et       = (float)pho->et();
-      eta      = (float)pho->superCluster()->eta();
-      phi      = (float)pho->superCluster()->phi();
-      if ( et < etCut_ )  continue;
-      if ( fabs(eta) > etaCut_ ) continue;
+     if ( cBin > 4 )
+       continue;
+     
+     et       = (float)pho->et();
+     eta      = (float)pho->superCluster()->eta();
+     phi      = (float)pho->superCluster()->phi();
+     if ( et < etCut_ )  continue;
+     if ( fabs(eta) > etaCut_ ) continue;
+     if ( pho->hadronicOverEm() > hoeCutMax_) continue;
+     if ( pho->hadronicOverEm() < hoeCutMin_) continue;
+
+     if ( pho->sigmaIetaIeta()  > sieieCut_) continue;
+
       
       math::XYZPoint theCaloPosition = pho->superCluster()->position();
       GlobalPoint pclu (theCaloPosition.x () , theCaloPosition.y () , theCaloPosition.z () );
@@ -226,50 +293,62 @@ IsoConeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       subdetnr = 0;  // barrel
       CaloSubdetectorGeometry::DetIdSet chosen = subdet_[subdetnr]->getCells(pclu,extRadius_);// select cells around cluster
       CaloRecHitMetaCollectionV::const_iterator j=RecHitsBarrel->end();
-    
-
-      nRH = 0;
-      for (CaloSubdetectorGeometry::DetIdSet::const_iterator  i = chosen.begin ();i!= chosen.end ();++i){//loop selected cells
-	 j=RecHitsBarrel->find(*i); // find selected cell among rechits
-	 if( j!=RecHitsBarrel->end()){ // add rechit only if available 
-	    const  GlobalPoint & position = theCaloGeom.product()->getPosition(*i);
-	    float etarh = position.eta();
-	    float phirh = position.phi();
-	    float etaDiff = etarh - eta;
-	    float phiDiff= deltaPhi(phirh,phi);
-	    float energyrh = j->energy();
-	    float etrh    = energyrh/cosh(etarh);
-	    
-	    if ( fabs(etaDiff) > etaWidth_)  
-	       continue;
-	    RHet[nRH]   = etrh;
-            RHe[nRH]   = energyrh;
-	    RHdEta[nRH] = etaDiff;
-	    RHdPhi[nRH] = phiDiff;
-	    nRH++;
-	 }
+      
+      
+      for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
+        BCet[nBC] = bcItr->energy()/cosh(bcItr->eta());
+	BCeta[nBC] = bcItr->eta();
+	BCphi[nBC] = bcItr->phi();
+	nBC++;
       }
+
+      
+      
+      nRH = 0;
+      
+      
+      for (CaloSubdetectorGeometry::DetIdSet::const_iterator  i = chosen.begin ();i!= chosen.end ();++i){//loop selected cells
+	j=RecHitsBarrel->find(*i); // find selected cell among rechi ts
+	if( j!=RecHitsBarrel->end()){ // add rechit only if available 
+	  const  GlobalPoint & position = theCaloGeom.product()->getPosition(*i);
+	  float etarh = position.eta();
+	  float phirh = position.phi();
+	  float etaDiff = etarh - eta;
+	  float phiDiff= deltaPhi(phirh,phi);
+	  float energyrh = j->energy();
+	  float etrh    = energyrh/cosh(etarh);
+	  
+	  if ( fabs(etaDiff) > etaWidth_)  
+	    continue;
+	  RHet[nRH]   = etrh;
+	  RHe[nRH]   = energyrh;
+	  RHdEta[nRH] = etaDiff;
+	  RHdPhi[nRH] = phiDiff;
+	  RHeta[nRH]  = etarh;
+	  RHphi[nRH]  = phirh;
+
+	  nRH++;
+	}
+      }
+      
+      // Hcal
+      nHC = 0;
+      for(size_t index = 0; index < fHBHERecHits_->size(); index++) {
+	const HBHERecHit &rechit = (*fHBHERecHits_)[index];
+	const DetId &detid = rechit.id();
+	const GlobalPoint& hitpoint = geometry_->getPosition(detid);
+	HCeta[nHC] = hitpoint.eta();
+	HCphi[nHC] = hitpoint.phi();
+	HCet[nHC]  = rechit.energy()/cosh( hitpoint.eta());
+	
+	nHC++;
+      }
+      
+      
+      
+      
       theTree->Fill();
    }
-   
-   /* how to remove the spikes? 
-      const reco::CaloClusterPtr  seed = leadingPho->superCluster()->seed();
-      DetId id = lazyTool.getMaximum(*seed).first;
-      const EcalRecHitCollection & rechits = ( leadingPho->isEB() ? *EBReducedRecHits : *EEReducedRecHits);
-      EcalRecHitCollection::const_iterator it = rechits.find( id );
-      
-      int severity(-100), recoFlag(-100);
-      
-      if( it != rechits.end() ) {
-      severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-      recoFlag = it->recoFlag();
-      }
-      bool finalFlag = true;
-      if ( (severity==3) || (severity==4) || (recoFlag ==2) )
-      finalFlag = false;
-      else
-      finalFlag = true;
-   */
    
    
    
@@ -287,6 +366,7 @@ IsoConeInspector::beginJob()
    theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
    theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("nBC",&nBC,"nBC/I");
+   theTree->Branch("nHC",&nHC,"nHC/I");
    theTree->Branch("nRH",&nRH,"nRH/I");
    theTree->Branch("cBin",&cBin,"cBin/I");
    
@@ -294,14 +374,21 @@ IsoConeInspector::beginJob()
    theTree->Branch("eta",&eta,"eta/F");
    theTree->Branch("phi",&phi,"phi/F");
 
-   //   theTree->Branch("BCet",BCet,"BCet[nBC]/F");
-   //  theTree->Branch("BCeta",BCeta,"BCeta[nBC]/F");
-   //  theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
+   theTree->Branch("BCet",BCet,"BCet[nBC]/F");
+   theTree->Branch("BCeta",BCeta,"BCeta[nBC]/F");
+   theTree->Branch("BCphi",BCphi,"BCphi[nBC]/F");
 
    theTree->Branch("rhet",RHet,"rhet[nRH]/F");
    theTree->Branch("rhe",RHe,"rhe[nRH]/F");
    theTree->Branch("rhdEta",RHdEta,"rhdEta[nRH]/F");
    theTree->Branch("rhdPhi",RHdPhi,"rhdPhi[nRH]/F");
+   theTree->Branch("rheta",RHeta,"rheta[nRH]/F");
+   theTree->Branch("rhphi",RHphi,"rhphi[nRH]/F");
+   
+   theTree->Branch("HCet",HCet,"HCet[nHC]/F");
+   theTree->Branch("HCeta",HCeta,"HCeta[nHC]/F");
+   theTree->Branch("HCphi",HCphi,"HCphi[nHC]/F");
+   
 
     
 }

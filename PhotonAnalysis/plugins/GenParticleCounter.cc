@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: GenParticleCounter.cc,v 1.4 2011/04/06 21:26:21 kimy Exp $
+// $Id: GenParticleCounter.cc,v 1.1 2011/04/14 15:44:27 kimy Exp $
 //
 //
 
@@ -69,6 +69,10 @@ Implementation:
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "SimDataFormats/Vertex/interface/SimVertex.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 
 //
 // class declaration
@@ -87,25 +91,26 @@ class GenParticleCounter : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
 
-        edm::Service<TFileService> fs;
-   
-        CentralityProvider *centrality_;
-        TNtuple* nt;
-        TTree* theTree;
-
-   std::string mSrc;
-   
-   float hf;
-   int cBin, nPar;
-   
-   float et[1000];
-   float eta[1000];
-   float phi[1000];
-   int id[1000];
-   int momId[1000];
+  edm::Service<TFileService> fs;
+  
+  CentralityProvider *centrality_;
+  TNtuple* nt;
+  TTree* theTree;
+  
+  std::string mSrc;
+  std::string vertexProducer_;      // vertecies producer                                                                                                                                                       
+  float hf;
+  int cBin, nPar;
+  float recoVtxZ;
+  float et[1000];
+  float eta[1000];
+  float phi[1000];
+  int id[1000];
+  int momId[1000];
    int status[1000];
-   int collId[1000];
-   bool doCentrality;
+  int collId[1000];
+  bool doCentrality;
+  
 };
 
 //
@@ -124,10 +129,13 @@ GenParticleCounter::GenParticleCounter(const edm::ParameterSet& iConfig)
 {
    mSrc = iConfig.getUntrackedParameter<std::string>("src", "hiGenParticles");
    doCentrality = iConfig.getUntrackedParameter<bool>("doCentrality", true);
+   vertexProducer_  = iConfig.getUntrackedParameter<std::string>("VertexProducer","hiSelectedVertex");
+   
 }
 
 
 GenParticleCounter::~GenParticleCounter()
+
 {
 
     // do anything here that needs to be done at desctruction time
@@ -157,6 +165,16 @@ GenParticleCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       cBin = -10000;
       hf = -10000;
    }
+ 
+   // Get the primary event vertex                                                                                                                                                                           
+   recoVtxZ = -100;
+   edm::Handle<reco::VertexCollection> vertexHandle;
+   iEvent.getByLabel(InputTag(vertexProducer_), vertexHandle);
+   reco::VertexCollection vertexCollection = *(vertexHandle.product());
+   if (vertexCollection.size()>0) {
+     recoVtxZ = vertexCollection.begin()->position().Z();
+   }
+   
    
    edm::Handle<reco::GenParticleCollection> inputHandle;
    iEvent.getByLabel(InputTag(mSrc),inputHandle);
@@ -197,6 +215,7 @@ GenParticleCounter::beginJob()
    theTree->Branch("cBin",&cBin,"cBin/I");
    theTree->Branch("hf",&hf,"hf/F");
    theTree->Branch("nPar",&nPar,"nPar/I");
+   theTree->Branch("recoVtxZ",&recoVtxZ,"recoVtxZ/F");
    
    theTree->Branch("et",et,"et[nPar]/F");
    theTree->Branch("eta",eta,"eta[nPar]/F");

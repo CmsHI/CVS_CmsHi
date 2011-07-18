@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.41 2011/05/10 13:54:04 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.42 2011/07/14 17:39:09 kimy Exp $
  *
  */
 
@@ -132,6 +132,8 @@ void MultiPhotonAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iS
    if (doStoreVertex_)	storeVertex(e);
    if (doStoreMET_)	storeMET(e);
    if (doStoreJets_)	storeJets(e);
+   if (doStoreTracks_)     storeTracks(e);
+
    storeEvtPlane(e);
    bool foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
