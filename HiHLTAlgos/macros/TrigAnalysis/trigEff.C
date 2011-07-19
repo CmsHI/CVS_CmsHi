@@ -16,15 +16,22 @@
 
 using namespace std;
 
+
+// Chooses bin number and bin content range. 
 const int nBin=25; 
 Float_t bin[nBin+1]={0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,90,100,110,120,140,160,200,240,300}; 
 
-TGraphAsymmErrors *calcEff1(TH1* h1, TH1* h2,char *hName="hEff") // We use BayesDivide to ensure that the error bars don't do something nonsensical such as giving this result a value above 1.  
-   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
+//Defines Basic efficiency Function
+TGraphAsymmErrors *calcEff1(TH1* h1, TH1* h2,char *hName="hEff") // We use BayesDivide to ensure that the error bars don't do something nonsensical such as giving this result a value above 1.
+{  
+  TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors()
    gEfficiency->BayesDivide(h2,h1);
    return gEfficiency;
 }
 
+
+
+// Defines more complex efficiency function with more output information.
 TGraphAsymmErrors *eff(TTree * t,TString var="nljet",TCut sel="",TCut cut="",TString tag="") 
 {
   cout << "var: " << var << endl;
@@ -41,6 +48,9 @@ TGraphAsymmErrors *eff(TTree * t,TString var="nljet",TCut sel="",TCut cut="",TSt
   return g;
 }
 
+
+
+// Inputs tree information and graphs efficiency as a function of pt. 
 TChain * trigEff(TString infile="alldata.root")
 // TChain * trigEff(TString infile="allgen.root")
 {
@@ -57,25 +67,26 @@ TChain * trigEff(TString infile="alldata.root")
   // g0 = eff(tree,"jtpt[0]",evtSel,"L1_SingleJet30_BptxAND","Single Jet 30");
   // g0 = eff(tree,"genpt[0]",evtSel,"L1_SingleJet30","Single Jet 30");
   
-
+     //Draws Canvas
   TCanvas *cTrigEff2 = new TCanvas("cTrigEff2","cTrigEff2",600,550);
   TH1F *hTmp = new TH1F("hTmp","",nBin,bin);
     hTmp->SetAxisRange(0,1.3,"Y");
    hTmp->SetXTitle("Leading Jet p_{T} (GeV/c)"); 
-    //hTmp->SetXTitle("Gen Jet p_{T} (GeV/c)"); 
+    //hTmp->SetXTitle("Gen Jet p_{T} (GeV/c)"); // Use for Monte Carlo
   hTmp->SetYTitle("HLT  Eff. (Trigger/MB)");
-   // hTmp->SetYTitle(" L1 Eff. (Trigger/Generated Jets)");
+   // hTmp->SetYTitle(" HLT Eff. (Trigger/Generated Jets)"); //Use for Monte Carlo
     handsomeTH1(hTmp);
   hTmp->Draw();
   g0->Draw("p");
 
+  //Draws Legend
   TLine *l = new TLine(0,1,bin[nBin],1);
   l->SetLineStyle(2);
   l->Draw();
    TLegend *t = new TLegend(0.251678,0.742366,.927852,0.9561);
-  //TLegend *t = new TLegend(0.236577,0.742366,1,0.956107); Use for MC
+  //TLegend *t = new TLegend(0.236577,0.742366,1,0.956107); Use for Monte Carlo
   t->SetHeader("All Physics |#eta|<2, All Centrality");
-  //PYTHIA+HYDJET"); Use for MC
+  //("PYTHIA+HYDJET |#eta|<2, All Centrality"); Use for Monte Carlo
   t->SetBorderSize(0);
   t->SetFillStyle(0);
   t->Draw();
