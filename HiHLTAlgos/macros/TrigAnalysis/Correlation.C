@@ -1,3 +1,5 @@
+// 19 July, 2011. Caluclates the overlaps and efficiencies for various triggers. 
+
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -13,6 +15,7 @@
 
 using namespace std;
 
+
 vector <string>* triggers = new vector<string>;
 vector <string>* triggerCuts = new vector<string>;
 vector< vector <double*> >* results = new vector< vector <double*> >;
@@ -20,12 +23,15 @@ TString goutdir;
 TString anaMode;
 
 
+//Defines error function
 double calcEffErr(double nEvt,double nAcc)
 {
   double eff =  nAcc / nEvt;
   return sqrt(eff*(1-eff)/nEvt);
 }
 
+
+//Defines efficiency function
 double* calcEff(TTree* HltTree, const char *title, double nEvt,const char *cut,int flag=1)
 {
   double nAcc = HltTree->GetEntries(cut);
@@ -34,6 +40,7 @@ double* calcEff(TTree* HltTree, const char *title, double nEvt,const char *cut,i
   double *result = new double[2];
   result[0]=eff;
   result[1]=effErr;
+
 
   // print out or not
   if (flag) {
@@ -63,15 +70,20 @@ void printEff(TTree* HltTree,const char *cut,const char *title, char *projectTit
 
   vector <double*> effs;
 
-  // calculate the efficiency //   
+  // Chooses the triggers for the correlation matrix   
   effs.push_back(calcEff(HltTree,"HLT_HIJet35U",nEvt,Form("(%s)&&HLT_HIJet35U",cut)));
   cout << cut << endl;
   if (anaMode=="HLTMB") {
-    //effs.push_back(calcEff(HltTree,"HLT_HIJet35U",nEvt,Form("(%s)&&HLT_HIJet35U",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIJet50U",nEvt,Form("(%s)&&HLT_HIJet50U",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIJet75U",nEvt,Form("(%s)&&HLT_HIJet75U",cut)));
     effs.push_back(calcEff(HltTree,"HLT_HIPhoton15",nEvt,Form("(%s)&&HLT_HIPhoton15",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIPhoton20",nEvt,Form("(%s)&&HLT_HIPhoton20",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIPhoton30" ,nEvt,Form("(%s)&&HLT_HIPhoton30",cut)));
     effs.push_back(calcEff(HltTree,"HLT_HIL2DoubleMu0",nEvt,Form("(%s)&&HLT_HIL2DoubleMu0",cut)));
-
-    //  effs.push_back(calcEff(HltTree,"HLT_HIJet50U",nEvt,Form("(%s)&&HLT_HIJet50U",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIL2Mu3",nEvt,Form("(%s)&&HLT_HIL2Mu3",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIL2DoubleMu3",nEvt,Form("(%s)&&HLT_HIL2DoubleMu3",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIL2Mu20",nEvt,Form("(%s)&&HLT_HIL2Mu20",cut)));
+    effs.push_back(calcEff(HltTree,"HLT_HIL2Mu5Tight",nEvt,Form("(%s)&&HLT_HIL2Mu5Tight",cut)));
   }
   results->push_back(effs);
 
@@ -137,22 +149,14 @@ void printEff(TTree* HltTree,const char *cut,const char *title, char *projectTit
   cout <<"<img src=\"%ATTACHURLPATH%/"<<fname<<"\" alt=\""<<fname<<"\" width='671'   height='478' />"<<endl;   
 }
 
+//Correlation function definition
 void Correlation(
     TString mode="HLTMB", // L1MB, L1Algo, HLTMB, HLTAlgo
-    //TString inFile0Name="/d101/frankma/data/HIAllPhysics/HR10AllPR2/r150471/hltana_*.root",
-    //TString outdir="out/HR10AllPR2/r150471",
     Int_t runNum = 152957,
     Int_t goodLumiStart = 0,
-    TString inFile0Name="alldata.root", ///d101/frankma/data/HIAllPhysics/HR10AllPR2/r150476v2/hltana_*.root",
+    TString inFile0Name="/net/hidsk0001/d00/scratch/frankma/data/HAZS/hazsv2-run152791to152957-jetoh-v2/merge/all.root", 
     TString outdir="out/HR10AllPR2",
-    //Int_t runNum = 150431,
-    //Int_t goodLumiStart = 130,
     char *projectTitle = "HIAllPhy2010",
-    //TString inFile0Name="/d101/frankma/data/HIExpress/HR10Exp3/r150476/hltana_*.root",
-    //TString outdir="out/HR10Exp3/r150476",
-    //Int_t runNum = 150476,
-    //Int_t goodLumiStart = 400,
-    //char *projectTitle = "HIExpPhy2010",
     string source="data")
 {
   // Load input
@@ -170,7 +174,7 @@ void Correlation(
   TFile *outf = new TFile(Form("%s/%s_hist.root",outdir.Data(),projectTitle),"RECREATE");
 
   // define event types
-  vector<string> evtType;
+    vector<string> evtType;
   vector<string> evtTypeCut;
   evtType.push_back("BptxAND"); evtTypeCut.push_back(evtSel.Data());
   if (source=="mc") {
@@ -187,7 +191,7 @@ void Correlation(
   }
   cout <<"</pre>"<<endl;
 
-  // Calc Efficiencies
+  // Calculate efficiencies
   for (unsigned int i=0; i<evtType.size(); ++i) {
     printEff(HltTree,evtTypeCut[i].c_str(),evtType[i].c_str(),projectTitle);
   }

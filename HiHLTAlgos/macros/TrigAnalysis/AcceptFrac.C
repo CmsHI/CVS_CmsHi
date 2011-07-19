@@ -28,7 +28,7 @@ TChain * AcceptFrac(TString infile="/net/hidsk0001/d00/scratch/frankma/data/HAZS
   TCut evtSel("Run==152957&&HLT_HIMinBiasHfOrBSC&&hiBin<40&&abs(jteta[0])<2");
 
 
-  //Defines histograms
+  // Defines histograms
   TH1F * h4 = new TH1F("h4","",50,0,300);
   TH1F * h5 = new TH1F("h5","",50,0,300);
   TH1F * h6 = new TH1F("h6","",50,0,300);
@@ -64,7 +64,7 @@ TChain * AcceptFrac(TString infile="/net/hidsk0001/d00/scratch/frankma/data/HAZS
    tree->Draw("LumiBlock>>h18",evtSel&&"HLT_HIL2Mu5Tight","goff");
    tree->Draw("LumiBlock>>h19",evtSel&&"HLT_HIL2Mu20","goff");
 
-   //Assigns Total triggered events to floats
+   // Assigns Total triggered events to floats
   Float_t TA = h4->GetEntries();
   Float_t TB = h5->GetEntries();
   Float_t TC = h6->GetEntries();
@@ -82,7 +82,7 @@ TChain * AcceptFrac(TString infile="/net/hidsk0001/d00/scratch/frankma/data/HAZS
   Float_t TO = h18->GetEntries();
   Float_t TP = h19->GetEntries();
 
-  //Computes Accept fraction as a percentage
+  // Computes Accept fraction as a percentage
   cout << "What is the Total # of MinBias Events? " << TA  << endl;
   cout << "What is the Accept Fraction for: " << endl;
   cout << " HLT_HIJet35U ? => " << TB/TA * 100 << " %" << endl;
