@@ -18,7 +18,7 @@ void RateEstimateVpt(TString infile="alldatacleaned.root") //Contains both clean
   TCut evtSel("Run==152957&&HLT_HIMinBiasHfOrBSC&&hiBin<40&&abs(jteta[0])<2");
    
 
-  //Canvas definition and choosing uncorrected and corrected jet pt variables. 
+  //Canvas definition and choosing uncorrected and corrected jet pt variables 
    TCanvas *e1 = new TCanvas("e1","Rate Estimate vs. Threshold",200,10,700,500);
    e1->SetLogy();
    TH1D * RJetPt = new TH1D("RJetPt",";Leading Jet p_{T} (GeV/c);count;",300,0,300);
@@ -27,13 +27,13 @@ void RateEstimateVpt(TString infile="alldatacleaned.root") //Contains both clean
    tree->Draw("jtpt[0]>>JetPt",evtSel,"goff");
    cout << "Integral: " << JetPt->Integral(0,101) << endl;
 
-   //Defines total # of entries for normalization and max rate.
+   //Defines total # of entries for normalization and max rate
    TH1F * h4 = new TH1F("h4","",50,0,300);
    tree->Draw("LumiBlock>>h4",evtSel,"goff");
    Float_t R = 2000 ; //Defines Maximum Rate
    Float_t TA = h4->GetEntries();
 
-   //Computes Accept Fraction as a function of pt. 
+   //Computes Accept Fraction as a function of pt 
    const Int_t n = 61;
    Float_t x[n], y[n], z[n], w[n], t[n];
    for (Int_t i=0;i<n;i++) {

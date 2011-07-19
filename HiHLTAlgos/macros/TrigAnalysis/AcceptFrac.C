@@ -1,3 +1,5 @@
+// 19 July, 2011. A simple macros which computes the accept fraction for various triggers. 
+
 #include <TGraphAsymmErrors.h>
 #include <TFile.h>
 #include <TTree.h>
