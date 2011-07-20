@@ -1,5 +1,5 @@
 #
-# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.19 2011/04/26 16:17:44 kimy Exp $
+# \version $Id: SinglePhotonAnalyzer_cfi.py,v 1.20 2011/07/18 15:49:25 kimy Exp $
 # track
 
 import FWCore.ParameterSet.Config as cms
@@ -22,8 +22,8 @@ singlePhotonAnalyzer = cms.EDAnalyzer("SinglePhotonAnalyzer",
                                       METProducer               = cms.InputTag("layer1METs"),
                                       VertexProducer            = cms.InputTag("hiSelectedVertex"),
                                       BeamSpotProducer          = cms.InputTag("offlineBeamSpot" ),
-                                      ebReducedRecHitCollection = cms.InputTag("reducedEcalRecHitsEB"),
-                                      eeReducedRecHitCollection = cms.InputTag("reducedEcalRecHitsEE"),
+                                      ebReducedRecHitCollection = cms.InputTag("EcalRecHitsEB"),
+                                      eeReducedRecHitCollection = cms.InputTag("EcalRecHitsEE"),
                                       basicClusterBarrel        = cms.InputTag("islandBasicClusters:islandBarrelBasicClusters"),
                                       basicClusterEndcap        = cms.InputTag("islandBasicClusters:islandEndcapBasicClusters"),
                                       compPhotonProducer   = cms.InputTag("complePhoton"),
