@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.42 2011/07/14 17:39:09 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.43 2011/07/18 15:49:01 kimy Exp $
  *
  */
 
@@ -358,7 +358,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> genMatchedPt(kMaxPhotons), genMatchedEta(kMaxPhotons), genMatchedPhi(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR03(kMaxPhotons), genTrkIsoDR03(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR04(kMaxPhotons), genTrkIsoDR04(kMaxPhotons);
-
+  
   int nphotonscounter=0;
   for (PhotonCollection::const_iterator phoItr = myphotons.begin(); phoItr != myphotons.end(); ++phoItr) {  
     if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
@@ -408,12 +408,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     scEta          (nphotonscounter)   =  photon.superCluster()->eta();
     scPhi          (nphotonscounter)   =  photon.superCluster()->phi();
     scSize         (nphotonscounter)   =  photon.superCluster()->size();
-
+  
     //ES Ratio
     ESRatio        (nphotonscounter)   =  getESRatio(&photon, e, iSetup);
 
 // Cluster shape variables
 
+    
     const reco::CaloClusterPtr  seed = photon.superCluster()->seed();
 
     DetId id = lazyTool.getMaximum(*seed).first; 
@@ -421,15 +422,15 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int   flags=-1, severity = -1; 
     const EcalRecHitCollection & rechits = ( photon.isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
     EcalRecHitCollection::const_iterator it = rechits.find( id );
-    //    if( it != rechits.end() ) { 
-	    time = it->time(); 
-	    outOfTimeChi2 = it->outOfTimeChi2();
-	    chi2 = it->chi2();
-	    flags = it->recoFlag();
-	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-            seedEnergy (nphotonscounter) = it->energy();
-	    //    }
-
+    if( it != rechits.end() ) { 
+       time = it->time(); 
+       outOfTimeChi2 = it->outOfTimeChi2();
+       chi2 = it->chi2();
+       flags = it->recoFlag();
+       severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
+       seedEnergy (nphotonscounter) = it->energy();
+    }
+   
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
     std::vector<DetId> right  = lazyTool.matrixDetId(id, 1, 1, 0, 0);
