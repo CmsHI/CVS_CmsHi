@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.43 2011/07/18 15:49:01 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.45 2011/07/25 17:28:10 kimy Exp $
  *
  */
 
@@ -421,14 +421,14 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int   flags=-1, severity = -1; 
     const EcalRecHitCollection & rechits = ( photon.isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
     EcalRecHitCollection::const_iterator it = rechits.find( id );
-    //    if( it != rechits.end() ) { 
-	    time = it->time(); 
-	    outOfTimeChi2 = it->outOfTimeChi2();
-	    chi2 = it->chi2();
-	    flags = it->recoFlag();
-	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-            seedEnergy (nphotonscounter) = it->energy();
-	    //    }
+    if( it != rechits.end() ) { 
+      time = it->time(); 
+      outOfTimeChi2 = it->outOfTimeChi2();
+      chi2 = it->chi2();
+      flags = it->recoFlag();
+      severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
+      seedEnergy (nphotonscounter) = it->energy();
+    }
 
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
@@ -569,14 +569,14 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int eleChargeTemp(100);
     float eleEpTemp(100);
     
-    cout << "photon et = " << photon.et() << "  eta =" << photon.eta() << endl;
+    //    cout << "photon et = " << photon.et() << "  eta =" << photon.eta() << endl;
     
     if ( isEleRecoed ) {
       //   cout << " start electron search " << endl;
       // We will find the smallest e/p electron canddiates.
       for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
 	if ( eleItr->superCluster()->energy() < 10 ) continue;
-	cout << "electron et = " << eleItr->et() << "    eta = " << eleItr->eta() << endl ;
+	//	cout << "electron et = " << eleItr->et() << "    eta = " << eleItr->eta() << endl ;
 	if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
 	
 	float dphi = eleItr->superCluster()->phi() - photon.superCluster()->phi();
