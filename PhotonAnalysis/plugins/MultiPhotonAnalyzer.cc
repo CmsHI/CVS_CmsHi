@@ -215,7 +215,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   
   bool isEleRecoed = false;
   if (EleHandle.isValid()) {
-    //     cout << " electron was reconstructed! " << endl;
+    cout << " electron was reconstructed! " << endl;
      isEleRecoed = true;
   }
   
@@ -358,7 +358,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
   HTValVector<Float_t> genMatchedPt(kMaxPhotons), genMatchedEta(kMaxPhotons), genMatchedPhi(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR03(kMaxPhotons), genTrkIsoDR03(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR04(kMaxPhotons), genTrkIsoDR04(kMaxPhotons);
-  
+
   int nphotonscounter=0;
   for (PhotonCollection::const_iterator phoItr = myphotons.begin(); phoItr != myphotons.end(); ++phoItr) {  
     if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
@@ -408,13 +408,12 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     scEta          (nphotonscounter)   =  photon.superCluster()->eta();
     scPhi          (nphotonscounter)   =  photon.superCluster()->phi();
     scSize         (nphotonscounter)   =  photon.superCluster()->size();
-  
+
     //ES Ratio
     ESRatio        (nphotonscounter)   =  getESRatio(&photon, e, iSetup);
 
 // Cluster shape variables
 
-    
     const reco::CaloClusterPtr  seed = photon.superCluster()->seed();
 
     DetId id = lazyTool.getMaximum(*seed).first; 
@@ -422,15 +421,15 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int   flags=-1, severity = -1; 
     const EcalRecHitCollection & rechits = ( photon.isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
     EcalRecHitCollection::const_iterator it = rechits.find( id );
-    if( it != rechits.end() ) { 
-       time = it->time(); 
-       outOfTimeChi2 = it->outOfTimeChi2();
-       chi2 = it->chi2();
-       flags = it->recoFlag();
-       severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-       seedEnergy (nphotonscounter) = it->energy();
-    }
-   
+    //    if( it != rechits.end() ) { 
+	    time = it->time(); 
+	    outOfTimeChi2 = it->outOfTimeChi2();
+	    chi2 = it->chi2();
+	    flags = it->recoFlag();
+	    severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
+            seedEnergy (nphotonscounter) = it->energy();
+	    //    }
+
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
     std::vector<DetId> right  = lazyTool.matrixDetId(id, 1, 1, 0, 0);
@@ -570,23 +569,29 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
     int eleChargeTemp(100);
     float eleEpTemp(100);
     
+    cout << "photon et = " << photon.et() << "  eta =" << photon.eta() << endl;
+    
     if ( isEleRecoed ) {
       //   cout << " start electron search " << endl;
-       // We will find the smallest e/p electron canddiates.
-       for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
-	  if ( eleItr->superCluster()->energy() < 10 ) continue;
-	  if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
-	  
-	  float dphi = eleItr->superCluster()->phi() - photon.superCluster()->phi();
-	  if ( dphi >  3.141592 ) dphi = dphi - 2* 3.141592;
-	  if ( dphi < -3.141592 ) dphi = dphi + 2* 3.141592;
-	  if ( abs(dphi) > 0.03 )  continue;
-	  
+      // We will find the smallest e/p electron canddiates.
+      for ( reco::GsfElectronCollection::const_iterator eleItr = myEle.begin(); eleItr != myEle.end(); ++eleItr) {
+	if ( eleItr->superCluster()->energy() < 10 ) continue;
+	cout << "electron et = " << eleItr->et() << "    eta = " << eleItr->eta() << endl ;
+	if ( abs( eleItr->superCluster()->eta() - photon.superCluster()->eta() ) > 0.03 ) continue;
+	
+	float dphi = eleItr->superCluster()->phi() - photon.superCluster()->phi();
+	if ( dphi >  3.141592 ) dphi = dphi - 2* 3.141592;
+	if ( dphi < -3.141592 ) dphi = dphi + 2* 3.141592;
+	if ( abs(dphi) > 0.03 )  continue;
+	
 	  float iEp = eleItr->eSuperClusterOverP() ;   
 	
 	  // We should match with higher momentum electron candidates. 
-	  if ( eleEpTemp > iEp )  continue;
-	  
+	  //	  cout << " current iEp = " << iEp << endl;
+	  //	  cout << " eleEpTemp = " << eleEpTemp << endl;
+
+	  if ( eleEpTemp < iEp )  continue;
+	  //  cout << " so.. it was replaced " << endl;
 	  eleEpTemp = iEp;
 	  eleChargeTemp =  eleItr->charge();
 	  deltaPhiEleCTTemp =  eleItr->deltaPhiEleClusterTrackAtCalo() ; 
@@ -594,7 +599,7 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 	  dphiTemp = dphi;  
 	  detaTemp = eleItr->superCluster()->eta() - photon.superCluster()->eta() ;
 	  
-	  //	  cout << " this is electron " << endl;
+	  cout << " this is electron " << endl;
 	  isEleTemp = true;
        }
        
