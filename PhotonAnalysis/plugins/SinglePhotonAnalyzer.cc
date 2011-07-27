@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzer.cc,v 1.15 2011/04/26 16:16:25 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzer.cc,v 1.16 2011/07/18 15:49:01 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -183,8 +183,8 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   
   pdgId_                           = ps.getUntrackedParameter<int>("pdgId", 22);
   otherPdgIds_                     = ps.getUntrackedParameter<vector<int> >("OtherPdgIds", vector<int>(1,11) );
-  mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 10);
-  mcEtaMax_                        = ps.getUntrackedParameter<double>("McEtaMax",3.5);
+  mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 12);
+  mcEtaMax_                        = ps.getUntrackedParameter<double>("McEtaMax",1.7);
 
   etCutGenMatch_                   = ps.getUntrackedParameter<double>("etCutGenMatch",13);
   etaCutGenMatch_                  = ps.getUntrackedParameter<double>("etaCutGenMatch",3);
@@ -235,7 +235,7 @@ SinglePhotonAnalyzer::SinglePhotonAnalyzer(const edm::ParameterSet& ps):
   
   tplmgr->SetDir("NTuples");  
   _ntuple     = tplmgr->Ntuple("Analysis");
-  _ntupleMC   = tplmgr->Ntuple("Generator");
+  //  _ntupleMC   = tplmgr->Ntuple("Generator");
 
 #if MPA_VERSION < 2
   theLikelihoodCalc_ = new ConversionLikelihoodCalculator();
@@ -315,7 +315,7 @@ void SinglePhotonAnalyzer::storeGeneral(const edm::Event& e, const edm::EventSet
 	 Int_t timesec = jtime.value() >> 32;
 	 _ntuple->Column("timesec",timesec);
 	 
-	 _ntupleMC->Column("event",(Int_t)e.id().event());
+	 //	 _ntupleMC->Column("event",(Int_t)e.id().event());
 	 
 	 // centrality
 
@@ -569,117 +569,78 @@ bool SinglePhotonAnalyzer::analyzeMC(const edm::Event& e, const edm::EventSetup&
   edm::Handle<reco::GenParticleCollection> genParticles;
 
   if (isMCData_) {
-     // get simulated vertex and store in ntuple
+    // get simulated vertex and store in ntuple
      Float_t simVertexX(0), simVertexY(0), simVertexZ(0);
      if(evtMC->GetEvent()->signal_process_vertex() != NULL) {
 	simVertexX = evtMC->GetEvent()->signal_process_vertex()->position().x();
 	simVertexY = evtMC->GetEvent()->signal_process_vertex()->position().y();
-      simVertexZ = evtMC->GetEvent()->signal_process_vertex()->position().z();
-           _vtxX->Fill(simVertexX);
-      _vtxY->Fill(simVertexY);
-      _vtxZ->Fill(simVertexZ);
-    }
-    
-    if( storePhysVectors_ ) {
-      _ntuple->Column("simVertex", TVector3(simVertexX,simVertexY,simVertexZ));
-    } else {
-      _ntuple->Column("simVertexX", simVertexX);
-      _ntuple->Column("simVertexY", simVertexY);
-      _ntuple->Column("simVertexZ", simVertexZ);     
-    }
-		
-    // get pthat value and store in ntuple                                                                                 
-    edm::Handle<GenEventInfoProduct>    genEventScale;
-    e.getByLabel(genEventScale_, genEventScale);   // hi style                                                                 
-    Float_t  pthat(0);
-    pthat = genEventScale->qScale();
-    _ptHatHist->Fill(pthat);
-
-    //    if( genEventScale->hasBinningValues() ) {                                                                       
-    //   pthat = genEventScale->binningValues()[0];                                                                    
-    //  } 
-    _ntuple->Column("ptHat", pthat);
-    
-		
-    //  get generated particles and store generator ntuple 
-    try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
-    int count(0);
-    int mothId(0), grandMothId(0), nSiblings(0);
-    Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
-    
-     for (reco::GenParticleCollection::const_iterator it_gen = 
-   	   genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
-       const reco::GenParticle &p = (*it_gen);    
-       if ( p.status() != 1  || fabs(p.pdgId()) != pdgId_  || p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
-      
-      count++;
-      _ptHist->Fill(p.pt()); 
-      _etaHist->Fill(p.eta()); 
-
-      genCalIsoDR03 = getGenCalIso(genParticles, it_gen, 0.3);
-      genTrkIsoDR03 = getGenTrkIso(genParticles, it_gen, 0.3);      
-      genCalIsoDR04 = getGenCalIso(genParticles, it_gen, 0.4);
-      genTrkIsoDR04 = getGenTrkIso(genParticles, it_gen, 0.4);
-
-      if( p.numberOfMothers() > 0 ) {
-	mothId = p.mother()->pdgId();
-	if( p.mother()->numberOfMothers() > 0 ) {
-	  grandMothId = p.mother()->mother()->pdgId();
-	}
-	nSiblings = p.mother()->numberOfDaughters();
-
-      }
-
-      _ntupleMC->Column("ptHat",    pthat);
-      _ntupleMC->Column("collId",   p.collisionId());
-      _ntupleMC->Column("pt",       p.pt());
-      _ntupleMC->Column("eta",      p.eta());
-      _ntupleMC->Column("phi",      p.phi());
-      _ntupleMC->Column("motherID", mothId);
-      _ntupleMC->Column("grandMotherID", grandMothId);
-      _ntupleMC->Column("nSiblings", nSiblings);
-      _ntupleMC->Column("counts",   count); 
-
-      if (doStoreCentrality_) {
-	 if(!centrality_) centrality_ = new CentralityProvider(iSetup);
-	 centrality_->newEvent(e,iSetup);
-	 const reco::Centrality *cent = centrality_->raw();
-	 double hf = (double)cent->EtHFhitSum();
-	 
-	 _ntupleMC->Column("hf",(double)cent->EtHFhitSum());
-	 _ntupleMC->Column("hftp",(double)cent->EtHFtowerSumPlus());
-	 _ntupleMC->Column("hftm",(double)cent->EtHFtowerSumMinus());
-	 _ntupleMC->Column("eb",(double)cent->EtEBSum());
-	 _ntupleMC->Column("eep",(double)cent->EtEESumPlus());
-	 _ntupleMC->Column("eem",(double)cent->EtEESumMinus());
-	 _ntupleMC->Column("cBin",(int)centrality_->getBin());
-	 _ntupleMC->Column("nbins",(int)centrality_->getNbins());
-	 _ntupleMC->Column("binsize",(int)(100/centrality_->getNbins() ));
-	 _ntupleMC->Column("npart",(double)centrality_->NpartMean());
-	 _ntupleMC->Column("npartSigma",(double)centrality_->NpartSigma());
-	 _ntupleMC->Column("ncoll",(double)centrality_->NcollMean());
-	 _ntupleMC->Column("ncollSigma",(double)centrality_->NcollSigma());
-	 _ntupleMC->Column("nhard",(double)centrality_->NhardMean());
-	 _ntupleMC->Column("nhardSigma",(double)centrality_->NhardSigma());
-	 _ntupleMC->Column("b",(double)centrality_->bMean());
-	 _ntupleMC->Column("bSigma",(double)centrality_->bSigma());
-      }
-      
-      
-      
-      // calculate isolation at the generator level
-      _ntupleMC->Column("calIsoDR03", genCalIsoDR03);
-     _ntupleMC->Column("trkIsoDR03", genTrkIsoDR03);
-     
-     _ntupleMC->Column("calIsoDR04", genCalIsoDR04);
-     _ntupleMC->Column("trkIsoDR04", genTrkIsoDR04);
-     
-     // conversion MC truth
-     //   storeConvMCTruth(e, it_gen, _ntupleMC);   // turned off for HI.
-     
-     if(fillMCNTuple_)
-	_ntupleMC->DumpData();
+	simVertexZ = evtMC->GetEvent()->signal_process_vertex()->position().z();
+	_vtxX->Fill(simVertexX);
+	_vtxY->Fill(simVertexY);
+	_vtxZ->Fill(simVertexZ);
      }
+     
+     if( storePhysVectors_ ) {
+       _ntuple->Column("simVertex", TVector3(simVertexX,simVertexY,simVertexZ));
+     } else {
+       _ntuple->Column("simVertexX", simVertexX);
+       _ntuple->Column("simVertexY", simVertexY);
+       _ntuple->Column("simVertexZ", simVertexZ);     
+     }
+     
+     // get pthat value and store in ntuple                                                                                 
+     edm::Handle<GenEventInfoProduct>    genEventScale;
+     e.getByLabel(genEventScale_, genEventScale);   // hi style                                                                 
+     Float_t  pthat(0);
+     pthat = genEventScale->qScale();
+     _ptHatHist->Fill(pthat);
+     
+     //    if( genEventScale->hasBinningValues() ) {                                                                       
+     //   pthat = genEventScale->binningValues()[0];                                                                    
+     //  } 
+     _ntuple->Column("ptHat", pthat);
+     
+     //  get generated particles and store generator ntuple 
+     try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
+     const int nMaxGenPar = 50;
+     HTValVector<Float_t> gpEt(nMaxGenPar), gpEta(nMaxGenPar), gpPhi(nMaxGenPar), gpIsoDR04(nMaxGenPar), gpIsoDR03(nMaxGenPar);
+     HTValVector<Int_t> gpId(nMaxGenPar), gpStatus(nMaxGenPar), gpMomId(nMaxGenPar), gpCollId(nMaxGenPar);
+     
+     int nGenParCounter=0;
+     for (reco::GenParticleCollection::const_iterator it_gen = 
+	    genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
+       const reco::GenParticle &p = (*it_gen);    
+       if ( p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
+       //_ptHist->Fill(p.pt()); 
+       //_etaHist->Fill(p.eta()); 
+       gpEt(nGenParCounter) = p.et();
+       gpEta(nGenParCounter) = p.eta();
+       gpPhi(nGenParCounter) = p.phi();
+       gpIsoDR04(nGenParCounter) =  getGenCalIso(genParticles, it_gen, 0.4);
+       gpIsoDR03(nGenParCounter) =  getGenCalIso(genParticles, it_gen, 0.3);
+       //      genTrkIsoDR03 = getGenTrkIso(genParticles, it_gen, 0.3);      
+      //    genTrkIsoDR04 = getGenTrkIso(genParticles, it_gen, 0.4);
+       gpStatus(nGenParCounter) = p.status();
+       gpCollId(nGenParCounter) = p.collisionId();
+       gpId(nGenParCounter) = p.pdgId();
+       gpMomId(nGenParCounter) = 0;
+       if( p.numberOfMothers() > 0 )
+	 gpMomId(nGenParCounter) = p.mother()->pdgId();
+       
+       nGenParCounter++;
+       if (nGenParCounter> nMaxGenPar-1) break;       
+     }
+    
+     _ntuple->Column("nGp", (Int_t) nGenParCounter);
+     _ntuple->Column("gpEt",         gpEt,           "nGp");
+     _ntuple->Column("gpEta",        gpEta,          "nGp");
+     _ntuple->Column("gpPhi",        gpPhi,          "nGp");
+     _ntuple->Column("gpIsoDR04",    gpIsoDR04    ,  "nGp");
+     _ntuple->Column("gpIsoDR03",    gpIsoDR03    ,  "nGp");
+     _ntuple->Column("gpStatus",     gpStatus,       "nGp");
+     _ntuple->Column("gpCollId",     gpCollId,          "nGp");
+     _ntuple->Column("gpId",         gpId,          "nGp");
+     _ntuple->Column("gpMomId",      gpMomId,          "nGp");
   }
   return (isMCData_ && fillMCNTuple_);
 }	
@@ -1027,7 +988,7 @@ bool SinglePhotonAnalyzer::selectStorePhoton(const edm::Event& e,const edm::Even
 		
     //  Build Monte Carlo truth associations 
     storeMCMatch(e,&photon,"PHOLEAD_");
-		
+    
     hiPtPhotonFound = true;
   }
 
@@ -1188,8 +1149,8 @@ void SinglePhotonAnalyzer::storePhotonAOD(Photon * photon,  const edm::Event& e,
   tpl->Column(prx+"trkSumPtHollowConeDR03",      photon->trkSumPtHollowConeDR03());
   tpl->Column(prx+"nTrkSolidConeDR03",           photon->nTrkSolidConeDR03());
   tpl->Column(prx+"nTrkHollowConeDR03",          photon->nTrkHollowConeDR03());
-
-
+  
+  
 // Conversion
   tpl->Column(prx+"hasConversionTracks",  photon->hasConversionTracks());
   tpl->Column(prx+"hasPixelSeed",         photon->hasPixelSeed());
@@ -1203,8 +1164,8 @@ void SinglePhotonAnalyzer::storePhotonAOD(Photon * photon,  const edm::Event& e,
   tpl->Column(prx+"isLoose",  isLoose );
   tpl->Column(prx+"isTight",  isTight );
 
-//Initialize the likelihood calculator
-
+  //Initialize the likelihood calculator
+  
   Int_t nTracks(-1);
   Float_t convPairInvariantMass(-1), convpairCotThetaSeparation(-1000), convPairMomentumMag(-1000),convPairMomentumPerp(-1000),
     convPairMomentumPhi(-1000), convPairMomentumEta(-1000), convPairMomentumX(-1000), convPairMomentumY(-1000), convPairMomentumZ(-1000);
@@ -1300,12 +1261,12 @@ void SinglePhotonAnalyzer::storePhotonAOD(Photon * photon,  const edm::Event& e,
   tpl->Column(prx+"convVtxNdof",       convVtxNdof); 
   tpl->Column(prx+"convMVALikelihood", convMVALikelihood);   
   tpl->Column(prx+"convVtxChi2Prob",   chi2Prob);
- 
+  
   tpl->Column(prx+"convEoverP",                     convEoverP); 
   tpl->Column(prx+"convzOfPrimaryVertexFromTracks", convzOfPrimaryVertexFromTracks); 
-
-
-     
+  
+  
+  
 }
 
 bool SinglePhotonAnalyzer::storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx){
