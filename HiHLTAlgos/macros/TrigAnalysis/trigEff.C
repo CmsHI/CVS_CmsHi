@@ -74,7 +74,7 @@ TChain * trigEff(TString infile="alldata.root")
    hTmp->SetXTitle("Leading Jet p_{T} (GeV/c)"); 
     //hTmp->SetXTitle("Gen Jet p_{T} (GeV/c)"); // Use for Monte Carlo
   hTmp->SetYTitle("HLT  Eff. (Trigger/MB)");
-   // hTmp->SetYTitle(" HLT Eff. (Trigger/Generated Jets)"); //Use for Monte Carlo
+   // hTmp->SetYTitle(" HLT Eff. (Trigger/Generated Jets)"); // Use for Monte Carlo
     handsomeTH1(hTmp);
   hTmp->Draw();
   g0->Draw("p");
@@ -84,9 +84,9 @@ TChain * trigEff(TString infile="alldata.root")
   l->SetLineStyle(2);
   l->Draw();
    TLegend *t = new TLegend(0.251678,0.742366,.927852,0.9561);
-  //TLegend *t = new TLegend(0.236577,0.742366,1,0.956107); Use for Monte Carlo
+  //TLegend *t = new TLegend(0.236577,0.742366,1,0.956107); //Use for Monte Carlo
   t->SetHeader("All Physics |#eta|<2, All Centrality");
-  //("PYTHIA+HYDJET |#eta|<2, All Centrality"); Use for Monte Carlo
+  //("PYTHIA+HYDJET |#eta|<2, All Centrality"); //Use for Monte Carlo
   t->SetBorderSize(0);
   t->SetFillStyle(0);
   t->Draw();

@@ -22,10 +22,11 @@ TChain * AcceptFrac(TString infile="/net/hidsk0001/d00/scratch/frankma/data/HAZS
 { 
   TChain * tree = new TChain("hltanalysis/HltTree");
   tree->Add(infile);
-  tree->AddFriend("icPu5JetAnalyzerRelVal/t",infile);
+  tree->AddFriend("icPu5JetAnalyzer/t",infile);
   cout << "Total: " << tree->GetEntries() << endl;
 
-  TCut evtSel("Run==152957&&HLT_HIMinBiasHfOrBSC&&hiBin<40&&abs(jteta[0])<2");
+  // TCut evtSel("Run==152957&&HLT_HIMinBiasHfOrBSC&&hiBin<40&&abs(jteta[0])<2");
+  TCut evtSel("Run==152957&&HLT_HIMinBiasHfOrBSC");
 
 
   // Defines histograms
