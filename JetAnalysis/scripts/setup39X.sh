@@ -4,10 +4,11 @@ cvs co          DataFormats/HeavyIonEvent
 cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
-## hiGoodMergedTracks and the track analyzer
+## tracking
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
 cvs co -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel/PixelTracksRun2010
+cvs co -d       MNguyen/iterTracking UserCode/MNguyen/iterTracking
 cvs co -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 
 # pat macros
