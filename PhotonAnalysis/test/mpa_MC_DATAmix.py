@@ -25,23 +25,25 @@ overrideCentrality(process)
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    ___inf___
+    ___inf___ 
     ),
-                            inputCommands = cms.untracked.vstring(
-    'keep *',
-    'drop recoPhotons_*_*_*',
-    'drop recoPhotonCores_*_*_*'
-    ),
-                            
-                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False )
+                            #                            inputCommands = cms.untracked.vstring(
+                            #    'keep *',
+                            #    'drop recoPhotons_*_*_*',
+                            #    'drop recoPhotonCores_*_*_*',
+                            #    'drop recoGsfElectrons_*_*_*',
+                            #    'drop recoGsfElectronCores_*_*_*'
+                            #                            ),                            
+                            dropDescendantsOfDroppedBranches = cms.untracked.bool( False ),
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
 
 
 
-process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('___TFoutf___'),
-                                   closeFileFast = cms.untracked.bool(True)
-                                   )
+#process.TFileService = cms.Service("TFileService",
+#                                   fileName = cms.string('tfile_1.root'),
+#                                   closeFileFast = cms.untracked.bool(True)
+#                                   )
 ########################################################################################
 
 ## Standard Heavy Ion PAT Configuration File
@@ -86,6 +88,7 @@ process.gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
 
 from RecoHI.HiEgammaAlgos.HiCoreTools import *
 
+
 # random Cone sequence
 process.load("RandomConeAna.Configuration.randomConeSequence_cff")
 process.multiPhotonAnalyzer.compPhotonProducer = cms.InputTag("compleCleanPhoton")
@@ -124,15 +127,67 @@ process.patHeavyIonDefaultSequence.remove(process.selectedPatJets)
 process.patHeavyIonDefaultSequence.remove(process.selectedPatMuons)
 ########################################################################
 
+
+########### electron reco with island ##########
+process.load("RecoEgamma.EgammaElectronProducers.ecalDrivenElectronSeedsParameters_cff")
+process.load("RecoHI.HiEgammaAlgos.HiElectronSequence_cff")                 # gsf electrons
+process.ecalDrivenElectronSeeds.barrelSuperClusters = cms.InputTag("hiSpikeCleanedSC")
+process.ecalDrivenElectronSeeds.endcapSuperClusters = cms.InputTag("correctedIslandEndcapSuperClusters")
+# chqnge the hoe to 0 22
+# change the Et cut 13 GeV
+process.ecalDrivenElectronSeeds.SeedConfiguration.maxHOverEBarrel = cms.double(0.25)
+process.ecalDrivenElectronSeeds.SeedConfiguration.maxHOverEEndcaps = cms.double(0.01)
+process.ecalDrivenElectronSeeds.SeedConfiguration.SCEtCut  = cms.double(13.0)
+process.gsfElectrons.ctfTracks = cms.InputTag("hiGlobalPrimTracks")
+
+
+# random number generator for mpa
+process.load('Configuration/StandardSequences/SimulationRandomNumberGeneratorSeeds_cff')
+process.RandomNumberGeneratorService.multiPhotonAnalyzer = cms.PSet(
+        engineName = cms.untracked.string("TRandom3"),
+            initialSeed = cms.untracked.uint32(982346)
+            )
+from IOMC.RandomEngine.RandomServiceHelper import RandomNumberServiceHelper
+randSvc = RandomNumberServiceHelper(process.RandomNumberGeneratorService)
+randSvc.populate()
+
+
+process.genParticleCounter = cms.EDAnalyzer("GenParticleCounter",
+                                            src = cms.untracked.string("hiGenParticles"),
+                                            vertexProducer_ = cms.untracked.string("hiSelectedVertex"),
+                                            doCentrality =  cms.untracked.bool(True)
+                                            )
+
+
+############ Make HiGoodTrack tight!!
+process.hiGoodTracks.src = cms.InputTag("hiPostGlobalPrimTracks")
+process.hiGoodTracks.keepAllTracks = cms.bool(False)
+process.hiGoodTracks.qualityBit = cms.string('highPurity')
+process.hiGoodTracks.min_nhits = cms.uint32(13)
+process.hiGoodTracks.chi2n_par = cms.double(0.15)
+
+
+#### for electron seeds!!!!!###################################
+process.hiPhotonCleaningSequence = cms.Sequence(process.hiSpikeCleanedSC*process.ecalDrivenElectronSeeds*process.cleanPhotonCore*process.cleanPhotons)
+process.cleanPhotonCore.pixelSeedProducer = cms.string('ecalDrivenElectronSeeds')
+process.hiElectronSequence.remove(process.ecalDrivenElectronSeeds)
+#######################################
+
 # the path! 
 process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
-    process.evtCounter *
+    #    process.evtCounter *
     process.hiGenParticles * 
-    process.hiGoodTracksSelection * #   process.hiGoodMergTrackSequence
-    process.hiPhotonCleaningSequence *
+    process.hiPostGlobalPrimTracks * process.hiGoodTracks *
+    #process.hiGoodTracksSelection * #   process.hiGoodMergTrackSequence
+    #    process.siPixelRecHits*
+    #    process.hiPixel3PrimTracks*
+    #    process.hiPixelTrackSeeds*
+    #    process.hiPhotonCleaningSequence *
+    #    process.hiElectronSequence*
     process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence *
-    process.multiPhotonAnalyzer 
+    process.multiPhotonAnalyzer  #*
+#    process.genParticleCounter
     )
