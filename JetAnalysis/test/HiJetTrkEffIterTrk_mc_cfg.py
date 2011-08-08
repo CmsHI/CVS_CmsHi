@@ -1,6 +1,15 @@
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process('JetAna')
+
+# setup runtime options
+options = VarParsing.VarParsing ('standard')
+options.register('sampleType', 0, # by default
+	VarParsing.VarParsing.multiplicity.singleton,
+	VarParsing.VarParsing.varType.int,
+	"0: non-embedded, 1: embedded")
+options.parseArguments()
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
@@ -8,9 +17,12 @@ process.options = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-                            fileNames = cms.untracked.vstring(
-    '/store/user/davidlw/Hydjet_Bass_MinBias_2760GeV/Pyquen_UnquenchedDiJet_Pt170_GEN-SIM-RECO_393_set1/fae6fe9048513d9ac8f476dd10ba6ba7/hiReco_RAW2DIGI_RECO_99_1_Zza.root'
-    ))
+	fileNames = cms.untracked.vstring(
+	# mb
+	'/store/himc/Fall10/Hydjet_Bass_MinBias_2760GeV/GEN-SIM-RECODEBUG/START39_V7HI-v1/0002/DCA084E3-9DFA-DF11-B873-001E68862A77.root'
+	# embedded
+	#'/store/user/davidlw/Hydjet_Bass_MinBias_2760GeV/Pyquen_UnquenchedDiJet_Pt170_GEN-SIM-RECO_393_set1/fae6fe9048513d9ac8f476dd10ba6ba7/hiReco_RAW2DIGI_RECO_99_1_Zza.root'
+	))
 
 process.maxEvents = cms.untracked.PSet(
             input = cms.untracked.int32(5))
@@ -112,6 +124,7 @@ process.trackerDrivenElectronSeeds.TkColList = cms.VInputTag("hiGeneralGlobalPri
 process.trackerDrivenElectronSeeds.UseQuality = cms.bool(False)
 
 # analyzer
+process.anaTrack.useCentrality = cms.untracked.bool(True)
 process.anaTrack.trackPtMin = cms.untracked.double(4)
 process.anaTrack.simTrackPtMin = cms.untracked.double(4)
 process.anaTrack.doSimTrack = cms.untracked.bool(True)
@@ -121,6 +134,7 @@ process.anaTrack.tpEffSrc = cms.untracked.InputTag('cutsTPForEff')
 process.anaTrack.doPFMatching = cms.untracked.bool(True)
 
 process.anaTrack_hgt = process.anaTrack.clone(trackSrc = 'hiGoodTightTracks')
+process.anaTrack_hgt.trackPtMin = cms.untracked.double(20)
 
 
 # fill tree
@@ -140,6 +154,7 @@ process.ana_step = cms.Path(process.hitrkEffAna_akpu3pf * process.icPu5JetAnalyz
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
+useSampleType(process,options.sampleType)
 #enableDataPat(process)
 #enableDataAnalyzers(process)
 #enableOpenHlt(process,process.ana_step)
