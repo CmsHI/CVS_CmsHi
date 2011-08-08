@@ -53,3 +53,13 @@ def enableOpenHlt(process, seq):
 	process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 	seq*=process.centralityBin
 	seq*=process.hltanalysis
+
+def useSampleType(process,sampleType):
+	if sampleType == 0:
+		print "Running on non-embedded sample"
+		process.hiGenParticles.srcVector = ['generator']
+		process.icPu5JetAnalyzer.eventInfoTag = 'generator'
+	elif sampleType == 1:
+		print "Running on embedded sample"
+		process.hiGenParticles.srcVector = ['hiSignal']
+		process.icPu5JetAnalyzer.eventInfoTag = 'hiSignal'
