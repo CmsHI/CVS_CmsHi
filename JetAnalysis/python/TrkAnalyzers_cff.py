@@ -3,6 +3,8 @@ import FWCore.ParameterSet.Config as cms
 from edwenger.HiTrkEffAnalyzer.hitrkEffAnalyzer_cff import *
 
 hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer.clone(
+  # options
+  useQaulityStr = cms.untracked.bool(False),
   # evt
   neededCentBins = cms.untracked.vint32(0, 1, 3, 11, 19, 35),
   # trk selection

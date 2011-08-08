@@ -103,7 +103,8 @@ process.iterTracking_seq = cms.Sequence(
     process.hiGoodTightTracks *
     process.secondStep *
     process.thirdStep *
-    process.globalPrimTrackCollectionMerging
+    process.globalPrimTrackCollectionMerging *
+    process.trackCollectionMerging
     )
 
 # pf
@@ -123,12 +124,14 @@ process.anaTrack_hgt = process.anaTrack.clone(trackSrc = 'hiGoodTightTracks')
 
 
 # fill tree
-process.hitrkEffAnalyzer_akpu3pf.fillNtuples = cms.bool(True)
-process.hitrkEffAnalyzer_akpu3pf.trkPtMin = cms.double(4)
+process.hitrkEffAnalyzer_akpu3pf.fillNtuples = cms.bool(False)
+process.hitrkEffAnalyzer_akpu3pf.trkPtMin = cms.double(-1)
 process.hitrkEffAnalyzer_akpu3pf.tracks = cms.untracked.InputTag("hiGeneralGlobalPrimTracks")
 # use calo jet
 process.hitrkEffAnalyzer_akpu3pf.jets = cms.untracked.InputTag("icPu5patJets")
 
+process.hitrkEffAnalyzer_generaltrk = process.hitrkEffAnalyzer_akpu3pf.clone(tracks = cms.untracked.InputTag("hiGeneralTracks"))
+process.hitrkEffAna_akpu3pf *= process.hitrkEffAnalyzer_generaltrk
 
 process.reco_extra = cms.Path( process.hiGen * process.iterTracking_seq * process.HiParticleFlowRecoNoJets)
 process.reco_extra_jet = cms.Path( process.iterativeConePu5CaloJets )
