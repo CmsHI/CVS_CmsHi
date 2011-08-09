@@ -33,10 +33,8 @@ cvs co RecoHI/HiEgammaAlgos                  # for 3_9_8 reconstruction   includ
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
 cvs co -d UserCode/HafHistogram UserCode/CmsHi/HafHistogram
 # electron reco sequence
-rm -rf RecoHI/HiEgammaAlgos/python
-cvs co -r CMSSW_3_9_9_patch1 RecoHI/HiEgammaAlgos/python
-cvs co RecoHI/HiEgammaAlgos/python/HiCoreTools.py
-cvs co RecoHI/HiEgammaAlgos/python/HiHelperTools.py
+rm -f RecoHI/HiEgammaAlgos/python/HiElectronSequence_cff.py
+cvs co -r CMSSW_3_9_9_patch1 RecoHI/HiEgammaAlgos/python/HiElectronSequence_cff.py # temp fix b/c head version not working
 
 #ecal and hcal cleaning
 #hcal
