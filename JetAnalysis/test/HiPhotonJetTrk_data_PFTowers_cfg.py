@@ -61,6 +61,7 @@ process.jec = cms.ESSource("PoolDBESSource",
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
 # Define Analysis sequencues
+process.load('CmsHi.JetAnalysis.EventSelection_cff')
 #process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
@@ -70,13 +71,22 @@ process.load('CmsHi.JetAnalysis.PatAna_cff')
 process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 
-process.reco_extra = cms.Path( process.hiTrackReReco * process.hiextraTrackReco * process.HiParticleFlowRecoNoJets)
-process.reco_extra_jet = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets
-	* process.photon_extra_reco)
-process.pat_step = cms.Path(process.icPu5patSequence_data * process.akPu3PFpatSequence_data
-  * process.makeHeavyIonPhotons)
-process.ana_step = cms.Path(process.icPu5JetAnalyzer * process.akPu3PFJetAnalyzer
-  * process.multiPhotonAnalyzer)
+# Filtering
+process.hltJetHI.HLTPaths = ['HLT_HIJet35U','HLT_HIPhoton20']
+print "Add cleaning to analysis"
+process.event_filter_seq = cms.Sequence(
+  process.hltJetHI *
+  process.collisionEventSelection *
+  #process.hiEcalRecHitSpikeFilter *
+  process.hbheReflagNewTimeEnv *
+  process.hcalTimingFilter *
+  process.HBHENoiseFilter
+  )
+
+process.reco_extra        = cms.Path( process.event_filter_seq * process.hiTrackReReco * process.hiextraTrackReco * process.HiParticleFlowRecoNoJets)
+process.reco_extra_jet    = cms.Path( process.event_filter_seq * process.iterativeConePu5CaloJets * process.akPu3PFJets	* process.photon_extra_reco)
+process.pat_step          = cms.Path( process.event_filter_seq * process.icPu5patSequence_data * process.akPu3PFpatSequence_data * process.makeHeavyIonPhotons)
+process.ana_step          = cms.Path( process.event_filter_seq * process.icPu5JetAnalyzer * process.akPu3PFJetAnalyzer * process.multiPhotonAnalyzer)
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
