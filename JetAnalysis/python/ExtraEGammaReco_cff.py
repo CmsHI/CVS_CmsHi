@@ -8,17 +8,9 @@ from CmsHi.PhotonAnalysis.isoConeInspector_cfi import *
 from CmsHi.PhotonAnalysis.ecalHistProducer_cfi import *
 from CmsHi.PhotonAnalysis.SpikeInspector_cfi import *
 
-photonObj = "cleanPhotons"
-
 # spike cleaner for island superclsters
 cleanPhotons.maxHoverEBarrel = cms.double(100)
-PhotonIDProd.photonProducer  = cms.string(photonObj)
-gamIsoDepositTk.src = cms.InputTag(photonObj)
-gamIsoDepositEcalFromHits.src = cms.InputTag(photonObj)
-gamIsoDepositHcalFromTowers.src = cms.InputTag(photonObj)
-gamIsoDepositHcalDepth1FromTowers.src = cms.InputTag(photonObj)
-gamIsoDepositHcalDepth2FromTowers.src = cms.InputTag(photonObj)
-
+  
 # clean photon filter
 goodPhotons = cms.EDFilter("PhotonSelector",
 	src = cms.InputTag("cleanPhotons"),
@@ -32,13 +24,6 @@ filterGoodPhotons = cms.EDFilter("PhotonCountFilter",
 
 barrelPhotonFilter = cms.Sequence ( goodPhotons * filterGoodPhotons )
 
-# pat
-from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonPhotons_cff import *
-
-patPhotons.photonSource = cms.InputTag(photonObj)
-photonMatch.src = cms.InputTag(photonObj)
-
-# final seq
 photon_extra_reco = cms.Sequence(
 	hiEcalClusteringSequence *
 	hiPhotonCleaningSequence *

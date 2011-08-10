@@ -68,18 +68,30 @@ process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
 process.load('CmsHi.JetAnalysis.PatAna_cff')
 process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
+process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 
 process.reco_extra = cms.Path( process.hiTrackReReco * process.hiextraTrackReco * process.HiParticleFlowRecoNoJets)
 process.reco_extra_jet = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets
 	* process.photon_extra_reco)
-process.pat_step = cms.Path(process.icPu5patSequence_data * process.akPu3PFpatSequence_data)
-process.ana_step = cms.Path(process.icPu5JetAnalyzer * process.akPu3PFJetAnalyzer)
+process.pat_step = cms.Path(process.icPu5patSequence_data * process.akPu3PFpatSequence_data
+  * process.makeHeavyIonPhotons)
+process.ana_step = cms.Path(process.icPu5JetAnalyzer * process.akPu3PFJetAnalyzer
+  * process.multiPhotonAnalyzer)
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
 enableDataPat(process)
+setPhotonObject(process,"cleanPhotons")
 enableDataAnalyzers(process)
 enableOpenHlt(process,process.ana_step)
+
+########### random number seed
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+  multiPhotonAnalyzer = cms.PSet(
+    engineName = cms.untracked.string("TRandom3"),
+    initialSeed = cms.untracked.uint32(98236)
+    )
+  )
 
 # =============== Final Schedule =====================
 process.schedule = cms.Schedule(process.reco_extra,process.reco_extra_jet,process.pat_step,process.ana_step)

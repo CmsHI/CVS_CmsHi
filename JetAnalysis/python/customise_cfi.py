@@ -26,9 +26,14 @@ def usehiHighPtTracks(process):
   process.hitrkPfCandAnalyzer.Tracks = "hiHighPtTracks"
 
 def enableDataPat(process):
+  # jet
   removePatMCMatch(process.icPu5patJets)
   removePatMCMatch(process.akPu5PFpatJets)
   removePatMCMatch(process.akPu3PFpatJets)
+  # photon
+  process.patPhotons.addGenMatch   = False
+  process.patPhotons.embedGenMatch = False
+  process.makeHeavyIonPhotons.remove(process.photonMatch)
 
 def enableDataAnalyzers(process):
   process.icPu5JetAnalyzer.isMC = False
@@ -63,3 +68,14 @@ def useSampleType(process,sampleType):
 		print "Running on embedded sample"
 		process.hiGenParticles.srcVector = ['hiSignal']
 		process.icPu5JetAnalyzer.eventInfoTag = 'hiSignal'
+
+def setPhotonObject(process,photonObj="cleanPhotons"):
+  process.PhotonIDProd.photonProducer  = photonObj
+  process.gamIsoDepositTk.src = photonObj
+  process.gamIsoDepositEcalFromHits.src = photonObj
+  process.gamIsoDepositHcalFromTowers.src = photonObj
+  process.gamIsoDepositHcalDepth1FromTowers.src = photonObj
+  process.gamIsoDepositHcalDepth2FromTowers.src = photonObj
+  # pat
+  process.patPhotons.photonSource = photonObj
+  process.photonMatch.src = photonObj

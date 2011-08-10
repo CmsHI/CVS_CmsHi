@@ -93,3 +93,42 @@ akPu3PFparton = patJetPartonMatch.clone(
 icPu5patSequence = cms.Sequence(icPu5corr * icPu5clean * icPu5match * icPu5parton * icPu5patJets)
 akPu5PFpatSequence = cms.Sequence(akPu5PFcorr * akPu5PFclean * akPu5PFmatch * akPu5PFparton * akPu5PFpatJets)
 akPu3PFpatSequence = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFpatJets)
+
+# Pat Photon
+from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonPhotons_cff import *
+from PhysicsTools.PatAlgos.producersLayer1.photonProducer_cff import *
+from PhysicsTools.PatAlgos.selectionLayer1.photonSelector_cfi import selectedPatPhotons
+from RecoHI.HiEgammaAlgos.HiEgammaIsolation_cff import * # (must be decleared after PAT sequence Yen-Jie)
+
+# from PhysicsTools/PatAlgos/python/tools/heavyIonTools.py
+photonMatch.matched = cms.InputTag("hiGenParticles")
+patPhotons.addPhotonID   = cms.bool(True)
+patPhotons.addGenMatch   = cms.bool(True)
+patPhotons.embedGenMatch = cms.bool(True)
+patPhotons.userData.userFloats.src  = cms.VInputTag(
+    cms.InputTag( "isoCC1"),cms.InputTag( "isoCC2"),cms.InputTag( "isoCC3"),cms.InputTag( "isoCC4"),cms.InputTag("isoCC5"),
+    cms.InputTag( "isoCR1"),cms.InputTag( "isoCR2"),cms.InputTag( "isoCR3"),cms.InputTag( "isoCR4"),cms.InputTag("isoCR5"),
+    cms.InputTag( "isoT11"),cms.InputTag( "isoT12"),cms.InputTag( "isoT13"),cms.InputTag( "isoT14"),  
+    cms.InputTag( "isoT21"),cms.InputTag( "isoT22"),cms.InputTag( "isoT23"),cms.InputTag( "isoT24"),  
+    cms.InputTag( "isoT31"),cms.InputTag( "isoT32"),cms.InputTag( "isoT33"),cms.InputTag( "isoT34"),  
+    cms.InputTag( "isoT41"),cms.InputTag( "isoT42"),cms.InputTag( "isoT43"),cms.InputTag( "isoT44"),  
+    cms.InputTag("isoDR11"),cms.InputTag("isoDR12"),cms.InputTag("isoDR13"),cms.InputTag("isoDR14"),  
+    cms.InputTag("isoDR21"),cms.InputTag("isoDR22"),cms.InputTag("isoDR23"),cms.InputTag("isoDR24"),  
+    cms.InputTag("isoDR31"),cms.InputTag("isoDR32"),cms.InputTag("isoDR33"),cms.InputTag("isoDR34"),  
+    cms.InputTag("isoDR41"),cms.InputTag("isoDR42"),cms.InputTag("isoDR43"),cms.InputTag("isoDR44")
+    )
+del patPhotons.photonIDSources
+
+# pat photon selection
+selectedPatPhotons.cut = cms.string('pt > 0. & abs(eta) < 12.')
+
+makeHeavyIonPhotons = cms.Sequence(
+  # reco pre-production
+  hiEgammaIsolationSequence *
+  patPhotonIsolation *
+  # pat and HI specifics    
+  photonMatch *
+  # object production
+  patPhotons *
+  selectedPatPhotons
+  )
