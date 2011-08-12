@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzer.cc,v 1.47 2011/08/10 19:13:24 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzer.cc,v 1.48 2011/08/10 19:51:51 kimy Exp $
  *
  */
 
@@ -1186,13 +1186,13 @@ int MultiPhotonAnalyzer::storePhotons(const edm::Event& e,const edm::EventSetup&
 
 
 
-  _ntuple->Column(pfx+"trackIsohi  ",                  trackIsohi,                  pfx+"nPhotons");
+  _ntuple->Column(pfx+"trackIsohi",                  trackIsohi,                  pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohi10",                  trackIsohi10,                pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohi15",                  trackIsohi15,                pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohi20",                  trackIsohi20,                pfx+"nPhotons");
   
   
-  _ntuple->Column(pfx+"trackIsohij  ",                  trackIsohij,                  pfx+"nPhotons");
+  _ntuple->Column(pfx+"trackIsohij",                  trackIsohij,                  pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohij10",                  trackIsohi10j,                pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohij15",                  trackIsohi15j,                pfx+"nPhotons");
   _ntuple->Column(pfx+"trackIsohij20",                  trackIsohi20j,                pfx+"nPhotons");
