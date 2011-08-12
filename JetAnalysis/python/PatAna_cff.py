@@ -117,6 +117,7 @@ patPhotons.userData.userFloats.src  = cms.VInputTag(
     cms.InputTag("isoDR31"),cms.InputTag("isoDR32"),cms.InputTag("isoDR33"),cms.InputTag("isoDR34"),  
     cms.InputTag("isoDR41"),cms.InputTag("isoDR42"),cms.InputTag("isoDR43"),cms.InputTag("isoDR44")
     )
+patPhotons.photonIDSource = cms.InputTag("PhotonIDProd","PhotonCutBasedIDLoose")
 del patPhotons.photonIDSources
 
 # pat photon selection
