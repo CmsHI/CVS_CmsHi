@@ -27,13 +27,13 @@ process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     ___inf___ 
     ),
-                            #                            inputCommands = cms.untracked.vstring(
-                            #    'keep *',
-                            #    'drop recoPhotons_*_*_*',
-                            #    'drop recoPhotonCores_*_*_*',
-                            #    'drop recoGsfElectrons_*_*_*',
-                            #    'drop recoGsfElectronCores_*_*_*'
-                            #                            ),                            
+                            inputCommands = cms.untracked.vstring(
+    'keep *',
+    #    'drop recoPhotons_*_*_*',
+    'drop recoPhotonCores_*_*_*',
+    'drop recoGsfElectrons_*_*_*',
+    'drop recoGsfElectronCores_*_*_*'
+    ),                            
                             dropDescendantsOfDroppedBranches = cms.untracked.bool( False ),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck')
                             )
@@ -158,8 +158,25 @@ process.genParticleCounter = cms.EDAnalyzer("GenParticleCounter",
                                             doCentrality =  cms.untracked.bool(True)
                                             )
 
-
-############ Make HiGoodTrack tight!!
+ ############
+process.load('MNguyen.iterTracking.secondStep_triplet_cff')
+process.load('MNguyen.iterTracking.thirdStep_pairs_cff')
+process.load('MNguyen.iterTracking.MergeTrackCollectionsHI_cff')
+process.newCombinedSeeds = cms.EDProducer("SeedCombiner",
+                                          seedCollections = cms.VInputTag(cms.InputTag("hiThrdSeedFromPairs"), cms.InputTag("hiScndSeedFromTriplets")),
+                                          clusterRemovalInfos = cms.VInputTag(cms.InputTag("hiThrdClusters"), cms.InputTag("hiScndClusters"))
+                                          )
+process.iterTracking = cms.Sequence(process.hiGlobalPrimTracks * process.hiGoodTightTracks * process.secondStep * process.thirdStep * process.iterTracks * process.newCombinedSeeds)
+#hiThrdTrackCandidates*hiThrdGlobalPrimTracks*ppThrdLoose*ppThrdTight*ppThrdTracks*hiThrdGoodTightTracks
+process.iterTracking.remove(process.hiThrdTrackCandidates)
+process.iterTracking.remove(process.hiThrdGlobalPrimTracks)
+process.iterTracking.remove(process.ppThrdLoose)
+process.iterTracking.remove(process.ppThrdTight)
+process.iterTracking.remove(process.ppThrdTracks)
+process.iterTracking.remove(process.hiThrdGoodTightTracks)
+ 
+############ Make HiGoodTrack tight!!  this is the tight track but used for photon anlaysis
+process.hiGoodTracks = process.hiGoodTightTracks.clone()
 process.hiGoodTracks.src = cms.InputTag("hiPostGlobalPrimTracks")
 process.hiGoodTracks.keepAllTracks = cms.bool(False)
 process.hiGoodTracks.qualityBit = cms.string('highPurity')
@@ -169,25 +186,45 @@ process.hiGoodTracks.chi2n_par = cms.double(0.15)
 
 #### for electron seeds!!!!!###################################
 process.hiPhotonCleaningSequence = cms.Sequence(process.hiSpikeCleanedSC*process.ecalDrivenElectronSeeds*process.cleanPhotonCore*process.cleanPhotons)
+process.ecalDrivenElectronSeeds.SeedConfiguration.initialSeeds = cms.InputTag("newCombinedSeeds")
 process.cleanPhotonCore.pixelSeedProducer = cms.string('ecalDrivenElectronSeeds')
 process.hiElectronSequence.remove(process.ecalDrivenElectronSeeds)
 #######################################
+
+## pre filter ##
+#cms.Sequence(hiSpikeCleanedSC*ecalDrivenElectronSeeds*cleanPhotonCore*cleanPhotons)
+process.hiSC1 = process.hiSpikeCleanedSC.clone()
+process.cleanPhotonCore1 = process.cleanPhotonCore.clone()
+process.cleanPhotons1    = process.cleanPhotons.clone()
+################ good photon filter #######
+process.goodPhotons = cms.EDFilter("PhotonSelector",
+                                   src = cms.InputTag("cleanPhotons1"),
+                                   cut = cms.string("pt > 18 & hadronicOverEm < 0.23 & abs(eta) < 1.5"),
+                                   )
+process.filterGoodPhotons = cms.EDFilter("PhotonCountFilter",
+                                         src = cms.InputTag("goodPhotons"),
+                                         minNumber = cms.uint32(1),
+                                         maxNumber = cms.uint32(999999),
+                                         )
+process.barrelPhotonFilter = cms.Sequence ( process.hiSC1 * process.cleanPhotonCore1 * process.cleanPhotons1 * process.goodPhotons * process.filterGoodPhotons )
+
+
 
 # the path! 
 process.p = cms.Path(
     # process.HIphotontrig *
     #    process.collisionEventSelection *
-    #    process.evtCounter *
-    process.hiGenParticles * 
+    process.barrelPhotonFilter *
+    process.hiGenParticles *
     process.hiPostGlobalPrimTracks * process.hiGoodTracks *
-    #process.hiGoodTracksSelection * #   process.hiGoodMergTrackSequence
-    #    process.siPixelRecHits*
-    #    process.hiPixel3PrimTracks*
-    #    process.hiPixelTrackSeeds*
-    #    process.hiPhotonCleaningSequence *
-    #    process.hiElectronSequence*
+    process.siPixelRecHits*
+    #    process.hiPixel3PrimTracks*     process.hiPixelTrackSeeds*
+    process.iterTracking *
+    process.hiEcalClusteringSequence *
+    process.hiPhotonCleaningSequence *
+    process.hiElectronSequence*
     process.patHeavyIonDefaultSequence *
     process.compleCleanPhotonSequence *
     process.multiPhotonAnalyzer  #*
-#    process.genParticleCounter
+    #    process.genParticleCounter
     )
