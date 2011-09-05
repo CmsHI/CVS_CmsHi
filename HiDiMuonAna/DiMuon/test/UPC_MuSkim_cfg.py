@@ -3,7 +3,6 @@
 ##Select muons with kinematical cuts which can be specified right here
 import FWCore.ParameterSet.Config as cms
 process = cms.Process("MuSkim")
-
 process.load('Configuration/StandardSequences/Services_cff')
 process.load('FWCore.MessageLogger.MessageLogger_cfi')
 process.load('Configuration/StandardSequences/GeometryExtended_cff')
@@ -11,9 +10,7 @@ process.load('Configuration/StandardSequences/MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load('Configuration/EventContent/EventContent_cff')
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
-
 process.GlobalTag.globaltag = 'GR_R_41_V0::All'
-
 process.source = cms.Source("PoolSource",
                             noEventSort = cms.untracked.bool(True),
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
@@ -22,10 +19,8 @@ process.source = cms.Source("PoolSource",
 
 
     "rfio:/castor/cern.ch/cms//store/hidata/HIRun2010/HIAllPhysics/RECO/ZS-v2/0055/A48380C8-AD4F-E011-AB06-0025901D62A6.root"
-
-
-
     #this file is avilable
+
     #'rfio:/castor/cern.ch/cms/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v1/000/150/063/78197C78-B4E8-DF11-ACE6-001D09F24259.root'
 
     #'rfio:/store/hidata/HIRun2010/HICorePhysics/RECO/PromptReco-v1/000/150/063/78197C78-B4E8-DF11-ACE6-001D09F24259.root',
@@ -77,7 +72,6 @@ process.source = cms.Source("PoolSource",
 #    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
 #    return file
 #process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/d/dmoon/cms370/Hydjet_MinBias_2.76TeV_Z0_Emb_Reco")
-
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
@@ -86,9 +80,7 @@ process.load("HLTrigger.HLTfilters.hltHighLevel_cfi")
 process.hltUPC = process.hltHighLevel.clone()
 #process.hltUPC.HLTPaths = ["HLT_HIUpcMu"]
 #process.hltUPC.HLTPaths = ["HLT_HIL1SingleMu3"]
-
 process.hltUPC.HLTPaths = ["HLT_HIL1DoubleMuOpen"]
-
 
 process.load("HiDiMuonAna.DiMuon.MuSkim_cff")            
 #Uncomment for HI reconstruction while PAT reco
@@ -112,12 +104,17 @@ process.MuonFilter = cms.EDFilter("MuonCountFilter",
 
 
 
+
+
+################################### Colllision event selection ####################################################
+process.load("HiDiMuonAna.DiMuon.collisionEventSelectionUPC_cff")
+
+#################################################################################################################
 #process.UPCTrigger_Step=cms.Path(process.hltUPC*process.MuonSelector*process.MuonFilter)
 #process.PatMuon_Step=cms.Path(process.goodMuonRecoForDimuon)
 #process.MuonSkim_Step = cms.Path(process.MuonSelector*process.MuonFilter*process.goodMuonRecoForDimuon)
 
-process.UPCMuonSkim_Step = cms.Path(process.hltUPC*process.MuonSelector*process.MuonFilter*process.goodMuonRecoForDimuon)
-
+process.UPCMuonSkim_Step = cms.Path(process.collisionEventSelection*process.hltUPC*process.MuonSelector*process.MuonFilter*process.goodMuonRecoForDimuon)
 
 #process.STAMuonSkim_Step=cms.Path(process.goodSTAMuons*process.goodSTAMuonFilter)
 #process.GlobalMuonSkim_Step=cms.Path(process.goodGlobalMuons*process.goodGlobalMuonFilter)
