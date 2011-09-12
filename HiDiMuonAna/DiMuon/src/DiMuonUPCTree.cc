@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuonUPCTree.cc,v 1.1 2011/07/19 05:31:05 kumarv Exp $
+// $Id: DiMuonUPCTree.cc,v 1.2 2011/09/04 08:23:58 kumarv Exp $
 //
 //
 // system include files
@@ -238,8 +238,8 @@ DiMuonUPCTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   int NoOfTracks =0;
   
   Handle<TrackCollection> trackCollectionHandle;
-  //  iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
-  iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
+  iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
+  //iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
 
   if( !trackCollectionHandle.isValid() ){
     cout << "Error! Can't get selectTracks!" << endl;
@@ -248,7 +248,8 @@ DiMuonUPCTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   NoOfTracks =trackCollectionHandle->size();
     
-  if(NoOfTracks > 1 && NoOfTracks < 7) {cout<<" no of tracks : "<<NoOfTracks<<endl;}
+  //  if(NoOfTracks > 1 && NoOfTracks < 7) {
+  cout<<" no of tracks : "<<NoOfTracks<<endl;
 
   if( NoOfTracks > 1 && NoOfTracks < 7 )
     {
@@ -547,8 +548,8 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
   //========================================== Track stuff ======================================================================//
   //Get a handle ("pointer") to the TrackCollection within the event                                                                                                           
   Handle<TrackCollection> trackCollectionHandle;
-  //iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
-  iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
+  iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
+  //iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
   //Check if there was a problem accessing the TrackCollection
   if( !trackCollectionHandle.isValid() ){
     cout << "Error! Can't get selectTracks!" << endl;
@@ -587,7 +588,10 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
     int chid = (iSection-1)*5+(iSide+1)/2*9+(iChannel-1);
     ZDCEnergy+=zhit->energy();
     ZDCEn[chid]=zhit->energy(); 
-  }
+    cout<<" chid "<<chid<<" zdcen "<<ZDCEn[chid]<<endl;  
+}
+
+
 
   //===============================  Tracker Muons  =====================================================//
   int nTrackMuon=0;
