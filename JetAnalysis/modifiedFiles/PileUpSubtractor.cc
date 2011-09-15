@@ -218,12 +218,10 @@ void PileUpSubtractor::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanI
 
   vector <fastjet::PseudoJet>::iterator pseudojetTMP = fjJets_->begin (),
     fjJetsEnd = fjJets_->end();
-    
+
   for (; pseudojetTMP != fjJetsEnd ; ++pseudojetTMP) {
+    if(pseudojetTMP->perp() < puPtMin_) continue;
 
-    if(pseudojetTMP->perp() < puPtMin_)continue;
-
-    vector<fastjet::PseudoJet> newtowers;
     // find towers within radiusPU_ of this jet
     for(vector<HcalDetId>::const_iterator im = allgeomid_.begin(); im != allgeomid_.end(); im++)
       {
@@ -234,23 +232,19 @@ void PileUpSubtractor::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanI
 	  excludedTowers.push_back(pair<int,int>(im->ieta(),im->iphi()));
 	}
       }
-  
+    
     vector<fastjet::PseudoJet>::const_iterator it = fjInputs_->begin(),
       fjInputsEnd = fjInputs_->end();
       
     for (; it != fjInputsEnd; ++it ) {
-
-      //if(it->perp() < puPtMin_) continue;      
-      //if(it->perp() < jetPtMin_) continue;      
       int index = it->user_index();
       int ie = ieta((*inputs_)[index]);
       int ip = iphi((*inputs_)[index]);
       
       vector<pair<int,int> >::const_iterator exclude = find(excludedTowers.begin(),excludedTowers.end(),pair<int,int>(ie,ip));
       if(exclude != excludedTowers.end()) {
-	newtowers.push_back(*it);
 	jettowers.push_back(index);
-      } //dr < 0.5
+      } //dr < radiusPU_
     } // initial input collection  
   } // pseudojets
   
@@ -327,6 +321,21 @@ void PileUpSubtractor::offsetCorrectJets()
   }
 }
 
+double PileUpSubtractor::getCone(double cone, double eta, double phi, double& et, double& pu){
+  pu = 0;
+  
+  for(vector<HcalDetId>::const_iterator im = allgeomid_.begin(); im != allgeomid_.end(); im++){
+     if( im->depth() != 1 ) continue;    
+    const GlobalPoint& point = geo_->getPosition((DetId)(*im));
+    double dr = reco::deltaR(point.eta(),point.phi(),eta,phi);      
+    if( dr < cone){
+      pu += (*emean_.find(im->ieta())).second+(*esigma_.find(im->ieta())).second;
+    }
+  }
+  
+  return pu;
+}
+
 double PileUpSubtractor::getMeanAtTower(const reco::CandidatePtr & in) const{
   int it = ieta(in);
   return (*emean_.find(it)).second;
@@ -341,6 +350,22 @@ double PileUpSubtractor::getPileUpAtTower(const reco::CandidatePtr & in) const {
   int it = ieta(in);
   return (*emean_.find(it)).second + (*esigma_.find(it)).second;
 }
+
+int PileUpSubtractor::getN(const reco::CandidatePtr & in) const {
+   int it = ieta(in);
+   
+   int n = (*(geomtowers_.find(it))).second - (*(ntowersWithJets_.find(it))).second;
+   return n;
+
+}
+
+int PileUpSubtractor::getNwithJets(const reco::CandidatePtr & in) const {
+   int it = ieta(in);
+   int n = (*(ntowersWithJets_.find(it))).second;
+   return n;
+
+}
+
 
 int PileUpSubtractor::ieta(const reco::CandidatePtr & in) const {
   int it = 0;

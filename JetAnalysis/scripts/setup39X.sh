@@ -50,8 +50,30 @@ rm RecoHI/HiEgammaAlgos/plugins/HiSpikeCleaner.cc
 cvs co -r HI_HLT_2010_11_20_fix2 RecoHI/HiEgammaAlgos/plugins/HiSpikeCleaner.cc
 
 # openhlt
-cvs co -r V03-03-08 HLTrigger/HLTanalyzers
-ed -i 's|std::cout << " Beginning HLTAnalyzer Analysis|//std::cout << " Beginning HLTAnalyzer Analysis|' HLTrigger/HLTanalyzers/src/HLTAnalyzer.cc
-sed -i 's|errMax(){return 100;}|errMax(){return 0;}|' HLTrigger/HLTanalyzers/interface/HLTAnalyzer.h
+cvs co -r V03-03-08-01 HLTrigger/HLTanalyzers
+# cvs co -r branch_HI39X HLTrigger/HLTanalyzers
+
+# muons for PF
+addpkg DataFormats/ParticleFlowCandidate
+addpkg RecoParticleFlow/PFProducer
+addpkg RecoParticleFlow/PFRootEvent
+
+# private mods related to muon reco
+
+modifiedFileDir=UserCode/yetkin/ParticleFlow/modifiedFiles
+cvs co $modifiedFileDir
+
+cp $modifiedFileDir/PFRootEventManager.cc RecoParticleFlow/PFRootEvent/src/ 
+cp $modifiedFileDir/PFBlockAlgo.h RecoParticleFlow/PFProducer/interface/
+cp $modifiedFileDir/PFBlockProducer.cc RecoParticleFlow/PFProducer/plugins/ 
+cp $modifiedFileDir/HiHackedAnalyticalTrackSelector.cc  edwenger/HiTrkEffAnalyzer/src/
+
+
+
+
+
+
+
+
 
 scram b -j4
