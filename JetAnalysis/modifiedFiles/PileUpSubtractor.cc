@@ -221,6 +221,8 @@ void PileUpSubtractor::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanI
     
   for (; pseudojetTMP != fjJetsEnd ; ++pseudojetTMP) {
 
+    if(pseudojetTMP->perp() < puPtMin_)continue;
+
     vector<fastjet::PseudoJet> newtowers;
     // find towers within radiusPU_ of this jet
     for(vector<HcalDetId>::const_iterator im = allgeomid_.begin(); im != allgeomid_.end(); im++)
@@ -232,13 +234,14 @@ void PileUpSubtractor::calculateOrphanInput(vector<fastjet::PseudoJet> & orphanI
 	  excludedTowers.push_back(pair<int,int>(im->ieta(),im->iphi()));
 	}
       }
-    
+  
     vector<fastjet::PseudoJet>::const_iterator it = fjInputs_->begin(),
       fjInputsEnd = fjInputs_->end();
       
     for (; it != fjInputsEnd; ++it ) {
 
-      if(it->perp() < puPtMin_) continue;      
+      //if(it->perp() < puPtMin_) continue;      
+      //if(it->perp() < jetPtMin_) continue;      
       int index = it->user_index();
       int ie = ieta((*inputs_)[index]);
       int ip = iphi((*inputs_)[index]);
