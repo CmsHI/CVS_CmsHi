@@ -40,10 +40,7 @@ rm CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.*
 cvs co -d UserCode/HafHistogram UserCode/CmsHi/HafHistogram
 
 # trigger analyzers
-cvs co -r CMSSW_4_1_2_patch1 HLTrigger/HLTanalyzers
-# some output cleanup
-sed -i 's|std::cout << " Beginning HLTAnalyzer Analysis|//std::cout << " Beginning HLTAnalyzer Analysis|' HLTrigger/HLTanalyzers/src/HLTAnalyzer.cc
-sed -i 's|errMax(){return 100;}|errMax(){return 0;}|' HLTrigger/HLTanalyzers/interface/HLTAnalyzer.h
+cvs co -r hi413_01 HLTrigger/HLTanalyzers
 
 scram build -c
 scram b -j4
