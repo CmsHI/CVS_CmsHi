@@ -19,14 +19,11 @@ cvs co         HeavyIonsAnalysis/Configuration
 
 # Jet and HI Software
 cvs co -d       MNguyen/InclusiveJetAnalyzer UserCode/MNguyen/InclusiveJetAnalyzer
-cvs co -r       V05-01-09 RecoJets/JetProducers
+cvs co -r       V05-01-09-01 RecoJets/JetProducers
 cvs co          RecoHI/HiJetAlgos
 
 # needed to get PFTowers to work
 cvs co -r cmssw39x_branch -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
-cp CmsHi/JetAnalysis/modifiedFiles/VirtualJetProducer.cc RecoJets/JetProducers/plugins/
-cp CmsHi/JetAnalysis/modifiedFiles/PileUpSubtractor.cc RecoJets/JetProducers/src/
-cp CmsHi/JetAnalysis/modifiedFiles/PileUpSubtractor.h RecoJets/JetProducers/interface/
 
 # gamma analysis
 cvs co RecoHI/HiEgammaAlgos                  # for 3_9_8 reconstruction   including spike cleaner 

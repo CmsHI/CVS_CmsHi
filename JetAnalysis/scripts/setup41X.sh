@@ -12,7 +12,7 @@ cvs co         HeavyIonsAnalysis/Configuration
 # Jet and HI Software
 cvs co -d       MNguyen/InclusiveJetAnalyzer UserCode/MNguyen/InclusiveJetAnalyzer
 
-cvs co -r       V05-01-09 RecoJets/JetProducers
+cvs co -r       V05-08-05 RecoJets/JetProducers
 cvs co          RecoHI/HiJetAlgos
 addpkg           RecoHI/Configuration
 
@@ -24,9 +24,6 @@ cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
 cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
-cp CmsHi/JetAnalysis/modifiedFiles/VirtualJetProducer.cc RecoJets/JetProducers/plugins/
-cp CmsHi/JetAnalysis/modifiedFiles/PileUpSubtractor.cc RecoJets/JetProducers/src/
-cp CmsHi/JetAnalysis/modifiedFiles/PileUpSubtractor.h RecoJets/JetProducers/interface/
 
 #ecal and hcal cleaning
 #hcal
