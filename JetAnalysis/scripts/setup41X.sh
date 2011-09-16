@@ -12,7 +12,7 @@ cvs co         HeavyIonsAnalysis/Configuration
 # Jet and HI Software
 cvs co -d       MNguyen/InclusiveJetAnalyzer UserCode/MNguyen/InclusiveJetAnalyzer
 
-cvs co -r       V05-08-05 RecoJets/JetProducers
+cvs co -r       V05-01-09-01 RecoJets/JetProducers
 cvs co          RecoHI/HiJetAlgos
 addpkg           RecoHI/Configuration
 
