@@ -5,17 +5,17 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 ## tracking
-cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
-cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel/PixelTracksRun2010
-cvs co -d       MNguyen/iterTracking UserCode/MNguyen/iterTracking
-cvs co -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r hi39X_01 -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
+cvs co -r hi39X_01 -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
+cvs co -r hi39X_01 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel/PixelTracksRun2010
+cvs co -r hi39X_01 -d       MNguyen/iterTracking UserCode/MNguyen/iterTracking
+cvs co -r hi39X_01 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 
 # pat macros
-cvs co -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
-cvs co -d      MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
-cvs co -d      MNguyen/Configuration  UserCode/MNguyen/Configuration
-cvs co         HeavyIonsAnalysis/Configuration
+cvs co -r hi39X_01 -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
+cvs co -r hi39X_01 -d      MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
+cvs co -r hi39X_01 -d      MNguyen/Configuration  UserCode/MNguyen/Configuration
+cvs co -r branch_hi39X     HeavyIonsAnalysis/Configuration
 
 # Jet and HI Software
 cvs co -d       MNguyen/InclusiveJetAnalyzer UserCode/MNguyen/InclusiveJetAnalyzer
@@ -40,7 +40,7 @@ addpkg RecoLocalCalo/HcalRecAlgos
 cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/src/HBHETimingShapedFlag.cc
 cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/interface/HBHETimingShapedFlag.h
 cvs co -r V00-00-18 JetMETAnalysis/HcalReflagging
-cvs co -d HcalFilter UserCode/MTonjes/HcalFilter
+cvs co -r hi39X_01 -d HcalFilter/HcalTimingFilter UserCode/MTonjes/HcalFilter/HcalTimingFilter
 
 # keep 39X version for spike cleaner.
 rm RecoHI/HiEgammaAlgos/plugins/HiSpikeCleaner.cc
@@ -63,14 +63,5 @@ cvs co $modifiedFileDir
 cp $modifiedFileDir/PFRootEventManager.cc RecoParticleFlow/PFRootEvent/src/ 
 cp $modifiedFileDir/PFBlockAlgo.h RecoParticleFlow/PFProducer/interface/
 cp $modifiedFileDir/PFBlockProducer.cc RecoParticleFlow/PFProducer/plugins/ 
-cp $modifiedFileDir/HiHackedAnalyticalTrackSelector.cc  edwenger/HiTrkEffAnalyzer/src/
-
-
-
-
-
-
-
-
 
 scram b -j4
