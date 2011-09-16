@@ -13,7 +13,7 @@ process.source = cms.Source("PoolSource",
     ))
 
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(-1))
+            input = cms.untracked.int32(10))
 
 #load some general stuff
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -88,6 +88,7 @@ process.event_filter_seq = cms.Sequence(
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
 
+process.hiGoodTightTracks.src = cms.InputTag("hiGlobalPrimTracks")
 process.hiGoodTightTracksDirect = process.hiGoodTightTracks.clone(keepAllTracks = True)
 
 process.globalMuons.TrackerCollectionLabel = cms.InputTag("hiGoodTightTracksDirect")
