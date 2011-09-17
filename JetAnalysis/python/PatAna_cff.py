@@ -43,7 +43,7 @@ akPu5PFpatJets = patJets.clone(
 
 akPu3PFcorr = icPu5corr.clone(
   src = cms.InputTag("akPu3PFJets"),
-  payload = cms.string('AK5PF')
+  payload = cms.string('AK3PF')
   )
 akPu3PFpatJets = patJets.clone(
   jetSource = cms.InputTag("akPu3PFJets"),
@@ -69,7 +69,6 @@ icPu5match = patJetGenJetMatch.clone(
 icPu5parton = patJetPartonMatch.clone(
   src = cms.InputTag("iterativeConePu5CaloJets")
 	)
-
 
 akPu5PFclean = heavyIonCleanedGenJets.clone( src = cms.InputTag('ak5HiGenJets') ) 
 akPu5PFmatch = patJetGenJetMatch.clone(
