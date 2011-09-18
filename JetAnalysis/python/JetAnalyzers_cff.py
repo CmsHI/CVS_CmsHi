@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
+from RecoHI.HiJetAlgos.HiGenJets_cff import *
 from MNguyen.InclusiveJetAnalyzer.inclusiveJetAnalyzer_cff import *
 icPu5JetAnalyzer = inclusiveJetAnalyzer.clone()
 icPu5JetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
