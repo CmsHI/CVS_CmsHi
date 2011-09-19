@@ -39,7 +39,7 @@ cvs co -d CmsHi/PhotonAnalysis UserCode/yetkin/PhotonAnalysis
 cvs co -d UserCode/HafHistogram UserCode/CmsHi/HafHistogram
 
 # trigger analyzers
-cvs co -r hi413_03 HLTrigger/HLTanalyzers
+cvs co -r hi413_05 HLTrigger/HLTanalyzers
 
 scram build -c
 scram b -j4
