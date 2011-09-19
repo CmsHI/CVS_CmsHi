@@ -60,7 +60,7 @@ process.hltbitnew = process.hltbitanalysis.clone(
 process.hltbitorg = process.hltbitanalysis.clone(l1GtReadoutRecord = "gtDigis")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(1000)
 )
 
 # Other statements
@@ -73,8 +73,7 @@ process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring(
       #'/store/hidata/HIRun2010/HIAllPhysics/RAW/v1/000/150/590/02D89852-5DEC-DF11-9E11-001D09F282F5.root'
-			'file:/d101/frankma/data/HICorePhysics/raw/mbskim_0.root',
-			'file:/d101/frankma/data/HICorePhysics/raw/mbskim_1.root'
+			'/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0001/D8E2C34A-D2AE-E011-9E1E-001A6478AC14.root',
       #'/store/data/Run2011A/MinimumBias/RAW/v1/000/173/692/3C024415-BECC-E011-96B3-001D09F244BB.root'
       )
 )
@@ -83,7 +82,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.334 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -140,13 +139,14 @@ process.L1simulation_step = cms.Path(process.SimL1Emulator)
 process.L1Ntuple_step = cms.Path(process.l1NtupleProducer*process.l1NtupleOrg)
 process.ana_step = cms.Path(process.HLTHIRecoJetSequenceIC5Corrected*process.patJets)
 process.endjob_step = cms.EndPath(process.endOfProcess*process.hltbitnew*process.hltbitorg*process.icPu5JetAnalyzer)
-#process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
+process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,
-                                process.HLT_HIJet45,
-                                process.ana_step,
-                                process.L1Ntuple_step,process.endjob_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step)
+process.schedule.extend(process.HLTSchedule)
+process.schedule.extend([process.ana_step,
+												#process.FEVTDEBUGHLToutput_step,
+												process.L1Ntuple_step,process.endjob_step])
 
 # customisation of the process.
 
@@ -159,7 +159,7 @@ process = customise(process)
 # customize the HLT to use the emulated results
 import HLTrigger.Configuration.customizeHLTforL1Emulator
 process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToL1Emulator( process )
-process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimGtDigis( process )
-process.hltL1sL1SingleJet30UBptxAND.L1SeedsLogicalExpression = "L1_SingleJet36"
+#process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimGtDigis( process )
+process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimGmtGctGtDigis( process )
 
 # End of customisation functions
