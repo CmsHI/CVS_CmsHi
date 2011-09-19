@@ -6,6 +6,13 @@ cvs co -d       edwenger/Skims UserCode/edwenger/Skims
 cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
 cvs co -d       edwenger/TrkEffAnalyzer UserCode/edwenger/TrkEffAnalyzer
 
+cvs co -d       edwenger/TrackSpectraAnalyzer UserCode/edwenger/TrackSpectraAnalyzer
+cvs co -d       edwenger/EvtSelAnalyzer  UserCode/edwenger/EvtSelAnalyzer
+cvs co -d       SpectraAna/JetEtaPhiFilter UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
+cvs co -d       SpectraAna/TrackSpectraAnalyzer UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
+
+cvs co          UserCode/FerencSiklerVertexing
+
 # pat macros
 cvs co -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
 cvs co -d      MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
