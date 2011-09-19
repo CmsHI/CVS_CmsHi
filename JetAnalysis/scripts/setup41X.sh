@@ -34,9 +34,8 @@ cvs co -r V00-00-18 JetMETAnalysis/HcalReflagging
 cvs co -d HcalFilter UserCode/MTonjes/HcalFilter
 
 #ecal requires some code from the photon analyzer, 'rm' commands are to truncate the endless chain of packages obviously, this should be cleaned up
-cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-rm CmsHi/PhotonAnalysis/plugins/MultiPhotonAnalyzer.*
-rm CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.*
+cvs co -d RecoHI/HiEgammaAlgos UserCode/yetkin/RecoHI/HiEgammaAlgos
+cvs co -d CmsHi/PhotonAnalysis UserCode/yetkin/PhotonAnalysis
 cvs co -d UserCode/HafHistogram UserCode/CmsHi/HafHistogram
 
 # trigger analyzers
