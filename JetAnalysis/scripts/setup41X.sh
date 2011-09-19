@@ -23,7 +23,7 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
-cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r hi413_02 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 
 #ecal and hcal cleaning
 #hcal
