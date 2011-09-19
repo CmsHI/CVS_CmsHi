@@ -1,8 +1,10 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -d       edwenger/HiTrkEffAnalyzer/python/ UserCode/edwenger/HiTrkEffAnalyzer/python/
 cvs co -r hi39X_01 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -d       edwenger/Skims UserCode/edwenger/Skims
+cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
+cvs co -d       edwenger/TrkEffAnalyzer UserCode/edwenger/TrkEffAnalyzer
 
 # pat macros
 cvs co -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
