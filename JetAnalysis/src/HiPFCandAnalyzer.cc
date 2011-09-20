@@ -78,7 +78,7 @@ HiPFCandAnalyzer::HiPFCandAnalyzer(const edm::ParameterSet& iConfig)
 
   doJets_ = iConfig.getUntrackedParameter<bool>("doJets",0);
   doMC_ = iConfig.getUntrackedParameter<bool>("doMC",0);
-
+  skipCharged_ = iConfig.getUntrackedParameter<bool>("skipCharged",0);
 }
 
 
@@ -110,17 +110,20 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
   for(unsigned icand=0;icand<pfCandidateColl->size(); icand++) {
-      const reco::PFCandidate pfCandidate = pfCandidateColl->at(icand);
-      
+      const reco::PFCandidate pfCandidate = pfCandidateColl->at(icand);      
+
       double pt =  pfCandidate.pt();
+      if(pt<pfPtMin_) continue;
+
+      int id = pfCandidate.particleId();
+      if(skipCharged_ && (abs(id) == 1 || abs(id) == 3)) continue;
+
+      pfEvt_.pfId_[pfEvt_.nPFpart_] = id;      
+      pfEvt_.pfPt_[pfEvt_.nPFpart_] = pt;      
+      pfEvt_.pfEta_[pfEvt_.nPFpart_] = pfCandidate.eta();      
+      pfEvt_.pfPhi_[pfEvt_.nPFpart_] = pfCandidate.phi();      
+      pfEvt_.nPFpart_++;
       
-      if(pt>pfPtMin_){
-	pfEvt_.pfId_[pfEvt_.nPFpart_] = pfCandidate.particleId();      
-	pfEvt_.pfPt_[pfEvt_.nPFpart_] = pt;      
-	pfEvt_.pfEta_[pfEvt_.nPFpart_] = pfCandidate.eta();      
-	pfEvt_.pfPhi_[pfEvt_.nPFpart_] = pfCandidate.phi();      
-	pfEvt_.nPFpart_++;
-      }
   }
 	
 
@@ -159,9 +162,9 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       double pt =  jet.pt();
       
       if(pt>jetPtMin_){
-	pfEvt_.pfPt_[pfEvt_.njets_] = pt;      
-	pfEvt_.pfEta_[pfEvt_.njets_] = jet.eta();      
-	pfEvt_.pfPhi_[pfEvt_.njets_] = jet.phi();      
+	pfEvt_.jetPt_[pfEvt_.njets_] = pt;      
+	pfEvt_.jetEta_[pfEvt_.njets_] = jet.eta();      
+	pfEvt_.jetPhi_[pfEvt_.njets_] = jet.phi();      
 	pfEvt_.njets_++;
       }
   }

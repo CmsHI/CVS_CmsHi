@@ -178,13 +178,11 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
   LogDebug("HiInclusiveJetAnalyzer")<<"START event: "<<event<<" in run "<<run<<endl;
 
-
  int bin = -1;
   double hf = 0.;
   double b = 999.;
 
   if(useCentrality_){
-    //if(!isMC_){
       if(!centrality_) centrality_ = new CentralityProvider(iSetup);      
       centrality_->newEvent(iEvent,iSetup); // make sure you do this first in every event
       //double c = centrality_->centralityValue();
@@ -194,24 +192,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
       bin = centrality_->getBin();
       b = centrality_->bMean();
-      //}
-      /*
-    else{
-
-      TFile * centFile = new TFile("/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_1_patch1/src/macros/Hydjet_CentTable.root");
-
-      edm::Handle<reco::Centrality> cent;
-      iEvent.getByLabel(edm::InputTag("hiCentrality"),cent);
-      //cout<<" grabbed centrality "<<endl;
-      CentralityBins::RunMap cmap = getCentralityFromFile(centFile, "makeCentralityTableTFile", "HFhitsHydjet_2760GeV", 1, 1);
-
-      // Still getting cent from hits.  When tower tables become available, we need to switch
-      hf = cent->EtHFhitSum();
-      //cout<<" hf "<<hf<<endl;
-      bin = cmap[run]->getBin(hf);
-      b = cmap[run]->bMeanOfBin(bin);
-    }
-      */
   }
    
 

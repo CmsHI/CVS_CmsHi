@@ -80,7 +80,7 @@ class HiPFCandAnalyzer : public edm::EDAnalyzer {
 
     bool   doJets_;
     bool   doMC_;
-
+    bool   skipCharged_;
 };
 
 
