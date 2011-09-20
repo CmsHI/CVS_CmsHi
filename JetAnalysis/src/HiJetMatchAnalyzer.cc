@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    HiJetResponseAnalyzer
-// Class:      HiJetResponseAnalyzer
+// Package:    HiJetMatchAnalyzer
+// Class:      HiJetMatchAnalyzer
 // 
-/**\class HiJetResponseAnalyzer HiJetResponseAnalyzer.cc CmsHi/HiJetResponseAnalyzer/src/HiJetResponseAnalyzer.cc
+/**\class HiJetMatchAnalyzer HiJetMatchAnalyzer.cc CmsHi/HiJetMatchAnalyzer/src/HiJetMatchAnalyzer.cc
 
  Description: [one line class summary]
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetResponseAnalyzer.cc,v 1.10 2011/01/20 19:41:10 yilmaz Exp $
+// $Id: HiJetMatchAnalyzer.cc,v 1.11 2011/04/01 12:09:17 yilmaz Exp $
 //
 //
 
@@ -109,10 +109,10 @@ struct JRAV{
 //
 bool comparePt(JRAV a, JRAV b) {return a.jtpt > b.jtpt;}
 
-class HiJetResponseAnalyzer : public edm::EDAnalyzer {
+class HiJetMatchAnalyzer : public edm::EDAnalyzer {
    public:
-      explicit HiJetResponseAnalyzer(const edm::ParameterSet&);
-      ~HiJetResponseAnalyzer();
+      explicit HiJetMatchAnalyzer(const edm::ParameterSet&);
+      ~HiJetMatchAnalyzer();
 
 
    private:
@@ -177,7 +177,7 @@ class HiJetResponseAnalyzer : public edm::EDAnalyzer {
 
 };
 
-bool HiJetResponseAnalyzer::selectJet(int i){
+bool HiJetMatchAnalyzer::selectJet(int i){
    const reco::Jet& jet = (*jets)[i];
    if(usePat_){
       const pat::Jet& patjet = (*patjets)[i];
@@ -204,7 +204,7 @@ bool HiJetResponseAnalyzer::selectJet(int i){
 //
 // constructors and destructor
 //
-HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
+HiJetMatchAnalyzer::HiJetMatchAnalyzer(const edm::ParameterSet& iConfig)
 
 {
 
@@ -266,7 +266,7 @@ HiJetResponseAnalyzer::HiJetResponseAnalyzer(const edm::ParameterSet& iConfig)
 }
 
 
-HiJetResponseAnalyzer::~HiJetResponseAnalyzer()
+HiJetMatchAnalyzer::~HiJetMatchAnalyzer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -281,7 +281,7 @@ HiJetResponseAnalyzer::~HiJetResponseAnalyzer()
 
 // ------------ method called to for each event  ------------
 void
-HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+HiJetMatchAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
@@ -440,7 +440,7 @@ HiJetResponseAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
 
 void 
-HiJetResponseAnalyzer::beginJob(){
+HiJetMatchAnalyzer::beginJob(){
   t= fs->make<TTree>("t","Jet Response Analyzer");
   t->Branch("nref",&jra_.nref,"nref/I");
   t->Branch("jtpt",jra_.jtpt,"jtpt[nref]/F");
@@ -489,8 +489,8 @@ HiJetResponseAnalyzer::beginJob(){
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-HiJetResponseAnalyzer::endJob() {
+HiJetMatchAnalyzer::endJob() {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(HiJetResponseAnalyzer);
+DEFINE_FWK_MODULE(HiJetMatchAnalyzer);
