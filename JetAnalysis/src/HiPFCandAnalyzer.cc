@@ -76,7 +76,8 @@ HiPFCandAnalyzer::HiPFCandAnalyzer(const edm::ParameterSet& iConfig)
   // debug
   verbosity_ = iConfig.getUntrackedParameter<int>("verbosity", 0);
 
-
+  doJets_ = iConfig.getUntrackedParameter<bool>("doJets",0);
+  doMC_ = iConfig.getUntrackedParameter<bool>("doMC",0);
 
 }
 
@@ -124,6 +125,7 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	
 
   // Fill GEN info
+  if(doMC_){
   edm::Handle<reco::GenParticleCollection> genParticles;
   iEvent.getByLabel(genLabel_,genParticles);     
   const reco::GenParticleCollection* genColl= &(*genParticles);
@@ -142,9 +144,10 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pfEvt_.nGENpart_++;
     }
   }
+  }
 
     // Fill Jet info
-  
+  if(doJets_){
   edm::Handle<pat::JetCollection> jets;
   iEvent.getByLabel(jetLabel_,jets);  
   const pat::JetCollection *jetColl = &(*jets);
@@ -162,7 +165,7 @@ HiPFCandAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	pfEvt_.njets_++;
       }
   }
-	
+  }	
 
   // All done
   pfTree_->Fill();
@@ -201,6 +204,9 @@ void HiPFCandAnalyzer::beginJob()
   // -- trees --                                                                                                                                                                                                                        
     pfTree_ = fs->make<TTree>("pfTree","dijet tree");
     pfEvt_.SetTree(pfTree_);
+    pfEvt_.doMC = doMC_;
+    pfEvt_.doJets = doJets_;
+
     pfEvt_.SetBranches();
 }
 
@@ -239,18 +245,21 @@ void TreePFCandEventData::SetBranches()
   tree_->Branch("pfPhi",this->pfPhi_,"pfPhi[nPFpart]/F");
 
   // -- jet info --
+  if(doJets){
   tree_->Branch("njets",&(this->njets_),"njets/I");
   tree_->Branch("jetPt",this->jetPt_,"jetPt[njets]/F");
   tree_->Branch("jetEta",this->jetEta_,"jetEta[njets]/F");
   tree_->Branch("jetPhi",this->jetPhi_,"jetPhi[njets]/F");
+  }
 
   // -- gen info --
+  if(doMC){
   tree_->Branch("nGENpart",&(this->nGENpart_),"nGENpart/I");
   tree_->Branch("genPDGId",this->genPDGId_,"genPDGId[nGENpart]/I");
   tree_->Branch("genPt",this->genPt_,"genPt[nGENpart]/F");
   tree_->Branch("genEta",this->genEta_,"genEta[nGENpart]/F");
   tree_->Branch("genPhi",this->genPhi_,"genPhi[nGENpart]/F");
-
+  }
 
 }
 void TreePFCandEventData::Clear()

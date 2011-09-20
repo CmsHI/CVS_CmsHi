@@ -29,6 +29,8 @@ class TreePFCandEventData
   void SetTree(TTree * t) { tree_=t; }
   void SetBranches();
   void Clear();
+  bool doJets;
+  bool doMC;
 
   Float_t                 jdphi_;
   // -- particle info --
@@ -75,6 +77,9 @@ class HiPFCandAnalyzer : public edm::EDAnalyzer {
 
    // debug
     Int_t	  verbosity_;
+
+    bool   doJets_;
+    bool   doMC_;
 
 };
 
