@@ -59,6 +59,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   useCentrality_ = iConfig.getUntrackedParameter<bool>("useCentrality",false);
   useVtx_ = iConfig.getUntrackedParameter<bool>("useVtx",true);
   useJEC_ = iConfig.getUntrackedParameter<bool>("useJEC",true);
+  usePat_ = iConfig.getUntrackedParameter<bool>("usePAT",true);
 
   if(!isMC_){
     L1gtReadout_ = iConfig.getParameter<edm::InputTag>("L1gtReadout");
@@ -102,7 +103,6 @@ HiInclusiveJetAnalyzer::beginJob() {
   string jetTagTitle = jetTag_.label()+" Jet Analysis Tree"; 
   t = fs1->make<TTree>("t",jetTagTitle.c_str());
 
-
   //  TTree* t= new TTree("t","Jet Response Analyzer");
   t->Branch("run",&jets_.run,"run/I");
   t->Branch("evt",&jets_.evt,"evt/I");
@@ -119,6 +119,7 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("jteta",jets_.jteta,"jteta[nref]/F");
   t->Branch("jty",jets_.jty,"jty[nref]/F");
   t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
+  t->Branch("jtpu",jets_.jtpu,"jtpu[nref]/F");
 
   if(isMC_){
     t->Branch("pthat",&jets_.pthat,"pthat/F");    
@@ -236,12 +237,12 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
       }
 	 }
    
-
-
-   edm::Handle<pat::JetCollection> jets;
+   edm::Handle<pat::JetCollection> patjets;
+   if(usePat_)iEvent.getByLabel(jetTag_, patjets);
+   
+   edm::Handle<reco::JetView> jets;
    iEvent.getByLabel(jetTag_, jets);
 
-   
    // FILL JRA TREE
 
    jets_.b = b;
@@ -253,43 +254,47 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    }
 
    for(unsigned int j = 0 ; j < jets->size(); ++j){
-     const pat::Jet& jet = (*jets)[j];
+     const reco::Jet& jet = (*jets)[j];
      
      //cout<<" jet pt "<<jet.pt()<<endl;
      //if(jet.pt() < jetPtMin) continue;
-     if (useJEC_) jets_.rawpt[jets_.nref]=jet.correctedJet("Uncorrected").pt();
+     if (useJEC_ && usePat_){
+       jets_.rawpt[jets_.nref]=(*patjets)[j].correctedJet("Uncorrected").pt();
+     }
      jets_.jtpt[jets_.nref] = jet.pt();                            
      jets_.jteta[jets_.nref] = jet.eta();
      jets_.jtphi[jets_.nref] = jet.phi();
      jets_.jty[jets_.nref] = jet.eta();
-     
+     jets_.jtpu[jets_.nref] = jet.pileup();
 	 
-     if(jet.genJet()){
-       jets_.refpt[jets_.nref] = jet.genJet()->pt();                            
-       jets_.refeta[jets_.nref] = jet.genJet()->eta();
-       jets_.refphi[jets_.nref] = jet.genJet()->phi();
-       jets_.refy[jets_.nref] = jet.genJet()->eta();
-       jets_.refdphijt[jets_.nref] = reco::deltaPhi(jet.phi(),jet.genJet()->phi());	
-       jets_.refdrjt[jets_.nref] = reco::deltaR(jet.eta(),jet.phi(),jet.genJet()->eta(),jet.genJet()->phi());	       
-     }            	
-     else{
-       jets_.refpt[jets_.nref] = -999.;
-       jets_.refeta[jets_.nref] = -999.;
-       jets_.refphi[jets_.nref] = -999.;
-       jets_.refy[jets_.nref] = -999.;
-       jets_.refdphijt[jets_.nref] = -999.;
-       jets_.refdrjt[jets_.nref] = -999.;
-     }
+     if(isMC_ && usePat_){
+       const reco::GenJet* genjet = (*patjets)[j].genJet();
+       if(genjet){
+	 jets_.refpt[jets_.nref] = genjet->pt();        
+	 jets_.refeta[jets_.nref] = genjet->eta();
+	 jets_.refphi[jets_.nref] = genjet->phi();
+	 jets_.refy[jets_.nref] = genjet->eta();
+	 jets_.refdphijt[jets_.nref] = reco::deltaPhi(jet.phi(), genjet->phi());	
+	 jets_.refdrjt[jets_.nref] = reco::deltaR(jet.eta(),jet.phi(),genjet->eta(),genjet->phi());	       
+       }else{
+	 jets_.refpt[jets_.nref] = -999.;
+	 jets_.refeta[jets_.nref] = -999.;
+	 jets_.refphi[jets_.nref] = -999.;
+	 jets_.refy[jets_.nref] = -999.;
+	 jets_.refdphijt[jets_.nref] = -999.;
+	 jets_.refdrjt[jets_.nref] = -999.;
+       }
 
-     // matched partons
-     if (jet.genParton()) {
-       jets_.refparton_pt[jets_.nref] = jet.genParton()->pt();
-       jets_.refparton_flavor[jets_.nref] = jet.genParton()->pdgId();
+   // matched partons
+       const reco::GenParticle * parton = (*patjets)[j].genParton();
+       if(parton){
+      jets_.refparton_pt[jets_.nref] = parton->pt();
+       jets_.refparton_flavor[jets_.nref] = parton->pdgId();
      } else {
        jets_.refparton_pt[jets_.nref] = -999;
        jets_.refparton_flavor[jets_.nref] = -999;
      }
-
+     }
  
      jets_.nref++;
        

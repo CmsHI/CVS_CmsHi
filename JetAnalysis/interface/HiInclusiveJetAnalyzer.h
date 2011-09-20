@@ -73,6 +73,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool useCentrality_;
   bool useVtx_;
   bool useJEC_;
+  bool usePat_;
   bool isMC_;
 
 
@@ -114,6 +115,8 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float jteta[MAXJETS];
     float jtphi[MAXJETS];
     float jty[MAXJETS];
+    float jtpu[MAXJETS];
+
     float refpt[MAXJETS];
     float refeta[MAXJETS];
     float refphi[MAXJETS];
