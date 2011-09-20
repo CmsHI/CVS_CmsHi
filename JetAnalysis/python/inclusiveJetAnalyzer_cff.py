@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-inclusiveJetAnalyzer = cms.EDAnalyzer("InclusiveJetAnalyzer",
+inclusiveJetAnalyzer = cms.EDAnalyzer("HiInclusiveJetAnalyzer",
                                       jetTag = cms.InputTag("icPu5patJets"),
                                       genjetTag = cms.InputTag("iterativeCone5HiGenJets"),
                                       eventInfoTag = cms.InputTag("generator"),
