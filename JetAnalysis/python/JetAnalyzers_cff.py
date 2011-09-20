@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Generator_cff import *
-from MNguyen.InclusiveJetAnalyzer.inclusiveJetAnalyzer_cff import *
+from CmsHi.JetAnalysis.inclusiveJetAnalyzer_cff import *
 icPu5JetAnalyzer = inclusiveJetAnalyzer.clone()
 icPu5JetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
 

@@ -13,6 +13,8 @@
 <use name="SimGeneral/HepPDTRecord"/>
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="SimDataFormats/HiGenData"/>
+<use name="SimTracker/TrackAssociation"/>
+<use name="SimTracker/Records" />
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/EcalRecHit"/>
 <use name="DataFormats/HcalRecHit"/>
