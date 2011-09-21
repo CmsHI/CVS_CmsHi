@@ -1,7 +1,7 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -r hi39X_01 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r hi39X_02 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -d       edwenger/Skims UserCode/edwenger/Skims
 cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
 cvs co -d       edwenger/TrkEffAnalyzer UserCode/edwenger/TrkEffAnalyzer

@@ -9,7 +9,7 @@ cvs co -r hi39X_01 -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertex
 cvs co -r hi39X_01 -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
 cvs co -r hi39X_01 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel/PixelTracksRun2010
 cvs co -r hi39X_01 -d       MNguyen/iterTracking UserCode/MNguyen/iterTracking
-cvs co -r hi39X_01 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r hi39X_02 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 
 # pat macros
 cvs co -r hi39X_01 -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
