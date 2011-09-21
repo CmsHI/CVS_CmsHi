@@ -1,7 +1,7 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -r hi39X_02 -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r hi413_01 -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -d       edwenger/Skims UserCode/edwenger/Skims
 cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
 cvs co -d       edwenger/TrkEffAnalyzer UserCode/edwenger/TrkEffAnalyzer
@@ -33,7 +33,7 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
-cvs co -r hi413_08 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r hi413_09 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 
 #ecal and hcal cleaning
 #hcal
