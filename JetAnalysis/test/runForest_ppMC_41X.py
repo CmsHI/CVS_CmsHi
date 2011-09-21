@@ -160,9 +160,6 @@ process.hiGoodTightTracks.src = cms.InputTag("hiGlobalPrimTracks")
 process.hiGoodTightTracksDirect = process.hiGoodTightTracks.clone(keepAllTracks = True)
 process.hiGoodTracks = process.hiGoodTightTracks.clone()
 
-process.pfTrack.TkColList = ["hiGoodTightTracksDirect"]
-process.pfTrack.GsfTracksInEvents = False
-
 process.reco_extra        = cms.Path( process.hiTrackReReco * process.hiextraTrackReco * process.iterativeConePu5CaloJets *
                                       process.hiGoodTightTracksDirect *  process.muonRecoPbPb *
                                       process.HiParticleFlowRecoNoJets * process.hiCentrality * process.hiGoodTracks)
