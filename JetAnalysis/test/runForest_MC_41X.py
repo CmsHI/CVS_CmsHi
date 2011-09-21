@@ -79,6 +79,13 @@ process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.load("MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff")
 process.anaTrack.trackPtMin = 4
+process.anaTrack.useQuality = True
+process.anaTrack.doPFMatching = True
+process.anaTrack.trackSrc = cms.InputTag("hiGoodTightTracksDirect")
+
+process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
+process.pfcandAnalyzer.skipCharged = True
+process.pfcandAnalyzer.pfPtMin = 1
 
 process.ak5CaloJets = process.akPu5CaloJets.clone(doPUOffsetCorr = False)
 process.ak5corr = process.icPu5corr.clone( src = cms.InputTag("ak5CaloJets"),
@@ -168,9 +175,11 @@ process.reco_extra        = cms.Path( process.hiTrackReReco * process.hiextraTra
                                       process.HiParticleFlowRecoNoJets * process.hiCentrality * process.hiGoodTracks)
 process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets * process.akPu5PFJets * process.photon_extra_reco)
 process.gen_step          = cms.Path( process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
-process.pat_step          = cms.Path( process.icPu5patSequence + process.akPu3PFpatSequence + process.akPu5PFpatSequence + process.makeHeavyIonPhotons + process.ak5extra + process.ak3extra)
+process.pat_step          = cms.Path( process.icPu5patSequence + process.akPu3PFpatSequence + process.akPu5PFpatSequence +
+                                      process.makeHeavyIonPhotons + process.ak5extra + process.ak3extra)
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
-process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer + process.multiPhotonAnalyzer + process.anaTrack)
+process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer +
+                                      process.multiPhotonAnalyzer + process.anaTrack + process.pfcandAnalyzer)
 
 process.phltJetHI = cms.Path( process.hltJetHI )
 # process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
