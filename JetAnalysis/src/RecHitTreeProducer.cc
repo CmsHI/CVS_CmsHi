@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.11 2010/11/09 22:57:31 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.12.2.1 2011/09/22 08:26:50 frankma Exp $
 //
 //
 
@@ -155,7 +155,13 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   double hbheThreshold_;
   double ebThreshold_;
   double eeThreshold_;
-
+  
+  double hbhePtMin_;
+  double hfPtMin_;
+  double ebPtMin_;
+  double eePtMin_;
+  double towerPtMin_;
+  
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
    const CaloGeometry *geo;
@@ -217,6 +223,11 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   hfTowerThreshold_ = iConfig.getUntrackedParameter<double>("HFtowerMin",3.);
   hfLongThreshold_ = iConfig.getUntrackedParameter<double>("HFlongMin",0.5);
   hfShortThreshold_ = iConfig.getUntrackedParameter<double>("HFshortMin",0.85);
+  hbhePtMin_ = iConfig.getUntrackedParameter<double>("HBHETreePtMin",0);
+  hfPtMin_ = iConfig.getUntrackedParameter<double>("HFTreePtMin",0);
+  ebPtMin_ = iConfig.getUntrackedParameter<double>("EBTreePtMin",0);
+  eePtMin_ = iConfig.getUntrackedParameter<double>("EETreePtMin",0.);
+  towerPtMin_ = iConfig.getUntrackedParameter<double>("TowerTreePtMin",0.);
 }
 
 
@@ -318,11 +329,12 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	 if(dr < cone){ hfRecHit.isjet[hfRecHit.n] = true; }
        }
      }
-     hfRecHit.n++;
+     if (hfRecHit.et[hfRecHit.n]>=hfPtMin_) hfRecHit.n++;
    }
    if(!doEbyEonly_){
    for(unsigned int i = 0; i < hbheHits->size(); ++i){
      const HBHERecHit & hit= (*hbheHits)[i];
+     if (getEt(hit.id(),hit.energy())<hbhePtMin_) continue;
      hbheRecHit.e[hbheRecHit.n] = hit.energy();
      hbheRecHit.et[hbheRecHit.n] = getEt(hit.id(),hit.energy());
      hbheRecHit.eta[hbheRecHit.n] = getEta(hit.id());
@@ -342,6 +354,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    if(doEcal_ && !doEbyEonly_){
    for(unsigned int i = 0; i < ebHits->size(); ++i){
      const EcalRecHit & hit= (*ebHits)[i];
+     if (getEt(hit.id(),hit.energy())<ebPtMin_) continue;
      ebRecHit.e[ebRecHit.n] = hit.energy();
      ebRecHit.et[ebRecHit.n] = getEt(hit.id(),hit.energy());
      ebRecHit.eta[ebRecHit.n] = getEta(hit.id());
@@ -359,6 +372,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    
    for(unsigned int i = 0; i < eeHits->size(); ++i){
      const EcalRecHit & hit= (*eeHits)[i];
+     if (getEt(hit.id(),hit.energy())<eePtMin_) continue;
      eeRecHit.e[eeRecHit.n] = hit.energy();
      eeRecHit.et[eeRecHit.n] = getEt(hit.id(),hit.energy());
      eeRecHit.eta[eeRecHit.n] = getEta(hit.id());
@@ -379,6 +393,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
       for(unsigned int i = 0; i < towers->size(); ++i){
       const CaloTower & hit= (*towers)[i];
+      if (getEt(hit.id(),hit.energy())<towerPtMin_) continue;
       myTowers.e[myTowers.n] = hit.energy();
       myTowers.et[myTowers.n] = getEt(hit.id(),hit.energy());
       myTowers.eta[myTowers.n] = getEta(hit.id());
