@@ -24,7 +24,6 @@ cvs co          RecoHI/HiJetAlgos
 
 # needed to get PFTowers to work
 cvs co -r cmssw39x_branch -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
-cvs co -r hi39X_01 -d MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 
 # gamma analysis
 cvs co RecoHI/HiEgammaAlgos                  # for 3_9_8 reconstruction   including spike cleaner 
