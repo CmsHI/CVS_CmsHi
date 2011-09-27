@@ -22,8 +22,9 @@ class HiForest
 
   // Utility functions
   void GetEntry(int i);
-  int  GetEntries();
-  void printStatus();
+  int  GetEntries();  				// Get the number of entries 
+  void checkTree(TTree *t,char *title);		// Check the status of a tree
+  void printStatus();				// Print the status of the hiForest
 
 
   // TFile
@@ -137,12 +138,26 @@ int HiForest::GetEntries()
   return tree->GetEntries();
 }
 
+void HiForest::checkTree(TTree *t,char *title)
+{
+   int entries = t->GetEntries();
+   cout <<title<<": "<<entries<<" entries loaded.";
+   if (entries != tree->GetEntries()) {
+      cout <<" Inconsistent number of entries!!"<<endl;
+   } else {
+      cout <<endl;
+   }
+
+}
+
 void HiForest::printStatus()
 {
-  if (hasHltTree)      cout <<"Hlt tree loaded."<<endl;
-  if (hasSkimTree)      cout <<"Skim tree loaded."<<endl;
-  if (hasPhotonTree)   cout <<"Photon tree loaded."<<endl;
-  if (hasTrackTree)    cout <<"Track tree loaded."<<endl;
-  if (hasAkPu3JetTree) cout <<"AkPu3PFJet tree loaded."<<endl;
-  if (hasIcPu5JetTree) cout <<"IcPu5Jet tree loaded."<<endl;
+  if (hasHltTree) checkTree(hltTree,"HltTree");
+  if (hasSkimTree) checkTree(skimTree,"SkimTree");
+  if (hasIcPu5JetTree) checkTree(icPu5jetTree,"IcPu5jetTree");
+  if (hasAkPu3JetTree) checkTree(akPu3jetTree,"AkPu3jetTree");
+  if (hasTrackTree) checkTree(trackTree,"TrackTree");
+  if (hasPhotonTree) checkTree(trackTree,"PhotonTree");
+
 }
+
