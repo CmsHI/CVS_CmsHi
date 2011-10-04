@@ -3,6 +3,7 @@
 #include "SetupPhotonTree.h"
 #include "SetupJetTree.h"
 #include "SetupHltTree.h"
+#include "SetupSkimTree.h"
 #include "SetupTrackTree.h"
 
 #include <TTree.h>
@@ -41,13 +42,12 @@ class HiForest
 
   // Branches
   Hlts hlt;
-  Hlts skim;
+  Skims skim;
   Jets icPu5;
   Jets akPu3PF;
   Photons photon;
   Tracks track;
 
-  private:
   
   // Boolings
   bool hasPhotonTree;
@@ -57,7 +57,7 @@ class HiForest
   bool hasTrackTree;
   bool hasSkimTree;
 
-                   
+  private:                   
 };
 
 HiForest::HiForest(char *infName)
@@ -113,7 +113,7 @@ HiForest::HiForest(char *infName)
   if (hasSkimTree) {
     skimTree->SetName("skim");
     if (tree == 0) tree = skimTree; else tree->AddFriend(skimTree);
-    setupHltTree(skimTree,skim);
+    setupSkimTree(skimTree,skim);
   }
   
   tree->SetMarkerStyle(20);
