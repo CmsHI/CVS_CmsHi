@@ -27,6 +27,9 @@ class HiForest
   void checkTree(TTree *t,char *title);		// Check the status of a tree
   void printStatus();				// Print the status of the hiForest
 
+  // Photon utility functions
+  bool isSpike(int i);                          // return true if it is considered as a spike candidate
+  bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
 
   // TFile
   TFile *inf; 
@@ -161,3 +164,33 @@ void HiForest::printStatus()
 
 }
 
+// ====================== Photon Utilities ========================
+bool HiForest::isSpike(int j)
+{
+  if (photon.isEB[j]) {
+    double swiss = 1-(photon.eRight[j]+photon.eLeft[j]+photon.eTop[j]+photon.eBottom[j])/photon.eMax[j];
+    if (swiss>0.9) return 1;
+    if (fabs(photon.seedTime[j])>3) return 1;
+    if (photon.sigmaIetaIeta[j]<0.002) return 1;
+    if (photon.sigmaIphiIphi[j]<0.002) return 1;
+  } 
+  return 0;
+}
+
+bool HiForest::isGoodPhoton(int j)
+{
+
+  if (photon.isEB[j]) {
+    // Barrel photon
+    if (photon.hadronicOverEm[j]>0.2) return 0;
+    if (photon.isEle[j]) return 0;
+    if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
+    if (photon.sigmaIetaIeta[j]>0.011) return 0;
+    if ((photon.cr4[j]+photon.cc4[j]+photon.ct4PtCut[j])>5) return 0;
+  } else {
+    // Endcap photon
+    return 0;  // Need to update to include endcap photons
+  } 
+
+  return 1;
+}

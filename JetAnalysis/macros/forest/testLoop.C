@@ -38,18 +38,10 @@ void photonJet(double etCut=40)
       int leadingPhoton=-1;
       int leadingJet=-1;
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.et[j]<etCut) break;
-         if (fabs(c->photon.eta[j])>1.44) continue;
-         double swiss = 1-(c->photon.eRight[j]+c->photon.eLeft[j]+c->photon.eTop[j]+c->photon.eBottom[j])/c->photon.eMax[j];
-         if (swiss>0.9) continue;
-         if (fabs(c->photon.seedTime[j])>3) continue;
-         if (c->photon.hadronicOverEm[j]>0.2) continue;
-         if (c->photon.isEle[j]) continue;
-         if ((c->photon.rawEnergy[j]/c->photon.energy[j])<0.5) continue;
-         if (c->photon.sigmaIetaIeta[j]>0.011) continue;
-         if ((c->photon.cr4[j]+c->photon.cc4[j]+c->photon.ct4PtCut[j])>5) continue;
-         if (c->photon.sigmaIetaIeta[j]<0.002) continue;
-         if (c->photon.sigmaIphiIphi[j]<0.002) continue;
+         if (c->photon.et[j]<etCut) break;          // photon pT cut, assuming that et is sorted
+         if (fabs(c->photon.eta[j])>1.44) continue; // |eta|<1.44
+         if (c->isSpike(j)) continue;               // spike removal
+         if (!c->isGoodPhoton(j)) continue;         // hiGoodPhoton cut
          leadingPhoton=j;  
          break;  
       }	 
