@@ -27,21 +27,28 @@ class HiForest
   void checkTree(TTree *t,char *title);		// Check the status of a tree
   void printStatus();				// Print the status of the hiForest
 
+  // Event filtering utility functions
+
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
 
+  // Jet utility functions
+
+  // Track utility functions
+
+
   // TFile
-  TFile *inf; 
+  TFile *inf; 					// Input file 
 
   // Trees
-  TTree *photonTree;
-  TTree *icPu5jetTree;
-  TTree *akPu3jetTree;
-  TTree *hltTree;
-  TTree *trackTree;
-  TTree *skimTree;
-  TTree *tree;
+  TTree *photonTree;				// Photon Tree, see branches in SetupPhotonTree.h
+  TTree *icPu5jetTree;				// Jet Tree with icPu5 algorithm, see branches in SetupJetTree.h
+  TTree *akPu3jetTree;				// Jet Tree with akPu3PF algorithm, see branches in SetupJetTree.h
+  TTree *hltTree;				// OpenHLT Tree, see branches in SetupHltTree.h
+  TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
+  TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
+  TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
   // Branches
   Hlts hlt;

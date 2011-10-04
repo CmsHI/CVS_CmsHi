@@ -13,30 +13,37 @@ double deltaPhi(double phi1, double phi2) {
 
 void photonJet(double etCut=40)
 {
-
+   // Define the input file and HiForest
    HiForest *c = new HiForest("merged_HI2010_SD_Jet35_prod05.root");
+
+   // Don't want to loop over trees which is not used in the analysis
    c->hasHltTree=0;
    c->hasSkimTree=0;
    c->hasTrackTree=0;
    c->hasIcPu5JetTree=0;
+
+   // Output file
    TFile *output = new TFile(Form("output-%.0f.root",etCut),"recreate");
+
+   // Agj histograms for different centralities
    TH1D *h1 = new TH1D("h1","",100,-1,1);
    TH1D *h2 = new TH1D("h2","",100,-1,1);
    TH1D *h3 = new TH1D("h3","",100,-1,1);
    TH1D *h4 = new TH1D("h4","",100,-1,1);
+
+   // A light Ntuple output
    TNtuple *t = new TNtuple("nt","","cBin:photonEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:Agj");
 
-
+   // Main loop
    for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
-      //cout <<"Run number = "<<c->hlt.Run<<endl;
-      //cout <<"Event number = "<<c->hlt.Event<<endl;
-      // Loop over photons
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries()<<endl;
 
       int leadingPhoton=-1;
       int leadingJet=-1;
+
+      // Loop over photons to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
          if (c->photon.et[j]<etCut) break;          // photon pT cut, assuming that et is sorted
          if (fabs(c->photon.eta[j])>1.44) continue; // |eta|<1.44
@@ -46,12 +53,15 @@ void photonJet(double etCut=40)
          break;  
       }	 
 
+      // Found a leading photon which passed basic quality cut!
       if (leadingPhoton!=-1) {
          Float_t var[100];
          var[0]=c->photon.cBin;
          var[1]=c->photon.et[leadingPhoton];
          var[2]=c->photon.eta[leadingPhoton];
          var[3]=c->photon.phi[leadingPhoton];
+
+         // Loop over jet tree to find a away side leading jet
          for (int j=0;j<c->akPu3PF.nref;j++) {
             if (c->akPu3PF.jtpt[j]<25) break;
             if (fabs(c->akPu3PF.jteta[j])>2) continue;
@@ -59,6 +69,8 @@ void photonJet(double etCut=40)
             leadingJet = j;
             break;
          }	 
+
+         // Found a leading jet!
          if (leadingJet !=-1) {
             double photonEt = c->photon.et[leadingPhoton];
             double jetPt = c->akPu3PF.jtpt[leadingJet];
@@ -76,31 +88,9 @@ void photonJet(double etCut=40)
             var[5]=0;
             var[6]=0;
             var[7]=1;
-
          }
          t->Fill(var);
       }
-
-/*
-      // Loop over icPu5 jets
-      for (int j=0;j<c->icPu5.nref;j++) {
-         cout <<i<<"IcPu5Jet "<<j<<" "<<c->icPu5.jtpt[j]<<endl;
-      }	 
-
-      // Loop over akPu3PF jets
-      for (int j=0;j<c->akPu3PF.nref;j++) {
-         cout <<i<<"AkPu3PFJet "<<j<<" "<<c->akPu3PF.jtpt[j]<<endl;
-      }	 
-
-      // Loop over tracks
-      for (int j=0;j<c->track.nTrk;j++) {
-         cout <<i<<"Track "<<j<<" "<<c->track.trkPt[j]<<endl;
-      }	 
-
-
-      cout <<"icPu5 leading jet "<<c->icPu5.jtpt[0]<<endl;	 
-      cout <<"akPu3PF leading jet "<<c->akPu3PF.jtpt[0]<<endl;	 
-*/
    }
 
    output->Write();
