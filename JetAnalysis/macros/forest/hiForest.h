@@ -13,7 +13,7 @@
 // ==========================================================
 // Main class which can be used to read the hiForest trees
 //
-// Auther: Yen-Jie Lee
+// Author: Yen-Jie Lee
 //
 // ==========================================================
 
@@ -54,6 +54,8 @@ class HiForest
   TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
   TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
+
+  vector<TTree*> cloneForest;                   // Vector of clones for skim
 
   // Branches
   Hlts hlt;
@@ -188,6 +190,7 @@ void HiForest::PrintStatus()
 void HiForest::SetOutputFile(char *name)
 {
    outf = new TFile(name,"recreate");
+  
    setupOutput = true;
 }
 
