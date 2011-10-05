@@ -10,9 +10,12 @@
 #include <TFile.h>
 #include <TString.h>
 
+// ==========================================================
 // Main class which can be used to read the hiForest trees
 //
+// Auther: Yen-Jie Lee
 //
+// ==========================================================
 
 class HiForest
 {
@@ -74,22 +77,26 @@ HiForest::HiForest(char *infName)
 {
   tree = 0;
 
+  // Input file
   inf = new TFile(infName);
-  hltTree = (TTree*) inf->Get("hltanalysis/HltTree");
-  skimTree = (TTree*) inf->Get("skimanalysis/HltTree");
-  photonTree = (TTree*) inf->Get("NTuples/Analysis");
+
+  // Load trees. Hard coded for the moment
+  hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
+  skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
+  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
-  trackTree = (TTree*) inf->Get("anaTrack/trackTree");
+  trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
 
+  // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
   hasTrackTree     = (trackTree    != 0);
   hasHltTree       = (hltTree      != 0);
-  hasSkimTree       = (skimTree      != 0);
+  hasSkimTree      = (skimTree     != 0);
   
-
+  // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
     photonTree->SetName("photon");
     if (tree == 0) tree = photonTree;
@@ -127,6 +134,8 @@ HiForest::HiForest(char *infName)
   }
   
   tree->SetMarkerStyle(20);
+
+  // Print the status of thre forest
   printStatus();
 }
 
@@ -144,7 +153,6 @@ void HiForest::GetEntry(int i)
 int HiForest::GetEntries()
 {
   // get the entries of the available trees
-  
   return tree->GetEntries();
 }
 
@@ -153,6 +161,7 @@ void HiForest::checkTree(TTree *t,char *title)
    int entries = t->GetEntries();
    cout <<title<<": "<<entries<<" entries loaded.";
    if (entries != tree->GetEntries()) {
+      // Entries from different trees are inconsistent!!
       cout <<" Inconsistent number of entries!!"<<endl;
    } else {
       cout <<endl;
@@ -201,3 +210,4 @@ bool HiForest::isGoodPhoton(int j)
 
   return 1;
 }
+
