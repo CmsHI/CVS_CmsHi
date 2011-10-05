@@ -20,7 +20,7 @@
  * \author Pasquale Musella,    LIP, PT
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
- * \version $Id: MultiPhotonAnalyzerTree.h,v 1.5 2011/02/06 14:35:22 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.h,v 1.1 2011/10/02 14:51:44 kimy Exp $
  *
  */
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -28,12 +28,12 @@
 #ifndef CmsHi_PhotonAnalysis_MultiPhotonAnalyzerTree_h
 #define CmsHi_PhotonAnalysis_MultiPhotonAnalyzerTree_h
 
-#include "CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzer.h"
+#include "CmsHi/PhotonAnalysis/plugins/SinglePhotonAnalyzerTree.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
 
-class MultiPhotonAnalyzerTree : public SinglePhotonAnalyzer { 
+class MultiPhotonAnalyzerTree : public SinglePhotonAnalyzerTree { 
 
 public:
    
@@ -46,8 +46,9 @@ public:
    virtual int selectStorePhotons(const edm::Event&,const edm::EventSetup&,const char* pfx="");
    virtual int storePhotons(const edm::Event&,const edm::EventSetup&  ,pat::PhotonCollection &, reco::PhotonCollection &,const char* pfx="");
    
-   const int kMaxPhotons;
-   
+   //   const int kMaxPhotons;
+   // #define kMaxPhotons 50;
+
 };
 
 #endif

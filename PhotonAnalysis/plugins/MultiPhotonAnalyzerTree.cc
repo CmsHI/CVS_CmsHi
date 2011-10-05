@@ -22,9 +22,10 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.1 2011/10/02 14:51:44 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.2 2011/10/04 17:09:51 kimy Exp $
  *
  */
+
 
 // This MultiphotonAnalyzer was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)
 
@@ -112,8 +113,9 @@ using namespace ROOT::Math::VectorUtil;
 
 
 MultiPhotonAnalyzerTree::MultiPhotonAnalyzerTree(const edm::ParameterSet& ps):
-   SinglePhotonAnalyzer(ps),
-   kMaxPhotons(ps.getUntrackedParameter<int>("MaxPhotons", 50))
+   SinglePhotonAnalyzerTree(ps)
+   //  kMaxPhotons(ps.getUntrackedParameter<int>("MaxPhotons", 50))
+   // already defined as 50
 {
 }
 
@@ -134,7 +136,8 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
    //  if (doStoreJets_)	storeJets(e);
    //  if (doStoreTracks_)     storeTracks(e);
 
-   storeEvtPlane(e);
+   //   storeEvtPlane(e);
+   
    bool foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
    
@@ -371,7 +374,7 @@ int MultiPhotonAnalyzerTree::storePhotons(const edm::Event& e,const edm::EventSe
     Photon photon = Photon(*phoItr);
     // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
     //       hence, Photon::setVertex() leaves photon object unchanged
-    photon.setVertex(vtx_);
+    //     photon.setVertex(vtx_);   <== Test if this makes error
     
     p4    (nphotonscounter) =  TLorentzVector(photon.px(),photon.py(),photon.pz(),photon.energy());
     p     (nphotonscounter) =  photon.p();
