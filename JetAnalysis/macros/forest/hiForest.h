@@ -27,8 +27,9 @@ class HiForest
   // Utility functions
   void GetEntry(int i);
   int  GetEntries();  				// Get the number of entries 
-  void checkTree(TTree *t,char *title);		// Check the status of a tree
-  void printStatus();				// Print the status of the hiForest
+  void CheckTree(TTree *t,char *title);		// Check the status of a tree
+  void PrintStatus();				// Print the status of the hiForest
+  void SetOutputFile(char *name);               // Set output file name for skim
 
   // Event filtering utility functions
 
@@ -43,6 +44,7 @@ class HiForest
 
   // TFile
   TFile *inf; 					// Input file 
+  TFile *outf;                                  // Output file
 
   // Trees
   TTree *photonTree;				// Photon Tree, see branches in SetupPhotonTree.h
@@ -69,6 +71,8 @@ class HiForest
   bool hasHltTree;
   bool hasTrackTree;
   bool hasSkimTree;
+  
+  bool setupOutput;
 
   private:                   
 };
@@ -95,6 +99,7 @@ HiForest::HiForest(char *infName)
   hasTrackTree     = (trackTree    != 0);
   hasHltTree       = (hltTree      != 0);
   hasSkimTree      = (skimTree     != 0);
+  setupOutput = false;
   
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
@@ -136,7 +141,7 @@ HiForest::HiForest(char *infName)
   tree->SetMarkerStyle(20);
 
   // Print the status of thre forest
-  printStatus();
+  PrintStatus();
 }
 
 void HiForest::GetEntry(int i)
@@ -156,7 +161,7 @@ int HiForest::GetEntries()
   return tree->GetEntries();
 }
 
-void HiForest::checkTree(TTree *t,char *title)
+void HiForest::CheckTree(TTree *t,char *title)
 {
    int entries = t->GetEntries();
    cout <<title<<": "<<entries<<" entries loaded.";
@@ -169,15 +174,21 @@ void HiForest::checkTree(TTree *t,char *title)
 
 }
 
-void HiForest::printStatus()
+void HiForest::PrintStatus()
 {
-  if (hasHltTree) checkTree(hltTree,"HltTree");
-  if (hasSkimTree) checkTree(skimTree,"SkimTree");
-  if (hasIcPu5JetTree) checkTree(icPu5jetTree,"IcPu5jetTree");
-  if (hasAkPu3JetTree) checkTree(akPu3jetTree,"AkPu3jetTree");
-  if (hasTrackTree) checkTree(trackTree,"TrackTree");
-  if (hasPhotonTree) checkTree(trackTree,"PhotonTree");
+  if (hasHltTree)      CheckTree(hltTree,"HltTree");
+  if (hasSkimTree)     CheckTree(skimTree,"SkimTree");
+  if (hasIcPu5JetTree) CheckTree(icPu5jetTree,"IcPu5jetTree");
+  if (hasAkPu3JetTree) CheckTree(akPu3jetTree,"AkPu3jetTree");
+  if (hasTrackTree)    CheckTree(trackTree,"TrackTree");
+  if (hasPhotonTree)   CheckTree(trackTree,"PhotonTree");
 
+}
+
+void HiForest::SetOutputFile(char *name)
+{
+   outf = new TFile(name,"recreate");
+   setupOutput = true;
 }
 
 // ====================== Photon Utilities ========================
