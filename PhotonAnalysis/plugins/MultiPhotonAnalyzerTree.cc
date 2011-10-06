@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.2 2011/10/04 17:09:51 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.3 2011/10/05 16:08:37 kimy Exp $
  *
  */
 
@@ -138,7 +138,7 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
 
    //   storeEvtPlane(e);
    
-   bool foundPhotons = selectStorePhotons(e,iSetup,"");
+   int foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
    
 
@@ -152,49 +152,36 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
 
 
 int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::EventSetup& iSetup, const char* prefx){
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Photon Section: store kMaxPhotons in the events as an array in the tree //
-  /////////////////////////////////////////////////////////////////////////////
-  // Get photon details  
-   Handle<pat::PhotonCollection> photons;
-  e.getByLabel(photonProducer_, photons);   
-
-  pat::PhotonCollection myphotons;
-  for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr != photons->end(); ++phoItr) {  
-    myphotons.push_back(*phoItr);
-  }
-  
-  reco::PhotonCollection myCompPhotons;
-
-  if (doStoreCompCone_) {
-     
-     Handle<reco::PhotonCollection> compPhotons;
-     e.getByLabel(compPhotonProducer_, compPhotons);
-     
-     for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr) {
-        myCompPhotons.push_back(*phoItr);
-     }
-  }
-
-
-  GreaterByPt<Photon> pTComparator_;
-
-  // Sort photons according to pt
-  std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
-  std::sort(myCompPhotons.begin(), myCompPhotons.end(), pTComparator_);
- 
- 
-  return storePhotons(e,iSetup,myphotons,myCompPhotons, prefx);
-  
-}
-
-int MultiPhotonAnalyzerTree::storePhotons(const edm::Event& e,const edm::EventSetup& iSetup,PhotonCollection & myphotons, reco::PhotonCollection & myCompPhotons,  const char* prefx){
    
-
+   /////////////////////////////////////////////////////////////////////////////
+   // Photon Section: store kMaxPhotons in the events as an array in the tree //
+   /////////////////////////////////////////////////////////////////////////////
+   // Get photon details  
+   Handle<pat::PhotonCollection> photons;
+   e.getByLabel(photonProducer_, photons);   
+   
+   pat::PhotonCollection myphotons;
+   for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr != photons->end(); ++phoItr) {  
+      myphotons.push_back(*phoItr);
+   }
+   
+   reco::PhotonCollection myCompPhotons;
+   if (doStoreCompCone_) {
+      Handle<reco::PhotonCollection> compPhotons;
+      e.getByLabel(compPhotonProducer_, compPhotons);
+      for (reco::PhotonCollection::const_iterator phoItr = compPhotons->begin(); phoItr != compPhotons->end(); ++phoItr){
+	 myCompPhotons.push_back(*phoItr);
+      }
+   }
+   
+   GreaterByPt<Photon> pTComparator_;
+   
+   // Sort photons according to pt
+   std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
+   std::sort(myCompPhotons.begin(), myCompPhotons.end(), pTComparator_);
+   
   TString pfx(prefx);
   
-
   // Tools to get cluster shapes
 
   edm::Handle<EcalRecHitCollection> EBReducedRecHits;
@@ -214,19 +201,15 @@ int MultiPhotonAnalyzerTree::storePhotons(const edm::Event& e,const edm::EventSe
   
   bool isEleRecoed = false;
   if (EleHandle.isValid()) {
-    cout << " electron was reconstructed! " << endl;
-     isEleRecoed = true;
+     cout << " electron was reconstructed! " << endl;
+    isEleRecoed = true;
   }
   
   if ( isEleRecoed) {
-     for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr)	{
+     for (reco::GsfElectronCollection::const_iterator eleItr = EleHandle->begin(); eleItr != EleHandle->end(); ++eleItr) {
 	myEle.push_back(*eleItr);
      }
   }
-  
-  
-  
-  
   
   // Heavy Ion variable calculator
   CxCalculator CxC(e,iSetup, basicClusterBarrel_, basicClusterEndcap_);
@@ -235,6 +218,7 @@ int MultiPhotonAnalyzerTree::storePhotons(const edm::Event& e,const edm::EventSe
   TxyCalculator Txy(e,iSetup,trackProducer_);
   dRxyCalculator dRxy(e,iSetup,trackProducer_);
   
+  /*
   HTValVector<TLorentzVector> p4(kMaxPhotons);
   HTValVector<Float_t> p(kMaxPhotons),  et(kMaxPhotons),  energy(kMaxPhotons);
   HTValVector<Float_t> px(kMaxPhotons), py(kMaxPhotons),  pz(kMaxPhotons);
@@ -361,6 +345,9 @@ int MultiPhotonAnalyzerTree::storePhotons(const edm::Event& e,const edm::EventSe
   HTValVector<Float_t> genMatchedPt(kMaxPhotons), genMatchedEta(kMaxPhotons), genMatchedPhi(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR03(kMaxPhotons), genTrkIsoDR03(kMaxPhotons);
   HTValVector<Float_t> genCalIsoDR04(kMaxPhotons), genTrkIsoDR04(kMaxPhotons);
+
+
+  */
 
   int nphotonscounter=0;
   for (PhotonCollection::const_iterator phoItr = myphotons.begin(); phoItr != myphotons.end(); ++phoItr) {  

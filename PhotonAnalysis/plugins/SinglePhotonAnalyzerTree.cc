@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.17 2011/07/27 13:39:32 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.1 2011/10/05 16:08:49 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -190,18 +190,17 @@ SinglePhotonAnalyzerTree::SinglePhotonAnalyzerTree(const edm::ParameterSet& ps):
   etCutGenMatch_                   = ps.getUntrackedParameter<double>("etCutGenMatch",13);
   etaCutGenMatch_                  = ps.getUntrackedParameter<double>("etaCutGenMatch",3);
   
-  doStoreGeneral_                  = ps.getUntrackedParameter<bool>("doStoreGeneral",true);
-  doStoreCentrality_                  = ps.getUntrackedParameter<bool>("doStoreCentrality",true);
-  doStoreL1Trigger_                = ps.getUntrackedParameter<bool>("doStoreL1Trigger",true);
-  doStoreHLT_                      = ps.getUntrackedParameter<bool>("doStoreHLT",true);
-  doStoreHF_                       = ps.getUntrackedParameter<bool>("doStoreHF",true);
-  doStoreVertex_                   = ps.getUntrackedParameter<bool>("doStoreVertex",true);
-  doStoreMET_                      = ps.getUntrackedParameter<bool>("doStoreMET",true);
-  doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",true);
-  doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",true);
+  doStoreCentrality_                  = ps.getUntrackedParameter<bool>("doStoreCentrality",false);
+  doStoreL1Trigger_                = ps.getUntrackedParameter<bool>("doStoreL1Trigger",false);
+  doStoreHLT_                      = ps.getUntrackedParameter<bool>("doStoreHLT",false);
+  doStoreHF_                       = ps.getUntrackedParameter<bool>("doStoreHF",false);
+  doStoreVertex_                   = ps.getUntrackedParameter<bool>("doStoreVertex",false);
+  doStoreMET_                      = ps.getUntrackedParameter<bool>("doStoreMET",false);
+  doStoreJets_                     = ps.getUntrackedParameter<bool>("doStoreJets",false);
+  doStoreCompCone_                 = ps.getUntrackedParameter<bool>("doStoreCompCone",false);
   doStoreConversions_              = ps.getUntrackedParameter<bool>("doStoreConversions",false);
   
-  doStoreTracks_                   = ps.getUntrackedParameter<bool>("doStoreTracks",true);
+  doStoreTracks_                   = ps.getUntrackedParameter<bool>("doStoreTracks",false);
 
   // electorn collection
   EleTag_                          = ps.getUntrackedParameter<edm::InputTag>("gsfElectronCollection");
@@ -263,8 +262,6 @@ SinglePhotonAnalyzerTree::~SinglePhotonAnalyzerTree() {
 
 void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
-        if (doStoreGeneral_) 	storeGeneral(e, iSetup);
-	if (doStoreL1Trigger_) 	storeL1Trigger(e);
 	if (doStoreHLT_) 	storeHLT(e);
 	if (doStoreHF_)		storeHF(e);
 	analyzeMC(e,iSetup);
@@ -286,19 +283,197 @@ void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetu
 }
 
 void SinglePhotonAnalyzerTree::beginJob() {
-   centrality_=0;
+   //   centrality_=0;
+   theTree  = fs->make<TTree>("photon","Tree of photons");
+   int run;
+   int evt;
+   int bunchCrossing;
+   int luminosityBlock;
+   theTree->Branch("run",&run,"run/I");
+   theTree->Branch("event",&event,"event/I");
+   theTree->Branch("bunchCrossing",&bunchCrossing,"bunchCrossing/I");
+   theTree->Branch("luminosityBlock",&luminosityBlock,"luminosityBlock/I");
+
+   theTree->Branch("pt",pt,"pt[nPho]/F");
+   theTree->Branch("energy",energy,"energy[nPho]/F");
+   theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPho]/F");
+   theTree->Branch("px",px,"px[nPho]/F");
+   theTree->Branch("py",py,"py[nPho]/F");
+   theTree->Branch("pz",pz,"pz[nPho]/F");
+   theTree->Branch("eta",eta,"eta[nPho]/F");
+   theTree->Branch("phi",phi,"phi[nPho]/F");
+   theTree->Branch("r9",r9,"r9[nPho]/F");
+   theTree->Branch("isEBGap",isEBGap,"isEBGap[nPho]/F");
+   theTree->Branch("isEEGap",isEEGap,"isEEGap[nPho]/F");
+   theTree->Branch("isEBEEGap",isEBEEGap,"isEBEEGap[nPho]/F");
+   theTree->Branch("isTransGap",isTransGap,"isTransGap[nPho]/F");
+   theTree->Branch("preshowerEnergy",preshowerEnergy,"preshowerEnergy[nPho]/F");
+   theTree->Branch("numOfPreshClusters",numOfPreshClusters,"numOfPreshClusters[nPho]/F");
+   theTree->Branch("ESRatio",ESRatio,"ESRatio[nPho]/F");
+   theTree->Branch("clustersSize",clustersSize,"clustersSize[nPho]/F");
+   theTree->Branch("scSize",scSize,"scSize[nPho]/F");
+   theTree->Branch("phiWidth",phiWidth,"phiWidth[nPho]/F");
+   theTree->Branch("etaWidth",etaWidth,"etaWidth[nPho]/F");
+   theTree->Branch("scEta",scEta,"scEta[nPho]/F");
+   theTree->Branch("scPhi",scPhi,"scPhi[nPho]/F");
+   theTree->Branch("sigmaEtaEta",sigmaEtaEta,"sigmaEtaEta[nPho]/F");
+   theTree->Branch("sigmaIetaIeta",sigmaIetaIeta,"sigmaIetaIeta[nPho]/F");
+   theTree->Branch("sigmaIphiIphi",sigmaIphiIphi,"sigmaIphiIphi[nPho]/F");
+   theTree->Branch("sieie50",sieie50,"sieie50[nPho]/F");
+   theTree->Branch("sieie45",sieie45,"sieie45[nPho]/F");
+   theTree->Branch("sieie42",sieie42,"sieie42[nPho]/F");
+   theTree->Branch("sieie39",sieie39,"sieie39[nPho]/F");
+   theTree->Branch("covPhiPhi",covPhiPhi,"covPhiPhi[nPho]/F");
+   theTree->Branch("covEtaPhi",covEtaPhi,"covEtaPhi[nPho]/F");
+   theTree->Branch("covEtaEta",covEtaEta,"covEtaEta[nPho]/F");
+   theTree->Branch("r1x5",r1x5,"r1x5[nPho]/F");
+   theTree->Branch("r2x5",r2x5,"r2x5[nPho]/F");
+   theTree->Branch("e1x5",e1x5,"e1x5[nPho]/F");
+   theTree->Branch("e2x5",e2x5,"e2x5[nPho]/F");
+   theTree->Branch("eMax",eMax,"eMax[nPho]/F");
+   theTree->Branch("e2nd",e2nd,"e2nd[nPho]/F");
+   theTree->Branch("e2x2",e2x2,"e2x2[nPho]/F");
+   theTree->Branch("e3x3",e3x3,"e3x3[nPho]/F");
+   theTree->Branch("e3x2",e3x2,"e3x2[nPho]/F");
+   theTree->Branch("e4x4",e4x4,"e4x4[nPho]/F");
+   theTree->Branch("e5x5",e5x5,"e5x5[nPho]/F");
+   theTree->Branch("e2overe8",e2overe8,"e2overe8[nPho]/F");
+   theTree->Branch("eRight",eRight,"eRight[nPho]/F");
+   theTree->Branch("eLeft",eLeft,"eLeft[nPho]/F");
+   theTree->Branch("eTop",eTop,"eTop[nPho]/F");
+   theTree->Branch("eBottom",eBottom,"eBottom[nPho]/F");
+   theTree->Branch("e2x5Right",e2x5Right,"e2x5Right[nPho]/F");
+   theTree->Branch("e2x5Left",e2x5Left,"e2x5Left[nPho]/F");
+   theTree->Branch("e2x5Top",e2x5Top,"e2x5Top[nPho]/F");
+   theTree->Branch("e2x5Bottom",e2x5Bottom,"e2x5Bottom[nPho]/F");
+   theTree->Branch("seedTime",seedTime,"seedTime[nPho]/F");
+   theTree->Branch("seedChi2",seedChi2,"seedChi2[nPho]/F");
+   theTree->Branch("seedOutOfTimeChi2",seedOutOfTimeChi2,"seedOutOfTimeChi2[nPho]/F");
+   theTree->Branch("seedRecoFlag",seedRecoFlag,"seedRecoFlag[nPho]/F");
+   theTree->Branch("seedSeverity",seedSeverity,"seedSeverity[nPho]/F");
+   theTree->Branch("tRight",tRight,"tRight[nPho]/F");
+   theTree->Branch("tLeft",tLeft,"tLeft[nPho]/F");
+   theTree->Branch("tTop",tTop,"tTop[nPho]/F");
+   theTree->Branch("tBottom",tBottom,"tBottom[nPho]/F");
+   theTree->Branch("swissCrx",swissCrx,"swissCrx[nPho]/F");
+   theTree->Branch("hadronicOverEm",hadronicOverEm,"hadronicOverEm[nPho]/F");
+   theTree->Branch("hadronicDepth1OverEm",hadronicDepth1OverEm,"hadronicDepth1OverEm[nPho]/F");
+   theTree->Branch("hadronicDepth2OverEm",hadronicDepth2OverEm,"hadronicDepth2OverEm[nPho]/F");
+   theTree->Branch("ecalRecHitSumEtConeDR04",ecalRecHitSumEtConeDR04,"ecalRecHitSumEtConeDR04[nPho]/F");
+   theTree->Branch("hcalTowerSumEtConeDR04",hcalTowerSumEtConeDR04,"hcalTowerSumEtConeDR04[nPho]/F");
+   theTree->Branch("hcalDepth1TowerSumEtConeDR04",hcalDepth1TowerSumEtConeDR04,"hcalDepth1TowerSumEtConeDR04[nPho]/F");
+   theTree->Branch("hcalDepth2TowerSumEtConeDR04",hcalDepth2TowerSumEtConeDR04,"hcalDepth2TowerSumEtConeDR04[nPho]/F");
+   theTree->Branch("trkSumPtHollowConeDR04",trkSumPtHollowConeDR04,"trkSumPtHollowConeDR04[nPho]/F");
+   theTree->Branch("ecalRecHitSumEtConeDR03",ecalRecHitSumEtConeDR03,"ecalRecHitSumEtConeDR03[nPho]/F");
+   theTree->Branch("hcalTowerSumEtConeDR03",hcalTowerSumEtConeDR03,"hcalTowerSumEtConeDR03[nPho]/F");
+   theTree->Branch("hcalDepth1TowerSumEtConeDR03",hcalDepth1TowerSumEtConeDR03,"hcalDepth1TowerSumEtConeDR03[nPho]/F");
+   theTree->Branch("hcalDepth2TowerSumEtConeDR03",hcalDepth2TowerSumEtConeDR03,"hcalDepth2TowerSumEtConeDR03[nPho]/F");
+   theTree->Branch("trkSumPtHollowConeDR03",trkSumPtHollowConeDR03,"trkSumPtHollowConeDR03[nPho]/F");
+   theTree->Branch("isEle",isEle,"isEle[nPho]/F");
+   theTree->Branch("detaEle",detaEle,"detaEle[nPho]/F");
+   theTree->Branch("dphiEle",dphiEle,"dphiEle[nPho]/F");
+   theTree->Branch("eleCharge",eleCharge,"eleCharge[nPho]/F");
+   theTree->Branch("eleEoverP",eleEoverP,"eleEoverP[nPho]/F");
+   theTree->Branch("c1",c1,"c1[nPho]/F");
+   theTree->Branch("c2",c2,"c2[nPho]/F");
+   theTree->Branch("c3",c3,"c3[nPho]/F");
+   theTree->Branch("c4",c4,"c4[nPho]/F");
+   theTree->Branch("c5",c5,"c5[nPho]/F");
+   theTree->Branch("r1",r1,"r1[nPho]/F");
+   theTree->Branch("r2",r2,"r2[nPho]/F");
+   theTree->Branch("r3",r3,"r3[nPho]/F");
+   theTree->Branch("r4",r4,"r4[nPho]/F");
+   theTree->Branch("r5",r5,"r5[nPho]/F");
+   theTree->Branch("t1PtCut",t1PtCut,"t1PtCut[nPho]/F");
+   theTree->Branch("t2PtCut",t2PtCut,"t2PtCut[nPho]/F");
+   theTree->Branch("t3PtCut",t3PtCut,"t3PtCut[nPho]/F");
+   theTree->Branch("t4PtCut",t4PtCut,"t4PtCut[nPho]/F");
+   theTree->Branch("t5PtCut",t5PtCut,"t5PtCut[nPho]/F");
+   theTree->Branch("cc1",cc1,"cc1[nPho]/F");
+   theTree->Branch("cc2",cc2,"cc2[nPho]/F");
+   theTree->Branch("cc3",cc3,"cc3[nPho]/F");
+   theTree->Branch("cc4",cc4,"cc4[nPho]/F");
+   theTree->Branch("cc5",cc5,"cc5[nPho]/F");
+   theTree->Branch("cr1",cr1,"cr1[nPho]/F");
+   theTree->Branch("cr2",cr2,"cr2[nPho]/F");
+   theTree->Branch("cr3",cr3,"cr3[nPho]/F");
+   theTree->Branch("cr4",cr4,"cr4[nPho]/F");
+   theTree->Branch("cr5",cr5,"cr5[nPho]/F");
+   theTree->Branch("ct1",ct1,"ct1[nPho]/F");
+   theTree->Branch("ct2",ct2,"ct2[nPho]/F");
+   theTree->Branch("ct3",ct3,"ct3[nPho]/F");
+   theTree->Branch("ct4",ct4,"ct4[nPho]/F");
+   theTree->Branch("ct5",ct5,"ct5[nPho]/F");
+   theTree->Branch("ct1PtCut20",ct1PtCut20,"ct1PtCut20[nPho]/F");
+   theTree->Branch("ct2PtCut20",ct2PtCut20,"ct2PtCut20[nPho]/F");
+   theTree->Branch("ct3PtCut20",ct3PtCut20,"ct3PtCut20[nPho]/F");
+   theTree->Branch("ct4PtCut20",ct4PtCut20,"ct4PtCut20[nPho]/F");
+   theTree->Branch("ct5PtCut20",ct5PtCut20,"ct5PtCut20[nPho]/F");
+   theTree->Branch("ct1j20",ct1j20,"ct1j20[nPho]/F");
+   theTree->Branch("ct2j20",ct2j20,"ct2j20[nPho]/F");
+   theTree->Branch("ct3j20",ct3j20,"ct3j20[nPho]/F");
+   theTree->Branch("ct4j20",ct4j20,"ct4j20[nPho]/F");
+   theTree->Branch("ct5j20",ct5j20,"ct5j20[nPho]/F");
+   theTree->Branch("ct4j10",ct4j10,"ct4j10[nPho]/F");
+   theTree->Branch("ct4j15",ct4j15,"ct4j15[nPho]/F");
+   theTree->Branch("ct4j05",ct4j05,"ct4j05[nPho]/F");
+   theTree->Branch("dr11",dr11,"dr11[nPho]/F");
+   theTree->Branch("dr21",dr21,"dr21[nPho]/F");
+   theTree->Branch("dr31",dr31,"dr31[nPho]/F");
+   theTree->Branch("dr41",dr41,"dr41[nPho]/F");
+   theTree->Branch("dr12",dr12,"dr12[nPho]/F");
+   theTree->Branch("dr22",dr22,"dr22[nPho]/F");
+   theTree->Branch("dr32",dr32,"dr32[nPho]/F");
+   theTree->Branch("dr42",dr42,"dr42[nPho]/F");
+   theTree->Branch("dr13",dr13,"dr13[nPho]/F");
+   theTree->Branch("dr23",dr23,"dr23[nPho]/F");
+   theTree->Branch("dr33",dr33,"dr33[nPho]/F");
+   theTree->Branch("dr43",dr43,"dr43[nPho]/F");
+   theTree->Branch("dr14",dr14,"dr14[nPho]/F");
+   theTree->Branch("dr24",dr24,"dr24[nPho]/F");
+   theTree->Branch("dr34",dr34,"dr34[nPho]/F");
+   theTree->Branch("dr44",dr44,"dr44[nPho]/F");
+   theTree->Branch("t11",t11,"t11[nPho]/F");
+   theTree->Branch("t21",t21,"t21[nPho]/F");
+   theTree->Branch("t31",t31,"t31[nPho]/F");
+   theTree->Branch("t41",t41,"t41[nPho]/F");
+   theTree->Branch("t12",t12,"t12[nPho]/F");
+   theTree->Branch("t22",t22,"t22[nPho]/F");
+   theTree->Branch("t32",t32,"t32[nPho]/F");
+   theTree->Branch("t42",t42,"t42[nPho]/F");
+   theTree->Branch("t13",t13,"t13[nPho]/F");
+   theTree->Branch("t23",t23,"t23[nPho]/F");
+   theTree->Branch("t33",t33,"t33[nPho]/F");
+   theTree->Branch("t43",t43,"t43[nPho]/F");
+   theTree->Branch("t14",t14,"t14[nPho]/F");
+   theTree->Branch("t24",t24,"t24[nPho]/F");
+   theTree->Branch("t34",t34,"t34[nPho]/F");
+   theTree->Branch("t44",t44,"t44[nPho]/F");
+
+
+   theTree->Branch("isGenMatched",&isGenMatched,"isGenMatched[nPho]/I");
+   theTree->Branch("genMatchedPt",genMatchedPt,"genMatchedPt[nPho]/F");
+   theTree->Branch("genMatchedEta",genMatchedEta,"genMatchedEta[nPho]/F");
+   theTree->Branch("genMatchedPhi",genMatchedPhi,"genMatchedPhi[nPho]/F");
+   theTree->Branch("genMomId",genMomId,"genMomId[nPho]/F");
+   theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/F");
+   theTree->Branch("genGrandMomId",genGrandMomId,"genGrandMomId[nPho]/F");
+   theTree->Branch("genNSiblings",genNSiblings,"genNSiblings[nPho]/F");
+   theTree->Branch("genCalIsoDR03",genCalIsoDR03,"genCalIsoDR03[nPho]/F");
+   theTree->Branch("genCalIsoDR04",genCalIsoDR04,"genCalIsoDR04[nPho]/F");
+   theTree->Branch("genTrkIsoDR04",genTrkIsoDR04,"genTrkIsoDR04[nPho]/F");
+
+
+
 }
 
 void SinglePhotonAnalyzerTree::endJob() {
-
-  tplmgr->Store();
-
-  tplmgr->SetDir("Info");
-  TObjString codeVersion = "$Name:  $";
-  codeVersion.Write("CodeVersion");
-
-  delete tplmgr;
-
+   //  tplmgr->Store();
+   // tplmgr->SetDir("Info");
+   //  TObjString codeVersion = "$Name:  $";
+   //  codeVersion.Write("CodeVersion");
+   //  delete tplmgr;
+   
 }
 
 void SinglePhotonAnalyzerTree::storeGeneral(const edm::Event& e, const edm::EventSetup& iSetup){
@@ -961,9 +1136,16 @@ int SinglePhotonAnalyzerTree::storeJets(const edm::Event& e){
 }
 
 bool SinglePhotonAnalyzerTree::selectStorePhoton(const edm::Event& e,const edm::EventSetup& iSetup){
-	// Tools to get cluster shapes
-  
-	
+   
+   // first store general;
+   run = (int)e.id().run());
+evt = _ntuple->Column("event",(Int_t)e.id().event());
+   _ntuple->Column("orbit",(Int_t)e.orbitNumber());
+   _ntuple->Column("bunchCrossing",(Int_t)e.bunchCrossing());
+   _ntuple->Column("luminosityBlock",(Int_t)e.luminosityBlock());
+
+   
+   
   /////////////////////////////////////////////////////////////////////////////
   // Photon Section: store kMaxPhotons in the events as an array in the tree //
   /////////////////////////////////////////////////////////////////////////////

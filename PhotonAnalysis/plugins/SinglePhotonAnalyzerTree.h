@@ -190,9 +190,16 @@ protected:
   CentralityProvider *centrality_;
 
   TTree *theTree;
-  int nPhoton;
+
+
   
-  float p[kMaxPhotons];
+  int run;
+  int event;
+  int bunchCrossing;
+  int luminosityBlock;
+
+  int nPho;
+  // float p[kMaxPhotons];
   float pt[kMaxPhotons];
   float energy[kMaxPhotons]; // same to scEnergy                                                                                        
   float rawEnergy[kMaxPhotons];
@@ -300,10 +307,98 @@ protected:
   float r4[kMaxPhotons];
   float r5[kMaxPhotons];
 
+  float t1PtCut[kMaxPhotons];
+  float t2PtCut[kMaxPhotons];
+  float t3PtCut[kMaxPhotons];
+  float t4PtCut[kMaxPhotons];
+  float t5PtCut[kMaxPhotons];
+  
+  float cc1[kMaxPhotons];
+  float cc2[kMaxPhotons];
+  float cc3[kMaxPhotons];
+  float cc4[kMaxPhotons];
+  float cc5[kMaxPhotons];
+  
+  float cr1[kMaxPhotons];
+  float cr2[kMaxPhotons];
+  float cr3[kMaxPhotons];
+  float cr4[kMaxPhotons];
+  float cr5[kMaxPhotons];
 
+  float ct1[kMaxPhotons];
+  float ct2[kMaxPhotons];
+  float ct3[kMaxPhotons];
+  float ct4[kMaxPhotons];
+  float ct5[kMaxPhotons];
 
+  float ct1PtCut20[kMaxPhotons];
+  float ct2PtCut20[kMaxPhotons];
+  float ct3PtCut20[kMaxPhotons];
+  float ct4PtCut20[kMaxPhotons];
+  float ct5PtCut20[kMaxPhotons];
 
+  float ct1j20[kMaxPhotons];
+  float ct2j20[kMaxPhotons];
+  float ct3j20[kMaxPhotons];
+  float ct4j20[kMaxPhotons];
+  float ct5j20[kMaxPhotons];
+
+  float ct4j10[kMaxPhotons];
+  float ct4j15[kMaxPhotons];
+  float ct4j05[kMaxPhotons];
+
+  float dr11[kMaxPhotons];
+  float dr21[kMaxPhotons];
+  float dr31[kMaxPhotons];
+  float dr41[kMaxPhotons];
+  float dr12[kMaxPhotons];
+  float dr22[kMaxPhotons];
+  float dr32[kMaxPhotons];
+  float dr42[kMaxPhotons];
+  float dr13[kMaxPhotons];
+  float dr23[kMaxPhotons];
+  float dr33[kMaxPhotons];
+  float dr43[kMaxPhotons];
+  float dr14[kMaxPhotons];
+  float dr24[kMaxPhotons];
+  float dr34[kMaxPhotons];
+  float dr44[kMaxPhotons];
+
+  float t11[kMaxPhotons];
+  float t21[kMaxPhotons];
+  float t31[kMaxPhotons];
+  float t41[kMaxPhotons];
+  float t12[kMaxPhotons];
+  float t22[kMaxPhotons];
+  float t32[kMaxPhotons];
+  float t42[kMaxPhotons];
+  float t13[kMaxPhotons];
+  float t23[kMaxPhotons];
+  float t33[kMaxPhotons];
+  float t43[kMaxPhotons];
+  float t14[kMaxPhotons];
+  float t24[kMaxPhotons];
+  float t34[kMaxPhotons];
+  float t44[kMaxPhotons];
+  
+  int isGenMatched[kMaxPhotons];
+
+  float genMatchedPt[kMaxPhotons];
+  float genMatchedEta[kMaxPhotons];
+  float genMatchedPhi[kMaxPhotons];
+  float genMomId[kMaxPhotons];
+  float genMatchedCollId[kMaxPhotons];
+
+  float genGrandMomId[kMaxPhotons];
+  float genNSiblings[kMaxPhotons];
+  float genCalIsoDR03[kMaxPhotons];
+  float genCalIsoDR04[kMaxPhotons];
+  float genTrkIsoDR04[kMaxPhotons];
+  
+    
 };
+
+
 
 
 #endif
