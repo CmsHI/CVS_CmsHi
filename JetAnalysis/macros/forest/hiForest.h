@@ -222,7 +222,7 @@ void HiForest::AddCloneTree(TTree* t, char *dirName, char *treeName)
 
   // Add a clone tree to the clone forest
   TTree *tClone = t->CloneTree(0);
-  tClone->SetMaxTreeSize(40000000000);
+  tClone->SetMaxTreeSize(4000000000);
   tClone->SetName(treeName);
   
   cloneForest.push_back(tClone);
