@@ -14,7 +14,7 @@ double deltaPhi(double phi1, double phi2) {
 void photonJet(double etCut=40)
 {
    // Define the input file and HiForest
-   HiForest *c = new HiForest("merged_HI2010_SD_Jet35_prod05.root");
+   HiForest *c = new HiForest("skim_Photon.root");
 
    // Don't want to loop over trees which is not used in the analysis
    c->hasHltTree=0;
