@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.1 2011/10/05 16:08:49 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.2 2011/10/06 18:46:51 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -293,8 +293,10 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("event",&event,"event/I");
    theTree->Branch("bunchCrossing",&bunchCrossing,"bunchCrossing/I");
    theTree->Branch("luminosityBlock",&luminosityBlock,"luminosityBlock/I");
-
+   
+   theTree->Branch("nPho",nPho,"nPho/I");
    theTree->Branch("pt",pt,"pt[nPho]/F");
+   theTree->Branch("et",et,"et[nPho]/F");
    theTree->Branch("energy",energy,"energy[nPho]/F");
    theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPho]/F");
    theTree->Branch("px",px,"px[nPho]/F");

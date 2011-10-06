@@ -218,11 +218,13 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
   TxyCalculator Txy(e,iSetup,trackProducer_);
   dRxyCalculator dRxy(e,iSetup,trackProducer_);
   
+  
+  
   /*
-  HTValVector<TLorentzVector> p4(kMaxPhotons);
-  HTValVector<Float_t> p(kMaxPhotons),  et(kMaxPhotons),  energy(kMaxPhotons);
-  HTValVector<Float_t> px(kMaxPhotons), py(kMaxPhotons),  pz(kMaxPhotons);
-  HTValVector<Float_t> pt(kMaxPhotons), eta(kMaxPhotons), phi(kMaxPhotons);
+    HTValVector<TLorentzVector> p4(kMaxPhotons);
+    HTValVector<Float_t> p(kMaxPhotons),  et(kMaxPhotons),  energy(kMaxPhotons);
+    HTValVector<Float_t> px(kMaxPhotons), py(kMaxPhotons),  pz(kMaxPhotons);
+    HTValVector<Float_t> pt(kMaxPhotons), eta(kMaxPhotons), phi(kMaxPhotons);
   
   HTValVector<Float_t> r9(kMaxPhotons), scEnergy(kMaxPhotons), rawEnergy(kMaxPhotons), preshowerEnergy(kMaxPhotons);
   HTValVector<Float_t> phiWidth(kMaxPhotons), etaWidth(kMaxPhotons), scEta(kMaxPhotons), scPhi(kMaxPhotons);
@@ -348,62 +350,56 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 
 
   */
-
-  int nphotonscounter=0;
+  // store general
+  run = (Int_t)e.id().run();
+  event = (Int_t)e.id().event();
+  bunchCrossing = (Int_t)e.bunchCrossing();
+  luminosityBlock = (Int_t)e.luminosityBlock();
+  
+  int nphotonscounter(0);
   for (PhotonCollection::const_iterator phoItr = myphotons.begin(); phoItr != myphotons.end(); ++phoItr) {  
-    if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
-    if(nphotonscounter==0) {
-      _gammaPtHist ->Fill(phoItr->et());
-      _gammaEtaHist->Fill(phoItr->eta());
-    }
-    
-    // Dump photon kinematics and AOD
-    Photon photon = Photon(*phoItr);
-    // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
-    //       hence, Photon::setVertex() leaves photon object unchanged
-    //     photon.setVertex(vtx_);   <== Test if this makes error
-    
-    p4    (nphotonscounter) =  TLorentzVector(photon.px(),photon.py(),photon.pz(),photon.energy());
+     if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
+     // Dump photon kinematics and AOD
+     Photon photon = Photon(*phoItr);
+     // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
+     //       hence, Photon::setVertex() leaves photon object unchanged
+     //     photon.setVertex(vtx_);   <== Test if this makes error
+     
+     //   p4    (nphotonscounter) =  TLorentzVector(photon.px(),photon.py(),photon.pz(),photon.energy());
     p     (nphotonscounter) =  photon.p();
     et    (nphotonscounter) =  photon.et();
-    energy(nphotonscounter) =  photon.energy();
-    px    (nphotonscounter) =  photon.px();
-    py    (nphotonscounter) =  photon.py();
-    pz    (nphotonscounter) =  photon.pz();
-    pt    (nphotonscounter) =  photon.p4().pt();
-    eta   (nphotonscounter) =  photon.p4().eta();
-    phi   (nphotonscounter) =  photon.p4().phi();
 
+    pt[nphotonscounter] = photon.p4().pt();
+    px[nphotonscounter] = photon.px();
+    py[nphotonscounter] = photon.py();
+    pz[nphotonscounter] = photon.pz();
+    energy[nphotonscounter] = photon.energy();
+    rawEnergy[nphotonscounter] =  photon.superCluster()->rawEnergy();
+    
+    eta[nphotonscounter] =  photon.p4().eta();
+    phi[nphotonscounter] =  photon.p4().phi();
 
-    r9     (nphotonscounter)    =  photon.r9();
-    isEBGap(nphotonscounter)    =  photon.isEBGap()? 1:0;
-    isEEGap(nphotonscounter)    =  photon.isEEGap()? 1:0;
-    isEBEEGap(nphotonscounter)  =  photon.isEBEEGap()? 1:0;
-    isTransGap(nphotonscounter) =  (fabs(photon.eta()) > ecalBarrelMaxEta_ && fabs(photon.eta()) < ecalEndcapMinEta_) ? 1:0;
-    isEB(nphotonscounter)       =  photon.isEB()? 1:0;
-    isEE(nphotonscounter)       =  photon.isEE()? 1:0;
-
-
-
-
-// Super-cluster parameters
-
-    scEnergy      (nphotonscounter)    =  photon.superCluster()->energy();
-    rawEnergy      (nphotonscounter)   =  photon.superCluster()->rawEnergy();
-    preshowerEnergy(nphotonscounter)   =  photon.superCluster()->preshowerEnergy();
-    numOfPreshClusters(nphotonscounter)=  getNumOfPreshClusters(&photon, e);
-    clustersSize   (nphotonscounter)   =  photon.superCluster()->clustersSize();
-    phiWidth       (nphotonscounter)   =  photon.superCluster()->phiWidth();
-    etaWidth       (nphotonscounter)   =  photon.superCluster()->etaWidth();
-    scEta          (nphotonscounter)   =  photon.superCluster()->eta();
-    scPhi          (nphotonscounter)   =  photon.superCluster()->phi();
-    scSize         (nphotonscounter)   =  photon.superCluster()->size();
+    r9[nphotonscounter]    =  photon.r9();
+ 
+    isEBGap[nphotonscounter]    =  photon.isEBGap()? 1:0;
+    isEEGap[nphotonscounter]    =  photon.isEEGap()? 1:0;
+    isEBEEGap[nphotonscounter]  =  photon.isEBEEGap()? 1:0;
+    isTransGap[nphotonscounter] =  (fabs(photon.eta()) > ecalBarrelMaxEta_ && fabs(photon.eta()) < ecalEndcapMinEta_) ? 1:0;
+    
+    preshowerEnergy[nphotonscounter]    =  photon.superCluster()->preshowerEnergy();
+    numOfPreshClusters[nphotonscounter] =  getNumOfPreshClusters(&photon, e);
+    clustersSize[nphotonscounter]   =  photon.superCluster()->clustersSize();
+    phiWidth  [nphotonscounter]  =  photon.superCluster()->phiWidth();
+    etaWidth  [nphotonscounter]   =  photon.superCluster()->etaWidth();
+    scEta     [nphotonscounter]   =  photon.superCluster()->eta();
+    scPhi     [nphotonscounter]  =  photon.superCluster()->phi();
+    scSize    [nphotonscounter]   =  photon.superCluster()->size();
 
     //ES Ratio
-    ESRatio        (nphotonscounter)   =  getESRatio(&photon, e, iSetup);
-
-// Cluster shape variables
-
+    ESRatio   [nphotonscounter]   =  getESRatio(&photon, e, iSetup);
+    
+    // Cluster shape variables
+    
     const reco::CaloClusterPtr  seed = photon.superCluster()->seed();
 
     DetId id = lazyTool.getMaximum(*seed).first; 
@@ -417,7 +413,6 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       chi2 = it->chi2();
       flags = it->recoFlag();
       severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-      seedEnergy (nphotonscounter) = it->energy();
     }
 
     float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
@@ -426,7 +421,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     std::vector<DetId> top    = lazyTool.matrixDetId(id, 0, 0, 1, 1);
     std::vector<DetId> bottom = lazyTool.matrixDetId(id, 0, 0,-1,-1);
     
-    float *times[4] = {&tlef,&tright,&ttop,&tbottom};
+    float *times[4] = {&tleft,&tright,&ttop,&tbottom};
     std::vector<DetId> ids[4]  = {left,right,top,bottom};
     int nt = sizeof(times)/sizeof(float);
     for(int ii=0; ii<nt; ++ii) {
@@ -435,36 +430,37 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
        if( it != rechits.end() ) { *(times[ii]) = it->time(); }
     }
     
-    seedTime              (nphotonscounter)  = time;
-    seedOutOfTimeChi2     (nphotonscounter)  = outOfTimeChi2;
-    seedChi2              (nphotonscounter)  = chi2;
-    seedRecoFlag             (nphotonscounter)  = flags;
-    seedSeverity          (nphotonscounter)  = severity;
+    seedTime              [nphotonscounter]  = time;
+    seedOutOfTimeChi2     [nphotonscounter]  = outOfTimeChi2;
+    seedChi2              [nphotonscounter]  = chi2;
+    seedRecoFlag          [nphotonscounter] = flags;
+    seedSeverity          [nphotonscounter]  = severity;
     
-    tLef         (nphotonscounter) = tlef;
-    tRight        (nphotonscounter) = tright;
-    tTop        (nphotonscounter) = ttop;
-    tBottom        (nphotonscounter) = tbottom;
+    tLeft         [nphotonscounter] = tleft;
+    tRight        [nphotonscounter] = tright;
+    tTop        [nphotonscounter] = ttop;
+    tBottom        [nphotonscounter] = tbottom;
     
     
-    eMax         (nphotonscounter) =  lazyTool.eMax(*seed);
-    e2nd         (nphotonscounter) =  lazyTool.e2nd(*seed);
-    e2x2         (nphotonscounter) =  lazyTool.e2x2(*seed);
-    e3x2         (nphotonscounter) =  lazyTool.e3x2(*seed);
-    e3x3         (nphotonscounter) =  lazyTool.e3x3(*seed);
-    e4x4         (nphotonscounter) =  lazyTool.e4x4(*seed);
-    e5x5         (nphotonscounter) =  lazyTool.e5x5(*seed);
-    e2overe8     (nphotonscounter) =  ( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) ==0 )? 0: lazyTool.e2nd(*seed)/( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) );
+    eMax         [nphotonscounter] =  lazyTool.eMax(*seed);
+    e2nd         [nphotonscounter] =  lazyTool.e2nd(*seed);
+    e2x2         [nphotonscounter] =  lazyTool.e2x2(*seed);
+    e3x2         [nphotonscounter] =  lazyTool.e3x2(*seed);
+    e3x3         [nphotonscounter] =  lazyTool.e3x3(*seed);
+    e4x4         [nphotonscounter] =  lazyTool.e4x4(*seed);
+    e5x5         [nphotonscounter] =  lazyTool.e5x5(*seed);
+    e2overe8     [nphotonscounter] =  ( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) ==0 )? 0: lazyTool.e2nd(*seed)/( lazyTool.e3x3(*seed)-lazyTool.eMax(*seed) );
     
-    e2x5Right    (nphotonscounter) =  lazyTool.e2x5Right(*seed);
-    e2x5Left     (nphotonscounter) =  lazyTool.e2x5Left(*seed);
-    e2x5Top      (nphotonscounter) =  lazyTool.e2x5Top(*seed);
-    e2x5Bottom   (nphotonscounter) =  lazyTool.e2x5Bottom(*seed);
-    eRight       (nphotonscounter) =  lazyTool.eRight(*seed);
-    eLeft        (nphotonscounter) =  lazyTool.eLeft(*seed);
-    eTop         (nphotonscounter) =  lazyTool.eTop(*seed);
-    eBottom      (nphotonscounter) =  lazyTool.eBottom(*seed);
-
+    e2x5Right    [nphotonscounter] =  lazyTool.e2x5Right(*seed);
+    e2x5Left     [nphotonscounter] =  lazyTool.e2x5Left(*seed);
+    e2x5Top      [nphotonscounter] =  lazyTool.e2x5Top(*seed);
+    e2x5Bottom   [nphotonscounter] =  lazyTool.e2x5Bottom(*seed);
+    eRight       [nphotonscounter] =  lazyTool.eRight(*seed);
+    eLeft        [nphotonscounter] =  lazyTool.eLeft(*seed);
+    eTop         [nphotonscounter] =  lazyTool.eTop(*seed);
+    eBottom      [nphotonscounter] =  lazyTool.eBottom(*seed);
+    swissCrx     [nphotonscounter] =  1 - eMax[nphotonscounter] / ( eRight[nphotonscounter] + eLeft[nphotonscounter] + eTop[nphotonscounter] + eBottom[nphotonscounter] )  ;
+    
     vector<float> vCov;
     vCov = lazyTool.covariances(*seed);
     covPhiPhi    (nphotonscounter) = vCov[0];
@@ -888,358 +884,17 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 
     } // if it's a MC
 
+
+    if (nphotonscounter>kMaxPhotons-1) break;
     
     nphotonscounter++;
-    if (nphotonscounter>kMaxPhotons-1) break;
   }
   
-  _nPhotonsHist->Fill(nphotonscounter);
-
-  _ntuple->Column(pfx+"nPhotons",     (Int_t) nphotonscounter);
-  _ntuple->Column(pfx+"kMaxPhotons",  kMaxPhotons);
-
-// Store gamma kinematics
-  if( storePhysVectors_ ) { 
-    _ntuple->Column(pfx+"p4",          p4,      pfx+"nPhotons");
-  } else {
-    _ntuple->Column(pfx+"p",          p,      pfx+"nPhotons");
-    _ntuple->Column(pfx+"et",         et,     pfx+"nPhotons");
-    _ntuple->Column(pfx+"energy",     energy, pfx+"nPhotons");
-    _ntuple->Column(pfx+"momentumX",  px,     pfx+"nPhotons");
-    _ntuple->Column(pfx+"momentumY",  py,     pfx+"nPhotons");
-    _ntuple->Column(pfx+"momentumZ",  pz,     pfx+"nPhotons");
-    _ntuple->Column(pfx+"pt",         pt,     pfx+"nPhotons");
-    _ntuple->Column(pfx+"eta",        eta,    pfx+"nPhotons");
-    _ntuple->Column(pfx+"phi",        phi,    pfx+"nPhotons");
-  }
-
-  _ntuple->Column(pfx+"r9",        r9,        pfx+"nPhotons");
-  _ntuple->Column(pfx+"isEBGap",   isEBGap,   pfx+"nPhotons");
-  _ntuple->Column(pfx+"isEEGap",   isEEGap,   pfx+"nPhotons");
-  _ntuple->Column(pfx+"isEBEEGap", isEBEEGap, pfx+"nPhotons");
-  _ntuple->Column(pfx+"isTransGap",isTransGap,pfx+"nPhotons");
-  _ntuple->Column(pfx+"isEB",      isEB,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"isEE",      isEE,      pfx+"nPhotons");
+  nPho  = nphotonscounter;
   
-
-  _ntuple->Column(pfx+"scEnergy",          scEnergy,          pfx+"nPhotons");
-  _ntuple->Column(pfx+"rawEnergy",         rawEnergy,          pfx+"nPhotons");
-  _ntuple->Column(pfx+"preshowerEnergy",   preshowerEnergy,    pfx+"nPhotons");
-  _ntuple->Column(pfx+"numOfPreshClusters",numOfPreshClusters, pfx+"nPhotons");
-  _ntuple->Column(pfx+"ESRatio",           ESRatio,            pfx+"nPhotons");
-  _ntuple->Column(pfx+"clustersSize",      clustersSize,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"scSize",            scSize,             pfx+"nPhotons");
-  _ntuple->Column(pfx+"phiWidth",          phiWidth,           pfx+"nPhotons");
-  _ntuple->Column(pfx+"etaWidth",          etaWidth,           pfx+"nPhotons");
-  _ntuple->Column(pfx+"scEta",             scEta,              pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"scPhi",             scPhi,              pfx+"nPhotons"); 
-
-// Photon shower shape parameters 
-
-  _ntuple->Column(pfx+"maxEnergyXtal",maxEnergyXtal, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sigmaEtaEta",  sigmaEtaEta,   pfx+"nPhotons");
-  _ntuple->Column(pfx+"sigmaIetaIeta",sigmaIetaIeta, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sigmaIphiIphi",sigmaIphiIphi, pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"sieie47",sieie47, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie50",sieie50, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie46",sieie46, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie45",sieie45, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie44",sieie44, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie43",sieie43, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie42",sieie42, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie39",sieie39, pfx+"nPhotons");
-
-  // absolute cuts
-  _ntuple->Column(pfx+"sieie02a",sieie02a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie03a",sieie03a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie04a",sieie04a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie05a",sieie05a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie08a",sieie08a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie10a",sieie10a, pfx+"nPhotons");
-
-
-  _ntuple->Column(pfx+"sieie022a",sieie022a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie025a",sieie025a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie027a",sieie027a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie032a",sieie032a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie035a",sieie035a, pfx+"nPhotons");
-  _ntuple->Column(pfx+"sieie037a",sieie037a, pfx+"nPhotons");
-
-
-  //  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
-
-
-
-
-  _ntuple->Column(pfx+"r1x5",         r1x5,          pfx+"nPhotons");
-  _ntuple->Column(pfx+"r2x5",         r2x5,          pfx+"nPhotons");
-  _ntuple->Column(pfx+"e1x5",         e1x5,          pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2x5",         e2x5,          pfx+"nPhotons");
- 
-// with lazyTool
-
-  _ntuple->Column(pfx+"seedTime",seedTime, pfx+"nPhotons");
-  _ntuple->Column(pfx+"seedChi2",seedChi2, pfx+"nPhotons");
-  _ntuple->Column(pfx+"seedOutOfTimeChi2",seedOutOfTimeChi2, pfx+"nPhotons");
-  _ntuple->Column(pfx+"seedRecoFlag",seedRecoFlag, pfx+"nPhotons");
-  _ntuple->Column(pfx+"seedSeverity",seedSeverity, pfx+"nPhotons");
-  _ntuple->Column(pfx+"seedEnergy",seedEnergy, pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"tRight",    tRight,     pfx+"nPhotons");
-  _ntuple->Column(pfx+"tLeft",     tLef,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"tTop",      tTop,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"tBottom",   tBottom,    pfx+"nPhotons");
-  
-  _ntuple->Column(pfx+"eMax",eMax, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2nd",e2nd, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2x2",e2x2, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e3x2",e3x2, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e3x3",e3x3, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e4x4",e4x4, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e5x5",e5x5, pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2overe8",e2overe8, pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"e2x5Right", e2x5Right,  pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2x5Left",  e2x5Left,   pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2x5Top",   e2x5Top,    pfx+"nPhotons");
-  _ntuple->Column(pfx+"e2x5Bottom",e2x5Bottom, pfx+"nPhotons");
-  _ntuple->Column(pfx+"eRight",    eRight,     pfx+"nPhotons");
-  _ntuple->Column(pfx+"eLeft",     eLeft,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"eTop",      eTop,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"eBottom",   eBottom,    pfx+"nPhotons");
-  
-  _ntuple->Column(pfx+"covPhiPhi",covPhiPhi, pfx+"nPhotons");
-  _ntuple->Column(pfx+"covEtaPhi",covEtaPhi, pfx+"nPhotons");
-  _ntuple->Column(pfx+"covEtaEta",covEtaEta, pfx+"nPhotons");
-
-
-// AOD isolation and identification
-
-  _ntuple->Column(pfx+"hadronicOverEm",       hadronicOverEm,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"hadronicDepth1OverEm", hadronicDepth1OverEm, pfx+"nPhotons");
-  _ntuple->Column(pfx+"hadronicDepth2OverEm", hadronicDepth2OverEm, pfx+"nPhotons");
-
-
-  _ntuple->Column(pfx+"trackIso", trackIso, pfx+"nPhotons");
-  _ntuple->Column(pfx+"caloIso",  caloIso,  pfx+"nPhotons");
-  _ntuple->Column(pfx+"ecalIso",  ecalIso,  pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalIso",  hcalIso,  pfx+"nPhotons");
-  
-  _ntuple->Column(pfx+"compTrackIso", compTrackIso, pfx+"nPhotons");
-  _ntuple->Column(pfx+"compEcalIso",  compEcalIso,  pfx+"nPhotons");
-  _ntuple->Column(pfx+"compHcalIso",  compHcalIso,  pfx+"nPhotons");
-  
-  // Delta R= 0.4
-  
-  _ntuple->Column(pfx+"ecalRecHitSumEtConeDR04",      ecalRecHitSumEtConeDR04,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalTowerSumEtConeDR04",       hcalTowerSumEtConeDR04,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalDepth1TowerSumEtConeDR04", hcalDepth1TowerSumEtConeDR04, pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalDepth2TowerSumEtConeDR04", hcalDepth2TowerSumEtConeDR04, pfx+"nPhotons");
-  _ntuple->Column(pfx+"trkSumPtSolidConeDR04",        trkSumPtSolidConeDR04,        pfx+"nPhotons");
-  _ntuple->Column(pfx+"trkSumPtHollowConeDR04",       trkSumPtHollowConeDR04,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"nTrkSolidConeDR04",            nTrkSolidConeDR04,            pfx+"nPhotons");
-  _ntuple->Column(pfx+"nTrkHollowConeDR04",           nTrkHollowConeDR04,           pfx+"nPhotons");
-
-
-// Delta R= 0.3
-
-  _ntuple->Column(pfx+"ecalRecHitSumEtConeDR03",      ecalRecHitSumEtConeDR03,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalTowerSumEtConeDR03",       hcalTowerSumEtConeDR03,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalDepth1TowerSumEtConeDR03", hcalDepth1TowerSumEtConeDR03, pfx+"nPhotons");
-  _ntuple->Column(pfx+"hcalDepth2TowerSumEtConeDR03", hcalDepth2TowerSumEtConeDR03, pfx+"nPhotons");
-  _ntuple->Column(pfx+"trkSumPtSolidConeDR03",        trkSumPtSolidConeDR03,        pfx+"nPhotons");
-  _ntuple->Column(pfx+"trkSumPtHollowConeDR03",       trkSumPtHollowConeDR03,       pfx+"nPhotons");
-  _ntuple->Column(pfx+"nTrkSolidConeDR03",            nTrkSolidConeDR03,            pfx+"nPhotons");
-  _ntuple->Column(pfx+"nTrkHollowConeDR03",           nTrkHollowConeDR03,           pfx+"nPhotons");
-
-  // electron?
-  _ntuple->Column(pfx+"isEle",                        isElectron,                   pfx+"nPhotons");
-  _ntuple->Column(pfx+"detaEle",                      detaEle,                      pfx+"nPhotons");
-  _ntuple->Column(pfx+"dphiEle",                      dphiEle,                      pfx+"nPhotons");
-  _ntuple->Column(pfx+"eleCharge",                    eleCharge,                    pfx+"nPhotons");
-  _ntuple->Column(pfx+"deltaEtaEleCT",      deltaEtaEleCT,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"deltaPhiEleCT",      deltaPhiEleCT,      pfx+"nPhotons");
-  _ntuple->Column(pfx+"eleEoverP",                    eleEoverP,                    pfx+"nPhotons");
-  
-
-  // Heavy Ion stuffs
-  _ntuple->Column(pfx+"c1",                           c1,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"c2",                           c2,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"c3",                           c3,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"c4",                           c4,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"c5",                           c5,                           pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"r1",                           r1,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"r2",                           r2,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"r3",                           r3,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"r4",                           r4,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"r5",                           r5,                           pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"t1",                           t1,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"t2",                           t2,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"t3",                           t3,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"t4",                           t4,                           pfx+"nPhotons");
-  _ntuple->Column(pfx+"t5",                           t5,                           pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"t1PtCut",                      t1PtCut,			    pfx+"nPhotons");
-  _ntuple->Column(pfx+"t2PtCut",                      t2PtCut,			    pfx+"nPhotons");
-  _ntuple->Column(pfx+"t3PtCut",                      t3PtCut,			    pfx+"nPhotons");
-  _ntuple->Column(pfx+"t4PtCut",                      t4PtCut,			    pfx+"nPhotons");
-  _ntuple->Column(pfx+"t5PtCut",                      t5PtCut,			    pfx+"nPhotons");
-
-
-  _ntuple->Column(pfx+"cc1",                          cc1,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc2",                          cc2,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc3",                          cc3,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc4",                          cc4,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc5",                          cc5,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc05",                         cc05,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"cc4j",                         cc4j,                         pfx+"nPhotons");
-
-
-
-  _ntuple->Column(pfx+"ct1",                          ct1,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct2",                          ct2,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct3",                          ct3,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4",                          ct4,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct5",                          ct5,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct05",                         ct05,                         pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"ct1PtCut",                      ct1PtCut,		    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct2PtCut",                      ct2PtCut,		    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct3PtCut",                      ct3PtCut,		    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4PtCut",                      ct4PtCut,		    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct5PtCut",                      ct5PtCut,		    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct05PtCut",                     ct05PtCut,                   pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4j",                          ct4j,                    pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4j10",                          ct4j10,                   pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4j15",                          ct4j15,                   pfx+"nPhotons");
-  _ntuple->Column(pfx+"ct4j20",                          ct4j20,                   pfx+"nPhotons");
-
-
-
-  _ntuple->Column(pfx+"trackIsohi",                    trackIsohi,                  pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohi10",                  trackIsohi10,                pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohi15",                  trackIsohi15,                pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohi20",                  trackIsohi20,                pfx+"nPhotons");
-  
-  
-  _ntuple->Column(pfx+"trackIsohij",                    trackIsohij,                  pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohij10",                  trackIsohi10j,                pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohij15",                  trackIsohi15j,                pfx+"nPhotons");
-  _ntuple->Column(pfx+"trackIsohij20",                  trackIsohi20j,                pfx+"nPhotons");
-  
-  _ntuple->Column(pfx+"mpt0",                         mpt0,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"mpt05",                        mpt05,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"mpt2",                         mpt2,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"mpt4",                         mpt4,                          pfx+"nPhotons");
-
-  
-
-  _ntuple->Column(pfx+"cr1",                          cr1,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr2",                          cr2,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr3",                          cr3,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr4",                          cr4,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr5",                          cr5,                          pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr05",                         cr05,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"cr4j",                         cr4j,                         pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"dr11",                         dr11,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr12",                         dr12,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr13",                         dr13,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr14",                         dr14,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr21",                         dr21,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr22",                         dr22,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr23",                         dr23,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr24",                         dr24,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr31",                         dr31,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr32",                         dr32,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr33",                         dr33,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr34",                         dr34,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr41",                         dr41,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr42",                         dr42,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr43",                         dr43,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"dr44",                         dr44,                         pfx+"nPhotons");
-
-  _ntuple->Column(pfx+"t11",                         t11,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t12",                         t12,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t13",                         t13,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t14",                         t14,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t21",                         t21,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t22",                         t22,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t23",                         t23,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t24",                         t24,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t31",                         t31,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t32",                         t32,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t33",                         t33,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t34",                         t34,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t41",                         t41,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t42",                         t42,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t43",                         t43,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"t44",                         t44,                         pfx+"nPhotons");
-  _ntuple->Column(pfx+"nAllTracks",                  nAllTracks,                  pfx+"nPhotons");
-  _ntuple->Column(pfx+"nLocalTracks",                nLocalTracks,                pfx+"nPhotons");
-
-
   // pixel seed? 
   _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");
   
-  
-
-
-// Conversion
-  if (doStoreConversions_) {
-
-  _ntuple->Column(pfx+"hasConversionTracks", hasConversionTracks, pfx+"nPhotons");
-  //  _ntuple->Column(pfx+"hasPixelSeed",        hasPixelSeed,        pfx+"nPhotons");  used for others.... moved to above.
-
-  _ntuple->Column(pfx+"isLoose",  isLoose, pfx+"nPhotons" );
-  _ntuple->Column(pfx+"isTight",  isTight, pfx+"nPhotons" );
-
-  _ntuple->Column(pfx+"nTracks", nTracks,         pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"isConverted", isConverted, pfx+"nPhotons"); 
-
-  _ntuple->Column(pfx+"convPairInvariantMass",      convPairInvariantMass,      pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convpairCotThetaSeparation", convpairCotThetaSeparation, pfx+"nPhotons"); 
-  if( storePhysVectors_ ) { 
-    _ntuple->Column(pfx+"convPairMomentum",         convPairMomentum,      pfx+"nPhotons");
-  } else {
-    _ntuple->Column(pfx+"convPairMomentumMag",        convPairMomentumMag,        pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumPerp",       convPairMomentumPerp,       pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumPhi",        convPairMomentumPhi,        pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumEta",        convPairMomentumEta,        pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumX",          convPairMomentumX,          pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumY",          convPairMomentumY,          pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convPairMomentumZ",          convPairMomentumZ,          pfx+"nPhotons");       
-  }
-  
-  _ntuple->Column(pfx+"convDistOfMinimumApproach",  convDistOfMinimumApproach,  pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convDPhiTracksAtVtx",        convDPhiTracksAtVtx,        pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convDPhiTracksAtEcal",       convDPhiTracksAtEcal,       pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convDEtaTracksAtEcal",       convDEtaTracksAtEcal,       pfx+"nPhotons"); 
-  
-// conversion vertex
-  
-  _ntuple->Column(pfx+"convVtxValid",      convVtxValid,      pfx+"nPhotons"); 
-  if( storePhysVectors_ ) { 
-    _ntuple->Column(pfx+"convVtx",          convVtx,      pfx+"nPhotons");
-  } else {
-    _ntuple->Column(pfx+"convVtxEta",        convVtxEta,        pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convVtxPhi",        convVtxPhi,        pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convVtxR",          convVtxR,          pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convVtxX",          convVtxX,          pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convVtxY",          convVtxY,          pfx+"nPhotons"); 
-    _ntuple->Column(pfx+"convVtxZ",          convVtxZ,          pfx+"nPhotons"); 
-  }
-  _ntuple->Column(pfx+"convVtxChi2",       convVtxChi2,       pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convVtxNdof",       convVtxNdof,       pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convMVALikelihood", convMVALikelihood, pfx+"nPhotons");   
-  _ntuple->Column(pfx+"convVtxChi2Prob",   chi2Prob,          pfx+"nPhotons");
- 
-  _ntuple->Column(pfx+"convEoverP",                     convEoverP, pfx+"nPhotons"); 
-  _ntuple->Column(pfx+"convzOfPrimaryVertexFromTracks", convzOfPrimaryVertexFromTracks, pfx+"nPhotons"); 
-  }
   
 
 // MC truth associations

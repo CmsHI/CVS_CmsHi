@@ -201,6 +201,7 @@ protected:
   int nPho;
   // float p[kMaxPhotons];
   float pt[kMaxPhotons];
+  float et[kMaxPhotons]; // same to pt
   float energy[kMaxPhotons]; // same to scEnergy                                                                                        
   float rawEnergy[kMaxPhotons];
   float px[kMaxPhotons];
@@ -258,7 +259,7 @@ protected:
   float e2x5Left[kMaxPhotons];
   float e2x5Top[kMaxPhotons];
   float e2x5Bottom[kMaxPhotons];
-
+  
   
   float seedTime[kMaxPhotons];
   float seedChi2[kMaxPhotons];
