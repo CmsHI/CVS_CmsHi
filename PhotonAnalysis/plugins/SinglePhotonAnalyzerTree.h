@@ -90,7 +90,7 @@ protected:
   bool verbose_;                 // verbose flag
   bool fillMCNTuple_;            // fill generator ntuple flag
   bool doL1Objects_;             // store L1 Object flag
-  bool isMCData_;                // run over MCData flag
+  bool isMC_;                // run over MCData flag
   bool storePhysVectors_;        // store TLorentzVector/TVector3 objects instead of plain floats
   std::string outputFile_;       // name of output file
 	
@@ -123,7 +123,6 @@ protected:
   
 
   // HepMC switch for HI July Exercise.
-  bool         isMC_; 
   
   // basiccluster inputtags for heavy ion
   edm::InputTag basicClusterBarrel_;
@@ -231,6 +230,7 @@ protected:
   float sigmaIphiIphi[kMaxPhotons];
   float sieie50[kMaxPhotons];
   float sieie45[kMaxPhotons];
+  float sieie47[kMaxPhotons];
   float sieie42[kMaxPhotons];
   float sieie39[kMaxPhotons];
 
@@ -282,12 +282,14 @@ protected:
   float hcalDepth1TowerSumEtConeDR04[kMaxPhotons];
   float hcalDepth2TowerSumEtConeDR04[kMaxPhotons];
   float trkSumPtHollowConeDR04[kMaxPhotons];
+  float trkSumPtSolidConeDR04[kMaxPhotons];
 
   float ecalRecHitSumEtConeDR03[kMaxPhotons];
   float hcalTowerSumEtConeDR03[kMaxPhotons];
   float hcalDepth1TowerSumEtConeDR03[kMaxPhotons];
   float hcalDepth2TowerSumEtConeDR03[kMaxPhotons];
   float trkSumPtHollowConeDR03[kMaxPhotons];
+  float trkSumPtSolidConeDR03[kMaxPhotons];
 
   float isEle[kMaxPhotons];
   float detaEle[kMaxPhotons];
@@ -319,12 +321,14 @@ protected:
   float cc3[kMaxPhotons];
   float cc4[kMaxPhotons];
   float cc5[kMaxPhotons];
-  
+  float cc4j[kMaxPhotons];
+
   float cr1[kMaxPhotons];
   float cr2[kMaxPhotons];
   float cr3[kMaxPhotons];
   float cr4[kMaxPhotons];
   float cr5[kMaxPhotons];
+  float cr4j[kMaxPhotons];
 
   float ct1[kMaxPhotons];
   float ct2[kMaxPhotons];
@@ -338,15 +342,10 @@ protected:
   float ct4PtCut20[kMaxPhotons];
   float ct5PtCut20[kMaxPhotons];
 
-  float ct1j20[kMaxPhotons];
-  float ct2j20[kMaxPhotons];
-  float ct3j20[kMaxPhotons];
   float ct4j20[kMaxPhotons];
-  float ct5j20[kMaxPhotons];
-
   float ct4j10[kMaxPhotons];
   float ct4j15[kMaxPhotons];
-  float ct4j05[kMaxPhotons];
+  float ct4j[kMaxPhotons];
 
   float dr11[kMaxPhotons];
   float dr21[kMaxPhotons];
@@ -383,7 +382,6 @@ protected:
   float t44[kMaxPhotons];
   
   int isGenMatched[kMaxPhotons];
-
   float genMatchedPt[kMaxPhotons];
   float genMatchedEta[kMaxPhotons];
   float genMatchedPhi[kMaxPhotons];
@@ -394,8 +392,9 @@ protected:
   float genNSiblings[kMaxPhotons];
   float genCalIsoDR03[kMaxPhotons];
   float genCalIsoDR04[kMaxPhotons];
+  float genTrkIsoDR03[kMaxPhotons];
   float genTrkIsoDR04[kMaxPhotons];
-  
+
     
 };
 

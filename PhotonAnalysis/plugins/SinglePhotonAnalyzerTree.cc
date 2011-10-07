@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.2 2011/10/06 18:46:51 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.3 2011/10/06 19:16:52 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -269,7 +269,6 @@ void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetu
 	if (doStoreMET_)	storeMET(e);
 	if (doStoreJets_)	storeJets(e);
 	if (doStoreTracks_)     storeTracks(e);
-	bool foundPhoton = selectStorePhoton(e,iSetup);
 
 	if (foundPhoton){
 		// Dump analysis ntuple 
@@ -323,6 +322,7 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("sigmaIphiIphi",sigmaIphiIphi,"sigmaIphiIphi[nPho]/F");
    theTree->Branch("sieie50",sieie50,"sieie50[nPho]/F");
    theTree->Branch("sieie45",sieie45,"sieie45[nPho]/F");
+   theTree->Branch("sieie47",sieie47,"sieie47[nPho]/F");
    theTree->Branch("sieie42",sieie42,"sieie42[nPho]/F");
    theTree->Branch("sieie39",sieie39,"sieie39[nPho]/F");
    theTree->Branch("covPhiPhi",covPhiPhi,"covPhiPhi[nPho]/F");
@@ -366,11 +366,15 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("hcalDepth1TowerSumEtConeDR04",hcalDepth1TowerSumEtConeDR04,"hcalDepth1TowerSumEtConeDR04[nPho]/F");
    theTree->Branch("hcalDepth2TowerSumEtConeDR04",hcalDepth2TowerSumEtConeDR04,"hcalDepth2TowerSumEtConeDR04[nPho]/F");
    theTree->Branch("trkSumPtHollowConeDR04",trkSumPtHollowConeDR04,"trkSumPtHollowConeDR04[nPho]/F");
+   theTree->Branch("trkSumPtSolidConeDR04",trkSumPtSolidConeDR04,"trkSumPtSolidConeDR04[nPho]/F");
+   
    theTree->Branch("ecalRecHitSumEtConeDR03",ecalRecHitSumEtConeDR03,"ecalRecHitSumEtConeDR03[nPho]/F");
    theTree->Branch("hcalTowerSumEtConeDR03",hcalTowerSumEtConeDR03,"hcalTowerSumEtConeDR03[nPho]/F");
    theTree->Branch("hcalDepth1TowerSumEtConeDR03",hcalDepth1TowerSumEtConeDR03,"hcalDepth1TowerSumEtConeDR03[nPho]/F");
    theTree->Branch("hcalDepth2TowerSumEtConeDR03",hcalDepth2TowerSumEtConeDR03,"hcalDepth2TowerSumEtConeDR03[nPho]/F");
    theTree->Branch("trkSumPtHollowConeDR03",trkSumPtHollowConeDR03,"trkSumPtHollowConeDR03[nPho]/F");
+   theTree->Branch("trkSumPtSolidConeDR03",trkSumPtSolidConeDR03,"trkSumPtSolidConeDR03[nPho]/F");
+   
    theTree->Branch("isEle",isEle,"isEle[nPho]/F");
    theTree->Branch("detaEle",detaEle,"detaEle[nPho]/F");
    theTree->Branch("dphiEle",dphiEle,"dphiEle[nPho]/F");
@@ -395,12 +399,14 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("cc2",cc2,"cc2[nPho]/F");
    theTree->Branch("cc3",cc3,"cc3[nPho]/F");
    theTree->Branch("cc4",cc4,"cc4[nPho]/F");
+   theTree->Branch("cc4j",cc4j,"cc4j[nPho]/F");
    theTree->Branch("cc5",cc5,"cc5[nPho]/F");
    theTree->Branch("cr1",cr1,"cr1[nPho]/F");
    theTree->Branch("cr2",cr2,"cr2[nPho]/F");
    theTree->Branch("cr3",cr3,"cr3[nPho]/F");
    theTree->Branch("cr4",cr4,"cr4[nPho]/F");
    theTree->Branch("cr5",cr5,"cr5[nPho]/F");
+   theTree->Branch("cr4j",cr4j,"cr4j[nPho]/F");
    theTree->Branch("ct1",ct1,"ct1[nPho]/F");
    theTree->Branch("ct2",ct2,"ct2[nPho]/F");
    theTree->Branch("ct3",ct3,"ct3[nPho]/F");
@@ -411,14 +417,10 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("ct3PtCut20",ct3PtCut20,"ct3PtCut20[nPho]/F");
    theTree->Branch("ct4PtCut20",ct4PtCut20,"ct4PtCut20[nPho]/F");
    theTree->Branch("ct5PtCut20",ct5PtCut20,"ct5PtCut20[nPho]/F");
-   theTree->Branch("ct1j20",ct1j20,"ct1j20[nPho]/F");
-   theTree->Branch("ct2j20",ct2j20,"ct2j20[nPho]/F");
-   theTree->Branch("ct3j20",ct3j20,"ct3j20[nPho]/F");
    theTree->Branch("ct4j20",ct4j20,"ct4j20[nPho]/F");
-   theTree->Branch("ct5j20",ct5j20,"ct5j20[nPho]/F");
    theTree->Branch("ct4j10",ct4j10,"ct4j10[nPho]/F");
    theTree->Branch("ct4j15",ct4j15,"ct4j15[nPho]/F");
-   theTree->Branch("ct4j05",ct4j05,"ct4j05[nPho]/F");
+   theTree->Branch("ct4j",ct4j,"ct4j[nPho]/F");
    theTree->Branch("dr11",dr11,"dr11[nPho]/F");
    theTree->Branch("dr21",dr21,"dr21[nPho]/F");
    theTree->Branch("dr31",dr31,"dr31[nPho]/F");
@@ -454,17 +456,17 @@ void SinglePhotonAnalyzerTree::beginJob() {
 
 
    theTree->Branch("isGenMatched",&isGenMatched,"isGenMatched[nPho]/I");
+   theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/F");
    theTree->Branch("genMatchedPt",genMatchedPt,"genMatchedPt[nPho]/F");
    theTree->Branch("genMatchedEta",genMatchedEta,"genMatchedEta[nPho]/F");
    theTree->Branch("genMatchedPhi",genMatchedPhi,"genMatchedPhi[nPho]/F");
    theTree->Branch("genMomId",genMomId,"genMomId[nPho]/F");
-   theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/F");
    theTree->Branch("genGrandMomId",genGrandMomId,"genGrandMomId[nPho]/F");
    theTree->Branch("genNSiblings",genNSiblings,"genNSiblings[nPho]/F");
    theTree->Branch("genCalIsoDR03",genCalIsoDR03,"genCalIsoDR03[nPho]/F");
    theTree->Branch("genCalIsoDR04",genCalIsoDR04,"genCalIsoDR04[nPho]/F");
+   theTree->Branch("genTrkIsoDR03",genTrkIsoDR03,"genTrkIsoDR03[nPho]/F");
    theTree->Branch("genTrkIsoDR04",genTrkIsoDR04,"genTrkIsoDR04[nPho]/F");
-
 
 
 }
@@ -480,262 +482,17 @@ void SinglePhotonAnalyzerTree::endJob() {
 
 void SinglePhotonAnalyzerTree::storeGeneral(const edm::Event& e, const edm::EventSetup& iSetup){
    using namespace edm;
-   
-   // Run, event number, collision and luminisity condisions
-   _ntuple->Column("run",  (Int_t)e.id().run());
-   _ntuple->Column("event",(Int_t)e.id().event());
-   _ntuple->Column("orbit",(Int_t)e.orbitNumber());
-   _ntuple->Column("bunchCrossing",(Int_t)e.bunchCrossing());
-   _ntuple->Column("luminosityBlock",(Int_t)e.luminosityBlock());
-   
-   const edm::Timestamp jtime = e.time();
-   Int_t timesec = jtime.value() >> 32;
-   _ntuple->Column("timesec",timesec);
-   
-   //	 _ntupleMC->Column("event",(Int_t)e.id().event());
-   
-   // centrality
-   
-   /*
-     if (doStoreCentrality_) {
-     if(!centrality_) centrality_ = new CentralityProvider(iSetup);
-     centrality_->newEvent(e,iSetup);
-     const reco::Centrality *cent = centrality_->raw();
-     double hf = (double)cent->EtHFhitSum();
-     
-     _ntuple->Column("hf",(double)cent->EtHFhitSum());
-     _ntuple->Column("hftp",(double)cent->EtHFtowerSumPlus());
-     _ntuple->Column("hftm",(double)cent->EtHFtowerSumMinus());
-     _ntuple->Column("eb",(double)cent->EtEBSum());
-     _ntuple->Column("eep",(double)cent->EtEESumPlus());
-     _ntuple->Column("eem",(double)cent->EtEESumMinus());
-     _ntuple->Column("cBin",(int)centrality_->getBin());
-     _ntuple->Column("nbins",(int)centrality_->getNbins()); 
-     _ntuple->Column("binsize",(int)(100/centrality_->getNbins() ));
-     _ntuple->Column("npart",(double)centrality_->NpartMean());
-     _ntuple->Column("npartSigma",(double)centrality_->NpartSigma());
-     _ntuple->Column("ncoll",(double)centrality_->NcollMean());
-     _ntuple->Column("ncollSigma",(double)centrality_->NcollSigma());
-     _ntuple->Column("nhard",(double)centrality_->NhardMean());
-     _ntuple->Column("nhardSigma",(double)centrality_->NhardSigma());
-     _ntuple->Column("b",(double)centrality_->bMean());
-     _ntuple->Column("bSigma",(double)centrality_->bSigma());
-     }
-   */
+  
 }
 
 void SinglePhotonAnalyzerTree::storeL1Trigger(const edm::Event& e){
-   /*
-   // L1 Trigger Decision
-   // get hold of L1GlobalReadoutRecord
-   edm::Handle< L1GlobalTriggerReadoutRecord >  L1GlobalTrigger;
-   e.getByLabel(l1gtReadout_, L1GlobalTrigger);
-   
-
-///////////////////////////////////////////////////////////////////
-//  L1 Technical Trigger (TT) Section: Analyzing TT Bits Results // 
-///////////////////////////////////////////////////////////////////
-
-  const TechnicalTriggerWord&  technicalTriggerWordBeforeMask = L1GlobalTrigger->technicalTriggerWord();
-// BSC 1 and 2  = 40 and 41 TechTrigger
-  bool techTrigger34 = technicalTriggerWordBeforeMask.at(34);
-  bool techTrigger40 = technicalTriggerWordBeforeMask.at(40);
-  bool techTrigger41 = technicalTriggerWordBeforeMask.at(41);
-  bool techTrigger0  = technicalTriggerWordBeforeMask.at(0);
   
-  if (verbose_){
-    std::cout << " Tech trigger size: "<< technicalTriggerWordBeforeMask.size() << endl;
-    std::cout << " Tech Trigger bits: 0, 40 and 41 = " << techTrigger0 << " " <<techTrigger40<<" " << techTrigger41 << endl;
-  }
-  const int kMaxTTBits = 64;
-  HTValVector<bool> TTVec(kMaxTTBits);
-  for (unsigned int it = 0; it!=technicalTriggerWordBeforeMask.size(); it++) {
-    bool accept = technicalTriggerWordBeforeMask.at(it);
-    TTVec(it) = (accept == true)? 1:0;
-    if (verbose_ && accept){
-      std::cout <<" TT object bit " << it << " = " << accept << endl;
-    }
-  }
-
-// Store TT Trigger
-  _ntuple->Column("nTTBits",    (Int_t)technicalTriggerWordBeforeMask.size());
-  _ntuple->Column("kMaxTTBits", kMaxTTBits);
-  _ntuple->Column("TTBit",      TTVec, "nTTBits");
-  _ntuple->Column("TTBit34",    techTrigger34);
-  _ntuple->Column("TTBit40",    techTrigger40);
-  _ntuple->Column("TTBit41",    techTrigger41);
-  _ntuple->Column("TTBit0",     techTrigger0);
-
-
-/////////////////////////////////////////////////////////////////////////////
-//  Level 1 Physics Trigger Section: Analyzing L1 Bits Results and objects // 
-/////////////////////////////////////////////////////////////////////////////
-
-  const int kMaxL1Bits = 128;
-  HTValVector<bool> L1Vec(kMaxL1Bits);
-  int ntrigs(0);
-  if (L1GlobalTrigger.isValid()) {
-    ntrigs = L1GlobalTrigger->decisionWord().size();
-    if (verbose_)
-      std::cout << "%L1Info --  Number of L1 Trigger Bits: " << ntrigs << std::endl;
-    for (int i=0; i != ntrigs; i++) {
-      bool accept = L1GlobalTrigger->decisionWord()[i];
-      L1Vec(i) = (accept == true)? 1:0;
-      if (verbose_ && accept)
-	cout << " L1 bit decision (" << i << "): " << accept << endl;
-    }
-  } else { if (verbose_) std::cout << "%L1Info -- No L1 Trigger Result" << std::endl;}
-
-// Store trigger
-  _ntuple->Column("kMaxL1Bits",  kMaxL1Bits);
-  _ntuple->Column("nL1Bits",     ntrigs);
-  _ntuple->Column("L1Bit",       L1Vec, "nL1Bits");
-
-
-// Analyzing L1 EM objects
-  if(doL1Objects_) {
-// L1 trigger EM Candidates  
-// Get the L1 Isolated EM Collection
-    edm::Handle< l1extra::L1EmParticleCollection > emIsolColl ;
-    e.getByLabel(l1IsolTag_, emIsolColl );
-// Get the L1 NonIsolated EM Collection
-    edm::Handle< l1extra::L1EmParticleCollection > emNonIsolColl ;
-    e.getByLabel(l1NonIsolTag_, emNonIsolColl );
-    
-    
-  // L1 Trigger Collections
-    if (verbose_) {
-      std::cout << " L1 Isolated EM Collection size: " << emIsolColl->size() << std::endl;
-      std::cout << " L1 NonIsolated EM Collection size: " << emNonIsolColl->size() << std::endl;
-    }
-    
-    const int kMaxL1Obj = 10;
-    HTValVector<TLorentzVector> l1EMIsoP4(kMaxL1Obj);
-    HTValVector<Float_t> l1EMIsoEnergy(kMaxL1Obj), l1EMIsoEt(kMaxL1Obj), l1EMIsoEta(kMaxL1Obj), l1EMIsoPhi(kMaxL1Obj);
-    Int_t nL1EMIso(0);
-    
-    for( l1extra::L1EmParticleCollection::const_iterator emItr = emIsolColl->begin(); emItr != emIsolColl->end() ;++emItr){
-      l1EMIsoP4    (nL1EMIso) = TLorentzVector(emItr->px(),emItr->py(),emItr->pz(),emItr->energy());
-      l1EMIsoEnergy(nL1EMIso) = emItr->energy();
-      l1EMIsoEt    (nL1EMIso) = emItr->et();
-      l1EMIsoEta   (nL1EMIso) = emItr->eta();
-      l1EMIsoPhi   (nL1EMIso) = emItr->phi();
-      nL1EMIso++;
-    }
-    
-    HTValVector<TLorentzVector> l1EMNonIsoP4(kMaxL1Obj);
-    HTValVector<Float_t> l1EMnonIsoEnergy(kMaxL1Obj), l1EMnonIsoEt(kMaxL1Obj), l1EMnonIsoEta(kMaxL1Obj), l1EMnonIsoPhi(kMaxL1Obj);
-    Int_t nL1EMnonIso(0);
-    for( l1extra::L1EmParticleCollection::const_iterator emItr = emNonIsolColl->begin(); emItr != emNonIsolColl->end() ;++emItr){
-      l1EMNonIsoP4    (nL1EMnonIso) = TLorentzVector(emItr->px(),emItr->py(),emItr->pz(),emItr->energy());
-      l1EMnonIsoEnergy(nL1EMnonIso) = emItr->energy();
-      l1EMnonIsoEt    (nL1EMnonIso) = emItr->et();
-      l1EMnonIsoEta   (nL1EMnonIso) = emItr->eta();
-      l1EMnonIsoPhi   (nL1EMnonIso) = emItr->phi();
-      nL1EMnonIso++;
-    }
-    
-    
-    _ntuple->Column("kMaxL1Obj",     kMaxL1Obj);
-    _ntuple->Column("nL1EMIso",      nL1EMIso);
-    if( storePhysVectors_ ) {
-      _ntuple->Column("l1EMIsoP4",     l1EMIsoP4,     "nL1EMIso");
-    } else {
-      _ntuple->Column("l1EMIsoEnergy", l1EMIsoEnergy, "nL1EMIso");
-      _ntuple->Column("l1EMIsoEt",     l1EMIsoEt,     "nL1EMIso");
-      _ntuple->Column("l1EMIsoEta",    l1EMIsoEta,    "nL1EMIso");
-      _ntuple->Column("l1EMIsoEPhi",   l1EMIsoPhi,    "nL1EMIso");
-    }
-    
-    _ntuple->Column("nL1EMnonIso",      nL1EMnonIso);
-    if( storePhysVectors_ ) {
-      _ntuple->Column("l1EMIsoP4",     l1EMIsoP4,     "nL1EMnonIso");
-    } else {
-      _ntuple->Column("l1EMnonIsoEnergy", l1EMnonIsoEnergy, "nL1EMnonIso");
-      _ntuple->Column("l1EMnonIsoEt",     l1EMnonIsoEt,     "nL1EMnonIso");
-      _ntuple->Column("l1EMnonIsoEta",    l1EMnonIsoEta,    "nL1EMnonIso");
-      _ntuple->Column("l1EMnonIsoEPhi",   l1EMnonIsoPhi,    "nL1EMnonIso");
-    }
-  }
-
-  
-   */
 }
 
 void SinglePhotonAnalyzerTree::storeHLT(const edm::Event& e){
-//////////////////////////////////////////////////////////////////////
-//  Trigger Section: Analyzing HLT Trigger Results (TriggerResults) // 
-//////////////////////////////////////////////////////////////////////
-  
-// get hold of TriggerResults
-  Handle<TriggerResults> TrgResultsHandle;
-  try {e.getByLabel(hlTriggerResults_, TrgResultsHandle);} catch (...) {;}
-  
-//trigger information
-  const int kMaxTrigFlag = 159;
-  HTValVector<bool> hltVec(kMaxTrigFlag);
-  int ntrigs(0);
-  if (TrgResultsHandle.isValid()) {
-    TriggerNames TrgNames = e.triggerNames( *TrgResultsHandle );
-    ntrigs=TrgNames.size();
-    if (verbose_)
-      std::cout << "%HLTInfo --  Number of HLT Triggers: " << ntrigs << std::endl;
-    
-    for( int itrig=0; itrig < ntrigs; itrig++){
-      bool accept = TrgResultsHandle->accept(itrig);
-      hltVec(itrig)  = (accept == true)? 1:0;
-      string trigName=TrgNames.triggerName(itrig);      
-
-      if (std::find( triggerPathsToStore_.begin(), triggerPathsToStore_.end(), trigName ) !=  triggerPathsToStore_.end())
-	_ntuple->Column(TString(trigName), accept);
-
-      if (verbose_ && accept){
-	std::cout << "%HLTInfo --  HLTTrigger(" << itrig << "): " << trigName << " = " << accept << std::endl;
-      }
-    }
-  }
-  else { if (verbose_) std::cout << "%HLTInfo -- No Trigger Result" << std::endl;}
-  
-// Store trigger
-  _ntuple->Column("kMaxTrigFlag", kMaxTrigFlag);
-  _ntuple->Column("nHLTBits",     ntrigs);
-  _ntuple->Column("HLTBit",       hltVec, "nHLTBits");
 }
 				
 void SinglePhotonAnalyzerTree::storeHF(const edm::Event& e){
-	//////////////////////////////////////////////////////////////////////
-	//  HF coincidence Section: HF Tower Coincidence                    // 
-	//////////////////////////////////////////////////////////////////////
-	
-	// calo based variables
-  edm::Handle<CaloTowerCollection> towers;
-  try {
-    e.getByLabel(srcTowers_, towers);
-  } catch (...) {}
-	
-  int nHfTowersN = 0;
-  int nHfTowersP = 0;
-	
-  if (towers.isValid()) {
-    for(CaloTowerCollection::const_iterator cal = towers->begin(); cal != towers->end(); ++cal) {
-      if (cal->energy()<3) continue;  // HF Threshold = 3 GeV
-      for(unsigned int i = 0; i < cal->constituentsSize(); ++i) {
-        const DetId id = cal->constituent(i);
-        if(id.det() != DetId::Hcal)
-          continue;
-        HcalSubdetector subdet=(HcalSubdetector(id.subdetId()));
-        if(subdet != HcalForward)
-          continue;
-        if (cal->eta()<-3) 
-          ++nHfTowersN;
-        if (cal->eta()>+3) 
-          ++nHfTowersP;
-      }
-    }
-  }
-	
-  _ntuple->Column("nHfTowersP",     nHfTowersP);  // # of HF Tower > 3GeV in the positive side
-  _ntuple->Column("nHfTowersN",     nHfTowersN);  // # of HF Tower > 3GeV in the negative side
 }	
 
 bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSetup& iSetup){
@@ -828,640 +585,27 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
 
 
 void SinglePhotonAnalyzerTree::storeEvtPlane(const edm::Event& e){
-   int kMaxEvtPlane = 100;
-   HTValVector<Float_t> evtPlane(kMaxEvtPlane);
-   
-   Handle<reco::EvtPlaneCollection> evtPlanes;
-   e.getByLabel(evtPlaneLabel, evtPlanes);
-   
-   int nEvtPlanes = 0;
-   // cout << " event plane is valid?? " ;
-   if(evtPlanes.isValid()){
-      //  cout << "   yes " << endl;
-      nEvtPlanes = evtPlanes->size();
-      for(unsigned int i = 0; i < evtPlanes->size(); ++i){
-	 evtPlane(i)  = (*evtPlanes)[i].angle();
-      }
-   }
-   else
-      cout << "no event plane" << endl;
-   //  _ntuple->Column("nEvtPlane",     (Int_t) nEvtPlanes);
-   // _ntuple->Column("evtPlane",  evtPlane, "nEvtPlane");
-   
 }
 
 void SinglePhotonAnalyzerTree::storeVertex(const edm::Event& e){
-   /*
-	///////////////////////////////////////////////////////////////////////
-	// Vertex Section: store BeamSpot and Primary Vertex of the event    //
-	///////////////////////////////////////////////////////////////////////
-	
-	// Get the Beam Spot
-  reco::BeamSpot beamSpot;
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  e.getByLabel(beamSpotProducer_,recoBeamSpotHandle);
-  beamSpot = *recoBeamSpotHandle;
-  
-	// Get the primary event vertex
-  Handle<reco::VertexCollection> vertexHandle;
-  e.getByLabel(vertexProducer_, vertexHandle);
-  reco::VertexCollection vertexCollection = *(vertexHandle.product());
-  vtx_.SetXYZ(0.,0.,0.);
-  double chi2(-1), ndof(-1), normChi2(-1), vtxXError(-1),  vtxYError(-1), vtxZError(-1);
-  Int_t vtxNTrk(0), vtxNTrkWeight05(0);
-  Bool_t vtxIsFake(kTRUE);
-  if (vertexCollection.size()>0) {    
-    vtxIsFake = vertexCollection.begin()->isFake();
-    vtx_ = vertexCollection.begin()->position();  
-    vtxXError = vertexCollection.begin()->xError();
-    vtxYError = vertexCollection.begin()->yError();
-    vtxZError = vertexCollection.begin()->zError();
-    chi2      = vertexCollection.begin()->chi2();  
-    ndof      = vertexCollection.begin()->ndof();  
-    normChi2  = vertexCollection.begin()->normalizedChi2();  
-    vtxNTrk   = vertexCollection.begin()->tracksSize();
-		
-    vtxNTrkWeight05 = 0;
-    reco::Vertex::trackRef_iterator ittrk;
-    for(ittrk = vertexCollection.begin()->tracks_begin(); ittrk!= vertexCollection.begin()->tracks_end(); ++ittrk)
-      if ( vertexCollection.begin()->trackWeight(*ittrk) > 0.5 ) vtxNTrkWeight05++;
-		
-  }
-	
- 
-  _nVtxHist->Fill(vertexCollection.size());
-  _primVtxX->Fill(vtx_.X());   
-  _primVtxY->Fill(vtx_.Y());   
-  _primVtxZ->Fill(vtx_.Z());   
-	
-  // Store beam spot 
-  if( storePhysVectors_ ) {
-    _ntuple->Column("beamSpot", TVector3(beamSpot.x0(),beamSpot.y0(),beamSpot.z0()) );
-  } else {
-    _ntuple->Column("beamSpotX", beamSpot.x0() );
-    _ntuple->Column("beamSpotY", beamSpot.y0() );
-    _ntuple->Column("beamSpotZ", beamSpot.z0() );
-  }
-	
-	// Store primary vertex     
-  _ntuple->Column("vtxIsFake"  ,vtxIsFake);
-  if( storePhysVectors_ ) { 
-      _ntuple->Column("vtx"       ,TVector3(vtx_.x(),vtx_.y(),vtx_.z()));
-  } else {
-    _ntuple->Column("vtxX"       ,vtx_.X());
-    _ntuple->Column("vtxY"       ,vtx_.Y());
-    _ntuple->Column("vtxZ"       ,vtx_.Z());
-  }
-
-  if( storePhysVectors_ ) { 
-    _ntuple->Column("vtxError"       ,TVector3(vtxXError,vtxYError,vtxZError));
-  } else {
-    _ntuple->Column("vtxXError"      ,vtxXError);
-    _ntuple->Column("vtxYError"      ,vtxYError);
-    _ntuple->Column("vtxZError"      ,vtxZError);
-  }
-  _ntuple->Column("vtxNTrk"        ,vtxNTrk);
-  _ntuple->Column("vtxNTrkWeight05",vtxNTrkWeight05);
-  _ntuple->Column("vtxChi2"        ,chi2);
-  _ntuple->Column("vtxNdof"        ,ndof);
-  _ntuple->Column("vtxNormChi2"    ,normChi2);
-
-
-   */ 
 }
 
 
 
 
 bool SinglePhotonAnalyzerTree::storeMET(const edm::Event& e){
-   /*
-	/////////////////////////////////////////
-	// MET Section: store MET the event    //
-	/////////////////////////////////////////
-	
-	// Get Missing ET
-	edm::Handle<edm::View<pat::MET> > mets;
-	e.getByLabel(metProducer_,mets);
-	_ntuple->Column("isMETEmpty"     ,(mets->empty())? 0 : 1);
-	if (!(mets->empty())) {
-	MET met = (*mets)[0];
-	
-	_metHist->Fill(met.et());
-    _ntuple->Column("metEt"          ,met.et());
-    _ntuple->Column("metPx"          ,met.px());
-    _ntuple->Column("metPy"          ,met.py());
-    _ntuple->Column("metPz"          ,met.pz());
-    _ntuple->Column("metE_longitudinal" ,met.e_longitudinal());
-    _ntuple->Column("metNCorrections"   ,(Int_t) met.nCorrections());
-		
-    _ntuple->Column("metCorEx"              ,met.corEx());
-    _ntuple->Column("metCorEy"              ,met.corEy());
-    _ntuple->Column("metCorSumEt"           ,met.corSumEt());
-    _ntuple->Column("metUncorrectedPt"      ,met.uncorrectedPt());
-    _ntuple->Column("metUncorrectedPhi"     ,met.uncorrectedPhi());
-    _ntuple->Column("metIsCaloMET"          ,met.isCaloMET());
-    _ntuple->Column("metIsRecoMET"          ,met.isRecoMET());
-    _ntuple->Column("metMaxEtInEmTowers"    ,met.maxEtInEmTowers());
-    _ntuple->Column("metMaxEtInHadTowers"   ,met.maxEtInHadTowers());
-    _ntuple->Column("metEtFractionHadronic" ,met.etFractionHadronic());
-    _ntuple->Column("metEmEtFraction"       ,met.emEtFraction());
-    _ntuple->Column("metHadEtInHB"          ,met.hadEtInHB());
-    _ntuple->Column("metHadEtInHO"          ,met.hadEtInHO());
-    _ntuple->Column("metHadEtInHE"          ,met.hadEtInHE());
-    _ntuple->Column("metHadEtInHF"          ,met.hadEtInHF());
-    _ntuple->Column("metSignificance"       ,met.metSignificance());
-    _ntuple->Column("metCaloSETInpHF"       ,met.CaloSETInpHF());
-    _ntuple->Column("metCaloSETInmHF"       ,met.CaloSETInmHF());
-    _ntuple->Column("metCaloMETInpHF"       ,met.CaloMETInpHF());
-    _ntuple->Column("metCaloMETInmHF"       ,met.CaloMETInmHF());
-    _ntuple->Column("metCaloMETPhiInpHF"    ,met.CaloMETPhiInpHF());
-    _ntuple->Column("metCaloMETPhiInmHF"    ,met.CaloMETPhiInmHF());
-    _ntuple->Column("metCaloMETPhiInmHF"    ,met.CaloMETPhiInmHF());
-		
-  }
-	return (!(mets->empty()));
-
-   */
    return false;
 }
 
 
 bool SinglePhotonAnalyzerTree::storeTracks(const edm::Event& e){
-  /////////////////////////////////////////                                                                                                                                                                 
-  // MET Section: store MET the event    //                                                                                                                                                                 
-  /////////////////////////////////////////                                                                                                                                                                 
-
-  // Get Missing ET          
-  edm::Handle<reco::TrackCollection>  recCollection;
-  e.getByLabel(trackProducer_, recCollection);
-  const int kMaxTracks = 100;
-  
-  HTValVector<Float_t> trackPt(kMaxTracks), trackEta(kMaxTracks), trackPhi(kMaxTracks);
-  size_t nTrackCounter = 0;
-  
-  for(reco::TrackCollection::const_iterator
-	recTrack = recCollection->begin(); recTrack!= recCollection->end(); recTrack++)
-    {
-      if ( (recTrack->pt() > ptTrackMin_) && ( fabs(recTrack->eta()) < etaTrackMax_) ) {
-	trackPt(nTrackCounter) =  recTrack->pt();
-	trackEta(nTrackCounter) =  recTrack->eta();
-	trackPhi(nTrackCounter) =  recTrack->phi();
-	
-	nTrackCounter++;
-      }
-      if (nTrackCounter>kMaxTracks-1) break;
-    }
-  
-  
-  _ntuple->Column("nRecTracks", (Int_t) nTrackCounter);
-  _ntuple->Column("trackPt",    trackPt,  "nRecTracks");
-  _ntuple->Column("trackEta",   trackEta, "nRecTracks");
-  _ntuple->Column("trackPhi",   trackPhi, "nRecTracks");
-  
-  return (!(recCollection->empty()));
 }
 
 
 
 
 int SinglePhotonAnalyzerTree::storeJets(const edm::Event& e){
-	///////////////////////////////////////////////////////////////////////
-	// Jet Section: store kMaxJets in the events as an array in the tree //
-	///////////////////////////////////////////////////////////////////////
-	
-	// Get jets
-  edm::Handle<edm::View<pat::Jet> > jetHandle;
-  e.getByLabel(jetProducer_,jetHandle);
-  edm::View<pat::Jet> jets = *jetHandle;
-	
-	// Store jets
-  const int kMaxJets    = 20;
-	
-  HTValVector<Bool_t>   isCaloJet(kMaxJets), isPFJet(kMaxJets), isBasicJet(kMaxJets);
-	
-  HTValVector<TLorentzVector> jetP4(kMaxJets);
-  HTValVector<Float_t> jetPt(kMaxJets), jetE(kMaxJets), jetP(kMaxJets), jetEta(kMaxJets), jetPhi(kMaxJets);
-  HTValVector<Float_t> jetCharge(kMaxJets);
-  HTValVector<Int_t>   jetNtrk(kMaxJets);
-	
-	// ---- Calo Jet specific information ----
-  HTValVector<Float_t> maxEInEmTowers(kMaxJets), maxEInHadTowers(kMaxJets), energyFractionHadronic(kMaxJets), emEnergyFraction(kMaxJets);
-  HTValVector<Float_t> hadEnergyInHB(kMaxJets), hadEnergyInHO(kMaxJets), hadEnergyInHE(kMaxJets), hadEnergyInHF(kMaxJets);
-  HTValVector<Float_t> emEnergyInEB(kMaxJets), emEnergyInEE(kMaxJets), emEnergyInHF(kMaxJets), towersArea(kMaxJets); 
-  HTValVector<Int_t>   n90(kMaxJets), n60(kMaxJets);
-  HTValVector<Float_t> fHPD(kMaxJets);
-  HTValVector<Float_t> fRBX(kMaxJets);
-  HTValVector<Float_t> n90Hits(kMaxJets);
-	
-  
-  size_t njetscounter=0;
-  for(edm::View<pat::Jet>::const_iterator jet = jets.begin(); jet!=jets.end(); ++jet){
-    if(jet->pt() > ptJetMin_) {
-      jetP4(njetscounter)     = TLorentzVector(jet->px(),jet->py(),jet->pz());
-      jetPt(njetscounter)     = jet->pt();
-      jetE(njetscounter)      = jet->energy();
-      jetP(njetscounter)      = jet->p();
-      jetEta(njetscounter)    = jet->eta();
-      jetPhi(njetscounter)    = jet->phi();
-      jetCharge(njetscounter) = jet->jetCharge();
-      jetNtrk(njetscounter)   = jet->associatedTracks().size();      
-			
-			// ---- Calo Jet specific information ----
-      isCaloJet(njetscounter)         = jet->isCaloJet();  // check if is a reco::CaloJet
-      isPFJet(njetscounter)           = jet->isPFJet();
-      isBasicJet(njetscounter)        = jet->isBasicJet();
-			
-      maxEInEmTowers(njetscounter)           = jet->maxEInEmTowers();
-      maxEInHadTowers(njetscounter)          = jet->maxEInHadTowers();
-      energyFractionHadronic(njetscounter)   = jet->energyFractionHadronic();
-      emEnergyFraction(njetscounter)         = jet->emEnergyFraction();
-      hadEnergyInHB(njetscounter)   = jet->hadEnergyInHB();
-      hadEnergyInHO(njetscounter)   = jet->hadEnergyInHO();
-      hadEnergyInHE(njetscounter)   = jet->hadEnergyInHE();
-      hadEnergyInHF(njetscounter)   = jet->hadEnergyInHF();
-      emEnergyInEB(njetscounter)    = jet->emEnergyInEB();
-      emEnergyInEE(njetscounter)    = jet->emEnergyInEE();
-      emEnergyInHF(njetscounter)    = jet->emEnergyInHF();
-      towersArea(njetscounter)      = jet->towersArea(); // area of contributing towers
-      n90(njetscounter)             = jet->n90(); // min num of CaloTowers needed to sum to 90% of Jet Energy
-      n60(njetscounter)             = jet->n60();
-      fHPD(njetscounter)            = jet->jetID().fHPD;    // fraction of jet energy carried by hottest HPD
-      fRBX(njetscounter)            = jet->jetID().fRBX;    // fraction of jet energy carried by hottest RBX
-      n90Hits(njetscounter)         = jet->jetID().n90Hits; // number of rechits carrying 90% of the jet energy
-      
-      njetscounter++;
-    }
-    if (njetscounter>kMaxJets-1) break;
-  }
-  _nJetsHist->Fill(njetscounter);
-	
-  _ntuple->Column("nJets", (Int_t) njetscounter);
-  _ntuple->Column("kMaxJets",  kMaxJets);
-  if( storePhysVectors_ ) {
-    _ntuple->Column("jetP4",     jetP4, "nJets");
-  } else { 
-    _ntuple->Column("jetPt",     jetPt,     "nJets");
-    _ntuple->Column("jetE",      jetE,      "nJets");
-    _ntuple->Column("jetP",      jetP,      "nJets");
-    _ntuple->Column("jetEta",    jetEta,    "nJets");
-    _ntuple->Column("jetPhi",    jetPhi,    "nJets");
-  }
-  _ntuple->Column("jetCharge", jetCharge, "nJets");
-  _ntuple->Column("jetNtrk",   jetNtrk,   "nJets");
-	
-	// ---- Calo Jet specific information ----
-	
-  _ntuple->Column("jetIsCaloJet",  isCaloJet,  "nJets");
-  _ntuple->Column("jetIsPFJet",    isPFJet,    "nJets");
-  _ntuple->Column("jetIsBasicJet", isBasicJet, "nJets");
-	
-	
-  _ntuple->Column("jetMaxEInEmTowers",         maxEInEmTowers,          "nJets");
-  _ntuple->Column("jetMaxEInHadTowers",        maxEInHadTowers,         "nJets");
-  _ntuple->Column("jetEnergyFractionHadronic", energyFractionHadronic,  "nJets");
-  _ntuple->Column("jetEmEnergyFraction",       emEnergyFraction,        "nJets");
-  _ntuple->Column("jetHadEnergyInHB",          hadEnergyInHB,           "nJets");
-  _ntuple->Column("jetHadEnergyInHO",          hadEnergyInHO,           "nJets");
-  _ntuple->Column("jetHadEnergyInHE",          hadEnergyInHE,           "nJets");
-  _ntuple->Column("jetHadEnergyInHF",          hadEnergyInHF,           "nJets");
-  _ntuple->Column("jetEmEnergyInEB",           emEnergyInEB,            "nJets");
-  _ntuple->Column("jetEmEnergyInEE",           emEnergyInEE,            "nJets");
-  _ntuple->Column("jetEmEnergyInHF",           emEnergyInHF,            "nJets");
-  _ntuple->Column("jetTowersArea",             towersArea,              "nJets");
-  _ntuple->Column("jetN90",                    n90,                     "nJets");
-  _ntuple->Column("jetN60",                    n60,                     "nJets");
-  _ntuple->Column("jetFHPD",                   fHPD,                    "nJets");
-  _ntuple->Column("jetFRBX",                   fRBX,                    "nJets");
-  _ntuple->Column("jetN90Hits",                n90Hits,                 "nJets");
 
-	return (njetscounter);
-}
-
-bool SinglePhotonAnalyzerTree::selectStorePhoton(const edm::Event& e,const edm::EventSetup& iSetup){
-   
-   // first store general;
-   run = (int)e.id().run());
-evt = _ntuple->Column("event",(Int_t)e.id().event());
-   _ntuple->Column("orbit",(Int_t)e.orbitNumber());
-   _ntuple->Column("bunchCrossing",(Int_t)e.bunchCrossing());
-   _ntuple->Column("luminosityBlock",(Int_t)e.luminosityBlock());
-
-   
-   
-  /////////////////////////////////////////////////////////////////////////////
-  // Photon Section: store kMaxPhotons in the events as an array in the tree //
-  /////////////////////////////////////////////////////////////////////////////
-  // Get photon details  
-  Handle<PhotonCollection> photons;
-  e.getByLabel(photonProducer_, photons);   
-	
-  // Sort photons according to pt
-  PhotonCollection myphotons;
-  for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr != photons->end(); ++phoItr) {  
-    myphotons.push_back(*phoItr);
-  }
-  GreaterByPt<Photon> pTComparator_;
-  std::sort(myphotons.begin(), myphotons.end(), pTComparator_);
-	
-  // Loop over "photon" collection until we find a decent High Pt Photon
-  bool hiPtPhotonFound = false;
-  for (PhotonCollection::const_iterator phoItr = photons->begin(); phoItr!=photons->end() && !hiPtPhotonFound; ++phoItr) {  
-    if(phoItr->pt() < ptMin_ || fabs(phoItr->eta()) > etaMax_) continue;
-		
-    // Dump photon kinematics and AOD
-    Photon photon = Photon(*phoItr);
-    // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
-    //       hence, Photon::setVertex() leaves photon object unchanged
-    photon.setVertex(vtx_);
-    storePhotonAOD(&photon, e, iSetup, _ntuple, "PHOLEAD_");
-    		
-    _gammaPtHist ->Fill(phoItr->et());
-    _gammaEtaHist->Fill(phoItr->eta());
-    float photon_phi = phoItr->phi();  // phi is over a whole circle, use fmod to collapse together all ecal modules
-    // Only fill phiMod plot with barrel photons
-    if (fabs(phoItr->eta())<1.5) _gammaPhiModHist->Fill( fmod(photon_phi+3.14159,20.0*3.141592/180.0)-10.0*3.141592/180.0 );
-		
-    //  Build Monte Carlo truth associations 
-    storeMCMatch(e,&photon,"PHOLEAD_");
-    
-    hiPtPhotonFound = true;
-  }
-
-  return (hiPtPhotonFound);
-}
-
-
-
-void SinglePhotonAnalyzerTree::storePhotonAOD(Photon * photon,  const edm::Event& e, const edm::EventSetup &iSetup, HTuple *tpl, const char* prefx) {
-
-  edm::Handle<EcalRecHitCollection> EBReducedRecHits;
-  e.getByLabel(ebReducedRecHitCollection_, EBReducedRecHits);
-  edm::Handle<EcalRecHitCollection> EEReducedRecHits;
-  e.getByLabel(eeReducedRecHitCollection_, EEReducedRecHits); 
-  // get the channel status from the DB
-  edm::ESHandle<EcalChannelStatus> chStatus;
-  iSetup.get<EcalChannelStatusRcd>().get(chStatus);
-
-  EcalClusterLazyTools lazyTool(e, iSetup, ebReducedRecHitCollection_, eeReducedRecHitCollection_ );   
-  
-  const reco::CaloClusterPtr  seed = (*photon).superCluster()->seed();
-
-// Photon parameters
-
-  TString prx(prefx);
-
-// Dump photon reco details
-
-  if( storePhysVectors_ ) { 
-    tpl->Column(prx+"p4",       TLorentzVector(photon->px(),photon->py(),photon->pz(),photon->energy()));
-  } else { 
-    tpl->Column(prx+"energy",photon->energy());
-    tpl->Column(prx+"pt",    photon->pt());
-    tpl->Column(prx+"eta",   photon->eta());
-    tpl->Column(prx+"phi",   photon->phi());
-  }
-  // phiMod = distance in phi to nearest ECAL module boundary
-  float degToRad = 3.14159265/180.0;
-  float phiMod = fmod(photon->phi()+3.14159265, 20.0*degToRad)-10.0*degToRad;
-  tpl->Column(prx+"phiMod",   phiMod);
-
-  if( ! storePhysVectors_ ) {
-    tpl->Column(prx+"p",         photon->p());
-    tpl->Column(prx+"et",        photon->et());
-    tpl->Column(prx+"momentumX", photon->px());
-    tpl->Column(prx+"momentumY", photon->py());
-    tpl->Column(prx+"momentumZ", photon->pz());
-  }
-  
-  tpl->Column(prx+"r9",         photon ->r9());
-  tpl->Column(prx+"isEBGap",    ((photon->isEBGap())? 1:0));
-  tpl->Column(prx+"isEEGap",    ((photon->isEEGap())? 1:0));
-  tpl->Column(prx+"isEBEEGap",  ((photon->isEBEEGap())? 1:0));
-  tpl->Column(prx+"isTransGap", ((fabs(photon->eta()) > ecalBarrelMaxEta_ && fabs(photon->eta()) < ecalEndcapMinEta_) ? 1:0));
-  tpl->Column(prx+"isEB",       ((photon->isEB())? 1:0));
-  tpl->Column(prx+"isEE",       ((photon->isEE())? 1:0));
-    
-  
-  // Super-cluster parameters
-  tpl->Column(prx+"rawEnergy",          photon->superCluster()->rawEnergy());
-  tpl->Column(prx+"preshowerEnergy",    photon->superCluster()->preshowerEnergy());
-  tpl->Column(prx+"numOfPreshClusters", getNumOfPreshClusters(photon, e));
-  tpl->Column(prx+"ESRatio",            getESRatio(photon, e, iSetup));  //ES Ratio
-  tpl->Column(prx+"scSize",             (Int_t) photon->superCluster()->size());
-  tpl->Column(prx+"clustersSize",       (Int_t) photon->superCluster()->clustersSize());
-  tpl->Column(prx+"phiWidth",           photon->superCluster()->phiWidth());
-  tpl->Column(prx+"etaWidth",           photon->superCluster()->etaWidth());
-  tpl->Column(prx+"scEta",              photon->superCluster()->eta());
-  tpl->Column(prx+"scPhi",              photon->superCluster()->phi());
-
-
-  
-
-  // Cluster shape variables
-  DetId id = lazyTool.getMaximum(*seed).first; 
-  float time  = -999., outOfTimeChi2 = -999., chi2 = -999.;
-  int   flags=-1, severity = -1; 
-  const EcalRecHitCollection & rechits = ( photon->isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
-  EcalRecHitCollection::const_iterator it = rechits.find( id );
-  if( it != rechits.end() ) { 
-	  time = it->time(); 
-	  outOfTimeChi2 = it->outOfTimeChi2();
-	  chi2 = it->chi2();
-	  flags = it->recoFlag();
-	  severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
-  }
-  tpl->Column(prx+"seedTime",time);
-  tpl->Column(prx+"seedChi2",chi2);
-  tpl->Column(prx+"seedOutOfTimeChi2",outOfTimeChi2);
-  tpl->Column(prx+"seedRecoFlag",flags);
-  tpl->Column(prx+"seedSeverity",severity);
-  
-  tpl->Column(prx+"eMax",lazyTool.eMax(*seed));
-  tpl->Column(prx+"e2nd",lazyTool.e2nd(*seed));
-  tpl->Column(prx+"e2x2",lazyTool.e2x2(*seed));
-  tpl->Column(prx+"e3x2",lazyTool.e3x2(*seed));
-  tpl->Column(prx+"e3x3",lazyTool.e3x3(*seed));
-  tpl->Column(prx+"e4x4",lazyTool.e4x4(*seed));
-  tpl->Column(prx+"e5x5",lazyTool.e5x5(*seed));
-  
-  tpl->Column(prx+"e2x5Right", lazyTool.e2x5Right(*seed));
-  tpl->Column(prx+"e2x5Left",  lazyTool.e2x5Left(*seed));
-  tpl->Column(prx+"e2x5Top",   lazyTool.e2x5Top(*seed));
-  tpl->Column(prx+"e2x5Bottom",lazyTool.e2x5Bottom(*seed));
-  tpl->Column(prx+"eRight",    lazyTool.eRight(*seed));
-  tpl->Column(prx+"eLeft",     lazyTool.eLeft(*seed));
-  tpl->Column(prx+"eTop",      lazyTool.eTop(*seed));
-  tpl->Column(prx+"eBottom",   lazyTool.eBottom(*seed));
-
-  vector<float> vCov;
-  vCov = lazyTool.covariances(*seed);
-  
-  tpl->Column(prx+"covPhiPhi",vCov[0]);
-  tpl->Column(prx+"covEtaPhi",vCov[1]);
-  tpl->Column(prx+"covEtaEta",vCov[2]);
-
-// Photon shower shape parameters 
-
-  tpl->Column(prx+"maxEnergyXtal",photon->maxEnergyXtal());
-  tpl->Column(prx+"sigmaEtaEta",  photon->sigmaEtaEta());
-  tpl->Column(prx+"sigmaIetaIeta",photon->sigmaIetaIeta());
-  tpl->Column(prx+"r1x5",         photon->r1x5());
-  tpl->Column(prx+"r2x5",         photon->r2x5());
-  tpl->Column(prx+"e1x5",         photon->e1x5());
-  tpl->Column(prx+"e2x5",         photon->e2x5());
-
-
-// AOD isolation and identification
-
-  tpl->Column(prx+"hadronicOverEm",      photon->hadronicOverEm());
-  tpl->Column(prx+"hadronicDepth1OverEm",photon->hadronicDepth1OverEm());
-  tpl->Column(prx+"hadronicDepth2OverEm",photon->hadronicDepth2OverEm());
-
-
-  tpl->Column(prx+"trackIso",photon->trackIso());
-  tpl->Column(prx+"caloIso", photon ->caloIso());
-  tpl->Column(prx+"ecalIso", photon ->ecalIso());
-  tpl->Column(prx+"hcalIso", photon ->hcalIso());
-
-
-// Delta R= 0.4
-  tpl->Column(prx+"ecalRecHitSumEtConeDR04",     photon->ecalRecHitSumEtConeDR04());
-  tpl->Column(prx+"hcalTowerSumEtConeDR04",      photon->hcalTowerSumEtConeDR04());
-  tpl->Column(prx+"hcalDepth1TowerSumEtConeDR04",photon->hcalDepth1TowerSumEtConeDR04());
-  tpl->Column(prx+"hcalDepth2TowerSumEtConeDR04",photon->hcalDepth2TowerSumEtConeDR04());
-  tpl->Column(prx+"trkSumPtSolidConeDR04",       photon->trkSumPtSolidConeDR04());
-  tpl->Column(prx+"trkSumPtHollowConeDR04",      photon->trkSumPtHollowConeDR04());
-  tpl->Column(prx+"nTrkSolidConeDR04",           photon->nTrkSolidConeDR04());
-  tpl->Column(prx+"nTrkHollowConeDR04",          photon->nTrkHollowConeDR04());
-
-
-// Delta R= 0.3
-  tpl->Column(prx+"ecalRecHitSumEtConeDR03",     photon->ecalRecHitSumEtConeDR03());
-  tpl->Column(prx+"hcalTowerSumEtConeDR03",      photon->hcalTowerSumEtConeDR03());
-  tpl->Column(prx+"hcalDepth1TowerSumEtConeDR03",photon->hcalDepth1TowerSumEtConeDR03());
-  tpl->Column(prx+"hcalDepth2TowerSumEtConeDR03",photon->hcalDepth2TowerSumEtConeDR03());
-  tpl->Column(prx+"trkSumPtSolidConeDR03",       photon->trkSumPtSolidConeDR03());
-  tpl->Column(prx+"trkSumPtHollowConeDR03",      photon->trkSumPtHollowConeDR03());
-  tpl->Column(prx+"nTrkSolidConeDR03",           photon->nTrkSolidConeDR03());
-  tpl->Column(prx+"nTrkHollowConeDR03",          photon->nTrkHollowConeDR03());
-  
-  
-// Conversion
-  tpl->Column(prx+"hasConversionTracks",  photon->hasConversionTracks());
-  tpl->Column(prx+"hasPixelSeed",         photon->hasPixelSeed());
-
-// IDs
-  bool isLoose=false, isTight=false;
-  try { isLoose=photon->photonID("PhotonCutBasedIDLoose"); } 
-  catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
-  try { isTight=photon->photonID("PhotonCutBasedIDTight"); } 
-  catch (std::exception &e) { edm::LogError("NotFound") << e.what();  }
-  tpl->Column(prx+"isLoose",  isLoose );
-  tpl->Column(prx+"isTight",  isTight );
-
-  //Initialize the likelihood calculator
-  
-  Int_t nTracks(-1);
-  Float_t convPairInvariantMass(-1), convpairCotThetaSeparation(-1000), convPairMomentumMag(-1000),convPairMomentumPerp(-1000),
-    convPairMomentumPhi(-1000), convPairMomentumEta(-1000), convPairMomentumX(-1000), convPairMomentumY(-1000), convPairMomentumZ(-1000);
-  Float_t convDistOfMinimumApproach(-1000), convDPhiTracksAtVtx(-1000), convDPhiTracksAtEcal(-1000), convDEtaTracksAtEcal(-1000);
-
-  Bool_t convVtxValid(kFALSE);
-  Float_t convVtxEta(-1000), convVtxPhi(-1000), convVtxR(-1000), convVtxX(-1000), convVtxY(-1000), convVtxZ(-1000);
-  Float_t convVtxChi2(-1000), convVtxNdof(-1000), convMVALikelihood(-1000), chi2Prob(-1);
-
-  Float_t convEoverP(-1), convzOfPrimaryVertexFromTracks(-1000);
-
-  Bool_t isConverted(kFALSE);
-  if (photon->conversions().size() > 0) {
-    isConverted = kTRUE;
-    nTracks = photon->conversions()[0]->nTracks();
-
-    if (nTracks == 2) {
-      convPairInvariantMass      = photon->conversions()[0]->pairInvariantMass(); 
-      convpairCotThetaSeparation = photon->conversions()[0]->pairCotThetaSeparation(); 
-      convPairMomentumMag        = sqrt(photon->conversions()[0]->pairMomentum().Mag2()); 
-      convPairMomentumPerp       = sqrt(photon->conversions()[0]->pairMomentum().perp2()); 
-      convPairMomentumEta        = photon->conversions()[0]->pairMomentum().eta(); 
-      convPairMomentumPhi        = photon->conversions()[0]->pairMomentum().phi(); 
-      convPairMomentumX          = photon->conversions()[0]->pairMomentum().x(); 
-      convPairMomentumY          = photon->conversions()[0]->pairMomentum().y(); 
-      convPairMomentumZ          = photon->conversions()[0]->pairMomentum().z();        
-      convDistOfMinimumApproach  = photon->conversions()[0]->distOfMinimumApproach(); 
-      convDPhiTracksAtVtx        = photon->conversions()[0]->dPhiTracksAtVtx(); 
-      convDPhiTracksAtEcal       = photon->conversions()[0]->dPhiTracksAtEcal(); 
-      convDEtaTracksAtEcal       = photon->conversions()[0]->dEtaTracksAtEcal(); 
-    
-    // conversion vertex
-  
-      convVtxValid      = photon->conversions()[0]->conversionVertex().isValid(); 
-      convVtxEta        = photon->conversions()[0]->conversionVertex().position().eta(); 
-      convVtxPhi        = photon->conversions()[0]->conversionVertex().position().phi(); 
-      convVtxR          = photon->conversions()[0]->conversionVertex().position().r(); 
-      convVtxX          = photon->conversions()[0]->conversionVertex().position().x(); 
-      convVtxY          = photon->conversions()[0]->conversionVertex().position().y(); 
-      convVtxZ          = photon->conversions()[0]->conversionVertex().position().z(); 
-      convVtxChi2       = photon->conversions()[0]->conversionVertex().chi2(); 
-      convVtxNdof       = photon->conversions()[0]->conversionVertex().ndof(); 
-      chi2Prob = ChiSquaredProbability(photon->conversions()[0]->conversionVertex().chi2(),photon->conversions()[0]->conversionVertex().ndof() );
-
-#if MPA_VERSION < 2
-      convMVALikelihood = theLikelihoodCalc_->calculateLikelihood(photon->conversions()[0]);
-#else
-      convMVALikelihood =  photon->conversions()[0]->MVAout();
-#endif
-
-    }
-
-    convEoverP                     = photon->conversions()[0]->EoverP(); 
-    convzOfPrimaryVertexFromTracks = photon->conversions()[0]->zOfPrimaryVertexFromTracks(); 
-
-  }
-
-  tpl->Column(prx+"nTracks", nTracks); 
-  tpl->Column(prx+"isConverted", isConverted); 
-
-  tpl->Column(prx+"convPairInvariantMass",      convPairInvariantMass); 
-  tpl->Column(prx+"convpairCotThetaSeparation", convpairCotThetaSeparation); 
-  if( storePhysVectors_ ) {
-    tpl->Column(prx+"convPairMomentum",          TVector3(convPairMomentumX,convPairMomentumY,convPairMomentumZ) );       
-  } else {
-    tpl->Column(prx+"convPairMomentumMag",        convPairMomentumMag); 
-    tpl->Column(prx+"convPairMomentumPerp",       convPairMomentumPerp); 
-    tpl->Column(prx+"convPairMomentumPhi",        convPairMomentumPhi); 
-    tpl->Column(prx+"convPairMomentumEta",        convPairMomentumEta); 
-    tpl->Column(prx+"convPairMomentumX",          convPairMomentumX); 
-    tpl->Column(prx+"convPairMomentumY",          convPairMomentumY); 
-    tpl->Column(prx+"convPairMomentumZ",          convPairMomentumZ);       
-  }
-  
-  tpl->Column(prx+"convDistOfMinimumApproach",  convDistOfMinimumApproach); 
-  tpl->Column(prx+"convDPhiTracksAtVtx",        convDPhiTracksAtVtx); 
-  tpl->Column(prx+"convDPhiTracksAtEcal",       convDPhiTracksAtEcal); 
-  tpl->Column(prx+"convDEtaTracksAtEcal",       convDEtaTracksAtEcal); 
-  
-  // conversion vertex
-  if( storePhysVectors_ ) { 
-    tpl->Column(prx+"convVtx",          TVector3(convVtxX,convVtxY,convVtxZ)); 
-  } else {
-    tpl->Column(prx+"convVtxEta",        convVtxEta); 
-    tpl->Column(prx+"convVtxPhi",        convVtxPhi); 
-    tpl->Column(prx+"convVtxR",          convVtxR); 
-    tpl->Column(prx+"convVtxX",          convVtxX); 
-    tpl->Column(prx+"convVtxY",          convVtxY); 
-    tpl->Column(prx+"convVtxZ",          convVtxZ); 
-  }
-  tpl->Column(prx+"convVtxValid",      convVtxValid); 
-  tpl->Column(prx+"convVtxChi2",       convVtxChi2); 
-  tpl->Column(prx+"convVtxNdof",       convVtxNdof); 
-  tpl->Column(prx+"convMVALikelihood", convMVALikelihood);   
-  tpl->Column(prx+"convVtxChi2Prob",   chi2Prob);
-  
-  tpl->Column(prx+"convEoverP",                     convEoverP); 
-  tpl->Column(prx+"convzOfPrimaryVertexFromTracks", convzOfPrimaryVertexFromTracks); 
-  
-  
-  
 }
 
 bool SinglePhotonAnalyzerTree::storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx){
