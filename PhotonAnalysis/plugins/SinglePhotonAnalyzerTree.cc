@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.5 2011/10/07 14:29:42 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.6 2011/10/07 17:21:20 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -107,10 +107,10 @@
 
 #include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 
-// Histograms, ntuples
-#include "UserCode/HafHistogram/interface/HTupleManager.h"
-#include "UserCode/HafHistogram/interface/HHistogram.h"
-#include "UserCode/HafHistogram/interface/HTuple.h"
+// Histograms, ntuples not used anymore!!
+//#include "UserCode/HafHistogram/interface/HTupleManager.h"
+//#include "UserCode/HafHistogram/interface/HHistogram.h"
+//#include "UserCode/HafHistogram/interface/HTuple.h"
 
 //ROOT includes
 #include <Math/VectorUtil.h>
@@ -132,7 +132,7 @@ SinglePhotonAnalyzerTree::SinglePhotonAnalyzerTree(const edm::ParameterSet& ps):
   verbose_                         = ps.getUntrackedParameter<bool>("verbose", false);
   fillMCNTuple_                    = ps.getUntrackedParameter<bool>("FillMCNTuple", true);
   doL1Objects_                     = ps.getUntrackedParameter<bool>("DoL1Objects",  false);
-  isMCData_                        = kFALSE;//Set by checking if generator block is valid
+  isMC_                            = kFALSE;//Set by checking if generator block is valid
   storePhysVectors_                = ps.getUntrackedParameter<bool>("StorePhysVectors",  false);
   outputFile_                      = ps.getParameter<string>("OutputFile");
 
@@ -271,7 +271,7 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("bunchCrossing",&bunchCrossing,"bunchCrossing/I");
    theTree->Branch("luminosityBlock",&luminosityBlock,"luminosityBlock/I");
    
-   theTree->Branch("nPho",nPho,"nPho/I");
+   theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("pt",pt,"pt[nPho]/F");
    theTree->Branch("et",et,"et[nPho]/F");
    theTree->Branch("energy",energy,"energy[nPho]/F");
@@ -444,7 +444,7 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("t44",t44,"t44[nPho]/F");
 
 
-   theTree->Branch("isGenMatched",&isGenMatched,"isGenMatched[nPho]/I");
+   theTree->Branch("isGenMatched",isGenMatched,"isGenMatched[nPho]/I");
    theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/I");
    theTree->Branch("genMatchedPt",genMatchedPt,"genMatchedPt[nPho]/F");
    theTree->Branch("genMatchedEta",genMatchedEta,"genMatchedEta[nPho]/F");
@@ -458,11 +458,11 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("genTrkIsoDR04",genTrkIsoDR04,"genTrkIsoDR04[nPho]/F");
 
  
-   theTree->Branch("nGp",nGp,"nGp/I");
-   theTree->Branch("simVtxX",simVtxX,"simVtxX/F");
-   theTree->Branch("simVtxY",simVtxY,"simVtxY/F");
-   theTree->Branch("simVtxZ",simVtxZ,"simVtxZ/F");
-   theTree->Branch("ptHat",ptHat,"ptHat/F");
+   theTree->Branch("nGp",&nGp,"nGp/I");
+   theTree->Branch("simVtxX",&simVtxX,"simVtxX/F");
+   theTree->Branch("simVtxY",&simVtxY,"simVtxY/F");
+   theTree->Branch("simVtxZ",&simVtxZ,"simVtxZ/F");
+   theTree->Branch("ptHat",&ptHat,"ptHat/F");
    theTree->Branch("gpEt",gpEt,"gpEt[nGp]/F");
    theTree->Branch("gpEta",gpEta,"gpEta[nGp]/F");
    theTree->Branch("gpCalIsoDR04",gpCalIsoDR04,"gpCalIsoDR04[nGp]/F");
@@ -524,7 +524,7 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
      simVtxX = simVertexX;
      simVtxY = simVertexY;
      simVtxZ = simVertexZ;
-     pthat = genEventScale->qScale();
+     ptHat = genEventScale->qScale();
                
      //  get generated particles and store generator ntuple 
      try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
@@ -563,7 +563,7 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
 
 
 
-Int_t SinglePhotonAnalyzer::getNumOfPreshClusters(Photon *photon, const edm::Event& e) {
+Int_t SinglePhotonAnalyzerTree::getNumOfPreshClusters(Photon *photon, const edm::Event& e) {
 
    // ES clusters in X plane
    edm::Handle<reco::PreshowerClusterCollection> esClustersX;
@@ -706,7 +706,7 @@ Float_t SinglePhotonAnalyzerTree::getGenCalIso(edm::Handle<reco::GenParticleColl
 {
   const Float_t etMin = 0.0;
   Float_t genCalIsoSum = 0.0;
-  if(!isMCData_)return genCalIsoSum;
+  if(!isMC_)return genCalIsoSum;
   if(!handle.isValid())return genCalIsoSum;
 
   for (reco::GenParticleCollection::const_iterator it_gen = 
@@ -742,7 +742,7 @@ Float_t SinglePhotonAnalyzerTree::getGenTrkIso(edm::Handle<reco::GenParticleColl
 {
   const Float_t ptMin = 0.0;
   Float_t genTrkIsoSum = 0.0;
-  if(!isMCData_)return genTrkIsoSum;
+  if(!isMC_)return genTrkIsoSum;
   if(!handle.isValid())return genTrkIsoSum;
 
   for (reco::GenParticleCollection::const_iterator it_gen = 

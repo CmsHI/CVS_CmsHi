@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.6 2011/10/07 14:14:00 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.7 2011/10/07 17:21:20 kimy Exp $
  *
  */
 
@@ -82,9 +82,9 @@
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
 
 // Histograms, ntuples
-#include "UserCode/HafHistogram/interface/HTupleManager.h"
-#include "UserCode/HafHistogram/interface/HHistogram.h"
-#include "UserCode/HafHistogram/interface/HTuple.h"
+//#include "UserCode/HafHistogram/interface/HTupleManager.h"
+//#include "UserCode/HafHistogram/interface/HHistogram.h"
+//#include "UserCode/HafHistogram/interface/HTuple.h"
 
 //ROOT includes
 #include <Math/VectorUtil.h>
@@ -140,12 +140,6 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
    
    int foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
-   
-
-   foundPhotons = true;
-   if (foundPhotons){
-      _ntuple->DumpData();   
-   }
    
 }
 
@@ -377,7 +371,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
   
    
     // absolute cuts.   cut = eMax * exp(-v)   so, v = -log(cut/eMax)
-    float  theSeedE = eMax[nphotonscounter];
+    //  float  theSeedE = eMax[nphotonscounter];
     //  vector<float> lCov02a = lazyTool.localCovariances(*seed, -log(0.2/theSeedE) );
     // sieie02a(nphotonscounter) = sqrt(lCov02a[0]);
     //    cout << "theSeedE = " << theSeedE << "    and cut = 0.2 " << "log (cut/theSeedE) = " << -log( 0.2 / theSeedE )  << endl;

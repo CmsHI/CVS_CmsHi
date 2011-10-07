@@ -8,10 +8,12 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include <TLorentzVector.h>
-#include "UserCode/HafHistogram/interface/HColumn.h"
+//#include "UserCode/HafHistogram/interface/HColumn.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TTree.h"
 #include "CmsHi/PhotonAnalysis/plugins/Limits.h"
 #if MPA_VERSION < 2
@@ -20,9 +22,9 @@
 
 const int kMaxPhotons = 50;
 
-class HTupleManager;
+//class HTupleManager;
 class HHistogram;
-class HTuple;
+//class HTuple;
 class EcalClusterLazyTools;
 class ConversionLikelihoodCalculator;
 
@@ -120,27 +122,6 @@ protected:
   double       etCutGenMatch_;    // cut for the genMatching.. 
   double       etaCutGenMatch_;   // cut for the genMatching..
   // TupleManager, Histograms, ntuples
-  HTupleManager  *tplmgr; 
-  
-  // Leading photon  MC truth histograms
-  HHistogram     *_ptHist;       // leading photon pt histo
-  HHistogram     *_ptHatHist;       // leading photon pt histo                                                                    
-  HHistogram     *_etaHist;      // leading photon eta histo
-  HHistogram     *_vtxX;         // generated vertex X
-  HHistogram     *_vtxY;         // generated vertex Y
-  HHistogram     *_vtxZ;         // generated vertex Z
-	
-  // Reco histograms
-  HHistogram     *_gammaPtHist;  // leading photon pt histo
-  HHistogram     *_gammaEtaHist; // leading photon eta histo
-  HHistogram     *_gammaPhiModHist; // leading photon phi_mod = phi * 180/pi mod 20 - 10
-  HHistogram     *_metHist;      // MET histo
-  HHistogram     *_nVtxHist;     // number of vertecies
-  HHistogram     *_primVtxX;     // reconstructed primary vertex X
-  HHistogram     *_primVtxY;     // reconstructed primary vertex Y
-  HHistogram     *_primVtxZ;     // reconstructed primary vertex Z
-  HHistogram     *_nJetsHist;    // number of jets
-  HHistogram     *_nPhotonsHist;  //number of Photons
 
   // Flags for the fillers
   bool 	doStoreGeneral_; 	 // Store General information
@@ -154,8 +135,8 @@ protected:
   bool  doStoreConversions_;
   bool  doStoreCompCone_;
   bool doStoreTracks_;
-  HTuple         *_ntuple;        // Analysis ntuple
-  HTuple         *_ntupleMC;      // MC truth ntuple
+  //  HTuple         *_ntuple;        // Analysis ntuple
+  //  HTuple         *_ntupleMC;      // MC truth ntuple
 
   // heavy ion stuffs
 
@@ -163,7 +144,7 @@ protected:
   CentralityProvider *centrality_;
   
   
-  
+  edm::Service<TFileService> fs;
   TTree *theTree;
   int run;
   int event;
