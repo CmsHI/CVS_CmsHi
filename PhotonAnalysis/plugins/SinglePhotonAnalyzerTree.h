@@ -25,7 +25,6 @@ class HHistogram;
 class HTuple;
 class EcalClusterLazyTools;
 class ConversionLikelihoodCalculator;
-class PhotonMCTruthFinder;
 
 // comparison operator needed by HTValVector
 
@@ -41,10 +40,6 @@ public:
 
   math::XYZPoint vtx_;
 
-#if MPA_VERSION < 2
-  ConversionLikelihoodCalculator* theLikelihoodCalc_;
-#endif
-
 
 protected:
 	
@@ -52,13 +47,11 @@ protected:
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 	
-  virtual void storeGeneral(const edm::Event&, const edm::EventSetup& );
   virtual bool analyzeMC(const edm::Event&,  const edm::EventSetup& );
-  
-  
   virtual Float_t getESRatio(pat::Photon *photon, const edm::Event&, const edm::EventSetup&);
+  virtual Int_t getNumOfPreshClusters(pat::Photon *photon, const edm::Event&);
 
-
+  
   // obtain generator-level calorimeter isolation and track isolation 
   // distribution, return number of particles and sumet surrounding the candidate
   
@@ -66,13 +59,6 @@ protected:
 			       reco::GenParticleCollection::const_iterator thisPho, const Float_t dRMax=0.4);
   virtual Float_t getGenTrkIso(edm::Handle<reco::GenParticleCollection> handle,
 			       reco::GenParticleCollection::const_iterator thisPho, const Float_t dRMax=0.4);
-
-  // collection of gen particles that are converted photons
-  virtual void storeConvMCTruth(const edm::Event& e, 
-				reco::GenParticleCollection::const_iterator thisPho, HTuple *tpl, const char* prefx = "");
-
-  PhotonMCTruthFinder*                            thePhotonMCTruthFinder_;
-
 	
 	// Configured fields
   bool verbose_;                 // verbose flag
@@ -175,11 +161,10 @@ protected:
 
   const CentralityBins * cbins_;
   CentralityProvider *centrality_;
-
-  TTree *theTree;
-
-
   
+  
+  
+  TTree *theTree;
   int run;
   int event;
   int bunchCrossing;
@@ -279,12 +264,13 @@ protected:
   float trkSumPtHollowConeDR03[kMaxPhotons];
   float trkSumPtSolidConeDR03[kMaxPhotons];
 
-  float isEle[kMaxPhotons];
+  int isEle[kMaxPhotons];
+  int hasPixelSeed[kMaxPhotons];
   float detaEle[kMaxPhotons];
   float dphiEle[kMaxPhotons];
   float eleCharge[kMaxPhotons];
   float eleEoverP[kMaxPhotons];
-
+  
 
   float c1[kMaxPhotons];
   float c2[kMaxPhotons];
@@ -292,6 +278,13 @@ protected:
   float c4[kMaxPhotons];
   float c5[kMaxPhotons];
 
+
+  float t1[kMaxPhotons];
+  float t2[kMaxPhotons];
+  float t3[kMaxPhotons];
+  float t4[kMaxPhotons];
+  float t5[kMaxPhotons];
+  
   float r1[kMaxPhotons];
   float r2[kMaxPhotons];
   float r3[kMaxPhotons];
@@ -310,6 +303,8 @@ protected:
   float cc4[kMaxPhotons];
   float cc5[kMaxPhotons];
   float cc4j[kMaxPhotons];
+  float cc05[kMaxPhotons];
+
 
   float cr1[kMaxPhotons];
   float cr2[kMaxPhotons];
@@ -369,20 +364,37 @@ protected:
   float t34[kMaxPhotons];
   float t44[kMaxPhotons];
   
-  int isGenMatched[kMaxPhotons];
+  int   isGenMatched[kMaxPhotons];
   float genMatchedPt[kMaxPhotons];
   float genMatchedEta[kMaxPhotons];
   float genMatchedPhi[kMaxPhotons];
-  float genMomId[kMaxPhotons];
-  float genMatchedCollId[kMaxPhotons];
+  int   genMomId[kMaxPhotons];
+  int   genMatchedCollId[kMaxPhotons];
 
-  float genGrandMomId[kMaxPhotons];
-  float genNSiblings[kMaxPhotons];
+  int   genGrandMomId[kMaxPhotons];
+  int   genNSiblings[kMaxPhotons];
   float genCalIsoDR03[kMaxPhotons];
   float genCalIsoDR04[kMaxPhotons];
   float genTrkIsoDR03[kMaxPhotons];
   float genTrkIsoDR04[kMaxPhotons];
 
+
+  float simVtxX;
+  float simVtxY;
+  float simVtxZ;
+  float ptHat;
+  int nGp;
+  float gpEt[100];
+  float gpEta[100];
+  float gpPhi[100];
+  float gpCalIsoDR04[100];
+  float gpCalIsoDR03[100];
+  float gpTrkIsoDR04[100];
+  float gpTrkIsoDR03[100];
+  int gpStatus[100];
+  int gpCollId[100];
+  int  gpId[100];
+  int gpMomId[100];
     
 };
 

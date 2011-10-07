@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.4 2011/10/07 14:14:01 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.5 2011/10/07 14:29:42 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -184,7 +184,7 @@ SinglePhotonAnalyzerTree::SinglePhotonAnalyzerTree(const edm::ParameterSet& ps):
   
   pdgId_                           = ps.getUntrackedParameter<int>("pdgId", 22);
   otherPdgIds_                     = ps.getUntrackedParameter<vector<int> >("OtherPdgIds", vector<int>(1,11) );
-  mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 12);
+  mcPtMin_                         = ps.getUntrackedParameter<double>("McPtMin", 15);
   mcEtaMax_                        = ps.getUntrackedParameter<double>("McEtaMax",1.7);
 
   etCutGenMatch_                   = ps.getUntrackedParameter<double>("etCutGenMatch",13);
@@ -208,67 +208,54 @@ SinglePhotonAnalyzerTree::SinglePhotonAnalyzerTree(const edm::ParameterSet& ps):
   
   
   // book ntuples; columns are defined dynamically later
-  tplmgr = new HTupleManager(outputFile_.c_str(),"RECREATE");
+  // tplmgr = new HTupleManager(outputFile_.c_str(),"RECREATE");
 
-  tplmgr->SetDir("1D-Spectra");
-  _ptHist    = tplmgr->MomentumHistogram("GenPt"  ,"p_{T} MC photon (GeV/c);p_{T} (GeV/c)",100,0,50);
-  _ptHatHist = tplmgr->MomentumHistogram("GenPtHat"  ,"p_{T} Hat MC Events (GeV/c);p_{T} (GeV/c)",500,0,500);
+  // tplmgr->SetDir("1D-Spectra");
+  //  _ptHist    = tplmgr->MomentumHistogram("GenPt"  ,"p_{T} MC photon (GeV/c);p_{T} (GeV/c)",100,0,50);
+  // _ptHatHist = tplmgr->MomentumHistogram("GenPtHat"  ,"p_{T} Hat MC Events (GeV/c);p_{T} (GeV/c)",500,0,500);
   
-  _etaHist   = tplmgr->MomentumHistogram("GenEta" ,"#eta MC photon;#eta"  ,100,-3,3);
-  _vtxX      = tplmgr->MomentumHistogram("GenVtxX","Generated Vertex X"   ,100, 0.01,0.06);
-  _vtxY      = tplmgr->MomentumHistogram("GenVtxY","Generated Vertex Y"   ,100,-0.02,0.02);
-  _vtxZ      = tplmgr->MomentumHistogram("GenVtxZ","Generated Vertex X"   ,100,-10,10);
-
- 
-  _gammaPtHist  = tplmgr->MomentumHistogram("GammaPt" ,"p_{T} leading photon candidate (GeV/c);p_{T} (GeV/c)",100,0,50);
-  _gammaEtaHist = tplmgr->MomentumHistogram("GammaEta","#eta leading photon candidate;#eta"        ,100,-3,3);
+  //  _etaHist   = tplmgr->MomentumHistogram("GenEta" ,"#eta MC photon;#eta"  ,100,-3,3);
+  //  _vtxX      = tplmgr->MomentumHistogram("GenVtxX","Generated Vertex X"   ,100, 0.01,0.06);
+  // _vtxY      = tplmgr->MomentumHistogram("GenVtxY","Generated Vertex Y"   ,100,-0.02,0.02);
+  //  _vtxZ      = tplmgr->MomentumHistogram("GenVtxZ","Generated Vertex X"   ,100,-10,10);
+  //  _gammaPtHist  = tplmgr->MomentumHistogram("GammaPt" ,"p_{T} leading photon candidate (GeV/c);p_{T} (GeV/c)",100,0,50);
+  //  _gammaEtaHist = tplmgr->MomentumHistogram("GammaEta","#eta leading photon candidate;#eta"        ,100,-3,3);
     // note 0.1745329 = 2*pi/360 (there are 360 ecal crystals in circle in phi)
-  _gammaPhiModHist=tplmgr->MomentumHistogram("GammaPhiMod","#phi_{mod} leading photon candidate (Barrel only);#phi_{mod}" , 42, (-1.-1./20)*0.1745329, (1.+1./20.)*0.1745329);
-  _metHist      = tplmgr->MomentumHistogram("MET"     ,"MET (GeV);MET (GeV)"                      ,100,0,100);
-  _nVtxHist     = tplmgr->Histogram("NumVtx",20,0,20);
-  _primVtxX     = tplmgr->MomentumHistogram("PrimVtxX","Primary Vertex X"   ,100, 0.01,0.06);
-  _primVtxY     = tplmgr->MomentumHistogram("PrimVtxY","Primary Vertex Y"   ,100,-0.02,0.02);
-  _primVtxZ     = tplmgr->MomentumHistogram("PrimVtxZ","Primary Vertex Z"   ,100,-10,10);
+  //  _gammaPhiModHist=tplmgr->MomentumHistogram("GammaPhiMod","#phi_{mod} leading photon candidate (Barrel only);#phi_{mod}" , 42, (-1.-1./20)*0.1745329, (1.+1./20.)*0.1745329);
+  //  _metHist      = tplmgr->MomentumHistogram("MET"     ,"MET (GeV);MET (GeV)"                      ,100,0,100);
+  //  _nVtxHist     = tplmgr->Histogram("NumVtx",20,0,20);
+  //  _primVtxX     = tplmgr->MomentumHistogram("PrimVtxX","Primary Vertex X"   ,100, 0.01,0.06);
+  // _primVtxY     = tplmgr->MomentumHistogram("PrimVtxY","Primary Vertex Y"   ,100,-0.02,0.02);
+  // _primVtxZ     = tplmgr->MomentumHistogram("PrimVtxZ","Primary Vertex Z"   ,100,-10,10);
 
-  _nPhotonsHist   = tplmgr->Histogram("NumPhotons",10,0,10);
-  _nJetsHist    = tplmgr->Histogram("NumJets",20,-0.5,19.5);
+  // _nPhotonsHist   = tplmgr->Histogram("NumPhotons",10,0,10);
+  // _nJetsHist    = tplmgr->Histogram("NumJets",20,-0.5,19.5);
   
-  tplmgr->SetDir("NTuples");  
-  _ntuple     = tplmgr->Ntuple("Analysis");
+  // tplmgr->SetDir("NTuples");  
+  //  _ntuple     = tplmgr->Ntuple("Analysis");
   //  _ntupleMC   = tplmgr->Ntuple("Generator");
 
-#if MPA_VERSION < 2
-  theLikelihoodCalc_ = new ConversionLikelihoodCalculator();
-  edm::FileInPath path_mvaWeightFile("RecoEgamma/EgammaTools/data/TMVAnalysis_Likelihood.weights.txt");
-  theLikelihoodCalc_->setWeightsFile(path_mvaWeightFile.fullPath().c_str());
-#endif
-
-  // conversion MC truth
- thePhotonMCTruthFinder_ = new PhotonMCTruthFinder();
-
-
+  //#if MPA_VERSION < 2
+  // theLikelihoodCalc_ = new ConversionLikelihoodCalculator();
+  // edm::FileInPath path_mvaWeightFile("RecoEgamma/EgammaTools/data/TMVAnalysis_Likelihood.weights.txt");
+  //  theLikelihoodCalc_->setWeightsFile(path_mvaWeightFile.fullPath().c_str());
+  //  #endif
+     
+  
 
 }
 
 SinglePhotonAnalyzerTree::~SinglePhotonAnalyzerTree() {
 
-#if MPA_VERSION < 2
-  delete theLikelihoodCalc_;
-#endif
-
- delete thePhotonMCTruthFinder_;
+   //#if MPA_VERSION < 2
+   //  delete theLikelihoodCalc_;
+   //#endif
 
 }
 
 void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
-   if (doStoreHLT_) 	storeHLT(e);
-   if (doStoreHF_)		storeHF(e);
    analyzeMC(e,iSetup);
-   if (doStoreVertex_)	storeVertex(e);
-   if (doStoreMET_)	storeMET(e);
-   if (doStoreJets_)	storeJets(e);
-   if (doStoreTracks_)     storeTracks(e);
    
 }
 
@@ -366,11 +353,14 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("trkSumPtHollowConeDR03",trkSumPtHollowConeDR03,"trkSumPtHollowConeDR03[nPho]/F");
    theTree->Branch("trkSumPtSolidConeDR03",trkSumPtSolidConeDR03,"trkSumPtSolidConeDR03[nPho]/F");
    
-   theTree->Branch("isEle",isEle,"isEle[nPho]/F");
+   theTree->Branch("isEle",isEle,"isEle[nPho]/I");
+   theTree->Branch("hasPixelSeed",hasPixelSeed,"hasPixelSeed[nPho]/I");
+
    theTree->Branch("detaEle",detaEle,"detaEle[nPho]/F");
    theTree->Branch("dphiEle",dphiEle,"dphiEle[nPho]/F");
    theTree->Branch("eleCharge",eleCharge,"eleCharge[nPho]/F");
    theTree->Branch("eleEoverP",eleEoverP,"eleEoverP[nPho]/F");
+   
    theTree->Branch("c1",c1,"c1[nPho]/F");
    theTree->Branch("c2",c2,"c2[nPho]/F");
    theTree->Branch("c3",c3,"c3[nPho]/F");
@@ -381,6 +371,12 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("r3",r3,"r3[nPho]/F");
    theTree->Branch("r4",r4,"r4[nPho]/F");
    theTree->Branch("r5",r5,"r5[nPho]/F");
+   theTree->Branch("t1",t1,"t1[nPho]/F");
+   theTree->Branch("t2",t2,"t2[nPho]/F");
+   theTree->Branch("t3",t3,"t3[nPho]/F");
+   theTree->Branch("t4",t4,"t4[nPho]/F");
+   theTree->Branch("t5",t5,"t5[nPho]/F");
+   
    theTree->Branch("t1PtCut",t1PtCut,"t1PtCut[nPho]/F");
    theTree->Branch("t2PtCut",t2PtCut,"t2PtCut[nPho]/F");
    theTree->Branch("t3PtCut",t3PtCut,"t3PtCut[nPho]/F");
@@ -392,6 +388,8 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("cc4",cc4,"cc4[nPho]/F");
    theTree->Branch("cc4j",cc4j,"cc4j[nPho]/F");
    theTree->Branch("cc5",cc5,"cc5[nPho]/F");
+   theTree->Branch("cc05",cc05,"cc05[nPho]/F");
+   
    theTree->Branch("cr1",cr1,"cr1[nPho]/F");
    theTree->Branch("cr2",cr2,"cr2[nPho]/F");
    theTree->Branch("cr3",cr3,"cr3[nPho]/F");
@@ -447,17 +445,35 @@ void SinglePhotonAnalyzerTree::beginJob() {
 
 
    theTree->Branch("isGenMatched",&isGenMatched,"isGenMatched[nPho]/I");
-   theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/F");
+   theTree->Branch("genMatchedCollId",genMatchedCollId,"genMatchedCollId[nPho]/I");
    theTree->Branch("genMatchedPt",genMatchedPt,"genMatchedPt[nPho]/F");
    theTree->Branch("genMatchedEta",genMatchedEta,"genMatchedEta[nPho]/F");
    theTree->Branch("genMatchedPhi",genMatchedPhi,"genMatchedPhi[nPho]/F");
-   theTree->Branch("genMomId",genMomId,"genMomId[nPho]/F");
-   theTree->Branch("genGrandMomId",genGrandMomId,"genGrandMomId[nPho]/F");
-   theTree->Branch("genNSiblings",genNSiblings,"genNSiblings[nPho]/F");
+   theTree->Branch("genMomId",genMomId,"genMomId[nPho]/I");
+   theTree->Branch("genGrandMomId",genGrandMomId,"genGrandMomId[nPho]/I");
+   theTree->Branch("genNSiblings",genNSiblings,"genNSiblings[nPho]/I");
    theTree->Branch("genCalIsoDR03",genCalIsoDR03,"genCalIsoDR03[nPho]/F");
    theTree->Branch("genCalIsoDR04",genCalIsoDR04,"genCalIsoDR04[nPho]/F");
    theTree->Branch("genTrkIsoDR03",genTrkIsoDR03,"genTrkIsoDR03[nPho]/F");
    theTree->Branch("genTrkIsoDR04",genTrkIsoDR04,"genTrkIsoDR04[nPho]/F");
+
+ 
+   theTree->Branch("nGp",nGp,"nGp/I");
+   theTree->Branch("simVtxX",simVtxX,"simVtxX/F");
+   theTree->Branch("simVtxY",simVtxY,"simVtxY/F");
+   theTree->Branch("simVtxZ",simVtxZ,"simVtxZ/F");
+   theTree->Branch("ptHat",ptHat,"ptHat/F");
+   theTree->Branch("gpEt",gpEt,"gpEt[nGp]/F");
+   theTree->Branch("gpEta",gpEta,"gpEta[nGp]/F");
+   theTree->Branch("gpCalIsoDR04",gpCalIsoDR04,"gpCalIsoDR04[nGp]/F");
+   theTree->Branch("gpCalIsoDR03",gpCalIsoDR03,"gpCalIsoDR03[nGp]/F");
+   theTree->Branch("gpTrkIsoDR03",gpTrkIsoDR03,"gpTrkIsoDR03[nGp]/F");
+   theTree->Branch("gpTrkIsoDR04",gpTrkIsoDR04,"gpTrkIsoDR04[nGp]/F");
+   theTree->Branch("gpStatus",gpStatus,"gpStatus[nGp]/I");
+   theTree->Branch("gpCollId",gpCollId,"gpCollId[nGp]/I");
+   theTree->Branch("gpId",gpId,"gpId[nGp]/I");
+   theTree->Branch("gpMomId",gpMomId,"gpMomId[nGp]/I");
+
 
 
 }
@@ -471,103 +487,129 @@ void SinglePhotonAnalyzerTree::endJob() {
    
 }
 
-void SinglePhotonAnalyzerTree::storeGeneral(const edm::Event& e, const edm::EventSetup& iSetup){
-   using namespace edm;
-  
-}
+
 
 bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSetup& iSetup){
 
   /////////////////////////////////////////////////////////
   // Generator Section: Analyzing Monte Carlo Truth Info //                                  
   /////////////////////////////////////////////////////////
-  
-  Handle<HepMCProduct> evtMC;
-  e.getByLabel(hepMCProducer_,evtMC);
-  if (evtMC.isValid())  isMC_=kTRUE;
-  edm::Handle<reco::GenParticleCollection> genParticles;
 
-  if (isMCData_) {
-    // get simulated vertex and store in ntuple
+   simVtxX=-100000;
+   simVtxY=-100000;
+   simVtxZ=-100000;
+   ptHat=-100000;
+   nGp=0;
+   
+   Handle<HepMCProduct> evtMC;
+   e.getByLabel(hepMCProducer_,evtMC);
+   if (evtMC.isValid())  isMC_=kTRUE;
+   edm::Handle<reco::GenParticleCollection> genParticles;
+   
+  if (isMC_) {
+     // get simulated vertex and store in ntuple
      Float_t simVertexX(0), simVertexY(0), simVertexZ(0);
      if(evtMC->GetEvent()->signal_process_vertex() != NULL) {
 	simVertexX = evtMC->GetEvent()->signal_process_vertex()->position().x();
 	simVertexY = evtMC->GetEvent()->signal_process_vertex()->position().y();
 	simVertexZ = evtMC->GetEvent()->signal_process_vertex()->position().z();
-	_vtxX->Fill(simVertexX);
-	_vtxY->Fill(simVertexY);
-	_vtxZ->Fill(simVertexZ);
      }
      
-     if( storePhysVectors_ ) {
-       _ntuple->Column("simVertex", TVector3(simVertexX,simVertexY,simVertexZ));
-     } else {
-       _ntuple->Column("simVertexX", simVertexX);
-       _ntuple->Column("simVertexY", simVertexY);
-       _ntuple->Column("simVertexZ", simVertexZ);     
-     }
-     
+          
      // get pthat value and store in ntuple                                                                                 
      edm::Handle<GenEventInfoProduct>    genEventScale;
      e.getByLabel(genEventScale_, genEventScale);   // hi style                                                                 
-     Float_t  pthat(0);
+     
+     
+     simVtxX = simVertexX;
+     simVtxY = simVertexY;
+     simVtxZ = simVertexZ;
      pthat = genEventScale->qScale();
-     _ptHatHist->Fill(pthat);
-     
-     //    if( genEventScale->hasBinningValues() ) {                                                                       
-     //   pthat = genEventScale->binningValues()[0];                                                                    
-     //  } 
-     _ntuple->Column("ptHat", pthat);
-     
+               
      //  get generated particles and store generator ntuple 
      try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
-     const int nMaxGenPar = 50;
-     HTValVector<Float_t> gpEt(nMaxGenPar), gpEta(nMaxGenPar), gpPhi(nMaxGenPar), gpIsoDR04(nMaxGenPar), gpIsoDR03(nMaxGenPar);
-     HTValVector<Int_t> gpId(nMaxGenPar), gpStatus(nMaxGenPar), gpMomId(nMaxGenPar), gpCollId(nMaxGenPar);
-     
+     const int nMaxGenPar = 90;
+        
      int nGenParCounter=0;
      for (reco::GenParticleCollection::const_iterator it_gen = 
 	    genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
        if ( p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
-       //_ptHist->Fill(p.pt()); 
-       //_etaHist->Fill(p.eta()); 
-       gpEt(nGenParCounter) = p.et();
-       gpEta(nGenParCounter) = p.eta();
-       gpPhi(nGenParCounter) = p.phi();
-       gpIsoDR04(nGenParCounter) =  getGenCalIso(genParticles, it_gen, 0.4);
-       gpIsoDR03(nGenParCounter) =  getGenCalIso(genParticles, it_gen, 0.3);
-       //      genTrkIsoDR03 = getGenTrkIso(genParticles, it_gen, 0.3);      
-      //    genTrkIsoDR04 = getGenTrkIso(genParticles, it_gen, 0.4);
-       gpStatus(nGenParCounter) = p.status();
-       gpCollId(nGenParCounter) = p.collisionId();
-       gpId(nGenParCounter) = p.pdgId();
-       gpMomId(nGenParCounter) = 0;
+     
+       gpEt    [nGenParCounter] = p.et();
+       gpEta   [nGenParCounter] = p.eta();
+       gpPhi   [nGenParCounter] = p.phi();
+       gpCalIsoDR04 [nGenParCounter] =  getGenCalIso(genParticles, it_gen, 0.4);
+       gpCalIsoDR03 [nGenParCounter] =  getGenCalIso(genParticles, it_gen, 0.3);
+             
+       gpTrkIsoDR03[nGenParCounter] = getGenTrkIso(genParticles, it_gen, 0.3);      
+       gpTrkIsoDR04[nGenParCounter] = getGenTrkIso(genParticles, it_gen, 0.4);
+      
+       gpStatus [nGenParCounter] = p.status();
+       gpCollId [nGenParCounter] = p.collisionId();
+       gpId     [nGenParCounter] = p.pdgId();
+       gpMomId  [nGenParCounter] = 0;
        if( p.numberOfMothers() > 0 )
-	 gpMomId(nGenParCounter) = p.mother()->pdgId();
+	 gpMomId[nGenParCounter] = p.mother()->pdgId();
        
        nGenParCounter++;
        if (nGenParCounter> nMaxGenPar-1) break;       
      }
-    
-     _ntuple->Column("nGp", (Int_t) nGenParCounter);
-     _ntuple->Column("gpEt",         gpEt,           "nGp");
-     _ntuple->Column("gpEta",        gpEta,          "nGp");
-     _ntuple->Column("gpPhi",        gpPhi,          "nGp");
-     _ntuple->Column("gpIsoDR04",    gpIsoDR04    ,  "nGp");
-     _ntuple->Column("gpIsoDR03",    gpIsoDR03    ,  "nGp");
-     _ntuple->Column("gpStatus",     gpStatus,       "nGp");
-     _ntuple->Column("gpCollId",     gpCollId,          "nGp");
-     _ntuple->Column("gpId",         gpId,          "nGp");
-     _ntuple->Column("gpMomId",      gpMomId,          "nGp");
   }
-  return (isMCData_ && fillMCNTuple_);
+  return (isMC_);
 }	
 
 
 
 
 
+Int_t SinglePhotonAnalyzer::getNumOfPreshClusters(Photon *photon, const edm::Event& e) {
+
+   // ES clusters in X plane
+   edm::Handle<reco::PreshowerClusterCollection> esClustersX;
+   e.getByLabel(InputTag("multi5x5SuperClustersWithPreshower:preshowerXClusters"), esClustersX);
+   const reco::PreshowerClusterCollection *ESclustersX = esClustersX.product();
+
+   // ES clusters in Y plane
+   edm::Handle<reco::PreshowerClusterCollection> esClustersY;
+   e.getByLabel(InputTag("multi5x5SuperClustersWithPreshower:preshowerYClusters"),esClustersY);
+   const reco::PreshowerClusterCollection *ESclustersY = esClustersY.product();
+
+
+   Int_t numOfPreshClusters(-1);
+  
+   // Is the photon in region of Preshower?
+   if (fabs(photon->eta())>1.62) {
+      numOfPreshClusters=0;
+
+      // Loop over all ECAL Basic clusters in the supercluster
+      for (reco::CaloCluster_iterator ecalBasicCluster = photon->superCluster()->clustersBegin();
+	   ecalBasicCluster!=photon->superCluster()->clustersEnd(); ecalBasicCluster++) {
+	 const reco::CaloClusterPtr ecalBasicClusterPtr = *(ecalBasicCluster);
+
+	 for (reco::PreshowerClusterCollection::const_iterator iESClus = ESclustersX->begin(); iESClus != ESclustersX->end(); ++iESClus) {
+	    const reco::CaloClusterPtr preshBasicCluster = iESClus->basicCluster();
+	    //const reco::PreshowerCluster *esCluster = &*iESClus;
+	    if (preshBasicCluster == ecalBasicClusterPtr) {
+	       numOfPreshClusters++;
+	       //  cout << esCluster->energy() <<"\t" << esCluster->x() << "\t" << esCluster->y() << endl;
+	    }
+	 }  
+
+	 for (reco::PreshowerClusterCollection::const_iterator iESClus = ESclustersY->begin(); iESClus != ESclustersY->end(); ++iESClus) {
+	    const reco::CaloClusterPtr preshBasicCluster = iESClus->basicCluster();
+	    //const reco::PreshowerCluster *esCluster = &*iESClus;
+	    if (preshBasicCluster == ecalBasicClusterPtr) {
+	       numOfPreshClusters++;
+	       //  cout << esCluster->energy() <<"\t" << esCluster->x() << "\t" << esCluster->y() << endl;
+	    }
+	 }
+      } 
+   } 
+
+   return numOfPreshClusters;
+  
+}
 
 Float_t SinglePhotonAnalyzerTree::getESRatio(Photon *photon, const edm::Event& e, const edm::EventSetup& iSetup){
 
@@ -726,94 +768,6 @@ Float_t SinglePhotonAnalyzerTree::getGenTrkIso(edm::Handle<reco::GenParticleColl
   return genTrkIsoSum;
 }
 
-
-//=============================================================================
-// get conversion truth
-void SinglePhotonAnalyzerTree::storeConvMCTruth(const edm::Event& e, 				
-					    reco::GenParticleCollection::const_iterator it_gen, 
-					    HTuple *tpl, const char* prefx)
-{
-  if(!isMCData_)return;
-  TString prx(prefx);
-
-  Int_t isConv = 0;
-  Float_t convVx = -9999.;
-  Float_t convVy = -9999.;
-  Float_t convVz = -9999.;
-  Float_t TrkPt1 = -9999;
-  Float_t TrkPt2 = -9999;
-
-  std::vector<SimTrack>        theSimTracks;
-  std::vector<SimVertex>       theSimVertices;
-  std::vector<PhotonMCTruth>   myPhotonMCTruth;
-  std::vector<ElectronMCTruth> myElectronMCTruth;
-
-  edm::Handle<SimTrackContainer> SimTk;
-  edm::Handle<SimVertexContainer> SimVtx;
-  e.getByLabel("g4SimHits",SimTk);
-  e.getByLabel("g4SimHits",SimVtx);
-  if(SimTk.isValid())
-    theSimTracks.insert(theSimTracks.end(),SimTk->begin(),SimTk->end());
-  if(SimVtx.isValid())
-    theSimVertices.insert(theSimVertices.end(),SimVtx->begin(),SimVtx->end());
-  myPhotonMCTruth = 
-    thePhotonMCTruthFinder_->find (theSimTracks,  theSimVertices);
-
-  for ( std::vector<PhotonMCTruth>::const_iterator 
-	  iPho=myPhotonMCTruth.begin(); iPho !=myPhotonMCTruth.end(); 
-	++iPho ){
-    
-    if(!iPho->isAConversion())continue;
-
-    if(abs(it_gen->pdgId())!= 22 || it_gen->status()!= 1)continue;
-    
-    float dpx = fabs(iPho->fourMomentum().x() - it_gen->p4().x());
-    float dpy = fabs(iPho->fourMomentum().y() - it_gen->p4().y());
-    float dpz = fabs(iPho->fourMomentum().z() - it_gen->p4().z());
-    float dvx = fabs(iPho->primaryVertex().x() - it_gen->vx());
-    float dvy = fabs(iPho->primaryVertex().y() - it_gen->vy());
-    float dvz = fabs(iPho->primaryVertex().z() - it_gen->vz());
-    myElectronMCTruth.clear();
-    
-    if(dpx < 0.001 && dpy < 0.001 && dpz < 0.001 && 
-       (iPho->primaryVertex().x() < -9999 || 
-	iPho->primaryVertex().y() < -9999 || 
-	iPho->primaryVertex().z() < -9999 || 
-	(dvx < 0.001 && dvy < 0.001 && dvz < 0.001)))
-      {
-
-	isConv = 1;
-	convVx = iPho->vertex().x();
-	convVy = iPho->vertex().y();
-	convVz = iPho->vertex().z();
-	myElectronMCTruth = iPho->electrons();
-	int ie=0;
-	for ( std::vector<ElectronMCTruth>::const_iterator 
-		iEle=myElectronMCTruth.begin(); 
-	      iEle !=myElectronMCTruth.end(); ++iEle ){
-
-	    Float_t tempPt = sqrt(pow(iEle->fourMomentum().x(),2)+
-		     pow(iEle->fourMomentum().y(),2));
-	    if(ie==0)TrkPt1 = tempPt;
-	    else if(ie==1)TrkPt2 = tempPt;
-	    ie++;
-	  }
-	break;
-      } // if this gen photon has converted
-
-
-  } // end of loop over photonMCTruth
-
-  
-  tpl->Column(prx + "genIsConv"  , isConv ); // conversion or not
-  tpl->Column(prx + "genConvVtxX", convVx);  // conversion vertex x
-  tpl->Column(prx + "genConvVtxY", convVy);  // conversion vertex y
-  tpl->Column(prx + "genConvVtxZ", convVz);  // conversion vertex z
-  tpl->Column(prx + "genConvElePt1", TrkPt1); // conversion electron pt
-  tpl->Column(prx + "genConvElePt2", TrkPt2); // conversion electron pt
-
-
-}
 
 
 

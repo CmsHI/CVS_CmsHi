@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.5 2011/10/06 19:16:52 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.6 2011/10/07 14:14:00 kimy Exp $
  *
  */
 
@@ -153,7 +153,9 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
 
 int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::EventSetup& iSetup, const char* prefx){
 
-   isMC_ = kFalse;
+   Handle<HepMCProduct> evtMC;
+   e.getByLabel(hepMCProducer_,evtMC);
+   isMC_ = false;
    if (evtMC.isValid())  isMC_=kTRUE;
    
    
@@ -224,137 +226,6 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
   dRxyCalculator dRxy(e,iSetup,trackProducer_);
   
   
-  
-  /*
-    HTValVector<TLorentzVector> p4(kMaxPhotons);
-    HTValVector<Float_t> p(kMaxPhotons),  et(kMaxPhotons),  energy(kMaxPhotons);
-    HTValVector<Float_t> px(kMaxPhotons), py(kMaxPhotons),  pz(kMaxPhotons);
-    HTValVector<Float_t> pt(kMaxPhotons), eta(kMaxPhotons), phi(kMaxPhotons);
-  
-  HTValVector<Float_t> r9(kMaxPhotons), scEnergy(kMaxPhotons), rawEnergy(kMaxPhotons), preshowerEnergy(kMaxPhotons);
-  HTValVector<Float_t> phiWidth(kMaxPhotons), etaWidth(kMaxPhotons), scEta(kMaxPhotons), scPhi(kMaxPhotons);
-  HTValVector<Int_t>   clustersSize(kMaxPhotons), numOfPreshClusters(kMaxPhotons);
-  HTValVector<Float_t> ESRatio(kMaxPhotons);
-  HTValVector<bool>    isEBGap(kMaxPhotons),  isEEGap(kMaxPhotons), isEBEEGap(kMaxPhotons);
-  HTValVector<bool>    isTransGap(kMaxPhotons),  isEB(kMaxPhotons), isEE(kMaxPhotons);
-  HTValVector<Int_t>   scSize(kMaxPhotons);
-  
-  // Photon shower shape parameters 
-  HTValVector<Float_t> maxEnergyXtal(kMaxPhotons), sigmaEtaEta(kMaxPhotons), sigmaIetaIeta(kMaxPhotons), sigmaIphiIphi(kMaxPhotons);
-  
-  // sigmaIetaIet with various relative cuts.
-  HTValVector<Float_t>  sieie47(kMaxPhotons), sieie50(kMaxPhotons), sieie46(kMaxPhotons), sieie45(kMaxPhotons) , sieie44(kMaxPhotons),  sieie43(kMaxPhotons), sieie42(kMaxPhotons), sieie39(kMaxPhotons) ;
-
-
-  // sigmaIetaIet with various absolute cuts.                                                                                    
-  HTValVector<Float_t>  sieie02a(kMaxPhotons), sieie03a(kMaxPhotons), sieie04a(kMaxPhotons), sieie05a(kMaxPhotons), sieie08a(kMaxPhotons), sieie10a(kMaxPhotons) ;       
-  HTValVector<Float_t> sieie022a(kMaxPhotons), sieie025a(kMaxPhotons), sieie027a(kMaxPhotons), sieie032a(kMaxPhotons), sieie035a(kMaxPhotons), sieie037a(kMaxPhotons);
-
-  HTValVector<Float_t> r1x5(kMaxPhotons), r2x5(kMaxPhotons), e1x5(kMaxPhotons), e2x5(kMaxPhotons), e3x3(kMaxPhotons);
-  // with lazyTool
-  HTValVector<Float_t> eMax(kMaxPhotons), e2nd(kMaxPhotons), e2x2(kMaxPhotons), e3x2(kMaxPhotons), e4x4(kMaxPhotons), e5x5(kMaxPhotons);
-  HTValVector<Float_t> e2x5Right(kMaxPhotons), e2x5Left(kMaxPhotons), e2x5Top(kMaxPhotons), e2x5Bottom(kMaxPhotons);
-  HTValVector<Float_t> eRight(kMaxPhotons), eLeft(kMaxPhotons), eTop(kMaxPhotons), eBottom(kMaxPhotons);
-  HTValVector<Float_t> e2overe8(kMaxPhotons); //NEW
-  HTValVector<Float_t> covPhiPhi(kMaxPhotons), covEtaPhi(kMaxPhotons), covEtaEta(kMaxPhotons);
-
-  HTValVector<Float_t> seedTime(kMaxPhotons), seedChi2(kMaxPhotons), seedOutOfTimeChi2(kMaxPhotons), seedEnergy(kMaxPhotons);
-  HTValVector<Float_t> tLef(kMaxPhotons), tRight(kMaxPhotons), tTop(kMaxPhotons), tBottom(kMaxPhotons);  
-  HTValVector<Int_t>   seedRecoFlag(kMaxPhotons), seedSeverity(kMaxPhotons);
-  
-
-  // AOD isolation and identification
-  HTValVector<Float_t> hadronicOverEm(kMaxPhotons), hadronicDepth1OverEm(kMaxPhotons), hadronicDepth2OverEm(kMaxPhotons);
-  HTValVector<Float_t> trackIso(kMaxPhotons), caloIso(kMaxPhotons), ecalIso(kMaxPhotons), hcalIso(kMaxPhotons);
-
-  // Delta R= 0.4
-  HTValVector<Float_t> ecalRecHitSumEtConeDR04(kMaxPhotons), hcalTowerSumEtConeDR04(kMaxPhotons), hcalDepth1TowerSumEtConeDR04(kMaxPhotons);
-  HTValVector<Float_t> hcalDepth2TowerSumEtConeDR04(kMaxPhotons), trkSumPtSolidConeDR04(kMaxPhotons), trkSumPtHollowConeDR04(kMaxPhotons);
-  HTValVector<Int_t> nTrkSolidConeDR04(kMaxPhotons), nTrkHollowConeDR04(kMaxPhotons);
-  
-  // Comp. Cone R= 0.4   (Average of all comp cones corresponding to that photon )
-  HTValVector<Float_t> compTrackIso(kMaxPhotons), compEcalIso(kMaxPhotons), compHcalIso(kMaxPhotons);
-  
-  // Delta R= 0.3
-  HTValVector<Float_t> ecalRecHitSumEtConeDR03(kMaxPhotons), hcalTowerSumEtConeDR03(kMaxPhotons), hcalDepth1TowerSumEtConeDR03(kMaxPhotons);
-  HTValVector<Float_t> hcalDepth2TowerSumEtConeDR03(kMaxPhotons), trkSumPtSolidConeDR03(kMaxPhotons), trkSumPtHollowConeDR03(kMaxPhotons);
-  HTValVector<Int_t> nTrkSolidConeDR03(kMaxPhotons), nTrkHollowConeDR03(kMaxPhotons);
-  
- 
-
-  // Heavy Ion Variables
-  HTValVector<Float_t> c1(kMaxPhotons), c2(kMaxPhotons),c3(kMaxPhotons),c4(kMaxPhotons),c5(kMaxPhotons), c4j(kMaxPhotons);
-  HTValVector<Float_t> cc1(kMaxPhotons), cc2(kMaxPhotons),cc3(kMaxPhotons),cc4(kMaxPhotons),cc5(kMaxPhotons),cc05(kMaxPhotons), cc4j(kMaxPhotons);
-  HTValVector<Float_t> t1(kMaxPhotons), t2(kMaxPhotons),t3(kMaxPhotons),t4(kMaxPhotons),t5(kMaxPhotons), t05(kMaxPhotons);
-  HTValVector<Float_t> ct1(kMaxPhotons), ct2(kMaxPhotons),ct3(kMaxPhotons),ct4(kMaxPhotons),ct5(kMaxPhotons),ct05(kMaxPhotons);
-  HTValVector<Float_t> t1PtCut(kMaxPhotons), t2PtCut(kMaxPhotons),t3PtCut(kMaxPhotons),t4PtCut(kMaxPhotons),t5PtCut(kMaxPhotons),t05PtCut(kMaxPhotons);
-  HTValVector<Float_t> ct1PtCut(kMaxPhotons), ct2PtCut(kMaxPhotons),ct3PtCut(kMaxPhotons),ct4PtCut(kMaxPhotons),ct5PtCut(kMaxPhotons), ct05PtCut(kMaxPhotons);
-    
-  HTValVector<Float_t> ct4j(kMaxPhotons), ct4j10(kMaxPhotons),ct4j15(kMaxPhotons),ct4j20(kMaxPhotons);
-
-  HTValVector<Float_t> trackIsohi(kMaxPhotons), trackIsohi10(kMaxPhotons), trackIsohi15(kMaxPhotons), trackIsohi20(kMaxPhotons);
-  HTValVector<Float_t> trackIsohij(kMaxPhotons), trackIsohi10j(kMaxPhotons), trackIsohi15j(kMaxPhotons), trackIsohi20j(kMaxPhotons);
-
-  // missing pt
-  HTValVector<Float_t> mpt0(kMaxPhotons), mpt05(kMaxPhotons), mpt2(kMaxPhotons), mpt4(kMaxPhotons); 
-  
-  
-  
-  HTValVector<Float_t> r1(kMaxPhotons), r2(kMaxPhotons),r3(kMaxPhotons),r4(kMaxPhotons),r5(kMaxPhotons);
-  HTValVector<Float_t> cr1(kMaxPhotons), cr2(kMaxPhotons),cr3(kMaxPhotons),cr4(kMaxPhotons),cr5(kMaxPhotons), cr05(kMaxPhotons), cr4j(kMaxPhotons);
-  HTValVector<Float_t> dr11(kMaxPhotons),dr12(kMaxPhotons),dr13(kMaxPhotons),dr14(kMaxPhotons);
-  HTValVector<Float_t> dr21(kMaxPhotons),dr22(kMaxPhotons),dr23(kMaxPhotons),dr24(kMaxPhotons);
-  HTValVector<Float_t> dr31(kMaxPhotons),dr32(kMaxPhotons),dr33(kMaxPhotons),dr34(kMaxPhotons);
-  HTValVector<Float_t> dr41(kMaxPhotons),dr42(kMaxPhotons),dr43(kMaxPhotons),dr44(kMaxPhotons);
-  HTValVector<Float_t> t11(kMaxPhotons),t12(kMaxPhotons),t13(kMaxPhotons),t14(kMaxPhotons);
-  HTValVector<Float_t> t21(kMaxPhotons),t22(kMaxPhotons),t23(kMaxPhotons),t24(kMaxPhotons);
-  HTValVector<Float_t> t31(kMaxPhotons),t32(kMaxPhotons),t33(kMaxPhotons),t34(kMaxPhotons);
-  HTValVector<Float_t> t41(kMaxPhotons),t42(kMaxPhotons),t43(kMaxPhotons),t44(kMaxPhotons);
-  HTValVector<Float_t> nLocalTracks(kMaxPhotons), nAllTracks(kMaxPhotons);
-
-  // Electron ID
-  HTValVector<bool> isElectron(kMaxPhotons);
-  HTValVector<Float_t>  dphiEle(kMaxPhotons), detaEle(kMaxPhotons) ; 
-  HTValVector<Float_t>  deltaEtaEleCT(kMaxPhotons), deltaPhiEleCT(kMaxPhotons) ;
-  HTValVector<Int_t>  eleCharge(kMaxPhotons);
-  HTValVector<Float_t>  eleEoverP(kMaxPhotons);
-  
-  // Conversion
-  HTValVector<bool> isConverted(kMaxPhotons), hasConversionTracks(kMaxPhotons), hasPixelSeed(kMaxPhotons);
-  
-  
-  // ID
-  HTValVector<bool> isLoose(kMaxPhotons), isTight(kMaxPhotons);
-  
-  HTValVector<Int_t>   nTracks(kMaxPhotons);
-  HTValVector<TVector3> convPairMomentum(kMaxPhotons);
-  HTValVector<Float_t> convPairInvariantMass(kMaxPhotons), convpairCotThetaSeparation(kMaxPhotons), convPairMomentumMag(kMaxPhotons);
-  HTValVector<Float_t> convPairMomentumPerp(kMaxPhotons), convPairMomentumPhi(kMaxPhotons), convPairMomentumEta(kMaxPhotons);
-  HTValVector<Float_t> convPairMomentumX(kMaxPhotons), convPairMomentumY(kMaxPhotons), convPairMomentumZ(kMaxPhotons);
-  HTValVector<Float_t> convDistOfMinimumApproach(kMaxPhotons), convDPhiTracksAtVtx(kMaxPhotons), convDPhiTracksAtEcal(kMaxPhotons);
-  HTValVector<Float_t> convDEtaTracksAtEcal(kMaxPhotons);
-
-  HTValVector<Bool_t> convVtxValid(kMaxPhotons);
-  HTValVector<TVector3> convVtx(kMaxPhotons);
-  HTValVector<Float_t> convVtxEta(kMaxPhotons), convVtxPhi(kMaxPhotons), convVtxR(kMaxPhotons);
-  HTValVector<Float_t> convVtxX(kMaxPhotons), convVtxY(kMaxPhotons), convVtxZ(kMaxPhotons);
-  HTValVector<Float_t> convVtxChi2(kMaxPhotons), convVtxNdof(kMaxPhotons), convMVALikelihood(kMaxPhotons), chi2Prob(kMaxPhotons);
-
-  HTValVector<Float_t> convEoverP(kMaxPhotons), convzOfPrimaryVertexFromTracks(kMaxPhotons);
-
-  // Generator matched 
-  HTValVector<TLorentzVector>    genMatchedP4(kMaxPhotons);
-  HTValVector<bool>    isGenMatched(kMaxPhotons);
-  HTValVector<Int_t>   genMomId(kMaxPhotons);
-  HTValVector<Int_t>   genGrandMomId(kMaxPhotons);
-  HTValVector<Int_t>   genNSiblings(kMaxPhotons);
-  HTValVector<Int_t>   genMatchedCollId(kMaxPhotons);
-  HTValVector<Float_t> genMatchedPt(kMaxPhotons), genMatchedEta(kMaxPhotons), genMatchedPhi(kMaxPhotons);
-  HTValVector<Float_t> genCalIsoDR03(kMaxPhotons), genTrkIsoDR03(kMaxPhotons);
-  HTValVector<Float_t> genCalIsoDR04(kMaxPhotons), genTrkIsoDR04(kMaxPhotons);
-
-
-  */
   // store general
   run = (Int_t)e.id().run();
   event = (Int_t)e.id().event();
@@ -369,11 +240,10 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
      // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
      //       hence, Photon::setVertex() leaves photon object unchanged
      //     photon.setVertex(vtx_);   <== Test if this makes error
-     
      //   p4    (nphotonscounter) =  TLorentzVector(photon.px(),photon.py(),photon.pz(),photon.energy());
      //    p     (nphotonscounter) =  photon.p();
      //   et    (nphotonscounter) =  photon.et();
-
+     
     pt[nphotonscounter] = photon.p4().pt();
     px[nphotonscounter] = photon.px();
     py[nphotonscounter] = photon.py();
@@ -420,7 +290,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
     }
 
-    float tlef = -999., tright=-999., ttop=-999., tbottom=-999.;
+    float tleft = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
     std::vector<DetId> right  = lazyTool.matrixDetId(id, 1, 1, 0, 0);
     std::vector<DetId> top    = lazyTool.matrixDetId(id, 0, 0, 1, 1);
@@ -486,21 +356,26 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     //  maxEnergyXtal(nphotonscounter) =  photon.maxEnergyXtal();
     sigmaEtaEta  [nphotonscounter] =  photon.sigmaEtaEta();
     sigmaIetaIeta[nphotonscounter] =  photon.sigmaIetaIeta();
-    sigmaIphiIphi[nphotonscounter] =  sqrt(lCov47[2]);
-    
+      
     // see http://cmslxr.fnal.gov/lxr/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h#076
     // other sieie values;
     vector<float> lCov39 = lazyTool.localCovariances(*seed, 3.9 );
     sieie39      [nphotonscounter] = sqrt(lCov39[0]);
+
     vector<float> lCov42 = lazyTool.localCovariances(*seed, 4.2 );
     sieie42      [nphotonscounter] = sqrt(lCov42[0]);
+
     vector<float> lCov45 = lazyTool.localCovariances(*seed, 4.5 );
     sieie45      [nphotonscounter] = sqrt(lCov45[0]);
+  
     vector<float> lCov47 = lazyTool.localCovariances(*seed, 4.7 );
     sieie47      [nphotonscounter] = sqrt(lCov47[0]);
+    sigmaIphiIphi[nphotonscounter] =  sqrt(lCov47[2]);
+    
     vector<float> lCov50 = lazyTool.localCovariances(*seed, 5.0 );
     sieie50      [nphotonscounter] = sqrt(lCov50[0]);
-     
+  
+   
     // absolute cuts.   cut = eMax * exp(-v)   so, v = -log(cut/eMax)
     float  theSeedE = eMax[nphotonscounter];
     //  vector<float> lCov02a = lazyTool.localCovariances(*seed, -log(0.2/theSeedE) );
@@ -562,7 +437,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       //	  cout << " this is not an electron" << endl;
     }
     
-    isElectron         [nphotonscounter]    =  isEleTemp;
+    isEle         [nphotonscounter]    =  isEleTemp;
     detaEle            [nphotonscounter]    =  detaTemp;
     dphiEle            [nphotonscounter]    =  dphiTemp;
     // deltaEtaEleCT      [nphotonscounter]    =  deltaEtaEleCTTemp;
@@ -635,11 +510,11 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     //   nTrkHollowConeDR03          (nphotonscounter)   =  photon.nTrkHollowConeDR03();
     
 
-    c1                          [nphotonscounter)   =  CxC.getCx(photon.superCluster(),1,0);
-    c2                          [nphotonscounter)   =  CxC.getCx(photon.superCluster(),2,0);
-    c3                          [nphotonscounter)   =  CxC.getCx(photon.superCluster(),3,0);
-    c4                          [nphotonscounter)   =  CxC.getCx(photon.superCluster(),4,0);
-    c5                          [nphotonscounter)   =  CxC.getCx(photon.superCluster(),5,0);
+    c1                          [nphotonscounter]   =  CxC.getCx(photon.superCluster(),1,0);
+    c2                          [nphotonscounter]   =  CxC.getCx(photon.superCluster(),2,0);
+    c3                          [nphotonscounter]   =  CxC.getCx(photon.superCluster(),3,0);
+    c4                          [nphotonscounter]   =  CxC.getCx(photon.superCluster(),4,0);
+    c5                          [nphotonscounter]   =  CxC.getCx(photon.superCluster(),5,0);
 
     t1                          [nphotonscounter]   =  TxC.getTx(photon,1,0);
     t2                          [nphotonscounter]   =  TxC.getTx(photon,2,0);
@@ -829,7 +704,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 	 genTrkIsoDR04[nphotonscounter]= getGenTrkIso(genParticles,matchedPart,0.4);
 	 
 	 isGenMatched[nphotonscounter] = gpTemp;
-	 genMatchedCollId[nphotonscounter] = cndMc->collisionId();
+	 genMatchedCollId[nphotonscounter] = matchedPart->collisionId();
 	 
 	if( cndMc->numberOfMothers() > 0 ) {
 	   genMomId[nphotonscounter] = cndMc->mother()->pdgId();
