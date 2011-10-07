@@ -16,7 +16,7 @@ patJets.embedGenJetMatch    = True
 patJets.embedGenPartonMatch = True
 patJets.embedCaloTowers	    = False
 
-
+patJetCorrFactors.useNPV = False
 # full reco
 icPu5corr = patJetCorrFactors.clone(
   src = cms.InputTag("iterativeConePu5CaloJets"),
