@@ -53,21 +53,9 @@ protected:
   virtual void endJob() ;
 	
   virtual void storeGeneral(const edm::Event&, const edm::EventSetup& );
-  virtual void storeL1Trigger(const edm::Event&);
-  virtual void storeHLT(const edm::Event&);
-  virtual void storeHF(const edm::Event&);
   virtual bool analyzeMC(const edm::Event&,  const edm::EventSetup& );
-  virtual void storeVertex(const edm::Event&);
-  virtual bool storeMET(const edm::Event&);
-  virtual int  storeJets(const edm::Event&);
-  virtual bool selectStorePhoton(const edm::Event&,const edm::EventSetup&);
-  virtual void storeEvtPlane(const edm::Event&);
-  virtual bool storeTracks(const edm::Event&);
   
-	
-  virtual void storePhotonAOD(pat::Photon *photon, const edm::Event& e, const edm::EventSetup &es, HTuple *tpl, const char* prefx = "PHO1_");
-  virtual bool storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx = "PHO1_");	
-  virtual Int_t getNumOfPreshClusters(pat::Photon *photon, const edm::Event&);
+  
   virtual Float_t getESRatio(pat::Photon *photon, const edm::Event&, const edm::EventSetup&);
 
 

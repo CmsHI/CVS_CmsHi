@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.3 2011/10/06 19:16:52 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.4 2011/10/07 14:14:01 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -262,23 +262,14 @@ SinglePhotonAnalyzerTree::~SinglePhotonAnalyzerTree() {
 
 void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
-	if (doStoreHLT_) 	storeHLT(e);
-	if (doStoreHF_)		storeHF(e);
-	analyzeMC(e,iSetup);
-	if (doStoreVertex_)	storeVertex(e);
-	if (doStoreMET_)	storeMET(e);
-	if (doStoreJets_)	storeJets(e);
-	if (doStoreTracks_)     storeTracks(e);
-
-	if (foundPhoton){
-		// Dump analysis ntuple 
-		// NOTE: dump ntuple only if at least one photon detected in a given acceptance
-		//       number of entries in ntuple does not correspond to the number of analyzed events
-		//       number of entries in certain histograms like "NumJets", "NumVtx" corresponds to the number of analyzed events  
-		_ntuple->DumpData();   
-	}
-
-
+   if (doStoreHLT_) 	storeHLT(e);
+   if (doStoreHF_)		storeHF(e);
+   analyzeMC(e,iSetup);
+   if (doStoreVertex_)	storeVertex(e);
+   if (doStoreMET_)	storeMET(e);
+   if (doStoreJets_)	storeJets(e);
+   if (doStoreTracks_)     storeTracks(e);
+   
 }
 
 void SinglePhotonAnalyzerTree::beginJob() {
@@ -485,16 +476,6 @@ void SinglePhotonAnalyzerTree::storeGeneral(const edm::Event& e, const edm::Even
   
 }
 
-void SinglePhotonAnalyzerTree::storeL1Trigger(const edm::Event& e){
-  
-}
-
-void SinglePhotonAnalyzerTree::storeHLT(const edm::Event& e){
-}
-				
-void SinglePhotonAnalyzerTree::storeHF(const edm::Event& e){
-}	
-
 bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSetup& iSetup){
 
   /////////////////////////////////////////////////////////
@@ -503,7 +484,7 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
   
   Handle<HepMCProduct> evtMC;
   e.getByLabel(hepMCProducer_,evtMC);
-  if (evtMC.isValid())  isMCData_=kTRUE;
+  if (evtMC.isValid())  isMC_=kTRUE;
   edm::Handle<reco::GenParticleCollection> genParticles;
 
   if (isMCData_) {
@@ -584,186 +565,9 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
 }	
 
 
-void SinglePhotonAnalyzerTree::storeEvtPlane(const edm::Event& e){
-}
-
-void SinglePhotonAnalyzerTree::storeVertex(const edm::Event& e){
-}
 
 
 
-
-bool SinglePhotonAnalyzerTree::storeMET(const edm::Event& e){
-   return false;
-}
-
-
-bool SinglePhotonAnalyzerTree::storeTracks(const edm::Event& e){
-}
-
-
-
-
-int SinglePhotonAnalyzerTree::storeJets(const edm::Event& e){
-
-}
-
-bool SinglePhotonAnalyzerTree::storeMCMatch( const edm::Event& e,pat::Photon *photon, const char* prefx){
-
-  TString prx(prefx);
-  Handle<HepMCProduct> evtMC;
-  e.getByLabel("generator",evtMC);
-  if (evtMC.isValid())  isMCData_=kTRUE;	
-  
-  if (isMCData_) {
-    float delta(0.15);
-    Int_t momId(0), grandMomId(0), nSiblings(0), genMatchedCollId(-100);
-    Bool_t isGenMatched(kFALSE);
-    Float_t genMatchedPt(-1), genMatchedEta(-1000), genMatchedPhi(0);
-    Float_t currentMaxPt(-1);
-    Float_t genCalIsoDR04(99999.), genTrkIsoDR04(99999.), genCalIsoDR03(99999.), genTrkIsoDR03(99999.);
-    TLorentzVector genMatchedP4(0,0,0,0); 
-    const reco::Candidate *cndMc(0);
-    reco::GenParticleCollection::const_iterator matchedPart; 
-
-    // get hold of generated particles from MC thuth 
-    edm::Handle<reco::GenParticleCollection> genParticles;
-    try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
-    
-    for (reco::GenParticleCollection::const_iterator it_gen = 
-	    genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
-       
-       const reco::Candidate &p = (*it_gen);  
-       if ( p.status() != 1 || fabs(p.pdgId()) != pdgId_ ) continue;
-       if ( p.et() < etCutGenMatch_ ) continue;
-       if ( fabs(p.eta()) > etaCutGenMatch_ ) continue;
-       
-       if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
-	  if( p.numberOfMothers() > 0 ) {
-	     momId = p.mother()->pdgId();
-	  if( p.mother()->numberOfMothers() > 0 ) {
-	     grandMomId = p.mother()->mother()->pdgId();
-	  }
-	  nSiblings = p.mother()->numberOfDaughters();
-	}
-	isGenMatched  = kTRUE; cndMc = &p;
-	currentMaxPt  = p.pt();
-	matchedPart   = it_gen;
-	genMatchedCollId = it_gen->collisionId();
-       }
-    } // end of loop over gen particles
-
-    // if no matching photon was found try with other particles
-    if( !isGenMatched ) { 
-       
-       currentMaxPt = -1;
-       for (reco::GenParticleCollection::const_iterator it_gen = 
-	       genParticles->begin(); it_gen!= genParticles->end(); it_gen++){      
-	  const reco::Candidate &p = (*it_gen);    	
-	  if (p.status() != 1 || find(otherPdgIds_.begin(),otherPdgIds_.end(),fabs(p.pdgId())) == otherPdgIds_.end() ) continue;
-	  if ( p.et() < etCutGenMatch_ ) continue;
-	  if ( fabs(p.eta()) > etaCutGenMatch_ ) continue;
-	  
-	  if(ROOT::Math::VectorUtil::DeltaR(p.p4(),photon->p4())<delta && p.pt() > currentMaxPt ) {
-	  momId = p.pdgId();
-	  if( p.numberOfMothers() > 0 ) {
-	    grandMomId = p.mother()->pdgId();
-	    nSiblings = p.mother()->numberOfDaughters();
-	  }
-	  cndMc = &p; // do not set the isGenMatched in this case
-	  currentMaxPt = p.pt();
-	  matchedPart = it_gen;
-	}
-      } // end of loop over gen particles
-
-    } // if not matched to gen photon
-    
-    if(cndMc) {
-      genMatchedP4.SetXYZT(cndMc->px(),cndMc->py(),cndMc->pz(),cndMc->energy());
-      genMatchedPt   = cndMc->pt();
-      genMatchedEta  = cndMc->eta();
-      genMatchedPhi  = cndMc->phi();
-      // calculate isolation at the generator level
-      genCalIsoDR03  = getGenCalIso(genParticles, matchedPart, 0.3);
-      genTrkIsoDR03  = getGenTrkIso(genParticles, matchedPart, 0.3);      
-      genCalIsoDR04  = getGenCalIso(genParticles, matchedPart, 0.4);
-      genTrkIsoDR04  = getGenTrkIso(genParticles, matchedPart, 0.4);
-    }	       	      	
-    
-    _ntuple->Column(prx+"isGenMatched", isGenMatched);
-    if( storePhysVectors_ ) {
-      _ntuple->Column(prx+"genMatchedP4", genMatchedP4);
-    } else { 
-      _ntuple->Column(prx+"genMatchedPt", genMatchedPt);
-      _ntuple->Column(prx+"genMatchedEta",genMatchedEta);
-      _ntuple->Column(prx+"genMatchedPhi",genMatchedPhi);
-    }
-    _ntuple->Column(prx+"genCollId",     genMatchedCollId);
-    _ntuple->Column(prx+"motherID",     momId);
-    _ntuple->Column(prx+"grandMotherID",     grandMomId);
-    _ntuple->Column(prx+"nSiblings",     nSiblings);
-    // calculate isolation at the generator level
-    _ntuple->Column(prx+"genCalIsoDR03", genCalIsoDR03);
-    _ntuple->Column(prx+"genTrkIsoDR03", genTrkIsoDR03);
-    
-    _ntuple->Column(prx+"genCalIsoDR04", genCalIsoDR04);
-    _ntuple->Column(prx+"genTrkIsoDR04", genTrkIsoDR04);
-    
-    
-  }
-  
-  return (isMCData_);
-}
-
-
-
-Int_t SinglePhotonAnalyzerTree::getNumOfPreshClusters(Photon *photon, const edm::Event& e) {
-
-// ES clusters in X plane
-  edm::Handle<reco::PreshowerClusterCollection> esClustersX;
-  e.getByLabel(InputTag("multi5x5SuperClustersWithPreshower:preshowerXClusters"), esClustersX);
-  const reco::PreshowerClusterCollection *ESclustersX = esClustersX.product();
-
-// ES clusters in Y plane
-  edm::Handle<reco::PreshowerClusterCollection> esClustersY;
-  e.getByLabel(InputTag("multi5x5SuperClustersWithPreshower:preshowerYClusters"),esClustersY);
-  const reco::PreshowerClusterCollection *ESclustersY = esClustersY.product();
-
-
-  Int_t numOfPreshClusters(-1);
-  
-// Is the photon in region of Preshower?
-  if (fabs(photon->eta())>1.62) {
-    numOfPreshClusters=0;
-
-  // Loop over all ECAL Basic clusters in the supercluster
-    for (reco::CaloCluster_iterator ecalBasicCluster = photon->superCluster()->clustersBegin();
-	 ecalBasicCluster!=photon->superCluster()->clustersEnd(); ecalBasicCluster++) {
-      const reco::CaloClusterPtr ecalBasicClusterPtr = *(ecalBasicCluster);
-
-      for (reco::PreshowerClusterCollection::const_iterator iESClus = ESclustersX->begin(); iESClus != ESclustersX->end(); ++iESClus) {
-	const reco::CaloClusterPtr preshBasicCluster = iESClus->basicCluster();
-//	const reco::PreshowerCluster *esCluster = &*iESClus;
-	if (preshBasicCluster == ecalBasicClusterPtr) {
-	  numOfPreshClusters++;
-//	  cout << esCluster->energy() <<"\t" << esCluster->x() << "\t" << esCluster->y() << endl;
-	}
-      }  
-
-      for (reco::PreshowerClusterCollection::const_iterator iESClus = ESclustersY->begin(); iESClus != ESclustersY->end(); ++iESClus) {
-	const reco::CaloClusterPtr preshBasicCluster = iESClus->basicCluster();
-//	const reco::PreshowerCluster *esCluster = &*iESClus;
-	if (preshBasicCluster == ecalBasicClusterPtr) {
-	  numOfPreshClusters++;
-//	  cout << esCluster->energy() <<"\t" << esCluster->x() << "\t" << esCluster->y() << endl;
-	}
-      }
-    } 
-  } 
-
-  return numOfPreshClusters;
-  
-}
 
 Float_t SinglePhotonAnalyzerTree::getESRatio(Photon *photon, const edm::Event& e, const edm::EventSetup& iSetup){
 
