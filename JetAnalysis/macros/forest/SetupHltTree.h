@@ -8,26 +8,7 @@ class Hlts
   ~Hlts(){};
 
    // Declaration of leaf types
-   Int_t           NohBJetL2;
-   Float_t         ohBJetL2Energy[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetL2Et[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetL2Pt[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetL2Eta[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetL2Phi[maxEntry];   //[NohBJetL2]
-   Int_t           NohBJetL2Corrected;
-   Float_t         ohBJetL2CorrectedEnergy[maxEntry];   //[NohBJetL2Corrected]
-   Float_t         ohBJetL2CorrectedEt[maxEntry];   //[NohBJetL2Corrected]
-   Float_t         ohBJetL2CorrectedPt[maxEntry];   //[NohBJetL2Corrected]
-   Float_t         ohBJetL2CorrectedEta[maxEntry];   //[NohBJetL2Corrected]
-   Float_t         ohBJetL2CorrectedPhi[maxEntry];   //[NohBJetL2Corrected]
-   Float_t         ohBJetIPL25Tag[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetIPL3Tag[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetIPLooseL25Tag[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetIPLooseL3Tag[maxEntry];   //[NohBJetL2]
-   Int_t           ohBJetMuL25Tag[maxEntry];   //[NohBJetL2]
-   Float_t         ohBJetMuL3Tag[maxEntry];   //[NohBJetL2]
-   Int_t           ohBJetPerfL25Tag[maxEntry];   //[NohBJetL2]
-   Int_t           ohBJetPerfL3Tag[maxEntry];   //[NohBJetL2]
+
    Float_t         Npart;
    Float_t         Ncoll;
    Float_t         Nhard;
@@ -64,68 +45,6 @@ class Hlts
    Int_t           hiNtracksEtaCut;
    Int_t           hiNtracksEtaPtCut;
    Int_t           NrecoElec;
-   Float_t         recoElecPt[maxEntry];   //[NrecoElec]
-   Float_t         recoElecPhi[maxEntry];   //[NrecoElec]
-   Float_t         recoElecEta[maxEntry];   //[NrecoElec]
-   Float_t         recoElecEt[maxEntry];   //[NrecoElec]
-   Float_t         recoElecE[maxEntry];   //[NrecoElec]
-   Int_t           recoElecEleID[maxEntry];   //[NrecoElec]
-   Int_t           NrecoPhot;
-   Float_t         recoPhotPt[maxEntry];   //[NrecoPhot]
-   Float_t         recoPhotPhi[maxEntry];   //[NrecoPhot]
-   Float_t         recoPhotEta[maxEntry];   //[NrecoPhot]
-   Float_t         recoPhotEt[maxEntry];   //[NrecoPhot]
-   Float_t         recoPhotE[maxEntry];   //[NrecoPhot]
-   Int_t           NrecoSC;
-   Float_t         recoSCPt[maxEntry];   //[NrecoSC]
-   Float_t         recoSCPhi[maxEntry];   //[NrecoSC]
-   Float_t         recoSCEta[maxEntry];   //[NrecoSC]
-   Float_t         recoSCEt[maxEntry];   //[NrecoSC]
-   Float_t         recoSCE[maxEntry];   //[NrecoSC]
-   Int_t           NohPhot;
-   Float_t         ohPhotEt[maxEntry];   //[NohPhot]
-   Float_t         ohPhotEta[maxEntry];   //[NohPhot]
-   Float_t         ohPhotPhi[maxEntry];   //[NohPhot]
-   Float_t         ohPhotEiso[maxEntry];   //[NohPhot]
-   Float_t         ohPhotHiso[maxEntry];   //[NohPhot]
-   Float_t         ohPhotTiso[maxEntry];   //[NohPhot]
-   Int_t           ohPhotL1iso[maxEntry];   //[NohPhot]
-   Float_t         ohPhotClusShap[maxEntry];   //[NohPhot]
-   Int_t           NL1IsolEm;
-   Float_t         L1IsolEmEt[maxEntry];   //[NL1IsolEm]
-   Float_t         L1IsolEmE[maxEntry];   //[NL1IsolEm]
-   Float_t         L1IsolEmEta[maxEntry];   //[NL1IsolEm]
-   Float_t         L1IsolEmPhi[maxEntry];   //[NL1IsolEm]
-   Int_t           NL1NIsolEm;
-   Float_t         L1NIsolEmEt[maxEntry];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmE[maxEntry];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmEta[maxEntry];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmPhi[maxEntry];   //[NL1NIsolEm]
-   Int_t           NL1Mu;
-   Float_t         L1MuPt[maxEntry];   //[NL1Mu]
-   Float_t         L1MuE[maxEntry];   //[NL1Mu]
-   Float_t         L1MuEta[maxEntry];   //[NL1Mu]
-   Float_t         L1MuPhi[maxEntry];   //[NL1Mu]
-   Int_t           L1MuIsol[maxEntry];   //[NL1Mu]
-   Int_t           L1MuMip[maxEntry];   //[NL1Mu]
-   Int_t           L1MuFor[maxEntry];   //[NL1Mu]
-   Int_t           L1MuRPC[maxEntry];   //[NL1Mu]
-   Int_t           L1MuQal[maxEntry];   //[NL1Mu]
-   Int_t           NL1CenJet;
-   Float_t         L1CenJetEt[maxEntry];   //[NL1CenJet]
-   Float_t         L1CenJetE[maxEntry];   //[NL1CenJet]
-   Float_t         L1CenJetEta[maxEntry];   //[NL1CenJet]
-   Float_t         L1CenJetPhi[maxEntry];   //[NL1CenJet]
-   Int_t           NL1ForJet;
-   Float_t         L1ForJetEt[maxEntry];   //[NL1ForJet]
-   Float_t         L1ForJetE[maxEntry];   //[NL1ForJet]
-   Float_t         L1ForJetEta[maxEntry];   //[NL1ForJet]
-   Float_t         L1ForJetPhi[maxEntry];   //[NL1ForJet]
-   Int_t           NL1Tau;
-   Float_t         L1TauEt[maxEntry];   //[NL1Tau]
-   Float_t         L1TauE[maxEntry];   //[NL1Tau]
-   Float_t         L1TauEta[maxEntry];   //[NL1Tau]
-   Float_t         L1TauPhi[maxEntry];   //[NL1Tau]
    Float_t         L1Met;
    Float_t         L1MetPhi;
    Float_t         L1EtTot;
@@ -1457,26 +1376,6 @@ class Hlts
 
 void setupHltTree(TTree *t, Hlts &hlts)
 {
-  t->SetBranchAddress("NohBJetL2", &hlts.NohBJetL2, &hlts.b_NohBJetL2);
-  t->SetBranchAddress("ohBJetL2Energy", &hlts.ohBJetL2Energy, &hlts.b_ohBJetL2Energy);
-  t->SetBranchAddress("ohBJetL2Et", &hlts.ohBJetL2Et, &hlts.b_ohBJetL2Et);
-  t->SetBranchAddress("ohBJetL2Pt", &hlts.ohBJetL2Pt, &hlts.b_ohBJetL2Pt);
-  t->SetBranchAddress("ohBJetL2Eta", &hlts.ohBJetL2Eta, &hlts.b_ohBJetL2Eta);
-  t->SetBranchAddress("ohBJetL2Phi", &hlts.ohBJetL2Phi, &hlts.b_ohBJetL2Phi);
-  t->SetBranchAddress("NohBJetL2Corrected", &hlts.NohBJetL2Corrected, &hlts.b_NohBJetL2Corrected);
-  t->SetBranchAddress("ohBJetL2CorrectedEnergy", &hlts.ohBJetL2CorrectedEnergy, &hlts.b_ohBJetL2CorrectedEnergy);
-  t->SetBranchAddress("ohBJetL2CorrectedEt", &hlts.ohBJetL2CorrectedEt, &hlts.b_ohBJetL2CorrectedEt);
-  t->SetBranchAddress("ohBJetL2CorrectedPt", &hlts.ohBJetL2CorrectedPt, &hlts.b_ohBJetL2CorrectedPt);
-  t->SetBranchAddress("ohBJetL2CorrectedEta", &hlts.ohBJetL2CorrectedEta, &hlts.b_ohBJetL2CorrectedEta);
-  t->SetBranchAddress("ohBJetL2CorrectedPhi", &hlts.ohBJetL2CorrectedPhi, &hlts.b_ohBJetL2CorrectedPhi);
-  t->SetBranchAddress("ohBJetIPL25Tag", &hlts.ohBJetIPL25Tag, &hlts.b_ohBJetIPL25Tag);
-  t->SetBranchAddress("ohBJetIPL3Tag", &hlts.ohBJetIPL3Tag, &hlts.b_ohBJetIPL3Tag);
-  t->SetBranchAddress("ohBJetIPLooseL25Tag", &hlts.ohBJetIPLooseL25Tag, &hlts.b_ohBJetIPLooseL25Tag);
-  t->SetBranchAddress("ohBJetIPLooseL3Tag", &hlts.ohBJetIPLooseL3Tag, &hlts.b_ohBJetIPLooseL3Tag);
-  t->SetBranchAddress("ohBJetMuL25Tag", &hlts.ohBJetMuL25Tag, &hlts.b_ohBJetMuL25Tag);
-  t->SetBranchAddress("ohBJetMuL3Tag", &hlts.ohBJetMuL3Tag, &hlts.b_ohBJetMuL3Tag);
-  t->SetBranchAddress("ohBJetPerfL25Tag", &hlts.ohBJetPerfL25Tag, &hlts.b_ohBJetPerfL25Tag);
-  t->SetBranchAddress("ohBJetPerfL3Tag", &hlts.ohBJetPerfL3Tag, &hlts.b_ohBJetPerfL3Tag);
   t->SetBranchAddress("Npart", &hlts.Npart, &hlts.b_Npart);
   t->SetBranchAddress("Ncoll", &hlts.Ncoll, &hlts.b_Ncoll);
   t->SetBranchAddress("Nhard", &hlts.Nhard, &hlts.b_Nhard);
@@ -1512,75 +1411,6 @@ void setupHltTree(TTree *t, Hlts &hlts)
   t->SetBranchAddress("hiNtracksPtCut", &hlts.hiNtracksPtCut, &hlts.b_hiNtracksPtCut);
   t->SetBranchAddress("hiNtracksEtaCut", &hlts.hiNtracksEtaCut, &hlts.b_hiNtracksEtaCut);
   t->SetBranchAddress("hiNtracksEtaPtCut", &hlts.hiNtracksEtaPtCut, &hlts.b_hiNtracksEtaPtCut);
-  t->SetBranchAddress("NrecoElec", &hlts.NrecoElec, &hlts.b_NrecoElec);
-  t->SetBranchAddress("recoElecPt", &hlts.recoElecPt, &hlts.b_recoElecPt);
-  t->SetBranchAddress("recoElecPhi", &hlts.recoElecPhi, &hlts.b_recoElecPhi);
-  t->SetBranchAddress("recoElecEta", &hlts.recoElecEta, &hlts.b_recoElecEta);
-  t->SetBranchAddress("recoElecEt", &hlts.recoElecEt, &hlts.b_recoElecEt);
-  t->SetBranchAddress("recoElecE", &hlts.recoElecE, &hlts.b_recoElecE);
-  t->SetBranchAddress("recoElecEleID", &hlts.recoElecEleID, &hlts.b_recoElecEleID);
-  t->SetBranchAddress("NrecoPhot", &hlts.NrecoPhot, &hlts.b_NrecoPhot);
-  t->SetBranchAddress("recoPhotPt", hlts.recoPhotPt, &hlts.b_recoPhotPt);
-  t->SetBranchAddress("recoPhotPhi", hlts.recoPhotPhi, &hlts.b_recoPhotPhi);
-  t->SetBranchAddress("recoPhotEta", hlts.recoPhotEta, &hlts.b_recoPhotEta);
-  t->SetBranchAddress("recoPhotEt", hlts.recoPhotEt, &hlts.b_recoPhotEt);
-  t->SetBranchAddress("recoPhotE", hlts.recoPhotE, &hlts.b_recoPhotE);
-  t->SetBranchAddress("NrecoSC", &hlts.NrecoSC, &hlts.b_NrecoSC);
-  t->SetBranchAddress("recoSCPt", hlts.recoSCPt, &hlts.b_recoSCPt);
-  t->SetBranchAddress("recoSCPhi", hlts.recoSCPhi, &hlts.b_recoSCPhi);
-  t->SetBranchAddress("recoSCEta", hlts.recoSCEta, &hlts.b_recoSCEta);
-  t->SetBranchAddress("recoSCEt", hlts.recoSCEt, &hlts.b_recoSCEt);
-  t->SetBranchAddress("recoSCE", hlts.recoSCE, &hlts.b_recoSCE);
-  t->SetBranchAddress("NohPhot", &hlts.NohPhot, &hlts.b_NohPhot);
-  t->SetBranchAddress("ohPhotEt", &hlts.ohPhotEt, &hlts.b_ohPhotEt);
-  t->SetBranchAddress("ohPhotEta", &hlts.ohPhotEta, &hlts.b_ohPhotEta);
-  t->SetBranchAddress("ohPhotPhi", &hlts.ohPhotPhi, &hlts.b_ohPhotPhi);
-  t->SetBranchAddress("ohPhotEiso", &hlts.ohPhotEiso, &hlts.b_ohPhotEiso);
-  t->SetBranchAddress("ohPhotHiso", &hlts.ohPhotHiso, &hlts.b_ohPhotHiso);
-  t->SetBranchAddress("ohPhotTiso", &hlts.ohPhotTiso, &hlts.b_ohPhotTiso);
-  t->SetBranchAddress("ohPhotL1iso", &hlts.ohPhotL1iso, &hlts.b_ohPhotL1iso);
-  t->SetBranchAddress("ohPhotClusShap", &hlts.ohPhotClusShap, &hlts.b_ohPhotClusShap);
-  t->SetBranchAddress("NL1IsolEm", &hlts.NL1IsolEm, &hlts.b_NL1IsolEm);
-  t->SetBranchAddress("L1IsolEmEt", &hlts.L1IsolEmEt, &hlts.b_L1IsolEmEt);
-  t->SetBranchAddress("L1IsolEmE", &hlts.L1IsolEmE, &hlts.b_L1IsolEmE);
-  t->SetBranchAddress("L1IsolEmEta", &hlts.L1IsolEmEta, &hlts.b_L1IsolEmEta);
-  t->SetBranchAddress("L1IsolEmPhi", &hlts.L1IsolEmPhi, &hlts.b_L1IsolEmPhi);
-  t->SetBranchAddress("NL1NIsolEm", &hlts.NL1NIsolEm, &hlts.b_NL1NIsolEm);
-  t->SetBranchAddress("L1NIsolEmEt", &hlts.L1NIsolEmEt, &hlts.b_L1NIsolEmEt);
-  t->SetBranchAddress("L1NIsolEmE", &hlts.L1NIsolEmE, &hlts.b_L1NIsolEmE);
-  t->SetBranchAddress("L1NIsolEmEta", &hlts.L1NIsolEmEta, &hlts.b_L1NIsolEmEta);
-  t->SetBranchAddress("L1NIsolEmPhi", &hlts.L1NIsolEmPhi, &hlts.b_L1NIsolEmPhi);
-  t->SetBranchAddress("NL1Mu", &hlts.NL1Mu, &hlts.b_NL1Mu);
-  t->SetBranchAddress("L1MuPt", &hlts.L1MuPt, &hlts.b_L1MuPt);
-  t->SetBranchAddress("L1MuE", &hlts.L1MuE, &hlts.b_L1MuE);
-  t->SetBranchAddress("L1MuEta", &hlts.L1MuEta, &hlts.b_L1MuEta);
-  t->SetBranchAddress("L1MuPhi", &hlts.L1MuPhi, &hlts.b_L1MuPhi);
-  t->SetBranchAddress("L1MuIsol", &hlts.L1MuIsol, &hlts.b_L1MuIsol);
-  t->SetBranchAddress("L1MuMip", &hlts.L1MuMip, &hlts.b_L1MuMip);
-  t->SetBranchAddress("L1MuFor", &hlts.L1MuFor, &hlts.b_L1MuFor);
-  t->SetBranchAddress("L1MuRPC", &hlts.L1MuRPC, &hlts.b_L1MuRPC);
-  t->SetBranchAddress("L1MuQal", &hlts.L1MuQal, &hlts.b_L1MuQal);
-  t->SetBranchAddress("NL1CenJet", &hlts.NL1CenJet, &hlts.b_NL1CenJet);
-  t->SetBranchAddress("L1CenJetEt", &hlts.L1CenJetEt, &hlts.b_L1CenJetEt);
-  t->SetBranchAddress("L1CenJetE", &hlts.L1CenJetE, &hlts.b_L1CenJetE);
-  t->SetBranchAddress("L1CenJetEta", &hlts.L1CenJetEta, &hlts.b_L1CenJetEta);
-  t->SetBranchAddress("L1CenJetPhi", &hlts.L1CenJetPhi, &hlts.b_L1CenJetPhi);
-  t->SetBranchAddress("NL1ForJet", &hlts.NL1ForJet, &hlts.b_NL1ForJet);
-  t->SetBranchAddress("L1ForJetEt", &hlts.L1ForJetEt, &hlts.b_L1ForJetEt);
-  t->SetBranchAddress("L1ForJetE", &hlts.L1ForJetE, &hlts.b_L1ForJetE);
-  t->SetBranchAddress("L1ForJetEta", &hlts.L1ForJetEta, &hlts.b_L1ForJetEta);
-  t->SetBranchAddress("L1ForJetPhi", &hlts.L1ForJetPhi, &hlts.b_L1ForJetPhi);
-  t->SetBranchAddress("NL1Tau", &hlts.NL1Tau, &hlts.b_NL1Tau);
-  t->SetBranchAddress("L1TauEt", &hlts.L1TauEt, &hlts.b_L1TauEt);
-  t->SetBranchAddress("L1TauE", &hlts.L1TauE, &hlts.b_L1TauE);
-  t->SetBranchAddress("L1TauEta", &hlts.L1TauEta, &hlts.b_L1TauEta);
-  t->SetBranchAddress("L1TauPhi", &hlts.L1TauPhi, &hlts.b_L1TauPhi);
-  t->SetBranchAddress("L1Met", &hlts.L1Met, &hlts.b_L1Met);
-  t->SetBranchAddress("L1MetPhi", &hlts.L1MetPhi, &hlts.b_L1MetPhi);
-  t->SetBranchAddress("L1EtTot", &hlts.L1EtTot, &hlts.b_L1EtTot);
-  t->SetBranchAddress("L1Mht", &hlts.L1Mht, &hlts.b_L1Mht);
-  t->SetBranchAddress("L1MhtPhi", &hlts.L1MhtPhi, &hlts.b_L1MhtPhi);
-  t->SetBranchAddress("L1EtHad", &hlts.L1EtHad, &hlts.b_L1EtHad);
   t->SetBranchAddress("L1HfRing1EtSumPositiveEta", &hlts.L1HfRing1EtSumPositiveEta, &hlts.b_L1HfRing1EtSumPositiveEta);
   t->SetBranchAddress("L1HfRing2EtSumPositiveEta", &hlts.L1HfRing2EtSumPositiveEta, &hlts.b_L1HfRing2EtSumPositiveEta);
   t->SetBranchAddress("L1HfRing1EtSumNegativeEta", &hlts.L1HfRing1EtSumNegativeEta, &hlts.b_L1HfRing1EtSumNegativeEta);
