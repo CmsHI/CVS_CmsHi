@@ -1,14 +1,11 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
-#include "commonTool.h"
 #include "SetupPhotonTree.h"
 #include "SetupJetTree.h"
 #include "SetupHltTree.h"
 #include "SetupSkimTree.h"
 #include "SetupTrackTree.h"
-#include "SetupHitTree.h"
 
 #include <TTree.h>
 #include <TFile.h>
@@ -21,24 +18,21 @@
 //
 // ==========================================================
 
-class HiForest : public TNamed
+class HiForest
 {
 
   public: 
-   HiForest(const char *file, const char *name="forest");
+  HiForest(char *name);
   ~HiForest();
 
   // Utility functions
   void GetEntry(int i);
   int  GetEntries();  						// Get the number of entries 
-  void CheckTree(TTree *t,const char *title);				// Check the status of a tree
+  void CheckTree(TTree *t,char *title);				// Check the status of a tree
   void PrintStatus();						// Print the status of the hiForest
-  void SetOutputFile(const char *name);               		// Set output file name for skim
-  void AddCloneTree(TTree* t, const char *dirName, const char *treeName);   // Add a clone tree to the clone forest
+  void SetOutputFile(char *name);               		// Set output file name for skim
+  void AddCloneTree(TTree* t, char *dirName, char *treeName);   // Add a clone tree to the clone forest
   void FillOutput();						// Fill output forest  
-  Long64_t Draw(const char* varexp, const char* selection, Option_t* option = "", Long64_t nentries = 1000000000, Long64_t firstentry = 0){
-     return tree->Draw(varexp,selection,option,nentries,firstentry);
-  }
 
   // Event filtering utility functions
 
@@ -47,24 +41,9 @@ class HiForest : public TNamed
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
 
   // Jet utility functions
-  void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1);
-  int leadingJet();
-  int subleadingJet();
-  int thirdJet();
-
-  // Get track-jet correlated variables. Not needed if correlatePF is run.
-  void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1);
-  // Build correlations between jet & its constituents, builds jetIDs
-  void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
-
-  double jetFracChg(int i);
-  double jetFracNeut(int i);
-  double jetFracEM(int i);
 
   // Track utility functions
-  int getMatchedCaloTowerAllowReuse(int j);
-  int getMatchedHBHEAllowReuse(int j);
-  void matchTrackCalo(bool allEvents = 1);
+
 
   // TFile
   TFile *inf; 					// Input file 
@@ -77,9 +56,6 @@ class HiForest : public TNamed
   TTree *hltTree;				// OpenHLT Tree, see branches in SetupHltTree.h
   TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
   TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
-  TTree *towerTree;                             // Tower Tree
-  TTree *hbheTree;                              // HCAL HBHE Tree
-
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
   vector<TTree*> cloneForest;                   // Vector of clones for skim
@@ -91,8 +67,7 @@ class HiForest : public TNamed
   Jets akPu3PF;
   Photons photon;
   Tracks track;
-  Hits tower;
-  Hits hbhe;
+
   
   // Boolings
   bool hasPhotonTree;
@@ -101,55 +76,18 @@ class HiForest : public TNamed
   bool hasHltTree;
   bool hasTrackTree;
   bool hasSkimTree;
-  bool hasTowerTree;
-  bool hasHbheTree;
-
+  
   bool setupOutput;
 
-  // Extra variables
-  Float_t* towerEt;
-  Float_t* towerdR;
-  Float_t* hbheEt;
-  Float_t* hbhedR;
-
-  Float_t* jtChg;
-  Float_t* jtNeut;
-  Float_t* jtEM;
-
-  Float_t* jtChgGen;
-  Float_t* jtNeutGen;
-  Float_t* jtEMGen;
-
-  Float_t* jtPtMax;
-  Float_t* jtPtMean;
-  Float_t* jtPtMeanW;
-
-  Int_t* jtLeadType;
-
-  Int_t jtLead;
-  Int_t jtSubLead;
-  bool jtHasDijet;
-  bool jtHasLeadingJet;
-
-  Float_t* tjDeltaEtaLead;
-  Float_t* tjDeltaPhiLead;
-  Float_t* zLead;
-
-  Float_t* tjDeltaEtaSubLead;
-  Float_t* tjDeltaPhiSubLead;
-  Float_t* zSubLead;
-
-  int currentEvent;
- private:
-
+  private:                   
 };
 
-HiForest::HiForest(const char *infName, const char* name)
+HiForest::HiForest(char *infName)
 {
   tree = 0;
-  SetName(name);
+
   // Input file
-  inf = TFile::Open(infName);
+  inf = new TFile(infName);
 
   // Load trees. Hard coded for the moment
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
@@ -158,8 +96,6 @@ HiForest::HiForest(const char *infName, const char* name)
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
-  towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
-  hbheTree    = (TTree*) inf->Get("rechitanalyzer/hbhe");
 
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
@@ -168,8 +104,6 @@ HiForest::HiForest(const char *infName, const char* name)
   hasTrackTree     = (trackTree    != 0);
   hasHltTree       = (hltTree      != 0);
   hasSkimTree      = (skimTree     != 0);
-  hasTowerTree     = (towerTree    != 0);
-  hasHbheTree      = (hbheTree     != 0);
   setupOutput = false;
   
   // Setup branches. See also Setup*.h
@@ -208,25 +142,11 @@ HiForest::HiForest(const char *infName, const char* name)
     if (tree == 0) tree = skimTree; else tree->AddFriend(skimTree);
     setupSkimTree(skimTree,skim);
   }
-
-  if (hasTowerTree) {
-    towerTree->SetName("tower");
-    if (tree == 0) tree = towerTree; else tree->AddFriend(towerTree);
-    setupHitTree(towerTree,tower);
-  }
-
-  if (hasHbheTree) {
-    hbheTree->SetName("hbhe");
-    if (tree == 0) tree = hbheTree; else tree->AddFriend(hbheTree);
-    setupHitTree(hbheTree,hbhe);
-  }
   
   tree->SetMarkerStyle(20);
 
   // Print the status of thre forest
   PrintStatus();
-
-  currentEvent = 0;
 }
 
 HiForest::~HiForest()
@@ -242,8 +162,6 @@ HiForest::~HiForest()
 
 void HiForest::GetEntry(int i)
 {
-
-   currentEvent = i;
   // get the entry of the available trees
   if (hasPhotonTree)   photonTree   ->GetEntry(i);
   if (hasHltTree)      hltTree      ->GetEntry(i);
@@ -251,8 +169,6 @@ void HiForest::GetEntry(int i)
   if (hasIcPu5JetTree) icPu5jetTree ->GetEntry(i);
   if (hasAkPu3JetTree) akPu3jetTree ->GetEntry(i);
   if (hasTrackTree)    trackTree    ->GetEntry(i);
-  if (hasTowerTree)    towerTree    ->GetEntry(i);
-  if (hasHbheTree)     hbheTree     ->GetEntry(i);
 }
 
 int HiForest::GetEntries()
@@ -261,7 +177,7 @@ int HiForest::GetEntries()
   return tree->GetEntries();
 }
 
-void HiForest::CheckTree(TTree *t,const char *title)
+void HiForest::CheckTree(TTree *t,char *title)
 {
    int entries = t->GetEntries();
    cout <<title<<": "<<entries<<" entries loaded.";
@@ -276,32 +192,28 @@ void HiForest::CheckTree(TTree *t,const char *title)
 
 void HiForest::PrintStatus()
 {
-  if (hasHltTree)      CheckTree(hltTree,      "HltTree");
-  if (hasSkimTree)     CheckTree(skimTree,     "SkimTree");
-  if (hasIcPu5JetTree) CheckTree(icPu5jetTree, "IcPu5jetTree");
-  if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
-  if (hasTrackTree)    CheckTree(trackTree,    "TrackTree");
-  if (hasPhotonTree)   CheckTree(photonTree,   "PhotonTree");
-  if (hasTowerTree)    CheckTree(towerTree,    "TowerTree");
-  if (hasHbheTree)     CheckTree(hbheTree,     "HbheTree");
+  if (hasHltTree)      CheckTree(hltTree,"HltTree");
+  if (hasSkimTree)     CheckTree(skimTree,"SkimTree");
+  if (hasIcPu5JetTree) CheckTree(icPu5jetTree,"IcPu5jetTree");
+  if (hasAkPu3JetTree) CheckTree(akPu3jetTree,"AkPu3jetTree");
+  if (hasTrackTree)    CheckTree(trackTree,"TrackTree");
+  if (hasPhotonTree)   CheckTree(photonTree,"PhotonTree");
 
 }
 
-void HiForest::SetOutputFile(const char *name)
+void HiForest::SetOutputFile(char *name)
 {
   outf = new TFile(name,"recreate");
-  if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
-  if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
-  if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, "icPu5JetAnalyzer",   "t");
-  if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, "akPu3PFJetAnalyzer", "t");
-  if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
-  if (hasPhotonTree)   AddCloneTree(photonTree,   "NTuples",            "Analysis");
-  if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
-  if (hasHbheTree)     AddCloneTree(hbheTree,     "hbhe",               "rechitanalyzer");
+  if (hasHltTree)      AddCloneTree(hltTree,"hltanalysis","HltTree");
+  if (hasSkimTree)     AddCloneTree(skimTree,"skimanalysis","HltTree");
+  if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree,"icPu5JetAnalyzer","t");
+  if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree,"akPu3PFJetAnalyzer","t");
+  if (hasTrackTree)    AddCloneTree(trackTree,"anaTrack","trackTree");
+  if (hasPhotonTree)   AddCloneTree(photonTree,"NTuples","Analysis");
   setupOutput = true;
 }
 
-void HiForest::AddCloneTree(TTree* t, const char *dirName, const char *treeName)
+void HiForest::AddCloneTree(TTree* t, char *dirName, char *treeName)
 {
   // Make directory
   outf->cd();
@@ -328,13 +240,34 @@ void HiForest::FillOutput()
   }
 }
 
-// ====================== Track Utilities ========================
-#include "TrackUtilities.C"
-
-// ======================= Jet Utilities =========================
-#include "JetUtilities.C"
-
 // ====================== Photon Utilities ========================
-#include "PhotonUtilities.C"
+bool HiForest::isSpike(int j)
+{
+  if (photon.isEB[j]) {
+    double swiss = 1-(photon.eRight[j]+photon.eLeft[j]+photon.eTop[j]+photon.eBottom[j])/photon.eMax[j];
+    if (swiss>0.9) return 1;
+    if (fabs(photon.seedTime[j])>3) return 1;
+    if (photon.sigmaIetaIeta[j]<0.002) return 1;
+    if (photon.sigmaIphiIphi[j]<0.002) return 1;
+  } 
+  return 0;
+}
 
+bool HiForest::isGoodPhoton(int j)
+{
+
+  if (photon.isEB[j]) {
+    // Barrel photon
+    if (photon.hadronicOverEm[j]>0.2) return 0;
+    if (photon.isEle[j]) return 0;
+    if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
+    if (photon.sigmaIetaIeta[j]>0.011) return 0;
+    if ((photon.cr4[j]+photon.cc4[j]+photon.ct4PtCut[j])>5) return 0;
+  } else {
+    // Endcap photon
+    return 0;  // Need to update to include endcap photons
+  } 
+
+  return 1;
+}
 
