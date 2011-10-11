@@ -146,8 +146,8 @@ class HiForest : public TNamed
 
 HiForest::HiForest(const char *infName, const char* name)
 {
-  tree = 0;
-  SetName(name);
+  tree = new TTree("tree","");
+    SetName(name);
   // Input file
   inf = TFile::Open(infName);
 
