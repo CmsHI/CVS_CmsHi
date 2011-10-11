@@ -14,7 +14,7 @@ double deltaPhi(double phi1, double phi2) {
 void photonJet(double etCut=40)
 {
    // Define the input file and HiForest
-   HiForest *c = new HiForest("skim_Photon.root");
+   HiForest *c = new HiForest("skim_PhotonNoCut.root");
 
    // Don't want to loop over trees which is not used in the analysis
    c->hasHltTree=0;
@@ -32,7 +32,7 @@ void photonJet(double etCut=40)
    TH1D *h4 = new TH1D("h4","",100,-1,1);
 
    // A light Ntuple output
-   TNtuple *t = new TNtuple("nt","","cBin:photonEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:Agj");
+   TNtuple *t = new TNtuple("nt","","cBin:sigmaIetaIeta:photonEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:Agj");
 
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -57,15 +57,16 @@ void photonJet(double etCut=40)
       if (leadingPhoton!=-1) {
          Float_t var[100];
          var[0]=c->photon.cBin;
-         var[1]=c->photon.et[leadingPhoton];
-         var[2]=c->photon.eta[leadingPhoton];
-         var[3]=c->photon.phi[leadingPhoton];
+         var[1]=c->photon.sigmaIetaIeta[leadingPhoton];
+         var[2]=c->photon.et[leadingPhoton];
+         var[3]=c->photon.eta[leadingPhoton];
+         var[4]=c->photon.phi[leadingPhoton];
 
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<c->akPu3PF.nref;j++) {
             if (c->akPu3PF.jtpt[j]<25) break;
             if (fabs(c->akPu3PF.jteta[j])>2) continue;
-            if (deltaPhi(c->akPu3PF.jtphi[j],c->photon.phi[leadingPhoton])<2.5) continue;
+            if (deltaPhi(c->akPu3PF.jtphi[j],c->photon.phi[leadingPhoton])<3.14159/2.) continue;
             leadingJet = j;
             break;
          }	 
@@ -79,15 +80,15 @@ void photonJet(double etCut=40)
             if (c->photon.cBin>=4&&c->photon.cBin<12) h2->Fill(Agj);
             if (c->photon.cBin>=12&&c->photon.cBin<20) h3->Fill(Agj);
             if (c->photon.cBin>=20) h4->Fill(Agj);
-            var[4]=jetPt;
-            var[5]=c->akPu3PF.jteta[leadingJet];
-            var[6]=c->akPu3PF.jtphi[leadingJet];
-            var[7]=Agj;
+            var[5]=jetPt;
+            var[6]=c->akPu3PF.jteta[leadingJet];
+            var[7]=c->akPu3PF.jtphi[leadingJet];
+            var[8]=Agj;
          } else {
-            var[4]=0;
             var[5]=0;
             var[6]=0;
-            var[7]=1;
+            var[7]=0;
+            var[8]=1;
          }
          t->Fill(var);
       }
