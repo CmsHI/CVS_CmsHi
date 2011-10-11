@@ -106,6 +106,9 @@ class HiForest : public TNamed
 
   bool setupOutput;
 
+  // variables; 
+  int nEntries;
+
   // Extra variables
   Float_t* towerEt;
   Float_t* towerdR;
@@ -258,12 +261,13 @@ void HiForest::GetEntry(int i)
 int HiForest::GetEntries()
 {
   // get the entries of the available trees
-  return tree->GetEntries();
+  return nEntries;
 }
 
 void HiForest::CheckTree(TTree *t,const char *title)
 {
    int entries = t->GetEntries();
+   if (nEntries==0) nEntries = entries;
    cout <<title<<": "<<entries<<" entries loaded.";
    if (entries != tree->GetEntries()) {
       // Entries from different trees are inconsistent!!
