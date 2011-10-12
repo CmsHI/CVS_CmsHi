@@ -269,7 +269,7 @@ void HiForest::CheckTree(TTree *t,const char *title)
    int entries = t->GetEntries();
    if (nEntries==0) nEntries = entries;
    cout <<title<<": "<<entries<<" entries loaded.";
-   if (entries != tree->GetEntries()) {
+   if (entries != nEntries) {
       // Entries from different trees are inconsistent!!
       cout <<" Inconsistent number of entries!!"<<endl;
    } else {
