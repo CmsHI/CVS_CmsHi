@@ -178,7 +178,7 @@ HiForest::HiForest(const char *infName, const char* name)
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
     photonTree->SetName("photon");
-    if (tree == 0) tree = photonTree;
+    if (tree == 0) tree = photonTree else tree->AddFriend(photonTree);
     setupPhotonTree(photonTree,photon);
   }
 
