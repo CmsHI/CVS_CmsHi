@@ -4,7 +4,8 @@
 
 void analyze2010(){
 
-   HiForest * t = new HiForest("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yjlee/hiForest/merged_HI2010_SD_Jet35_prod05_full.root");
+//   HiForest * t = new HiForest("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yjlee/hiForest/merged_HI2010_SD_Jet35_prod05_full.root");
+   HiForest * t = new HiForest("merged_pp2760_AllPhysics_NoPhoyon_Prod02.root");
    // HiForest * t = new HiForest("merged_HI2010_SD_Jet35_prod05.root");
 
    t->sortJets(t->akPu3jetTree, t->akPu3PF, 2., 50, 1);
