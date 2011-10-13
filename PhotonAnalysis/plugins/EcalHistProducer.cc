@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: EcalHistProducer.cc,v 1.14 2010/11/23 16:09:13 kimy Exp $
+// $Id: EcalHistProducer.cc,v 1.15 2010/11/23 16:36:42 kimy Exp $
 //
 //
 
@@ -68,8 +68,8 @@ Implementation:
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
 #include "RecoLocalCalo/EcalRecAlgos/interface/EcalSeverityLevelAlgo.h"
-
-
+#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalTools.h"
 //
 // class declaration
 //
@@ -258,7 +258,7 @@ EcalHistProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     EcalRecHitCollection::const_iterator rh;
     for (rh = (*rechitsCollectionBarrel).begin(); rh!= (*rechitsCollectionBarrel).end(); rh++){
        DetId id = rh->id();
-       double swissCrx = EcalSeverityLevelAlgo::swissCross(id, *rechitsCollectionBarrel, 0.,true);
+       double swissCrx = EcalTools::swissCross   (id, *rechitsCollectionBarrel, 0, true) ; // EcalSeverityLevelAlgo::swissCross(id, *rechitsCollectionBarrel, 0.,true);
        double time     = rh->time();
        if ( (doSpikeClean_==true) && (rh->energy()>3) && ((fabs(time) > timeCut_)||(swissCrx > swissCut_)) )  
 	  continue;  // This is a spike

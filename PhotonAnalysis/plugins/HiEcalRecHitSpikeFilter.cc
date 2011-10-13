@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Wed Oct 27 23:56:49 CEST 2010
-// $Id: HiEcalRecHitSpikeFilter.cc,v 1.2 2010/11/17 12:02:49 troxlo Exp $
+// $Id: HiEcalRecHitSpikeFilter.cc,v 1.3 2010/11/17 12:13:54 troxlo Exp $
 //
 //
 
@@ -53,6 +53,7 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalChannelStatusCode.h"
+#include "RecoEcal/EgammaCoreTools/interface/EcalTools.h"
 
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
@@ -142,13 +143,15 @@ HiEcalRecHitSpikeFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetu
 
    double rhEt;
    if(rechits) {
-       for(EcalRecHitCollection::const_iterator it=rechits->begin(); it!=rechits->end(); it++) {
-           const GlobalPoint &position = caloGeom->getPosition(it->id());
-           rhEt = it->energy()/cosh(position.eta());
-           if(rhEt > minEt_ && (EcalSeverityLevelAlgo::swissCross(it->id(), *rechits,0,avoidIeta85_) > swissThreshold_ || abs(it->time()) > timeThreshold_)) {
-               return false;
-           }
-       }
+     for(EcalRecHitCollection::const_iterator it=rechits->begin(); it!=rechits->end(); it++) {
+       const GlobalPoint &position = caloGeom->getPosition(it->id());
+       rhEt = it->energy()/cosh(position.eta());
+       double  swissCrx = EcalTools::swissCross  (it->id(), *rechits, 0.,avoidIeta85_);
+       if(   (rhEt > minEt_) &&  (    (swissCrx > swissThreshold_)     ||     ( abs(it->time()) > timeThreshold_) )     )
+	 {
+	   return false;
+	 }
+     }
    }
    return true;
 }
