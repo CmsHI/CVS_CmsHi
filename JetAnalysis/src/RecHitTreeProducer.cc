@@ -12,8 +12,9 @@
 */
 //
 // Original Author:  Yetkin Yilmaz
+// Modified: Frank Ma
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.12.2.1 2011/09/22 08:26:50 frankma Exp $
+// $Id: RecHitTreeProducer.cc,v 1.12.2.2 2011/10/13 10:39:42 frankma Exp $
 //
 //
 
@@ -60,6 +61,9 @@
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/DetId/interface/DetId.h"
 
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+
 
 #include "TNtuple.h"
 
@@ -76,6 +80,10 @@ struct MyRecHit{
   float eta[MAXHITS];
   float phi[MAXHITS];
   bool isjet[MAXHITS];
+  float etvtx[MAXHITS];
+  float etavtx[MAXHITS];
+  float emEtVtx[MAXHITS];
+  float hadEtVtx[MAXHITS];
 
    float jtpt;
    float jteta;
@@ -102,6 +110,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   double       getEt(const DetId &id, double energy);
   double       getEta(const DetId &id);
   double       getPhi(const DetId &id);
+  reco::Vertex::Point getVtx(const edm::Event& ev);
+
 
 
    private:
@@ -123,6 +133,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
 
    edm::Handle<reco::BasicClusterCollection> bClusters;
    edm::Handle<CaloTowerCollection> towers;
+  edm::Handle<reco::VertexCollection> vtxs;
 
   typedef vector<EcalRecHit>::const_iterator EcalIterator;
   
@@ -172,6 +183,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   edm::InputTag EESrc_;
    edm::InputTag BCSrc_;
    edm::InputTag TowerSrc_;
+  edm::InputTag VtxSrc_;
 
   edm::InputTag JetSrc_;
 
@@ -211,6 +223,7 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
   BCSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
   TowerSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
+  VtxSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxSrc",edm::InputTag("hiSelectedVertex"));
   JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeConePu5CaloJets"));
   useJets_ = iConfig.getUntrackedParameter<bool>("useJets",true);
   doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
@@ -256,6 +269,9 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
   myBC.n = 0;
    myTowers.n = 0;
    bkg.n = 0;
+
+  // get vertex
+  reco::Vertex::Point vtx = getVtx(ev);
 
    if(doEcal_){
   ev.getByLabel(EBSrc_,ebHits);
@@ -399,6 +415,10 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       myTowers.eta[myTowers.n] = getEta(hit.id());
       myTowers.phi[myTowers.n] = getPhi(hit.id());
       myTowers.isjet[myTowers.n] = false;
+      myTowers.etvtx[myTowers.n] = hit.p4(vtx).Et();
+      myTowers.etavtx[myTowers.n] = hit.p4(vtx).Eta();
+      myTowers.emEtVtx[myTowers.n] = hit.emEt(vtx);
+      myTowers.hadEtVtx[myTowers.n] = hit.hadEt(vtx);
 
       if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtowerPlus++;
       if(hit.ieta() < -29 && hit.energy() > hfTowerThreshold_) nHFtowerMinus++;
@@ -502,6 +522,10 @@ RecHitTreeProducer::beginJob()
   towerTree->Branch("eta",myTowers.eta,"eta[n]/F");
   towerTree->Branch("phi",myTowers.phi,"phi[n]/F");
   towerTree->Branch("isjet",myTowers.isjet,"isjet[n]/O");
+  towerTree->Branch("etvtx",myTowers.etvtx,"etvtx[n]/F");
+  towerTree->Branch("etavtx",myTowers.etavtx,"etavtx[n]/F");
+  towerTree->Branch("emEtVtx",myTowers.emEtVtx,"emEtVtx[n]/F");
+  towerTree->Branch("hadEtVtx",myTowers.hadEtVtx,"hadEtVtx[n]/F");
 
 
   if(doBasicClusters_){
@@ -551,7 +575,23 @@ double RecHitTreeProducer::getPhi(const DetId &id){
   return et;
 }
 
-
+reco::Vertex::Point RecHitTreeProducer::getVtx(const edm::Event& ev)
+{
+  ev.getByLabel(VtxSrc_,vtxs);
+  int greatestvtx = 0;
+  int nVertex = vtxs->size();
+  
+  for (unsigned int i = 0 ; i< vtxs->size(); ++i){
+    unsigned int daughter = (*vtxs)[i].tracksSize();
+    if( daughter > (*vtxs)[greatestvtx].tracksSize()) greatestvtx = i;
+    //cout <<"Vertex: "<< (*vtxs)[i].position().z()<<" "<<daughter<<endl;
+  }
+  
+  if(nVertex<=0){
+    return reco::Vertex::Point(-999,-999,-999);
+  }
+  return (*vtxs)[greatestvtx].position();
+}
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(RecHitTreeProducer);
