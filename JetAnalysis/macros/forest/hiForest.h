@@ -55,6 +55,8 @@ class HiForest : public TNamed
   int leadingJet();
   int subleadingJet();
   int thirdJet();
+  double deltaPhiDijet(Jets& jets);
+  bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
 
   // Get track-jet correlated variables. Not needed if correlatePF is run.
   void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1);

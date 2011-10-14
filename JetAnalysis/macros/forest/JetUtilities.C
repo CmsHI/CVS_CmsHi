@@ -180,10 +180,20 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents){
 }
 
 
-int HiForest::leadingJet(){ return 0;}
-int HiForest::subleadingJet(){ return 0;}
-int HiForest::thirdJet(){ return 0;}
+int HiForest::leadingJet(){ return jtLead;}
+int HiForest::subleadingJet(){ return jtSubLead;}
+int HiForest::thirdJet(){ return -1;}
+double HiForest::deltaPhiDijet(Jets& jets){
+  return fabs(deltaPhi(jets.jtphi[leadingJet()],jets.jtphi[subleadingJet()]));
+}
 
+bool HiForest::hasDiJet(Jets& jets, double pt1, double pt2, double dphiMin){ 
+  if(jtSubLead < 0 || jtLead < 0) return false;
+  if(deltaPhiDijet(jets) < dphiMin) return false;
+  if(jets.jtpt[leadingJet()] < pt1) return false;
+  if(jets.jtpt[subleadingJet()] < pt2) return false;
+  return true;
+};
 
 double HiForest::jetFracChg(int i){ return 0;}
 double HiForest::jetFracNeut(int i){ return 0;}
