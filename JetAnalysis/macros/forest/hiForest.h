@@ -23,6 +23,15 @@
 //
 // ==========================================================
 
+namespace names{
+  enum Algo{
+     icPu5calo,         ic5calo,         akPu3calo,         ak3calo,         akPu3PF,             ak3PF,             akPu5calo,         ak5calo,         akPu5PF,             ak5PF};
+  string AlgoRename[100] = {
+    "icPu5calo",       "ic5calo",       "akPu3calo",       "ak3calo",       "akPu3PF",           "ak3PF",           "akPu5calo",       "ak5calo",       "akPu5PF",           "ak5PF"};
+  string AlgoAnalyzer[100] = {
+    "icPu5JetAnalyzer","ic5JetAnalyzer","akPu3JetAnalyzer","ak3JetAnalyzer","akPu3PFJetAnalyzer","ak3PFJetAnalyzer","akPu5JetAnalyzer","ak5JetAnalyzer","akPu5PFJetAnalyzer","ak5PFJetAnalyzer"};
+}
+
 class HiForest : public TNamed
 {
 
@@ -88,6 +97,7 @@ class HiForest : public TNamed
 
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
+  vector<TTree*> jetTrees;
   vector<TTree*> cloneForest;                   // Vector of clones for skim
 
   TF1* fGauss;
@@ -95,8 +105,12 @@ class HiForest : public TNamed
   // Branches
   Hlts hlt;
   Skims skim;
+
+  vector<Jets> alljets;
+
   Jets icPu5;
   Jets akPu3PF;
+
   Photons photon;
   Tracks track;
   Hits tower;
@@ -171,11 +185,17 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree   = (TTree*) inf->Get("NTuples/Analysis");
-  icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
-  akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   hbheTree    = (TTree*) inf->Get("rechitanalyzer/hbhe");
+
+  if(pp){
+    icPu5jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
+    akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::ak3PF].data()));
+  }else{
+    icPu5jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
+    akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
+  }
 
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
@@ -308,8 +328,13 @@ void HiForest::SetOutputFile(const char *name)
   outf = new TFile(name,"recreate");
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
-  if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, "icPu5JetAnalyzer",   "t");
-  if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, "akPu3PFJetAnalyzer", "t");
+  if(pp){
+    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
+  }else{
+    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
+  }
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "NTuples",            "Analysis");
   if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");

@@ -32,10 +32,13 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 
    for (int i=0; allEvents ? i<GetEntries() : 1;i++){
       if(verbose && i % 50000 == 0) cout<<"Processing Event : "<<i<<endl;
-      if(allEvents) jetTree->GetEntry(i);
+ 
+     if(allEvents){
+	jetTree->GetEntry(i);
+      }
 
       vecs.clear();
-      
+     
       for(int j = 0; j < jets.nref; ++j){
          if(jets.jtpt[j] < ptMin) continue;
 	 if(fabs(jets.jteta[j]) > etaMax) continue;
@@ -49,9 +52,9 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	    jets.refpt[j] = jets.jtpt[j];
 	    jets.jtpt[j] = entry.pt;
 	 }
-	 
 	 vecs.push_back(entry);
       }
+
       sort(vecs.begin(),vecs.end(),comparePt);
 
       jtLead=-1;
@@ -63,13 +66,18 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 jtLead = vecs[0].index;
 	 if(jets.jtpt[jtLead] > 100) jtHasLeadingJet = 1;
       }
+
       if(vecs.size() > 1){
 	 jtSubLead = vecs[1].index;
 	 if(jets.jtpt[jtSubLead] > 40) jtHasDijet = jtHasLeadingJet;
       }
 
       for(int ib = 0; ib < branches.size(); ++ib){
+	cout<<"c"<<endl;
+
 	 branches[ib]->Fill();
+	 cout<<"d"<<endl;
+
       }
 
    }
