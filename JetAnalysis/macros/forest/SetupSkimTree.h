@@ -162,6 +162,10 @@ class Skims
    Int_t           ana_step_Prescl;
    Int_t           phltJetHI;
    Int_t           phltJetHI_Prescl;
+
+   Int_t           phfCoincFilter;
+   Int_t           ppurityFractionFilter;
+
    Int_t           pcollisionEventSelection;
    Int_t           pcollisionEventSelection_Prescl;
    Int_t           phbheReflagNewTimeEnv;
@@ -809,6 +813,8 @@ class Skims
    TBranch        *b_ana_step_Prescl;   //!
    TBranch        *b_phltJetHI;   //!
    TBranch        *b_phltJetHI_Prescl;   //!
+   TBranch        *b_phfCoincFilter;
+   TBranch        *b_ppurityFractionFilter;
    TBranch        *b_pcollisionEventSelection;   //!
    TBranch        *b_pcollisionEventSelection_Prescl;   //!
    TBranch        *b_phbheReflagNewTimeEnv;   //!
@@ -1460,6 +1466,10 @@ void setupSkimTree(TTree *t, Skims &skims)
   t->SetBranchAddress("phltJetHI", &skims.phltJetHI, &skims.b_phltJetHI);
   t->SetBranchAddress("phltJetHI_Prescl", &skims.phltJetHI_Prescl, &skims.b_phltJetHI_Prescl);
   t->SetBranchAddress("pcollisionEventSelection", &skims.pcollisionEventSelection, &skims.b_pcollisionEventSelection);
+
+  t->SetBranchAddress("phfCoincFilter", &skims.phfCoincFilter, &skims.b_phfCoincFilter);
+  t->SetBranchAddress("ppurityFractionFilter", &skims.ppurityFractionFilter, &skims.b_ppurityFractionFilter);
+
   t->SetBranchAddress("pcollisionEventSelection_Prescl", &skims.pcollisionEventSelection_Prescl, &skims.b_pcollisionEventSelection_Prescl);
   t->SetBranchAddress("phbheReflagNewTimeEnv", &skims.phbheReflagNewTimeEnv, &skims.b_phbheReflagNewTimeEnv);
   t->SetBranchAddress("phbheReflagNewTimeEnv_Prescl", &skims.phbheReflagNewTimeEnv_Prescl, &skims.b_phbheReflagNewTimeEnv_Prescl);

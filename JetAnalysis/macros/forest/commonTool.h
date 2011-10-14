@@ -1,6 +1,8 @@
+
 double deltaPhi(double phi1, double phi2) {
-    double dePhi = fabs(phi1 - phi2);
-    if (dePhi > 3.1415926) dePhi = 2 * 3.1415926 - dePhi;
+    double dePhi = phi1 - phi2;
+    if (dePhi > 3.1415926) dePhi = dePhi - 2 * 3.1415926;
+    if (dePhi < -3.1415926) dePhi = dePhi + 2 * 3.1415926;
     return dePhi;
 }
  

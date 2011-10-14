@@ -13,6 +13,8 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <TString.h>
+#include <TF1.h>
+#include <TCut.h>
 
 // ==========================================================
 // Main class which can be used to read the hiForest trees
@@ -25,7 +27,7 @@ class HiForest : public TNamed
 {
 
   public: 
-   HiForest(const char *file, const char *name="forest");
+   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0);
   ~HiForest();
 
   // Utility functions
@@ -41,13 +43,15 @@ class HiForest : public TNamed
   }
 
   // Event filtering utility functions
+  bool selectEvent();
+  TCut eventSelection();
 
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
 
   // Jet utility functions
-  void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1);
+  void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1, int smearType = -1);
   int leadingJet();
   int subleadingJet();
   int thirdJet();
@@ -84,6 +88,8 @@ class HiForest : public TNamed
 
   vector<TTree*> cloneForest;                   // Vector of clones for skim
 
+  TF1* fGauss;
+
   // Branches
   Hlts hlt;
   Skims skim;
@@ -94,7 +100,7 @@ class HiForest : public TNamed
   Hits tower;
   Hits hbhe;
   
-  // Boolings
+  // Booleans
   bool hasPhotonTree;
   bool hasIcPu5JetTree;
   bool hasAkPu3JetTree;
@@ -105,9 +111,9 @@ class HiForest : public TNamed
   bool hasHbheTree;
 
   bool setupOutput;
-
-  // variables; 
-  int nEntries;
+  bool verbose;
+  bool pp;
+  bool mc;
 
   // Extra variables
   Float_t* towerEt;
@@ -147,10 +153,15 @@ class HiForest : public TNamed
 
 };
 
-HiForest::HiForest(const char *infName, const char* name)
+HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
+   tree(0),
+   fGauss(0),
+   verbose(0),
+   pp(ispp),
+   mc(ismc)
 {
-  tree = new TTree("tree","");
-    SetName(name);
+
+  SetName(name);
   // Input file
   inf = TFile::Open(infName);
 
@@ -178,7 +189,7 @@ HiForest::HiForest(const char *infName, const char* name)
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
     photonTree->SetName("photon");
-    if (tree == 0) tree = photonTree; else tree->AddFriend(photonTree);
+    if (tree == 0) tree = photonTree;
     setupPhotonTree(photonTree,photon);
   }
 
@@ -261,15 +272,14 @@ void HiForest::GetEntry(int i)
 int HiForest::GetEntries()
 {
   // get the entries of the available trees
-  return nEntries;
+  return tree->GetEntries();
 }
 
 void HiForest::CheckTree(TTree *t,const char *title)
 {
    int entries = t->GetEntries();
-   if (nEntries==0) nEntries = entries;
    cout <<title<<": "<<entries<<" entries loaded.";
-   if (entries != nEntries) {
+   if (entries != tree->GetEntries()) {
       // Entries from different trees are inconsistent!!
       cout <<" Inconsistent number of entries!!"<<endl;
    } else {
@@ -331,6 +341,36 @@ void HiForest::FillOutput()
        cout <<"ERROR: Specify an output file by hiForest.SetOutputFile(filename)!"<<endl;
   }
 }
+
+// ====================== Event Utilities ========================
+
+bool HiForest::selectEvent(){
+   bool select = skim.phbheReflagNewTimeEnv 
+      && 
+      skim.phcalTimingFilter 
+      && 
+      skim.pHBHENoiseFilter 
+      && 
+      skim.phiEcalRecHitSpikeFilter;
+
+   if(!pp){
+      select = select && skim.pcollisionEventSelection;
+   }else{
+      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
+   }
+   return select;
+}
+
+TCut HiForest::eventSelection(){
+   TCut select("skim.phbheReflagNewTimeEnv && skim.phcalTimingFilter && skim.pHBHENoiseFilter && skim.phiEcalRecHitSpikeFilter");
+   if(!pp){
+      select = select && "skim.pcollisionEventSelection";
+   }else{
+      select = select && "skim.phfCoincFilter && skim.ppurityFractionFilter";
+   }
+   return select;
+}
+
 
 // ====================== Track Utilities ========================
 #include "TrackUtilities.C"

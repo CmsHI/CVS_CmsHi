@@ -7,7 +7,15 @@ public:
 
 bool comparePt(JetIndex a, JetIndex b) {return a.pt > b.pt;}
 
-void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin, bool allEvents){
+void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin, bool allEvents, int smearType){
+
+   if(smearType>=0 && fGauss == 0){
+      fGauss = new TF1("fGauss","gaus(0)",-3,3);
+      fGauss->SetParameter(0,1);
+      fGauss->SetParameter(1,0);
+      fGauss->SetParameter(2,1);
+   }
+   double resolution[2] = {0.08,0.05};
 
    vector<TBranch*> branches(0);
 
@@ -23,7 +31,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
    vecs.reserve(maxEntry);
 
    for (int i=0; allEvents ? i<GetEntries() : 1;i++){
-      if(i % 1000 == 0) cout<<"Processing Event : "<<i<<endl;
+      if(verbose && i % 50000 == 0) cout<<"Processing Event : "<<i<<endl;
       if(allEvents) jetTree->GetEntry(i);
 
       vecs.clear();
@@ -35,6 +43,12 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 JetIndex entry;
 	 entry.pt = jets.jtpt[j];
 	 entry.index = j;
+
+	 if(smearType >= 0){
+	    entry.pt += resolution[smearType]*entry.pt*fGauss->GetRandom();
+	    jets.refpt[j] = jets.jtpt[j];
+	    jets.jtpt[j] = entry.pt;
+	 }
 	 
 	 vecs.push_back(entry);
       }

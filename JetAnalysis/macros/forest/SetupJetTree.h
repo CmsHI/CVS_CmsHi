@@ -29,7 +29,6 @@ void setupJetTree(TTree *t, Jets &jets)
 {
   t->SetBranchAddress("nref",&jets.nref);
   t->SetBranchAddress("jtpt",jets.jtpt);
-  t->SetBranchAddress("rawpt",jets.rawpt);
   t->SetBranchAddress("jteta",jets.jteta);
   t->SetBranchAddress("jtphi",jets.jtphi);
   t->SetBranchAddress("refpt",jets.refpt);
