@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.12.2.1 2011/09/22 08:26:50 frankma Exp $
+// $Id: RecHitTreeProducer.cc,v 1.12.2.2 2011/10/13 10:39:42 frankma Exp $
 //
 //
 
@@ -194,6 +194,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doTowers_;
    bool doEcal_;
    bool doHcal_;
+   bool hasVtx_;
 
    bool doFastJet_;
 
@@ -230,6 +231,7 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
   doEcal_ = iConfig.getUntrackedParameter<bool>("doEcal",true);
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
+  hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",false);
   doFastJet_ = iConfig.getUntrackedParameter<bool>("doFastJet",true);
   FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
   doEbyEonly_ = iConfig.getUntrackedParameter<bool>("doEbyEonly",false);
@@ -271,7 +273,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    bkg.n = 0;
 
   // get vertex
-  reco::Vertex::Point vtx = getVtx(ev);
+  reco::Vertex::Point vtx;
+  if (hasVtx_) vtx = getVtx(ev);
 
    if(doEcal_){
   ev.getByLabel(EBSrc_,ebHits);
@@ -415,10 +418,12 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       myTowers.eta[myTowers.n] = getEta(hit.id());
       myTowers.phi[myTowers.n] = getPhi(hit.id());
       myTowers.isjet[myTowers.n] = false;
-      myTowers.etvtx[myTowers.n] = hit.p4(vtx).Et();
-      myTowers.etavtx[myTowers.n] = hit.p4(vtx).Eta();
-      myTowers.emEtVtx[myTowers.n] = hit.emEt(vtx);
-      myTowers.hadEtVtx[myTowers.n] = hit.hadEt(vtx);
+      if (hasVtx_) {
+	myTowers.etvtx[myTowers.n] = hit.p4(vtx).Et();
+	myTowers.etavtx[myTowers.n] = hit.p4(vtx).Eta();
+	myTowers.emEtVtx[myTowers.n] = hit.emEt(vtx);
+	myTowers.hadEtVtx[myTowers.n] = hit.hadEt(vtx);
+      }
 
       if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtowerPlus++;
       if(hit.ieta() < -29 && hit.energy() > hfTowerThreshold_) nHFtowerMinus++;
@@ -522,10 +527,12 @@ RecHitTreeProducer::beginJob()
   towerTree->Branch("eta",myTowers.eta,"eta[n]/F");
   towerTree->Branch("phi",myTowers.phi,"phi[n]/F");
   towerTree->Branch("isjet",myTowers.isjet,"isjet[n]/O");
-  towerTree->Branch("etvtx",myTowers.etvtx,"etvtx[n]/F");
-  towerTree->Branch("etavtx",myTowers.etavtx,"etavtx[n]/F");
-  towerTree->Branch("emEtVtx",myTowers.emEtVtx,"emEtVtx[n]/F");
-  towerTree->Branch("hadEtVtx",myTowers.hadEtVtx,"hadEtVtx[n]/F");
+  if (hasVtx_) {
+    towerTree->Branch("etvtx",myTowers.etvtx,"etvtx[n]/F");
+    towerTree->Branch("etavtx",myTowers.etavtx,"etavtx[n]/F");
+    towerTree->Branch("emEtVtx",myTowers.emEtVtx,"emEtVtx[n]/F");
+    towerTree->Branch("hadEtVtx",myTowers.hadEtVtx,"hadEtVtx[n]/F");
+  }
 
 
   if(doBasicClusters_){
