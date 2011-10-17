@@ -43,10 +43,11 @@ from CmsHi.PhotonAnalysis.hiEcalRecHitSpikeFilter_cfi import *
 hiEcalRecHitSpikeFilter.minEt = 20.0
 
 #HCAL cleaning
-from JetMETAnalysis.HcalReflagging.hbherechitreflaggerJETMET_cfi import *
+#from JetMETAnalysis.HcalReflagging.hbherechitreflaggerJETMET_cfi import *
+# Broken.. commented out by Yen-Jie
 
-hbheReflagNewTimeEnv = hbherechitreflaggerJETMET.clone()
-hbheReflagNewTimeEnv.timingshapedcutsParameters.hbheTimingFlagBit=cms.untracked.int32(8)
+#hbheReflagNewTimeEnv = hbherechitreflaggerJETMET.clone()
+#hbheReflagNewTimeEnv.timingshapedcutsParameters.hbheTimingFlagBit=cms.untracked.int32(8)
 
 # HCAL Timing
 hcalTimingFilter = cms.EDFilter("HcalTimingFilter",
@@ -68,7 +69,7 @@ jetSkimSequence = cms.Sequence(hltJetHI
                                * jetEtFilter
                                #* dijetEtFilter
                                * hiEcalRecHitSpikeFilter
-                               * hbheReflagNewTimeEnv
+                               #* hbheReflagNewTimeEnv
                                * hcalTimingFilter
                                * HBHENoiseFilter
                                )
