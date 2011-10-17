@@ -6,7 +6,7 @@ hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer.clone(
   # evt
   neededCentBins = cms.untracked.vint32(0, 1, 3, 11, 19, 35),
   # trk selection
-  tracks = "hiGoodTightTracks",
+  tracks = "hiSelectedTracks",
   fiducialCut = True,
   # setup
   fillNtuples = False,

@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 pfcandAnalyzer = cms.EDAnalyzer('HiPFCandAnalyzer',
-                                pfCandidateLabel = cms.InputTag("particleFlow"),
+                                pfCandidateLabel = cms.InputTag("particleFlowTmp"),
                                 jetLabel = cms.InputTag("ak5patJets"),
                                 genLabel = cms.InputTag("hiGenParticles"),
                                 # debug

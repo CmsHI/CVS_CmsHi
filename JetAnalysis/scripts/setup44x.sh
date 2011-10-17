@@ -22,8 +22,22 @@ cvs co -d      MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataS
 cvs co -d      MNguyen/Configuration  UserCode/MNguyen/Configuration
 cvs co         HeavyIonsAnalysis/Configuration
 
+# Standard sequences
+#<
+#reconstructionHeavyIons_withPF *= HiParticleFlowReco
+#reconstructionHeavyIons_HcalNZS_withPF *= HiParticleFlowReco
+#>
+#reconstructionHeavyIons_withPF *= hiElectronSequence*HiParticleFlowReco
+#reconstructionHeavyIons_HcalNZS_withPF *= hiElectronSequence*HiParticleFlowReco
+#addpkg Configuration/StandardSequences
+
+
 # Jet and HI Software
 cvs co -d       MNguyen/InclusiveJetAnalyzer UserCode/MNguyen/InclusiveJetAnalyzer
+
+# Latest hiSelectedTrack (= hiGoodTightTrack)
+cvs co RecoHI/HiTracking
+cvs co RecoHI/HiMuonAlgos
 
 #Commented out by yenjie
 #cvs co -r       V05-01-09-01 RecoJets/JetProducers
@@ -38,13 +52,13 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
-cvs co -r hi413_11 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r hi441_0 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 
 #ecal and hcal cleaning
 #hcal
-addpkg RecoLocalCalo/HcalRecAlgos
-cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/src/HBHETimingShapedFlag.cc
-cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/interface/HBHETimingShapedFlag.h
+#addpkg RecoLocalCalo/HcalRecAlgos
+#cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/src/HBHETimingShapedFlag.cc
+#cvs co -r V00-07-21 RecoLocalCalo/HcalRecAlgos/interface/HBHETimingShapedFlag.h
 
 # broken, Yen-Jie checked with Yi
 #cvs co -r V00-00-18 JetMETAnalysis/HcalReflagging
@@ -55,14 +69,16 @@ cvs co -d HcalFilter UserCode/MTonjes/HcalFilter
 
 # Removed by Yen-Jie
 #cvs co -d RecoHI/HiEgammaAlgos UserCode/yetkin/RecoHI/HiEgammaAlgos
+# Needed to fix PF reco
+cvs co -r V02-02-01 RecoHI/HiEgammaAlgos
+cvs co -r V00-00-15 RecoHI/Configuration
 
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
 rm CmsHi/PhotonAnalysis/plugins/SpikeInspector.cc 
 
 
-
 # trigger analyzers
-cvs co -r hi413_05 HLTrigger/HLTanalyzers
+cvs co -r HLTrigger/HLTanalyzers
 
 scram build -c
 scram b -j4
