@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Mon Nov  1 18:22:21 CET 2010
-// $Id: HiRecHitSpikeCleaner.cc,v 1.1 2010/12/04 13:32:04 troxlo Exp $
+// $Id: HiRecHitSpikeCleaner.cc,v 1.1 2011/09/19 10:28:31 yilmaz Exp $
 //
 //
 
@@ -45,7 +45,7 @@
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 
-#include "RecoEcal/EgammaCoreTools/interface/EcalTools.h"
+
 
 //
 // class declaration
@@ -155,7 +155,7 @@ HiRecHitSpikeCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
        bool flagS = true;
        float swissCrx(0);
 
-       swissCrx = EcalTools::swissCross   (it->id(), *ebRecHits, 0.,avoidIeta85_); //EcalSeverityLevelAlgo::swissCross(it->id(), *ebRecHits, 0.,avoidIeta85_);
+       swissCrx = EcalSeverityLevelAlgo::swissCross(it->id(), *ebRecHits, 0.,avoidIeta85_);
        //	    std::cout << "swissCross = " << swissCrx <<std::endl;
        // std::cout << " timing = " << it->time() << std::endl;
 

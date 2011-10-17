@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id: SpikeInspector.cc,v 1.6 2010/11/12 00:36:51 troxlo Exp $
+// $Id: SpikeInspector.cc,v 1.1 2011/09/19 10:28:31 yilmaz Exp $
 //
 //
 
@@ -64,7 +64,7 @@ Implementation:
 
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
-#include "RecoEcal/EgammaCoreTools/interface/EcalTools.h"
+
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
 
 using namespace edm;
@@ -401,8 +401,8 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             DetId id = getMaximumRecHit(*(it->superCluster()->seed()),ecalRecHits);
 
             time = recHitTime(id,ecalRecHits);
-            swiss =  EcalTools::swissCross   (id,*ecalRecHits,0,true); // EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
-            e2e9 = 0; //EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
+            swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
+            e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
             spike = (swiss > swissCut || abs(time) > 3);
 
             if(it->isEB()) {
@@ -419,9 +419,9 @@ SpikeInspector::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             DetId id = getMaximumRecHit(*(it->seed()),ecalRecHits);
 
             time = recHitTime(id,ecalRecHits);
-            swiss =EcalTools::swissCross   (id,*ecalRecHits,0,true);  // EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
-            e2e9 = 0 ;//EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
-            e1e9 = 0; // EcalSeverityLevelAlgo::E1OverE9(id, *ecalRecHits, 0);
+            swiss = EcalSeverityLevelAlgo::swissCross(id,*ecalRecHits,0,true);
+            e2e9 = EcalSeverityLevelAlgo::E2overE9(id, *ecalRecHits, 0, 0, true);
+            e1e9 = EcalSeverityLevelAlgo::E1OverE9(id, *ecalRecHits, 0);
             spike = (swiss > swissCut || abs(time) > 3);
             et = it->energy()/cosh(it->eta());
             if(spike && et >= en3)
