@@ -8,8 +8,8 @@ addpkg L1Trigger/Configuration
 cvs co -r V12-02-45 HLTrigger/Configuration
 cvs co -r V03-08-14 HLTrigger/HLTanalyzers
 
-# get menu
-hltGetConfiguration --cff --offline --data  hltGetConfiguration --cff --offline --data /users/frankma/devCMSSW_4_2_0/HIonV976 --type HIon --unprescale > $CMSSW_BASE/src/HLTrigger/Configuration/python/HLT_HIon_data_cff.py
+# get hlt menu
+hltGetConfiguration --cff --offline --data /users/frankma/devCMSSW_4_2_0/HIonV976 --type HIon --unprescale > $CMSSW_BASE/src/HLTrigger/Configuration/python/HLT_HIon_data_cff.py
 
 # hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
@@ -25,5 +25,10 @@ rm CmsHi/JetAnalysis/python/EventSelection_cff.py # tmp fix
 
 # trigger analyzers
 cvs co -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
+
+# custom l1 menu from xml
+addpkg L1TriggerConfig/L1GtConfigProducers
+cp CmsHi/HiHLTAlgos/data/L1Menu_CollisionsHeavyIons2011_v0_L1T_Scales_20101224_Imp0_0x1026.xml L1TriggerConfig/L1GtConfigProducers/data/Luminosity/startup
+cp modifiedFiles/L1Trigger_custom.py L1Trigger/Configuration/python/
 
 scram build -c
