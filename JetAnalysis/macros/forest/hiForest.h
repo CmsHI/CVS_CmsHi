@@ -164,7 +164,6 @@ class HiForest : public TNamed
   Float_t* tjDeltaPhiSubLead;
   Float_t* zSubLead;
 
-  int nEntries;
   int currentEvent;
  private:
 
@@ -177,7 +176,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
    pp(ispp),
    mc(ismc)
 {
-  tree = new TTree("tree","");
+
   SetName(name);
   // Input file
   inf = TFile::Open(infName);
@@ -295,19 +294,20 @@ void HiForest::GetEntry(int i)
 int HiForest::GetEntries()
 {
   // get the entries of the available trees
-  return nEntries;
+  return tree->GetEntries();
 }
 
 void HiForest::CheckTree(TTree *t,const char *title)
 {
-  int entries = t->GetEntries();
-  if (nEntries==0) nEntries = entries;
-  cout <<title<<": "<<entries<<" entries loaded.";
-  if (entries != nEntries) {
-    cout <<" Inconsistent number of entries!!"<<endl;
-  } else {
-    cout <<endl;
-  }
+   int entries = t->GetEntries();
+   cout <<title<<": "<<entries<<" entries loaded.";
+   if (entries != tree->GetEntries()) {
+      // Entries from different trees are inconsistent!!
+      cout <<" Inconsistent number of entries!!"<<endl;
+   } else {
+      cout <<endl;
+   }
+
 }
 
 void HiForest::PrintStatus()
