@@ -34,7 +34,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.341 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -56,8 +56,8 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 process.GlobalTag.globaltag = 'GR_R_44_V5::All'
-process.GlobalTag.toGet = cms.VPSet()
-process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
+#process.GlobalTag.toGet = cms.VPSet()
+#process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
 # Analyzers
 process.load("HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi")
@@ -92,6 +92,10 @@ from L1Trigger.Configuration.customise_l1EmulatorFromRaw import customise
 
 #call to customisation function customise imported from L1Trigger.Configuration.customise_l1EmulatorFromRaw
 process = customise(process)
+
+# set l1 menu from xml
+import L1Trigger.Configuration.L1Trigger_custom
+process = L1Trigger.Configuration.L1Trigger_custom.customiseL1Menu( process )
 
 # customize the HLT to use the emulated results
 import HLTrigger.Configuration.customizeHLTforL1Emulator
