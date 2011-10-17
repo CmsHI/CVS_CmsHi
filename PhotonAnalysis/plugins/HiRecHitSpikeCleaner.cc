@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Mon Nov  1 18:22:21 CET 2010
-// $Id: HiRecHitSpikeCleaner.cc,v 1.5 2010/11/03 22:31:25 edwenger Exp $
+// $Id: HiRecHitSpikeCleaner.cc,v 1.1 2011/09/19 10:28:31 yilmaz Exp $
 //
 //
 

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #include "SetupPhotonTree.h"
 #include "SetupJetTree.h"
@@ -11,28 +10,22 @@
 #include <TFile.h>
 #include <TString.h>
 
-// ==========================================================
 // Main class which can be used to read the hiForest trees
 //
-// Author: Yen-Jie Lee
 //
-// ==========================================================
 
 class HiForest
 {
 
   public: 
   HiForest(char *name);
-  ~HiForest();
+  ~HiForest(){};
 
   // Utility functions
   void GetEntry(int i);
-  int  GetEntries();  						// Get the number of entries 
-  void CheckTree(TTree *t,char *title);				// Check the status of a tree
-  void PrintStatus();						// Print the status of the hiForest
-  void SetOutputFile(char *name);               		// Set output file name for skim
-  void AddCloneTree(TTree* t, char *dirName, char *treeName);   // Add a clone tree to the clone forest
-  void FillOutput();						// Fill output forest  
+  int  GetEntries();  				// Get the number of entries 
+  void checkTree(TTree *t,char *title);		// Check the status of a tree
+  void printStatus();				// Print the status of the hiForest
 
   // Event filtering utility functions
 
@@ -47,7 +40,6 @@ class HiForest
 
   // TFile
   TFile *inf; 					// Input file 
-  TFile *outf;                                  // Output file
 
   // Trees
   TTree *photonTree;				// Photon Tree, see branches in SetupPhotonTree.h
@@ -57,8 +49,6 @@ class HiForest
   TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
   TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
-
-  vector<TTree*> cloneForest;                   // Vector of clones for skim
 
   // Branches
   Hlts hlt;
@@ -76,8 +66,6 @@ class HiForest
   bool hasHltTree;
   bool hasTrackTree;
   bool hasSkimTree;
-  
-  bool setupOutput;
 
   private:                   
 };
@@ -86,27 +74,22 @@ HiForest::HiForest(char *infName)
 {
   tree = 0;
 
-  // Input file
   inf = new TFile(infName);
-
-  // Load trees. Hard coded for the moment
-  hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
-  skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
-  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
+  hltTree = (TTree*) inf->Get("hltanalysis/HltTree");
+  skimTree = (TTree*) inf->Get("skimanalysis/HltTree");
+  photonTree = (TTree*) inf->Get("NTuples/Analysis");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
-  trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
+  trackTree = (TTree*) inf->Get("anaTrack/trackTree");
 
-  // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
   hasTrackTree     = (trackTree    != 0);
   hasHltTree       = (hltTree      != 0);
-  hasSkimTree      = (skimTree     != 0);
-  setupOutput = false;
+  hasSkimTree       = (skimTree      != 0);
   
-  // Setup branches. See also Setup*.h
+
   if (hasPhotonTree) {
     photonTree->SetName("photon");
     if (tree == 0) tree = photonTree;
@@ -144,20 +127,7 @@ HiForest::HiForest(char *infName)
   }
   
   tree->SetMarkerStyle(20);
-
-  // Print the status of thre forest
-  PrintStatus();
-}
-
-HiForest::~HiForest()
-{
-  if (setupOutput) {
-    for (unsigned int i=0; i<cloneForest.size(); i++)
-    {
-      cloneForest[i]->AutoSave();
-    }
-    outf->Close();
-  }
+  printStatus();
 }
 
 void HiForest::GetEntry(int i)
@@ -165,7 +135,7 @@ void HiForest::GetEntry(int i)
   // get the entry of the available trees
   if (hasPhotonTree)   photonTree   ->GetEntry(i);
   if (hasHltTree)      hltTree      ->GetEntry(i);
-  if (hasSkimTree)     skimTree     ->GetEntry(i);
+  if (hasSkimTree)     skimTree      ->GetEntry(i);
   if (hasIcPu5JetTree) icPu5jetTree ->GetEntry(i);
   if (hasAkPu3JetTree) akPu3jetTree ->GetEntry(i);
   if (hasTrackTree)    trackTree    ->GetEntry(i);
@@ -174,15 +144,15 @@ void HiForest::GetEntry(int i)
 int HiForest::GetEntries()
 {
   // get the entries of the available trees
+  
   return tree->GetEntries();
 }
 
-void HiForest::CheckTree(TTree *t,char *title)
+void HiForest::checkTree(TTree *t,char *title)
 {
    int entries = t->GetEntries();
    cout <<title<<": "<<entries<<" entries loaded.";
    if (entries != tree->GetEntries()) {
-      // Entries from different trees are inconsistent!!
       cout <<" Inconsistent number of entries!!"<<endl;
    } else {
       cout <<endl;
@@ -190,54 +160,15 @@ void HiForest::CheckTree(TTree *t,char *title)
 
 }
 
-void HiForest::PrintStatus()
+void HiForest::printStatus()
 {
-  if (hasHltTree)      CheckTree(hltTree,"HltTree");
-  if (hasSkimTree)     CheckTree(skimTree,"SkimTree");
-  if (hasIcPu5JetTree) CheckTree(icPu5jetTree,"IcPu5jetTree");
-  if (hasAkPu3JetTree) CheckTree(akPu3jetTree,"AkPu3jetTree");
-  if (hasTrackTree)    CheckTree(trackTree,"TrackTree");
-  if (hasPhotonTree)   CheckTree(photonTree,"PhotonTree");
+  if (hasHltTree) checkTree(hltTree,"HltTree");
+  if (hasSkimTree) checkTree(skimTree,"SkimTree");
+  if (hasIcPu5JetTree) checkTree(icPu5jetTree,"IcPu5jetTree");
+  if (hasAkPu3JetTree) checkTree(akPu3jetTree,"AkPu3jetTree");
+  if (hasTrackTree) checkTree(trackTree,"TrackTree");
+  if (hasPhotonTree) checkTree(trackTree,"PhotonTree");
 
-}
-
-void HiForest::SetOutputFile(char *name)
-{
-  outf = new TFile(name,"recreate");
-  if (hasHltTree)      AddCloneTree(hltTree,"hltanalysis","HltTree");
-  if (hasSkimTree)     AddCloneTree(skimTree,"skimanalysis","HltTree");
-  if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree,"icPu5JetAnalyzer","t");
-  if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree,"akPu3PFJetAnalyzer","t");
-  if (hasTrackTree)    AddCloneTree(trackTree,"anaTrack","trackTree");
-  if (hasPhotonTree)   AddCloneTree(photonTree,"NTuples","Analysis");
-  setupOutput = true;
-}
-
-void HiForest::AddCloneTree(TTree* t, char *dirName, char *treeName)
-{
-  // Make directory
-  outf->cd();
-  outf->mkdir(dirName);
-  outf->cd(dirName);
-
-  // Add a clone tree to the clone forest
-  TTree *tClone = t->CloneTree(0);
-  tClone->SetMaxTreeSize(4000000000);
-  tClone->SetName(treeName);
-  
-  cloneForest.push_back(tClone);
-}
-
-void HiForest::FillOutput()
-{
-  if (setupOutput) {
-     for (unsigned int i=0; i<cloneForest.size(); i++)
-     {
-       cloneForest[i]->Fill();
-     } 
-  } else {
-       cout <<"ERROR: Specify an output file by hiForest.SetOutputFile(filename)!"<<endl;
-  }
 }
 
 // ====================== Photon Utilities ========================
@@ -270,4 +201,3 @@ bool HiForest::isGoodPhoton(int j)
 
   return 1;
 }
-

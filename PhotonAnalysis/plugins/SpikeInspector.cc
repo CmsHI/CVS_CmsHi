@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Thomas Quan-Li Roxlo,,,
 //         Created:  Mon Jun 21 11:11:16 CEST 2010
-// $Id: SpikeInspector.cc,v 1.5 2010/11/11 14:37:06 troxlo Exp $
+// $Id: SpikeInspector.cc,v 1.1 2011/09/19 10:28:31 yilmaz Exp $
 //
 //
 

@@ -13,7 +13,7 @@
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Wed Oct 27 23:56:49 CEST 2010
-// $Id: HiEcalRecHitSpikeFilter.cc,v 1.2 2010/11/17 12:02:49 troxlo Exp $
+// $Id: HiEcalRecHitSpikeFilter.cc,v 1.1 2011/09/19 10:28:31 yilmaz Exp $
 //
 //
 
