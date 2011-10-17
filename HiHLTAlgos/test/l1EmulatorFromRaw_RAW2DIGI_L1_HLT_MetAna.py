@@ -114,14 +114,14 @@ process.TFileService = cms.Service("TFileService",
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
-process.ana_step = cms.Path(process.HLTHIRecoJetSequenceIC5Corrected*process.patJets)
+process.ana_step = cms.EndPath(process.HLTHIRecoJetSequenceIC5Corrected*process.patJets)
 process.endjob_step = cms.EndPath(process.endOfProcess*process.hltbitnew*process.icPu5JetAnalyzer*process.rechitanalyzer)
 #process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step)
 process.schedule.extend(process.HLTSchedule)
-process.schedule = cms.Schedule(process.ana_step)
+process.schedule.extend([process.ana_step])
 process.schedule.extend([process.endjob_step])
 
 # customisation of the process.
