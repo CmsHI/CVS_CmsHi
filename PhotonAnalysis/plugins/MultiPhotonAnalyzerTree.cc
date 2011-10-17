@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.8 2011/10/07 17:41:35 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.9 2011/10/17 15:46:43 yjlee Exp $
  *
  */
 
@@ -133,7 +133,7 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
    
    int foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
-   
+   theTree->Fill();  
 }
 
 
@@ -234,7 +234,6 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     
     eta[nphotonscounter] =  photon.p4().eta();
     phi[nphotonscounter] =  photon.p4().phi();
-
     r9[nphotonscounter]    =  photon.r9();
  
     isEBGap[nphotonscounter]    =  photon.isEBGap()? 1:0;
@@ -253,7 +252,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 
     //ES Ratio
     ESRatio   [nphotonscounter]   =  getESRatio(&photon, e, iSetup);
-    
+
     // Cluster shape variables
     
     const reco::CaloClusterPtr  seed = photon.superCluster()->seed();
@@ -271,10 +270,10 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       flags = it->recoFlag();
       //severityFlag = EcalSeverityLevelAlgo::severityLevel(id, rechits);
     }
-
     // Yen-Jie: Not used, need to be fixed
     //severity = -1;
     //if (severityFlag = EcalSeverityLevelAlgo::SeverityLevel::kGood) severity = 0;
+/*
 
     float tleft = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
@@ -289,7 +288,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
        if( ids[ii].empty() ) { continue; }
        it = rechits.find( ids[ii][0] );
        if( it != rechits.end() ) { *(times[ii]) = it->time(); }
-    }
+    }*/
     
     seedTime              [nphotonscounter]  = time;
     seedOutOfTimeChi2     [nphotonscounter]  = outOfTimeChi2;
@@ -297,11 +296,12 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     seedRecoFlag          [nphotonscounter] = flags;
     seedSeverity          [nphotonscounter]  = severity;
     
+/*
     tLeft         [nphotonscounter] = tleft;
     tRight        [nphotonscounter] = tright;
     tTop        [nphotonscounter] = ttop;
     tBottom        [nphotonscounter] = tbottom;
-    
+  */  
     
     eMax         [nphotonscounter] =  lazyTool.eMax(*seed);
     e2nd         [nphotonscounter] =  lazyTool.e2nd(*seed);
@@ -343,6 +343,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     sigmaEtaEta  [nphotonscounter] =  photon.sigmaEtaEta();
     sigmaIetaIeta[nphotonscounter] =  photon.sigmaIetaIeta();
       
+
     // see http://cmslxr.fnal.gov/lxr/source/RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h#076
     // other sieie values;
     vector<float> lCov39 = lazyTool.localCovariances(*seed, 3.9 );
@@ -441,7 +442,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     //  float sumCompHIso=0;
     //  float sumCompTIso=0;
     
-    /*///////////////// comp photon
+    /* ///////////////// comp photon
       for (reco::PhotonCollection::const_iterator compItr = myCompPhotons.begin(); compItr != myCompPhotons.end(); ++compItr) {
       allcomps++;
       if(compItr->pt() < ptMin_ || fabs(compItr->p4().eta()) > etaMax_) continue;
@@ -472,7 +473,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     */   //////////////// comp photon                                                                                                                                                                               
     
     
-    // Delta R= 0.4
+/*    // Delta R= 0.4
     
     ecalRecHitSumEtConeDR04     [nphotonscounter]   =  photon.ecalRecHitSumEtConeDR04();
     hcalTowerSumEtConeDR04      [nphotonscounter]   =  photon.hcalTowerSumEtConeDR04();
@@ -703,7 +704,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       
     } // if it's a MC
     if (nphotonscounter>kMaxPhotons-1) break;
-    
+    */
     nphotonscounter++;
   }
   
