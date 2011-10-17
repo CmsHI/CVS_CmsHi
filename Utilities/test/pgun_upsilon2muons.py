@@ -37,31 +37,28 @@ process.RandomNumberGeneratorService.signalSIM.initialSeed = 5
 ##################################################################################
 # Pb+Pb Background Source
 process.source = cms.Source('PoolSource',
-                            #fileNames = cms.untracked.vstring('file:///d00/yjlee/sample/hydjet_mb_2_2_4/1EA7C31D-83FB-DD11-8218-001C23BED6CA.root')
-                            fileNames = cms.untracked.vstring('dcache:/pnfs/cmsaf.mit.edu/hibat/cms/users/davidlw/HYDJET_Minbias_4TeV_31X/sim/HYDJET_Minbias_4TeV_seq11_31X.root')
-							)
+                            fileNames = cms.untracked.vstring('file:///d00/yjlee/sample/hydjet_mb_2_2_4/1EA7C31D-83FB-DD11-8218-001C23BED6CA.root')
+                            )
 
 process.maxEvents = cms.untracked.PSet(
                        input = cms.untracked.int32(1)
                        )
 
 ##################################################################################
-# Generate Pyquen Signal
-from GeneratorInterface.PyquenInterface.pyquenPythiaDefault_cff import *
-import GeneratorInterface.PyquenInterface.pyquenDefault_cfi
-process.signal = GeneratorInterface.PyquenInterface.pyquenDefault_cfi.generator.clone()
-process.signal.embeddingMode = cms.bool(True)
+# Generate Particle Gun Signal (Upsilons here)
+process.load("CmsHi.Utilities.DecayGun_cfi")
+process.signal.kinematicsFile = cms.untracked.string('')
+process.signal.ParticleID = cms.untracked.int32(553)
+process.signal.doubleParticle = cms.untracked.bool(False)
 
-# modifications to the default pyquen source (unquenched 100 GeV dijets)
-process.signal.PythiaParameters.parameterSets = cms.vstring('pythiaDefault','pythiaJets','kinematics')
-process.signal.PythiaParameters.kinematics = cms.vstring (
-    "CKIN(3)=100",  #min pthat
-    "CKIN(4)=9999", #max pthat
-    "CKIN(7)=-2.",  #min rapidity
-    "CKIN(8)=2."    #max rapidity
-    )	
-process.signal.doQuench = False
+# Kinematics
+process.signal.Ptmin = cms.untracked.double(5.99)
+process.signal.Ptmax = cms.untracked.double(6.01)
+process.signal.Etamin = cms.untracked.double(-0.01)
+process.signal.Etamax = cms.untracked.double(0.01)
 
+# Decay parameters
+process.signal.PythiaParameters.parameterSets = cms.vstring('pythiaDefault','upsilonDecay')
 
 ##################################################################################
 # Match vertex of the signal event to the background event
@@ -92,6 +89,12 @@ process.load("Configuration.StandardSequences.L1Emulator_cff")          # L1Emul
 process.load("Configuration.StandardSequences.DigiToRaw_cff")# DigiToRaw
 process.load("Configuration.StandardSequences.RawToDigi_cff")# RawToDigi
 process.load("RecoHI.Configuration.Reconstruction_HI_cff")              # full heavy ion reconstruction
+
+##################################################################################
+# Digi + Reconstruction of Signal-Only
+
+process.noMix = noMix
+
 
 ##############################################################################
 # Output EDM File
