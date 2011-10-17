@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.7 2011/10/07 17:21:20 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.8 2011/10/07 17:41:35 kimy Exp $
  *
  */
 
@@ -81,11 +81,6 @@
 #include "CommonTools/Statistics/interface/ChiSquaredProbability.h"
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
 
-// Histograms, ntuples
-//#include "UserCode/HafHistogram/interface/HTupleManager.h"
-//#include "UserCode/HafHistogram/interface/HHistogram.h"
-//#include "UserCode/HafHistogram/interface/HTuple.h"
-
 //ROOT includes
 #include <Math/VectorUtil.h>
 #include <TLorentzVector.h>
@@ -103,8 +98,6 @@
 // Electron
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
-
-
 
 using namespace pat;
 using namespace edm;
@@ -228,15 +221,9 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
   
   int nphotonscounter(0);
   for (PhotonCollection::const_iterator phoItr = myphotons.begin(); phoItr != myphotons.end(); ++phoItr) {  
-     if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
-     // Dump photon kinematics and AOD
-     Photon photon = Photon(*phoItr);
-     // NOTE: since CMSSW_3_1_x all photons are corrected to the primary vertex
-     //       hence, Photon::setVertex() leaves photon object unchanged
-     //     photon.setVertex(vtx_);   <== Test if this makes error
-     //   p4    (nphotonscounter) =  TLorentzVector(photon.px(),photon.py(),photon.pz(),photon.energy());
-     //    p     (nphotonscounter) =  photon.p();
-     //   et    (nphotonscounter) =  photon.et();
+    if(phoItr->pt() < ptMin_ || fabs(phoItr->p4().eta()) > etaMax_) continue;
+    // Dump photon kinematics and AOD
+    Photon photon = Photon(*phoItr);
      
     pt[nphotonscounter] = photon.p4().pt();
     px[nphotonscounter] = photon.px();
@@ -271,9 +258,10 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     
     const reco::CaloClusterPtr  seed = photon.superCluster()->seed();
 
-    DetId id = lazyTool.getMaximum(*seed).first; 
+    const DetId &id = lazyTool.getMaximum(*seed).first; 
     float time  = -999., outOfTimeChi2 = -999., chi2 = -999.;
-    int   flags=-1, severity = -1; 
+    int   flags = -1, severity = -1;
+    //EcalSeverityLevel::SeverityLevel severityFlag; 
     const EcalRecHitCollection & rechits = ( photon.isEB() ? *EBReducedRecHits : *EEReducedRecHits); 
     EcalRecHitCollection::const_iterator it = rechits.find( id );
     if( it != rechits.end() ) { 
@@ -281,8 +269,12 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       outOfTimeChi2 = it->outOfTimeChi2();
       chi2 = it->chi2();
       flags = it->recoFlag();
-      severity = EcalSeverityLevelAlgo::severityLevel( id, rechits, *chStatus );
+      //severityFlag = EcalSeverityLevelAlgo::severityLevel(id, rechits);
     }
+
+    // Yen-Jie: Not used, need to be fixed
+    //severity = -1;
+    //if (severityFlag = EcalSeverityLevelAlgo::SeverityLevel::kGood) severity = 0;
 
     float tleft = -999., tright=-999., ttop=-999., tbottom=-999.;
     std::vector<DetId> left   = lazyTool.matrixDetId(id,-1,-1, 0, 0);
