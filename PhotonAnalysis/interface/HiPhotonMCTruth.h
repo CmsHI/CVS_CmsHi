@@ -14,22 +14,23 @@
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
+#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
 #include "CmsHi/PhotonAnalysis/interface/HiMCGammaJetSignalDef.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "DataFormats/Common/interface/Handle.h"
 
-#include <vector>
+#include <vector.h>
 
 class HiPhotonMCTruth
 {
  public:
-  HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle);
+  HiPhotonMCTruth(edm::Handle<reco::GenParticleCollection> inputHandle, edm::Handle<edm::SubEventMap> subs);
+  bool indexMatch(const reco::Candidate &pp1);
   bool IsPrompt(const reco::GenParticle &pp);
-  bool IsIsolated(const reco::GenParticle &pp);
-  bool IsIsolatedPP(const reco::GenParticle &pp,double cone = 0.4, double etCut = 2.0);
-  bool IsIsolatedJP(const reco::GenParticle &pp);
- 
+  bool IsPrompt(const reco::Candidate &pp);
+  bool IsIsolated(const reco::Candidate &pp);
+  
  private:
   HiMCGammaJetSignalDef mcisocut;
 };

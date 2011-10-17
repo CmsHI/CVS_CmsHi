@@ -16,27 +16,30 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
 #include "FWCore/Framework/interface/ESHandle.h"
-#include <vector>
+#include "SimDataFormats/HiGenData/interface/SubEventMap.h"
+#include <vector.h>
 
 class HiMCGammaJetSignalDef
 {
   public:
 
   HiMCGammaJetSignalDef();
-  HiMCGammaJetSignalDef(const reco::GenParticleCollection *sigPartic);
-  bool IsIsolated(const reco::GenParticle &pp);  
-  bool IsIsolatedPP(const reco::GenParticle &pp, double cone = 0.4, double etCut = 2.0);
-  bool IsIsolatedJP(const reco::GenParticle &pp);
-
-  //  bool IsSignal(const reco::Candidate &pp, double dPhi, bool isIso);
-  //  int getIndex(const reco::Candidate &pp);
+  HiMCGammaJetSignalDef(const reco::GenParticleCollection *sigParticles, const std::vector<int> Map);
+  bool IsIsolated(const reco::Candidate &pp, int candId);
+  bool IsIsolated(const reco::Candidate &pp)            ;  
+  bool IsSignal(const reco::Candidate &pp, double dPhi, bool isIso);
+  int getIndex(const reco::Candidate &pp);
   double getDeltaR (const reco::Candidate &track1, const reco::Candidate &track2);
   double getDeltaPhi(const reco::Candidate &track1, const reco::Candidate &track2);
   
+  int GetAwayParton() const { return fiAway;}
+  int GetNearParton() const { return fiNear;}
   
  private:
    const reco::GenParticleCollection        *fSigParticles;
-
+   int                               fiNear;
+   int                               fiAway;
+   std::vector<int>             fmap;   
 };
 
 #endif
