@@ -5,31 +5,22 @@ export CVSROOT=:gserver:cmscvs.cern.ch:/cvs_server/repositories/CMSSW
 cd $CMSSW_BASE/src
 eval `scramv1 ru -sh`
 
-checkOutVersion=`echo $CMSSW_VERSION | sed "s/_pre1//g" | sed "s/_pre2//g" | sed "s/_pre3//g"`
-ver=`echo $checkOutVersion | sed "s/CMSSW//g" | sed "s/_//g"`
-if [ $ver -lt 330 ]; then
-
 # latest reconstruction code
-cvs co -r V00-00-00 RecoHI/Configuration
-cvs co -r V01-00-05 RecoHI/HiTracking                        
-cvs co -r V00-00-01 RecoHI/HiJetAlgos
-cvs co -r V00-00-03 RecoHI/HiEgammaAlgos
-cvs co -r V00-00-05 RecoHI/HiMuonAlgos
+cvs co RecoHI/Configuration
+cvs co -r V01-00-04 RecoHI/HiTracking                        
+cvs co RecoHI/HiJetAlgos
+cvs co -r V00-00-02 RecoHI/HiEgammaAlgos
 cvs co RecoHI/HiCentralityAlgos
-cvs co RecoHI/HiEvtPlaneAlgos
+cvs co -r V00-00-04 RecoHI/HiMuonAlgos
 
 # latest generator configurations
 cvs co Configuration/Generator
 # latest generator interfaces (consistent impact parameter generation)
-cvs co GeneratorInterface/Core
 cvs co GeneratorInterface/HydjetInterface
-cvs co GeneratorInterface/PyquenInterface # genfiltering in branch
+cvs co -r embedding_v02 GeneratorInterface/PyquenInterface
 # heavy ion event mixing tools
 cvs co SimGeneral/MixingModule
-#cvs co -r V05-00-00 SimGeneral/MixingModule
-cvs co -r V04-00-00 SimDataFormats/CrossingFrame
-cvs co -r V03-02-00 Mixing/Base
-cvs co -r V00-15-07 FWCore/Sources
+cvs co SimGeneral/CrossingFrame
 
 # latest centrality and event plane formats
 cvs co DataFormats/HeavyIonEvent
@@ -50,12 +41,23 @@ mv tmp2.cc $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/SealModule.cc
 cat $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile | replace "RecoHI/HiMuonAlgos" "RecoHIMuon/HiMuTracking" | replace "RecoHIHiMuonAlgos" "RecoHIMuonHiMuTracking" > tmp3
 mv tmp3 $CMSSW_BASE/src/RecoHIMuon/HiMuTracking/plugins/BuildFile
 
+# for heavy ion PAT candidates
+cvs co UserCode/yetkin/DataFormats
+mv UserCode/yetkin/DataFormats .
+
+### Use the code below if you need gen-level filter for signal-mixing
+### Warning: Not compatible with consistent b generation pyquen
+
+#rm -r GeneratorInterface/PyquenInterface
+#cvs co UserCode/yetkin/GeneratorInterface
+#mv UserCode/yetkin/GeneratorInterface/* GeneratorInterface/
+
 ################################
 
-cvs co -r V00-01-02 -d CmsHi/Utilities UserCode/CmsHi/Utilities
-cvs co -r cmshi_32X -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co UserCode/CmsHi
+cvs co -r V00-01-00 UserCode/CmsHi/Utilities
+mv UserCode/CmsHi .
+
 scramv1 b
 
-else
-echo "This script is for 3_1_X and 3_2_X only. Use setup33X.sh for 3_3_X please!"
-fi
+
