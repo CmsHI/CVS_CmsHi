@@ -12,9 +12,8 @@
 */
 //
 // Original Author:  Yetkin Yilmaz
-// Modified: Frank Ma
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.12.2.3 2011/10/14 15:04:30 frankma Exp $
+// $Id: RecHitTreeProducer.cc,v 1.11 2010/11/09 22:57:31 yilmaz Exp $
 //
 //
 
@@ -61,9 +60,6 @@
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
 #include "DataFormats/DetId/interface/DetId.h"
 
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
-
 
 #include "TNtuple.h"
 
@@ -80,10 +76,6 @@ struct MyRecHit{
   float eta[MAXHITS];
   float phi[MAXHITS];
   bool isjet[MAXHITS];
-  float etvtx[MAXHITS];
-  float etavtx[MAXHITS];
-  float emEtVtx[MAXHITS];
-  float hadEtVtx[MAXHITS];
 
    float jtpt;
    float jteta;
@@ -110,8 +102,6 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   double       getEt(const DetId &id, double energy);
   double       getEta(const DetId &id);
   double       getPhi(const DetId &id);
-  reco::Vertex::Point getVtx(const edm::Event& ev);
-
 
 
    private:
@@ -133,7 +123,6 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
 
    edm::Handle<reco::BasicClusterCollection> bClusters;
    edm::Handle<CaloTowerCollection> towers;
-  edm::Handle<reco::VertexCollection> vtxs;
 
   typedef vector<EcalRecHit>::const_iterator EcalIterator;
   
@@ -166,13 +155,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   double hbheThreshold_;
   double ebThreshold_;
   double eeThreshold_;
-  
-  double hbhePtMin_;
-  double hfPtMin_;
-  double ebPtMin_;
-  double eePtMin_;
-  double towerPtMin_;
-  
+
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
    const CaloGeometry *geo;
@@ -183,7 +166,6 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   edm::InputTag EESrc_;
    edm::InputTag BCSrc_;
    edm::InputTag TowerSrc_;
-  edm::InputTag VtxSrc_;
 
   edm::InputTag JetSrc_;
 
@@ -194,7 +176,6 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doTowers_;
    bool doEcal_;
    bool doHcal_;
-   bool hasVtx_;
 
    bool doFastJet_;
 
@@ -224,25 +205,18 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
   BCSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("BasicClusterSrc1",edm::InputTag("ecalRecHit","EcalRecHitsEB","RECO"));
   TowerSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("towersSrc",edm::InputTag("towerMaker"));
-  VtxSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxSrc",edm::InputTag("hiSelectedVertex"));
   JetSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("JetSrc",edm::InputTag("iterativeConePu5CaloJets"));
   useJets_ = iConfig.getUntrackedParameter<bool>("useJets",true);
   doBasicClusters_ = iConfig.getUntrackedParameter<bool>("doBasicClusters",false);
   doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
   doEcal_ = iConfig.getUntrackedParameter<bool>("doEcal",true);
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
-  hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",false);
   doFastJet_ = iConfig.getUntrackedParameter<bool>("doFastJet",true);
   FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
   doEbyEonly_ = iConfig.getUntrackedParameter<bool>("doEbyEonly",false);
   hfTowerThreshold_ = iConfig.getUntrackedParameter<double>("HFtowerMin",3.);
   hfLongThreshold_ = iConfig.getUntrackedParameter<double>("HFlongMin",0.5);
   hfShortThreshold_ = iConfig.getUntrackedParameter<double>("HFshortMin",0.85);
-  hbhePtMin_ = iConfig.getUntrackedParameter<double>("HBHETreePtMin",0);
-  hfPtMin_ = iConfig.getUntrackedParameter<double>("HFTreePtMin",0);
-  ebPtMin_ = iConfig.getUntrackedParameter<double>("EBTreePtMin",0);
-  eePtMin_ = iConfig.getUntrackedParameter<double>("EETreePtMin",0.);
-  towerPtMin_ = iConfig.getUntrackedParameter<double>("TowerTreePtMin",0.);
 }
 
 
@@ -271,10 +245,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
   myBC.n = 0;
    myTowers.n = 0;
    bkg.n = 0;
-
-  // get vertex
-  reco::Vertex::Point vtx;
-  if (hasVtx_) vtx = getVtx(ev);
 
    if(doEcal_){
   ev.getByLabel(EBSrc_,ebHits);
@@ -348,12 +318,11 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	 if(dr < cone){ hfRecHit.isjet[hfRecHit.n] = true; }
        }
      }
-     if (hfRecHit.et[hfRecHit.n]>=hfPtMin_) hfRecHit.n++;
+     hfRecHit.n++;
    }
    if(!doEbyEonly_){
    for(unsigned int i = 0; i < hbheHits->size(); ++i){
      const HBHERecHit & hit= (*hbheHits)[i];
-     if (getEt(hit.id(),hit.energy())<hbhePtMin_) continue;
      hbheRecHit.e[hbheRecHit.n] = hit.energy();
      hbheRecHit.et[hbheRecHit.n] = getEt(hit.id(),hit.energy());
      hbheRecHit.eta[hbheRecHit.n] = getEta(hit.id());
@@ -373,7 +342,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    if(doEcal_ && !doEbyEonly_){
    for(unsigned int i = 0; i < ebHits->size(); ++i){
      const EcalRecHit & hit= (*ebHits)[i];
-     if (getEt(hit.id(),hit.energy())<ebPtMin_) continue;
      ebRecHit.e[ebRecHit.n] = hit.energy();
      ebRecHit.et[ebRecHit.n] = getEt(hit.id(),hit.energy());
      ebRecHit.eta[ebRecHit.n] = getEta(hit.id());
@@ -391,7 +359,6 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
    
    for(unsigned int i = 0; i < eeHits->size(); ++i){
      const EcalRecHit & hit= (*eeHits)[i];
-     if (getEt(hit.id(),hit.energy())<eePtMin_) continue;
      eeRecHit.e[eeRecHit.n] = hit.energy();
      eeRecHit.et[eeRecHit.n] = getEt(hit.id(),hit.energy());
      eeRecHit.eta[eeRecHit.n] = getEta(hit.id());
@@ -412,18 +379,11 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
       for(unsigned int i = 0; i < towers->size(); ++i){
       const CaloTower & hit= (*towers)[i];
-      if (getEt(hit.id(),hit.energy())<towerPtMin_) continue;
       myTowers.e[myTowers.n] = hit.energy();
       myTowers.et[myTowers.n] = getEt(hit.id(),hit.energy());
       myTowers.eta[myTowers.n] = getEta(hit.id());
       myTowers.phi[myTowers.n] = getPhi(hit.id());
       myTowers.isjet[myTowers.n] = false;
-      if (hasVtx_) {
-	myTowers.etvtx[myTowers.n] = hit.p4(vtx).Et();
-	myTowers.etavtx[myTowers.n] = hit.p4(vtx).Eta();
-	myTowers.emEtVtx[myTowers.n] = hit.emEt(vtx);
-	myTowers.hadEtVtx[myTowers.n] = hit.hadEt(vtx);
-      }
 
       if(hit.ieta() > 29 && hit.energy() > hfTowerThreshold_) nHFtowerPlus++;
       if(hit.ieta() < -29 && hit.energy() > hfTowerThreshold_) nHFtowerMinus++;
@@ -527,12 +487,6 @@ RecHitTreeProducer::beginJob()
   towerTree->Branch("eta",myTowers.eta,"eta[n]/F");
   towerTree->Branch("phi",myTowers.phi,"phi[n]/F");
   towerTree->Branch("isjet",myTowers.isjet,"isjet[n]/O");
-  if (hasVtx_) {
-    towerTree->Branch("etvtx",myTowers.etvtx,"etvtx[n]/F");
-    towerTree->Branch("etavtx",myTowers.etavtx,"etavtx[n]/F");
-    towerTree->Branch("emEtVtx",myTowers.emEtVtx,"emEtVtx[n]/F");
-    towerTree->Branch("hadEtVtx",myTowers.hadEtVtx,"hadEtVtx[n]/F");
-  }
 
 
   if(doBasicClusters_){
@@ -582,23 +536,7 @@ double RecHitTreeProducer::getPhi(const DetId &id){
   return et;
 }
 
-reco::Vertex::Point RecHitTreeProducer::getVtx(const edm::Event& ev)
-{
-  ev.getByLabel(VtxSrc_,vtxs);
-  int greatestvtx = 0;
-  int nVertex = vtxs->size();
-  
-  for (unsigned int i = 0 ; i< vtxs->size(); ++i){
-    unsigned int daughter = (*vtxs)[i].tracksSize();
-    if( daughter > (*vtxs)[greatestvtx].tracksSize()) greatestvtx = i;
-    //cout <<"Vertex: "<< (*vtxs)[i].position().z()<<" "<<daughter<<endl;
-  }
-  
-  if(nVertex<=0){
-    return reco::Vertex::Point(-999,-999,-999);
-  }
-  return (*vtxs)[greatestvtx].position();
-}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(RecHitTreeProducer);

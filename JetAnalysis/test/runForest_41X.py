@@ -9,13 +9,11 @@ process.options = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-#    'rfio:/castor/cern.ch/cms/store/data/Run2011A/AllPhysics2760/RECO/PromptReco-v2/000/161/474/F8322CAC-975A-E011-907B-0030487CBD0A.root'
-    'file:/d101/frankma/data/HIAllPhysics/ZS-v2/A2AD1439-F242-E011-A425-003048F00412.root'
-    
+    'rfio:/castor/cern.ch/cms/store/data/Run2011A/AllPhysics2760/RECO/PromptReco-v2/000/161/474/F8322CAC-975A-E011-907B-0030487CBD0A.root'
     ))
 
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(10))
+            input = cms.untracked.int32(-1))
 
 #load some general stuff
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -66,7 +64,7 @@ process.jec = cms.ESSource("PoolDBESSource",
                            )
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
 
-# Define Analysis sequences
+# Define Analysis sequencues
 process.load('CmsHi.JetAnalysis.EventSelection_cff')
 #process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
@@ -78,13 +76,6 @@ process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.load("MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff")
 process.anaTrack.trackPtMin = 4
-process.anaTrack.useQuality = True
-process.anaTrack.doPFMatching = True
-process.anaTrack.trackSrc = cms.InputTag("hiGoodTightTracksDirect")
-
-process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
-process.pfcandAnalyzer.skipCharged = True
-process.pfcandAnalyzer.pfPtMin = 1
 
 process.ak5CaloJets = process.akPu5CaloJets.clone(doPUOffsetCorr = False)
 process.ak5corr = process.icPu5corr.clone(
@@ -119,28 +110,27 @@ process.ak3PFJetAnalyzer = process.icPu5JetAnalyzer.clone(
 process.ak5extra = cms.Sequence(process.ak5CaloJets*process.ak5corr*process.ak5patJets*process.ak5CaloJetAnalyzer)
 process.ak3extra = cms.Sequence(process.ak3PFJetsX*process.ak3corrX*process.ak3patJetsX*process.ak3PFJetAnalyzer)
 
-#process.load("edwenger.Skims.EventFilter_cff")
-#from edwenger.Skims.customise_cfi import *
-#run2760GeVmode(process)
+process.load("edwenger.Skims.EventFilter_cff")
+from edwenger.Skims.customise_cfi import *
+run2760GeVmode(process)
 
 # Filtering
 process.hltJetHI.HLTPaths = ['HLT_HIJet35U','HLT_HIPhoton20']
 print "Add cleaning to analysis"
 process.event_filter_seq = cms.Sequence(
   process.hltJetHI *
-  process.collisionEventSelection *
+#  process.collisionEventSelection *
   process.hbheReflagNewTimeEnv *
   process.hcalTimingFilter *
   process.HBHENoiseFilter *
 
-  process.hiEcalRecHitSpikeFilter
+  process.hiEcalRecHitSpikeFilter *
 
-# pp selection
-#  process.preTrgTest *
-#  process.minBiasBscFilter *
-#  process.postTrgTest *
-#  process.hfCoincFilter *
-#  process.purityFractionFilter
+  process.preTrgTest *
+  process.minBiasBscFilter *
+  process.postTrgTest *
+  process.hfCoincFilter *
+  process.purityFractionFilter
 
   )
 
@@ -153,37 +143,30 @@ process.hiGoodTightTracks.src = cms.InputTag("hiGlobalPrimTracks")
 process.hiGoodTightTracksDirect = process.hiGoodTightTracks.clone(keepAllTracks = True)
 process.hiGoodTracks = process.hiGoodTightTracks.clone()
 
-process.pfTrack.TkColList = ["hiGoodTightTracksDirect"]
-process.pfTrack.GsfTracksInEvents = False
-
 process.reco_extra        = cms.Path( process.hiTrackReReco * process.hiextraTrackReco * process.iterativeConePu5CaloJets *
                                       process.hiGoodTightTracksDirect *  process.muonRecoPbPb *
                                       process.HiParticleFlowRecoNoJets * process.hiCentrality * process.hiGoodTracks)
-process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets
-                                      * process.photon_extra_reco
-                                      + process.ak5extra + process.ak3extra
-                                      )
-
+process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets	* process.photon_extra_reco + process.ak5extra + process.ak3extra)
 process.pat_step          = cms.Path( process.icPu5patSequence_data + process.akPu3PFpatSequence_data + process.makeHeavyIonPhotons)
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
-process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer + process.multiPhotonAnalyzer + process.anaTrack + process.pfcandAnalyzer)
+process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer + process.multiPhotonAnalyzer + process.anaTrack)
 
 process.phltJetHI = cms.Path( process.hltJetHI )
-process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
+# process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
 process.phbheReflagNewTimeEnv = cms.Path( process.hbheReflagNewTimeEnv )
 process.phcalTimingFilter = cms.Path( process.hcalTimingFilter )
 process.pHBHENoiseFilter = cms.Path( process.HBHENoiseFilter )
 process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
-#process.phfCoincFilter = cms.Path(process.hfCoincFilter )
+process.ppreTrgTest = cms.Path(process.preTrgTest )
+process.pminBiasBscFilter = cms.Path(process.minBiasBscFilter )
+process.ppostTrgTest = cms.Path(process.postTrgTest )
+process.phfCoincFilter = cms.Path(process.hfCoincFilter )
+process.ppurityFractionFilter = cms.Path(process.purityFractionFilter )
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
 enableDataPat(process)
 setPhotonObject(process,"cleanPhotons")
-#process.multiPhotonAnalyzer.GenEventScale = cms.InputTag("generator")
-process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiSelectedTracks")
-process.photonMatch.matched = cms.InputTag("hiGenParticles")
-
 enableDataAnalyzers(process)
 enableOpenHlt(process,process.ana_step)
 process.hltanalysis.RunParameters.DoAlCa = cms.untracked.bool(False)

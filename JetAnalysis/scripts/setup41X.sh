@@ -1,17 +1,7 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -r hi413_01 -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
-cvs co -d       edwenger/Skims UserCode/edwenger/Skims
-cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
-cvs co -d       edwenger/TrkEffAnalyzer UserCode/edwenger/TrkEffAnalyzer
-
-cvs co -d       edwenger/TrackSpectraAnalyzer UserCode/edwenger/TrackSpectraAnalyzer
-cvs co -d       edwenger/EvtSelAnalyzer  UserCode/edwenger/EvtSelAnalyzer
-cvs co -d       SpectraAna/JetEtaPhiFilter UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
-cvs co -d       SpectraAna/TrackSpectraAnalyzer UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
-
-cvs co          UserCode/FerencSiklerVertexing
+cvs co -d       edwenger/HiTrkEffAnalyzer/python/ UserCode/edwenger/HiTrkEffAnalyzer/python/
 
 # pat macros
 cvs co -d      MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
@@ -33,7 +23,7 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
-cvs co -r hi413_11 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 
 #ecal and hcal cleaning
 #hcal
