@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.9 2011/10/17 15:46:43 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.10 2011/10/17 21:38:18 yjlee Exp $
  *
  */
 
@@ -320,7 +320,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     eLeft        [nphotonscounter] =  lazyTool.eLeft(*seed);
     eTop         [nphotonscounter] =  lazyTool.eTop(*seed);
     eBottom      [nphotonscounter] =  lazyTool.eBottom(*seed);
-    swissCrx     [nphotonscounter] =  1 - eMax[nphotonscounter] / ( eRight[nphotonscounter] + eLeft[nphotonscounter] + eTop[nphotonscounter] + eBottom[nphotonscounter] )  ;
+    swissCrx     [nphotonscounter] =  1 - ( eRight[nphotonscounter] + eLeft[nphotonscounter] + eTop[nphotonscounter] + eBottom[nphotonscounter] )/eMax[nphotonscounter]  ;
 
 
     hadronicOverEm      [nphotonscounter]   =  photon.hadronicOverEm();
