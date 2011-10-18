@@ -2,8 +2,7 @@
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
 cvs co -r hi413_01 -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
-
-rm /d101/yjlee/skim/newPhotonAnalyzer/CMSSW_4_4_0/src/MitHig/PixelTrackletAnalyzer/src/SimTrackAnalyzer.cc
+rm MitHig/PixelTrackletAnalyzer/src/SimTrackAnalyzer.cc
 
 cvs co -d       edwenger/Skims UserCode/edwenger/Skims
 cvs co -d       edwenger/VertexAnalyzer UserCode/edwenger/VertexAnalyzer
@@ -76,6 +75,17 @@ cvs co -r V00-00-15 RecoHI/Configuration
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
 rm CmsHi/PhotonAnalysis/plugins/SpikeInspector.cc 
 
+echo '54c54
+< reconstructionHeavyIons_withPF *= HiParticleFlowReco
+---
+> reconstructionHeavyIons_withPF *= hiElectronSequence*HiParticleFlowReco
+57c57
+< reconstructionHeavyIons_HcalNZS_withPF *= HiParticleFlowReco
+---
+> reconstructionHeavyIons_HcalNZS_withPF *= hiElectronSequence*HiParticleFlowReco' > patch.tmp
+
+patch Configuration/StandardSequences/python/ReconstructionHeavyIons_cff.py < patch.tmp
+rm patch.tmp
 
 # trigger analyzers
 cvs co -r HLTrigger/HLTanalyzers
