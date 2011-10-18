@@ -175,7 +175,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
    fGauss(0),
    verbose(0),
    pp(ispp),
-   mc(ismc)
+   mc(ismc),
+   nEntries(0)
 {
   tree = new TTree("tree","");
   SetName(name);
