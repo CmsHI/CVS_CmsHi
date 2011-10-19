@@ -55,7 +55,8 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 # Additional output definition
 
 # Other statements
-process.GlobalTag.globaltag = 'GR_R_44_V5::All'
+#process.GlobalTag.globaltag = 'GR_R_44_V5::All'
+process.GlobalTag.globaltag = 'START44_V6::All'
 process.GlobalTag.toGet = cms.VPSet()
 process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
