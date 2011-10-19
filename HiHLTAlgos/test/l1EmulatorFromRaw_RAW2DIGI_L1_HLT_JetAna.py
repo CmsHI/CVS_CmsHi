@@ -34,7 +34,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -56,7 +56,8 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 
 # Other statements
 #process.GlobalTag.globaltag = 'GR_R_44_V5::All'
-process.GlobalTag.globaltag = 'START44_V4::All'
+process.GlobalTag.globaltag = 'START44_V6::All'
+# customise globaltag
 #process.GlobalTag.toGet = cms.VPSet()
 #process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
