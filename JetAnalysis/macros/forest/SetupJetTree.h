@@ -18,6 +18,7 @@ class Jets
   float refphi[maxEntry];
   float refparton_pt[maxEntry];
   float refparton_flavor[maxEntry];
+  float smpt[maxEntry];
   
   int ngen;
   float genpt[maxEntry];

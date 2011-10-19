@@ -68,7 +68,7 @@ class HiForest : public TNamed
   bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
 
   // Get track-jet correlated variables. Not needed if correlatePF is run.
-  void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1);
+  void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
   // Build correlations between jet & its constituents, builds jetIDs
   void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
 

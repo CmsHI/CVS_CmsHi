@@ -1,4 +1,6 @@
 
+//#include "JetSmear.h"
+
 class JetIndex{
 public:
    double pt;
@@ -7,24 +9,96 @@ public:
 
 bool comparePt(JetIndex a, JetIndex b) {return a.pt > b.pt;}
 
-void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin, bool allEvents, int smearType){
 
-   if(smearType>=0 && fGauss == 0){
+namespace jetsmear{
+  static const double par0[3] = {0.0313613,0.00878359,0.0248872};
+  static const double par1[3] = {1.55023,1.48813,1.41283};
+  static const double par2[3] = {1.91448,0.607755,0};  
+  static const double  factorDiff[3] = {0.830665,0.954202,1.03942};
+  static const double  factorSum[3] = {1.99776,1.87422,1.78901};
+  
+  class JetResolution{
+  public:
+    JetResolution(){
+      for(int i = 0; i < 3; ++i){
+	fReso[i] = new TF1(Form("fReso_%d",i),"sqrt(pow([0],2)+pow([1]/sqrt(x),2)+pow([2]/x,2)-(pow([3],2)+pow([4]/sqrt(x),2)+pow([5]/x,2)) )",0,300);
+	fReso[i]->SetParameter(3,1.90344e-10);
+	fReso[i]->SetParameter(4,1.29908e+00);
+	fReso[i]->SetParameter(5,2.04609e+00);
+	fReso[i]->SetParameter(0,par0[i]);
+	fReso[i]->SetParameter(1,par1[i]);
+	fReso[i]->SetParameter(2,par2[i]);
+      }
+      
       fGauss = new TF1("fGauss","gaus(0)",-3,3);
       fGauss->SetParameter(0,1);
       fGauss->SetParameter(1,0);
-      fGauss->SetParameter(2,1);
-   }
-   double resolution[2] = {0.08,0.05};
 
-   vector<TBranch*> branches(0);
+      fCentrality = new TF1("fGauss","pol1",0,3);
+      fCentrality->SetParameter(0,1.);
+      fCentrality->SetParameter(1,-0.2034);      
+    }
+
+    int roll(){
+      bin = floor(fCentrality->GetRandom());
+      if(bin == 3) bin = 2;
+
+      sum = factorSum[bin]*fGauss->GetRandom();
+      diff = factorDiff[bin]*fGauss->GetRandom();
+
+      return bin;
+    }
+
+    double getFluct1(double pt){
+      return fReso[bin]->Eval(pt)*(sum+diff)/2.;
+    }
+
+    double getFluct2(double pt){
+      return fReso[bin]->Eval(pt)*(sum-diff)/2.;
+    }
+
+    double getFluct(Jets jets, int j){
+      double pt = jets.jtpt[j];
+      double fluct = getFluct1(pt);
+      if(fabs(deltaPhi(jets.jtphi[j],jets.jtphi[0])) > 0.157079632) fluct = getFluct2(pt);
+      return pt*fluct;
+    }
+
+    TF1* fReso[3];
+    TF1* fGauss;
+    TF1* fCentrality;
+    int bin;    
+    double sum;
+    double diff;
+    double fluct1;
+    double fluct2;
+
+  };
+}
+
+
+
+void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin, bool allEvents, int smearType){
+
+  jetsmear::JetResolution* res = 0;
+  if(smearType==0){
+    res = new jetsmear::JetResolution();
+  }
+
+  vector<TBranch*> branches(0);
 
    if(allEvents || currentEvent == 0){
       branches.push_back(jetTree->Branch("Lead",&jtLead,"Lead/I"));
       branches.push_back(jetTree->Branch("SubLead",&jtSubLead,"SubLead/I"));
       branches.push_back(jetTree->Branch("HasDijet",&jtHasDijet,"HasDijet/O"));
       branches.push_back(jetTree->Branch("HasLeadingJet",&jtHasLeadingJet,"HasLeadingJet/O"));
+
+      if(smearType==0 && !mc){
+	branches.push_back(jetTree->Branch("smpt",jets.smpt,"smpt[nref]/F"));
+      }
+
       jetTree->SetAlias("AJ","(jtpt[Lead]-jtpt[SubLead])/(jtpt[Lead]+jtpt[SubLead])");
+
    }
 
    vector<JetIndex> vecs;
@@ -38,7 +112,9 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
       }
 
       vecs.clear();
-     
+
+      if(smearType == 0)res->roll();
+	      
       for(int j = 0; j < jets.nref; ++j){
          if(jets.jtpt[j] < ptMin) continue;
 	 if(fabs(jets.jteta[j]) > etaMax) continue;
@@ -47,10 +123,11 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 entry.pt = jets.jtpt[j];
 	 entry.index = j;
 
-	 if(smearType >= 0){
-	    entry.pt += resolution[smearType]*entry.pt*fGauss->GetRandom();
-	    jets.refpt[j] = jets.jtpt[j];
-	    jets.jtpt[j] = entry.pt;
+	 if(smearType == 0){
+	   entry.pt += res->getFluct(jets,j);
+
+	   jets.smpt[j] = entry.pt;
+	   jets.jtpt[j] = entry.pt;
 	 }
 	 vecs.push_back(entry);
       }
@@ -64,12 +141,18 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 
       if(vecs.size() > 0){
 	 jtLead = vecs[0].index;
-	 if(jets.jtpt[jtLead] > 100) jtHasLeadingJet = 1;
+	 if(smearType == 0 && jets.smpt[jtLead] > 100) jtHasLeadingJet = 1;
+	 if(smearType != 0 && jets.jtpt[jtLead] > 100) jtHasLeadingJet = 1;
       }
 
       if(vecs.size() > 1){
 	 jtSubLead = vecs[1].index;
-	 if(jets.jtpt[jtSubLead] > 40) jtHasDijet = jtHasLeadingJet;
+	 if(smearType == 0 &&jets.smpt[jtSubLead] > 40){
+           jtHasDijet = jtHasLeadingJet && fabs(deltaPhi(jets.jtphi[jtLead],jets.jtphi[jtSubLead])) > 2.*3.1415926/3.;
+         }
+	 if(smearType != 0 && jets.jtpt[jtSubLead] > 40){
+	   jtHasDijet = jtHasLeadingJet && fabs(deltaPhi(jets.jtphi[jtLead],jets.jtphi[jtSubLead])) > 2.*3.1415926/3.;
+	 }
       }
 
       for(int ib = 0; ib < branches.size(); ++ib){
@@ -82,7 +165,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 }
 
 
-void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents){ 
+void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool smeared){ 
 
    vector<TBranch*> branches(0);
 
@@ -150,28 +233,20 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents){
 	 trackTree->GetEntry(i);
       }
 
-      /*
-      for (int t = 0; t < track.nTrk; t++) {
-	 tjDeltaEtaLead[t] = -999;
-         tjDeltaPhiLead[t] = -999;
-	 tjDeltaEtaSubLead[t] = -999;
-         tjDeltaPhiSubLead[t] = -999;
-	 zLead[t] = -999;
-         zSubLead[t] = -999;
-      }
-      */
-      
       for(int j = 0; j < jets.nref; ++j){
 	 for (int t = 0; t < track.nTrk; ++t) {
 	    if(j == jtLead){
 	       tjDeltaEtaLead[t] = track.trkEta[t] - jets.jteta[j];
 	       tjDeltaPhiLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
 	       zLead[t] = track.trkPt[t]/jets.jtpt[j];
+	       //	       cout<<"jtpt : "<<jets.jtpt[j]<<"  spt : "<<jets.smpt[j]<<endl;
+	       if(smeared) zLead[t] = track.trkPt[t]/jets.smpt[j];
 	    }
 	    if(j == jtSubLead){
 	       tjDeltaEtaSubLead[t] = track.trkEta[t] - jets.jteta[j];
                tjDeltaPhiSubLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
                zSubLead[t] = track.trkPt[t]/jets.jtpt[j];
+	       if(smeared) zSubLead[t] = track.trkPt[t]/jets.smpt[j];
 	    }
 	 }
       }
