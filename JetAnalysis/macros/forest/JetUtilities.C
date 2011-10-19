@@ -193,6 +193,10 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       tjDeltaPhiSubLead = new Float_t[maxEntryTrack];
       zSubLead = new Float_t[maxEntryTrack];
 
+      corrLead = new Float_t[maxEntryTrack];
+      corrSubLead = new Float_t[maxEntryTrack];
+
+
       branches.push_back(jetTree->Branch("jtChg",jtChg,"jtChg[nref]/F"));
       branches.push_back(jetTree->Branch("jtNeut",jtNeut,"jtNeut[nref]/F"));
       branches.push_back(jetTree->Branch("jtEM",jtEM,"jtEM[nref]/F"));
@@ -211,6 +215,9 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       branches.push_back(trackTree->Branch("tjDphiSubLead",tjDeltaPhiSubLead,"tjDphiSubLead[nTrk]/F"));
       branches.push_back(trackTree->Branch("zSubLead",zSubLead,"zSubLead[nTrk]/F"));
 
+      branches.push_back(trackTree->Branch("corrLead",corrLead,"corrLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("corrSubLead",corrSubLead,"corrSubLead[nTrk]/F"));
+
       jetTree->SetAlias("jtFracChg","jtChg/jtpt");
       jetTree->SetAlias("jtFracNeut","jtNeut/jtpt");
       jetTree->SetAlias("jtFracEM","jtFracEM/jtpt");
@@ -226,27 +233,38 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 
    }
 
+   double correctionFactors[4] = {0,0,0,0};
+
    for (int i=0; allEvents ? i<GetEntries() : 1;i++){
       if(i % 1000 == 0) cout<<"Processing Event : "<<i<<endl;
       if(allEvents){
 	 jetTree->GetEntry(i);
 	 trackTree->GetEntry(i);
+	 hltTree->GetEntry(i);
       }
+
+      int cbin = hlt.hiBin;
+      if(pp) cbin = 33;
 
       for(int j = 0; j < jets.nref; ++j){
 	 for (int t = 0; t < track.nTrk; ++t) {
+
+	   double jetPt = jets.jtpt[j];
+	   if(smeared)jetPt = jets.smpt[j];
+
 	    if(j == jtLead){
 	       tjDeltaEtaLead[t] = track.trkEta[t] - jets.jteta[j];
 	       tjDeltaPhiLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
-	       zLead[t] = track.trkPt[t]/jets.jtpt[j];
+	       zLead[t] = track.trkPt[t]/jetPt;
 	       //	       cout<<"jtpt : "<<jets.jtpt[j]<<"  spt : "<<jets.smpt[j]<<endl;
-	       if(smeared) zLead[t] = track.trkPt[t]/jets.smpt[j];
+
+	       corrLead[t] = trackCorrections[0]->GetCorr(track.trkPt[t],track.trkEta[t],jetPt,cbin,correctionFactors);
 	    }
 	    if(j == jtSubLead){
 	       tjDeltaEtaSubLead[t] = track.trkEta[t] - jets.jteta[j];
                tjDeltaPhiSubLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
-               zSubLead[t] = track.trkPt[t]/jets.jtpt[j];
-	       if(smeared) zSubLead[t] = track.trkPt[t]/jets.smpt[j];
+               zSubLead[t] = track.trkPt[t]/jetPt;
+               corrSubLead[t] = trackCorrections[1]->GetCorr(track.trkPt[t],track.trkEta[t],jetPt,cbin,correctionFactors);
 	    }
 	 }
       }

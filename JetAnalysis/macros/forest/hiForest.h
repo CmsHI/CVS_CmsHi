@@ -9,6 +9,7 @@
 #include "SetupSkimTree.h"
 #include "SetupTrackTree.h"
 #include "SetupHitTree.h"
+#include "TrackingCorrections.h"
 
 #include <TTree.h>
 #include <TFile.h>
@@ -164,8 +165,14 @@ class HiForest : public TNamed
   Float_t* tjDeltaPhiSubLead;
   Float_t* zSubLead;
 
+  Float_t* corrLead;
+  Float_t* corrSubLead;
+
   int nEntries;
   int currentEvent;
+
+  vector<TrackingCorrections*> trackCorrections;
+
  private:
 
 };
@@ -263,6 +270,18 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
 
   // Print the status of thre forest
   PrintStatus();
+
+  if(pp){
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf_j1"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf_j2"));
+  }else{
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf_j1"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf_j2"));
+  }
+
+  for(int i = 0; i < trackCorrections.size(); ++i){
+    trackCorrections[i]->Init();
+  }
 
   currentEvent = 0;
 }

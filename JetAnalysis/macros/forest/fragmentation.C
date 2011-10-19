@@ -82,6 +82,9 @@ void plotXsi(int centIndex = 0){
   TH1D* hDphi = new TH1D("hDphi",";#Delta#phi;",160,-8,8);
   TH1D* hDphimc = new TH1D("hDphimc",";#Delta#phi;",160,-8,8);
 
+  TH1D* hRun = new TH1D("hRun",";Run;N_{dijets}",3400,150600,154000);
+
+
   bool pp = 0;
 
   int nAJ = 5;
@@ -90,21 +93,14 @@ void plotXsi(int centIndex = 0){
 
   if(remake){
     
-    //    TFile* outf = new TFile(Form("output3.root"),"recreate");
-
-    HiForest * t;
-    //    t = new HiForest("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yjlee/hiForest/merged_HI2010_SD_Jet35_prod05_full.root");
-    //    t = new HiForest("./sd_prod05_410.root");
-    t = new HiForest("/Users/yetkinyilmaz/analysis/forest_d20101017/skim_Dijet_PbPb.root");
-    t->sortJets(t->akPu3jetTree, t->akPu3PF, 2., 40, 1); // add smearing in here. save input as ref  
-    t->correlateTracks(t->akPu3jetTree, t->akPu3PF);
-
     TCut etaLead("1 || abs(akPu3PF.jteta[Lead])>0.5");
     TCut etaSubLead("1 || abs(akPu3PF.jteta[SubLead])>0.5");
-   TCut dijet("akPu3PF.HasDijet");
-   TCut leadingCone("track.tjDRlead < 0.3");
+    TCut dijet("akPu3PF.HasDijet");
+    TCut leadingCone("track.tjDRlead < 0.3");
    TCut subleadingCone("track.tjDRsublead < 0.3");
    TCut track4("track.trkPt > 4");
+   TCut correctionLead("track.corrLead");
+   TCut correctionSubLead("track.corrSubLead");
 
    TCut c0to30("hiBin < 12");
    TCut c30to100("hiBin >= 12");
@@ -134,9 +130,6 @@ void plotXsi(int centIndex = 0){
      runSelection = runSelection || Form("Run == %d",runs[r]);
    }
    
-   TCut evtSel(t->eventSelection());
-   evtSel = evtSel && runSelection;
-
    vector<TCut> cent;
    cent.push_back(c0to30);
    cent.push_back(c30to100);
@@ -146,6 +139,15 @@ void plotXsi(int centIndex = 0){
    outf->cd();
 
    int NxsiBin = 20;
+
+   HiForest * t;
+   t = new HiForest("/Users/yetkinyilmaz/analysis/forest_d20101017/skim_Dijet_PbPb.root");
+   outf->cd();
+
+   t->sortJets(t->akPu3jetTree, t->akPu3PF, 2., 40, 1); // add smearing in here. save input as ref 
+   t->correlateTracks(t->akPu3jetTree, t->akPu3PF);
+   TCut evtSel(t->eventSelection());
+   evtSel = evtSel && runSelection;
 
    for(  int i = 0; i < nAJ; ++i){
 
@@ -159,14 +161,14 @@ void plotXsi(int centIndex = 0){
       TCut AJsublead(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hin[i]->GetName()),
-	      dijet&&leadingCone&&cent[centIndex]&&track4&&AJlead&&evtSel&&etaLead);
+	      correctionLead*(dijet&&leadingCone&&cent[centIndex]&&track4&&AJlead&&evtSel&&etaLead));
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hia[i]->GetName()),
-	      dijet&&subleadingCone&&cent[centIndex]&&track4&&AJsublead&&evtSel&&etaSubLead);
+	      correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJsublead&&evtSel&&etaSubLead));
 
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]>>%s",hptn[i]->GetName()),
               dijet&&cent[centIndex]&&AJlead&&evtSel&&etaLead);
-
+      
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]>>%s",hpta[i]->GetName()),
               dijet&&cent[centIndex]&&AJsublead&&evtSel&&etaSubLead);
 
@@ -175,9 +177,14 @@ void plotXsi(int centIndex = 0){
    t->Draw("akPu3PF.AJ>>hAJ",dijet&&cent[centIndex]&&evtSel);
    t->Draw("akPu3PF.jtphi[akPu3PF.Lead]-akPu3PF.jtphi[akPu3PF.SubLead]>>hDphi",dijet&&cent[centIndex]&&evtSel);
    t->Draw("akPu3PF.jteta[akPu3PF.SubLead]:akPu3PF.jteta[akPu3PF.Lead]>>heta",dijet&&cent[centIndex]&&evtSel);
-   hDphi->Scale(1./hAJ->Integral());
-   heta->Scale(1./hAJ->Integral());
-   hAJ->Scale(1./hAJ->Integral());
+
+   t->Draw("Run>>hRun",dijet&&evtSel);
+
+   cout<<"Event selection : "<<(const char*)(dijet&&cent[centIndex]&&evtSel)<<endl;
+
+   hDphi->Scale(1./hAJ->Integral("width"));
+   heta->Scale(1./hAJ->Integral("width"));
+   hAJ->Scale(1./hAJ->Integral("width"));
 
    delete t;
    //   t = new HiForest("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yjlee/hiForest/merged_pp2760_AllPhysics_NoPhoyon_Prod02.root","ppForest",1);
@@ -209,10 +216,10 @@ void plotXsi(int centIndex = 0){
       TCut AJsublead(Form("%f <= sAJ && sAJ < %f",ajMin[i],ajMax[i]));
 	 
       t->Draw(Form("smpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hinmc[i]->GetName()),
-	      dijet&&leadingCone&&track4&&evtSel&&etaLead);
+	      correctionLead*(dijet&&leadingCone&&track4&&evtSel&&etaLead));
       
       t->Draw(Form("smpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hiamc[i]->GetName()),
-	      dijet&&subleadingCone&&track4&&evtSel&&etaSubLead);
+	      correctionLead*(dijet&&subleadingCone&&track4&&evtSel&&etaSubLead));
 
       t->Draw(Form("smpt[akPu3PF.Lead]>>%s",hptnmc[i]->GetName()),
               dijet&&evtSel&&etaLead);
@@ -227,9 +234,9 @@ void plotXsi(int centIndex = 0){
    t->Draw("sAJ>>hAJmc",dijet&&evtSel);
    t->Draw("akPu3PF.jtphi[akPu3PF.Lead]-akPu3PF.jtphi[akPu3PF.SubLead]>>hDphimc",dijet&&evtSel);
    t->Draw("akPu3PF.jteta[akPu3PF.SubLead]:akPu3PF.jteta[akPu3PF.Lead]>>hetamc",dijet&&evtSel);
-   hDphimc->Scale(1./hAJmc->Integral());
-   hetamc->Scale(1./hAJmc->Integral());
-   hAJmc->Scale(1./hAJmc->Integral());
+   hDphimc->Scale(1./hAJmc->Integral("width"));
+   hetamc->Scale(1./hAJmc->Integral("width"));
+   hAJmc->Scale(1./hAJmc->Integral("width"));
 
    delete t;
   }else{
