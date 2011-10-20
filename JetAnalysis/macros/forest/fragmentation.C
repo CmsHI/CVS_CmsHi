@@ -172,11 +172,31 @@ void plotXsi(int centIndex = 0){
       TCut AJ(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hin[i]->GetName()),
-	      correctionLead*(dijet&&leadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaLead));
+	      (
+	       dijet
+               &&cent[centIndex]
+	       &&AJ
+	       &&evtSel
+	       &&etaLead
+               &&track4
+	       &&leadingCone
+	       )
+	      *correctionLead
+	      );
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hia[i]->GetName()),
-	      correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaSubLead));
-
+	      (	       
+	       dijet
+	       &&cent[centIndex]
+	       &&AJ
+	       &&evtSel
+	       &&etaSubLead
+	       &&track4	       
+	       &&subleadingCone
+		       )
+	      *correctionSubLead
+              );
+      
       cout<<"Weight and Selection : "<<(const char*)correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaSubLead)<<endl;
 
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]>>%s",hptn[i]->GetName()),
@@ -287,7 +307,7 @@ void plotXsi(int centIndex = 0){
   for(  int i = 0; i < nAJ; ++i){
 
     double binwidth = hin[i]->GetXaxis()->GetBinWidth(1);
-    bool weightScaled = 1;
+    bool weightScaled = 0;
 
     binwidth = 1;
 
@@ -310,8 +330,8 @@ void plotXsi(int centIndex = 0){
     }
 
     if(centIndex != 2){
-      //      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i]);
-      //      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i]);
+      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i]);
+      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i]);
     }
 
     if(!weightScaled){
@@ -375,9 +395,8 @@ void plotXsi(int centIndex = 0){
 void fragmentation(){
 
   plotXsi(0);
-  //  plotXsi(1);
-  //  plotXsi(2);
-
+  plotXsi(1);
+  plotXsi(2);
 
 }
 
