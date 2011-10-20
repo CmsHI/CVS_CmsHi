@@ -38,9 +38,11 @@ void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2){
       dpt2 = h2->Integral(0,nx,i,i);
       h2->IntegralAndError(0,nx,i,i,e);
     }else{
+
       dpt1 = hpt1->GetBinContent(i);
       dpt2 = hpt2->GetBinContent(i);      
       e = hpt2->GetBinError(i);
+
     }
      if(dpt2 <= 0) e = 0;
      if(dpt1 > 0)
@@ -66,6 +68,7 @@ void plotXsi(int centIndex = 0){
   TH1D *xsia[100], *norma[100], *xsin[100], *normn[100];
   TH1D *xsiamc[100], *normamc[100], *xsinmc[100], *normnmc[100];
   TH1D *hptn[100], *hpta[100], *hptnmc[100], *hptamc[100], *hpt[100], *hptmc[100];
+  TH1D *hchn[100], *hcha[100], *hchnmc[100], *hchamc[100], *hch[100], *hchmc[100];
 
   string name[10] = {"central","peripheral","pp"};
 
@@ -73,8 +76,10 @@ void plotXsi(int centIndex = 0){
 
   TH2D* hSmear = new TH2D("hSmear",";;p_{T} (GeV/c);p_{T} fluctuation (GeV/c)",100,0,1000,100,-50,50);
 
-  TH1D* hAJ = new TH1D("hAJ",";A_{J};",10,0,1);
-  TH1D* hAJmc = new TH1D("hAJmc",";A_{J};",10,0,1);
+  TH1D* hAJ = new TH1D("hAJ",";A_{J};",20,-1,1);
+  TH1D* hAJmc = new TH1D("hAJmc",";A_{J};",20,-1,1);
+
+  TH2D* hpt2D = new TH2D("hpt2D",";p_{T}^{Lead} (GeV/c);p_{T}^{SubLead} (GeV/c)",100,0,1000,100,0,1000);
 
   TH2D* heta = new TH2D("heta",";#eta_{Lead};#eta_{Sublead}",50,-5,5,50,-5,5);
   TH2D* hetamc = new TH2D("hetamc",";#eta_{Lead};#eta_{Sublead}",50,-5,5,50,-5,5);
@@ -84,6 +89,7 @@ void plotXsi(int centIndex = 0){
 
   TH1D* hRun = new TH1D("hRun",";Run;N_{dijets}",3400,150600,154000);
 
+  TH2D* hCorrelationLead = new TH2D("hCorrelationLead",";#Delta#eta;#Delta#phi",100,-5,5,100,-5,5);
 
   bool pp = 0;
 
@@ -99,8 +105,12 @@ void plotXsi(int centIndex = 0){
     TCut leadingCone("track.tjDRlead < 0.3");
    TCut subleadingCone("track.tjDRsublead < 0.3");
    TCut track4("track.trkPt > 4");
+
    TCut correctionLead("track.corrLead");
    TCut correctionSubLead("track.corrSubLead");
+
+   correctionLead = "1";
+   correctionSubLead = "1";
 
    TCut c0to30("hiBin < 12");
    TCut c30to100("hiBin >= 12");
@@ -157,22 +167,29 @@ void plotXsi(int centIndex = 0){
       hptn[i] = new TH1D(Form("hptn%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,1000);
       hpta[i] = new TH1D(Form("hpta%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,1000);
 
-      TCut AJlead(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
-      TCut AJsublead(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
+      hch[i] = new TH1D(Form("hch%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,100);
+
+      TCut AJ(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hin[i]->GetName()),
-	      correctionLead*(dijet&&leadingCone&&cent[centIndex]&&track4&&AJlead&&evtSel&&etaLead));
+	      correctionLead*(dijet&&leadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaLead));
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hia[i]->GetName()),
-	      correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJsublead&&evtSel&&etaSubLead));
+	      correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaSubLead));
+
+      cout<<"Weight and Selection : "<<(const char*)correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaSubLead)<<endl;
 
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]>>%s",hptn[i]->GetName()),
-              dijet&&cent[centIndex]&&AJlead&&evtSel&&etaLead);
+              dijet&&cent[centIndex]&&AJ&&evtSel&&etaLead);
       
       t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]>>%s",hpta[i]->GetName()),
-              dijet&&cent[centIndex]&&AJsublead&&evtSel&&etaSubLead);
+              dijet&&cent[centIndex]&&AJ&&evtSel&&etaSubLead);
 
+      t->Draw(Form("track.trkPt>>%s",hch[i]->GetName()),
+	      correctionLead*(dijet&&leadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaLead));
    }      
+
+   t->Draw("akPu3PF.jtpt[akPu3PF.SubLead]:akPu3PF.jtpt[akPu3PF.Lead]>>hpt2D",dijet&&cent[centIndex]&&evtSel);
 
    t->Draw("akPu3PF.AJ>>hAJ",dijet&&cent[centIndex]&&evtSel);
    t->Draw("akPu3PF.jtphi[akPu3PF.Lead]-akPu3PF.jtphi[akPu3PF.SubLead]>>hDphi",dijet&&cent[centIndex]&&evtSel);
@@ -187,8 +204,6 @@ void plotXsi(int centIndex = 0){
    hAJ->Scale(1./hAJ->Integral("width"));
 
    delete t;
-   //   t = new HiForest("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yjlee/hiForest/merged_pp2760_AllPhysics_NoPhoyon_Prod02.root","ppForest",1);
-   //   t = new HiForest("./sd_prod05_410.root","ppForest",1);                        
    t = new HiForest("/Users/yetkinyilmaz/analysis/forest_d20101017/skim_Dijet_pp1.root","ppForest",1);
    outf->cd();
 
@@ -204,30 +219,42 @@ void plotXsi(int centIndex = 0){
    t->tree->SetAlias("sAJ","(smpt[akPu3PF.Lead]-smpt[akPu3PF.SubLead])/(smpt[akPu3PF.Lead]+smpt[akPu3PF.SubLead])");
 
    for(  int i = 0; i < nAJ; ++i){
-
       hinmc[i] = new TH2D(Form("hinmc%d",i),"",NxsiBin,-1,9,100,0,1000);
       hiamc[i] = new TH2D(Form("hiamc%d",i),"",NxsiBin,-1,9,100,0,1000);
-
       hptmc[i] = new TH1D(Form("hptmc%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,1000);
       hptnmc[i] = new TH1D(Form("hptnmc%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,1000);
       hptamc[i] = new TH1D(Form("hptamc%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,1000);
+      hchmc[i] = new TH1D(Form("hchmc%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,100);
 
-      TCut AJlead(Form("%f <= sAJ && sAJ < %f",ajMin[i],ajMax[i]));
-      TCut AJsublead(Form("%f <= sAJ && sAJ < %f",ajMin[i],ajMax[i]));
-	 
+   }
+
+   for(  int i = nAJ-1; i < nAJ; ++i){
+
       t->Draw(Form("smpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hinmc[i]->GetName()),
 	      correctionLead*(dijet&&leadingCone&&track4&&evtSel&&etaLead));
       
       t->Draw(Form("smpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hiamc[i]->GetName()),
-	      correctionLead*(dijet&&subleadingCone&&track4&&evtSel&&etaSubLead));
+	      correctionSubLead*(dijet&&subleadingCone&&track4&&evtSel&&etaSubLead));
 
       t->Draw(Form("smpt[akPu3PF.Lead]>>%s",hptnmc[i]->GetName()),
               dijet&&evtSel&&etaLead);
 
       t->Draw(Form("smpt[akPu3PF.SubLead]>>%s",hptamc[i]->GetName()),
               dijet&&evtSel&&etaSubLead);
+
+      t->Draw(Form("track.trkPt>>%s",hchmc[i]->GetName()),
+              correctionLead*(dijet&&leadingCone&&track4&&evtSel&&etaLead));
    
    }
+
+   for(  int i = 0; i < nAJ-1; ++i){
+     hinmc[i]->Add(hinmc[nAJ-1]);
+     hiamc[i]->Add(hiamc[nAJ-1]);
+     hptnmc[i]->Add(hptnmc[nAJ-1]);
+     hptamc[i]->Add(hptamc[nAJ-1]);
+     hchmc[i]->Add(hchmc[nAJ-1]);
+   }
+
    outf->cd();
 
    t->Draw("smpt-akPu3PF.jtpt:akPu3PF.jtpt>>hSmear","abs(akPu3PF.jteta) < 2 && akPu3PF.jtpt > 40");
@@ -238,6 +265,8 @@ void plotXsi(int centIndex = 0){
    hetamc->Scale(1./hAJmc->Integral("width"));
    hAJmc->Scale(1./hAJmc->Integral("width"));
 
+   t->Draw("track.tjDphiLead:track.tjDetaLead>>hCorrelationLead",correctionLead*(dijet&&leadingCone&&track4&&evtSel&&etaLead),"");
+
    delete t;
   }else{
 
@@ -245,40 +274,45 @@ void plotXsi(int centIndex = 0){
     TFile* infMC = new TFile("output.root");
 
     for(  int i = 0; i < nAJ; ++i){
-
-    hin[i] = (TH2D*)inf->Get(Form("hin%d",i));
-    hinmc[i] = (TH2D*)inf->Get(Form("hinmc%d",i));
-    hia[i] = (TH2D*)inf->Get(Form("hia%d",i));
-    hiamc[i] = (TH2D*)inf->Get(Form("hiamc%d",i));
+      hin[i] = (TH2D*)inf->Get(Form("hin%d",i));
+      hinmc[i] = (TH2D*)inf->Get(Form("hinmc%d",i));
+      hia[i] = (TH2D*)inf->Get(Form("hia%d",i));
+      hiamc[i] = (TH2D*)inf->Get(Form("hiamc%d",i));
     }
   }
 
   cout<<"Draws done"<<endl;
   //  outf->cd();
 
-
   for(  int i = 0; i < nAJ; ++i){
 
     double binwidth = hin[i]->GetXaxis()->GetBinWidth(1);
-    bool weightScaled = 0;
+    bool weightScaled = 1;
+
+    binwidth = 1;
+
+    hch[i]->Scale(1./hptn[i]->Integral()/binwidth);
+    hchmc[i]->Scale(1./hptnmc[i]->Integral()/binwidth);
 
     if(weightScaled){
+
       hin[i]->Scale(1./hptn[i]->Integral()/binwidth);
       hia[i]->Scale(1./hpta[i]->Integral()/binwidth);
       hinmc[i]->Scale(1./hptnmc[i]->Integral()/binwidth);
       hiamc[i]->Scale(1./hptamc[i]->Integral()/binwidth);
-      
-      hptn[i]->Scale(1./hptn[i]->Integral("width"));
-      hpta[i]->Scale(1./hpta[i]->Integral("width"));
-      hptnmc[i]->Scale(1./hptnmc[i]->Integral("width"));
-      hptamc[i]->Scale(1./hptamc[i]->Integral("width"));
+
+      if(0){      
+	hptn[i]->Scale(1./hptn[i]->Integral("width"));
+	hpta[i]->Scale(1./hpta[i]->Integral("width"));
+	hptnmc[i]->Scale(1./hptnmc[i]->Integral("width"));
+	hptamc[i]->Scale(1./hptamc[i]->Integral("width"));
+      }
     }
 
     if(centIndex != 2){
-      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i]);
-      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i]);
+      //      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i]);
+      //      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i]);
     }
-
 
     if(!weightScaled){
       hin[i]->Scale(1./hptn[i]->Integral()/binwidth);
@@ -324,8 +358,14 @@ void plotXsi(int centIndex = 0){
   normnmc[i]->Draw("hist same");
 
    c1->Print("Fragmentations.gif");
+  
+   c1->cd(2);
+   hpt2D->Draw("colz");
+   hCorrelationLead->Draw("surf2");
+   
+   c1->cd(4);
+   hAJ->Draw();
   }
-
    outf->Write();
 
    cout<<"Congrats!!!"<<endl;
@@ -335,7 +375,7 @@ void plotXsi(int centIndex = 0){
 void fragmentation(){
 
   plotXsi(0);
-  plotXsi(1);
+  //  plotXsi(1);
   //  plotXsi(2);
 
 

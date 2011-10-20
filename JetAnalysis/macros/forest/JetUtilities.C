@@ -116,7 +116,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
       if(smearType == 0)res->roll();
 	      
       for(int j = 0; j < jets.nref; ++j){
-         if(jets.jtpt[j] < ptMin) continue;
+	//         if(jets.jtpt[j] < ptMin) continue;
 	 if(fabs(jets.jteta[j]) > etaMax) continue;
 	 
 	 JetIndex entry;
@@ -125,7 +125,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 
 	 if(smearType == 0){
 	   entry.pt += res->getFluct(jets,j);
-
+	   if(!pp && i>=0) cout<<"Flucted"<<endl;
 	   jets.smpt[j] = entry.pt;
 	   jets.jtpt[j] = entry.pt;
 	 }
