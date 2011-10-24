@@ -6,7 +6,7 @@
 
 // Example of forest skim
 
-void dijetSkim(const char* fname = "", const char* outname = "", bool pp = 1)
+void dijetSkim(const char* fname = "recor.root", const char* outname = "out.root", bool pp = 0)
 {
 
    // Define the input file and HiForest

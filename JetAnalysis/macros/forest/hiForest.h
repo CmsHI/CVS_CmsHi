@@ -146,6 +146,7 @@ class HiForest : public TNamed
   bool verbose;
   bool pp;
   bool mc;
+  bool doJetCorrection;
 
   // Extra variables
   Float_t* towerEt;
@@ -239,6 +240,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
     if(recjec){
        akPu3jetTree = (TTree*) inf->Get(Form("%s/t",(names::AlgoAnalyzer[names::akPu3PF]+"_recorrected").data()));
+       cout<<"HEEY, the jets are: "<<akPu3jetTree->GetName()<<endl;
     }else{
        akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
     }
@@ -326,6 +328,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   cout<<"c"<<endl;
 
   _JEC_HI310X = new FactorizedJetCorrector(vpar_HI310x);
+  doJetCorrection = 1;
   cout<<"d"<<endl;
 
   // Setup Track Corrections
@@ -443,13 +446,15 @@ void HiForest::SetOutputFile(const char *name)
   outf = new TFile(name,"recreate");
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
-  if(pp){
-    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
-  }else{
-    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
-  }
+
+     if(pp){
+	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
+     }else{
+	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
+     }
+
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "NTuples",            "Analysis");
   if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
