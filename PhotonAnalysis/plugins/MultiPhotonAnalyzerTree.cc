@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.12 2011/10/24 15:31:42 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.13 2011/10/24 16:13:19 yjlee Exp $
  *
  */
 
@@ -132,7 +132,7 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
    
    analyzeMC(e,iSetup);
    int foundPhotons = selectStorePhotons(e,iSetup,"");
-   cout <<"Found photons? "<<foundPhotons<<endl;
+   //cout <<"Found photons? "<<foundPhotons<<endl;
    theTree->Fill();  
 }
 
@@ -195,7 +195,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
   
   bool isEleRecoed = false;
   if (EleHandle.isValid()) {
-     cout << " electron was reconstructed! " << endl;
+     //cout << " electron was reconstructed! " << endl;
     isEleRecoed = true;
   }
   
@@ -236,6 +236,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     phi[nphotonscounter] =  photon.p4().phi();
     r9[nphotonscounter]    =  photon.r9();
  
+    isEB[nphotonscounter]    =  photon.isEB()? 1:0;
     isEBGap[nphotonscounter]    =  photon.isEBGap()? 1:0;
     isEEGap[nphotonscounter]    =  photon.isEEGap()? 1:0;
     isEBEEGap[nphotonscounter]  =  photon.isEBEEGap()? 1:0;
@@ -631,7 +632,6 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     genTrkIsoDR04[nphotonscounter] = 99999.;
     
     if (isMC_) {
-       cout <<"This is MC!"<<endl;
        edm::Handle<reco::GenParticleCollection> genParticles;
       
        //  get generated particles and store generator ntuple 
@@ -684,7 +684,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 	 genMatchedPt [nphotonscounter]  = cndMc->pt();
 	 genMatchedEta[nphotonscounter]  = cndMc->eta();
 	 genMatchedPhi[nphotonscounter]  = cndMc->phi();
-	 cout <<"Matched!" << cndMc->pt()<<endl;
+	 //cout <<"Matched!" << cndMc->pt()<<endl;
 	 
 	 genCalIsoDR03[nphotonscounter]= getGenCalIso(genParticles,matchedPart,0.3);
 	 genTrkIsoDR03[nphotonscounter]= getGenTrkIso(genParticles,matchedPart,0.3);

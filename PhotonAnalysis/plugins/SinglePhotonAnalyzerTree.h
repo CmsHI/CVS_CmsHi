@@ -163,10 +163,11 @@ protected:
   float eta[kMaxPhotons];
   float phi[kMaxPhotons];
   float r9[kMaxPhotons];
-  float isEBGap[kMaxPhotons];
-  float isEEGap[kMaxPhotons];
-  float isEBEEGap[kMaxPhotons];
-  float isTransGap[kMaxPhotons];
+  bool isEB[kMaxPhotons];
+  bool isEBGap[kMaxPhotons];
+  bool isEEGap[kMaxPhotons];
+  bool isEBEEGap[kMaxPhotons];
+  bool isTransGap[kMaxPhotons];
 
 
   float preshowerEnergy[kMaxPhotons];
