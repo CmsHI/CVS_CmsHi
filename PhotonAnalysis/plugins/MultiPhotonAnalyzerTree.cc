@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.10 2011/10/17 21:38:18 yjlee Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.11 2011/10/18 12:38:56 kimy Exp $
  *
  */
 
@@ -473,7 +473,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     */   //////////////// comp photon                                                                                                                                                                               
     
     
-/*    // Delta R= 0.4
+    // Delta R= 0.4
     
     ecalRecHitSumEtConeDR04     [nphotonscounter]   =  photon.ecalRecHitSumEtConeDR04();
     hcalTowerSumEtConeDR04      [nphotonscounter]   =  photon.hcalTowerSumEtConeDR04();
@@ -481,12 +481,12 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     hcalDepth2TowerSumEtConeDR04[nphotonscounter]   =  photon.hcalDepth2TowerSumEtConeDR04();
     trkSumPtSolidConeDR04       [nphotonscounter]   =  photon.trkSumPtSolidConeDR04();
     trkSumPtHollowConeDR04      [nphotonscounter]   =  photon.trkSumPtHollowConeDR04();
-
+    
     //    nTrkSolidConeDR04           (nphotonscounter)   =  photon.nTrkSolidConeDR04();
     //  nTrkHollowConeDR04          (nphotonscounter)   =  photon.nTrkHollowConeDR04();
-
-// Delta R= 0.3
-
+    
+    // Delta R= 0.3
+    
     ecalRecHitSumEtConeDR03     [nphotonscounter]   =  photon.ecalRecHitSumEtConeDR03();
     hcalTowerSumEtConeDR03      [nphotonscounter]   =  photon.hcalTowerSumEtConeDR03();
     hcalDepth1TowerSumEtConeDR03[nphotonscounter]   =  photon.hcalDepth1TowerSumEtConeDR03();
@@ -704,7 +704,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
       
     } // if it's a MC
     if (nphotonscounter>kMaxPhotons-1) break;
-    */
+    
     nphotonscounter++;
   }
   
