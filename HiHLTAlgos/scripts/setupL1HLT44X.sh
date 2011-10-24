@@ -28,7 +28,7 @@ cvs co -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # custom l1 menu from xml
 addpkg L1TriggerConfig/L1GtConfigProducers
-cp CmsHi/HiHLTAlgos/data/L1Menu_CollisionsHeavyIons2011_v0_L1T_Scales_20101224_Imp0_0x1026.xml L1TriggerConfig/L1GtConfigProducers/data/Luminosity/startup
-cp modifiedFiles/L1Trigger_custom.py L1Trigger/Configuration/python/
+cvs co L1TriggerConfig/L1GtConfigProducers/data/Luminosity/startup/L1Menu_CollisionsHeavyIons2011_v0_L1T_Scales_20101224_Imp0_0x1026.xml
+cp -v CmsHi/HiHLTAlgos/modifiedFiles/L1Trigger_custom.py L1Trigger/Configuration/python/
 
 scram build -c
