@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.6 2011/10/07 17:21:20 kimy Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.7 2011/10/07 17:41:35 kimy Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -273,7 +273,6 @@ void SinglePhotonAnalyzerTree::beginJob() {
    
    theTree->Branch("nPho",&nPho,"nPho/I");
    theTree->Branch("pt",pt,"pt[nPho]/F");
-   theTree->Branch("et",et,"et[nPho]/F");
    theTree->Branch("energy",energy,"energy[nPho]/F");
    theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPho]/F");
    theTree->Branch("px",px,"px[nPho]/F");
@@ -530,30 +529,30 @@ bool SinglePhotonAnalyzerTree::analyzeMC(const edm::Event& e, const edm::EventSe
      try { e.getByLabel( genParticleProducer_,      genParticles );} catch (...) {;}
      const int nMaxGenPar = 90;
         
-     int nGenParCounter=0;
+     nGp=0;
      for (reco::GenParticleCollection::const_iterator it_gen = 
 	    genParticles->begin(); it_gen!= genParticles->end(); it_gen++){
        const reco::GenParticle &p = (*it_gen);    
        if ( p.pt() < mcPtMin_ ||  fabs(p.p4().eta()) > mcEtaMax_ ) continue; 
      
-       gpEt    [nGenParCounter] = p.et();
-       gpEta   [nGenParCounter] = p.eta();
-       gpPhi   [nGenParCounter] = p.phi();
-       gpCalIsoDR04 [nGenParCounter] =  getGenCalIso(genParticles, it_gen, 0.4);
-       gpCalIsoDR03 [nGenParCounter] =  getGenCalIso(genParticles, it_gen, 0.3);
+       gpEt    [nGp] = p.et();
+       gpEta   [nGp] = p.eta();
+       gpPhi   [nGp] = p.phi();
+       gpCalIsoDR04 [nGp] =  getGenCalIso(genParticles, it_gen, 0.4);
+       gpCalIsoDR03 [nGp] =  getGenCalIso(genParticles, it_gen, 0.3);
              
-       gpTrkIsoDR03[nGenParCounter] = getGenTrkIso(genParticles, it_gen, 0.3);      
-       gpTrkIsoDR04[nGenParCounter] = getGenTrkIso(genParticles, it_gen, 0.4);
+       gpTrkIsoDR03[nGp] = getGenTrkIso(genParticles, it_gen, 0.3);      
+       gpTrkIsoDR04[nGp] = getGenTrkIso(genParticles, it_gen, 0.4);
       
-       gpStatus [nGenParCounter] = p.status();
-       gpCollId [nGenParCounter] = p.collisionId();
-       gpId     [nGenParCounter] = p.pdgId();
-       gpMomId  [nGenParCounter] = 0;
+       gpStatus [nGp] = p.status();
+       gpCollId [nGp] = p.collisionId();
+       gpId     [nGp] = p.pdgId();
+       gpMomId  [nGp] = 0;
        if( p.numberOfMothers() > 0 )
-	 gpMomId[nGenParCounter] = p.mother()->pdgId();
+	 gpMomId[nGp] = p.mother()->pdgId();
        
-       nGenParCounter++;
-       if (nGenParCounter> nMaxGenPar-1) break;       
+       nGp++;
+       if (nGp> nMaxGenPar-1) break;       
      }
   }
   return (isMC_);

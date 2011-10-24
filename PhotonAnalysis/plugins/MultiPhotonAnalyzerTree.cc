@@ -22,7 +22,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Abe DeBenedetti,     University of Minnesota, US  
  * \author Rong-Shyang Lu,      National Taiwan University, TW
- * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.11 2011/10/18 12:38:56 kimy Exp $
+ * \version $Id: MultiPhotonAnalyzerTree.cc,v 1.12 2011/10/24 15:31:42 kimy Exp $
  *
  */
 
@@ -123,7 +123,6 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
    //  if (doStoreL1Trigger_) 	storeL1Trigger(e);
    //   if (doStoreHLT_) 	storeHLT(e);
    //  if (doStoreHF_)		storeHF(e);
-   //   analyzeMC(e,iSetup);
    //  if (doStoreVertex_)	storeVertex(e);
    //  if (doStoreMET_)	storeMET(e);
    //  if (doStoreJets_)	storeJets(e);
@@ -131,6 +130,7 @@ void MultiPhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup
 
    //   storeEvtPlane(e);
    
+   analyzeMC(e,iSetup);
    int foundPhotons = selectStorePhotons(e,iSetup,"");
    cout <<"Found photons? "<<foundPhotons<<endl;
    theTree->Fill();  
@@ -631,7 +631,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
     genTrkIsoDR04[nphotonscounter] = 99999.;
     
     if (isMC_) {
-       
+       cout <<"This is MC!"<<endl;
        edm::Handle<reco::GenParticleCollection> genParticles;
       
        //  get generated particles and store generator ntuple 
@@ -684,6 +684,7 @@ int MultiPhotonAnalyzerTree::selectStorePhotons(const edm::Event& e,const edm::E
 	 genMatchedPt [nphotonscounter]  = cndMc->pt();
 	 genMatchedEta[nphotonscounter]  = cndMc->eta();
 	 genMatchedPhi[nphotonscounter]  = cndMc->phi();
+	 cout <<"Matched!" << cndMc->pt()<<endl;
 	 
 	 genCalIsoDR03[nphotonscounter]= getGenCalIso(genParticles,matchedPart,0.3);
 	 genTrkIsoDR03[nphotonscounter]= getGenTrkIso(genParticles,matchedPart,0.3);
