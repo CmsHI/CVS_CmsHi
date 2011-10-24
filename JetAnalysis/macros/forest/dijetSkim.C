@@ -6,19 +6,15 @@
 
 // Example of forest skim
 
-void dijetSkim(bool pp = 1)
+void dijetSkim(const char* fname = "", const char* outname = "", bool pp = 1)
 {
 
    // Define the input file and HiForest
   HiForest *c;
 
-  if(pp){
-    c = new HiForest("/d100/yjlee/hiForest/merged_pp2760_AllPhysics_NoPhoyon_Prod02.root","ppForest",1);
-    c->SetOutputFile("skim_Dijet_pp2.root");
-  }else{
-    c = new HiForest("/d100/yjlee/hiForest/merged_HI2010_SD_Jet35_prod05_full.root");
-    c->SetOutputFile("skim_Dijet_PbPb.root");
-  }
+  c = new HiForest(fname,"myForest",pp,0,1);
+  c->SetOutputFile(outname);
+
 
   c->verbose = 1;
 
@@ -30,7 +26,7 @@ void dijetSkim(bool pp = 1)
   c->hasIcPu5JetTree = 0;
 
   if(pp){
-    c->sortJets(c->akPu3jetTree, c->akPu3PF, 2., 20, 1);
+     c->sortJets(c->akPu3jetTree, c->akPu3PF, 2., 0, 1);
   }else{
     c->sortJets(c->akPu3jetTree, c->akPu3PF, 2., 40, 1);
   }
@@ -43,7 +39,8 @@ void dijetSkim(bool pp = 1)
       c->GetEntry(i);
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries()<<endl;
       if(!c->selectEvent()) continue;
-      if(c->hasDiJet(c->akPu3PF)) c->FillOutput();
+      if(pp && c->hasDiJet(c->akPu3PF,70,0,1.)) c->FillOutput(); // Leave room for smearing
+      if(!pp && c->hasDiJet(c->akPu3PF)) c->FillOutput();
    }
 
    delete c;
