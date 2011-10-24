@@ -7,7 +7,27 @@ public:
    int index;
 };
 
+
 bool comparePt(JetIndex a, JetIndex b) {return a.pt > b.pt;}
+
+double getProjectedZ(double jetpt, double jeteta, double jetphi, double trackpt, double tracketa, double trackphi, double eventEta = 0){
+  
+  double jetetaB = jeteta - eventEta;
+  double tracketaB = tracketa - eventEta;
+
+  double thetaJt = 2*atan(exp(-jetetaB));
+  double thetaTr = 2*atan(exp(-tracketaB));
+
+  double dphi = trackphi - jetphi;
+  // angle between jet and track in dijet frame // Nooo - theta phi sit on curved space
+  //  double alpha = sqrt(fabs(thetaJt*thetaJt + thetaTr*thetaTr - 2* thetaTr*thetaJt*cos(dphi)));
+  double alpha = acos(cos(dphi)*sin(thetaJt)*sin(thetaTr)+cos(thetaJt)*cos(thetaTr));
+  double pJet = jetpt/sin(thetaJt);
+  double pTrack = trackpt/sin(thetaTr);
+  return pTrack*cos(alpha)/pJet;
+
+}
+
 
 
 namespace jetsmear{
@@ -98,7 +118,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
       }
 
       jetTree->SetAlias("AJ","(jtpt[Lead]-jtpt[SubLead])/(jtpt[Lead]+jtpt[SubLead])");
-
+      jetTree->SetAlias("dijetEta","(jteta[Lead]+jteta[SubLead])/2.");
    }
 
    vector<JetIndex> vecs;
@@ -171,6 +191,7 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 
    if(allEvents || currentEvent == 0){
 
+     if(0){
       jtChg = new Float_t[maxEntry];
       jtNeut = new Float_t[maxEntry];
       jtEM = new Float_t[maxEntry];
@@ -179,11 +200,14 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       jtNeutGen = new Float_t[maxEntry];
       jtEMGen = new Float_t[maxEntry];
 
+     
+
       jtPtMax = new Float_t[maxEntry];
       jtPtMean = new Float_t[maxEntry];
       jtPtMeanW = new Float_t[maxEntry];
 
       jtLeadType = new Int_t[maxEntry];
+     }
 
       tjDeltaEtaLead = new Float_t[maxEntryTrack];
       tjDeltaPhiLead = new Float_t[maxEntryTrack];
@@ -192,6 +216,26 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       tjDeltaEtaSubLead = new Float_t[maxEntryTrack];
       tjDeltaPhiSubLead = new Float_t[maxEntryTrack];
       zSubLead = new Float_t[maxEntryTrack];
+
+      zOldLead = new Float_t[maxEntryTrack];
+      zOldSubLead = new Float_t[maxEntryTrack];
+
+
+      zSingleLead = new Float_t[maxEntryTrack];
+      zLabLead = new Float_t[maxEntryTrack];
+
+      tjDeltaThetaLead = new Float_t[maxEntryTrack];
+      tjDeltaThetaLabLead = new Float_t[maxEntryTrack];
+      tjDeltaThetaSingleLead = new Float_t[maxEntryTrack];
+
+
+      zSingleSubLead = new Float_t[maxEntryTrack];
+      zLabSubLead = new Float_t[maxEntryTrack];
+
+      tjDeltaThetaSubLead = new Float_t[maxEntryTrack];
+      tjDeltaThetaLabSubLead = new Float_t[maxEntryTrack];
+      tjDeltaThetaSingleSubLead = new Float_t[maxEntryTrack];
+
 
       corrLead = new Float_t[maxEntryTrack];
       corrSubLead = new Float_t[maxEntryTrack];
@@ -214,6 +258,23 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       branches.push_back(trackTree->Branch("tjDetaSubLead",tjDeltaEtaSubLead,"tjDetaSubLead[nTrk]/F"));
       branches.push_back(trackTree->Branch("tjDphiSubLead",tjDeltaPhiSubLead,"tjDphiSubLead[nTrk]/F"));
       branches.push_back(trackTree->Branch("zSubLead",zSubLead,"zSubLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("zOldLead",zOldLead,"zOldLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("zOldSubLead",zOldSubLead,"zOldSubLead[nTrk]/F"));
+
+      branches.push_back(trackTree->Branch("zSingleLead",zSingleLead,"zSingleLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("zSingleSubLead",zSingleSubLead,"zSingleSubLead[nTrk]/F"));
+
+      branches.push_back(trackTree->Branch("zLabLead",zLabLead,"zLabLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("zLabSubLead",zSubLead,"zLabSubLead[nTrk]/F"));
+
+      branches.push_back(trackTree->Branch("tjDthetaLead",tjDeltaThetaLead,"tjDthetaLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("tjDthetaLabLead",tjDeltaThetaLabLead,"tjDthetaLabLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("tjDthetaSingleLead",tjDeltaThetaSingleLead,"tjDthetaSingleLead[nTrk]/F"));
+
+      branches.push_back(trackTree->Branch("tjDthetaSubLead",tjDeltaThetaSubLead,"tjDthetaSubLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("tjDthetaLabSubLead",tjDeltaThetaLabSubLead,"tjDthetaLabSubLead[nTrk]/F"));
+      branches.push_back(trackTree->Branch("tjDthetaSingleSubLead",tjDeltaThetaSingleSubLead,"tjDthetaSingleSubLead[nTrk]/F"));
+
 
       branches.push_back(trackTree->Branch("corrLead",corrLead,"corrLead[nTrk]/F"));
       branches.push_back(trackTree->Branch("corrSubLead",corrSubLead,"corrSubLead[nTrk]/F"));
@@ -246,6 +307,9 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       int cbin = hlt.hiBin;
       if(pp) cbin = 33;
 
+      double eventEta = 0;
+      if(hasDiJet(jets)) eventEta = (jets.jteta[jtLead]+jets.jteta[jtSubLead])/2.;
+
       for(int j = 0; j < jets.nref; ++j){
 	 for (int t = 0; t < track.nTrk; ++t) {
 
@@ -255,7 +319,9 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 	    if(j == jtLead){
 	       tjDeltaEtaLead[t] = track.trkEta[t] - jets.jteta[j];
 	       tjDeltaPhiLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
-	       zLead[t] = track.trkPt[t]/jetPt;
+
+	       zOldLead[t] = track.trkPt[t]/jetPt;
+	       zLead[t] = getProjectedZ(jetPt,jets.jteta[j],jets.jtphi[j],track.trkPt[t],track.trkEta[t],track.trkPhi[t],eventEta);
 	       //	       cout<<"jtpt : "<<jets.jtpt[j]<<"  spt : "<<jets.smpt[j]<<endl;
 
 	       corrLead[t] = trackCorrections[0]->GetCorr(track.trkPt[t],track.trkEta[t],jetPt,cbin,correctionFactors);
@@ -263,7 +329,8 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 	    if(j == jtSubLead){
 	       tjDeltaEtaSubLead[t] = track.trkEta[t] - jets.jteta[j];
                tjDeltaPhiSubLead[t] = deltaPhi(track.trkPhi[t],jets.jtphi[j]);
-               zSubLead[t] = track.trkPt[t]/jetPt;
+               zSubLead[t] = getProjectedZ(jetPt,jets.jteta[j],jets.jtphi[j],track.trkPt[t],track.trkEta[t],track.trkPhi[t],eventEta);
+               zOldSubLead[t] = track.trkPt[t]/jetPt;
                corrSubLead[t] = trackCorrections[1]->GetCorr(track.trkPt[t],track.trkEta[t],jetPt,cbin,correctionFactors);
 	    }
 	 }

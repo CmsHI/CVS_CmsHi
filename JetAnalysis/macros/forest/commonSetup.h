@@ -1,2 +1,2 @@
-#define maxEntry 1000
-#define maxEntryTrack 6000 
+#define maxEntry 100
+#define maxEntryTrack 200 

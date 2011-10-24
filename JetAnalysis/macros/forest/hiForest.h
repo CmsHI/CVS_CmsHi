@@ -44,6 +44,8 @@ class HiForest : public TNamed
   void GetEntry(int i);
   int  GetEntries();  						// Get the number of entries 
   void CheckTree(TTree *t,const char *title);				// Check the status of a tree
+
+  void CheckArraySizes();
   void PrintStatus();						// Print the status of the hiForest
   void SetOutputFile(const char *name);               		// Set output file name for skim
   void AddCloneTree(TTree* t, const char *dirName, const char *treeName);   // Add a clone tree to the clone forest
@@ -165,6 +167,22 @@ class HiForest : public TNamed
   Float_t* tjDeltaPhiSubLead;
   Float_t* zSubLead;
 
+  Float_t* zOldLead;
+  Float_t* zOldSubLead;
+
+  Float_t* zSingleLead;
+  Float_t* zLabLead;
+  Float_t* zSingleSubLead;
+  Float_t* zLabSubLead;
+  Float_t* tjDeltaThetaLead;
+  Float_t* tjDeltaThetaLabLead;
+  Float_t* tjDeltaThetaSingleLead;
+
+  Float_t* tjDeltaThetaSubLead;
+  Float_t* tjDeltaThetaLabSubLead;
+  Float_t* tjDeltaThetaSingleSubLead;
+
+
   Float_t* corrLead;
   Float_t* corrSubLead;
 
@@ -183,7 +201,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
    verbose(0),
    pp(ispp),
    mc(ismc),
-   nEntries(0)
+   nEntries(0),
+   currentEvent(0)
 {
   tree = new TTree("tree","");
   SetName(name);
@@ -272,18 +291,25 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
   PrintStatus();
 
   if(pp){
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf_j1"));
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf_j2"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
   }else{
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf_j1"));
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf_j2"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
+    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
   }
 
+
+  trackCorrections[0]->isLeadingJet_ = 1;
+  trackCorrections[1]->isLeadingJet_ = 0;
+
   for(int i = 0; i < trackCorrections.size(); ++i){
+
+    trackCorrections[i]->sampleMode_ = 1;
+    trackCorrections[i]->smoothLevel_ = 4;
     trackCorrections[i]->Init();
   }
 
-  currentEvent = 0;
+  CheckArraySizes();
 }
 
 HiForest::~HiForest()
@@ -329,6 +355,37 @@ void HiForest::CheckTree(TTree *t,const char *title)
     cout <<endl;
   }
 }
+
+
+void HiForest::CheckArraySizes(){
+
+  vector<int> trackOverflow(0);
+  vector<int> objectOverflow(0);
+
+  for(int ie = 0; ie < nEntries; ++ie){
+    GetEntry(ie);
+    if(track.nTrk > maxEntryTrack) trackOverflow.push_back(track.nTrk);
+    if(akPu3PF.nref > maxEntry) objectOverflow.push_back(akPu3PF.nref);
+    if(icPu5.nref > maxEntry) objectOverflow.push_back(icPu5.nref);
+  }
+
+  for(int i = 0; i < trackOverflow.size(); ++i){
+    cout<<trackOverflow[i]<<endl;
+  }
+
+  if(trackOverflow.size() == 0) cout<<"Track sizes OK"<<endl;
+  else cout<<"tracks crash"<<endl; // TODO : really crash
+
+  for(int i = 0; i < objectOverflow.size(); ++i){
+    cout<<objectOverflow[i]<<endl;
+  }
+
+  if(objectOverflow.size() == 0) cout<<"Object sizes OK"<<endl;
+  else cout<<"objects crash"<<endl; // TODO : really crash
+
+}
+
+
 
 void HiForest::PrintStatus()
 {
