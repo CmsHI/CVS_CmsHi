@@ -14,11 +14,11 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.12.2.3 2011/10/14 15:04:30 frankma Exp $
+// $Id: RecHitTreeProducer.cc,v 1.15 2011/10/14 15:06:14 frankma Exp $
 //
 //
 
-
+#define versionTag "v1"
 // system include files
 #include <memory>
 #include <vector>
@@ -487,7 +487,7 @@ void
 RecHitTreeProducer::beginJob()
 {
   
-  hbheTree = fs->make<TTree>("hbhe","");
+  hbheTree = fs->make<TTree>("hbhe",versionTag);
   hbheTree->Branch("n",&hbheRecHit.n,"n/I");
   hbheTree->Branch("e",hbheRecHit.e,"e[n]/F");
   hbheTree->Branch("et",hbheRecHit.et,"et[n]/F");
@@ -495,7 +495,7 @@ RecHitTreeProducer::beginJob()
   hbheTree->Branch("phi",hbheRecHit.phi,"phi[n]/F");
   hbheTree->Branch("isjet",hbheRecHit.isjet,"isjet[n]/O");
   
-  hfTree = fs->make<TTree>("hf","");
+  hfTree = fs->make<TTree>("hf",versionTag);
   hfTree->Branch("n",&hfRecHit.n,"n/I");
   hfTree->Branch("e",hfRecHit.e,"e[n]/F");
   hfTree->Branch("et",hfRecHit.et,"et[n]/F");
@@ -504,7 +504,7 @@ RecHitTreeProducer::beginJob()
   hfTree->Branch("depth",hfRecHit.depth,"depth[n]/I");
   hfTree->Branch("isjet",hfRecHit.isjet,"isjet[n]/O");
 
-  eeTree = fs->make<TTree>("ee","");
+  eeTree = fs->make<TTree>("ee",versionTag);
   eeTree->Branch("n",&eeRecHit.n,"n/I");
   eeTree->Branch("e",eeRecHit.e,"e[n]/F");
   eeTree->Branch("et",eeRecHit.et,"et[n]/F");
@@ -512,7 +512,7 @@ RecHitTreeProducer::beginJob()
   eeTree->Branch("phi",eeRecHit.phi,"phi[n]/F");
   eeTree->Branch("isjet",eeRecHit.isjet,"isjet[n]/O");
  
-  ebTree = fs->make<TTree>("eb","");
+  ebTree = fs->make<TTree>("eb",versionTag);
   ebTree->Branch("n",&ebRecHit.n,"n/I");
   ebTree->Branch("e",ebRecHit.e,"e[n]/F");
   ebTree->Branch("et",ebRecHit.et,"et[n]/F");
@@ -520,7 +520,7 @@ RecHitTreeProducer::beginJob()
   ebTree->Branch("phi",ebRecHit.phi,"phi[n]/F");
   ebTree->Branch("isjet",ebRecHit.isjet,"isjet[n]/O");
 
-  towerTree = fs->make<TTree>("tower","");
+  towerTree = fs->make<TTree>("tower",versionTag);
   towerTree->Branch("n",&myTowers.n,"n/I");
   towerTree->Branch("e",myTowers.e,"e[n]/F");
   towerTree->Branch("et",myTowers.et,"et[n]/F");
@@ -536,7 +536,7 @@ RecHitTreeProducer::beginJob()
 
 
   if(doBasicClusters_){
-     bcTree = fs->make<TTree>("bc","");
+     bcTree = fs->make<TTree>("bc",versionTag);
      bcTree->Branch("n",&myBC.n,"n/I");
      bcTree->Branch("e",myBC.e,"e[n]/F");
      bcTree->Branch("et",myBC.et,"et[n]/F");
@@ -549,7 +549,7 @@ RecHitTreeProducer::beginJob()
   }
 
   if(doFastJet_){
-     bkgTree = fs->make<TTree>("bkg","");
+     bkgTree = fs->make<TTree>("bkg",versionTag);
      bkgTree->Branch("n",&bkg.n,"n/I");
      bkgTree->Branch("rho",bkg.rho,"rho[n]/F");
      bkgTree->Branch("sigma",bkg.sigma,"sigma[n]/F");
