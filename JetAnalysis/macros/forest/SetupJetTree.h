@@ -21,7 +21,6 @@ class Jets
   float smpt[maxEntry];
   
   int ngen;
-  int bin;
   float genpt[maxEntry];
   float geneta[maxEntry];
   float genphi[maxEntry];
@@ -30,7 +29,6 @@ class Jets
 void setupJetTree(TTree *t, Jets &jets)
 {
   t->SetBranchAddress("nref",&jets.nref);
-  t->SetBranchAddress("bin",&jets.bin);
   t->SetBranchAddress("rawpt",jets.rawpt);
   t->SetBranchAddress("jtpt",jets.jtpt);
   t->SetBranchAddress("jteta",jets.jteta);
