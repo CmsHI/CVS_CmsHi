@@ -1,5 +1,7 @@
 
 //#include "JetSmear.h"
+#include "TRandom.h"
+#include "TMath.h"
 
 class JetIndex{
 public:
@@ -34,9 +36,11 @@ namespace jetsmear{
   static const double par0[3] = {0.0313613,0.00878359,0.0248872};
   static const double par1[3] = {1.55023,1.48813,1.41283};
   static const double par2[3] = {1.91448,0.607755,0};  
-  static const double  factorDiff[3] = {0.830665,0.954202,1.03942};
-  static const double  factorSum[3] = {1.99776,1.87422,1.78901};
-  
+  //  static const double  factorDiff[3] = {0.830665,0.954202,1.03942};
+  //  static const double  factorSum[3] = {1.99776,1.87422,1.78901};
+  static const double  factorDiff[3] = {1.,1.,1.};
+  static const double  factorSum[3] = {1.,1.,1.};
+
   class JetResolution{
   public:
     JetResolution(){
@@ -49,7 +53,9 @@ namespace jetsmear{
 	fReso[i]->SetParameter(1,par1[i]);
 	fReso[i]->SetParameter(2,par2[i]);
       }
-      
+
+      random = new TRandom();
+      pi = TMath::Pi();      
       fGauss = new TF1("fGauss","gaus(0)",-3,3);
       fGauss->SetParameter(0,1);
       fGauss->SetParameter(1,0);
@@ -62,7 +68,7 @@ namespace jetsmear{
     int roll(){
       bin = floor(fCentrality->GetRandom());
       if(bin == 3) bin = 2;
-
+      phi0 = pi*(random->Uniform());
       sum = factorSum[bin]*fGauss->GetRandom();
       diff = factorDiff[bin]*fGauss->GetRandom();
 
@@ -80,18 +86,23 @@ namespace jetsmear{
     double getFluct(Jets jets, int j){
       double pt = jets.jtpt[j];
       double fluct = getFluct1(pt);
-      if(fabs(deltaPhi(jets.jtphi[j],jets.jtphi[0])) > 0.157079632) fluct = getFluct2(pt);
+      double dphi0 = fabs(deltaPhi(jets.jtphi[j],phi0));
+      if(dphi0 >= pi/4. && dphi0 <= 3.*pi/4.) fluct = getFluct2(pt);
       return pt*fluct;
     }
 
     TF1* fReso[3];
     TF1* fGauss;
     TF1* fCentrality;
+    TRandom* random;
+
     int bin;    
     double sum;
     double diff;
     double fluct1;
     double fluct2;
+    double pi;
+    double phi0;
 
   };
 }

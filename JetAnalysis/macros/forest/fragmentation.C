@@ -10,7 +10,7 @@
 #include <string>
 using namespace std;
 static const bool christof = 0;
-static const bool centralOnly = 1;
+static const bool centralOnly = 0;
 
 void scaleAlongX(TH2* h,int bin, double a, double ea){
 
@@ -61,7 +61,7 @@ void getProjections(TH2* h1, TH1D*& xsi1,TH1D*& norm1, const char* label = "",in
 void plotXsi(int centIndex = 0, int etaBin = 0){
 
   bool remake = 1;
-  bool shortCut = 1;
+  bool shortCut = 0;
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
@@ -177,7 +177,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
    int NxsiBin = 20;
 
    HiForest * t;
-   t = new HiForest("/Users/yetkinyilmaz/analysis/forest_d20101017/skim_Dijet_PbPb.root");
+   t = new HiForest("/Users/yetkinyilmaz/analysis/forest_d20101025/skim_Dijet_PbPb1.root");
    outf->cd();
 
    TCut evtSel(t->eventSelection());
@@ -574,10 +574,11 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
 
 void fragmentation(){
 
-  for(int i = 0; i < 1; ++i){
+  for(int i = 0; i < 4; ++i){
     if(centralOnly){
       plotXsi(0,i);
     }else{
+      plotXsi(0,i);
       plotXsi(1,i);
       plotXsi(2,i);
     }

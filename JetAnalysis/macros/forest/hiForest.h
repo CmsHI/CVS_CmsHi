@@ -17,19 +17,6 @@
 #include <TF1.h>
 #include <TCut.h>
 
-
-#define CMSSW 1
-#ifdef CMSSW
-
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-
-#else
-#include "DummyJetCorrector.h"
-#endif
-
-
 // ==========================================================
 // Main class which can be used to read the hiForest trees
 //
@@ -50,7 +37,7 @@ class HiForest : public TNamed
 {
 
   public: 
-   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0, bool isrecorrected = 0);
+   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0);
   ~HiForest();
 
   // Utility functions
@@ -146,7 +133,6 @@ class HiForest : public TNamed
   bool verbose;
   bool pp;
   bool mc;
-  bool doJetCorrection;
 
   // Extra variables
   Float_t* towerEt;
@@ -196,14 +182,12 @@ class HiForest : public TNamed
   Float_t* tjDeltaThetaLabSubLead;
   Float_t* tjDeltaThetaSingleSubLead;
 
+
   Float_t* corrLead;
   Float_t* corrSubLead;
 
   int nEntries;
   int currentEvent;
-
-  vector<JetCorrectorParameters> vpar_HI310x;
-  FactorizedJetCorrector *_JEC_HI310X;
 
   vector<TrackingCorrections*> trackCorrections;
 
@@ -211,7 +195,7 @@ class HiForest : public TNamed
 
 };
 
-HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, bool recjec):
+HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc):
    tree(0),
    fGauss(0),
    verbose(0),
@@ -238,12 +222,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::ak3PF].data()));
   }else{
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
-    if(recjec){
-       akPu3jetTree = (TTree*) inf->Get(Form("%s/t",(names::AlgoAnalyzer[names::akPu3PF]+"_recorrected").data()));
-       cout<<"HEEY, the jets are: "<<akPu3jetTree->GetName()<<endl;
-    }else{
-       akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
-    }
+    akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
   }
 
   // Check the validity of the trees.
@@ -311,33 +290,6 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Print the status of thre forest
   PrintStatus();
 
-
-  // Setup Jet Corrections
-  string prestring399x = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_9_patch1/src/CondFormats/JetMETObjects/data/HI_PFTowers_hiGoodTightTracks_D6T_399_v2";
-
-  string prestring399y = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_4_1_3_patch2/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_399";
-
-  string prestring399 = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_9_patch1/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_399";
-
-  string prestring413 = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_4_1_3_patch2/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_413";
-
-  string L2Name = "", L3Name = "";
-
-  L2Name = prestring399 + "_L2Relative_AK3PF.txt";
-  L3Name = prestring399 + "_L3Absolute_AK3PF.txt";
-  
-  cout<<"a"<<endl;
-  vpar_HI310x.push_back(JetCorrectorParameters(L2Name.data()));
-  cout<<"b"<<endl;
-
-  vpar_HI310x.push_back(JetCorrectorParameters(L3Name.data()));
-  cout<<"c"<<endl;
-
-  _JEC_HI310X = new FactorizedJetCorrector(vpar_HI310x);
-  doJetCorrection = 1;
-  cout<<"d"<<endl;
-
-  // Setup Track Corrections
   if(pp){
     trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
     trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
@@ -345,6 +297,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
     trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
   }
+
 
   trackCorrections[0]->isLeadingJet_ = 1;
   trackCorrections[1]->isLeadingJet_ = 0;
@@ -356,7 +309,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     trackCorrections[i]->Init();
   }
 
-  //  CheckArraySizes();
+  CheckArraySizes();
 }
 
 HiForest::~HiForest()
@@ -452,15 +405,13 @@ void HiForest::SetOutputFile(const char *name)
   outf = new TFile(name,"recreate");
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
-
-     if(pp){
-	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
-     }else{
-	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
-     }
-
+  if(pp){
+    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
+  }else{
+    if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
+    if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
+  }
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "NTuples",            "Analysis");
   if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
