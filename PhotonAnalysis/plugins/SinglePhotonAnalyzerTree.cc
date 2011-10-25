@@ -23,7 +23,7 @@
  * \author Shin-Shan Eiko Yu,   National Central University, TW
  * \author Rong-Shyang Lu,      National Taiwan University, TW
  *
- * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.8 2011/10/24 16:13:19 yjlee Exp $
+ * \version $Id: SinglePhotonAnalyzerTree.cc,v 1.9 2011/10/24 22:08:47 yjlee Exp $
  *
  */
 // This was modified to fit with Heavy Ion collsion by Yongsun Kim ( MIT)                                                                                                
@@ -261,7 +261,7 @@ void SinglePhotonAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetu
 
 void SinglePhotonAnalyzerTree::beginJob() {
    //   centrality_=0;
-   theTree  = fs->make<TTree>("photon","Tree of photons");
+   theTree  = fs->make<TTree>("photon","v1");
    int run;
    int evt;
    int bunchCrossing;
@@ -275,9 +275,11 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("pt",pt,"pt[nPhotons]/F");
    theTree->Branch("energy",energy,"energy[nPhotons]/F");
    theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPhotons]/F");
+/*
    theTree->Branch("px",px,"px[nPhotons]/F");
    theTree->Branch("py",py,"py[nPhotons]/F");
    theTree->Branch("pz",pz,"pz[nPhotons]/F");
+*/
    theTree->Branch("eta",eta,"eta[nPhotons]/F");
    theTree->Branch("phi",phi,"phi[nPhotons]/F");
    theTree->Branch("r9",r9,"r9[nPhotons]/F");
@@ -331,10 +333,10 @@ void SinglePhotonAnalyzerTree::beginJob() {
    theTree->Branch("seedOutOfTimeChi2",seedOutOfTimeChi2,"seedOutOfTimeChi2[nPhotons]/F");
    theTree->Branch("seedRecoFlag",seedRecoFlag,"seedRecoFlag[nPhotons]/F");
    theTree->Branch("seedSeverity",seedSeverity,"seedSeverity[nPhotons]/F");
-   theTree->Branch("tRight",tRight,"tRight[nPhotons]/F");
-   theTree->Branch("tLeft",tLeft,"tLeft[nPhotons]/F");
-   theTree->Branch("tTop",tTop,"tTop[nPhotons]/F");
-   theTree->Branch("tBottom",tBottom,"tBottom[nPhotons]/F");
+//   theTree->Branch("tRight",tRight,"tRight[nPhotons]/F");
+//   theTree->Branch("tLeft",tLeft,"tLeft[nPhotons]/F");
+//   theTree->Branch("tTop",tTop,"tTop[nPhotons]/F");
+//   theTree->Branch("tBottom",tBottom,"tBottom[nPhotons]/F");
    theTree->Branch("swissCrx",swissCrx,"swissCrx[nPhotons]/F");
    theTree->Branch("hadronicOverEm",hadronicOverEm,"hadronicOverEm[nPhotons]/F");
    theTree->Branch("hadronicDepth1OverEm",hadronicDepth1OverEm,"hadronicDepth1OverEm[nPhotons]/F");
