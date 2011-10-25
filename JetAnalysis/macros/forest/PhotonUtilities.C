@@ -1,6 +1,6 @@
 bool HiForest::isSpike(int j)
 {
-   if (fabs(photon.eta[j])<1.479) {
+   if (photon.isEB[j]) {
       double swiss = 1-(photon.eRight[j]+photon.eLeft[j]+photon.eTop[j]+photon.eBottom[j])/photon.eMax[j];
       if (swiss>0.9) return 1;
       if (fabs(photon.seedTime[j])>3) return 1;
@@ -12,7 +12,7 @@ bool HiForest::isSpike(int j)
 bool HiForest::isGoodPhoton(int j)
 {
 
-   if (fabs(photon.eta[j])<1.479) {
+   if (photon.isEB[j]) {
       // Barrel photon                                                                                                                                                                   
       if (photon.hadronicOverEm[j]>0.2) return 0;
       if (photon.isEle[j]) return 0;

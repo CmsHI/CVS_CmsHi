@@ -18,7 +18,7 @@
 #include <TCut.h>
 
 
-//#define CMSSW 1
+#define CMSSW 1
 #ifdef CMSSW
 
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
@@ -313,12 +313,18 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
 
 
   // Setup Jet Corrections
-  string prestring3 = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_9_patch1//src/CondFormats/JetMETObjects/data/HI_PFTowers_hiGoodTightTracks_D6T_399_v2";
+  string prestring399x = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_9_patch1/src/CondFormats/JetMETObjects/data/HI_PFTowers_hiGoodTightTracks_D6T_399_v2";
+
+  string prestring399y = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_4_1_3_patch2/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_399";
+
+  string prestring399 = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_3_9_9_patch1/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_399";
+
+  string prestring413 = "/net/hidsk0001/d00/scratch/mnguyen/CMSSW_4_1_3_patch2/src/macros/JEC/data/HI_PFTowers_hiGoodTightTracks_D6T_413";
 
   string L2Name = "", L3Name = "";
 
-  L2Name = prestring3 + "_L2Relative_AK3PF.txt";
-  L3Name = prestring3 + "_L3Absolute_AK3PF.txt";
+  L2Name = prestring399 + "_L2Relative_AK3PF.txt";
+  L3Name = prestring399 + "_L3Absolute_AK3PF.txt";
   
   cout<<"a"<<endl;
   vpar_HI310x.push_back(JetCorrectorParameters(L2Name.data()));
