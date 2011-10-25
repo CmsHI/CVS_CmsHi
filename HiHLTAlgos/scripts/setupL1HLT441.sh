@@ -1,6 +1,7 @@
 #/bin/bash -
 # l1/HLT menu tags
-cvs co -r V12-03-18     HLTrigger/Configuration
+#cvs co -r V12-03-18     HLTrigger/Configuration
+cvs co -r V12-03-21     HLTrigger/Configuration
 cvs co -r V03-00-07     L1TriggerConfig/L1GtConfigProducers
 
 # get hlt menu
