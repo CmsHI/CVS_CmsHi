@@ -147,6 +147,7 @@ class HiForest : public TNamed
   bool pp;
   bool mc;
   bool doJetCorrection;
+  bool doTrackCorrections;
 
   // Extra variables
   Float_t* towerEt;
@@ -224,6 +225,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   SetName(name);
   // Input file
   inf = TFile::Open(infName);
+
+  doTrackCorrections = false;
 
   // Load trees. Hard coded for the moment
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
@@ -338,24 +341,26 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   cout<<"d"<<endl;
 
   // Setup Track Corrections
-  if(pp){
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
-  }else{
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
-    trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
+  if(doTrackCorrections){
+    if(pp){
+      trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
+      trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf"));
+    }else{
+      trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
+      trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf"));
+    }
+    
+    trackCorrections[0]->isLeadingJet_ = 1;
+    trackCorrections[1]->isLeadingJet_ = 0;
+    
+    for(int i = 0; i < trackCorrections.size(); ++i){
+      
+      trackCorrections[i]->sampleMode_ = 1;
+      trackCorrections[i]->smoothLevel_ = 4;
+      trackCorrections[i]->Init();
+    }
   }
-
-  trackCorrections[0]->isLeadingJet_ = 1;
-  trackCorrections[1]->isLeadingJet_ = 0;
-
-  for(int i = 0; i < trackCorrections.size(); ++i){
-
-    trackCorrections[i]->sampleMode_ = 1;
-    trackCorrections[i]->smoothLevel_ = 4;
-    trackCorrections[i]->Init();
-  }
-
+  
   //  CheckArraySizes();
 }
 
