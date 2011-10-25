@@ -202,7 +202,7 @@ process.patPhotons.addPhotonID = cms.bool(False)
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(3)
-process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
+process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(15)
 process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer +
                                       process.multiPhotonAnalyzer + process.anaTrack + process.pfcandAnalyzer
                                       + process.met * process.anaMET
