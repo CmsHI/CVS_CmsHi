@@ -16,31 +16,36 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-process.load('HLTrigger.Configuration.HLT_HIon_data_cff')
+#process.load('HLTrigger.Configuration.HLT_HIon_data_cff')
+process.load('HLTrigger.Configuration.HLT_HIon_Jet_data_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5)
+    input = cms.untracked.int32(1000)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring(
-    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/0EDFD1BD-C9AE-E011-963E-003048CB82AC.root'
-    'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_mctag_5evt.root'
+    'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/0EDFD1BD-C9AE-E011-963E-003048CB82AC.root',
+    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/B03AE47D-C2AE-E011-A408-003048CB96F8.root',
+    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/F8A193D3-C2AE-E011-8D37-003048CF667C.root',
+    'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/AA944F78-C2AE-E011-8D7D-003048CB87A6.root',
+    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/50D1C4BF-C3AE-E011-931A-003048CF6578.root'
+    #'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_mctag_5evt.root'
     )
 )
-newSource = True
-doL1Emul = False
-doL1Xml = True
+newSource = False
+doL1Emul = True
+doL1Xml = False # the new HIon cff contains the customization to use xml
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -70,7 +75,8 @@ process.GlobalTag.globaltag = 'START44_V6::All'
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
-process.endjob_step = cms.EndPath(process.endOfProcess)
+#process.endjob_step = cms.EndPath(process.endOfProcess)
+process.endjob_step = cms.EndPath()
 
 # Schedule definition
 process.schedule = cms.Schedule()
