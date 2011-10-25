@@ -129,10 +129,13 @@ process.ak5patJets = process.akPu5PFpatJets.clone(
 	    
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.icPu5JetAnalyzer.isMC   = cms.untracked.bool(True)
+process.akPu3PFJetAnalyzer.isMC = cms.untracked.bool(True)
+
 process.ak5CaloJetAnalyzer = process.icPu5JetAnalyzer.clone(
     jetTag = 'ak5patJets',
     genjetTag = 'ak5HiGenJets',
-    isMC = False
+    isMC = True
     )
 
 process.ak3PFJetsX = process.akPu3PFJets.clone(doPUOffsetCorr = False)
@@ -147,7 +150,7 @@ process.ak3patJetsX = process.akPu5PFpatJets.clone(
 process.ak3PFJetAnalyzer = process.icPu5JetAnalyzer.clone(
     jetTag = 'ak3patJetsX',
     genjetTag = 'ak3HiGenJets',
-    isMC = False
+    isMC = True
     )
 
 process.ak5extra = cms.Sequence(process.ak5CaloJets*process.ak5corr*process.ak5patJets*process.ak5CaloJetAnalyzer)
@@ -194,7 +197,8 @@ process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process
 process.gen_step          = cms.Path( process.hiGenParticles * process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
 process.pat_step          = cms.Path( process.icPu5patSequence + process.akPu3PFpatSequence + process.akPu5PFpatSequence + process.makeHeavyIonPhotons)
 process.pat_step.remove(process.interestingTrackEcalDetIds)
-process.pat_step.remove(process.photonMatch)
+process.photonMatch.matched = cms.InputTag("hiGenParticles")
+#process.pat_step.remove(process.photonMatch)
 #+ process.patPhotons)
 
 process.patPhotons.addPhotonID = cms.bool(False)
@@ -220,9 +224,7 @@ process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
-enableDataPat(process)
 setPhotonObject(process,"cleanPhotons")
-enableDataAnalyzers(process)
 
 process.load("HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi")
 
