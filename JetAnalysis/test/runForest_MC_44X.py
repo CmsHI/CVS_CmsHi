@@ -240,11 +240,11 @@ process.pAna = cms.EndPath(process.skimanalysis)
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
   
-process.rechitanalyzer.HBHETreePtMin = cms.untracked.double(2)
-process.rechitanalyzer.HFTreePtMin = cms.untracked.double(2)
-process.rechitanalyzer.EBTreePtMin = cms.untracked.double(2)
-process.rechitanalyzer.EETreePtMin = cms.untracked.double(2)
-process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(2)
+process.rechitanalyzer.HBHETreePtMin = cms.untracked.double(4)
+process.rechitanalyzer.HFTreePtMin = cms.untracked.double(4)
+process.rechitanalyzer.EBTreePtMin = cms.untracked.double(4)
+process.rechitanalyzer.EETreePtMin = cms.untracked.double(4)
+process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(4)
    
 process.rechitAna = cms.Path(process.rechitanalyzer)
 
