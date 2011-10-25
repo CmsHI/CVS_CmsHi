@@ -231,7 +231,7 @@ process.hltanalysis = process.hltbitanalysis.clone()
 #process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
 process.skimanalysis = process.hltanalysis.clone(
     HLTProcessName                  = cms.string("JetAna"),
-    hltresults                      = cms.InputTag("TriggerResults::JetAna")
+    hltresults                      = cms.InputTag("TriggerResults::hiForestAna")
     )
 process.hlt = cms.Path(process.hltanalysis)
 process.pAna = cms.EndPath(process.skimanalysis)
