@@ -99,7 +99,7 @@ def customiseL1Menu(process):
     elif l1MenuSource == 'xmlFile' :
         # the menu will be read from an XML file instead of the global tag - must copy the file in luminosityDirectory
         luminosityDirectory = "startup"
-        #useXmlFile = 'L1Menu_Collisions2011_v4_L1T_Scales_20101224_Imp0_0x1022.xml'
+        # useXmlFile = 'L1Menu_Collisions2011_v4_L1T_Scales_20101224_Imp0_0x1022.xml'
         useXmlFile = 'L1Menu_CollisionsHeavyIons2011_v0_L1T_Scales_20101224_Imp0_0x1026.xml'
 
     else :
@@ -186,12 +186,17 @@ def customiseL1EmulatorFromRaw(process):
         cms.InputTag('hcalDigis'),
         cms.InputTag('hcalDigis')
     )
-
-    process.simDtTriggerPrimitiveDigis.digiTag = 'muonDTDigis'
+    process.simCsctfTrackDigis.SectorProcessor.initializeFromPSet = cms.bool(True)
+    process.simCsctfTrackDigis.SectorProcessor.PTLUT.PtMethod     = cms.untracked.uint32(4) #PTLUTs 2010
+    process.simCsctfTrackDigis.SectorReceiverInput                = cms.untracked.InputTag("csctfDigis","")
     process.simCscTriggerPrimitiveDigis.CSCComparatorDigiProducer = cms.InputTag( 'muonCSCDigis', 'MuonCSCComparatorDigi' )
     process.simCscTriggerPrimitiveDigis.CSCWireDigiProducer       = cms.InputTag( 'muonCSCDigis', 'MuonCSCWireDigi' )
-    process.simRpcTriggerDigis.label         = 'muonRPCDigis'
-    process.simRpcTechTrigDigis.RPCDigiLabel = 'muonRPCDigis'
+
+    process.simDtTriggerPrimitiveDigis.digiTag = 'muonDTDigis'
+    process.simDttfDigis.DTDigi_Source         = 'dttfDigis'#'simDtTriggerPrimitiveDigis'
+    
+    process.simRpcTriggerDigis.label           = 'muonRPCDigis'
+    process.simRpcTechTrigDigis.RPCDigiLabel   = 'muonRPCDigis'
 
     return process
 
