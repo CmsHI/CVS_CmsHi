@@ -22,30 +22,30 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring(
-    'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/0EDFD1BD-C9AE-E011-963E-003048CB82AC.root',
+    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/0EDFD1BD-C9AE-E011-963E-003048CB82AC.root',
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/B03AE47D-C2AE-E011-A408-003048CB96F8.root',
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/F8A193D3-C2AE-E011-8D37-003048CF667C.root',
-    'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/AA944F78-C2AE-E011-8D7D-003048CB87A6.root',
+    #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/AA944F78-C2AE-E011-8D7D-003048CB87A6.root',
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/50D1C4BF-C3AE-E011-931A-003048CF6578.root'
-    #'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_mctag_5evt.root'
+    'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_officialL1Menu_mctag_100.root'
     )
 )
-newSource = False
-doL1Emul = True
+newSource = True
+doL1Emul = False
 doL1Xml = False # the new HIon cff contains the customization to use xml
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.1 $'),
+    version = cms.untracked.string('$Revision: 1.2 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -69,8 +69,8 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 #process.GlobalTag.globaltag = 'GR_R_44_V5::All'
 #process.GlobalTag.globaltag = 'GR_R_44_V5::All'
 process.GlobalTag.globaltag = 'START44_V6::All'
-#process.GlobalTag.toGet = cms.VPSet()
-#process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
+process.GlobalTag.toGet = cms.VPSet()
+process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
