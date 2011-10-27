@@ -59,7 +59,6 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 process.GlobalTag.globaltag = 'START44_V6::All'
 # customise globaltag
 process.GlobalTag.toGet = cms.VPSet()
-#process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
 # Analyzers
