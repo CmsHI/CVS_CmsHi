@@ -21,7 +21,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(5)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
@@ -36,7 +36,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.341 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('l1EmulatorFromRawRepackRaw nevts:10'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -63,7 +63,7 @@ process.FEVTDEBUGHLToutput.outputCommands.extend(['drop FEDRawDataCollection_sou
 #process.GlobalTag.globaltag = 'GR_R_44_V5::All'
 process.GlobalTag.globaltag = 'START44_V6::All'
 #process.GlobalTag.toGet = cms.VPSet()
-#process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_Collisions2011_v5_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
+process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -104,7 +104,7 @@ from L1Trigger.Configuration.customise_l1EmulatorFromRaw import customise
 process = customise(process)
 
 # set l1 menu from xml
-import L1Trigger.Configuration.L1Trigger_custom
-process = L1Trigger.Configuration.L1Trigger_custom.customiseL1Menu( process )
+#import L1Trigger.Configuration.L1Trigger_custom
+#process = L1Trigger.Configuration.L1Trigger_custom.customiseL1Menu( process )
 
 # End of customisation functions
