@@ -62,7 +62,7 @@ process.FEVTDEBUGHLToutput.outputCommands.extend(['drop FEDRawDataCollection_sou
 # Other statements
 #process.GlobalTag.globaltag = 'GR_R_44_V5::All'
 process.GlobalTag.globaltag = 'START44_V6::All'
-#process.GlobalTag.toGet = cms.VPSet()
+process.GlobalTag.toGet = cms.VPSet()
 process.GlobalTag.toGet.append(cms.PSet(tag=cms.string("L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc"),record=cms.string("L1GtTriggerMenuRcd"),connect=cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_L1T"),))
 
 # Path and EndPath definitions
