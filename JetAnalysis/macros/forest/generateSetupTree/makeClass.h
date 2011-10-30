@@ -78,10 +78,11 @@ static TString R__GetBranchPointerName(TLeaf *leaf)
 }
 
 
-Int_t makeClass(TTree *fTree, const char *className, const char *option)
+Int_t makeClass(TTree *fTree, const char *className, const char *option, double safety = 2)
 {
    TString opt = option;
    vector<TString> dimArray;
+   vector<Int_t> dimSize;
    opt.ToLower();
    // Connect output files
    if (!className) className = fTree->GetName();
@@ -127,6 +128,7 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
    }
    fprintf(fp,"//////////////////////////////////////////////////////////\n");
    fprintf(fp,"#include \"commonSetup.h\"\n");
+   fprintf(fp,"#include <iostream>\n");
    fprintf(fp,"#include <TROOT.h>\n");
    fprintf(fp,"#include <TChain.h>\n");
    fprintf(fp,"#include <TFile.h>\n");
@@ -378,17 +380,23 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
          }
          if (dimensions) {
 	    TString h(leafcountName);
-	    if (!findInArray(dimArray,h)) dimArray.push_back(h);
+	    if (!findInArray(dimArray,h)) {
+	       dimArray.push_back(h);
+	       dimSize.push_back(len*safety);
+	    }
 	    if (kmax) fprintf(fp,"   %-14s %s%s[kMax%s]%s;   //[%s]\n",leaf->GetTypeName(), stars,
                               branchname,blen,dimensions,leafcountName);
             else      fprintf(fp,"   %-14s %s%s[%d]%s;   //[%s]\n",leaf->GetTypeName(), stars,
-                              branchname,len,dimensions,leafcountName);
+                              branchname,len*2,dimensions,leafcountName);
             delete [] dimensions;
          } else {
 	    TString h(leafcountName);
-	    if (!findInArray(dimArray,h)) dimArray.push_back(h);
+	    if (!findInArray(dimArray,h)) {
+	       dimArray.push_back(h);
+	       dimSize.push_back(len*safety);
+	    }
             if (kmax) fprintf(fp,"   %-14s %s%s[kMax%s];   //[%s]\n",leaf->GetTypeName(), stars, branchname,blen,leafcountName);
-            else      fprintf(fp,"   %-14s %s%s[%d];   //[%s]\n",leaf->GetTypeName(), stars, branchname,len,leafcountName);
+            else      fprintf(fp,"   %-14s %s%s[%d];   //[%s]\n",leaf->GetTypeName(), stars, branchname,len*2,leafcountName);
          }
          if (stars[0]=='*') {
             TNamed *n;
@@ -423,7 +431,7 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
 //======================================================================================================
 // generate code for setup function, first pass = get branch pointer
 //======================================================================================================
-   fprintf(fp,"void setup%sTree(TTree *t,%s &t%s)\n",classNameOld,className,className);
+   fprintf(fp,"void setup%sTree(TTree *t,%s &t%s,bool doCheck = 0)\n",classNameOld,className,className);
    fprintf(fp,"{\n");
    if (mustInit.Last()) {
       TIter next(&mustInit);
@@ -510,13 +518,16 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
                            branch->GetName(), className, branchname, className, R__GetBranchPointerName(leaf).Data());
    }
 
+   fprintf(fp,"   if (doCheck) {\n");
+   for (int i=0;i<dimArray.size();i++)
+   {
+       fprintf(fp,"      if (t->GetMaximum(\"%s\")>%d) cout <<\"FATAL ERROR: Arrary size of %s too small!!!  \"<<t->GetMaximum(\"%s\")<<endl;\n",dimArray[i].Data(),dimSize[i],dimArray[i].Data(),dimArray[i].Data());
+   }
+   fprintf(fp,"   }\n");
+  
    fprintf(fp,"}\n");
    fprintf(fp,"\n");
 
-   for (int i=0;i<dimArray.size();i++)
-   {
-     cout <<dimArray[i]<<endl;
-   }
 
    delete [] leafStatus;
    fclose(fp);

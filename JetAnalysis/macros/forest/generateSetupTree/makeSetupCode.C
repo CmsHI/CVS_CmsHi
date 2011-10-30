@@ -15,6 +15,7 @@ void makeSetupCode(char *infname = "../merged_HI2010_SD_Jet35_prod05_full.root")
 
   Int_t phfCoincFilter;
   Int_t ppurityFractionFilter;
+
   // Add Dummy for skimTree
   if (skimTree)
   {
@@ -22,6 +23,12 @@ void makeSetupCode(char *infname = "../merged_HI2010_SD_Jet35_prod05_full.root")
      skimTree->Branch("ppurityFractionFilter",&ppurityFractionFilter,"ppurityFractionFilter/I");
   }
 
+  // hack for jet tree
+  Float_t smpt[1000];
+  if (jetTree) {
+     jetTree->Branch("smpt",smpt,"smpt[nref]/F");
+  }
+  
   if (hltTree) makeClass(hltTree,"Hlt","");
   if (skimTree) makeClass(skimTree,"Skim","");
   if (photonTree) makeClass(photonTree,"Photon","");
