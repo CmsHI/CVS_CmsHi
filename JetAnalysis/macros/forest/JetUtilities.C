@@ -202,7 +202,7 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 
    if(allEvents || currentEvent == 0){
 
-     if(0){
+     if(1){
       jtChg = new Float_t[maxEntry];
       jtNeut = new Float_t[maxEntry];
       jtEM = new Float_t[maxEntry];
@@ -250,7 +250,6 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 
       corrLead = new Float_t[maxEntryTrack];
       corrSubLead = new Float_t[maxEntryTrack];
-
 
       branches.push_back(jetTree->Branch("jtChg",jtChg,"jtChg[nref]/F"));
       branches.push_back(jetTree->Branch("jtNeut",jtNeut,"jtNeut[nref]/F"));
@@ -322,6 +321,17 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       if(hasDiJet(jets)) eventEta = (jets.jteta[jtLead]+jets.jteta[jtSubLead])/2.;
 
       for(int j = 0; j < jets.nref; ++j){
+
+	jtChg[j] = 0;
+        jtNeut[j] = 0;
+        jtEM[j] = 0;
+
+	jtPtMax[j] = 0;
+        jtPtMean[j] = 0;
+        jtPtMeanW[j] = 0;
+
+	jtLeadType[j] = 0;
+
 	 for (int t = 0; t < track.nTrk; ++t) {
 
 	   double jetPt = jets.jtpt[j];
@@ -344,6 +354,12 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
                zOldSubLead[t] = track.trkPt[t]/jetPt;
                corrSubLead[t] = trackCorrections[1]->GetCorr(track.trkPt[t],track.trkEta[t],jetPt,cbin,correctionFactors);
 	    }
+
+	    double dr = deltaR(track.trkEta[t],track.trkPhi[t],jets.jteta[j],jets.jtphi[j]);
+	    if(dr > cone) continue;
+	    if(jtPtMax[j] < track.trkPt[t]) jtPtMax[j] = track.trkPt[t];
+	    jtChg[j] += track.trkPt[t];
+	    
 	 }
       }
       for(int ib = 0; ib < branches.size(); ++ib){

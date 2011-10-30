@@ -58,8 +58,9 @@ void getProjections(TH2* h1, TH1D*& xsi1,TH1D*& norm1, const char* label = "",in
   norm1->SetName(Form("norm%s%d",label,i));
 }
 
-void plotXsi(int centIndex = 0, int etaBin = 0){
+void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, double trackPtMin = 4.){
 
+  int analysisId = 0;
   bool remake = 1;
   bool shortCut = 0;
 
@@ -78,7 +79,10 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
   string name[10] = {"central","peripheral","pp"};
 
   TFile* outf = new TFile(
-			  Form("results_xsi_%s%s.root",
+			  Form("results%d_lead%d_track%d_%s%s.root",
+			       analysisId,
+			       (int)leadJetPtMin,
+			       (int)trackPtMin,
 			       name[centIndex].data(),
 			       etaBin == 0 ? "" : Form("_eta%d",etaBin)
 			       ),"recreate");
@@ -123,10 +127,10 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
 
     TCut etaEvent(Form("abs(akPu3PF.dijetEta) >= %f && abs(akPu3PF.dijetEta) <= %f",etaMin[etaBin],etaMax[etaBin]));
 
-    TCut dijet("akPu3PF.HasDijet");
+    TCut dijet(Form("akPu3PF.HasDijet && akPu3PF.jtpt[akPu3PF.Lead] > %f",leadJetPtMin));
     TCut leadingCone("track.tjDRlead < 0.3");
    TCut subleadingCone("track.tjDRsublead < 0.3");
-   TCut track4("track.trkPt > 4");
+   TCut track4(Form("track.trkPt > %f",trackPtMin));
 
    TCut correctionLead("track.corrLead");
    TCut correctionSubLead("track.corrSubLead");
@@ -347,6 +351,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
      t->tree->SetAlias("smpt","akPu3PF.jtpt");
    }
    t->tree->SetAlias("sAJ","(smpt[akPu3PF.Lead]-smpt[akPu3PF.SubLead])/(smpt[akPu3PF.Lead]+smpt[akPu3PF.SubLead])");
+   dijet = TCut(Form("akPu3PF.HasDijet && akPu3PF.smpt[akPu3PF.Lead] > %f",leadJetPtMin));
 
    for(  int i = 0; i < nAJ; ++i){
       hinmc[i] = new TH2D(Form("hinmc%d",i),"",NxsiBin,-1,9,100,0,1000);
@@ -574,13 +579,21 @@ void plotXsi(int centIndex = 0, int etaBin = 0){
 
 void fragmentation(){
 
+  double et[10] = {100,120,150,180,200};
+  double tk[10] = {4.,5.,7.,10.,20.};
+
   for(int i = 0; i < 4; ++i){
     if(centralOnly){
       plotXsi(0,i);
     }else{
-      plotXsi(0,i);
-      plotXsi(1,i);
-      plotXsi(2,i);
+      for(int j = 0; j < 5; ++j){
+	for(int k = 0; k < 5; ++k){
+	  plotXsi(0,i,et[j],tk[k]);
+	  plotXsi(1,i,et[j],tk[k]);
+	  plotXsi(2,i,et[j],tk[k]);
+	}
+      }
+
     }
   }
 

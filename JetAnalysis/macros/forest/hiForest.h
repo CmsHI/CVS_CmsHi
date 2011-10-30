@@ -202,6 +202,7 @@ class HiForest : public TNamed
 
   int nEntries;
   int currentEvent;
+  double cone;
 
   vector<JetCorrectorParameters> vpar_HI310x;
   FactorizedJetCorrector *_JEC_HI310X;
@@ -226,7 +227,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Input file
   inf = TFile::Open(infName);
 
-  doTrackCorrections = false;
+  cone = 0.3;
+  doTrackCorrections = 1;
 
   // Load trees. Hard coded for the moment
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
