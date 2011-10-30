@@ -9,6 +9,7 @@ void makeSetupCode(char *infname = "../merged_HI2010_SD_Jet35_prod05_full.root")
   TTree *skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
   TTree *photonTree   = (TTree*) inf->Get("NTuples/Analysis");
   TTree *trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
+  TTree *jetTree      = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
   TTree *hitTree      = (TTree*) inf->Get("rechitanalyzer/hbhe");
   TTree *metTree      = (TTree*) inf->Get("anaMET/metTree");
 
@@ -25,6 +26,7 @@ void makeSetupCode(char *infname = "../merged_HI2010_SD_Jet35_prod05_full.root")
   if (skimTree) makeClass(skimTree,"Skim","");
   if (photonTree) makeClass(photonTree,"Photon","");
   if (trackTree) makeClass(trackTree,"Track","");
+  if (jetTree) makeClass(jetTree,"Jet","");
   if (hitTree) makeClass(hitTree,"Hit","");
   if (metTree) makeClass(metTree,"Met","");
 }

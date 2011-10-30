@@ -25,6 +25,15 @@ void Error(const char *t,const  char *mes, const char *mm = 0)
    cout <<t<<" : "<<mes<< " "<<mm<<endl;
 }*/
 
+bool findInArray(vector<TString> &v,TString &t)
+{
+   for (int i=0;i<v.size();i++)
+   {
+      if (t==v[i]) return 1;
+   }
+   return 0;
+}
+
 static TString R__GetBranchPointerName(TLeaf *leaf)
 {
    // Return the name of the branch pointer needed by MakeClass/MakeSelector
@@ -72,6 +81,7 @@ static TString R__GetBranchPointerName(TLeaf *leaf)
 Int_t makeClass(TTree *fTree, const char *className, const char *option)
 {
    TString opt = option;
+   vector<TString> dimArray;
    opt.ToLower();
    // Connect output files
    if (!className) className = fTree->GetName();
@@ -367,12 +377,16 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
             leafcountName = b2len;
          }
          if (dimensions) {
-            if (kmax) fprintf(fp,"   %-14s %s%s[kMax%s]%s;   //[%s]\n",leaf->GetTypeName(), stars,
+	    TString h(leafcountName);
+	    if (!findInArray(dimArray,h)) dimArray.push_back(h);
+	    if (kmax) fprintf(fp,"   %-14s %s%s[kMax%s]%s;   //[%s]\n",leaf->GetTypeName(), stars,
                               branchname,blen,dimensions,leafcountName);
             else      fprintf(fp,"   %-14s %s%s[%d]%s;   //[%s]\n",leaf->GetTypeName(), stars,
                               branchname,len,dimensions,leafcountName);
             delete [] dimensions;
          } else {
+	    TString h(leafcountName);
+	    if (!findInArray(dimArray,h)) dimArray.push_back(h);
             if (kmax) fprintf(fp,"   %-14s %s%s[kMax%s];   //[%s]\n",leaf->GetTypeName(), stars, branchname,blen,leafcountName);
             else      fprintf(fp,"   %-14s %s%s[%d];   //[%s]\n",leaf->GetTypeName(), stars, branchname,len,leafcountName);
          }
@@ -407,7 +421,7 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
    fprintf(fp,"\n");
 
 //======================================================================================================
-// generate code for class member function Init(), first pass = get branch pointer
+// generate code for setup function, first pass = get branch pointer
 //======================================================================================================
    fprintf(fp,"void setup%sTree(TTree *t,%s &t%s)\n",classNameOld,className,className);
    fprintf(fp,"{\n");
@@ -499,6 +513,10 @@ Int_t makeClass(TTree *fTree, const char *className, const char *option)
    fprintf(fp,"}\n");
    fprintf(fp,"\n");
 
+   for (int i=0;i<dimArray.size();i++)
+   {
+     cout <<dimArray[i]<<endl;
+   }
 
    delete [] leafStatus;
    fclose(fp);
