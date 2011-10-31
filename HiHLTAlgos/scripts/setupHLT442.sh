@@ -22,19 +22,21 @@ addpkg L1Trigger/Configuration
 cp -v CmsHi/HiHLTAlgos/modifiedFiles/L1Trigger_custom.py L1Trigger/Configuration/python/
 
 # analyzers
+# evt
 cvs co UserCode/L1TriggerDPG
-
+# trk
+cvs co MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-
+# jet
 cvs co          RecoHI/HiJetAlgos
 cvs co          HeavyIonsAnalysis/Configuration
 cvs co -r hi441_1 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
-
+# photon
 cvs co -r V02-02-01  RecoHI/HiEgammaAlgos
 cvs co -r V00-00-15  RecoHI/Configuration
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-
-cvs co MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
+# muon
+cvs co -d MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
 
 scram build -c
