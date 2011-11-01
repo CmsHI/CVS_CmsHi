@@ -12,7 +12,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.load("Configuration.StandardSequences.Geometry_cff")
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('START311_V1::All')
+#process.GlobalTag.globaltag = cms.string('MC_44_V1::All')
+
+process.GlobalTag.globaltag = cms.string('START44_V7::All')
+
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
@@ -21,11 +24,11 @@ process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 process.HeavyIonGlobalParameters = cms.PSet(
-    #centralityVariable = cms.string("HFtowers"),
     centralityVariable = cms.string("HFhits"),
     centralitySrc = cms.InputTag("hiCentrality"),
     nonDefaultGlauberModel = cms.string("Hydjet_Bass")
     )
+
 
 
 process.maxEvents = cms.untracked.PSet(
@@ -38,6 +41,13 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
 
                             fileNames = cms.untracked.vstring(
+
+
+"rfio:/castor/cern.ch/user/t/tdahms/ForVineet_onia2MuMu_441.root"
+#"rfio:/castor/cern.ch/cms/store/user/tdahms/pp2760/Onia/MC/v1/Skims/PromptJpsi/onia2MuMuPAT_MC_19.root"
+
+
+#'rfio:/castor/cern.ch/cms/store/user/tdahms/HeavyIons/Onia/MC/v9/Skims/Upsilon2SPt05/onia2MuMuPAT_MC_83_1_SaH.root'
 
 #'file:onia2MuMuPATSkim_Test.root'
 #'rfio:/castor/cern.ch/user/p/pshukla/cms394/MC/DMJPsiOniaSkim/JPsi_OniaSkim_DM_2.root'
@@ -53,16 +63,12 @@ process.source = cms.Source("PoolSource",
 
 
 ##This should be uncommented to include all files from any castor directory automatically
-
-import os,commands
-def getCastorDirectoryList(path):
-    cmd  = 'nsls %s/ ' % (path)
-    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
-    return file
-process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/user/tdahms/HeavyIons/Onia/MC/v4/Skims/PromptJpsiPt03/")
-#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/p/pshukla/cms394/MC/DMJPsiOniaSkim_NoFilter")
-#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cms3111/MC/JPsiOniaSkim/JPsiPt36")
-
+#import os,commands
+#def getCastorDirectoryList(path):
+#    cmd  = 'nsls %s/ ' % (path)
+#    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
+#    return file
+#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/user/tdahms/HeavyIons/Onia/MC/v4/Skims/PromptJpsiPt03/")
 
 
 
@@ -71,16 +77,14 @@ process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/user
 #import os,commands
 # get a list of files from a specified directory
 
-#mydir ="/castor/cern.ch/cms/store/user/tdahms/HeavyIons/Onia/MC/v3/Skims/PromptJpsiPt36"
-#mydir ="/castor/cern.ch/user/k/kumarv/cms3111/MC/JPsiOniaSkim/JPsiPt03"
+#mydir ="/castor/cern.ch/cms/store/user/tdahms/HeavyIons/Onia/MC/v9/Skims/PromptJpsiPt1530"
 #cmd  = 'nsls %s/ ' % (mydir)
 #mylist = ["rfio:%s/%s" % (mydir,j) for j in commands.getoutput(cmd).split('\n')]
 # add a specified number of files from mydir to the list of fileNames
-#nfiles=13
+#nfiles=1
 #for i in range(0,nfiles):
 #    process.source.fileNames.append('%s' % (mylist[i]))
 #    print "process.source.fileNames.append(%s" % (mylist[i])
-    #print "Number of files to process is %s"%
 #    (len(process.source.fileNames))
   
 
@@ -88,9 +92,10 @@ process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/cms/store/user
 
 process.dimuonsOnia2DPlots = cms.EDAnalyzer(
     "DiMuonOnia2DPlots",
-    OutputFileName = cms.untracked.string('file:DimuonOnia2Dplots_JPsiPt03.root'),
-    #HLTFilterName=cms.untracked.InputTag('hltHIL2DoubleMu3L2Filtered'),    
-    HLTFilterName=cms.untracked.string('hltHIDoubleMuLevel1PathL1OpenFiltered'),
+    OutputFileName = cms.untracked.string('file:DimuonOnia2Dplots_JPsiPt_PP_test.root'),
+    HLTFilterName=cms.untracked.string('HLT_L1DoubleMu0_v1'),
+    MotherID=cms.untracked.string("JPsi"),
+
     IsGenInfo=cms.untracked.string("TRUE"),
     IsPATInfo=cms.untracked.string("TRUE"),
     IsCuts = cms.untracked.bool(True)
