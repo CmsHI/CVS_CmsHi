@@ -9,8 +9,8 @@
 #include "TCut.h"
 #include <string>
 using namespace std;
-static const bool christof = 0;
-static const bool centralOnly = 0;
+
+static const bool centralOnly = 1;
 
 void scaleAlongX(TH2* h,int bin, double a, double ea){
 
@@ -25,7 +25,24 @@ void scaleAlongX(TH2* h,int bin, double a, double ea){
   }
 }
 
-void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2){
+void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2, double min=100, double max = 200, double par0 = 0.01){
+
+  TF1* fPt1 = new TF1(Form("%s_fit",hpt1->GetName()),"[0]*x^([1])",min,max);
+  TF1* fPt2 = new TF1(Form("%s_fit",hpt2->GetName()),"[0]*x^([1])",min,max);
+  //  TF1* fPt1 = new TF1(Form("%s_fit",hpt1->GetName()),"[0]*x^([1]+[2]*x+[3]*x^2)",100,300);
+  //  TF1* fPt2 = new TF1(Form("%s_fit",hpt2->GetName()),"[0]*x^([1]+[2]*x+[3]*x^2)",100,300);
+
+  fPt1->SetParameter(0,10000);
+  fPt1->SetParameter(1,-0.5);
+
+  fPt2->SetParameter(0,100);
+  fPt2->SetParameter(1,-0.5);
+
+  //  fPt1->SetParameter(2,0);
+  //  fPt1->SetParameter(3,0);
+
+  hpt1->Fit(fPt1,"MRL");
+  hpt2->Fit(fPt2,"MRL");
 
   int nx = h1->GetNbinsX();
   int ny = h1->GetNbinsY();
@@ -34,35 +51,47 @@ void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2){
 
     double dpt1 = 0, dpt2 = 0, e = 0;
 
-    if(christof){
-      dpt1 = h1->Integral(0,nx,i,i);
-      dpt2 = h2->Integral(0,nx,i,i);
-      h2->IntegralAndError(0,nx,i,i,e);
-    }else{
-
-      dpt1 = hpt1->GetBinContent(i);
-      dpt2 = hpt2->GetBinContent(i);      
+    if(hpt1->GetBinCenter(i) < min){
+	dpt1 = hpt1->GetBinContent(i);
+	dpt2 = hpt2->GetBinContent(i);      
+      }else{
+	dpt1 = fPt1->Eval(hpt1->GetBinCenter(i));
+	dpt2 = fPt2->Eval(hpt2->GetBinCenter(i));
+      }
       e = hpt2->GetBinError(i);
 
-    }
      if(dpt2 <= 0) e = 0;
      if(dpt1 > 0)
        scaleAlongX(h1,i,dpt2/dpt1,e/dpt1);
   }
 }
 
-void getProjections(TH2* h1, TH1D*& xsi1,TH1D*& norm1, const char* label = "",int i = 0){
+void getProjections(TH2* h1, TH1D*& xsi1,TH1D*& norm1, const char* label = "",int i = 0, const char* name = "xsi"){
   xsi1 = h1->ProjectionX();
-  xsi1->SetName(Form("xsi%s%d",label,i));
-  norm1 = h1->ProjectionY();
-  norm1->SetName(Form("norm%s%d",label,i));
+  xsi1->SetName(Form("%s%s%d",name,label,i));
+  if(!norm1){
+    norm1 = h1->ProjectionY();
+    norm1->SetName(Form("norm%s%d",label,i));
+  }
 }
 
-void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, double trackPtMin = 4.){
+void plotXsi(int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackPtBin = 0){
 
-  int analysisId = 0;
+  int analysisId = 1;
   bool remake = 1;
   bool shortCut = 0;
+
+  double etLeadMin[10] = {100, 100,120,150,180,200  };
+  double etLeadMax[10] = {1000,120,150,180,200,1000 };
+
+  double tkMin[10] = {4.,  4.,5.,7.,10., 20.};
+  double tkMax[10] = {100.,5.,7.,10.,20.,1000.};
+
+  //  double fitMin[10] = {100,80,60,50,100};
+  //  double fitMax[10] = {250,200,150,100,250};
+
+  double fitMin[10] = {100,90,80,70,100};
+  double fitMax[10] = {300,300,300,300,300};
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
@@ -76,13 +105,25 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
 
   TH2D *hTrkWeightN[100], *hTrkWeightA[100], *hTrkWeightNmc[100], *hTrkWeightAmc[100];
 
+  TH1D* hF[100], * hFmc[100],  * hFn[100], * hFnmc[100], * hFa[100], * hFamc[100],
+    * hFmcO[100],* hFnmcO[100],* hFamcO[100];
+
+  TH1D* hTrk[100], * hTrkmc[100],  * hTrkn[100], * hTrknmc[100], * hTrka[100], * hTrkamc[100],
+    * hTrkmcO[100],* hTrknmcO[100],* hTrkamcO[100];
+
+  TH2D* hF2D[100], * hFmc2D[100],  * hFn2D[100], * hFnmc2D[100], * hFa2D[100], * hFamc2D[100],
+    * hFmcO2D[100],* hFnmcO2D[100],* hFamcO2D[100];
+
+  TH2D* hTrk2D[100], * hTrkmc2D[100],  * hTrkn2D[100], * hTrknmc2D[100], * hTrka2D[100], * hTrkamc2D[100],
+    * hTrkmcO2D[100],* hTrknmcO2D[100],* hTrkamcO2D[100];
+
   string name[10] = {"central","peripheral","pp"};
 
   TFile* outf = new TFile(
 			  Form("results%d_lead%d_track%d_%s%s.root",
 			       analysisId,
-			       (int)leadJetPtMin,
-			       (int)trackPtMin,
+			       leadJetPtBin,
+			       trackPtBin,
 			       name[centIndex].data(),
 			       etaBin == 0 ? "" : Form("_eta%d",etaBin)
 			       ),"recreate");
@@ -110,6 +151,11 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
 
   TH2D* hCorrelationLead = new TH2D("hCorrelationLead",";#Delta#eta;#Delta#phi",100,-5,5,100,-5,5);
 
+  TH2D* jetCorrections = new TH2D("jetCorrections","; raw p_{T}; correction",500,0,500,200,0,2);
+  TH2D* jetCorrections0 = new TH2D("jetCorrections0","; raw p_{T}; correction",500,0,500,200,0,2);
+  TH2D* jetCorrections1 = new TH2D("jetCorrections1","; raw p_{T}; correction",500,0,500,200,0,2);
+  TH2D* jetCorrections2 = new TH2D("jetCorrections2","; raw p_{T}; correction",500,0,500,200,0,2);
+
   bool pp = 0;
 
   int nAJ = 5;
@@ -127,10 +173,10 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
 
     TCut etaEvent(Form("abs(akPu3PF.dijetEta) >= %f && abs(akPu3PF.dijetEta) <= %f",etaMin[etaBin],etaMax[etaBin]));
 
-    TCut dijet(Form("akPu3PF.HasDijet && akPu3PF.jtpt[akPu3PF.Lead] > %f",leadJetPtMin));
+    TCut dijet(Form("akPu3PF.HasDijet && akPu3PF.jtpt[akPu3PF.Lead] > %f && akPu3PF.jtpt[akPu3PF.Lead] < %f",etLeadMin[leadJetPtBin],etLeadMax[leadJetPtBin]));
     TCut leadingCone("track.tjDRlead < 0.3");
    TCut subleadingCone("track.tjDRsublead < 0.3");
-   TCut track4(Form("track.trkPt > %f",trackPtMin));
+   TCut track4(Form("track.trkPt > %f && track.trkPt < %f",tkMin[trackPtBin],tkMax[trackPtBin]));
 
    TCut correctionLead("track.corrLead");
    TCut correctionSubLead("track.corrSubLead");
@@ -148,6 +194,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
    TCut c0to100("1");
 
    TCut runSelection("1");
+   if(0){
    int runs[100] = {150883, 150886, 150887, 151020, 151027, 
 		    151058, 151059, 151076, 151077, 151088, 
 	
@@ -168,6 +215,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
 
    for(int r = 0; r < 55; ++r){
      runSelection = runSelection || Form("Run == %d",runs[r]);
+   }
    }
    
    vector<TCut> cent;
@@ -209,107 +257,73 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
       hTrkWeightN[i] = new TH2D(Form("hTrkWeightN%d",i),";p_{T}^{Track} (GeV/c); weight",100,0,100,200,0,4);
       hTrkWeightA[i] = new TH2D(Form("hTrkWeightA%d",i),";p_{T}^{Track} (GeV/c); weight",100,0,100,200,0,4);
 
+
+      hFa2D[i] = new TH2D(Form("hFa2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hFamc2D[i] = new TH2D(Form("hFamc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hFn2D[i] = new TH2D(Form("hFn2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hFnmc2D[i] = new TH2D(Form("hFnmc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hF2D[i] = new TH2D(Form("hF2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hFmc2D[i] = new TH2D(Form("hFmc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+
+      hFamcO2D[i] = new TH2D(Form("hFamcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hFnmcO2D[i] = new TH2D(Form("hFnmcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hFmcO2D[i] = new TH2D(Form("hFmcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+
+      hTrka2D[i] = new TH2D(Form("hTrka2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hTrkamc2D[i] = new TH2D(Form("hTrkamc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hTrkn2D[i] = new TH2D(Form("hTrkn2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hTrknmc2D[i] = new TH2D(Form("hTrknmc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hTrk2D[i] = new TH2D(Form("hTrk2D%d",i),";#Sigmap_{T}^{Track}/p_{T}^{RecoJet};Jets",150,0,1.5,100,0,1000);
+      hTrkmc2D[i] = new TH2D(Form("hTrkmc2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+
+      hTrkamcO2D[i] = new TH2D(Form("hTrkamcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hTrknmcO2D[i] = new TH2D(Form("hTrknmcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+      hTrkmcO2D[i] = new TH2D(Form("hTrkmcO2D%d",i),";#Sigmap_{T}^{Gen,Charged}/p_{T}^{GenJet};Jets",150,0,1.5,100,0,1000);
+
       TCut AJ(Form("%f <= akPu3PF.AJ && akPu3PF.AJ < %f",ajMin[i],ajMax[i]));
-      
-      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hin[i]->GetName()),
-	      (
-	       dijet
-               &&cent[centIndex]
-	       &&AJ
-	       &&evtSel
-	       &&etaLead
-               &&track4
-	       &&leadingCone
-	       )
-	      *correctionLead
-	      );
-      
-      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hia[i]->GetName()),
-	      (	       
-	       dijet
-	       &&cent[centIndex]
-	       &&AJ
-	       &&evtSel
-	       &&etaSubLead
-	       &&track4	       
-	       &&subleadingCone
-		       )
-	      *correctionSubLead
-              );
-      
-      cout<<"Weight and Selection : "<<(const char*)correctionSubLead*(dijet&&subleadingCone&&cent[centIndex]&&track4&&AJ&&evtSel&&etaSubLead)<<endl;
 
-      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]>>%s",hptn[i]->GetName()),
-              dijet&&cent[centIndex]&&AJ&&evtSel&&etaLead);
-      
-      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]>>%s",hpta[i]->GetName()),
-              dijet&&cent[centIndex]&&AJ&&evtSel&&etaSubLead);
+      TCut jetCutsAndWeights = dijet&&cent[centIndex]&&AJ&&evtSel&&etaLead;	
+      TCut allCutsAndWeightsLead = (jetCutsAndWeights && track4 && leadingCone)*correctionLead; 
+      TCut allCutsAndWeightsSubLead = (jetCutsAndWeights && track4 && subleadingCone)*correctionSubLead;
+	
+      cout<<"Weight and Selection : "<<(const char*)allCutsAndWeightsLead<<endl;
+    
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hin[i]->GetName()),allCutsAndWeightsLead);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hia[i]->GetName()),allCutsAndWeightsSubLead);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]>>%s",hptn[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]>>%s",hpta[i]->GetName()),jetCutsAndWeights); 
+      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.Lead])>>%s",hetan[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.SubLead])>>%s",hetaa[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("abs(akPu3PF.dijetEta)>>%s",hetaDijet[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("track.corrLead:track.trkPt>>%s",hTrkWeightN[i]->GetName()),allCutsAndWeightsLead);
+      t->Draw(Form("track.corrSubLead:track.trkPt>>%s",hTrkWeightA[i]->GetName()),allCutsAndWeightsSubLead);
+      t->Draw(Form("track.trkPt>>%s",hch[i]->GetName()),allCutsAndWeightsLead);
 
-      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.Lead])>>%s",hetan[i]->GetName()),
-              dijet&&cent[centIndex]&&AJ&&evtSel&&etaLead);
+      t->tree->SetAlias("jtFracChgLead","akPu3PF.jtChg[akPu3PF.Lead]/akPu3PF.jtpt[akPu3PF.Lead]");
+      t->tree->SetAlias("jtFracChgSubLead","akPu3PF.jtChg[akPu3PF.SubLead]/akPu3PF.jtpt[akPu3PF.SubLead]");
 
-      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.SubLead])>>%s",hetaa[i]->GetName()),
-              dijet&&cent[centIndex]&&AJ&&evtSel&&etaLead);
+      t->Draw(Form("akPu3PF.jtpt:akPu3PF.jtFracChg>>%s",hF2D[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:jtFracChgLead>>%s",hFn2D[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:jtFracChgSubLead>>%s",hFa2D[i]->GetName()),jetCutsAndWeights);
 
-      t->Draw(Form("abs(akPu3PF.dijetEta)>>%s",hetaDijet[i]->GetName()),
-              dijet&&cent[centIndex]&&AJ&&evtSel);
+      t->tree->SetAlias("jtFracChgMax","akPu3PF.jtPtMax/akPu3PF.jtpt");
 
-      t->Draw(Form("track.corrLead:track.trkPt>>%s",hTrkWeightN[i]->GetName()),
-	      (
-               dijet
-               &&cent[centIndex]
-               &&AJ
-               &&evtSel
-               &&etaLead
-               &&track4
-               &&leadingCone
-               )
-              *correctionLead
-	      );
+      t->tree->SetAlias("jtFracChgMaxLead","akPu3PF.jtPtMax[akPu3PF.Lead]/akPu3PF.jtpt[akPu3PF.Lead]");
+      t->tree->SetAlias("jtFracChgMaxSubLead","akPu3PF.jtPtMax[akPu3PF.SubLead]/akPu3PF.jtpt[akPu3PF.SubLead]");
 
-      t->Draw(Form("track.corrSubLead:track.trkPt>>%s",hTrkWeightA[i]->GetName()),
-              (
-               dijet
-               &&cent[centIndex]
-               &&AJ
-               &&evtSel
-               &&etaSubLead
-               &&track4
-               &&subleadingCone
-               )
-              *correctionSubLead
-              );
-
-      t->Draw(Form("track.trkPt>>%s",hch[i]->GetName()),
-	      (
-               dijet
-               &&cent[centIndex]
-               &&AJ
-               &&evtSel
-               &&etaLead
-               &&track4
-               &&leadingCone
-               )
-              *correctionLead
-              );
+      t->Draw(Form("akPu3PF.jtpt:jtFracChgMax>>%s",hTrk2D[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:jtFracChgMaxLead>>%s",hTrkn2D[i]->GetName()),jetCutsAndWeights);
+      t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:jtFracChgMaxSubLead>>%s",hTrka2D[i]->GetName()),jetCutsAndWeights);
 
    }      
-
-   
-
+  
    t->Draw("akPu3PF.jtpt[akPu3PF.SubLead]:akPu3PF.jtpt[akPu3PF.Lead]>>hpt2D",dijet&&cent[centIndex]&&evtSel);
-
    t->Draw("akPu3PF.AJ>>hAJ",dijet&&cent[centIndex]&&evtSel);
-
    t->Draw("akPu3PF.AJ:akPu3PF.dijetEta>>hAJeta",dijet&&cent[centIndex]&&evtSel);
-
    t->Draw("akPu3PF.jtphi[akPu3PF.Lead]-akPu3PF.jtphi[akPu3PF.SubLead]>>hDphi",dijet&&cent[centIndex]&&evtSel);
    t->Draw("akPu3PF.jteta[akPu3PF.SubLead]:akPu3PF.jteta[akPu3PF.Lead]>>heta",dijet&&cent[centIndex]&&evtSel);
-
    t->Draw("Run>>hRun",dijet&&evtSel);
-
    t->Draw("track.zSubLead:track.zOldSubLead>>hZ",dijet&&evtSel&&subleadingCone&&track4);
-
    t->Draw("-log(track.zSubLead):-log(track.zOldSubLead)>>hXsi",dijet&&evtSel&&subleadingCone&&track4);
 
    cout<<"Event selection : "<<(const char*)(dijet&&cent[centIndex]&&evtSel)<<endl;
@@ -319,6 +333,11 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
    hAJ->Scale(1./hAJ->Integral("width"));
 
    }   
+
+   t->tree->Draw("akPu3PF.jtpt/akPu3PF.rawpt:akPu3PF.rawpt>>jetCorrections");
+   t->tree->Draw("akPu3PF.jtpt/akPu3PF.rawpt:akPu3PF.rawpt>>jetCorrections0","abs(akPu3PF.jteta) < 0.5");
+   t->tree->Draw("akPu3PF.jtpt/akPu3PF.rawpt:akPu3PF.rawpt>>jetCorrections1","abs(akPu3PF.jteta) >= 0.5 && abs(akPu3PF.jteta) < 1");
+   t->tree->Draw("akPu3PF.jtpt/akPu3PF.rawpt:akPu3PF.rawpt>>jetCorrections2","abs(akPu3PF.jteta) >= 1 && abs(akPu3PF.jteta) < 2");
 
    TCanvas* cEvtDebug = new TCanvas("cEvtDebug","cEvtDebug",900,400);
    cEvtDebug->Divide(2,1);
@@ -351,7 +370,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
      t->tree->SetAlias("smpt","akPu3PF.jtpt");
    }
    t->tree->SetAlias("sAJ","(smpt[akPu3PF.Lead]-smpt[akPu3PF.SubLead])/(smpt[akPu3PF.Lead]+smpt[akPu3PF.SubLead])");
-   dijet = TCut(Form("akPu3PF.HasDijet && akPu3PF.smpt[akPu3PF.Lead] > %f",leadJetPtMin));
+   dijet = TCut(Form("akPu3PF.HasDijet && smpt[akPu3PF.Lead] > %f && smpt[akPu3PF.Lead] < %f",etLeadMin[leadJetPtBin],etLeadMax[leadJetPtBin]));
 
    for(  int i = 0; i < nAJ; ++i){
       hinmc[i] = new TH2D(Form("hinmc%d",i),"",NxsiBin,-1,9,100,0,1000);
@@ -362,86 +381,55 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
       hchmc[i] = new TH1D(Form("hchmc%d",i),";p_{T} (GeV/c);dN/dp_{T}",100,0,100);
       hTrkWeightNmc[i] = new TH2D(Form("hTrkWeightNmc%d",i),";p_{T}^{Track} (GeV/c); weight",100,0,100,200,0,4);
       hTrkWeightAmc[i] = new TH2D(Form("hTrkWeightAmc%d",i),";p_{T}^{Track} (GeV/c); weight",100,0,100,200,0,4);
-
       hetanmc[i] = new TH1D(Form("hetanmc%d",i),"",20,0,2);
       hetaamc[i] = new TH1D(Form("hetaamc%d",i),"",20,0,2);
       hetaDijetmc[i] = new TH1D(Form("hetaDijetmc%d",i),"",20,0,2);
-
-
    }
 
    for(  int i = nAJ-1; i < nAJ; ++i){
 
-      t->Draw(Form("smpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hinmc[i]->GetName()),
-	      (
-               dijet
-               &&evtSel
-               &&etaLead
-               &&track4
-               &&leadingCone
-               )
-              *correctionLead
-              );
-      
-      t->Draw(Form("smpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hiamc[i]->GetName()),
-	      (
-               dijet
-               &&evtSel
-               &&etaSubLead
-               &&track4
-               &&subleadingCone
-               )
-              *correctionSubLead
-              );
+     TCut jetCutsAndWeights = dijet&&evtSel&&etaLead;
+     TCut allCutsAndWeightsLead = (jetCutsAndWeights && track4 && leadingCone)*correctionLead;
+     TCut allCutsAndWeightsSubLead = (jetCutsAndWeights && track4 && subleadingCone)*correctionSubLead;
 
-      t->Draw(Form("smpt[akPu3PF.Lead]>>%s",hptnmc[i]->GetName()),
-              dijet&&evtSel&&etaLead);
+     t->Draw(Form("smpt[akPu3PF.Lead]:-log(track.zLead)>>%s",hinmc[i]->GetName()),allCutsAndWeightsLead);
+     t->Draw(Form("smpt[akPu3PF.SubLead]:-log(track.zSubLead)>>%s",hiamc[i]->GetName()),allCutsAndWeightsSubLead);
+     t->Draw(Form("smpt[akPu3PF.Lead]>>%s",hptnmc[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("smpt[akPu3PF.SubLead]>>%s",hptamc[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.Lead])>>%s",hetanmc[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.SubLead])>>%s",hetaamc[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("abs(akPu3PF.dijetEta)>>%s",hetaDijetmc[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("track.corrLead:track.trkPt>>%s",hTrkWeightNmc[i]->GetName()),allCutsAndWeightsLead);
+     t->Draw(Form("track.corrSubLead:track.trkPt>>%s",hTrkWeightAmc[i]->GetName()),allCutsAndWeightsSubLead);
+     t->Draw(Form("track.trkPt>>%s",hchmc[i]->GetName()),allCutsAndWeightsLead);
 
-      t->Draw(Form("smpt[akPu3PF.SubLead]>>%s",hptamc[i]->GetName()),
-              dijet&&evtSel&&etaSubLead);
+     t->Draw(Form("akPu3PF.jtpt:akPu3PF.jtFracChg>>%s",hFmcO2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:akPu3PF.jtFracChg[akPu3PF.Lead]>>%s",hFnmcO2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:akPu3PF.jtFracChg[akPu3PF.SubLead]>>%s",hFamcO2D[i]->GetName()),jetCutsAndWeights);
 
-      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.Lead])>>%s",hetanmc[i]->GetName()),
-              dijet&&evtSel&&etaLead);
+     t->tree->SetAlias("jtFracChg","akPu3PF.jtChg/smpt");
+     t->tree->SetAlias("jtFracChgLead","akPu3PF.jtChg[akPu3PF.Lead]/smpt[akPu3PF.Lead]");
+     t->tree->SetAlias("jtFracChgSubLead","akPu3PF.jtChg[akPu3PF.SubLead]/smpt[akPu3PF.SubLead]");
 
-      t->Draw(Form("abs(akPu3PF.jteta[akPu3PF.SubLead])>>%s",hetaamc[i]->GetName()),
-              dijet&&evtSel&&etaLead);
+     t->Draw(Form("smpt:jtFracChg>>%s",hFmc2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("smpt[akPu3PF.Lead]:jtFracChgLead>>%s",hFnmc2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("smpt[akPu3PF.SubLead]:jtFracChgSubLead>>%s",hFamc2D[i]->GetName()),jetCutsAndWeights);
 
-      t->Draw(Form("abs(akPu3PF.dijetEta)>>%s",hetaDijetmc[i]->GetName()),
-              dijet&&evtSel);
+     t->tree->SetAlias("jtFracChgMaxO","akPu3PF.jtPtMax/akPu3PF.jtpt");
+     t->tree->SetAlias("jtFracChgMaxLeadO","akPu3PF.jtPtMax[akPu3PF.Lead]/akPu3PF.jtpt[akPu3PF.Lead]");
+     t->tree->SetAlias("jtFracChgMaxSubLeadO","akPu3PF.jtPtMax[akPu3PF.SubLead]/akPu3PF.jtpt[akPu3PF.SubLead]");
 
-      t->Draw(Form("track.corrLead:track.trkPt>>%s",hTrkWeightNmc[i]->GetName()),
-              (
-               dijet
-               &&evtSel
-               &&etaLead
-               &&track4
-               &&leadingCone
-               )
-              *correctionLead
-              );
+     t->Draw(Form("akPu3PF.jtpt:jtFracChgMaxO>>%s",hTrkmcO2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("akPu3PF.jtpt[akPu3PF.Lead]:jtFracChgMaxLeadO>>%s",hTrknmcO2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("akPu3PF.jtpt[akPu3PF.SubLead]:jtFracChgMaxSubLeadO>>%s",hTrkamcO2D[i]->GetName()),jetCutsAndWeights);
 
-      t->Draw(Form("track.corrSubLead:track.trkPt>>%s",hTrkWeightAmc[i]->GetName()),
-              (
-               dijet
-               &&evtSel
-               &&etaSubLead
-               &&track4
-               &&subleadingCone
-               )
-              *correctionSubLead
-              );
+     t->tree->SetAlias("jtFracChgMax","akPu3PF.jtPtMax/smpt");
+     t->tree->SetAlias("jtFracChgMaxLead","akPu3PF.jtPtMax[akPu3PF.Lead]/smpt[akPu3PF.Lead]");
+     t->tree->SetAlias("jtFracChgMaxSubLead","akPu3PF.jtPtMax[akPu3PF.SubLead]/smpt[akPu3PF.SubLead]");
 
-      t->Draw(Form("track.trkPt>>%s",hchmc[i]->GetName()),
-	      (
-               dijet
-               &&evtSel
-               &&etaLead
-               &&track4
-               &&leadingCone
-               )
-              *correctionLead
-              );
-      
+     t->Draw(Form("smpt:jtFracChgMax>>%s",hTrkmc2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("smpt[akPu3PF.Lead]:jtFracChgMaxLead>>%s",hTrknmc2D[i]->GetName()),jetCutsAndWeights);
+     t->Draw(Form("smpt[akPu3PF.SubLead]:jtFracChgMaxSubLead>>%s",hTrkamc2D[i]->GetName()),jetCutsAndWeights);
    }
 
    for(  int i = 0; i < nAJ-1; ++i){
@@ -450,6 +438,21 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
      hptnmc[i]->Add(hptnmc[nAJ-1]);
      hptamc[i]->Add(hptamc[nAJ-1]);
      hchmc[i]->Add(hchmc[nAJ-1]);
+
+     hTrkmcO2D[i]->Add(hTrkmcO2D[nAJ-1]);
+     hTrknmcO2D[i]->Add(hTrknmcO2D[nAJ-1]);
+     hTrkamcO2D[i]->Add(hTrkamcO2D[nAJ-1]);
+     hTrkmc2D[i]->Add(hTrkmc2D[nAJ-1]);
+     hTrknmc2D[i]->Add(hTrknmc2D[nAJ-1]);
+     hTrkamc2D[i]->Add(hTrkamc2D[nAJ-1]);
+
+     hFmcO2D[i]->Add(hFmcO2D[nAJ-1]);
+     hFnmcO2D[i]->Add(hFnmcO2D[nAJ-1]);
+     hFamcO2D[i]->Add(hFamcO2D[nAJ-1]);
+     hFmc2D[i]->Add(hFmc2D[nAJ-1]);
+     hFnmc2D[i]->Add(hFnmc2D[nAJ-1]);
+     hFamc2D[i]->Add(hFamc2D[nAJ-1]);
+
    }
 
    outf->cd();
@@ -499,45 +502,84 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
     hetaamc[i]->Scale(1./hptamc[i]->Integral()/binwidth);
     hetaDijetmc[i]->Scale(1./hptnmc[i]->Integral()/binwidth);
 
-    if(weightScaled){
-
-      hin[i]->Scale(1./hptn[i]->Integral()/binwidth);
-      hia[i]->Scale(1./hpta[i]->Integral()/binwidth);
-      hinmc[i]->Scale(1./hptnmc[i]->Integral()/binwidth);
-      hiamc[i]->Scale(1./hptamc[i]->Integral()/binwidth);
-
-      if(0){      
-	hptn[i]->Scale(1./hptn[i]->Integral("width"));
-	hpta[i]->Scale(1./hpta[i]->Integral("width"));
-	hptnmc[i]->Scale(1./hptnmc[i]->Integral("width"));
-	hptamc[i]->Scale(1./hptamc[i]->Integral("width"));
-      }
-    }
-
     if(centIndex != 2){
-      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i]);
-      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i]);
+      reweightPt(hinmc[i],hin[i],hptnmc[i],hptn[i],fitMin[0],fitMax[0]);
+      reweightPt(hiamc[i],hia[i],hptamc[i],hpta[i],fitMin[i],fitMax[i]);
+
+      reweightPt(hFnmc2D[i],hFn2D[i],hptnmc[i],hptn[i],fitMin[0],fitMax[0]);
+      reweightPt(hFamc2D[i],hFa2D[i],hptamc[i],hpta[i],fitMin[i],fitMax[i]);
+      //      reweightPt(hFmc2D[i],hF2D[i],hptmc[i],hpt[i]);
+      //      reweightPt(hFmcO2D[i],hF2D[i],hptmc[i],hpt[i]);
+
+      reweightPt(hTrknmc2D[i],hTrkn2D[i],hptnmc[i],hptn[i],fitMin[0],fitMax[0]);
+      reweightPt(hTrkamc2D[i],hTrka2D[i],hptamc[i],hpta[i],fitMin[i],fitMax[i]);
+      //      reweightPt(hTrkmc2D[i],hTrk2D[i],hptmc[i],hpt[i]);
+      //      reweightPt(hTrkmcO2D[i],hTrk2D[i],hptmc[i],hpt[i]);
+
     }
 
-    if(!weightScaled){
       hin[i]->Scale(1./hptn[i]->Integral()/binwidth);
       hia[i]->Scale(1./hpta[i]->Integral()/binwidth);
       hinmc[i]->Scale(1./hptn[i]->Integral()/binwidth);
       hiamc[i]->Scale(1./hpta[i]->Integral()/binwidth);
 
-      hptn[i]->Scale(1./hptn[i]->Integral("width"));
-      hpta[i]->Scale(1./hpta[i]->Integral("width"));
-      hptnmc[i]->Scale(1./hptnmc[i]->Integral("width"));
-      hptamc[i]->Scale(1./hptamc[i]->Integral("width"));
-    }
+      hFnmc2D[i]->Scale(1./hptn[i]->Integral()/binwidth);
+      hFamc2D[i]->Scale(1./hpta[i]->Integral()/binwidth);
+      hFn2D[i]->Scale(1./hptn[i]->Integral()/binwidth);
+      hFa2D[i]->Scale(1./hpta[i]->Integral()/binwidth);
+      hTrknmc2D[i]->Scale(1./hptn[i]->Integral()/binwidth);
+      hTrkamc2D[i]->Scale(1./hpta[i]->Integral()/binwidth);
+      hTrkn2D[i]->Scale(1./hptn[i]->Integral()/binwidth);
+      hTrka2D[i]->Scale(1./hpta[i]->Integral()/binwidth);
+
+
+      //      hFmc2D[i]->Scale(1./hpt[i]->Integral()/binwidth);
+      //      hF2D[i]->Scale(1./hpt[i]->Integral()/binwidth);
+
+      if(0){
+
+	hptnmc[i]->Scale(hptn[i]->Integral("width")/hptnmc[i]->Integral("width"));
+	hptamc[i]->Scale(hpta[i]->Integral("width")/hptamc[i]->Integral("width"));
+
+	hptn[i]->Scale(1./hptn[i]->Integral("width"));
+	hpta[i]->Scale(1./hpta[i]->Integral("width"));
+	hptnmc[i]->Scale(1./hptnmc[i]->Integral("width"));
+	hptamc[i]->Scale(1./hptamc[i]->Integral("width"));
+      }
+
+      cout<<"a"<<endl;
 
     getProjections(hin[i],xsin[i],normn[i],"n",i);
     getProjections(hinmc[i],xsinmc[i],normnmc[i],"nmc",i);
-
     getProjections(hia[i],xsia[i],norma[i],"a",i);
     getProjections(hiamc[i],xsiamc[i],normamc[i],"amc",i);
+    cout<<"b"<<endl;
 
-    if(1){
+    getProjections(hFn2D[i],hFn[i],normn[i],"fn",i,"hF");
+    getProjections(hFa2D[i],hFa[i],norma[i],"fa",i,"hF");
+    //    getProjections(hF2D[i],hF[i],norma[i],"",i,"hF");
+    getProjections(hFnmc2D[i],hFnmc[i],normnmc[i],"fnmc",i,"hF");
+    getProjections(hFamc2D[i],hFamc[i],normamc[i],"famc",i,"hF");
+    //    getProjections(hFmc2D[i],hFmc[i],normamc[i],"mc",i,"hF");
+    getProjections(hFnmcO2D[i],hFnmcO[i],normnmc[i],"fnmcO",i,"hF");
+    getProjections(hFamcO2D[i],hFamcO[i],normamc[i],"famcO",i,"hF");
+    //    getProjections(hFmcO2D[i],hFmcO[i],normamc[i],"mcO",i,"hF");
+
+    cout<<"c"<<endl;
+    getProjections(hTrkn2D[i],hTrkn[i],normn[i],"tn",i,"hTrk");
+    getProjections(hTrka2D[i],hTrka[i],norma[i],"ta",i,"hTrk");
+    //    getProjections(hTrk2D[i],hTrk[i],norma[i],"",i,"hTrk");
+    getProjections(hTrknmc2D[i],hTrknmc[i],normnmc[i],"tnmc",i,"hTrk");
+    getProjections(hTrkamc2D[i],hTrkamc[i],normamc[i],"tamc",i,"hTrk");
+    //    getProjections(hTrkmc2D[i],hTrkmc[i],normamc[i],"mc",i,"hTrk");
+    getProjections(hTrknmcO2D[i],hTrknmcO[i],normnmc[i],"tnmcO",i,"hTrk");
+    getProjections(hTrkamcO2D[i],hTrkamcO[i],normamc[i],"tamcO",i,"hTrk");
+    //    getProjections(hTrkmcO2D[i],hTrkmcO[i],normamc[i],"mcO",i,"hTrk");
+
+
+    cout<<"d"<<endl;
+
+    if(0){
     normn[i]->Reset();
     normn[i]->Add(hptn[i]);
     norma[i]->Reset();
@@ -551,27 +593,8 @@ void plotXsi(int centIndex = 0, int etaBin = 0, double leadJetPtMin = 100, doubl
 
     cout<<"Got projections."<<endl;
 
-  TCanvas* c1 = new TCanvas("c1","",900,900);
-  c1->Divide(2,2);
-
-  c1->cd(1);
-  xsin[i]->Draw("p");  
-  xsinmc[i]->Draw("hist same");
-
-  c1->cd(3);
-  normn[i]->Draw("p");
-  normnmc[i]->Draw("hist same");
-
-   c1->Print("Fragmentations.gif");
-  
-   c1->cd(2);
-   hpt2D->Draw("colz");
-   hCorrelationLead->Draw("surf2");
-   
-   c1->cd(4);
-   hAJ->Draw();
   }
-   outf->Write();
+  outf->Write();
 
    cout<<"Congrats!!!"<<endl;
 }
@@ -582,22 +605,26 @@ void fragmentation(){
   double et[10] = {100,120,150,180,200};
   double tk[10] = {4.,5.,7.,10.,20.};
 
-  for(int i = 0; i < 4; ++i){
+  //  for(int i = 0; i < 1 + 3*(!centralOnly); ++i){
+  for(int i = 0; i < 1; ++i){
     if(centralOnly){
       plotXsi(0,i);
+      //      plotXsi(1,i);
+      //      plotXsi(2,i);
+
     }else{
-      for(int j = 0; j < 5; ++j){
-	for(int k = 0; k < 5; ++k){
-	  plotXsi(0,i,et[j],tk[k]);
-	  plotXsi(1,i,et[j],tk[k]);
-	  plotXsi(2,i,et[j],tk[k]);
+      for(int j = 0; j < 6; ++j){
+	for(int k = 0; k < 6; ++k){
+	  plotXsi(0,i,j,k);
+	  plotXsi(1,i,j,k);
+	  plotXsi(2,i,j,k);
 	}
       }
-
+      
     }
   }
 
-
+  
 
 }
 
