@@ -103,7 +103,7 @@ HiInclusiveJetAnalyzer::beginJob() {
   string jetTagTitle = jetTag_.label()+" Jet Analysis Tree"; 
   t = fs1->make<TTree>("t",jetTagTitle.c_str());
 
-    TTree* t= new TTree("t","Jet Response Analyzer");
+  //  TTree* t= new TTree("t","Jet Response Analyzer");
   //t->Branch("run",&jets_.run,"run/I");
   t->Branch("evt",&jets_.evt,"evt/I");
   //t->Branch("lumi",&jets_.lumi,"lumi/I");
