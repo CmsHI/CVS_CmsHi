@@ -57,7 +57,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   verbose_ = iConfig.getUntrackedParameter<bool>("verbose",false);
 
   useCentrality_ = iConfig.getUntrackedParameter<bool>("useCentrality",false);
-  useVtx_ = iConfig.getUntrackedParameter<bool>("useVtx",true);
+  useVtx_ = iConfig.getUntrackedParameter<bool>("useVtx",false);
   useJEC_ = iConfig.getUntrackedParameter<bool>("useJEC",true);
   usePat_ = iConfig.getUntrackedParameter<bool>("usePAT",true);
 
@@ -104,16 +104,20 @@ HiInclusiveJetAnalyzer::beginJob() {
   t = fs1->make<TTree>("t",jetTagTitle.c_str());
 
   //  TTree* t= new TTree("t","Jet Response Analyzer");
-  t->Branch("run",&jets_.run,"run/I");
+  //t->Branch("run",&jets_.run,"run/I");
   t->Branch("evt",&jets_.evt,"evt/I");
-  t->Branch("lumi",&jets_.lumi,"lumi/I");
+  //t->Branch("lumi",&jets_.lumi,"lumi/I");
   t->Branch("b",&jets_.b,"b/F");
-  t->Branch("vx",&jets_.vx,"vx/F");
-  t->Branch("vy",&jets_.vy,"vy/F");
-  t->Branch("vz",&jets_.vz,"vz/F");
-  t->Branch("hf",&jets_.hf,"hf/F");
-  t->Branch("nref",&jets_.nref,"nref/I");
-  t->Branch("bin",&jets_.bin,"bin/I");
+  if (useVtx_) {
+     t->Branch("vx",&jets_.vx,"vx/F");
+     t->Branch("vy",&jets_.vy,"vy/F");
+     t->Branch("vz",&jets_.vz,"vz/F");
+  }
+  if (useCentrality_) {
+     t->Branch("hf",&jets_.hf,"hf/F");
+     t->Branch("nref",&jets_.nref,"nref/I");
+     t->Branch("bin",&jets_.bin,"bin/I");
+  }
   t->Branch("rawpt",jets_.rawpt,"rawpt[nref]/F");
   t->Branch("jtpt",jets_.jtpt,"jtpt[nref]/F");
   t->Branch("jteta",jets_.jteta,"jteta[nref]/F");
