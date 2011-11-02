@@ -13,13 +13,14 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.1 2011/11/02 14:13:55 frankma Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.2 2011/11/02 18:24:57 yjlee Exp $
 //
 //
 
 
 // system include files
 #include <memory>
+#include <vector>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -36,7 +37,10 @@
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 #include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
+#include "DataFormats/VertexReco/interface/Vertex.h"
+
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
+
 
 #include "TTree.h"
 
@@ -67,11 +71,14 @@ private:
    edm::InputTag CentralityBinTag_;
    edm::InputTag EvtPlaneTag_;
    edm::InputTag HiMCTag_;
+   edm::InputTag VertexTag_;
 
    bool doEvtPlane_;
    bool doMC_;
+   bool doVertex_;
    
    edm::Service<TFileService> fs_;
+   CentralityProvider * centProvider;
    
    TTree * thi_;
    
@@ -95,6 +102,13 @@ private:
    float fEtMR;
    int fNchargedPtCut;
    int fNchargedPtCutMR;
+
+   float vx,vy,vz;
+
+   int event;
+   int run;
+   int lumi;
+   
 };
 
 //
@@ -113,8 +127,10 @@ CentralityTag_(iConfig.getParameter<edm::InputTag> ("Centrality")),
 CentralityBinTag_(iConfig.getParameter<edm::InputTag> ("CentralityBin")),
 EvtPlaneTag_(iConfig.getParameter<edm::InputTag> ("EvtPlane")),
 HiMCTag_(iConfig.getParameter<edm::InputTag> ("HiMC")),
+VertexTag_(iConfig.getParameter<edm::InputTag> ("Vertex")),
 doEvtPlane_(iConfig.getParameter<bool> ("doEvtPlane")),
-doMC_(iConfig.getParameter<bool> ("doMC"))
+doMC_(iConfig.getParameter<bool> ("doMC")),
+doVertex_(iConfig.getParameter<bool>("doVertex"))
 {
    //now do what ever initialization is needed
    
@@ -142,11 +158,16 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //ESHandle<SetupData> pSetup;
    //iSetup.get<SetupRecord>().get(pSetup);
 
+   // Run info
+   event = iEvent.id().event();
+   run = iEvent.id().run();
+   lumi = iEvent.id().luminosityBlock();
+
+
    edm::Handle<edm::GenHIEvent> mchievt;
    edm::Handle<reco::Centrality> centrality;
    edm::Handle<reco::EvtPlaneCollection> evtPlanes;
-   CentralityProvider * centProvider;
-   
+   centProvider = 0;
    if(doMC_){
       edm::Handle<edm::GenHIEvent> mchievt;
       iEvent.getByLabel(edm::InputTag(HiMCTag_),mchievt);
@@ -208,6 +229,14 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
    }
    
+   if (doVertex_) {
+      edm::Handle<std::vector<reco::Vertex> > vertex;
+      iEvent.getByLabel(VertexTag_, vertex);
+      vx=vertex->begin()->x();
+      vy=vertex->begin()->y();
+      vz=vertex->begin()->z();
+   }
+   
    // Done w/ all vars
    thi_->Fill();
 }
@@ -218,10 +247,11 @@ void
 HiEvtAnalyzer::beginJob()
 {
    thi_ = fs_->make<TTree>("HiTree", "");
-   
+
+   centProvider = 0;
    HltEvtCnt = 0;
    const int kMaxEvtPlanes = 1000;
-   
+    
    fNpart = -1;
    fNcoll = -1;
    fNhard = -1;
@@ -240,18 +270,36 @@ HiEvtAnalyzer::beginJob()
    hiBin = -1;
    hiEvtPlane = new float[kMaxEvtPlanes];
    
-   thi_->Branch("Npart",&fNpart,"Npart/F");
-   thi_->Branch("Ncoll",&fNcoll,"Ncoll/F");
-   thi_->Branch("Nhard",&fNhard,"Nhard/F");
-   thi_->Branch("phi0",&fPhi0,"NPhi0/F");
-   thi_->Branch("b",&fb,"b/F");
-   thi_->Branch("Ncharged",&fNcharged,"Ncharged/I");
-   thi_->Branch("NchargedMR",&fNchargedMR,"NchargedMR/I");
-   thi_->Branch("MeanPt",&fMeanPt,"MeanPt/F");
-   thi_->Branch("MeanPtMR",&fMeanPtMR,"MeanPtMR/F");
-   thi_->Branch("EtMR",&fEtMR,"EtMR/F");
-   thi_->Branch("NchargedPtCut",&fNchargedPtCut,"NchargedPtCut/I");
-   thi_->Branch("NchargedPtCutMR",&fNchargedPtCutMR,"NchargedPtCutMR/I");
+   vx = -100;
+   vy = -100;
+   vz = -100;
+   
+   // Run info
+   thi_->Branch("run",&run,"run/I");
+   thi_->Branch("evt",&event,"evt/I");
+   thi_->Branch("lumi",&lumi,"lumi/I");
+
+   // Vertex
+   thi_->Branch("vx",&vx,"vx/F");
+   thi_->Branch("vy",&vy,"vy/F");
+   thi_->Branch("vz",&vz,"vz/F");
+
+   // Centrality 
+   if (doMC_) {
+      thi_->Branch("Npart",&fNpart,"Npart/F");
+      thi_->Branch("Ncoll",&fNcoll,"Ncoll/F");
+      thi_->Branch("Nhard",&fNhard,"Nhard/F");
+      thi_->Branch("phi0",&fPhi0,"NPhi0/F");
+      thi_->Branch("b",&fb,"b/F");
+      thi_->Branch("Ncharged",&fNcharged,"Ncharged/I");
+      thi_->Branch("NchargedMR",&fNchargedMR,"NchargedMR/I");
+      thi_->Branch("MeanPt",&fMeanPt,"MeanPt/F");         
+      thi_->Branch("MeanPtMR",&fMeanPtMR,"MeanPtMR/F");
+      thi_->Branch("EtMR",&fEtMR,"EtMR/F");
+      thi_->Branch("NchargedPtCut",&fNchargedPtCut,"NchargedPtCut/I");
+      thi_->Branch("NchargedPtCutMR",&fNchargedPtCutMR,"NchargedPtCutMR/I");
+   } 
+    
    thi_->Branch("hiBin",&hiBin,"hiBin/I");
    thi_->Branch("hiHF",&hiHF,"hiHF/F");
    thi_->Branch("hiHFplus",&hiHFplus,"hiHFplus/F");
@@ -272,11 +320,15 @@ HiEvtAnalyzer::beginJob()
    thi_->Branch("hiNpix",&hiNpix,"hiNpix/I");
    thi_->Branch("hiNpixelTracks",&hiNpixelTracks,"hiNpixelTracks/I");
    thi_->Branch("hiNtracks",&hiNtracks,"hiNtracks/I");
-   thi_->Branch("hiNevtPlane",&nEvtPlanes,"hiNevtPlane/I");
-   thi_->Branch("hiEvtPlanes",hiEvtPlane,"hiEvtPlanes[hiNevtPlane]/F");
    thi_->Branch("hiNtracksPtCut",&hiNtracksPtCut,"hiNtracksPtCut/I");
    thi_->Branch("hiNtracksEtaCut",&hiNtracksEtaCut,"hiNtracksEtaCut/I");
    thi_->Branch("hiNtracksEtaPtCut",&hiNtracksEtaPtCut,"hiNtracksEtaPtCut/I");
+   
+   // Event plane
+   if (doEvtPlane_) {
+      thi_->Branch("hiNevtPlane",&nEvtPlanes,"hiNevtPlane/I");
+      thi_->Branch("hiEvtPlanes",hiEvtPlane,"hiEvtPlanes[hiNevtPlane]/F");
+   }
 }
 
 // ------------ method called once each job just after ending the event loop  ------------

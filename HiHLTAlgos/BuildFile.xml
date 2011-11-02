@@ -4,6 +4,7 @@
 <use name="CommonTools/UtilAlgos"/>
 <use name="FWCore/ServiceRegistry"/>
 <use name="DataFormats/HeavyIonEvent"/>
+<use name="DataFormats/VertexReco"/>
 <use name="SimDataFormats/HiGenData"/>
 <flags EDM_PLUGIN="1"/>
 <export>
