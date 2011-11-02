@@ -25,7 +25,9 @@ void scaleAlongX(TH2* h,int bin, double a, double ea){
   }
 }
 
-void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2, double min=100, double max = 200, double par0 = 0.01){
+void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2, double min=100, double max = 200, bool doPt = 0, double par0 = 0.01){
+
+  //Reweight h1 according to hpt2/hpt1
 
   TF1* fPt1 = new TF1(Form("%s_fit",hpt1->GetName()),"[0]*x^([1])",min,max);
   TF1* fPt2 = new TF1(Form("%s_fit",hpt2->GetName()),"[0]*x^([1])",min,max);
@@ -52,17 +54,24 @@ void reweightPt(TH2* h1, TH2* h2, TH1* hpt1, TH1* hpt2, double min=100, double m
     double dpt1 = 0, dpt2 = 0, e = 0;
 
     if(hpt1->GetBinCenter(i) < min){
-	dpt1 = hpt1->GetBinContent(i);
-	dpt2 = hpt2->GetBinContent(i);      
-      }else{
-	dpt1 = fPt1->Eval(hpt1->GetBinCenter(i));
+      dpt1 = hpt1->GetBinContent(i);
+      dpt2 = hpt2->GetBinContent(i);      
+    }else{
+      dpt1 = fPt1->Eval(hpt1->GetBinCenter(i));
 	dpt2 = fPt2->Eval(hpt2->GetBinCenter(i));
+    }
+    e = hpt2->GetBinError(i);
+    e = 0;
+    if(dpt2 <= 0) e = 0;
+    if(dpt1 > 0){
+      if(doPt){
+	hpt1->SetBinContent(i,dpt2);
+	double e1 = hpt1->GetBinError(i)/dpt1;
+	double e2 = hpt2->GetBinError(i)/dpt2;
+	hpt1->SetBinError(i,sqrt(e1*e1+e2*e2)*dpt2);
       }
-      e = hpt2->GetBinError(i);
-
-     if(dpt2 <= 0) e = 0;
-     if(dpt1 > 0)
-       scaleAlongX(h1,i,dpt2/dpt1,e/dpt1);
+      scaleAlongX(h1,i,dpt2/dpt1,e/dpt1);
+    }
   }
 }
 
@@ -511,8 +520,8 @@ void plotXsi(int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackP
       //      reweightPt(hFmc2D[i],hF2D[i],hptmc[i],hpt[i]);
       //      reweightPt(hFmcO2D[i],hF2D[i],hptmc[i],hpt[i]);
 
-      reweightPt(hTrknmc2D[i],hTrkn2D[i],hptnmc[i],hptn[i],fitMin[0],fitMax[0]);
-      reweightPt(hTrkamc2D[i],hTrka2D[i],hptamc[i],hpta[i],fitMin[i],fitMax[i]);
+      reweightPt(hTrknmc2D[i],hTrkn2D[i],hptnmc[i],hptn[i],fitMin[0],fitMax[0],1);
+      reweightPt(hTrkamc2D[i],hTrka2D[i],hptamc[i],hpta[i],fitMin[i],fitMax[i],1);
       //      reweightPt(hTrkmc2D[i],hTrk2D[i],hptmc[i],hpt[i]);
       //      reweightPt(hTrkmcO2D[i],hTrk2D[i],hptmc[i],hpt[i]);
 
@@ -536,7 +545,7 @@ void plotXsi(int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackP
       //      hFmc2D[i]->Scale(1./hpt[i]->Integral()/binwidth);
       //      hF2D[i]->Scale(1./hpt[i]->Integral()/binwidth);
 
-      if(0){
+      if(1){
 
 	hptnmc[i]->Scale(hptn[i]->Integral("width")/hptnmc[i]->Integral("width"));
 	hptamc[i]->Scale(hpta[i]->Integral("width")/hptamc[i]->Integral("width"));
@@ -609,8 +618,8 @@ void fragmentation(){
   for(int i = 0; i < 1; ++i){
     if(centralOnly){
       plotXsi(0,i);
-      //      plotXsi(1,i);
-      //      plotXsi(2,i);
+      plotXsi(1,i);
+     plotXsi(2,i);
 
     }else{
       for(int j = 0; j < 6; ++j){
