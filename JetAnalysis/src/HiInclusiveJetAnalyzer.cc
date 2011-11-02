@@ -115,9 +115,10 @@ HiInclusiveJetAnalyzer::beginJob() {
   }
   if (useCentrality_) {
      t->Branch("hf",&jets_.hf,"hf/F");
-     t->Branch("nref",&jets_.nref,"nref/I");
      t->Branch("bin",&jets_.bin,"bin/I");
   }
+
+  t->Branch("nref",&jets_.nref,"nref/I");
   t->Branch("rawpt",jets_.rawpt,"rawpt[nref]/F");
   t->Branch("jtpt",jets_.jtpt,"jtpt[nref]/F");
   t->Branch("jteta",jets_.jteta,"jteta[nref]/F");
@@ -149,7 +150,7 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
     t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
   }
-  
+  /*
   if(!isMC_){
     t->Branch("nL1TBit",&jets_.nL1TBit,"nL1TBit/I");
     t->Branch("l1TBit",jets_.l1TBit,"l1TBit[nL1TBit]/O");
@@ -161,7 +162,7 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("hltBit",jets_.hltBit,"hltBit[nHLTBit]/O");
 
   }
-
+  */
   TH1D::SetDefaultSumw2();
   
   
