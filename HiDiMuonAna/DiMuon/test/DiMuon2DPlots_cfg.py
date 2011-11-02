@@ -10,31 +10,36 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 
 process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-process.GlobalTag.globaltag = cms.string('GR10_P_V12::All')
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.GlobalTag.globaltag = cms.string('START44_V7::All')
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
 
+
+#from CmsHi.Analysis2010.CommonFunctions_cff import *
+#overrideCentrality(process)
+#process.HeavyIonGlobalParameters = cms.PSet(
+#    centralityVariable = cms.string("HFhits"),
+#    nonDefaultGlauberModel = cms.string(""), 
+#    centralitySrc = cms.InputTag("hiCentrality")
+#    )
+
+
+
+
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
-
-
 process.HeavyIonGlobalParameters = cms.PSet(
-    centralityVariable = cms.string("HFhits"),
-    nonDefaultGlauberModel = cms.string(""), 
-    centralitySrc = cms.InputTag("hiCentrality")
-    )
-
-
-
-
-
+        centralityVariable = cms.string("HFhits"),
+            centralitySrc = cms.InputTag("hiCentrality"),
+            nonDefaultGlauberModel = cms.string("Hydjet_Bass")
+            )
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2000)
+    input = cms.untracked.int32(10)
     )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
@@ -43,13 +48,17 @@ process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
 
+    'file:RV_DiMuonSkim.root'
+    
+
+#'file:/tmp/kumarv/ReReco_ZoroSkimMC.root'
+
+#'rfio:/castor/cern.ch/cms/store/caf/user/silvest/PanchoSkim_150436-152957_MuonPhys_v3/PanchoSkim_97_1_9k8.root'
+
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/DiMuSkim_zsTotal43.root'
+#'rfio:/castor/cern.ch/user/k/kumarv/cms391/DiMuSkim_cutG.root'
 
 
-#'file:/tmp/camelia/ZoroSkim_v2.root'
-
-
-
-'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/HydTest/HydPt50Test.root'
 
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0HydPt50PatDiMuon/Z0HydPt50_PatDiMuonSkim_95.root',
 #'rfio:/castor/cern.ch/user/k/kumarv/cms391/MC/Z0HydPt50PatDiMuon/Z0HydPt50_PatDiMuonSkim_93.root'
@@ -77,25 +86,16 @@ process.source = cms.Source("PoolSource",
 #    cmd  = 'nsls %s/ ' % (path)
 #    file = ["rfio:%s/%s" % (path,i) for i in commands.getoutput(cmd).split('\n')]
 #    return file
-#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cms391/MC/Z0HydPt50PatDiMuon")
-
-
-
-
-#process.TFileService = cms.Service(
- #   "TFileService",
-    #fileName = cms.string("rfio:/castor/cern.ch/user/k/kumarv/JulyExercise/ZMuMu_Plot.root")
-  #  fileName = cms.string('file:DiMuon1D_PlotsDM.root')
-   # )
-
-
+#process.source.fileNames= getCastorDirectoryList("/castor/cern.ch/user/k/kumarv/cms391/MC/Z0DataMixPt50PatDiMuon/")
 
 
 
 process.dimuons2DPlots = cms.EDAnalyzer(
     "DiMuon2DPlots",
-    OutputFileName = cms.untracked.string('file:Dimuon2DplotsHydTest.root'),
-    IsGenInfo=cms.untracked.string("TRUE"),
+    OutputFileName = cms.untracked.string('file:RV_Dimuon2Dplots.root'),
+    #HLTFilterName=cms.untracked.InputTag('hltHIL2DoubleMu3L2Filtered'),    
+    HLTFilterName=cms.untracked.string('hltHIDoubleMuLevel1PathL1OpenFiltered'),
+    IsGenInfo=cms.untracked.string("FALSE"),
     IsPATInfo=cms.untracked.string("TRUE"),
     IsCuts = cms.untracked.bool(True)
 
@@ -110,8 +110,6 @@ process.eventInfo = cms.OutputModule (
  
 
 process.dimuons2DPlotsPath = cms.Path(process.dimuons2DPlots)
-
-
 process.schedule=cms.Schedule(process.dimuons2DPlotsPath)
 
 
