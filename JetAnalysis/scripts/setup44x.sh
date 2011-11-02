@@ -90,5 +90,12 @@ rm patch.tmp
 # trigger analyzers
 cvs co -r HLTrigger/HLTanalyzers
 
+# event analyzer
+cvs co -d  CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
+process.load("CmsHi.HiHLTAlgos.hievtanalyzer_cfi")
+
+# muon analyzer
+cvs co -d MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
+
 scram build -c
 scram b -j4
