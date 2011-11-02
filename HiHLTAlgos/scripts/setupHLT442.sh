@@ -1,12 +1,12 @@
 #/bin/bash -
 # setup HLT
-cvs co -r V13-00-01 HLTrigger/Configuration
-#cvs co -r V03-00-07     L1TriggerConfig/L1GtConfigProducers
+cvs co -r V00-00-13-04 Configuration/AlCa
+cvs co -r V13-00-08 HLTrigger/Configuration
+cvs co -r V01-23-03 HLTrigger/HLTfilters
+cvs co -r V09-01-03 RecoTracker/MeasurementDet
+cvs co -r V01-04-06 RecoHI/HiTracking
 checkdeps -a
-addpkg RecoTracker/MeasurementDet
-cp -v /afs/cern.ch/user/g/gruen/public/MeasurementTrackerESProducer.cc RecoTracker/MeasurementDet/plugins/
-addpkg DQM/HcalMonitorTasks
-cp -v /afs/cern.ch/user/g/gruen/public/HcalDataIntegrityTask.cc DQM/HcalMonitorTasks/src/
+rm -rf Fireworks
 
 # get hlt menu cff
 hltGetConfiguration --cff --offline --data /dev/CMSSW_4_4_2/HIon --type HIon --unprescale > $CMSSW_BASE/src/HLTrigger/Configuration/python/HLT_HIon_data_cff.py
@@ -31,7 +31,7 @@ cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
 # jet
 cvs co          RecoHI/HiJetAlgos
 cvs co          HeavyIonsAnalysis/Configuration
-cvs co -r hi441_1 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 # photon
 cvs co -r V02-02-01  RecoHI/HiEgammaAlgos
 cvs co -r V00-00-15  RecoHI/Configuration
