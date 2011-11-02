@@ -13,28 +13,43 @@ process.load("Configuration.StandardSequences.Geometry_cff")
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 
-#process.GlobalTag.globaltag = cms.string('START311_V1::All')
-process.GlobalTag.globaltag = cms.string('GR_R_41_V0::All')
+
+##2010 HI run global tag
+#process.GlobalTag.globaltag = cms.string('GR_R_41_V0::All')
+
+process.GlobalTag.globaltag = cms.string('START44_V7::All')
+
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("RecoHI.HiCentralityAlgos.CentralityBin_cfi")
 
 
+##from CmsHi.Analysis2010.CommonFunctions_cff import *
+##overrideCentrality(process)
+##process.HeavyIonGlobalParameters = cms.PSet(
+##    #reco data centralityVariable = cms.string("HFhits"),
+##    centralityVariable = cms.string("HFtowers"),
+##    centralitySrc = cms.InputTag("hiCentrality"),
+##    #nonDefaultGlauberModel = cms.string("Hydjet_Bass")
+##    nonDefaultGlauberModel = cms.string("")
+    
+##    )
+
+
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 process.HeavyIonGlobalParameters = cms.PSet(
-    #reco data centralityVariable = cms.string("HFhits"),
-
-    centralityVariable = cms.string("HFtowers"),
+    centralityVariable = cms.string("HFhits"),
     centralitySrc = cms.InputTag("hiCentrality"),
-    #nonDefaultGlauberModel = cms.string("Hydjet_Bass")
-    nonDefaultGlauberModel = cms.string("")
-
+    nonDefaultGlauberModel = cms.string("Hydjet_Bass")
     )
 
 
+
+
+
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20)
+    input = cms.untracked.int32(-1)
     )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
@@ -48,7 +63,22 @@ process.source = cms.Source("PoolSource",
 
 
 
-"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim/UPC_MuSkim_103_1_5nB.root"
+'file:UPC_MuSkim.root'
+
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/Test/UPC_MuSkim.root",
+
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V5/UPC_MuSkim_984_3_O3Y.root",
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V5/UPC_MuSkim_883_1_92T.root"
+
+
+
+
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V3/UPC_MuSkim_182_1_V4j.root",
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V3/UPC_MuSkim_68_1_aYH.root"
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V3/UPC_MuSkim_25_1_VOQ.root"
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim_V3/UPC_MuSkim_91_1_itH.root"
+#'file:UPC_MuSkim.root'
+#"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyMukim/UPC_MuSkim_103_1_5nB.root"
 #"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyV3/UPC_MuSkim_188_1_4KM.root"
 #"rfio:/castor/cern.ch/user/k/kumarv/cms414/Exp/Data/UPC/Mu/AllPhyV3/UPC_MuSkim_541_1_NGl.root"
 
@@ -83,6 +113,9 @@ process.source = cms.Source("PoolSource",
 #    (len(process.source.fileNames))
   
 
+################################################# HF Filter #######################################################################
+#process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
+##################################################################################################################################
 
 
 process.dimuonUPCTree = cms.EDAnalyzer(
@@ -99,6 +132,9 @@ process.dimuonUPCTree = cms.EDAnalyzer(
 process.eventInfo = cms.OutputModule (
     "AsciiOutputModule"
        )
+
+
+
 
 process.dimuonUPCTreePath = cms.Path(process.dimuonUPCTree)
 process.schedule=cms.Schedule(process.dimuonUPCTreePath)
