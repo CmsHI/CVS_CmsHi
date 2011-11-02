@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id$
+// $Id: HiEvtAnalyzer.cc,v 1.1 2011/11/02 14:13:55 frankma Exp $
 //
 //
 
@@ -34,6 +34,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 #include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 
@@ -143,8 +144,8 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    edm::Handle<edm::GenHIEvent> mchievt;
    edm::Handle<reco::Centrality> centrality;
-   edm::Handle<int> binHandle;
    edm::Handle<reco::EvtPlaneCollection> evtPlanes;
+   CentralityProvider * centProvider;
    
    if(doMC_){
       edm::Handle<edm::GenHIEvent> mchievt;
@@ -163,10 +164,16 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       fNchargedPtCutMR = mchievt->NchargedPtCutMR();
    }
    
-   iEvent.getByLabel(CentralityBinTag_,binHandle);
-   hiBin = *binHandle;
+   //iEvent.getByLabel(CentralityBinTag_,binHandle);
+   //hiBin = *binHandle;
    
    iEvent.getByLabel(CentralityTag_,centrality);
+   if (!centProvider) centProvider = new CentralityProvider(iSetup);
+
+   // make supre you do this first in every event
+   centProvider->newEvent(iEvent,iSetup); 
+
+   hiBin = centProvider->getBin();
    hiNpix = centrality->multiplicityPixel();
    hiNpixelTracks = centrality->NpixelTracks();
    hiNtracks = centrality->Ntracks();
