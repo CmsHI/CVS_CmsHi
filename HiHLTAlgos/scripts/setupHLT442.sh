@@ -24,6 +24,7 @@ cp -v CmsHi/HiHLTAlgos/modifiedFiles/L1Trigger_custom.py L1Trigger/Configuration
 # analyzers
 # evt
 cvs co UserCode/L1TriggerDPG
+cvs co UserCode/CmsHi UserCode/CmsHi/Analysis2010
 # trk
 cvs co MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
