@@ -1,6 +1,7 @@
 #/bin/bash -
 
-# trigger analyzers
+# trigger
+cvs co -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 # evt
 cvs co UserCode/L1TriggerDPG
 cvs co UserCode/CmsHi UserCode/CmsHi/Analysis2010
