@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.2 2011/07/18 15:49:01 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.1 2011/11/02 21:47:18 kimy Exp $
 //
 //
 
@@ -43,6 +43,7 @@ Implementation:
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+
 
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
@@ -102,7 +103,16 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   edm::InputTag ebReducedRecHitCollection_;
   edm::InputTag eeReducedRecHitCollection_;
 
+  edm::InputTag basicClusterBarrel_;
+  edm::InputTag basicClusterEndcap_;
+
   TTree* theTree;
+  TTree* theBC;
+  
+  bool doRecHit;
+  TH1D* hRHetBarrel;
+  TH1D* hRHetEndcap;
+  TH1D* hRHetBarrelCleaned;
   
   std::string mSrc;
   std::string vertexProducer_;      // vertecies producer                                                                                                                                                       
@@ -116,6 +126,14 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   float swissCrx[1000];
   int nPar;
   double etCut;
+
+  
+  bool doBasicCluster;
+  int nBC ; 
+  float bcet[1000];
+  float bceta[1000];
+  float bcphi[1000];
+  
 };
 
 //
@@ -136,9 +154,12 @@ ClusterTreeMaker::ClusterTreeMaker(const edm::ParameterSet& iConfig)
    scProducerE_  = iConfig.getUntrackedParameter<std::string>("scTagE","hltRecoHIEcalWithCleaningCandidate");
    ebReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("ebRecHitCollection");
    eeReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("eeRecHitCollection");
-   etCut                           = iConfig.getUntrackedParameter<double>("etCut",8.0);
+   etCut                            = iConfig.getUntrackedParameter<double>("etCut",8.0);
+   basicClusterBarrel_              = iConfig.getParameter<edm::InputTag>("basicClusterBarrel");
+   basicClusterEndcap_              = iConfig.getParameter<edm::InputTag>("basicClusterEndcap");
+   doRecHit                         = iConfig.getUntrackedParameter<bool>("doRecHit",true);
+   doBasicCluster                   = iConfig.getUntrackedParameter<bool>("doBasicCluster",true);
 
-   
    
 }
 
@@ -284,10 +305,70 @@ ClusterTreeMaker::~ClusterTreeMaker()
    
    theTree->Fill();
    
+   // Rechit loop
+   //get the rechit geometry
+   edm::ESHandle<CaloGeometry> theCaloGeom;
+   const CaloGeometry* caloGeom;
+   
+   //Barrel 
+   EcalRecHitCollection::const_iterator rh;
+   if ( doRecHit) {
+     
+     iSetup.get<CaloGeometryRecord>().get(theCaloGeom);
+     caloGeom = theCaloGeom.product();
+     
+     EcalRecHitCollection::const_iterator rh;
+     
+     for (rh = (*ecalRecHitsEB).begin(); rh!= (*ecalRecHitsEB).end(); rh++){
+       DetId id = rh->id();
+       double swissCrx = EcalTools::swissCross   (id, *ecalRecHitsEB, 0, true) ; // EcalSeverityLevelAlgo::swissCross(id, *rechitsCollectionBarrel, 0.,true);
+       double time     = rh->time();
+       
+       const GlobalPoint & position = caloGeom->getPosition(rh->id());
+       double tempEt = rh->energy()/cosh(position.eta()) ;
+       hRHetBarrel->Fill(tempEt);
+       if ( (rh->energy()>3) && ((fabs(time) > 3)||(swissCrx > 0.95)) )
+	 hRHetBarrelCleaned->Fill(tempEt);
+     }
+     //Endcap
+     for (rh = (*ecalRecHitsEE).begin(); rh!= (*ecalRecHitsEE).end(); rh++){
+       DetId id = rh->id();
+       const GlobalPoint & position = caloGeom->getPosition(rh->id());
+       double tempEt = rh->energy()/cosh(position.eta()) ;
+       hRHetEndcap->Fill(tempEt);
+     }
+   }
+
+   Handle<reco::CaloClusterCollection> basicClusterB;
+   iEvent.getByLabel(basicClusterBarrel_, basicClusterB);
+   Handle<reco::CaloClusterCollection> basicClusterE;
+   iEvent.getByLabel(basicClusterEndcap_, basicClusterE);
+   reco::CaloClusterCollection myBCs;
+   for (reco::CaloClusterCollection::const_iterator bcItr = basicClusterB->begin(); bcItr != basicClusterB->end(); ++bcItr) {
+     myBCs.push_back(*bcItr);
+   }
+   for (reco::CaloClusterCollection::const_iterator bcItr = basicClusterE->begin(); bcItr != basicClusterE->end(); ++bcItr) {
+     myBCs.push_back(*bcItr);
+   }
+   
+   nBC = 0;
+   if (doBasicCluster) {
+     for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
+       
+       bceta[nBC] = bcItr->eta();
+       bcphi[nBC] = bcItr->phi();
+       bcet[nBC] =  bcItr->energy()/cosh(bcItr->eta());
+       
+       nBC++;
+     }
+     
+   }  
+   theBC->Fill();
+   
 }
 
 
-// ------------ method called once each job just before starting event loop  ------------
+   // ------------ method called once each job just before starting event loop  ------------
     void 
 ClusterTreeMaker::beginJob() 
 {
@@ -302,7 +383,20 @@ ClusterTreeMaker::beginJob()
    theTree->Branch("swissCrx",swissCrx,"swissCrx[nPar]/F");
    theTree->Branch("severity",severity,"severity[nPar]/F");
  
+   theBC  = fs->make<TTree>("photon","Tree of Rechits around photon");
 
+   theBC->Branch("number",&nBC,"number/I");
+   theBC->Branch("et",bcet,"et[number]/F");
+   theBC->Branch("eta",bceta,"eta[number]/F");
+   theBC->Branch("phi",bcphi,"phi[number]/F");
+   
+   
+
+   hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 400,-2.5,197.5);;
+   hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 400,-2.5,197.5);;
+   hRHetBarrelCleaned = fs->make<TH1D>( "hRHetBarrelCleaned" , "", 400,-2.5,197.5);;
+
+   
    std::cout<<"done beginjob"<<std::endl;
 }
 
