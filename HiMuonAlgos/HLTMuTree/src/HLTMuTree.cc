@@ -1,23 +1,11 @@
-// -*- C++ -*-
-//
 // Package:    HLTMuTree
 // Class:      HLTMuTree
 // 
-/**\class HLTMuTree HLTMuTree.cc UserCode/HLTMuTree/src/HLTMuTree.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Mihee Jo,588 R-012,+41227673278,
-//         Created:  Thu Jul  7 11:47:28 CEST 2011
-// $Id: HLTMuTree.cc,v 1.5 2011/10/31 07:32:25 frankma Exp $
-//
+// Original Author:  Mihee Jo
+// $Id: HLTMuTree.cc,v 1.2 2011/11/03 10:25:28 miheejo Exp $
 //
 
-#include "MuTrig/HLTMuTree/interface/HLTMuTree.h"
+#include "HiMuonAlgos/HLTMuTree/interface/HLTMuTree.h"
 
 using namespace std;
 using namespace reco;
@@ -36,16 +24,11 @@ HLTMuTree::HLTMuTree(const edm::ParameterSet& iConfig)
   doGen = iConfig.getUntrackedParameter<bool>("doGen");
   tagGenPtl = iConfig.getParameter<edm::InputTag>("genparticle");
   tagSimTrk = iConfig.getParameter<edm::InputTag>("simtrack");
-
 }
 
 
 HLTMuTree::~HLTMuTree()
 {
- 
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
-
 }
 
 
@@ -153,13 +136,6 @@ HLTMuTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           }
           nGen++;
 
-/*          if (genPtl->numberOfMothers() > 0 ) {
-            GenMu.mom[nGen] = genPtl->mother(0)->pdgId();
-            cout << "mom pid: " << genPtl->mother(0)->pdgId() << endl;
-          } else {
-            GenMu.mom[nGen] = 10; 
-          }*/
-
         }
       }
     } //End of gen collection
@@ -205,7 +181,6 @@ HLTMuTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     centrality = new CentralityProvider(iSetup);
     centrality->newEvent(iEvent,iSetup);
     cbin = centrality->getBin();
-//    cbin = -1;
 
     //Get vertex position
     edm::Handle< vector<reco::Vertex> > vertex;
