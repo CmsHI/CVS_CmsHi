@@ -103,13 +103,19 @@ process.load("CmsHi.PhotonAnalysis.simpleSCTree_cfi")
 #### muon anlayzer
 process.load("HiMuonAlgos.HLTMuTree.hltMuTree_cfi")
 
+### Track analyzer
+process.load("MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff")
+process.anaTrack.trackPtMin = 4
+process.anaTrack.useQuality = True
+process.anaTrack.trackSrc = cms.InputTag("hiSelectedTracks")
+
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string("openhlt_data.root")
 )
 
 # Path and EndPath definitions
 process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.patJets)
-process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree)
+process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree*process.anaTrack)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
