@@ -54,11 +54,14 @@ process.load('RecoHI.HiCentralityAlgos.CentralityBin_cfi')
 process.load('HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi')
 process.hltbitanalysis.UseTFileService			= cms.untracked.bool(True)
 
-process.hltbitnew = process.hltbitanalysis.clone(
-  l1GtObjectMapRecord	= cms.InputTag("hltL1GtObjectMap","","HLT"),
-  l1GtReadoutRecord		= cms.InputTag("gtDigis"),
-  hltresults           = cms.InputTag("TriggerResults","","HLT"),
-  HLTProcessName       = cms.string("HLT")
+process.hltana = process.hltbitanalysis.clone(
+   l1GtReadoutRecord		= cms.InputTag("gtDigis"),
+   l1GctHFBitCounts     = cms.InputTag("gctDigis"),
+   l1GctHFRingSums      = cms.InputTag("gctDigis"),
+   l1extramu            = cms.string('l1extraParticles'),
+   l1extramc            = cms.string('l1extraParticles'),
+   hltresults           = cms.InputTag("TriggerResults","","HLT"),
+   HLTProcessName       = cms.string("HLT")
   )
 
 # HiEvt Analyzer
@@ -105,7 +108,7 @@ process.TFileService = cms.Service("TFileService",
 
 # Path and EndPath definitions
 process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.patJets)
-process.ana_step = cms.Path(process.hltbitnew*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree)
+process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
