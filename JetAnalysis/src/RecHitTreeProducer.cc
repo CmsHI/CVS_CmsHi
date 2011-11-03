@@ -12,9 +12,9 @@
 */
 //
 // Original Author:  Yetkin Yilmaz
-// Modified: Frank Ma
+// Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.15 2011/10/14 15:06:14 frankma Exp $
+// $Id: RecHitTreeProducer.cc,v 1.16 2011/10/25 13:41:08 yjlee Exp $
 //
 //
 
@@ -194,6 +194,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doTowers_;
    bool doEcal_;
    bool doHcal_;
+   bool doHF_;
    bool hasVtx_;
 
    bool doFastJet_;
@@ -231,6 +232,7 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doTowers_ = iConfig.getUntrackedParameter<bool>("doTowers",true);
   doEcal_ = iConfig.getUntrackedParameter<bool>("doEcal",true);
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
+  doHF_ = iConfig.getUntrackedParameter<bool>("doHF",true);
   hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",false);
   doFastJet_ = iConfig.getUntrackedParameter<bool>("doFastJet",true);
   FastJetTag_ = iConfig.getUntrackedParameter<edm::InputTag>("FastJetTag",edm::InputTag("kt4CaloJets"));
@@ -276,14 +278,18 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
   reco::Vertex::Point vtx;
   if (hasVtx_) vtx = getVtx(ev);
 
-   if(doEcal_){
-  ev.getByLabel(EBSrc_,ebHits);
-  ev.getByLabel(EESrc_,eeHits);
+  if(doEcal_){
+    ev.getByLabel(EBSrc_,ebHits);
+    ev.getByLabel(EESrc_,eeHits);
    }
+
   if(doHcal_){
-  ev.getByLabel(HcalRecHitHFSrc_,hfHits);
-  ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
+    ev.getByLabel(HcalRecHitHBHESrc_,hbheHits);
   }
+  if(doHF_){
+    ev.getByLabel(HcalRecHitHFSrc_,hfHits);
+  }
+
   if(useJets_) {
     ev.getByLabel(JetSrc_,jets);
   }
@@ -323,7 +329,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
 
    
-   if(doHcal_){
+   if(doHF_){
    for(unsigned int i = 0; i < hfHits->size(); ++i){
      const HFRecHit & hit= (*hfHits)[i];
      hfRecHit.e[hfRecHit.n] = hit.energy();
@@ -334,8 +340,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      hfRecHit.depth[hfRecHit.n] = hit.id().depth();
 
      if(hit.id().ieta() > 0){
-     if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshortPlus++;
-     if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlongPlus++;
+       if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshortPlus++;
+       if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlongPlus++;
      }else{
        if(hit.energy() > hfShortThreshold_ && hit.id().depth() != 1) nHFshortMinus++;
        if(hit.energy() > hfLongThreshold_ && hit.id().depth() == 1) nHFlongMinus++;
@@ -350,7 +356,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      }
      if (hfRecHit.et[hfRecHit.n]>=hfPtMin_) hfRecHit.n++;
    }
-   if(!doEbyEonly_){
+
+   if(doHcal_ && !doEbyEonly_){
    for(unsigned int i = 0; i < hbheHits->size(); ++i){
      const HBHERecHit & hit= (*hbheHits)[i];
      if (getEt(hit.id(),hit.energy())<hbhePtMin_) continue;
