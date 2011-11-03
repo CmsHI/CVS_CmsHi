@@ -100,7 +100,8 @@ process.icPu5JetAnalyzer = inclusiveJetAnalyzer.clone(
 #### supercluster analyzer
 process.load("CmsHi.PhotonAnalysis.simpleSCTree_cfi")
 
-
+#### muon anlayzer
+process.load("HiMuonAlgos.HLTMuTree.hltMuTree_cfi")
 
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string("openhlt_data.root")
@@ -108,7 +109,7 @@ process.TFileService = cms.Service("TFileService",
 
 # Path and EndPath definitions
 process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.patJets)
-process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree)
+process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
