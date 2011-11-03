@@ -17,7 +17,8 @@ cvs co -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r V02-02-01  RecoHI/HiEgammaAlgos
 cvs co -r V00-00-15  RecoHI/Configuration
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
+
 # muon
-cvs co -d MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
+cvs co -d HiMuonAlgos/HLTMuTree UserCode/CmsHi/HiMuonAlgos/HLTMuTree
 
 scram build -c
