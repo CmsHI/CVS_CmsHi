@@ -71,6 +71,12 @@ process.hiEvtAnalyzer.doMC = False
 
 # Jet Analyzers
 process.load("PhysicsTools.PatAlgos.patHeavyIonSequences_cff")
+process.icPu5corr = process.patJetCorrFactors.clone(
+   src = cms.InputTag("iterativeConePu5CaloJets"),
+   levels = cms.vstring('L2Relative','L3Absolute'),
+   payload = cms.string('AK5Calo'),
+   primaryVertices = cms.InputTag("hiSelectedVertex")
+  )
 process.patJets.jetSource  = cms.InputTag("iterativeConePu5CaloJets")
 process.patJets.addBTagInfo         = False
 process.patJets.addTagInfos         = False
@@ -84,14 +90,13 @@ process.patJets.addGenJetMatch      = False
 process.patJets.embedGenJetMatch    = False
 process.patJets.embedGenPartonMatch = False
 process.patJets.embedCaloTowers	    = False
-process.patJets.addJetCorrFactors		= False
+process.patJets.jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu5corr"))
 
 from CmsHi.JetAnalysis.inclusiveJetAnalyzer_cff import *
 process.icPu5JetAnalyzer = inclusiveJetAnalyzer.clone(
 	jetTag = 'patJets',
 	hltTrgNames = ['HLT_HIJet55_v1','HLT_HIJet65_v1','HLT_HIJet80_v1','HLT_HIJet95_v1'],
 	useCentrality = False,
-	useJEC = cms.untracked.bool(False),
 	useVtx = cms.untracked.bool(False),
 	isMC = False
 	)
@@ -114,7 +119,7 @@ process.TFileService = cms.Service("TFileService",
 )
 
 # Path and EndPath definitions
-process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.patJets)
+process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.icPu5corr*process.patJets)
 process.ana_step = cms.Path(process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree*process.anaTrack)
 
 # Schedule definition
