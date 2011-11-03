@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.1 2011/11/02 21:47:18 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.2 2011/11/03 10:08:23 kimy Exp $
 //
 //
 
@@ -373,7 +373,7 @@ ClusterTreeMaker::~ClusterTreeMaker()
 ClusterTreeMaker::beginJob() 
 {
    
-   theTree  = fs->make<TTree>("photon","Tree of Rechits around photon");
+  theTree  = fs->make<TTree>("superCluster","Tree of supercluster");
    
    theTree->Branch("nPar",&nPar,"nPar/I");
    theTree->Branch("et",et,"et[nPar]/F");
@@ -383,7 +383,7 @@ ClusterTreeMaker::beginJob()
    theTree->Branch("swissCrx",swissCrx,"swissCrx[nPar]/F");
    theTree->Branch("severity",severity,"severity[nPar]/F");
  
-   theBC  = fs->make<TTree>("photon","Tree of Rechits around photon");
+   theBC  = fs->make<TTree>("basicCluster","Tree of basiccluster");
 
    theBC->Branch("number",&nBC,"number/I");
    theBC->Branch("et",bcet,"et[number]/F");
