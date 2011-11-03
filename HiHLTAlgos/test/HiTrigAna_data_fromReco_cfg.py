@@ -27,7 +27,10 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('/store/hidata/HIRun2010/HICorePhysics/RAW-RECO/v2/000/150/590/4CEB2F45-25ED-DF11-AC92-00E08178C06B.root')
+    fileNames = cms.untracked.vstring(
+    #'/store/hidata/HIRun2010/HICorePhysics/RAW-RECO/v2/000/150/590/4CEB2F45-25ED-DF11-AC92-00E08178C06B.root'
+    'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
+    )
 )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
