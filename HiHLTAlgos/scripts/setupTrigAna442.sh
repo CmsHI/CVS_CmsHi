@@ -6,7 +6,7 @@ cvs co -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 cvs co          UserCode/L1TriggerDPG
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 # trk
-cvs co MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
 # jet
