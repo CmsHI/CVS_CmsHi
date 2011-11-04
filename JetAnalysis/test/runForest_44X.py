@@ -18,7 +18,7 @@ process.source = cms.Source("PoolSource",
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(-1))
+            input = cms.untracked.int32(1))
 
 
 #####################################################################################
@@ -113,9 +113,20 @@ process.anaTrack.doPFMatching = True
 process.anaTrack.trackSrc = cms.InputTag("hiSelectedTracks")
 process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
-process.pfcandAnalyzer.skipCharged = True
-process.pfcandAnalyzer.pfPtMin = 1
+process.pfcandAnalyzer.skipCharged = False
+process.pfcandAnalyzer.pfPtMin = 4
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiSelectedTracks")
+
+# Muons 
+process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
+process.muonTree = process.hltMuTree.clone()
+process.muonTree.doGen = cms.untracked.bool(False)
+
+# Event tree
+process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
+# Not working for the moment..
+process.hiEvtAnalyzer.doMC = cms.bool(False)
+process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 
 process.ak5CaloJets = process.akPu5CaloJets.clone(doPUOffsetCorr = False)
 process.ak5corr = process.icPu5corr.clone(
@@ -129,6 +140,9 @@ process.ak5patJets = process.akPu5PFpatJets.clone(
 	    
 #process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 #process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.icPu5JetAnalyzer.useCentrality   = cms.untracked.bool(False) # doesn't fill cent info
+process.akPu3PFJetAnalyzer.useCentrality = cms.untracked.bool(False) # doesn't fill cent info
+
 process.ak5CaloJetAnalyzer = process.icPu5JetAnalyzer.clone(
     jetTag = 'ak5patJets',
     genjetTag = 'ak5HiGenJets',
@@ -201,11 +215,14 @@ process.patPhotons.addPhotonID = cms.bool(False)
 #process.makeHeavyIonPhotons)
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
-process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(3)
-process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(15)
+process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(2)
+process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(20)
 process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PFJetAnalyzer +
-                                      process.multiPhotonAnalyzer + process.anaTrack + process.pfcandAnalyzer
-                                      + process.met * process.anaMET
+                                      process.multiPhotonAnalyzer + process.anaTrack + process.pfcandAnalyzer +
+                                      process.met * process.anaMET +
+				      process.muonTree +
+				      process.hiEvtAnalyzer 
+
                                       )
  
 process.phltJetHI = cms.Path( process.hltJetHI )
@@ -241,11 +258,11 @@ process.pAna = cms.EndPath(process.skimanalysis)
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
   
 process.rechitanalyzer.HBHETreePtMin = cms.untracked.double(4)
-process.rechitanalyzer.HFTreePtMin = cms.untracked.double(4)
+#process.rechitanalyzer.HFTreePtMin = cms.untracked.double(4)
 process.rechitanalyzer.EBTreePtMin = cms.untracked.double(4)
 process.rechitanalyzer.EETreePtMin = cms.untracked.double(4)
 process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(4)
-   
+process.rechitanalyzer.doHF = cms.untracked.bool(False)
 process.rechitAna = cms.Path(process.rechitanalyzer)
 
 ########### random number seed
