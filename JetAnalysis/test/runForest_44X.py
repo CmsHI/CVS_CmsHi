@@ -32,10 +32,10 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 # Data Global Tag 44x 
-#process.GlobalTag.globaltag = 'GR_R_44_V6C::All'
+process.GlobalTag.globaltag = 'GR_R_44_V6C::All'
 
 # MC Global Tag 44x 
-process.GlobalTag.globaltag = 'STARTHI44_V4::All'
+#process.GlobalTag.globaltag = 'STARTHI44_V4::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
