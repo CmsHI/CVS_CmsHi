@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.4 2011/11/06 14:12:01 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.5 2011/11/06 16:47:23 kimy Exp $
 //
 //
 
@@ -404,6 +404,8 @@ ClusterTreeMaker::beginJob()
    theTree->Branch("time",time,"time[nPar]/F");
    theTree->Branch("swissCrx",swissCrx,"swissCrx[nPar]/F");
    theTree->Branch("severity",severity,"severity[nPar]/F");
+   theTree->Branch("nRHBarrel",&nRHBarrel,"nRHBarrel/I");
+   theTree->Branch("nRHEndcap",&nRHEndcap,"nRHEndcap/I");
  
    theBC  = fs->make<TTree>("basicCluster","Tree of basiccluster");
 
@@ -411,8 +413,7 @@ ClusterTreeMaker::beginJob()
    theBC->Branch("et",bcet,"et[number]/F");
    theBC->Branch("eta",bceta,"eta[number]/F");
    theBC->Branch("phi",bcphi,"phi[number]/F");
-   theBC->Branch("nRHBarrel",&nRHBarrel,"nRHBarrel/I");
-   theBC->Branch("nRHEndcap",&nRHEndcap,"nRHEndcap/I");
+
    
 
    hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 400,-2.5,197.5);;
