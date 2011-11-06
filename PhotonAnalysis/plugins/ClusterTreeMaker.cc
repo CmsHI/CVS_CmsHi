@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.3 2011/11/03 10:11:12 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.4 2011/11/06 14:12:01 kimy Exp $
 //
 //
 
@@ -113,7 +113,12 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   TH1D* hRHetBarrel;
   TH1D* hRHetEndcap;
   TH1D* hRHetBarrelCleaned;
-  
+
+  TH1D* hRHetaEndcap;
+  TH1D* hRHphiEndcap;
+  TH1D* hRHetaBarrel;
+  TH1D* hRHphiBarrel;
+
   std::string mSrc;
   std::string vertexProducer_;      // vertecies producer                                                                                                                                                       
   std::string scProducerB_;
@@ -133,6 +138,10 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   float bcet[1000];
   float bceta[1000];
   float bcphi[1000];
+
+  int nRHBarrel ;
+  int nRHEndcap ;
+
   
 };
 
@@ -303,14 +312,16 @@ ClusterTreeMaker::~ClusterTreeMaker()
 
 
    
-   theTree->Fill();
-   
+      
    // Rechit loop
    //get the rechit geometry
    edm::ESHandle<CaloGeometry> theCaloGeom;
    const CaloGeometry* caloGeom;
    
    //Barrel 
+   nRHBarrel=0;
+   nRHEndcap=0;
+
    EcalRecHitCollection::const_iterator rh;
    if ( doRecHit) {
      
@@ -327,8 +338,13 @@ ClusterTreeMaker::~ClusterTreeMaker()
        const GlobalPoint & position = caloGeom->getPosition(rh->id());
        double tempEt = rh->energy()/cosh(position.eta()) ;
        hRHetBarrel->Fill(tempEt);
+       hRHetaBarrel->Fill ( position.eta() ) ;
+       hRHphiBarrel->Fill ( position.phi() ) ;
+       
        if ( (rh->energy()>3) && ((fabs(time) > 3)||(swissCrx > 0.95)) )
 	 hRHetBarrelCleaned->Fill(tempEt);
+     
+       nRHBarrel++;
      }
      //Endcap
      for (rh = (*ecalRecHitsEE).begin(); rh!= (*ecalRecHitsEE).end(); rh++){
@@ -336,9 +352,13 @@ ClusterTreeMaker::~ClusterTreeMaker()
        const GlobalPoint & position = caloGeom->getPosition(rh->id());
        double tempEt = rh->energy()/cosh(position.eta()) ;
        hRHetEndcap->Fill(tempEt);
+       hRHetaEndcap->Fill ( position.eta() ) ;
+       hRHphiEndcap->Fill ( position.phi() ) ;
+       
+       nRHEndcap++;
      }
    }
-
+   
    Handle<reco::CaloClusterCollection> basicClusterB;
    iEvent.getByLabel(basicClusterBarrel_, basicClusterB);
    Handle<reco::CaloClusterCollection> basicClusterE;
@@ -363,6 +383,8 @@ ClusterTreeMaker::~ClusterTreeMaker()
      }
      
    }  
+   
+   theTree->Fill();
    theBC->Fill();
    
 }
@@ -389,16 +411,25 @@ ClusterTreeMaker::beginJob()
    theBC->Branch("et",bcet,"et[number]/F");
    theBC->Branch("eta",bceta,"eta[number]/F");
    theBC->Branch("phi",bcphi,"phi[number]/F");
-   
+   theBC->Branch("nRHBarrel",&nRHBarrel,"nRHBarrel/I");
+   theBC->Branch("nRHEndcap",&nRHEndcap,"nRHEndcap/I");
    
 
    hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 400,-2.5,197.5);;
    hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 400,-2.5,197.5);;
+   hRHetaBarrel = fs->make<TH1D>( "hRHetaBarrel" , "", 400,-3,3);
+   hRHetaEndcap = fs->make<TH1D>( "hRHetaEndcap" , "", 400,-3,3);
+   hRHphiBarrel = fs->make<TH1D>( "hRHphiBarrel" , "", 400,-4,4);
+   hRHphiEndcap = fs->make<TH1D>( "hRHphiEndcap" , "", 400,-4,4);
+   
    hRHetBarrelCleaned = fs->make<TH1D>( "hRHetBarrelCleaned" , "", 400,-2.5,197.5);;
-
+   
    
    std::cout<<"done beginjob"<<std::endl;
 }
+
+
+
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
