@@ -1,7 +1,7 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -r hi413_01 -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 rm MitHig/PixelTrackletAnalyzer/src/SimTrackAnalyzer.cc
 
 cvs co -d       edwenger/Skims UserCode/edwenger/Skims
@@ -92,7 +92,6 @@ cvs co -r HLTrigger/HLTanalyzers
 
 # event analyzer
 cvs co -d  CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
-process.load("CmsHi.HiHLTAlgos.hievtanalyzer_cfi")
 
 # muon analyzer
 cvs co -d MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
