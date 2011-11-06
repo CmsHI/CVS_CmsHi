@@ -596,7 +596,7 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
 
   //===================================== ZDC ====================================================//
   
-  /*
+  
     double ZDCEnergy=0;  
     cout<<" 1 "<<endl;
     Handle<ZDCRecHitCollection> zdc_recHits_h;
@@ -623,7 +623,7 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
     ZDCEn[chid]=zhit->energy(); 
     cout<<" chid "<<chid<<" zdcen "<<ZDCEn[chid]<<endl;  
     }
-  */
+  
   
  
   
