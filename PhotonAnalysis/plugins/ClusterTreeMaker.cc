@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.2 2011/11/03 10:08:23 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.3 2011/11/03 10:11:12 kimy Exp $
 //
 //
 
@@ -235,7 +235,7 @@ ClusterTreeMaker::~ClusterTreeMaker()
    int maxindex = (int)superClusterCollectionB->size();
    
    nPar = 0;
-   cout << " nPhoton barrel = " << maxindex << endl;
+   // cout << " nPhoton barrel = " << maxindex << endl;
    for(int i = 0; i < maxindex; i++)  {
      const reco::SuperCluster &c1 = (*superClusterCollectionB)[i];
      
@@ -268,7 +268,7 @@ ClusterTreeMaker::~ClusterTreeMaker()
    }
    
    maxindex = (int)superClusterCollectionE->size();
-   cout << " nPhoton Endcap = " << maxindex << endl;
+   //  cout << " nPhoton Endcap = " << maxindex << endl;
    for(int i = 0; i < maxindex; i++) {
      const reco::SuperCluster &c1 = (*superClusterCollectionE)[i];
 
