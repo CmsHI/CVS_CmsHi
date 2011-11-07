@@ -1,7 +1,7 @@
 ## hiGoodMergedTracks and the track analyzer
 cvs co -d       edwenger/HiVertexAnalyzer UserCode/edwenger/HiVertexAnalyzer
 cvs co -d       edwenger/HiTrkEffAnalyzer UserCode/edwenger/HiTrkEffAnalyzer
-cvs co -d  MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -d       MitHig/PixelTrackletAnalyzer UserCode/MitHig/PixelTrackletAnalyzer
 rm MitHig/PixelTrackletAnalyzer/src/SimTrackAnalyzer.cc
 
 cvs co -d       edwenger/Skims UserCode/edwenger/Skims
@@ -51,7 +51,7 @@ cvs co          RecoHI/HiCentralityAlgos
 cvs co -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 
 # needed to get PFTowers to work
-cvs co -r hi441_1 -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -d CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 
 #ecal and hcal cleaning
 #hcal
@@ -69,7 +69,7 @@ cvs co -d HcalFilter UserCode/MTonjes/HcalFilter
 # Removed by Yen-Jie
 #cvs co -d RecoHI/HiEgammaAlgos UserCode/yetkin/RecoHI/HiEgammaAlgos
 # Needed to fix PF reco
-cvs co -r V02-02-01 RecoHI/HiEgammaAlgos
+cvs co RecoHI/HiEgammaAlgos
 cvs co -r V00-00-15 RecoHI/Configuration
 
 cvs co -d CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
