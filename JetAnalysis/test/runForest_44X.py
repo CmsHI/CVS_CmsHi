@@ -13,12 +13,12 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
  duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
     fileNames = cms.untracked.vstring(
-    'file:testReco.root',
+      'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
     ))
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(1))
+            input = cms.untracked.int32(2))
 
 
 #####################################################################################
@@ -241,18 +241,25 @@ enableDataPat(process)
 setPhotonObject(process,"cleanPhotons")
 enableDataAnalyzers(process)
 
-process.load("HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi")
-
+process.load('L1Trigger.Configuration.L1Extra_cff')
+process.load('HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi')
 process.hltbitanalysis.UseTFileService			= cms.untracked.bool(True)
-process.hltanalysis = process.hltbitanalysis.clone() 
-#process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
+process.hltanalysis = process.hltbitanalysis.clone(
+   l1GtReadoutRecord		= cms.InputTag("gtDigis"),
+   l1GctHFBitCounts     = cms.InputTag("gctDigis"),
+   l1GctHFRingSums      = cms.InputTag("gctDigis"),
+   l1extramu            = cms.string('l1extraParticles'),
+   l1extramc            = cms.string('l1extraParticles'),
+   hltresults           = cms.InputTag("TriggerResults","","HLT"),
+   HLTProcessName       = cms.string("HLT")
+  )
 process.skimanalysis = process.hltanalysis.clone(
     HLTProcessName                  = cms.string("JetAna"),
     hltresults                      = cms.InputTag("TriggerResults::hiForestAna")
     )
 process.hlt = cms.Path(process.hltanalysis)
 process.pAna = cms.EndPath(process.skimanalysis)
-
+process.reco_extra*=process.L1Extra
 
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
