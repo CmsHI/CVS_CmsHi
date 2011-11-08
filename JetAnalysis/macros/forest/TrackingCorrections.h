@@ -218,7 +218,7 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
 
   for (Int_t lv=0; lv<numLevels_; ++lv) {
     for (Int_t m=0; m<2; ++m) {
-      for (Int_t s=0; s<sample_.size(); ++s) {
+      for (UInt_t s=0; s<sample_.size(); ++s) {
 	if (s>isample) continue; // if a jet case, only use samples with suitable pthatmin
 	//cout << "jet(lead" << isLeadingJet_ << "): " << jet << " sample " << s << endl;
 	for (Int_t j=jetBin; j<=jetBin+djet; ++j) { // jet pt smoothing
@@ -295,7 +295,7 @@ TH1 * TrackingCorrections::InspectCorr(Int_t lv, Int_t isample, Int_t centBeg, I
   hDen = (TH3F*)correction_[lv][0][0][1]->Clone(inspName+"hDen");
   hDen->Reset();
   hDen->Sumw2();
-  for (Int_t s=0; s<sample_.size(); ++s) {
+  for (UInt_t s=0; s<sample_.size(); ++s) {
     if (sampleMode_==0&&s!=isample) continue;
     for (Int_t c=centBeg; c<=centEnd; ++c) {
       hNum->Add(correction_[lv][s][c][0]);

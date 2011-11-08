@@ -1,6 +1,6 @@
 #include "makeClass.h"
 
-void makeSetupCode(char *infname = "../merged_HI2010_SD_Jet35_prod05_full.root")
+void makeSetupCode(char *infname = "/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod02.root")
 {
 
   TFile *inf = new TFile(infname);  

@@ -52,6 +52,7 @@ class HiForest : public TNamed
   void SetOutputFile(const char *name);               		// Set output file name for skim
   void AddCloneTree(TTree* t, const char *dirName, const char *treeName);   // Add a clone tree to the clone forest
   void FillOutput();						// Fill output forest  
+
   Long64_t Draw(const char* varexp, const char* selection, Option_t* option = "", Long64_t nentries = 1000000000, Long64_t firstentry = 0){
      return tree->Draw(varexp,selection,option,nentries,firstentry);
   }

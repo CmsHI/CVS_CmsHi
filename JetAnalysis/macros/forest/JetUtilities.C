@@ -186,7 +186,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 }
       }
 
-      for(int ib = 0; ib < branches.size(); ++ib){
+      for(UInt_t ib = 0; ib < branches.size(); ++ib){
 	 branches[ib]->Fill();
       }
 
