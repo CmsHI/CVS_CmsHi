@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.5 2011/11/06 16:47:23 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.6 2011/11/06 16:56:52 kimy Exp $
 //
 //
 
@@ -416,8 +416,8 @@ ClusterTreeMaker::beginJob()
 
    
 
-   hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 400,-2.5,197.5);;
-   hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 400,-2.5,197.5);;
+   hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 4000,-2.5,197.5);;
+   hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 4000,-2.5,197.5);;
    hRHetaBarrel = fs->make<TH1D>( "hRHetaBarrel" , "", 400,-3,3);
    hRHetaEndcap = fs->make<TH1D>( "hRHetaEndcap" , "", 400,-3,3);
    hRHphiBarrel = fs->make<TH1D>( "hRHphiBarrel" , "", 400,-4,4);
