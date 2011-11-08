@@ -6,10 +6,10 @@
 
 // Example of forest skim
 
-void photonSkim(double etCut=40)
+void photonSkim(double etCut=40, char *infname = "merged_HI2010_SD_Jet35_prod05.root")
 {
    // Define the input file and HiForest
-   HiForest *c = new HiForest("merged_HI2010_SD_Jet35_prod05.root");
+   HiForest *c = new HiForest(infname);
    c->SetOutputFile("skim_Photon.root");
 
    // Main loop
