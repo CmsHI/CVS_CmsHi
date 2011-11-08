@@ -16,8 +16,8 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-#process.load('HLTrigger.Configuration.HLT_HIon_data_cff')
-process.load('HLTrigger.Configuration.HLT_HIon_Jet_data_cff')
+process.load('HLTrigger.Configuration.HLT_HIon_data_cff')
+#process.load('HLTrigger.Configuration.HLT_HIon_Jet_data_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -34,7 +34,8 @@ process.source = cms.Source("PoolSource",
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/F8A193D3-C2AE-E011-8D37-003048CF667C.root',
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/AA944F78-C2AE-E011-8D7D-003048CB87A6.root',
     #'file:/mnt/hadoop/cms/store/results/heavy-ions/HICorePhysics/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/HICorePhysics/USER/StoreResults-HICorePhysics_Skim_MinimumBias_RAW-a606dc809a29a92e17749e5652319ad0-SD_MBHI/0000/50D1C4BF-C3AE-E011-931A-003048CF6578.root'
-    'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_officialL1Menu_mctag_100.root'
+    #'file:l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW_officialL1Menu_mctag_100.root'
+    'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_1_L1Repack/src/l1EmulatorFromRawRepackRaw_RAW2DIGI_L1_DIGI2RAW.root'
     )
 )
 newSource = True
@@ -45,7 +46,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.2 $'),
+    version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
