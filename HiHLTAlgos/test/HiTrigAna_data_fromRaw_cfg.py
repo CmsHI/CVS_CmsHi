@@ -4,8 +4,20 @@
 # Source: /cvs_server/repositories/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
 # with command line options: l1EmulatorFromRaw -s RAW2DIGI,L1,HLT:HIon -n 100 --conditions auto:hltonline --datatier DIGI-RECO --eventcontent FEVTDEBUGHLT --data --filein /store/hidata/HIRun2010/HIAllPhysics/RAW/v1/000/150/590/02D89852-5DEC-DF11-9E11-001D09F282F5.root --customise=L1Trigger/Configuration/customise_l1EmulatorFromRaw --custom_conditions=L1GtTriggerMenu_L1Menu_Collisions2011_v5,L1GtTriggerMenuRcd,frontier://FrontierProd/CMS_COND_31X_L1T --processName=L1EmulRawHLT --no_exec
 import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process('HiTrigAna')
+
+# setup 'analysis'  options
+options = VarParsing.VarParsing ('analysis')
+
+# setup any defaults you want
+options.outputFile = 'output.root'
+options.inputFiles = 'rfio:/castor/cern.ch/cms/store/data/ComissioningHI/HIExpressPhysics/RAW/v1/000/180/892/F6B10997-2B08-E111-A133-BCAEC532970F.root'
+options.maxEvents = -1 # -1 means all events
+
+# get and parse the command line arguments
+options.parseArguments()
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -27,9 +39,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring(
-    'rfio:/castor/cern.ch/cms/store/data/ComissioningHI/HIExpressPhysics/RAW/v1/000/180/892/F6B10997-2B08-E111-A133-BCAEC532970F.root'
-    )
+    fileNames = cms.untracked.vstring(options.inputFiles)
 )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
