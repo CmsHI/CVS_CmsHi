@@ -58,6 +58,7 @@ process.hltana = process.hltbitanalysis.clone(
    l1GctHFRingSums      = cms.InputTag("hltGctDigis"),
    l1extramu            = cms.string('hltL1extraParticles'),
    l1extramc            = cms.string('hltL1extraParticles'),
+   l1GtObjectMapRecord  = cms.InputTag("hltL1GtObjectMap"),
    hltresults           = cms.InputTag("TriggerResults","","HLT"),
    HLTProcessName       = cms.string("HLT")
   )
