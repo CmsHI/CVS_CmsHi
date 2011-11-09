@@ -4,13 +4,6 @@
 #include <TNtuple.h>
 #include <iostream>
 
-double deltaPhi(double phi1, double phi2) {
-        double dePhi = fabs(phi1 - phi2);  
-        if (dePhi > 3.1415926) dePhi = 2 * 3.1415926 - dePhi;
-        return dePhi;
-}
-
-
 void photonJet(double etCut=40)
 {
    // Define the input file and HiForest
