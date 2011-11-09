@@ -41,7 +41,8 @@ void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi,
       float drG = deltaR(trkEta,trkPhi,geta,gphi);
       float drJ = deltaR(trkEta,trkPhi,jeta,jphi);
       if ((drG>=m.dRMin && drG<m.dRMax)
-          || (drJ>=m.dRMin || drJ<m.dRMax)) {
+          || (drJ>=m.dRMin && drJ<m.dRMax)) {
+         //if (m.name=="OutCone") cout << "pt: " << trkPt << "drG: " << drG << "drJ: " << drJ << endl;
          float ptx = -1* trkPt * cos(deltaPhi(trkPhi,gphi));
          float pty = -1* trkPt * sin(deltaPhi(trkPhi,gphi));
          m.mptx += ptx;
@@ -60,11 +61,11 @@ void SetMPTBranches(TTree * t, MPT & m)
 {
    t->Branch("mptx"+m.name,&m.mptx,"mptx"+m.name+"/F");
    t->Branch("mpty"+m.name,&m.mpty,"mpty"+m.name+"/F");
-   TString sbrxpt = Form("mptx_pt%s[%d]/F",m.name.Data(),nptrange);
-   TString sbrypt = Form("mpty_pt%s[%d]/F",m.name.Data(),nptrange);
+   TString sbrxpt = Form("mptx%s[%d]_pt/F",m.name.Data(),nptrange);
+   TString sbrypt = Form("mpty%s[%d]_pt/F",m.name.Data(),nptrange);
    //cout << sbrxpt << ", " << sbrypt << endl;
-   t->Branch("mptx_pt"+m.name,m.mptx_pt,sbrxpt);
-   t->Branch("mpty_pt"+m.name,m.mpty_pt,sbrypt);
+   t->Branch("mptx"+m.name+"_pt",m.mptx_pt,sbrxpt);
+   t->Branch("mpty"+m.name+"_pt",m.mpty_pt,sbrypt);
 }
 
 // Calo Matching
