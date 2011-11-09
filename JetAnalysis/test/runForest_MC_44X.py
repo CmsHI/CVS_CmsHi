@@ -244,10 +244,19 @@ process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 from CmsHi.JetAnalysis.customise_cfi import *
 setPhotonObject(process,"cleanPhotons")
 
-process.load("HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi")
+process.load('L1Trigger.Configuration.L1Extra_cff')
+process.load('HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi')
 
 process.hltbitanalysis.UseTFileService			= cms.untracked.bool(True)
-process.hltanalysis = process.hltbitanalysis.clone() 
+process.hltanalysis = process.hltbitanalysis.clone(
+   	            l1GtReadoutRecord            = cms.InputTag("gtDigis"),
+	 	    l1GctHFBitCounts     = cms.InputTag("gctDigis"),
+	 	    l1GctHFRingSums      = cms.InputTag("gctDigis"),
+	 	    l1extramu            = cms.string('l1extraParticles'),
+	 	    l1extramc            = cms.string('l1extraParticles'),
+	 	    hltresults           = cms.InputTag("TriggerResults","","HLT"),
+	 	    HLTProcessName       = cms.string("HLT")
+	 	   )
 process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
 process.skimanalysis = process.hltanalysis.clone(
     HLTProcessName                  = cms.string("JetAna"),
@@ -255,7 +264,7 @@ process.skimanalysis = process.hltanalysis.clone(
     )
 process.hlt = cms.Path(process.hltanalysis)
 process.pAna = cms.EndPath(process.skimanalysis)
-
+process.reco_extra*=process.L1Extra
 
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')

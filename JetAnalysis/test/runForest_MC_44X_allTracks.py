@@ -13,12 +13,12 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
  duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
     fileNames = cms.untracked.vstring(
-      'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
+    'file:MCRaw/step2_RAW2DIGI_RECO_1.root',
     ))
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(2))
+            input = cms.untracked.int32(100))
 
 
 #####################################################################################
@@ -32,10 +32,10 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 # Data Global Tag 44x 
-process.GlobalTag.globaltag = 'GR_R_44_V6C::All'
+#process.GlobalTag.globaltag = 'GR_R_44_V6C::All'
 
 # MC Global Tag 44x 
-#process.GlobalTag.globaltag = 'STARTHI44_V4::All'
+process.GlobalTag.globaltag = 'STARTHI44_V4::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
@@ -98,7 +98,7 @@ process.load("RecoMET.METProducers.CaloMET_cfi")
 
 # Define Analysis sequencues
 process.load('CmsHi.JetAnalysis.EventSelection_cff')
-#process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
+process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 #process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
@@ -120,14 +120,16 @@ process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiSelectedTra
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
 process.muonTree = process.hltMuTree.clone()
-process.muonTree.doGen = cms.untracked.bool(False)
+process.muonTree.doGen = cms.untracked.bool(True)
 
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 # Not working for the moment..
-process.hiEvtAnalyzer.doMC = cms.bool(False)
+#process.hiEvtAnalyzer.doMC = cms.bool(True)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 
+
+# Jet stuff
 process.ak5CaloJets = process.akPu5CaloJets.clone(doPUOffsetCorr = False)
 process.ak5corr = process.icPu5corr.clone(
         src = cms.InputTag("ak5CaloJets"),
@@ -138,15 +140,18 @@ process.ak5patJets = process.akPu5PFpatJets.clone(
             jetCorrFactorsSource = cms.VInputTag(cms.InputTag("ak5corr"))
             )
 	    
-#process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
-#process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.icPu5JetAnalyzer.isMC   = cms.untracked.bool(True)
+process.akPu3PFJetAnalyzer.isMC = cms.untracked.bool(True)
 process.icPu5JetAnalyzer.useCentrality   = cms.untracked.bool(False) # doesn't fill cent info
 process.akPu3PFJetAnalyzer.useCentrality = cms.untracked.bool(False) # doesn't fill cent info
+
 
 process.ak5CaloJetAnalyzer = process.icPu5JetAnalyzer.clone(
     jetTag = 'ak5patJets',
     genjetTag = 'ak5HiGenJets',
-    isMC = False
+    isMC = True
     )
 
 process.ak3PFJetsX = process.akPu3PFJets.clone(doPUOffsetCorr = False)
@@ -161,7 +166,7 @@ process.ak3patJetsX = process.akPu5PFpatJets.clone(
 process.ak3PFJetAnalyzer = process.icPu5JetAnalyzer.clone(
     jetTag = 'ak3patJetsX',
     genjetTag = 'ak3HiGenJets',
-    isMC = False
+    isMC = True
     )
 
 process.ak5extra = cms.Sequence(process.ak5CaloJets*process.ak5corr*process.ak5patJets*process.ak5CaloJetAnalyzer)
@@ -173,7 +178,7 @@ process.ak3extra = cms.Sequence(process.ak3PFJetsX*process.ak3corrX*process.ak3p
 
 # Filtering
 process.hltJetHI.HLTPaths = ['HLT_HIJet35U','HLT_HIPhoton20']
-#process.hltJetHI.TriggerResultsTag = cms.InputTag("TriggerResults::RECO")
+process.hltJetHI.TriggerResultsTag = cms.InputTag("TriggerResults::RECO")
 
 print "Add cleaning to analysis"
 process.event_filter_seq = cms.Sequence(
@@ -205,10 +210,11 @@ process.reco_extra        = cms.Path( process.iterativeConePu5CaloJets *
                                       process.PFTowers 
                                       )
 process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets * process.akPu5PFJets * process.photon_extra_reco)
-#process.gen_step          = cms.Path( process.hiGenParticles * process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
-process.pat_step          = cms.Path( process.icPu5patSequence_data + process.akPu3PFpatSequence_data + process.akPu5PFpatSequence_data + process.makeHeavyIonPhotons)
+process.gen_step          = cms.Path( process.hiGenParticles * process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
+process.pat_step          = cms.Path( process.icPu5patSequence + process.akPu3PFpatSequence + process.akPu5PFpatSequence + process.makeHeavyIonPhotons)
 process.pat_step.remove(process.interestingTrackEcalDetIds)
-process.pat_step.remove(process.photonMatch)
+process.photonMatch.matched = cms.InputTag("hiGenParticles")
+#process.pat_step.remove(process.photonMatch)
 #+ process.patPhotons)
 
 process.patPhotons.addPhotonID = cms.bool(False)
@@ -222,7 +228,6 @@ process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PF
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer 
-
                                       )
  
 process.phltJetHI = cms.Path( process.hltJetHI )
@@ -237,22 +242,22 @@ process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
-enableDataPat(process)
 setPhotonObject(process,"cleanPhotons")
-enableDataAnalyzers(process)
 
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi')
+
 process.hltbitanalysis.UseTFileService			= cms.untracked.bool(True)
 process.hltanalysis = process.hltbitanalysis.clone(
-   l1GtReadoutRecord		= cms.InputTag("gtDigis"),
-   l1GctHFBitCounts     = cms.InputTag("gctDigis"),
-   l1GctHFRingSums      = cms.InputTag("gctDigis"),
-   l1extramu            = cms.string('l1extraParticles'),
-   l1extramc            = cms.string('l1extraParticles'),
-   hltresults           = cms.InputTag("TriggerResults","","HLT"),
-   HLTProcessName       = cms.string("HLT")
-  )
+   	            l1GtReadoutRecord            = cms.InputTag("gtDigis"),
+	 	    l1GctHFBitCounts     = cms.InputTag("gctDigis"),
+	 	    l1GctHFRingSums      = cms.InputTag("gctDigis"),
+	 	    l1extramu            = cms.string('l1extraParticles'),
+	 	    l1extramc            = cms.string('l1extraParticles'),
+	 	    hltresults           = cms.InputTag("TriggerResults","","HLT"),
+	 	    HLTProcessName       = cms.string("HLT")
+	 	   )
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
 process.skimanalysis = process.hltanalysis.clone(
     HLTProcessName                  = cms.string("JetAna"),
     hltresults                      = cms.InputTag("TriggerResults::hiForestAna")
