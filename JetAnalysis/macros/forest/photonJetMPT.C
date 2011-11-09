@@ -139,7 +139,7 @@ void photonJetMPT(double etCut=40)
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
       evt.cbin = c->photon.cBin;
-      evt.vz = c->track.vz[0];
+      evt.vz = c->track.vz[1];
       //cout << evt.run << " " << evt.evt << " " << evt.cbin << " " << evt.vz << endl;
       
       int leadingPhoton=-1;
