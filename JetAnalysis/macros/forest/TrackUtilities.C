@@ -1,4 +1,73 @@
+#ifndef TrackUtilities_C
+#define TrackUtilities_C
+// Trk MPT Classes and functions
+const int nptrange = 8;
+float ptranges[nptrange+1] = {0.5,1,2,4,8,16,32,64,128};
 
+class MPT {
+public:
+   TString name;
+   float dRMin;
+   float dRMax;
+   float ptMin;
+   float etaMax;
+   
+   float mptx;
+   float mpty;
+   float mptx_pt[nptrange];
+   float mpty_pt[nptrange];
+   
+   MPT(TString s, float drmin=0, float drmax=1e3, float ptmin=0.5, float etamax=2.4) :
+   name(s), dRMin(drmin), dRMax(drmax),ptMin(ptmin), etaMax(etamax) {
+      clear();
+   }
+   void clear() {
+      mptx = 0; mpty = 0;
+      for (int i=0; i<nptrange; ++i) {
+         mptx_pt[i] =0; mpty_pt[i] = 0;
+      }      
+   }
+};
+
+void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi, MPT & m)
+{
+   m.clear();
+   for (int it=0; it<c->track.nTrk; ++it) {
+      float trkPt = c->track.trkPt[it];
+      float trkEta = c->track.trkEta[it];
+      float trkPhi = c->track.trkPhi[it];
+      if (trkPt < m.ptMin) continue;
+      if (fabs(trkEta) > m.etaMax) continue;
+      float drG = deltaR(trkEta,trkPhi,geta,gphi);
+      float drJ = deltaR(trkEta,trkPhi,jeta,jphi);
+      if ((drG>=m.dRMin && drG<m.dRMax)
+          || (drJ>=m.dRMin || drJ<m.dRMax)) {
+         float ptx = -1* trkPt * cos(deltaPhi(trkPhi,gphi));
+         float pty = -1* trkPt * sin(deltaPhi(trkPhi,gphi));
+         m.mptx += ptx;
+         m.mpty += pty;
+         for (int k=0; k<nptrange; ++k) {
+            if (trkPt> ptranges[k] && trkPt<ptranges[k+1]) {
+               m.mptx_pt[k]+= ptx;
+               m.mpty_pt[k]+= pty;
+            }
+         }
+      }
+   }  
+}
+
+void SetMPTBranches(TTree * t, MPT & m)
+{
+   t->Branch("mptx"+m.name,&m.mptx,"mptx"+m.name+"/F");
+   t->Branch("mpty"+m.name,&m.mpty,"mpty"+m.name+"/F");
+   TString sbrxpt = Form("mptx_pt%s[%d]/F",m.name.Data(),nptrange);
+   TString sbrypt = Form("mpty_pt%s[%d]/F",m.name.Data(),nptrange);
+   //cout << sbrxpt << ", " << sbrypt << endl;
+   t->Branch("mptx_pt"+m.name,m.mptx_pt,sbrxpt);
+   t->Branch("mpty_pt"+m.name,m.mpty_pt,sbrypt);
+}
+
+// Calo Matching
 void HiForest::matchTrackCalo(bool allEvents){
 
    if(allEvents || currentEvent == 0){
@@ -67,12 +136,4 @@ int HiForest::getMatchedHBHEAllowReuse(int j)
    return best;
 }
 
-
-
-
-
-
-
-
-
-
+#endif

@@ -4,72 +4,6 @@
 #include <TNtuple.h>
 #include <iostream>
 
-// MPT Classes and functions
-const int nptrange = 8;
-float ptranges[nptrange+1] = {0.5,1,2,4,8,16,32,64,128};
-
-class MPT {
-public:
-   TString name;
-   float dRMin;
-   float dRMax;
-   float ptMin;
-   float etaMax;
-   
-   float mptx;
-   float mpty;
-   float mptx_pt[nptrange];
-   float mpty_pt[nptrange];
-   
-   MPT(TString s, float drmin=0, float drmax=1e3, float ptmin=0.5, float etamax=2.4) :
-   name(s), dRMin(drmin), dRMax(drmax),ptMin(ptmin), etaMax(etamax) {
-      clear();
-   }
-   void clear() {
-      mptx = 0; mpty = 0;
-      for (int i=0; i<nptrange; ++i) {
-         mptx_pt[i] =0; mpty_pt[i] = 0;
-      }      
-   }
-};
-
-void CalcMPT(const HiForest * c, int iphoton, int ijet, MPT & m)
-{
-   m.clear();
-   for (int it=0; it<c->track.nTrk; ++it) {
-      float trkPt = c->track.trkPt[it];
-      float trkEta = c->track.trkEta[it];
-      float trkPhi = c->track.trkPhi[it];
-      if (trkPt < m.ptMin) continue;
-      if (fabs(trkEta) > m.etaMax) continue;
-      float drG = deltaR(trkEta,trkPhi,c->photon.eta[iphoton],c->photon.phi[iphoton]);
-      if (drG<m.dRMin || drG>m.dRMax) continue;
-      float drJ = deltaR(trkEta,trkPhi,c->akPu3PF.jteta[ijet],c->akPu3PF.jtphi[ijet]);
-      if (drJ<m.dRMin || drJ>m.dRMax) continue;
-      float ptx = trkPt * cos(deltaPhi(trkPhi,c->photon.phi[iphoton]));
-      float pty = trkPt * sin(deltaPhi(trkPhi,c->photon.phi[iphoton]));
-      m.mptx += ptx;
-      m.mpty += pty;
-      for (int k=0; k<nptrange; ++k) {
-         if (trkPt> ptranges[k] && trkPt<ptranges[k+1]) {
-            m.mptx_pt[k]+= ptx;
-            m.mpty_pt[k]+= pty;
-         }
-      }
-   }  
-}
-
-void SetMPTBranches(TTree * t, MPT & m)
-{
-   t->Branch("mptx"+m.name,&m.mptx,"mptx"+m.name+"/F");
-   t->Branch("mpty"+m.name,&m.mpty,"mpty"+m.name+"/F");
-   TString sbrxpt = Form("mptx_pt%s[%d]/F",m.name.Data(),nptrange);
-   TString sbrypt = Form("mpty_pt%s[%d]/F",m.name.Data(),nptrange);
-   cout << sbrxpt << ", " << sbrypt << endl;
-   t->Branch("mptx_pt"+m.name,m.mptx_pt,sbrxpt);
-   t->Branch("mpty_pt"+m.name,m.mpty_pt,sbrypt);
-}
-
 // Convinient Output Classes
 class EvtSel {
 public:
@@ -115,6 +49,10 @@ void photonJetMPT(double etCut=40)
    TH1D *h2 = new TH1D("h2","",100,-1,1);
    TH1D *h3 = new TH1D("h3","",100,-1,1);
    TH1D *h4 = new TH1D("h4","",100,-1,1);
+   // trk monitoring
+   TH1D * hTrkPt = new TH1D("hTrkPt","",nptrange,ptranges);
+   TH1D * hTrkEta = new TH1D("hTrkEta","",40,-2.4,2.4);
+   TH1D * hTrkPhi = new TH1D("hTrkPhi","",40,-3.14,3.14);
    
    // Output
    TTree * tgj = new TTree("tgj","gammajet");
@@ -127,7 +65,10 @@ void photonJetMPT(double etCut=40)
    vmpt.push_back(MPT("AllEta"));
    vmpt.push_back(MPT("InCone",0,0.8));
    vmpt.push_back(MPT("OutCone",0.8,1e3));
-   for (int m=0; m<vmpt.size(); ++m) { SetMPTBranches(tgj,vmpt[m]); }
+   for (unsigned m=0; m<vmpt.size(); ++m) { 
+      cout << "CalcMPT for " << vmpt[m].name << " dRMin: " << vmpt[m].dRMin << " dRMax: " << vmpt[m].dRMax << endl;
+      SetMPTBranches(tgj,vmpt[m]);
+   }
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -170,6 +111,12 @@ void photonJetMPT(double etCut=40)
             leadingJet = j;
             break;
          }	 
+         // Trk Monitoring
+         for (int it=0; it<c->track.nTrk; ++it) {
+            hTrkPt->Fill(c->track.trkPt[it]);
+            hTrkEta->Fill(c->track.trkEta[it]);
+            hTrkPhi->Fill(c->track.trkPhi[it]);
+         }
          
          // Found a leading jet!
          if (leadingJet !=-1) {
@@ -186,6 +133,10 @@ void photonJetMPT(double etCut=40)
             gj.deta = c->akPu3PF.jteta[leadingJet] - c->photon.eta[leadingPhoton];
             gj.dphi = deltaPhi(c->akPu3PF.jtphi[leadingJet],c->photon.phi[leadingPhoton]);
             gj.Aj   = Agj;
+            // MPT
+            for (unsigned m=0; m<vmpt.size(); ++m) {
+               CalcMPT(c,gj.geta,gj.gphi,gj.jeta,gj.jphi,vmpt[m]);
+            }
          }
       }
       tgj->Fill();
