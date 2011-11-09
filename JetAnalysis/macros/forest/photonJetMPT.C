@@ -22,17 +22,20 @@ public:
    float mpty_pt[nptrange];
    
    MPT(TString s, float drmin=0, float drmax=1e3, float ptmin=0.5, float etamax=2.4) :
-   name(s), dRMin(drmin), dRMax(drmax),ptMin(ptmin), etaMax(etamax),
-   mptx(0), mpty(0) { 
+   name(s), dRMin(drmin), dRMax(drmax),ptMin(ptmin), etaMax(etamax) {
+      clear();
+   }
+   void clear() {
+      mptx = 0; mpty = 0;
       for (int i=0; i<nptrange; ++i) {
-         mptx_pt[i] =0;
-         mpty_pt[i] = 0;
-      }
+         mptx_pt[i] =0; mpty_pt[i] = 0;
+      }      
    }
 };
 
 void CalcMPT(const HiForest * c, int iphoton, int ijet, MPT & m)
 {
+   m.clear();
    for (int it=0; it<c->track.nTrk; ++it) {
       float trkPt = c->track.trkPt[it];
       float trkEta = c->track.trkEta[it];
