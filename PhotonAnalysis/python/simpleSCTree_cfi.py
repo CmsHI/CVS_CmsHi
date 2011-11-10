@@ -6,7 +6,7 @@ simpleSCTree = cms.EDAnalyzer("ClusterTreeMaker",
                               ebRecHitCollection = cms.untracked.InputTag( 'ecalRecHit','EcalRecHitsEB'),
                               eeRecHitCollection = cms.untracked.InputTag( 'ecalRecHit','EcalRecHitsEE'),
                               etCutSC              = cms.untracked.double(8),
-                              etCutBC              = cms.untracked.double(1.5),
+                              etCutBC              = cms.untracked.double(1.0),
                               basicClusterBarrel        = cms.InputTag("islandBasicClusters","islandBarrelBasicClusters"),
                               basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters"),
                               

@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.7 2011/11/08 10:30:18 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.8 2011/11/10 16:00:46 kimy Exp $
 //
 //
 
@@ -131,8 +131,9 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   float swissCrx[1000];
   int nPar;
   double etCut;
+   
+   double etCutBC;
 
-  
   bool doBasicCluster;
   int nBC ; 
   float bcet[3000];
@@ -163,7 +164,8 @@ ClusterTreeMaker::ClusterTreeMaker(const edm::ParameterSet& iConfig)
    scProducerE_  = iConfig.getUntrackedParameter<std::string>("scTagE","hltRecoHIEcalWithCleaningCandidate");
    ebReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("ebRecHitCollection");
    eeReducedRecHitCollection_       = iConfig.getUntrackedParameter<edm::InputTag>("eeRecHitCollection");
-   etCut                            = iConfig.getUntrackedParameter<double>("etCut",8.0);
+   etCut                            = iConfig.getUntrackedParameter<double>("etCutSC",8.0);
+   etCutBC                          = iConfig.getUntrackedParameter<double>("etCutBC",1.0);
    basicClusterBarrel_              = iConfig.getParameter<edm::InputTag>("basicClusterBarrel");
    basicClusterEndcap_              = iConfig.getParameter<edm::InputTag>("basicClusterEndcap");
    doRecHit                         = iConfig.getUntrackedParameter<bool>("doRecHit",true);
@@ -374,12 +376,12 @@ ClusterTreeMaker::~ClusterTreeMaker()
    nBC = 0;
    if (doBasicCluster) {
      for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
-       
-       bceta[nBC] = bcItr->eta();
-       bcphi[nBC] = bcItr->phi();
-       bcet[nBC] =  bcItr->energy()/cosh(bcItr->eta());
-       
-       nBC++;
+	if (bcItr->eta() < etCutBC ) 
+	   continue;
+	bceta[nBC] = bcItr->eta();
+	bcphi[nBC] = bcItr->phi();
+	bcet[nBC] =  bcItr->energy()/cosh(bcItr->eta());
+	nBC++;
      }
      
    }  
