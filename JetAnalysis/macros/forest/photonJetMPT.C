@@ -10,6 +10,9 @@ public:
    int run;
    int evt;
    int cbin;
+   int nG;
+   int nJ;
+   int nT;
    float vz;
 };
 
@@ -59,7 +62,7 @@ void photonJetMPT(double etCut=40)
 
    EvtSel evt;
    GammaJet gj;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cbin:vz/F");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cbin:nG:nJ:nT:vz/F");
    tgj->Branch("jet",&gj.gpt,"gpt/F:geta:gphi:jpt:jeta:jphi:deta:dphi:Aj");
    vector<MPT> vmpt;
    vmpt.push_back(MPT("AllAcc"));
@@ -79,6 +82,9 @@ void photonJetMPT(double etCut=40)
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
       evt.cbin = c->photon.cBin;
+      evt.nG = c->photon.nPhotons;
+      evt.nJ = c->akPu3PF.nref;
+      evt.nT = c->track.nTrk;
       evt.vz = c->track.vz[1];
       if (i%1==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cbin << " " << c->track.nTrk <<endl;
       
