@@ -62,11 +62,11 @@ void photonJetMPT(double etCut=40)
    tgj->Branch("evt",&evt.run,"run/I:evt:cbin:vz/F");
    tgj->Branch("jet",&gj.gpt,"gpt/F:geta:gphi:jpt:jeta:jphi:deta:dphi:Aj");
    vector<MPT> vmpt;
-   vmpt.push_back(MPT("AllEta"));
-   vmpt.push_back(MPT("InCone",0,0.8));
-   vmpt.push_back(MPT("OutCone",0.8,1e3));
+   vmpt.push_back(MPT("AllAcc"));
+   vmpt.push_back(MPT("InCone",1,0.8));
+   vmpt.push_back(MPT("OutCone",2,0.8));
    for (unsigned m=0; m<vmpt.size(); ++m) { 
-      cout << "CalcMPT for " << vmpt[m].name << " dRMin: " << vmpt[m].dRMin << " dRMax: " << vmpt[m].dRMax << endl;
+      cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
       SetMPTBranches(tgj,vmpt[m]);
    }
    
@@ -74,18 +74,18 @@ void photonJetMPT(double etCut=40)
    for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries()<<endl;
       
       // Event Info
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
       evt.cbin = c->photon.cBin;
       evt.vz = c->track.vz[1];
-      //cout << evt.run << " " << evt.evt << " " << evt.cbin << " " << evt.vz << endl;
+      if (i%1==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cbin << " " << c->track.nTrk <<endl;
       
       int leadingPhoton=-1;
       int leadingJet=-1;
       gj.clear();
+      for (unsigned m=0; m<vmpt.size(); ++m) vmpt[m].clear();
       
       // Loop over photons to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {

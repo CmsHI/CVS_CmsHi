@@ -1,24 +1,24 @@
 #ifndef TrackUtilities_C
 #define TrackUtilities_C
-// Trk MPT Classes and functions
+// Trk MPT Classes and functions ------------------------------------------
 const int nptrange = 8;
 float ptranges[nptrange+1] = {0.5,1,2,4,8,16,32,64,128};
 
 class MPT {
 public:
    TString name;
-   float dRMin;
-   float dRMax;
+   float dRCone;
    float ptMin;
    float etaMax;
+   int selType;
    
    float mptx;
    float mpty;
    float mptx_pt[nptrange];
    float mpty_pt[nptrange];
    
-   MPT(TString s, float drmin=0, float drmax=1e3, float ptmin=0.5, float etamax=2.4) :
-   name(s), dRMin(drmin), dRMax(drmax),ptMin(ptmin), etaMax(etamax) {
+   MPT(TString s, int t=0, float dr=0.8, float ptmin=0.5, float etamax=2.4) :
+   name(s), selType(t), dRCone(dr),ptMin(ptmin), etaMax(etamax) {
       clear();
    }
    void clear() {
@@ -40,9 +40,16 @@ void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi,
       if (fabs(trkEta) > m.etaMax) continue;
       float drG = deltaR(trkEta,trkPhi,geta,gphi);
       float drJ = deltaR(trkEta,trkPhi,jeta,jphi);
-      if ((drG>=m.dRMin && drG<m.dRMax)
-          || (drJ>=m.dRMin && drJ<m.dRMax)) {
-         //if (m.name=="OutCone") cout << "pt: " << trkPt << "drG: " << drG << "drJ: " << drJ << endl;
+      bool accept=false;
+      if (m.selType==0) accept = true;
+      else if (m.selType==1) {
+         if (drG<m.dRCone||drJ<m.dRCone) accept=true;
+      }
+      else if (m.selType==2) {
+         if (drG>m.dRCone&&drJ>m.dRCone) accept=true;
+      }
+      if (accept) {
+         //cout << m.name << " pt: " << trkPt << " drG: " << drG << " drJ: " << drJ << endl;
          float ptx = -1* trkPt * cos(deltaPhi(trkPhi,gphi));
          float pty = -1* trkPt * sin(deltaPhi(trkPhi,gphi));
          m.mptx += ptx;
@@ -54,7 +61,8 @@ void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi,
             }
          }
       }
-   }  
+   }
+   //cout << m.name << " mptx = " << m.mptx << " mpty = " << m.mpty << endl;
 }
 
 void SetMPTBranches(TTree * t, MPT & m)
@@ -68,7 +76,7 @@ void SetMPTBranches(TTree * t, MPT & m)
    t->Branch("mpty"+m.name+"_pt",m.mpty_pt,sbrypt);
 }
 
-// Calo Matching
+// Calo Matching -----------------------------------------
 void HiForest::matchTrackCalo(bool allEvents){
 
    if(allEvents || currentEvent == 0){
