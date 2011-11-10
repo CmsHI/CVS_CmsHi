@@ -11,6 +11,6 @@ simpleSCTree = cms.EDAnalyzer("ClusterTreeMaker",
                               basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters"),
                               
                               doRecHit          = cms.untracked.bool(True),
-                              doBasicCluster    = cms.untracked.bool(False)
+                              doBasicCluster    = cms.untracked.bool(True)
                               
                               )
