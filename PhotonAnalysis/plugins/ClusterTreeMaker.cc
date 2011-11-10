@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.6 2011/11/06 16:56:52 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.7 2011/11/08 10:30:18 kimy Exp $
 //
 //
 
@@ -135,9 +135,9 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   
   bool doBasicCluster;
   int nBC ; 
-  float bcet[1000];
-  float bceta[1000];
-  float bcphi[1000];
+  float bcet[3000];
+  float bceta[3000];
+  float bcphi[3000];
 
   int nRHBarrel ;
   int nRHEndcap ;
