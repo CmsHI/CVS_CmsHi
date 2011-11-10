@@ -16,12 +16,12 @@ process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 process.load('Configuration.StandardSequences.SimL1Emulator_cff')
-process.load('HLTrigger.Configuration.HLT_HIon_Jet_data_cff')
+process.load('HLTrigger.Configuration.HLT_HIon_JetMET_data_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 # Input source
@@ -34,7 +34,7 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.5 $'),
     annotation = cms.untracked.string('l1EmulatorFromRaw nevts:100'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -121,12 +121,16 @@ process.icPu5JetAnalyzer = inclusiveJetAnalyzer.clone(
 	)
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
-process.rechitanalyzer.doEcal = cms.untracked.bool(False);
-process.rechitanalyzer.doHcal = cms.untracked.bool(False);
-process.rechitanalyzer.hasVtx = cms.untracked.bool(False);
+process.rechitanalyzer.doEcal = cms.untracked.bool(False)
+process.rechitanalyzer.doHcal = cms.untracked.bool(False)
+process.rechitanalyzer.hasVtx = cms.untracked.bool(False)
+process.rechitanalyzer.hcalHFRecHitSrc = "hltHfreco"
 process.rechitanalyzer.towersSrc = "hltTowerMakerForAll"
 process.rechitanalyzer.JetSrc = "hltHICaloJetCorrected"
 process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(4)
+
+process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
+process.anaMET.METSrc = "hltMet"
 
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string("openhlt_data_l1emul_mcgt.root")
@@ -135,8 +139,8 @@ process.TFileService = cms.Service("TFileService",
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
-process.ana_step = cms.EndPath(process.HLTHIRecoJetSequenceIC5Corrected*process.patJets)
-process.endjob_step = cms.EndPath(process.endOfProcess*process.l1NtupleProducer*process.hltbitnew*process.icPu5JetAnalyzer*process.rechitanalyzer)
+process.ana_step = cms.EndPath(process.HLTHIRecoJetSequenceIC5Corrected*process.patJets*process.hltMet)
+process.endjob_step = cms.EndPath(process.endOfProcess*process.l1NtupleProducer*process.hltbitnew*process.icPu5JetAnalyzer*process.rechitanalyzer*process.anaMET)
 #process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
