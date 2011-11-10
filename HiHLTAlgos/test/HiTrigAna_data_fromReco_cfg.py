@@ -21,7 +21,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(-1)
 )
 
 # Input source
@@ -29,14 +29,15 @@ process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
     fileNames = cms.untracked.vstring(
     #'/store/hidata/HIRun2010/HICorePhysics/RAW-RECO/v2/000/150/590/4CEB2F45-25ED-DF11-AC92-00E08178C06B.root'
-    'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
+    #'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
+    'rfio:/castor/cern.ch/user/y/yjlee/HIData2011/recoTest/reco-Run180892-D2E86FE1-FA06-E111-99DC-003048D2C01E.root'
     )
 )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Other statements
-process.GlobalTag.globaltag = 'GR_R_44_V6::All'
+process.GlobalTag.globaltag = 'GR_R_44_V7::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
