@@ -5,8 +5,8 @@ simpleSCTree = cms.EDAnalyzer("ClusterTreeMaker",
                               scTagE = cms.untracked.string("correctedEndcapSuperClustersWithPreshower"),
                               ebRecHitCollection = cms.untracked.InputTag( 'ecalRecHit','EcalRecHitsEB'),
                               eeRecHitCollection = cms.untracked.InputTag( 'ecalRecHit','EcalRecHitsEE'),
-                              etCut              = cms.untracked.double(8),
-                              
+                              etCutSC              = cms.untracked.double(8),
+                              etCutBC              = cms.untracked.double(1.5),
                               basicClusterBarrel        = cms.InputTag("islandBasicClusters","islandBarrelBasicClusters"),
                               basicClusterEndcap        = cms.InputTag("islandBasicClusters","islandEndcapBasicClusters"),
                               
