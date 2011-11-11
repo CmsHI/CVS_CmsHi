@@ -39,7 +39,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('/store/data/ComissioningHI/HIHighPt/RAW/v1/000/180/891/9AC450E9-3508-E111-8E63-003048CF94A6.root')
+    fileNames = cms.untracked.vstring('/store/data/ComissioningHI/HIExpressPhysics/RAW/v1/000/180/892/F6B10997-2B08-E111-A133-BCAEC532970F.root')
 )
 
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
