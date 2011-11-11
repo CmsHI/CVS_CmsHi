@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.8 2011/11/10 16:00:46 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.9 2011/11/10 16:23:07 kimy Exp $
 //
 //
 
@@ -375,15 +375,15 @@ ClusterTreeMaker::~ClusterTreeMaker()
    
    nBC = 0;
    if (doBasicCluster) {
-     for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
-	if (bcItr->eta() < etCutBC ) 
+      for (reco::CaloClusterCollection::const_iterator bcItr = myBCs.begin(); bcItr != myBCs.end(); ++bcItr) {
+	 if ( (  bcItr->energy()/cosh(bcItr->eta()) ) < etCutBC ) 
 	   continue;
-	bceta[nBC] = bcItr->eta();
-	bcphi[nBC] = bcItr->phi();
-	bcet[nBC] =  bcItr->energy()/cosh(bcItr->eta());
-	nBC++;
-     }
-     
+	 bceta[nBC] = bcItr->eta();
+	 bcphi[nBC] = bcItr->phi();
+	 bcet[nBC] =  bcItr->energy()/cosh(bcItr->eta());
+	 nBC++;
+      }
+      
    }  
    
    theTree->Fill();
