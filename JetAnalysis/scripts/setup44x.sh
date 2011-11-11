@@ -94,7 +94,7 @@ cvs co -r HLTrigger/HLTanalyzers
 cvs co -d  CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
-cvs co -d MuTrig/HLTMuTree UserCode/Miheejo/MuTrig/HLTMuTree
+cvs co -d MuTrig/HLTMuTree UserCode/CmsHi/HiMuonAlgos/HLTMuTree/
 
 scram build -c
 scram b -j4
