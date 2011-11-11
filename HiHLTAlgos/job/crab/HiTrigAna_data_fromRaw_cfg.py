@@ -63,13 +63,66 @@ process.hltana = process.hltbitanalysis.clone(
    HLTProcessName       = cms.string("HLT")
   )
 
+# Towers
+process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
+process.rechitanalyzer.doEcal = cms.untracked.bool(False)
+process.rechitanalyzer.doHcal = cms.untracked.bool(False)
+process.rechitanalyzer.hasVtx = cms.untracked.bool(False)
+process.rechitanalyzer.hcalHFRecHitSrc = "hltHfreco"
+process.rechitanalyzer.towersSrc = "hltTowerMakerForAll"
+process.rechitanalyzer.JetSrc = "hltHICaloJetCorrected"
+
+# Jet Analyzers
+process.load("PhysicsTools.PatAlgos.patHeavyIonSequences_cff")
+process.icPu5corr = process.patJetCorrFactors.clone(
+   src = cms.InputTag("hltIterativeCone5PileupSubtractionCaloJets"),
+   levels = cms.vstring('L2Relative','L3Absolute'),
+   payload = cms.string('AK5Calo'),
+   useNPV = False
+  )
+process.patJets.jetSource  = cms.InputTag("hltIterativeCone5PileupSubtractionCaloJets")
+process.patJets.addBTagInfo         = False
+process.patJets.addTagInfos         = False
+process.patJets.addDiscriminators   = False
+process.patJets.addAssociatedTracks = False
+process.patJets.addJetCharge        = False
+process.patJets.addJetID            = False
+process.patJets.getJetMCFlavour     = False
+process.patJets.addGenPartonMatch   = False
+process.patJets.addGenJetMatch      = False
+process.patJets.embedGenJetMatch    = False
+process.patJets.embedGenPartonMatch = False
+process.patJets.embedCaloTowers	    = False
+process.patJets.jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu5corr"))
+
+from CmsHi.JetAnalysis.inclusiveJetAnalyzer_cff import *
+process.icPu5JetAnalyzer = inclusiveJetAnalyzer.clone(
+	jetTag = 'patJets',
+   L1gtReadout = cms.InputTag("hltGtDigis"),
+	hltTrgNames = ['HLT_HIJet55_v1','HLT_HIJet65_v1','HLT_HIJet80_v1','HLT_HIJet95_v1'],
+	useCentrality = False,
+	useVtx = cms.untracked.bool(False),
+	isMC = False
+	)
+
+#### supercluster analyzer
+process.load("CmsHi.PhotonAnalysis.simpleSCTree_cfi")
+process.simpleSCTree.doBasicCluster = False
+process.simpleSCTree.doRecHit = False
+process.simpleSCTree.eeRecHitCollection = cms.untracked.InputTag("hltEcalRecHitAll","EcalRecHitsEE")
+process.simpleSCTree.ebRecHitCollection = cms.untracked.InputTag("hltEcalRecHitAll","EcalRecHitsEB")
+process.simpleSCTree.basicClusterEndcap = cms.InputTag("hltIslandBasicClustersHI","islandEndcapBasicClusters")
+process.simpleSCTree.basicClusterBarrel = cms.InputTag("hltIslandBasicClustersHI","islandBarrelBasicClusters")
+process.simpleSCTree.scTagB = 'hltCorrectedIslandBarrelSuperClustersHI'
+process.simpleSCTree.scTagE = 'hltCleanedCorrectedIslandBarrelSuperClustersHI'
+
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string("openhlt_data.root")
 )
 
 # Path and EndPath definitions
-process.recoextra_step = cms.Path(process.HLTL1UnpackerSequence)
-process.ana_step = cms.Path(process.hltana)
+process.recoextra_step = cms.Path(process.HLTL1UnpackerSequence*process.HLTHIRecoJetSequenceIC5Corrected*process.icPu5corr*process.patJets*process.HLTDoHIEcalClusWithCleaningSequence)
+process.ana_step = cms.Path(process.hltana*process.rechitanalyzer*process.icPu5JetAnalyzer)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
