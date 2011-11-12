@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.10 2011/11/11 12:43:19 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.11 2011/11/12 10:59:07 kimy Exp $
 //
 //
 
@@ -126,6 +126,9 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   float et[3000];
   float eta[3000];
   float phi[3000];
+  float energy[3000];
+  float rawEnergy[3000];
+  
   float severity[3000];
   float time[3000];
   float swissCrx[3000];
@@ -275,6 +278,9 @@ ClusterTreeMaker::~ClusterTreeMaker()
      et[nPar] = theEt;
      eta[nPar] = (float)c1.eta();
      phi[nPar] = (float)c1.phi();
+     energy[nPar] = (float)c1.energy();
+     rawEnergy[nPar] = (float)c1.rawEnergy();
+     
      nPar++;
    }
    
@@ -284,7 +290,7 @@ ClusterTreeMaker::~ClusterTreeMaker()
      const reco::SuperCluster &c1 = (*superClusterCollectionE)[i];
 
      float theEt = c1.energy()/cosh(c1.eta());
-     if ( theEt < 8 )  continue;
+     if ( theEt < etCut )  continue;
      float theSeverity = -100;
      float theSwissCrx = -100;
      float theTime = -100;
@@ -309,6 +315,10 @@ ClusterTreeMaker::~ClusterTreeMaker()
      et[nPar] = theEt;
      eta[nPar] = (float)c1.eta();
      phi[nPar] = (float)c1.phi();
+     energy[nPar] = (float)c1.energy();
+     rawEnergy[nPar] = (float)c1.rawEnergy();
+     
+
      nPar++;
    }
 
@@ -401,6 +411,8 @@ ClusterTreeMaker::beginJob()
    
    theTree->Branch("nPar",&nPar,"nPar/I");
    theTree->Branch("et",et,"et[nPar]/F");
+   theTree->Branch("energy",energy,"energy[nPar]/F");
+   theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPar]/F");
    theTree->Branch("eta",eta,"eta[nPar]/F");
    theTree->Branch("phi",phi,"phi[nPar]/F");
    theTree->Branch("time",time,"time[nPar]/F");
