@@ -127,7 +127,7 @@ process.ana_step = cms.Path(process.hltana*process.rechitanalyzer*process.icPu5J
 # Schedule definition
 process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
 
-repacked=True
+repacked=False
 if (repacked):
     from FWCore.ParameterSet import Mixins
     for module in process.__dict__.itervalues():
