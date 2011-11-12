@@ -37,7 +37,7 @@ process.source = cms.Source("PoolSource",
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 # Other statements
-process.GlobalTag.globaltag = 'GR_R_44_V7::All'
+process.GlobalTag.globaltag = 'GR_R_44_V10::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
