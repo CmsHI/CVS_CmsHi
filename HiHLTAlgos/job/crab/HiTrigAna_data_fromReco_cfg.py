@@ -32,7 +32,7 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
     #'/store/hidata/HIRun2010/HICorePhysics/RAW-RECO/v2/000/150/590/4CEB2F45-25ED-DF11-AC92-00E08178C06B.root'
     #'file:/net/hisrv0001/home/davidlw/scratch1/HLTStudies/CMSSW_4_4_0_NewZS/src/RECO_highptInNewNotOld_NewZS_Jet50U.root'
-    'rfio:/castor/cern.ch/user/y/yjlee/HIData2011/recoTest/reco-Run180892-D2E86FE1-FA06-E111-99DC-003048D2C01E.root'
+    'file:HIExpressPhysics_FEVT_18151.root'
     )
 )
 
@@ -55,15 +55,19 @@ process.load('RecoHI.HiCentralityAlgos.CentralityBin_cfi')
 process.load('HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi')
 process.hltbitanalysis.UseTFileService			= cms.untracked.bool(True)
 
-process.hltana = process.hltbitanalysis.clone(
+process.hltanalysis = process.hltbitanalysis.clone(
    l1GtReadoutRecord		= cms.InputTag("gtDigis"),
    l1GctHFBitCounts     = cms.InputTag("gctDigis"),
-   l1GctHFRingSums      = cms.InputTag("gctDigis"),   l1extramu            = cms.string('l1extraParticles'),
-   l1extramc            = cms.string('l1extraParticles'),
+   l1GctHFRingSums      = cms.InputTag("gctDigis"),
+   l1extramu            = cms.string("l1extraParticles"),
+   l1extramc            = cms.string("l1extraParticles"),
    hltresults           = cms.InputTag("TriggerResults","","HLT"),
    HLTProcessName       = cms.string("HLT")
   )
-
+process.skimanalysis = process.hltanalysis.clone(
+    HLTProcessName                  = cms.string(process.name_()),
+    hltresults                      = cms.InputTag("TriggerResults","",process.name_())
+    )
 # HiEvt Analyzer
 process.load("CmsHi.HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doEvtPlane = False
@@ -121,11 +125,12 @@ process.TFileService = cms.Service("TFileService",
 
 # Common offline event selection
 process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
-#process.path = cms.Path(process.nameOfHltSelection*process.collisionEventSelection*process.nameOfAnalysisSequence)
 
 # Path and EndPath definitions
-process.recoextra_step = cms.Path(process.collisionEventSelection * process.L1Extra*process.centralityBin*process.icPu5corr*process.patJets)
-process.ana_step = cms.Path(process.collisionEventSelection * process.hltana*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree*process.anaTrack)
+process.recoextra_step = cms.Path(process.L1Extra*process.centralityBin*process.icPu5corr*process.patJets)
+process.ana_step = cms.Path(process.hltanalysis*process.hiEvtAnalyzer*process.icPu5JetAnalyzer*process.simpleSCTree*process.hltMuTree*process.anaTrack)
+process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
+process.pathana_step = cms.EndPath(process.skimanalysis)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.recoextra_step,process.ana_step)
+process.schedule = cms.Schedule(process.recoextra_step,process.ana_step,process.pcollisionEventSelection,process.pathana_step)
