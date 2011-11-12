@@ -223,7 +223,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Load trees. Hard coded for the moment
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
-  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
+  photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   hbheTree    = (TTree*) inf->Get("rechitanalyzer/hbhe");
@@ -255,7 +255,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
     photonTree->SetName("photon");
-    if (tree == 0) tree = photonTree;
+    if (tree == 0) tree = photonTree; else tree->AddFriend(photonTree);
     setupPhotonTree(photonTree,photon);
   }
 
@@ -412,7 +412,7 @@ void HiForest::SetOutputFile(const char *name)
      }
 
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
-  if (hasPhotonTree)   AddCloneTree(photonTree,   "NTuples",            "Analysis");
+  if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
   if (hasHbheTree)     AddCloneTree(hbheTree,     "hbhe",               "rechitanalyzer");
   setupOutput = true;
