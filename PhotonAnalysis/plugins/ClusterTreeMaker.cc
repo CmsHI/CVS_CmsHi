@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.9 2011/11/10 16:23:07 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.10 2011/11/11 12:43:19 kimy Exp $
 //
 //
 
@@ -123,12 +123,12 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   std::string vertexProducer_;      // vertecies producer                                                                                                                                                       
   std::string scProducerB_;
   std::string scProducerE_;
-  float et[1000];
-  float eta[1000];
-  float phi[1000];
-  float severity[1000];
-  float time[1000];
-  float swissCrx[1000];
+  float et[3000];
+  float eta[3000];
+  float phi[3000];
+  float severity[3000];
+  float time[3000];
+  float swissCrx[3000];
   int nPar;
   double etCut;
    
