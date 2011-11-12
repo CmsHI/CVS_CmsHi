@@ -42,8 +42,6 @@ process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 process.GlobalTag.globaltag = 'GR_R_44_V10::All'
 
 # load centrality
-from CmsHi.Analysis2010.CommonFunctions_cff import *
-overrideCentrality(process)
 process.HeavyIonGlobalParameters = cms.PSet(
 	centralityVariable = cms.string("HFhits"),
 	nonDefaultGlauberModel = cms.string(""),
