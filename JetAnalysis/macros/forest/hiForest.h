@@ -10,6 +10,7 @@
 #include "SetupTrackTree.h"
 #include "SetupHitTree.h"
 #include "SetupEvtTree.h"
+#include "SetupMetTree.h"
 #include "TrackingCorrections.h"
 
 #include <TTree.h>
@@ -101,7 +102,9 @@ class HiForest : public TNamed
   TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
   TTree *towerTree;                             // Tower Tree
   TTree *hbheTree;                              // HCAL HBHE Tree
+  TTree *ebTree;                                // ECAL eb Tree
   TTree *evtTree;                               // Event Tree
+  TTree *metTree;                               // MET Tree
 
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
@@ -123,11 +126,14 @@ class HiForest : public TNamed
   Tracks track;
   Hits tower;
   Hits hbhe;
+  Hits eb;
   Evts evt;
-  
+  Mets met;
+    
   // Booleans
   bool hasPhotonTree;
   bool hasEvtTree;
+  bool hasMetTree;
   bool hasIcPu5JetTree;
   bool hasAkPu3JetTree;
   bool hasHltTree;
@@ -135,6 +141,7 @@ class HiForest : public TNamed
   bool hasSkimTree;
   bool hasTowerTree;
   bool hasHbheTree;
+  bool hasEbTree;
 
   bool setupOutput;
   bool verbose;
@@ -231,7 +238,9 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
+  ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
+  metTree      = (TTree*) inf->Get("anaMET/metTree");
 
   if(pp){
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
@@ -249,6 +258,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
   hasEvtTree       = (evtTree   != 0);
+  hasMetTree       = (metTree   != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
   hasTrackTree     = (trackTree    != 0);
@@ -256,6 +266,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasSkimTree      = (skimTree     != 0);
   hasTowerTree     = (towerTree    != 0);
   hasHbheTree      = (hbheTree     != 0);
+  hasEbTree        = (ebTree     != 0);
   setupOutput = false;
   
   // Setup branches. See also Setup*.h
@@ -266,9 +277,15 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   }
 
   if (hasEvtTree) {
-    evtTree->SetName("evt");
+    evtTree->SetName("event");
     if (tree == 0) tree = evtTree; else tree->AddFriend(evtTree);
     setupEvtTree(evtTree,evt);
+  }
+
+  if (hasMetTree) {
+    evtTree->SetName("met");
+    if (tree == 0) tree = metTree; else tree->AddFriend(metTree);
+    setupMetTree(metTree,met);
   }
 
   if (hasHltTree) {
@@ -312,6 +329,12 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     if (tree == 0) tree = hbheTree; else tree->AddFriend(hbheTree);
     setupHitTree(hbheTree,hbhe);
   }
+
+  if (hasEbTree) {
+    ebTree->SetName("eb");
+    if (tree == 0) tree = ebTree; else tree->AddFriend(ebTree);
+    setupHitTree(ebTree,eb);
+  }
   
   tree->SetMarkerStyle(20);
 
@@ -339,6 +362,7 @@ void HiForest::GetEntry(int i)
   // get the entry of the available trees
   if (hasPhotonTree)   photonTree   ->GetEntry(i);
   if (hasEvtTree)      evtTree   ->GetEntry(i);
+  if (hasMetTree)      metTree   ->GetEntry(i);
   if (hasHltTree)      hltTree      ->GetEntry(i);
   if (hasSkimTree)     skimTree     ->GetEntry(i);
   if (hasIcPu5JetTree) icPu5jetTree ->GetEntry(i);
@@ -346,6 +370,7 @@ void HiForest::GetEntry(int i)
   if (hasTrackTree)    trackTree    ->GetEntry(i);
   if (hasTowerTree)    towerTree    ->GetEntry(i);
   if (hasHbheTree)     hbheTree     ->GetEntry(i);
+  if (hasEbTree)       ebTree     ->GetEntry(i);
 }
 
 int HiForest::GetEntries()
@@ -405,9 +430,10 @@ void HiForest::PrintStatus()
   if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
   if (hasTrackTree)    CheckTree(trackTree,    "TrackTree");
   if (hasPhotonTree)   CheckTree(photonTree,   "PhotonTree");
-  if (hasEvtTree)      CheckTree(evtTree,   "EvtTree");
+  if (hasMetTree)      CheckTree(metTree,   "MetTree");
   if (hasTowerTree)    CheckTree(towerTree,    "TowerTree");
   if (hasHbheTree)     CheckTree(hbheTree,     "HbheTree");
+  if (hasEbTree)       CheckTree(ebTree,     "EbTree");
 
 }
 
@@ -428,8 +454,10 @@ void HiForest::SetOutputFile(const char *name)
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasEvtTree)      AddCloneTree(evtTree,      "hiEvtAnalyzer",            "HiTree");
+  if (hasMetTree)      AddCloneTree(evtTree,      "anaMET",            "metTree");
   if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
   if (hasHbheTree)     AddCloneTree(hbheTree,     "hbhe",               "rechitanalyzer");
+  if (hasEbTree)     AddCloneTree(ebTree,     "eb",               "rechitanalyzer");
   setupOutput = true;
 }
 
