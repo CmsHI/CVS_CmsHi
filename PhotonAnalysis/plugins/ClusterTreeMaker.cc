@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.11 2011/11/12 10:59:07 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.12 2011/11/12 13:42:03 kimy Exp $
 //
 //
 
@@ -112,6 +112,7 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   bool doRecHit;
   TH1D* hRHetBarrel;
   TH1D* hRHetEndcap;
+  TH1D* hRHetEndcap2;
   TH1D* hRHetBarrelCleaned;
 
   TH1D* hRHetaEndcap;
@@ -364,6 +365,10 @@ ClusterTreeMaker::~ClusterTreeMaker()
        const GlobalPoint & position = caloGeom->getPosition(rh->id());
        double tempEt = rh->energy()/cosh(position.eta()) ;
        hRHetEndcap->Fill(tempEt);
+       if ( fabs(position.eta()) < 2 )   
+	 hRHetEndcap2->Fill(tempEt);
+       
+       
        hRHetaEndcap->Fill ( position.eta() ) ;
        hRHphiEndcap->Fill ( position.phi() ) ;
        
@@ -432,6 +437,7 @@ ClusterTreeMaker::beginJob()
 
    hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 4000,-2.5,197.5);;
    hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 4000,-2.5,197.5);;
+   hRHetEndcap2 = fs->make<TH1D>( "hRHetEndcap2" , "", 4000,-2.5,197.5);;
    hRHetaBarrel = fs->make<TH1D>( "hRHetaBarrel" , "", 400,-3,3);
    hRHetaEndcap = fs->make<TH1D>( "hRHetaEndcap" , "", 400,-3,3);
    hRHphiBarrel = fs->make<TH1D>( "hRHphiBarrel" , "", 400,-4,4);
