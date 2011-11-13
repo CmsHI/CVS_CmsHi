@@ -237,8 +237,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
-  hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
-  ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
+  //hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
+  //ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
 
