@@ -289,7 +289,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   }
 
   if (hasHltTree) {
-    hltTree->SetName("hlt");
+    hltTree->SetName("hltTree");
     if (tree == 0) tree = hltTree; else tree->AddFriend(hltTree);
     setupHltTree(hltTree,hlt);
   }
