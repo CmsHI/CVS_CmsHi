@@ -237,11 +237,13 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
+  icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
+  akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
   //hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
   //ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
-
+/*
   if(pp){
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
     akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::ak3PF].data()));
@@ -254,7 +256,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
        akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
     }
   }
-
+*/
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
   hasEvtTree       = (evtTree   != 0);
@@ -455,9 +457,9 @@ void HiForest::SetOutputFile(const char *name)
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasEvtTree)      AddCloneTree(evtTree,      "hiEvtAnalyzer",            "HiTree");
   if (hasMetTree)      AddCloneTree(evtTree,      "anaMET",            "metTree");
-  if (hasTowerTree)    AddCloneTree(towerTree,    "tower",              "rechitanalyzer");
-  if (hasHbheTree)     AddCloneTree(hbheTree,     "hbhe",               "rechitanalyzer");
-  if (hasEbTree)     AddCloneTree(ebTree,     "eb",               "rechitanalyzer");
+  if (hasTowerTree)    AddCloneTree(towerTree,    "rechitanalyzer",              "tower");
+  if (hasHbheTree)     AddCloneTree(hbheTree,     "rechitanalyzer",               "hbhe");
+  if (hasEbTree)       AddCloneTree(ebTree,       "rechitanalyzer",               "eb");
   setupOutput = true;
 }
 
