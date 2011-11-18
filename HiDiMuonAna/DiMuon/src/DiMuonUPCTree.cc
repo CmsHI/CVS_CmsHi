@@ -141,35 +141,35 @@ private:
   double ZDCEn[18];
   
   int TrackSize;
-  double TrackPx[100], TrackPy[100], TrackPz[100], TrackPhi[100], TrackEta[100], TrackCharge[100];
+  double TrackPx[1000], TrackPy[1000], TrackPz[1000], TrackPhi[1000], TrackEta[1000], TrackCharge[1000];
 
   int TrackMuSize;
   
   
-  double TrackMuPx[100], TrackMuPy[100], TrackMuPz[100], TrackMuPhi[100], TrackMuEta[100], TrackMuCharge[100];
-  double TrackMu_nchi2In[100], TrackMu_dxy[100],TrackMu_dz[100];
-  int TrackMu_found[100], TrackMu_pixeLayers[100], TrackMu_arbitrated[100],TrackMu_global[100];
+  double TrackMuPx[1000], TrackMuPy[1000], TrackMuPz[1000], TrackMuPhi[1000], TrackMuEta[1000], TrackMuCharge[1000];
+  double TrackMu_nchi2In[1000], TrackMu_dxy[1000],TrackMu_dz[1000];
+  int TrackMu_found[1000], TrackMu_pixeLayers[1000], TrackMu_arbitrated[1000],TrackMu_global[1000];
 
 
   int DiMuSize;
   
-  double DiMuCharge[100],DiMuNo[100], DiMuMass[100] , DiMuPt[100], DiMuRap[100];
-  double DiMuPx[100], DiMuPy[100], DiMuPz[100];
+  double DiMuCharge[1000],DiMuNo[1000], DiMuMass[1000] , DiMuPt[1000], DiMuRap[1000];
+  double DiMuPx[1000], DiMuPy[1000], DiMuPz[1000];
 
-  double Mu1Charge[100],Mu1No[100], Mu1Mass[100] , Mu1Pt[100], Mu1Eta[100];
-  double Mu1Px[100], Mu1Py[100], Mu1Pz[100], Mu1Phi[100];
-  double Mu1_nchi2In[100], Mu1_dxy[100], Mu1_dz[100], Mu1_nchi2Gl[100];
-  int Mu1_found[100], Mu1_pixeLayers[100], Mu1_nValidMuHits[100], Mu1_arbitrated[100];
-  int Mu1_tracker[100], Mu1_global[100], Mu1_standalone[100];
-  int Mu1_trigger1[100],Mu1_trigger2[100],Mu1_trigger3[100];
+  double Mu1Charge[1000],Mu1No[1000], Mu1Mass[1000] , Mu1Pt[1000], Mu1Eta[1000];
+  double Mu1Px[1000], Mu1Py[1000], Mu1Pz[1000], Mu1Phi[1000];
+  double Mu1_nchi2In[1000], Mu1_dxy[1000], Mu1_dz[1000], Mu1_nchi2Gl[1000];
+  int Mu1_found[1000], Mu1_pixeLayers[1000], Mu1_nValidMuHits[1000], Mu1_arbitrated[1000];
+  int Mu1_tracker[1000], Mu1_global[1000], Mu1_standalone[1000];
+  int Mu1_trigger1[1000],Mu1_trigger2[1000],Mu1_trigger3[1000];
 
-  double Mu2Charge[100],Mu2No[100], Mu2Mass[100] , Mu2Pt[100], Mu2Eta[100];
-  double Mu2Px[100], Mu2Py[100], Mu2Pz[100], Mu2Phi[100];
-  double Mu2_nchi2In[100], Mu2_dxy[100], Mu2_dz[100], Mu2_nchi2Gl[100];
-  int Mu2_found[100], Mu2_pixeLayers[100], Mu2_nValidMuHits[100],Mu2_arbitrated[100];
-  int Mu2_tracker[100], Mu2_global[100], Mu2_standalone[100];
+  double Mu2Charge[1000],Mu2No[1000], Mu2Mass[1000] , Mu2Pt[1000], Mu2Eta[1000];
+  double Mu2Px[1000], Mu2Py[1000], Mu2Pz[1000], Mu2Phi[1000];
+  double Mu2_nchi2In[1000], Mu2_dxy[1000], Mu2_dz[1000], Mu2_nchi2Gl[1000];
+  int Mu2_found[1000], Mu2_pixeLayers[1000], Mu2_nValidMuHits[1000],Mu2_arbitrated[1000];
+  int Mu2_tracker[1000], Mu2_global[1000], Mu2_standalone[1000];
 
-  int Mu2_trigger1[100],Mu2_trigger2[100],Mu2_trigger3[100];
+  int Mu2_trigger1[1000],Mu2_trigger2[1000],Mu2_trigger3[1000];
 
 };
 
@@ -233,26 +233,26 @@ DiMuonUPCTree::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   bin = centrality_->getBin();
   Centrality->Fill(bin);
 
-  int NoOfTracks =0;
+  //int NoOfTracks =0;
   
-  Handle<TrackCollection> trackCollectionHandle;
-  iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
+  //Handle<TrackCollection> trackCollectionHandle;
+  //iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
   //iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
 
-  if( !trackCollectionHandle.isValid() ){
-   cout << "Error! Can't get selectTracks!" << endl;
-  return ;
-  }
+  //if( !trackCollectionHandle.isValid() ){
+  //cout << "Error! Can't get selectTracks!" << endl;
+  //return ;
+  //}
 
-  NoOfTracks =trackCollectionHandle->size();
+  //NoOfTracks =trackCollectionHandle->size();
     
-  cout<<" no of tracks : "<<NoOfTracks<<endl;
+  //cout<<" no of tracks : "<<NoOfTracks<<endl;
 
-  if( NoOfTracks > 1 && NoOfTracks < 100 )
-    {
+  //if( NoOfTracks > 1 && NoOfTracks < 100 )
+  //{
       FillTree(iEvent,iSetup);
       EventTree->Fill();
-    }
+      //}
   
  
   
@@ -456,7 +456,8 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
   using reco::MuonCollection;
   
   float massMu=0.105658;
-  int evTrigger[20]={0};
+  
+  //int evTrigger[20]={0};
 
   //reset EVENT information
   eventNb= 0 ;
@@ -480,7 +481,7 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
   TrackMuSize = 0;
 
 
-  cout<<" 0 TrackMuSize "<<TrackMuSize<<endl;
+  //cout<<" 0 TrackMuSize "<<TrackMuSize<<endl;
 
   // Event related infos
   eventNb = iEvent.id().event();
@@ -507,13 +508,13 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
     vertexRho=privtx->position().rho();
     RefVtx = privtx->position();
     if(privtx->isFake()){isVtxFake=1;}else{isVtxFake=0;}
-    cout<<" vtx trk: "<<vertexTrk<<" is fake "<<privtx->isFake()<<" is ff "<<isVtxFake<<endl;
-    cout<<" vtx x: "<<vertexX<<" vtxy "<<vertexY<<" z "<<vertexZ<<endl;
+    //cout<<" vtx trk: "<<vertexTrk<<" is fake "<<privtx->isFake()<<" is ff "<<isVtxFake<<endl;
+    //cout<<" vtx x: "<<vertexX<<" vtxy "<<vertexY<<" z "<<vertexZ<<endl;
   } 
   else {RefVtx.SetXYZ(0.,0.,0.);}  
   
 
-  cout<<" 1 TrackMuSize "<<TrackMuSize <<endl; 
+  //cout<<" 1 TrackMuSize "<<TrackMuSize <<endl; 
   //========================================== Trigger stuff==============================================================//
   /*
   Handle<edm::TriggerResults> triggerResults;
@@ -554,6 +555,7 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
   
   
   //Get a handle ("pointer") to the TrackCollection within the event                                                                                                           
+  /*
   Handle<TrackCollection> trackCollectionHandle;
   iEvent.getByLabel("hiGlobalPrimTracks", trackCollectionHandle);
   //iEvent.getByLabel("hiSelectedTracks", trackCollectionHandle);
@@ -592,11 +594,11 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
 
   cout<<" out of track loop "<<endl;
   cout<<" 2 TrackMuSize "<<TrackMuSize <<endl; 
-  
+  */
 
   //===================================== ZDC ====================================================//
   
-  
+  /*  
     double ZDCEnergy=0;  
     cout<<" 1 "<<endl;
     Handle<ZDCRecHitCollection> zdc_recHits_h;
@@ -623,12 +625,14 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
     ZDCEn[chid]=zhit->energy(); 
     cout<<" chid "<<chid<<" zdcen "<<ZDCEn[chid]<<endl;  
     }
-  
+  */
   
  
   
   //===============================  Tracker Muons  =====================================================//
-  int nTrackMuon=0;
+  
+    /*
+    int nTrackMuon=0;
   
   cout<<" 3 TrackMuSize "<<TrackMuSize <<endl; 
   
@@ -706,7 +710,7 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
     cout<< " out of track muon loop1 "<<endl;
   }
   cout<< " out of track muon loop2 "<<endl;
-  
+    */
 
   
   //===============================  Muons  =====================================================//
@@ -769,12 +773,13 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
        if(aMuon.isTrackerMuon()){Mu1_tracker[DiMuSize]=1;} else {Mu1_tracker[DiMuSize]=0;}
        if(aMuon.isStandAloneMuon()){Mu1_standalone[DiMuSize]=1;} else{Mu1_standalone[DiMuSize]=0;} 
        
+
        
-       if(!aMuon.triggerObjectMatchesByPath("HLT_HIL1SingleMu3").empty()) {Mu1_trigger1[DiMuSize]=1;} else {Mu1_trigger1[DiMuSize]=0;}
-       if(!aMuon.triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()) {Mu1_trigger2[DiMuSize]=1;} else {Mu1_trigger2[DiMuSize]=0;}
-       if(!aMuon.triggerObjectMatchesByPath("HLT_HIUpcMu").empty()) {Mu1_trigger3[DiMuSize]=1;} else {Mu1_trigger3[DiMuSize]=0;}
+       if(!aMuon.triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()) {Mu1_trigger1[DiMuSize]=1;} else {Mu1_trigger1[DiMuSize]=0;}
+       if(!aMuon.triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()) {Mu1_trigger2[DiMuSize]=1;} else {Mu1_trigger2[DiMuSize]=0;}
+       if(!aMuon.triggerObjectMatchesByPath("HLT_HIL3Mu3_v1").empty()) {Mu1_trigger3[DiMuSize]=1;} else {Mu1_trigger3[DiMuSize]=0;}
        
-       if(aMuon.isTrackerMuon())
+       if( aMuon.isGlobalMuon() &&  aMuon.isTrackerMuon())
 	 {
 	   TrackRef iTrack =aMuon.innerTrack();
 	   const reco::HitPattern& p1=iTrack->hitPattern();
@@ -813,15 +818,15 @@ void DiMuonUPCTree::FillTree(const edm::Event& iEvent, const edm::EventSetup& iS
        
        
       
-       if(!bMuon.triggerObjectMatchesByPath("HLT_HIL1SingleMu3").empty()) {Mu2_trigger1[DiMuSize]=1;} else {Mu2_trigger1[DiMuSize]=0;}
-       if(!bMuon.triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()) {Mu2_trigger2[DiMuSize]=1;} else {Mu2_trigger2[DiMuSize]=0;}
-       if(!bMuon.triggerObjectMatchesByPath("HLT_HIUpcMu").empty()) {Mu2_trigger3[DiMuSize]=1;} else {Mu2_trigger3[DiMuSize]=0;}
+       if(!bMuon.triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()) {Mu2_trigger1[DiMuSize]=1;} else {Mu2_trigger1[DiMuSize]=0;}
+       if(!bMuon.triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()) {Mu2_trigger2[DiMuSize]=1;} else {Mu2_trigger2[DiMuSize]=0;}
+       if(!bMuon.triggerObjectMatchesByPath("HLT_HIL3Mu3_v1").empty()) {Mu2_trigger3[DiMuSize]=1;} else {Mu2_trigger3[DiMuSize]=0;}
        
       
       
        //cout<<"mu2 : global "<<Mu2_global[DiMuSize]<<" tracker "<<Mu2_tracker[DiMuSize]<<" sa "<<Mu2_standalone[DiMuSize]<<endl; 
       
-       if(bMuon.isTrackerMuon())
+       if( bMuon.isGlobalMuon() &&  bMuon.isTrackerMuon())
 	 {
 	   TrackRef iTrack =bMuon.innerTrack();
 	   const reco::HitPattern& p2=iTrack->hitPattern();
