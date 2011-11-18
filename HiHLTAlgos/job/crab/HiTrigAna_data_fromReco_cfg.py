@@ -108,6 +108,7 @@ process.icPu5JetAnalyzer = inclusiveJetAnalyzer.clone(
 
 #### supercluster analyzer
 process.load("CmsHi.PhotonAnalysis.simpleSCTree_cfi")
+process.simpleSCTree.doBasicCluster = cms.untracked.bool(False)
 
 #### muon anlayzer
 process.load("HiMuonAlgos.HLTMuTree.hltMuTree_cfi")
