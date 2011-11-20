@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    EvtSelAnalyzer
-// Class:      EvtSelAnalyzer
+// Package:    FilterAnalyzer
+// Class:      FilterAnalyzer
 // 
-/**\class EvtSelAnalyzer EvtSelAnalyzer.cc CmsHi/EvtSelAnalyzer/src/EvtSelAnalyzer.cc
+/**\class FilterAnalyzer FilterAnalyzer.cc CmsHi/FilterAnalyzer/src/FilterAnalyzer.cc
 
  Description: [one line class summary]
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz,32 4-A08,+41227673039,
 //         Created:  Sun Nov 20 13:04:12 CET 2011
-// $Id$
+// $Id: FilterAnalyzer.cc,v 1.1 2011/11/20 13:00:45 yilmaz Exp $
 //
 //
 
@@ -21,7 +21,8 @@
 // system include files
 #include <memory>
 #include <iostream>
-#include <string.h>
+#include <vector>
+#include <string>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -46,10 +47,10 @@ using namespace std;
 // class declaration
 //
 
-class EvtSelAnalyzer : public edm::EDAnalyzer {
+class FilterAnalyzer : public edm::EDAnalyzer {
    public:
-      explicit EvtSelAnalyzer(const edm::ParameterSet&);
-      ~EvtSelAnalyzer();
+      explicit FilterAnalyzer(const edm::ParameterSet&);
+      ~FilterAnalyzer();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -67,7 +68,7 @@ class EvtSelAnalyzer : public edm::EDAnalyzer {
       // ----------member data ---------------------------
 
   edm::InputTag hltresults_;
-  string superFilter_;
+  vector<string> superFilters_;
   bool _Debug;
 
   int HltEvtCnt;
@@ -88,13 +89,13 @@ class EvtSelAnalyzer : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-EvtSelAnalyzer::EvtSelAnalyzer(const edm::ParameterSet& conf)
+FilterAnalyzer::FilterAnalyzer(const edm::ParameterSet& conf)
 {
 
 
    //now do what ever initialization is needed
   hltresults_   = conf.getParameter<edm::InputTag> ("hltresults");
-  superFilter_  = conf.getParameter<string> ("superFilter");
+  superFilters_  = conf.getParameter<vector<string> > ("superFilters");
   _Debug  = conf.getUntrackedParameter<bool> ("Debug",0);
 
   HltEvtCnt = 0;
@@ -106,7 +107,7 @@ EvtSelAnalyzer::EvtSelAnalyzer(const edm::ParameterSet& conf)
 }
 
 
-EvtSelAnalyzer::~EvtSelAnalyzer()
+FilterAnalyzer::~FilterAnalyzer()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -121,7 +122,7 @@ EvtSelAnalyzer::~EvtSelAnalyzer()
 
 // ------------ method called for each event  ------------
 void
-EvtSelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+FilterAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    edm::Handle<edm::TriggerResults>  hltresults;
@@ -143,8 +144,12 @@ EvtSelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    for (int itrig = 0; itrig != ntrigs; ++itrig){
      std::string trigName=triggerNames.triggerName(itrig);
      bool accept = hltresults->accept(itrig);
-     if(trigName == superFilter_) saveEvent = saveEvent && accept;
-     
+
+     for(unsigned int ifilter = 0; ifilter<superFilters_.size(); ++ifilter){
+       if(_Debug) cout<<"trigName "<<trigName.data()<<"    superFilters_[ifilter] "<<superFilters_[ifilter]<<endl;
+       if(trigName == superFilters_[ifilter]) saveEvent = saveEvent && accept;
+     }
+
      if (accept){trigflag[itrig] = 1;}
      else {trigflag[itrig] = 0;}
      
@@ -161,43 +166,43 @@ EvtSelAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-EvtSelAnalyzer::beginJob()
+FilterAnalyzer::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-EvtSelAnalyzer::endJob() 
+FilterAnalyzer::endJob() 
 {
 }
 
 // ------------ method called when starting to processes a run  ------------
 void 
-EvtSelAnalyzer::beginRun(edm::Run const&, edm::EventSetup const&)
+FilterAnalyzer::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a run  ------------
 void 
-EvtSelAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
+FilterAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 void 
-EvtSelAnalyzer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+FilterAnalyzer::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 void 
-EvtSelAnalyzer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+FilterAnalyzer::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-EvtSelAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+FilterAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -206,4 +211,4 @@ EvtSelAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(EvtSelAnalyzer);
+DEFINE_FWK_MODULE(FilterAnalyzer);
