@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: ClusterTreeMaker.cc,v 1.12 2011/11/12 13:42:03 kimy Exp $
+// $Id: ClusterTreeMaker.cc,v 1.9 2011/11/10 16:23:07 kimy Exp $
 //
 //
 
@@ -112,7 +112,6 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   bool doRecHit;
   TH1D* hRHetBarrel;
   TH1D* hRHetEndcap;
-  TH1D* hRHetEndcap2;
   TH1D* hRHetBarrelCleaned;
 
   TH1D* hRHetaEndcap;
@@ -124,15 +123,12 @@ class ClusterTreeMaker : public edm::EDAnalyzer {
   std::string vertexProducer_;      // vertecies producer                                                                                                                                                       
   std::string scProducerB_;
   std::string scProducerE_;
-  float et[3000];
-  float eta[3000];
-  float phi[3000];
-  float energy[3000];
-  float rawEnergy[3000];
-  
-  float severity[3000];
-  float time[3000];
-  float swissCrx[3000];
+  float et[1000];
+  float eta[1000];
+  float phi[1000];
+  float severity[1000];
+  float time[1000];
+  float swissCrx[1000];
   int nPar;
   double etCut;
    
@@ -279,9 +275,6 @@ ClusterTreeMaker::~ClusterTreeMaker()
      et[nPar] = theEt;
      eta[nPar] = (float)c1.eta();
      phi[nPar] = (float)c1.phi();
-     energy[nPar] = (float)c1.energy();
-     rawEnergy[nPar] = (float)c1.rawEnergy();
-     
      nPar++;
    }
    
@@ -291,7 +284,7 @@ ClusterTreeMaker::~ClusterTreeMaker()
      const reco::SuperCluster &c1 = (*superClusterCollectionE)[i];
 
      float theEt = c1.energy()/cosh(c1.eta());
-     if ( theEt < etCut )  continue;
+     if ( theEt < 8 )  continue;
      float theSeverity = -100;
      float theSwissCrx = -100;
      float theTime = -100;
@@ -316,10 +309,6 @@ ClusterTreeMaker::~ClusterTreeMaker()
      et[nPar] = theEt;
      eta[nPar] = (float)c1.eta();
      phi[nPar] = (float)c1.phi();
-     energy[nPar] = (float)c1.energy();
-     rawEnergy[nPar] = (float)c1.rawEnergy();
-     
-
      nPar++;
    }
 
@@ -365,10 +354,6 @@ ClusterTreeMaker::~ClusterTreeMaker()
        const GlobalPoint & position = caloGeom->getPosition(rh->id());
        double tempEt = rh->energy()/cosh(position.eta()) ;
        hRHetEndcap->Fill(tempEt);
-       if ( fabs(position.eta()) < 2 )   
-	 hRHetEndcap2->Fill(tempEt);
-       
-       
        hRHetaEndcap->Fill ( position.eta() ) ;
        hRHphiEndcap->Fill ( position.phi() ) ;
        
@@ -416,8 +401,6 @@ ClusterTreeMaker::beginJob()
    
    theTree->Branch("nPar",&nPar,"nPar/I");
    theTree->Branch("et",et,"et[nPar]/F");
-   theTree->Branch("energy",energy,"energy[nPar]/F");
-   theTree->Branch("rawEnergy",rawEnergy,"rawEnergy[nPar]/F");
    theTree->Branch("eta",eta,"eta[nPar]/F");
    theTree->Branch("phi",phi,"phi[nPar]/F");
    theTree->Branch("time",time,"time[nPar]/F");
@@ -437,7 +420,6 @@ ClusterTreeMaker::beginJob()
 
    hRHetBarrel = fs->make<TH1D>( "hRHetBarrel" , "", 4000,-2.5,197.5);;
    hRHetEndcap = fs->make<TH1D>( "hRHetEndcap" , "", 4000,-2.5,197.5);;
-   hRHetEndcap2 = fs->make<TH1D>( "hRHetEndcap2" , "", 4000,-2.5,197.5);;
    hRHetaBarrel = fs->make<TH1D>( "hRHetaBarrel" , "", 400,-3,3);
    hRHetaEndcap = fs->make<TH1D>( "hRHetaEndcap" , "", 400,-3,3);
    hRHphiBarrel = fs->make<TH1D>( "hRHphiBarrel" , "", 400,-4,4);
