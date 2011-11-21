@@ -14,9 +14,10 @@
 using namespace std;
 
 void hcalValTree(
-                   TString infdataname="/d00/yjlee/hiForest/PromptReco2011/Run181532/merged_Run181532_HIMinBiasUPC_PromptReco.root",
-                   TString infrefname="/d00/yjlee/hiForest/HIData2010/merged_hiForest_HIData2010_EB200MeV.root"
-                   )
+                 TString infdataname="/d00/yjlee/hiForest/PromptReco2011/Run181611/merged_Run181611_HIMinBiasUPC_PromptReco.root",
+                 TString infrefname="/d00/yjlee/hiForest/HIData2010/merged_hiForest_HIData2010_EB200MeV.root",
+                 TString tag="181611"
+                 )
 {
    TH1::SetDefaultSumw2();
    
@@ -44,13 +45,13 @@ void hcalValTree(
    makeMultiPanelCanvas(c2,2,2,0,0,0.25);
    c2->cd(1);
    c2->GetPad(1)->SetLogy();
-   Compare comp2_1("hEtCen1_hb",tdata,tref,sel&&"ev.hiNpix>30000",selref&&"ev.hiNpix>30000","abs(rh.eta)>2&&abs(rh.eta)>2");
+   Compare comp2_1("hEtCen1_hb",tdata,tref,sel&&"ev.hiNpix>30000",selref&&"ev.hiNpix>30000","abs(rh.eta)<2&&abs(rh.eta)<2");
    comp2_1.Init(100,0,40);
    comp2_1.Project("rh.et>>");
-   comp2_1.Draw(";rechit E_{T} (GeV);a.u.",0,0,"2011 Data Run 181531","2010 Data",1,0.5,0.8,0.9,0.9);
+   comp2_1.Draw(";rechit E_{T} (GeV);a.u.",0,0,"2011 Data "+tag,"2010 Data",1,0.5,0.8,0.9,0.9);
    c2->cd(2);
    c2->GetPad(2)->SetLogy();
-   Compare comp2_2("hEtCen2_hb",tdata,tref,sel&&"ev.hiNpix<1000",selref&&"ev.hiNpix<1000","abs(rh.eta)>2&&abs(rh.eta)>2");
+   Compare comp2_2("hEtCen2_hb",tdata,tref,sel&&"ev.hiNpix<1000",selref&&"ev.hiNpix<1000","abs(rh.eta)<2&&abs(rh.eta)<2");
    comp2_2.Init(100,0,40);
    comp2_2.Project("rh.et>>");
    comp2_2.Draw(";rechit E_{T} (GeV);a.u.");
@@ -65,5 +66,5 @@ void hcalValTree(
    hRat2_2->SetAxisRange(0,1.4,"Y");
    hRat2_2->Draw();
    l->Draw();
-   //c2->Print("out/"+comp2.tag+"_181683.gif");
+   c2->Print("out/RechitEt"+tag+"EtaLt2.gif");
 }
