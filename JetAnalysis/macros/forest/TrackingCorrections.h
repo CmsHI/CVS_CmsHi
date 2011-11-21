@@ -101,9 +101,7 @@ void TrackingCorrections::Init(Int_t inputMethod, TString corrFileName)
   // Setup Inputs
   // =============================
   for (Int_t i=0; i<ptHatMin_.size(); ++i) {
-    TString fname;
-    if(1) fname=Form("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/yetkin/trkcorr/%s%.0f%s.root",corrSetName_.Data(),ptHatMin_[i],corrSetNameApp_.Data());
-    if(0) fname=Form("/Users/yetkinyilmaz/analysis/trkcorr/%s%.0f%s.root",corrSetName_.Data(),ptHatMin_[i],corrSetNameApp_.Data());
+    TString fname=Form("trkcorr/%s%.0f%s.root",corrSetName_.Data(),ptHatMin_[i],corrSetNameApp_.Data());
 
     sample_.push_back(TFile::Open(fname));
     cout << sample_[i]->GetName() << endl;

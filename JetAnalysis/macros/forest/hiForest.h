@@ -47,6 +47,7 @@ class HiForest : public TNamed
   // Utility functions
   void GetEntry(int i);
   int  GetEntries();  						// Get the number of entries 
+  void InitTree();
   void CheckTree(TTree *t,const char *title);				// Check the status of a tree
 
   void CheckArraySizes();
@@ -229,7 +230,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   inf = TFile::Open(infName);
 
   cone = 0.3;
-  doTrackCorrections = 1;
+  doTrackCorrections = 0;
 
   // Load trees. Hard coded for the moment
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
@@ -379,6 +380,29 @@ int HiForest::GetEntries()
 {
   // get the entries of the available trees
   return nEntries;
+}
+
+void HiForest::InitTree()
+{
+   // Setup Track Corrections 	 
+   if(doTrackCorrections){ 	 
+      if(pp){ 	 
+         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf")); 	 
+         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf")); 	 
+      }else{ 	 
+         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf")); 	 
+         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf")); 	 
+      } 	 
+      
+      trackCorrections[0]->isLeadingJet_ = 1; 	 
+      trackCorrections[1]->isLeadingJet_ = 0; 	 
+      
+      for(int i = 0; i < trackCorrections.size(); ++i){ 	 
+         trackCorrections[i]->sampleMode_ = 1; 	 
+         trackCorrections[i]->smoothLevel_ = 4; 	 
+         trackCorrections[i]->Init(); 	 
+      }
+   }
 }
 
 void HiForest::CheckTree(TTree *t,const char *title)
