@@ -1,8 +1,8 @@
 #ifndef TrackUtilities_C
 #define TrackUtilities_C
 // Trk MPT Classes and functions ------------------------------------------
-const int nptrange = 8;
-float ptranges[nptrange+1] = {0.5,1,2,4,8,16,32,64,128};
+const int nptrange = 6;
+float ptranges[nptrange+1]={0.5,1.0,2,4,8,20,180};
 
 class MPT {
 public:
