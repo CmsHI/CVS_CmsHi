@@ -133,8 +133,7 @@ void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
          }
          
          // Loop over jet tree to find a away side leading jet
-         for (int j=0;j<c->icPu5.nref;j++) {
-            if (j==leadingIndex) continue;
+         for (int j=leadingIndex+1;j<c->icPu5.nref;j++) {
             if (c->icPu5.jtpt[j]<40) break;
             if (fabs(c->icPu5.jteta[j])>cutEtaJet) continue;
             awayIndex = j;
