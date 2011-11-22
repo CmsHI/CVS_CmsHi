@@ -49,7 +49,7 @@ public:
    }
 };
 
-void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
+void dijetMPT(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_icPu5Jet80/merged_HIData2011_HIHighPt_highPtExercise_icPu5JetSkim80GeVEta2.root")
 {
 	double cutPtJet = 100;
    double cutEtaJet = 2;
@@ -59,6 +59,8 @@ void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname.Data());
    c->hasHltTree = 0;
+   c->doTrackCorrections = 1;
+   c->InitTree();
    
    // Output file
    TFile *output = new TFile(Form("output-dj%.0f.root",cutPtJet),"recreate");
@@ -80,9 +82,12 @@ void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
    tjt->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tjt->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    vector<MPT> vmpt;
-   vmpt.push_back(MPT("AllAcc",0,-1,cutPtTrk,cutEtaTrk));
-   vmpt.push_back(MPT("InCone",1,0.8,cutPtTrk,cutEtaTrk));
-   vmpt.push_back(MPT("OutCone",2,0.8,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("AllAcc",0,0,-1,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("InCone",1,0,0.8,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("OutCone",2,0,0.8,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("AllAccCorr",0,1,-1,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("InConeCorr",1,1,0.8,cutPtTrk,cutEtaTrk));
+   vmpt.push_back(MPT("OutConeCorr",2,1,0.8,cutPtTrk,cutEtaTrk));
    for (unsigned m=0; m<vmpt.size(); ++m) { 
       cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
       SetMPTBranches(tjt,vmpt[m]);
@@ -94,8 +99,8 @@ void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
       c->GetEntry(i);
       
       // Event Info
-      evt.run = c->hlt.Run;
-      evt.evt = c->hlt.Event;
+      evt.run = c->evt.run;
+      evt.evt = c->evt.evt;
       evt.cbin = c->evt.hiBin;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
@@ -153,7 +158,7 @@ void dijetMPT(TString inname="/d100/velicanu/forest/PromptHiForestDiJet.root")
             gj.Aj   = Agj;
             // MPT
             for (unsigned m=0; m<vmpt.size(); ++m) {
-               CalcMPT(c,gj.eta1,gj.phi1,gj.eta2,gj.phi2,vmpt[m]);
+               CalcMPT(c,gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2,vmpt[m]);
             }
          }
       }

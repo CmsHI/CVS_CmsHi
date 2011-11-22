@@ -211,7 +211,7 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
   //cout << "isLeading: " << isLeadingJet_ << " bins(s,c,p,e,j): " << isample << " " << bin << " " << ptBin << " " << etaBin << " " << jetBin << endl;
 
   vector<vector<Double_t> > mat(numLevels_,vector<Double_t>(2));
-  Int_t djet = 1, dpt=0, dcbin=0, deta=0;
+  Int_t djet = 2, dpt=0, dcbin=0, deta=0;
   if (jet<40) djet=0; // 0 is for non-jet events
 
   for (Int_t lv=0; lv<numLevels_; ++lv) {

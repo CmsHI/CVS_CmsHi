@@ -11,14 +11,15 @@ public:
    float ptMin;
    float etaMax;
    int selType;
+   int corrType;
    
    float mptx;
    float mpty;
    float mptx_pt[nptrange];
    float mpty_pt[nptrange];
    
-   MPT(TString s, int t=0, float dr=0.8, float ptmin=0.5, float etamax=2.4) :
-   name(s), selType(t), dRCone(dr),ptMin(ptmin), etaMax(etamax) {
+   MPT(TString s, int t=0, int c=0, float dr=0.8, float ptmin=0.5, float etamax=2.4) :
+   name(s), dRCone(dr),ptMin(ptmin), etaMax(etamax), selType(t), corrType(c) {
       clear();
    }
    void clear() {
@@ -29,9 +30,12 @@ public:
    }
 };
 
-void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi, MPT & m)
+void CalcMPT(const HiForest * c, float gpt, float geta, float gphi, float jpt, float jeta, float jphi, MPT & m)
 {
    m.clear();
+   double correctionFactors[4] = {0,0,0,0};
+   float trkweight = 1.;
+   
    for (int it=0; it<c->track.nTrk; ++it) {
       float trkPt = c->track.trkPt[it];
       float trkEta = c->track.trkEta[it];
@@ -52,6 +56,13 @@ void CalcMPT(const HiForest * c, float geta, float gphi, float jeta, float jphi,
          //cout << m.name << " pt: " << trkPt << " drG: " << drG << " drJ: " << drJ << endl;
          float ptx = -1* trkPt * cos(deltaPhi(trkPhi,gphi));
          float pty = -1* trkPt * sin(deltaPhi(trkPhi,gphi));
+         if (m.corrType==1) {
+            if (drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(trkPt,trkEta,gpt,c->evt.hiBin,correctionFactors);
+            else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(trkPt,trkEta,jpt,c->evt.hiBin,correctionFactors);
+            else trkweight = c->trackCorrections[0]->GetCorr(trkPt,trkEta,0,c->evt.hiBin,correctionFactors);
+            ptx*=trkweight;
+            pty*=trkweight;
+         }
          m.mptx += ptx;
          m.mpty += pty;
          for (int k=0; k<nptrange; ++k) {
