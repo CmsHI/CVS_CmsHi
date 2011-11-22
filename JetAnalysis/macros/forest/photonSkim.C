@@ -6,7 +6,7 @@
 
 // Example of forest skim
 
-void photonSkim(double etCut=40, char *infname = "merged_HI2010_SD_Jet35_prod05.root")
+void photonSkim(double etCut=40, char *infname = "/d100/yjlee/hiForest/PromptReco2011/HIHighPt/skim_Photon35/merged_HIData2011_HIHighPt_highPtExercise_photonSkim35GeVEB.root")
 {
    // Define the input file and HiForest
    HiForest *c = new HiForest(infname);
@@ -23,7 +23,7 @@ void photonSkim(double etCut=40, char *infname = "merged_HI2010_SD_Jet35_prod05.
 
       // Loop over photons to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.et[j]<etCut) break;          // photon pT cut, assuming that et is sorted
+         if (c->photon.pt[j]<etCut) break;          // photon pT cut, assuming that et is sorted
          if (fabs(c->photon.eta[j])>1.44) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          //if (!c->isGoodPhoton(j)) continue;         // hiGoodPhoton cut
