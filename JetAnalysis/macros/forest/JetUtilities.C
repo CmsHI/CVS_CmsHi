@@ -311,10 +311,10 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       if(allEvents){
 	 jetTree->GetEntry(i);
 	 trackTree->GetEntry(i);
-	 hltTree->GetEntry(i);
+	 evtTree->GetEntry(i);
       }
 
-      int cbin = hlt.hiBin;
+      int cbin = evt.hiBin;
       if(pp) cbin = 33;
 
       double eventEta = 0;

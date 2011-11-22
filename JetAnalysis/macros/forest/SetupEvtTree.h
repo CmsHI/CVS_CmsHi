@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sat Nov 12 11:23:23 2011 by ROOT version 5.27/06b
+// Sun Nov 20 23:20:00 2011 by ROOT version 5.27/06b
 // from TTree HiTree/
-// found on file: ../merged_Run181531_HIExpressPhysics_Part.root
+// found on file: /d100/velicanu/forest/PromptHiForestDiJet.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>

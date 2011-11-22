@@ -517,6 +517,7 @@ void HiForest::FillOutput()
 // ====================== Event Utilities ========================
 
 bool HiForest::selectEvent(){
+  /*
    bool select = skim.phbheReflagNewTimeEnv 
       && 
       skim.phcalTimingFilter 
@@ -524,22 +525,24 @@ bool HiForest::selectEvent(){
       skim.pHBHENoiseFilter 
       && 
       skim.phiEcalRecHitSpikeFilter;
-
+  */
+  bool select = 1;
    if(!pp){
       select = select && skim.pcollisionEventSelection;
    }else{
-      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
+     //      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
    }
    return select;
 }
 
 TCut HiForest::eventSelection(){
-   TCut select("skim.phbheReflagNewTimeEnv && skim.phcalTimingFilter && skim.pHBHENoiseFilter && skim.phiEcalRecHitSpikeFilter");
-   if(!pp){
-      select = select && "skim.pcollisionEventSelection";
-   }else{
-      select = select && "skim.phfCoincFilter && skim.ppurityFractionFilter";
-   }
+  //   TCut select("skim.phbheReflagNewTimeEnv && skim.phcalTimingFilter && skim.pHBHENoiseFilter && skim.phiEcalRecHitSpikeFilter");
+  TCut select("1");
+  if(!pp){
+    select = select && "skim.pcollisionEventSelection";
+  }else{
+    //      select = select && "skim.phfCoincFilter && skim.ppurityFractionFilter";
+  }
    return select;
 }
 
