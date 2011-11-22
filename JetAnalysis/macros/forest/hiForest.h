@@ -240,8 +240,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
-  //hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
-  //ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
+  hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
+  ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
 /*
@@ -280,7 +280,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   }
 
   if (hasEvtTree) {
-    evtTree->SetName("event");
+    evtTree->SetName("evtTree");
     if (tree == 0) tree = evtTree; else tree->AddFriend(evtTree);
     setupEvtTree(evtTree,evt);
   }
