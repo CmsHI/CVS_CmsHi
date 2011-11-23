@@ -34,6 +34,7 @@ public:
   explicit HLTBitAnalyzer(edm::ParameterSet const& conf);
   virtual void analyze(edm::Event const& e, edm::EventSetup const& iSetup);
   virtual void endJob();
+  virtual void beginRun(edm::Run const&, edm::EventSetup const&);
 
   //  static void fillDescriptions(edm::ConfigurationDescriptions & descriptions); 
 
@@ -63,11 +64,11 @@ private:
   edm::InputTag gctBitCounts_,gctRingSums_;
 
   int errCnt;
-  const int errMax(){return 100;}
+  static int errMax() { return 100; }
 
   std::string _HistName; // Name of histogram file
   double _EtaMin,_EtaMax;
   TFile* m_file; // pointer to Histogram file
-  bool _UseTFileService;
+	bool _UseTFileService;
 
 };

@@ -24,6 +24,13 @@ bool getCollection(const edm::Event & event, std::vector<MissingCollectionInfo> 
   return valid;
 }
 
+
+void HLTBitAnalyzer::beginRun(edm::Run const& run, edm::EventSetup const& evt){
+  hlt_analysis_.beginRun(run, evt);
+}
+
+
+
 // Boiler-plate constructor definition of an analyzer module:
 HLTBitAnalyzer::HLTBitAnalyzer(edm::ParameterSet const& conf) {
 
@@ -52,7 +59,7 @@ HLTBitAnalyzer::HLTBitAnalyzer(edm::ParameterSet const& conf) {
   gctBitCounts_        = edm::InputTag( conf.getParameter<edm::InputTag>("l1GctHFBitCounts").label(), "" );
   gctRingSums_         = edm::InputTag( conf.getParameter<edm::InputTag>("l1GctHFRingSums").label(), "" );
 
-  _UseTFileService = conf.getUntrackedParameter<bool>("UseTFileService",false);
+	_UseTFileService = conf.getUntrackedParameter<bool>("UseTFileService",false);
 	
   m_file = 0;   // set to null
   errCnt = 0;
@@ -75,6 +82,7 @@ HLTBitAnalyzer::HLTBitAnalyzer(edm::ParameterSet const& conf) {
   // Setup the different analysis
   hlt_analysis_.setup(conf, HltTree);
   evt_header_.setup(HltTree);
+
 }
 
 // Boiler-plate "analyze" method declaration for an analyzer module.
