@@ -4,37 +4,48 @@
 
 void mergeForest(){
 
-   const char* fname = "merged_*.root";
+   const char* fname = "HiForest_*.root";
 
-   string dir[10] = {
+   string dir[15] = {
       "hltanalysis",
       "skimanalysis",
       "icPu5JetAnalyzer",
       "akPu3PFJetAnalyzer",
-//      "ak3PFJetAnalyzer",
-//      "ak5CaloJetAnalyzer",
       "anaTrack",
-      "NTuples",
-      "",
-      ""
+      "multiPhotonAnalyzer",
+      "pfcandAnalyzer",
+      "anaMET",
+      "muonTree",
+      "rechitanalyzer",
+      "rechitanalyzer",
+      "rechitanalyzer",
+      "rechitanalyzer",
+      "rechitanalyzer",
+      "hiEvtAnalyzer"
    };
 
-   string trees[10] = {
+   string trees[15] = {
       "HltTree",
       "HltTree",
       "t",
       "t",
-//      "t",
-//      "t",
       "trackTree",
-      "Analysis",
-      "",
-      ""
+      "photon",
+      "pfTree",
+      "metTree",
+      "HLTMuTree",
+      "eb",
+      "ee",
+      "hbhe",
+      "hf",
+      "tower",
+      "HiTree"
    };
 
-   TChain* ch[10];
 
-   int N = 6;
+   TChain* ch[15];
+
+   int N = 15;
 
    for(int i = 0; i < N; ++i){
       ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
@@ -47,11 +58,18 @@ void mergeForest(){
    for(int i = 0; i < N; ++i){
       file->cd();
       cout <<string(dir[i]+"/"+trees[i]).data()<<endl;
-      file->mkdir(dir[i].data())->cd();
+      if (i==0) {
+         file->mkdir(dir[i].data())->cd();
+      } else {
+         if (TString(dir[i].data())!=TString(dir[i-1].data()))  
+           file->mkdir(dir[i].data())->cd();
+         else 
+           file->cd(dir[i].data());  
+      }
       ch[i]->Merge(file,0,"keep");
    }
    cout <<"Good"<<endl;
-   file->Write();
+   //file->Write();
    file->Close();
 
 }

@@ -537,7 +537,7 @@ bool HiForest::selectEvent(){
 
 TCut HiForest::eventSelection(){
   //   TCut select("skim.phbheReflagNewTimeEnv && skim.phcalTimingFilter && skim.pHBHENoiseFilter && skim.phiEcalRecHitSpikeFilter");
-  TCut select("1");
+  TCut select("skim.pHBHENoiseFilter");
   if(!pp){
     select = select && "skim.pcollisionEventSelection";
   }else{
