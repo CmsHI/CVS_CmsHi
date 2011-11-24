@@ -2,10 +2,7 @@
 
 # trigger
 cvs co -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
-addpkg          HLTrigger/HLTanalyzers
-# bug fixed files.. need to be updated these files to official packages soon
-cp CmsHi/HiHLTAlgos/modifiedFiles/cmssw44X/HLTBitAnalyzer.cc HLTrigger/HLTanalyzers/src
-cp CmsHi/HiHLTAlgos/modifiedFiles/cmssw44X/HLTBitAnalyzer.h HLTrigger/HLTanalyzers/interface
+cvs co -r branch_hi44X   HLTrigger/HLTanalyzers
 
 # evt
 cvs co          UserCode/L1TriggerDPG
