@@ -2,8 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 from HLTrigger.HLTanalyzers.HLTBitAnalyser_cfi import *
 
-process.hltbitanalysis.UseTFileService = cms.untracked.bool(True)
-process.hltanalysis = process.hltbitanalysis.clone(
+hltbitanalysis.UseTFileService = cms.untracked.bool(True)
+hltanalysis = hltbitanalysis.clone(
     dummyBranches = cms.untracked.vstring(
     "HLT_HICentral10_v1",
     "HLT_HICentral10_v2",
@@ -31,7 +31,7 @@ process.hltanalysis = process.hltbitanalysis.clone(
     HLTProcessName       = cms.string("HLT")
     )
 
-process.skimanalysis = cms.EDAnalyzer("FilterAnalyzer",
+skimanalysis = cms.EDAnalyzer("FilterAnalyzer",
                                       hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
                                       )
 
