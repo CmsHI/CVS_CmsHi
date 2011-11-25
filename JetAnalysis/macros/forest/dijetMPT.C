@@ -99,9 +99,12 @@ void dijetMPT(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_i
       c->GetEntry(i);
       
       // Event Info
-      evt.run = c->evt.run;
-      evt.evt = c->evt.evt;
-      evt.cbin = c->evt.hiBin;
+//      evt.run = c->photon.run;
+//      evt.evt = c->photon.event;
+//      evt.cbin = c->photon.cBin;
+      c->icPu5jetTree->SetBranchAddress("run",&evt.run);
+      c->icPu5jetTree->SetBranchAddress("evt",&evt.evt);
+      c->icPu5jetTree->SetBranchAddress("bin",&evt.cbin);
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
