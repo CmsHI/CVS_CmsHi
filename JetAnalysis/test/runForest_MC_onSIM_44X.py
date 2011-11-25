@@ -132,8 +132,6 @@ process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiSelectedTracks")
 
-process.hiGenParticles.srcVector = cms.vstring('generator')
-
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
 process.muonTree = process.hltMuTree.clone()
@@ -156,7 +154,12 @@ process.ak5patJets = process.akPu5PFpatJets.clone(
         jetSource = cms.InputTag("ak5CaloJets"),
             jetCorrFactorsSource = cms.VInputTag(cms.InputTag("ak5corr"))
             )
-	    
+
+process.hiGenParticles.srcVector = cms.vstring('generator')
+process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("generator")
+process.akPu3PFJetAnalyzer.eventInfoTag = cms.InputTag("generator")
+process.multiPhotonAnalyzer.GenEventScale = cms.InputTag("generator")
+
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.icPu5JetAnalyzer.isMC   = cms.untracked.bool(True)
