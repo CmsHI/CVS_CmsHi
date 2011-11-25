@@ -13,7 +13,7 @@
 //
 // Original Author:  Torsten Dahms,40 4-A32,+41227671635,
 //         Created:  Mon Dec  6 15:52:57 CET 2010
-// $Id: MinBiasCounter.cc,v 1.3 2010/12/14 11:26:40 tdahms Exp $
+// $Id: MinBiasCounter.cc,v 1.4 2010/12/14 16:53:23 silvest Exp $
 //
 //
 
@@ -69,6 +69,7 @@ class MinBiasCounter : public edm::EDAnalyzer {
   std::vector<std::string> _hltString ;
   // centrality
   TH1F *hCent;
+  TH1F *hStats;
 
   CentralityProvider* centrality_;
   int centBin;
@@ -175,6 +176,12 @@ MinBiasCounter::beginJob()
 {
   hCent = new TH1F("hCent","hCent;centrality bin;Number of Events",40,0,40);
   hCent->Sumw2();
+
+  hStats = new TH1F("hStats","hStats;;Number of Events",2,0,2);
+  hStats->Sumw2();
+
+  hStats->GetXaxis()->SetBinLabel(1,"Raw");
+  hStats->GetXaxis()->SetBinLabel(2,"Sampled");
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
@@ -187,8 +194,15 @@ MinBiasCounter::endJob() {
   std::cout << "Number of recorded events: " << nRawEvents << std::endl;
   std::cout << "Number of sampled events: " << nScaledEvents << std::endl;
 
+  hStats->SetBinContent(1,nRawEvents);
+  hStats->SetBinContent(2,nScaledEvents);
+
+  hStats->SetBinError(1,sqrt(nRawEvents));
+  hStats->SetBinError(2,nScaledEvents/sqrt(nRawEvents));
+
   TFile *outf = new TFile(_histfilename.c_str(), "RECREATE");
   hCent->Write();
+  hStats->Write();
   outf->Close();
 }
 
