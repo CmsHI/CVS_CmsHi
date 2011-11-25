@@ -13,7 +13,8 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
  duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
     fileNames = cms.untracked.vstring(
-    'file:/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon30/RECO/edmOut_364.root',
+    'file:/mnt/hadoop/cms/store/himc/Summer11/Hydjet_Bass_MinBias_2760GeV/GEN-SIM/STARTHI44_V4-v1/0002/4C8726CB-80FA-E011-8692-0002C90B3966.root',
+#    'file:/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon30/RECO/edmOut_364.root',
     ))
 
 # Number of events we want to process, -1 = all events
@@ -29,6 +30,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('Configuration.StandardSequences.GeometryExtended_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+process.load('SimGeneral.MixingModule.mixNoPU_cfi')
+process.load('Configuration.StandardSequences.Digi_cff')
+process.load('Configuration.StandardSequences.SimL1Emulator_cff')
+process.load('Configuration.StandardSequences.DigiToRaw_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
@@ -219,7 +224,7 @@ process.hiSelectedTrackHighPurity = cms.EDFilter("TrackSelector",
                                                  )
 
 process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
-#process.reco = cms.Path(process.RawToDigi * process.reconstructionHeavyIons_withPF)
+process.reco = cms.Path(process.pdigi * process.SimL1Emulator * process.DigiToRaw * process.RawToDigi * process.reconstructionHeavyIons_withPF)
 process.reco_extra        = cms.Path( process.siPixelRecHits * process.siStripMatchedRecHits *
                                                                             process.hiPixel3PrimTracks *
                                                                             process.hiPixelTrackSeeds *
