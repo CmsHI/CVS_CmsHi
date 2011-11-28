@@ -67,6 +67,7 @@ class HiForest : public TNamed
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
+  bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
 
   // Jet utility functions
   void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1, int smearType = -1);
@@ -236,6 +237,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
+  if (photonTree==0)  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
@@ -526,7 +528,7 @@ bool HiForest::selectEvent(){
       && 
       skim.phiEcalRecHitSpikeFilter;
   */
-  bool select = 1;
+  bool select = skim.pHBHENoiseFilter;
    if(!pp){
       select = select && skim.pcollisionEventSelection;
    }else{
