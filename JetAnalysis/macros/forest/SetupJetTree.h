@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov 20 23:20:00 2011 by ROOT version 5.27/06b
+// Sun Nov 27 11:40:13 2011 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
-// found on file: /d100/velicanu/forest/PromptHiForestDiJet.root
+// found on file: ../HiForestPhoton.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -21,13 +21,13 @@ public :
    Int_t           evt;
    Float_t         b;
    Int_t           nref;
-   Float_t         rawpt[248];   //[nref]
-   Float_t         jtpt[248];   //[nref]
-   Float_t         jteta[248];   //[nref]
-   Float_t         jty[248];   //[nref]
-   Float_t         jtphi[248];   //[nref]
-   Float_t         jtpu[248];   //[nref]
-   Float_t         smpt[248];   //[nref]
+   Float_t         rawpt[212];   //[nref]
+   Float_t         jtpt[212];   //[nref]
+   Float_t         jteta[212];   //[nref]
+   Float_t         jty[212];   //[nref]
+   Float_t         jtphi[212];   //[nref]
+   Float_t         jtpu[212];   //[nref]
+   Float_t         smpt[212];   //[nref]
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -58,7 +58,7 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
    t->SetBranchAddress("jtpu", tJets.jtpu, &tJets.b_jtpu);
    t->SetBranchAddress("smpt", tJets.smpt, &tJets.b_smpt);
    if (doCheck) {
-      if (t->GetMaximum("nref")>248) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
+      if (t->GetMaximum("nref")>212) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
    }
 }
 

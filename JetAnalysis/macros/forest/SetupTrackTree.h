@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov 20 23:20:00 2011 by ROOT version 5.27/06b
+// Sun Nov 27 11:40:13 2011 by ROOT version 5.27/06b
 // from TTree trackTree/v1
-// found on file: /d100/velicanu/forest/PromptHiForestDiJet.root
+// found on file: ../HiForestPhoton.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -27,40 +27,40 @@ public :
    Float_t         vy[4];   //[nv]
    Float_t         vz[4];   //[nv]
    Int_t           nTrk;
-   Float_t         trkPt[2098];   //[nTrk]
-   Float_t         trkPtError[2098];   //[nTrk]
-   Int_t           trkNHit[2098];   //[nTrk]
-   Int_t           trkNlayer[2098];   //[nTrk]
-   Int_t           trkNlayer3D[2098];   //[nTrk]
-   Float_t         trkEta[2098];   //[nTrk]
-   Float_t         trkPhi[2098];   //[nTrk]
-   Int_t           trkQual[2098];   //[nTrk]
-   Float_t         trkChi2[2098];   //[nTrk]
-   Float_t         trkChi2hit1D[2098];   //[nTrk]
-   Float_t         trkNdof[2098];   //[nTrk]
-   Float_t         trkDz[2098];   //[nTrk]
-   Float_t         trkDzError[2098];   //[nTrk]
-   Float_t         trkDzError1[2098];   //[nTrk]
-   Float_t         trkDzError2[2098];   //[nTrk]
-   Float_t         trkDxy[2098];   //[nTrk]
-   Float_t         trkDxyBS[2098];   //[nTrk]
-   Float_t         trkDxy1[2098];   //[nTrk]
-   Float_t         trkDxy2[2098];   //[nTrk]
-   Float_t         trkDxyError[2098];   //[nTrk]
-   Float_t         trkDxyErrorBS[2098];   //[nTrk]
-   Float_t         trkDxyError1[2098];   //[nTrk]
-   Float_t         trkDxyError2[2098];   //[nTrk]
-   Float_t         trkDz1[2098];   //[nTrk]
-   Float_t         trkDz2[2098];   //[nTrk]
-   Float_t         trkVx[2098];   //[nTrk]
-   Float_t         trkVy[2098];   //[nTrk]
-   Float_t         trkVz[2098];   //[nTrk]
-   Bool_t          trkFake[2098];   //[nTrk]
-   Float_t         trkAlgo[2098];   //[nTrk]
-   Int_t           pfType[2098];   //[nTrk]
-   Float_t         pfCandPt[2098];   //[nTrk]
-   Float_t         pfSumEcal[2098];   //[nTrk]
-   Float_t         pfSumHcal[2098];   //[nTrk]
+   Float_t         trkPt[2310];   //[nTrk]
+   Float_t         trkPtError[2310];   //[nTrk]
+   Int_t           trkNHit[2310];   //[nTrk]
+   Int_t           trkNlayer[2310];   //[nTrk]
+   Int_t           trkNlayer3D[2310];   //[nTrk]
+   Float_t         trkEta[2310];   //[nTrk]
+   Float_t         trkPhi[2310];   //[nTrk]
+   Int_t           trkQual[2310];   //[nTrk]
+   Float_t         trkChi2[2310];   //[nTrk]
+   Float_t         trkChi2hit1D[2310];   //[nTrk]
+   Float_t         trkNdof[2310];   //[nTrk]
+   Float_t         trkDz[2310];   //[nTrk]
+   Float_t         trkDzError[2310];   //[nTrk]
+   Float_t         trkDzError1[2310];   //[nTrk]
+   Float_t         trkDzError2[2310];   //[nTrk]
+   Float_t         trkDxy[2310];   //[nTrk]
+   Float_t         trkDxyBS[2310];   //[nTrk]
+   Float_t         trkDxy1[2310];   //[nTrk]
+   Float_t         trkDxy2[2310];   //[nTrk]
+   Float_t         trkDxyError[2310];   //[nTrk]
+   Float_t         trkDxyErrorBS[2310];   //[nTrk]
+   Float_t         trkDxyError1[2310];   //[nTrk]
+   Float_t         trkDxyError2[2310];   //[nTrk]
+   Float_t         trkDz1[2310];   //[nTrk]
+   Float_t         trkDz2[2310];   //[nTrk]
+   Float_t         trkVx[2310];   //[nTrk]
+   Float_t         trkVy[2310];   //[nTrk]
+   Float_t         trkVz[2310];   //[nTrk]
+   Bool_t          trkFake[2310];   //[nTrk]
+   Float_t         trkAlgo[2310];   //[nTrk]
+   Int_t           pfType[2310];   //[nTrk]
+   Float_t         pfCandPt[2310];   //[nTrk]
+   Float_t         pfSumEcal[2310];   //[nTrk]
+   Float_t         pfSumHcal[2310];   //[nTrk]
 
    // List of branches
    TBranch        *b_nEv;   //!
@@ -158,7 +158,7 @@ void setupTrackTree(TTree *t,Tracks &tTracks,bool doCheck = 0)
    t->SetBranchAddress("pfSumHcal", tTracks.pfSumHcal, &tTracks.b_pfSumHcal);
    if (doCheck) {
       if (t->GetMaximum("nv")>4) cout <<"FATAL ERROR: Arrary size of nv too small!!!  "<<t->GetMaximum("nv")<<endl;
-      if (t->GetMaximum("nTrk")>2098) cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl;
+      if (t->GetMaximum("nTrk")>2310) cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl;
    }
 }
 

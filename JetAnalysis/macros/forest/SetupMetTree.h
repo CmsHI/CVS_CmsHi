@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov 20 23:20:00 2011 by ROOT version 5.27/06b
+// Sun Nov 27 11:40:13 2011 by ROOT version 5.27/06b
 // from TTree metTree/v1
-// found on file: /d100/velicanu/forest/PromptHiForestDiJet.root
+// found on file: ../HiForestPhoton.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
