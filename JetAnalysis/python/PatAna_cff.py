@@ -23,6 +23,7 @@ icPu5corr = patJetCorrFactors.clone(
   levels = cms.vstring('L2Relative','L3Absolute'),
   payload = cms.string('IC5Calo')
   )
+
 icPu5patJets = patJets.clone(
   jetSource = cms.InputTag("iterativeConePu5CaloJets"),
   genJetMatch = cms.InputTag("icPu5match"),
@@ -45,6 +46,7 @@ akPu3PFcorr = icPu5corr.clone(
   src = cms.InputTag("akPu3PFJets"),
   payload = cms.string('AK3PF')
   )
+
 akPu3PFpatJets = patJets.clone(
   jetSource = cms.InputTag("akPu3PFJets"),
   genJetMatch = cms.InputTag("akPu3PFmatch"),
@@ -52,11 +54,38 @@ akPu3PFpatJets = patJets.clone(
   jetCorrFactorsSource = cms.VInputTag(cms.InputTag("akPu3PFcorr"))
   )
 
+akPu5corr = icPu5corr.clone(
+    src = cms.InputTag("akPu5CaloJets"),
+    payload = cms.string('AK5Calo')
+    )
+
+akPu5patJets = patJets.clone(
+    jetSource = cms.InputTag("akPu5CaloJets"),
+    genJetMatch = cms.InputTag("akPu5match"),
+    genPartonMatch = cms.InputTag("akPu5parton"),
+    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("akPu5corr"))
+    )
+
+akPu3corr = icPu5corr.clone(
+    src = cms.InputTag("akPu3CaloJets"),
+    payload = cms.string('AK3Calo')
+    )
+
+akPu3patJets = patJets.clone(
+    jetSource = cms.InputTag("akPu3CaloJets"),
+    genJetMatch = cms.InputTag("akPu3match"),
+    genPartonMatch = cms.InputTag("akPu3parton"),
+    jetCorrFactorsSource = cms.VInputTag(cms.InputTag("akPu3corr"))
+    )
+
+
 # === data sequences ===
 # Note still need to use enableData function in cfg to remove mc dep of patjet
 icPu5patSequence_data = cms.Sequence( icPu5corr * icPu5patJets )
 akPu5PFpatSequence_data = cms.Sequence(akPu5PFcorr * akPu5PFpatJets )
 akPu3PFpatSequence_data = cms.Sequence( akPu3PFcorr * akPu3PFpatJets )
+akPu5patSequence_data = cms.Sequence( akPu5corr * akPu5patJets )
+akPu3patSequence_data = cms.Sequence( akPu3corr * akPu3patJets )
 
 # mc matching
 patJetPartonMatch.matched = cms.InputTag("hiPartons")
@@ -89,7 +118,25 @@ akPu3PFparton = patJetPartonMatch.clone(
   src = cms.InputTag("akPu3PFJets")
 	)
 
+akPu5match = patJetGenJetMatch.clone(
+    src = cms.InputTag("akPu5CaloJets"),
+    matched = cms.InputTag("akPu5PFclean")
+    )
+akPu5parton = patJetPartonMatch.clone(
+    src = cms.InputTag("akPu5CaloJets")
+    )
+
+akPu3match = patJetGenJetMatch.clone(
+    src = cms.InputTag("akPu3CaloJets"),
+    matched = cms.InputTag("akPu3PFclean")
+    )
+akPu3parton = patJetPartonMatch.clone(
+    src = cms.InputTag("akPu3CaloJets")
+    )
+
 # === mc sequences ===
 icPu5patSequence = cms.Sequence(icPu5corr * icPu5clean * icPu5match * icPu5parton * icPu5patJets)
 akPu5PFpatSequence = cms.Sequence(akPu5PFcorr * akPu5PFclean * akPu5PFmatch * akPu5PFparton * akPu5PFpatJets)
 akPu3PFpatSequence = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFpatJets)
+akPu5patSequence = cms.Sequence(akPu5corr * akPu5PFclean * akPu5match * akPu5parton * akPu5patJets)
+akPu3patSequence = cms.Sequence(akPu3corr * akPu3PFclean * akPu3match * akPu3parton * akPu3patJets)
