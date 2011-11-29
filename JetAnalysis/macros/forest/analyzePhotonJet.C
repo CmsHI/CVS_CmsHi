@@ -47,7 +47,9 @@ class GammaJet{
     }
 };
 
-void analyzePhotonJet(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_icPu5Jet80/merged_HIData2011_HIHighPt_highPtExercise_icPu5JetSkim80GeVjetEta.root")
+void analyzePhotonJet(
+    TString inname="/d100/velicanu/forest/HiForestPhoton35_Skim_v1.root"
+    )
 {
   double cutphotonEt = 70;
   double cutphotonEta = 1.44;
