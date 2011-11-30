@@ -6,138 +6,143 @@
 
 // Convinient Output Classes
 class EvtSel {
-  public:
-    int run;
-    int evt;
-    int cBin;
-    int nG;
-    int nJ;
-    int nT;
-    int trig;
-    int offlSel;
-    int noiseFilt;
-    float vz;
+public:
+   int run;
+   int evt;
+   int cBin;
+   int nG;
+   int nJ;
+   int nT;
+   int trig;
+   int offlSel;
+   int noiseFilt;
+   float vz;
 };
 
 static const int MAXTRK = 10000;
 
 class GammaJet{
-  public:
-    GammaJet() :
-      photonEt(-99),photonEta(0),photonPhi(0),
-      jetEt(-99),jetEta(0),jetPhi(0),
-      deta(-99),dphi(-99), Aj(-99),
-      sigmaIetaIeta(-99)
-  {}
-    float photonEt;
-    float photonEta;
-    float photonPhi;
-    float jetEt;
-    float jetEta;
-    float jetPhi;
-    float deta;
-    float dphi;
-    float Aj;
-    float sigmaIetaIeta;
-    void clear() {
+public:
+   GammaJet() :
+   photonEt(-99),photonEta(0),photonPhi(0),
+   jetEt(-99),jetEta(0),jetPhi(0),
+   deta(-99),dphi(-99), Aj(-99),
+   sigmaIetaIeta(-99)
+   {}
+   float photonEt;
+   float photonEta;
+   float photonPhi;
+   float jetEt;
+   float jetEta;
+   float jetPhi;
+   float deta;
+   float dphi;
+   float Aj;
+   float sigmaIetaIeta;
+   void clear() {
       photonEt=-99; photonEta=0; photonPhi=0;
       jetEt=-99; jetEta=0; jetPhi=0;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
-    }
+   }
 };
 
-void analyzePhotonJet_gen(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_icPu5Jet80/merged_HIData2011_HIHighPt_highPtExercise_icPu5JetSkim80GeVjetEta.root")
+void analyzePhotonJet_gen(TString inname="/net/hisrv0001/home/frankma/scratch01/work/jet/JeAna11_442p2_hiforest/src/CmsHi/JetAnalysis/test/GenHiForest_HyPhton50_all_v2.root")
 {
-  double cutphotonEt = 60;
-  double cutphotonEta = 1.44;
-  double cutjetEta = 2;
-
-  // Define the input file and HiForest
-  HiForest *c = new HiForest(inname);
-  c->hasHltTree = 0;
-  c->hasTrackTree=0;
-
-  // Output file
-  TFile *output = new TFile(Form("output-%.0f.root",cutphotonEt),"recreate");
-  TTree * tgj = new TTree("tgj","gamma jet tree");
-
-  EvtSel evt;
-  GammaJet gj;
-  tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
-  tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
-
-  // Main loop
-  for (int i=0;i<c->GetEntries();i++)
-  {
-    c->GetEntry(i);
-
-    // Event Info
-    evt.run = c->evt.run;
-    evt.evt = c->evt.evt;
-    evt.cBin = c->evt.hiBin;
-    evt.nG = c->photon.nPhotons;
-    evt.nJ = c->icPu5.nref;
-    evt.nT = c->track.nTrk;
-    evt.trig = c->hlt.HLT_HIJet80_v1;
-    evt.offlSel = c->skim.pcollisionEventSelection;
-    evt.noiseFilt = c->skim.pHBHENoiseFilter;
-    evt.vz = c->track.vz[1];
-    if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << c->track.nTrk <<endl;
-
-    // initialize
-    int leadingIndex=-1;
-    int awayIndex=-1;
-    float leadingAwayPt = 0;
-    gj.clear();
-
-    // Loop over jets to look for leading jet candidate in the event
-    for(int j = 0; j < c->genp.nPar; ++j){
-      if(c->genp.status[j]!=3||c->genp.id[j]!=22) continue; // parton photon selection
-      if(c->genp.et[j] < cutphotonEt) continue;
-      if(fabs(c->genp.eta[j]) > cutphotonEta) continue;
-      leadingIndex = j;
-      break;
-    }
-
-    // Found a leading jet which passed basic quality cut!
-    if (leadingIndex!=-1) {
-      // set leading jet
-      gj.photonEt=c->genp.et[leadingIndex];
-      gj.photonEta=c->genp.eta[leadingIndex];
-      gj.photonPhi=c->genp.phi[leadingIndex];
-
-      // Loop over jet tree to find a away side leading jet
-      for (int j=0;j<c->akPu3PF.ngen;j++) {
-	if (c->akPu3PF.genpt[j]<40) break;
-	if (fabs(c->akPu3PF.geneta[j])>cutjetEta) continue;
-	if (fabs(deltaPhi(c->akPu3PF.genphi[j],c->genp.phi[leadingIndex]))<0.3) continue;
-	if (c->akPu3PF.genpt[j]>leadingAwayPt) {
-	  leadingAwayPt = c->akPu3PF.genpt[j];
-	  awayIndex = j;
-	}
-	break;
-      }	 
-
-      // Found an away jet!
-      if (awayIndex !=-1) {
-	double photonEt = c->genp.et[leadingIndex];
-	double jetEt = c->akPu3PF.genpt[awayIndex];
-	double Agj = (photonEt-jetEt)/(photonEt+jetEt);
-	gj.jetEt  = jetEt;
-	gj.jetEta = c->akPu3PF.geneta[awayIndex];
-	gj.jetPhi = c->akPu3PF.genphi[awayIndex];
-	gj.deta = c->akPu3PF.geneta[awayIndex] - c->genp.eta[leadingIndex];
-	gj.dphi = deltaPhi(c->akPu3PF.genphi[awayIndex],c->genp.phi[leadingIndex]);
-	gj.Aj   = Agj;
+   double cutphotonEt = 60;
+   double cutphotonEta = 1.44;
+   double cutjetEta = 2;
+   
+   // Define the input file and HiForest
+   HiForest *c = new HiForest(inname);
+   c->hasHltTree = 0;
+   c->hasTrackTree=0;
+   
+   // Output file
+   TFile *output = new TFile(Form("output-%.0f.root",cutphotonEt),"recreate");
+   TTree * tgj = new TTree("tgj","gamma jet tree");
+   
+   EvtSel evt;
+   GammaJet gj;
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
+   
+   // Main loop
+   for (int i=0;i<c->GetEntries();i++)
+   {
+      c->GetEntry(i);
+      
+      // Event Info
+      evt.run = c->evt.run;
+      evt.evt = c->evt.evt;
+      evt.cBin = c->evt.hiBin;
+      evt.nG = c->photon.nPhotons;
+      evt.nJ = c->icPu5.nref;
+      evt.nT = c->track.nTrk;
+      evt.trig = c->hlt.HLT_HIJet80_v1;
+      evt.offlSel = c->skim.pcollisionEventSelection;
+      evt.noiseFilt = c->skim.pHBHENoiseFilter;
+      evt.vz = c->track.vz[1];
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << c->track.nTrk <<endl;
+      
+      // initialize
+      int leadingIndex=-1;
+      int awayIndex=-1;
+      float leadingAwayPt = 0;
+      gj.clear();
+      
+      // Loop over jets to look for leading jet candidate in the event
+      for(int j = 0; j < c->genp.nPar; ++j){
+         if(c->genp.status[j]!=3||c->genp.id[j]!=22) continue; // parton photon selection
+         if(c->genp.et[j] < cutphotonEt) continue;
+         if(fabs(c->genp.eta[j]) > cutphotonEta) continue;
+         leadingIndex = j;
+         break;
       }
-    }
-
-    // All done
-    tgj->Fill();
-  }
-
-  output->Write();
-  output->Close();
-  delete c;
+      
+      // Found a leading jet which passed basic quality cut!
+      if (leadingIndex!=-1) {
+         // set leading jet
+         gj.photonEt=c->genp.et[leadingIndex];
+         gj.photonEta=c->genp.eta[leadingIndex];
+         gj.photonPhi=c->genp.phi[leadingIndex];
+         
+         // intialize jet variables
+         int nJets=c->akPu3PF.ngen;
+         float *jet_pt  = c->akPu3PF.genpt;
+         float *jet_eta = c->akPu3PF.geneta;
+         float *jet_phi = c->akPu3PF.genphi;
+         // Loop over jet tree to find a away side leading jet
+         for (int j=0;j<nJets;j++) {
+            if (jet_pt[j]<40) break;
+            if (fabs(jet_eta[j])>cutjetEta) continue;
+            if (fabs(deltaPhi(jet_phi[j],c->genp.phi[leadingIndex]))<0.3) continue;
+            if (jet_pt[j]>leadingAwayPt) {
+               leadingAwayPt = jet_pt[j];
+               awayIndex = j;
+            }
+            break;
+         }	 
+         
+         // Found an away jet!
+         if (awayIndex !=-1) {
+            double photonEt = c->genp.et[leadingIndex];
+            double jetEt = jet_pt[awayIndex];
+            double Agj = (photonEt-jetEt)/(photonEt+jetEt);
+            gj.jetEt  = jetEt;
+            gj.jetEta = jet_eta[awayIndex];
+            gj.jetPhi = jet_phi[awayIndex];
+            gj.deta = jet_eta[awayIndex] - c->genp.eta[leadingIndex];
+            gj.dphi = deltaPhi(jet_phi[awayIndex],c->genp.phi[leadingIndex]);
+            gj.Aj   = Agj;
+         }
+      }
+      
+      // All done
+      tgj->Fill();
+   }
+   
+   output->Write();
+   output->Close();
+   delete c;
 }
