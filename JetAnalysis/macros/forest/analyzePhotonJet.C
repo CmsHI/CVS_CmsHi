@@ -48,8 +48,8 @@ public:
 };
 
 void analyzePhotonJet(
-                      TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50_50k/HiForest_Tree/photon50_50k.root"
-                      )
+    TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root"
+    )
 {
    double cutphotonEt = 60;
    double cutphotonEta = 1.44;
@@ -112,10 +112,14 @@ void analyzePhotonJet(
          gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
          
          // intialize jet variables
-         int nJets=c->akPu3PF.nref;
-         float *jet_pt  = c->akPu3PF.jtpt;
-         float *jet_eta = c->akPu3PF.jteta;
-         float *jet_phi = c->akPu3PF.jtphi;
+//         int nJets=c->akPu3PF.nref;
+//         float *jet_pt  = c->akPu3PF.jtpt;
+//         float *jet_eta = c->akPu3PF.jteta;
+//         float *jet_phi = c->akPu3PF.jtphi;
+         int nJets=c->icPu5.nref;
+         float *jet_pt  = c->icPu5.jtpt;
+         float *jet_eta = c->icPu5.jteta;
+         float *jet_phi = c->icPu5.jtphi;
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<nJets;j++) {
             if (jet_pt[j]<40) break;
