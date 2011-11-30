@@ -15,6 +15,7 @@ public:
    int nT;
    int trig;
    int offlSel;
+   int noiseFilt;
    float vz;
 };
 
@@ -75,7 +76,7 @@ void dijetMPT(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_i
 
    EvtSel evt;
    GammaJet gj;
-   tjt->Branch("evt",&evt.run,"run/I:evt:cbin:nG:nJ:nT:trig:offlSel:vz/F");
+   tjt->Branch("evt",&evt.run,"run/I:evt:cbin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
    tjt->Branch("jet",&gj.pt1,"pt1/F:eta1:phi1:pt2:eta2:phi2:deta:dphi:Aj");
    tjt->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tjt->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -110,6 +111,7 @@ void dijetMPT(TString inname="/d00/yjlee/hiForest/PromptReco2011/HIHighPt/skim_i
       evt.nT = c->track.nTrk;
       evt.trig = c->hlt.HLT_HIJet80_v1;
       evt.offlSel = c->skim.pcollisionEventSelection;
+      evt.noiseFilt = c->skim.pHBHENoiseFilter;
       evt.vz = c->track.vz[1];
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cbin << " " << c->track.nTrk <<endl;
       
