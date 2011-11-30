@@ -17,17 +17,11 @@
 #include "TLatex.h"
 #include "TString.h"
 
+#include "commonUtility.h"
 #endif
 
 
 //---------------------------------------------------------------------
-void makeMultiPanelCanvas(TCanvas*& canv, const Int_t columns, 
-                          const Int_t rows, const Float_t leftOffset=0.,
-                          const Float_t bottomOffset=0., 
-                          const Float_t leftMargin=0.2, 
-                          const Float_t bottomMargin=0.2,
-                          const Float_t edge=0.05);
-
 void plotBalance(int cbin = 0,
                  TString infname = "data.root",
                  TString pythia = "pythia.root",
@@ -38,16 +32,6 @@ void plotBalance(int cbin = 0,
 
 void plotPPBalanceAll();
 
-void drawText(const char *text, float xp, float yp);
-
-//--------------------------------------------------------------
-// drawPatch() is a crazy way of removing 0 in the second and third 
-// pad which is partially shown due to no margin between the pads
-// if anybody has a better way of doing it let me know! - Andre
-//--------------------------------------------------------------
-void drawPatch(float x1, float y1, float x2, float y2); 
-//---------------------------------------------------------------------
-
 void plotBalanceAllCent3(){
    
    TCanvas *c1 = new TCanvas("c1","",1050,350);
@@ -55,7 +39,8 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(1);
-   plotBalance(2,"output-70-HI.root","output-70-MC.root","output-70-MC.root",true,false,false);
+   plotBalance(2,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
+   //plotBalance(2,"../output-hypho50-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
    drawText("30-100%",0.7,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
@@ -73,7 +58,7 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(2);
-   plotBalance(1,"output-70-HI.root","output-70-MC.root","output-70-MC.root",true,true,true);
+   plotBalance(1,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,true,true);
    drawText("10-30%",0.7,0.3);
    drawText("(b)",0.05,0.885);
    
@@ -85,7 +70,7 @@ void plotBalanceAllCent3(){
    // jetf_PbPb->Draw();
    
    c1->cd(3);
-   plotBalance(0,"output-70-HI.root","output-70-MC.root","output-70-MC.root",true,false,false);
+   plotBalance(0,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
    drawText("0-10%",0.7,0.3);
    drawText("(c)",0.05,0.885);
    
@@ -93,14 +78,14 @@ void plotBalanceAllCent3(){
    tsel.SetNDC();
    tsel.SetTextFont(63);
    tsel.SetTextSize(15);
-   tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 70 GeV/c");
+   tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 60 GeV/c");
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 40 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
    
-   c1->Print("./fig/dijet_imbalance_all_cent_20101126_v0.gif");
-   c1->Print("./fig/dijet_imbalance_all_cent_20101126_v0.eps");
-   c1->Print("./fig/dijet_imbalance_all_cent_20101126_v0.pdf");
-   
+   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v0.gif");
+   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v0.pdf");
+   //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.gif");
+   //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.pdf");
 }
 
 void plotBalance(int cbin,
@@ -112,8 +97,8 @@ void plotBalance(int cbin,
                  bool drawLeg)
 {
    
-   TString cut="photonEt>70 && jetEt>60 && acos(cos(photonPhi-jetPhi))>2.0944";
-   TString cutpp="photonEt>70 && jetEt>60 && acos(cos(photonPhi-jetPhi))>2.0944";
+   TString cut="photonEt>60 && jetEt>40 && acos(cos(photonPhi-jetPhi))>2.0944";
+   TString cutpp="photonEt>60 && jetEt>40 && acos(cos(photonPhi-jetPhi))>2.0944";
    
    TString cstring = "";
    if(cbin==-1) {
@@ -133,20 +118,14 @@ void plotBalance(int cbin,
    // open the data file
    TFile *inf = new TFile(infname.Data());
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   nt->SetAlias("cBin","cbin");
-   nt->SetAlias("Agj","Aj");
    
    // open the pythia (MC) file
    TFile *infPythia = new TFile(pythia.Data());
    TTree *ntPythia = (TTree*) infPythia->FindObjectAny("tgj");
-   ntPythia->SetAlias("cBin","cbin");
-   ntPythia->SetAlias("Agj","Aj");
    
    // open the datamix file
    TFile *infMix = new TFile(mix.Data());
    TTree *ntMix =(TTree*)infMix->FindObjectAny("tgj");
-   ntMix->SetAlias("cBin","cbin");
-   ntMix->SetAlias("Agj","Aj");
    
    
    // projection histogram
@@ -223,10 +202,13 @@ void plotBalance(int cbin,
    
    cout<<" mean value of data "<<h->GetMean()<<endl;
    if(drawLeg){
-      TLegend *t3=new TLegend(0.46,0.70,0.91,0.86); 
+      TLegend *t3=new TLegend(0.44,0.70,0.91,0.86); 
       t3->AddEntry(h,"PbPb","p");
+      //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
+      t3->AddEntry(h,"PYTHIA+HYD Gen","l");
       //t3->AddEntry(hPythia,"PYTHIA","lf");  
-      t3->AddEntry(hDataMix,"pp","lf");
+      //t3->AddEntry(hDataMix,"pp","lf");
+      //t3->AddEntry(hDataMix,"pp","lf");
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
       t3->SetFillStyle(0);
@@ -235,99 +217,6 @@ void plotBalance(int cbin,
       t3->Draw();
    }
    
-}
-
-void drawPatch(float x1, float y1, float x2, float y2){
-   TLegend *t1=new TLegend(x1,y1,x2,y2);
-   t1->SetFillColor(kWhite);
-   t1->SetBorderSize(0);
-   t1->SetFillStyle(1001);
-   t1->Draw("");
-}
-
-void drawText(const char *text, float xp, float yp){
-   TLatex *tex = new TLatex(xp,yp,text);
-   tex->SetTextFont(63);
-   tex->SetTextSize(22);
-   //tex->SetTextSize(0.05);
-   tex->SetTextColor(kBlack);
-   tex->SetLineWidth(1);
-   tex->SetNDC();
-   tex->Draw();
-}
-
-
-void makeMultiPanelCanvas(TCanvas*& canv,
-                          const Int_t columns,
-                          const Int_t rows,
-                          const Float_t leftOffset,
-                          const Float_t bottomOffset,
-                          const Float_t leftMargin,
-                          const Float_t bottomMargin,
-                          const Float_t edge) {
-   if (canv==0) {
-      Error("makeMultiPanelCanvas","Got null canvas.");
-      return;
-   }
-   canv->Clear();
-   
-   TPad* pad[columns][rows];
-   
-   Float_t Xlow[columns];
-   Float_t Xup[columns];
-   Float_t Ylow[rows];
-   Float_t Yup[rows];
-   Float_t PadWidth = 
-   (1.0-leftOffset)/((1.0/(1.0-leftMargin)) +
-                     (1.0/(1.0-edge))+(Float_t)columns-2.0);
-   Float_t PadHeight =
-   (1.0-bottomOffset)/((1.0/(1.0-bottomMargin)) +
-                       (1.0/(1.0-edge))+(Float_t)rows-2.0);
-   Xlow[0] = leftOffset;
-   Xup[0] = leftOffset + PadWidth/(1.0-leftMargin);
-   Xup[columns-1] = 1;
-   Xlow[columns-1] = 1.0-PadWidth/(1.0-edge);
-   
-   Yup[0] = 1;
-   Ylow[0] = 1.0-PadHeight/(1.0-edge);
-   Ylow[rows-1] = bottomOffset;
-   Yup[rows-1] = bottomOffset + PadHeight/(1.0-bottomMargin);
-   
-   for(Int_t i=1;i<columns-1;i++) {
-      Xlow[i] = Xup[0] + (i-1)*PadWidth;
-      Xup[i] = Xup[0] + (i)*PadWidth;
-   }
-   Int_t ct = 0;
-   for(Int_t i=rows-2;i>0;i--) {
-      Ylow[i] = Yup[rows-1] + ct*PadHeight;
-      Yup[i] = Yup[rows-1] + (ct+1)*PadHeight;
-      ct++;
-   }
-   
-   TString padName;
-   for(Int_t i=0;i<columns;i++) {
-      for(Int_t j=0;j<rows;j++) {
-         canv->cd();
-         padName = Form("p_%d_%d",i,j);
-         pad[i][j] = new TPad(padName.Data(),padName.Data(),
-                              Xlow[i],Ylow[j],Xup[i],Yup[j]);
-         if(i==0) pad[i][j]->SetLeftMargin(leftMargin);
-         else pad[i][j]->SetLeftMargin(0);
-         
-         if(i==(columns-1)) pad[i][j]->SetRightMargin(edge);
-         else pad[i][j]->SetRightMargin(0);
-         
-         if(j==0) pad[i][j]->SetTopMargin(edge);
-         else pad[i][j]->SetTopMargin(0);
-         
-         if(j==(rows-1)) pad[i][j]->SetBottomMargin(bottomMargin);
-         else pad[i][j]->SetBottomMargin(0);
-         
-         pad[i][j]->Draw();
-         pad[i][j]->cd();
-         pad[i][j]->SetNumber(columns*j+i+1);
-      }
-   }
 }
 
 
