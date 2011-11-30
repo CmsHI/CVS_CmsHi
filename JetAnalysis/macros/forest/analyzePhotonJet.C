@@ -9,7 +9,7 @@ class EvtSel {
   public:
     int run;
     int evt;
-    int cbin;
+    int cBin;
     int nG;
     int nJ;
     int nT;
@@ -66,8 +66,8 @@ void analyzePhotonJet(
 
   EvtSel evt;
   GammaJet gj;
-  tgj->Branch("evt",&evt.run,"run/I:evt:cbin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
-  tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Aj:sigmaIetaIeta");
+  tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
+  tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
 
   // Main loop
   for (int i=0;i<c->GetEntries();i++)
@@ -77,7 +77,7 @@ void analyzePhotonJet(
     // Event Info
     evt.run = c->evt.run;
     evt.evt = c->evt.evt;
-    evt.cbin = c->evt.hiBin;
+    evt.cBin = c->evt.hiBin;
     evt.nG = c->photon.nPhotons;
     evt.nJ = c->icPu5.nref;
     evt.nT = c->track.nTrk;
@@ -85,7 +85,7 @@ void analyzePhotonJet(
     evt.offlSel = c->skim.pcollisionEventSelection;
     evt.noiseFilt = c->skim.pHBHENoiseFilter;
     evt.vz = c->track.vz[1];
-    if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cbin << " " << c->track.nTrk <<endl;
+    if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << c->track.nTrk <<endl;
 
     // initialize
     int leadingIndex=-1;
