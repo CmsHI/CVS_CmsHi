@@ -33,6 +33,12 @@ akPu3PFJets.puPtMin = cms.double(15.0)
 akPu5CaloJets.puPtMin = cms.double(10.0)
 akPu3CaloJets.puPtMin = cms.double(10.0)
 
+akPu5PFJets.doRhoFastjet = False
+akPu5PFJets.doAreaFastjet = False
+
+akPu3PFJets.doRhoFastjet = False
+akPu3PFJets.doAreaFastjet = False
+
 akPu5CaloJets.doRhoFastjet = False
 akPu5CaloJets.doAreaFastjet = False
 akPu5CaloJets.doPUOffsetCorr = True

@@ -21,7 +21,7 @@ patJetCorrFactors.useNPV = False
 icPu5corr = patJetCorrFactors.clone(
   src = cms.InputTag("iterativeConePu5CaloJets"),
   levels = cms.vstring('L2Relative','L3Absolute'),
-  payload = cms.string('IC5Calo')
+  payload = cms.string('IC5Calo_2760GeV')
   )
 
 icPu5patJets = patJets.clone(
@@ -33,7 +33,7 @@ icPu5patJets = patJets.clone(
 
 akPu5PFcorr = icPu5corr.clone(
   src = cms.InputTag("akPu5PFJets"),
-  payload = cms.string('AK5PF')
+  payload = cms.string('AK5PFTowers_hiGoodTightTracks')
   )
 akPu5PFpatJets = patJets.clone(
   jetSource = cms.InputTag("akPu5PFJets"),
@@ -44,7 +44,7 @@ akPu5PFpatJets = patJets.clone(
 
 akPu3PFcorr = icPu5corr.clone(
   src = cms.InputTag("akPu3PFJets"),
-  payload = cms.string('AK3PF')
+  payload = cms.string('AK3PFTowers_hiGoodTightTracks')
   )
 
 akPu3PFpatJets = patJets.clone(
@@ -68,7 +68,7 @@ akPu5patJets = patJets.clone(
 
 akPu3corr = icPu5corr.clone(
     src = cms.InputTag("akPu3CaloJets"),
-    payload = cms.string('AK3Calo')
+    payload = cms.string('AK5Calo')
     )
 
 akPu3patJets = patJets.clone(
