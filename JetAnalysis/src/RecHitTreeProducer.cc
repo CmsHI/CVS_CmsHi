@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.17 2011/11/03 16:12:42 yjlee Exp $
+// $Id: RecHitTreeProducer.cc,v 1.18 2011/11/20 15:45:10 yilmaz Exp $
 //
 //
 
@@ -510,6 +510,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
       myTowers.et[myTowers.n] = hit.p4(vtx).Et();
       myTowers.eta[myTowers.n] = hit.p4(vtx).Eta();
+      myTowers.phi[myTowers.n] = hit.p4(vtx).Phi();
       myTowers.emEt[myTowers.n] = hit.emEt(vtx);
       myTowers.hadEt[myTowers.n] = hit.hadEt(vtx);
 
