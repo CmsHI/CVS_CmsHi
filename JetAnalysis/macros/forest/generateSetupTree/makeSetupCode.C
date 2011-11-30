@@ -14,6 +14,7 @@ void makeSetupCode(char *infname = "../merged_Run181531_HIExpressPhysics_Part.ro
   TTree *hitTree      = (TTree*) inf->Get("rechitanalyzer/hbhe");
   TTree *metTree      = (TTree*) inf->Get("anaMET/metTree");
   TTree *pfTree      = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
+  TTree *genTree      = (TTree*) inf->Get("genpana/photon");
 
   Int_t phfCoincFilter;
   Int_t ppurityFractionFilter;
@@ -40,4 +41,5 @@ void makeSetupCode(char *infname = "../merged_Run181531_HIExpressPhysics_Part.ro
   if (hitTree) makeClass(hitTree,"Hit","");
   if (metTree) makeClass(metTree,"Met","");
   if (pfTree) makeClass(pfTree,"PF","");
+  if (genTree) makeClass(genTree,"Genp","");
 }

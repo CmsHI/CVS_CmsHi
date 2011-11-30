@@ -11,6 +11,7 @@
 #include "SetupHitTree.h"
 #include "SetupEvtTree.h"
 #include "SetupMetTree.h"
+#include "SetupGenpTree.h"
 #include "TrackingCorrections.h"
 
 #include <TTree.h>
@@ -67,7 +68,7 @@ class HiForest : public TNamed
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
-  bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
+  //bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
 
   // Jet utility functions
   void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1, int smearType = -1);
@@ -107,6 +108,7 @@ class HiForest : public TNamed
   TTree *ebTree;                                // ECAL eb Tree
   TTree *evtTree;                               // Event Tree
   TTree *metTree;                               // MET Tree
+  TTree *genpTree;                               // Gen particles of the signal event Tree
 
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
@@ -131,6 +133,7 @@ class HiForest : public TNamed
   Hits eb;
   Evts evt;
   Mets met;
+  Genps genp;
     
   // Booleans
   bool hasPhotonTree;
@@ -144,6 +147,7 @@ class HiForest : public TNamed
   bool hasTowerTree;
   bool hasHbheTree;
   bool hasEbTree;
+  bool hasGenpTree;
 
   bool setupOutput;
   bool verbose;
@@ -246,6 +250,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
+  genpTree     = (TTree*) inf->Get("genpana/photon");
 /*
   if(pp){
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
@@ -272,6 +277,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasTowerTree     = (towerTree    != 0);
   hasHbheTree      = (hbheTree     != 0);
   hasEbTree        = (ebTree     != 0);
+  hasGenpTree	   = (genpTree   !=0);
   setupOutput = false;
   
   // Setup branches. See also Setup*.h
@@ -341,6 +347,12 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     setupHitTree(ebTree,eb);
   }
   
+  if (hasGenpTree) {
+    evtTree->SetName("genp");
+    if (tree == 0) tree = genpTree; else tree->AddFriend(genpTree);
+    setupGenpTree(genpTree,genp);
+  }
+
   tree->SetMarkerStyle(20);
 
   // Print the status of thre forest
@@ -376,6 +388,7 @@ void HiForest::GetEntry(int i)
   if (hasTowerTree)    towerTree    ->GetEntry(i);
   if (hasHbheTree)     hbheTree     ->GetEntry(i);
   if (hasEbTree)       ebTree     ->GetEntry(i);
+  if (hasGenpTree)     genpTree   ->GetEntry(i);
 }
 
 int HiForest::GetEntries()
@@ -462,6 +475,7 @@ void HiForest::PrintStatus()
   if (hasTowerTree)    CheckTree(towerTree,    "TowerTree");
   if (hasHbheTree)     CheckTree(hbheTree,     "HbheTree");
   if (hasEbTree)       CheckTree(ebTree,     "EbTree");
+  if (hasGenpTree)      CheckTree(genpTree,   "GenpTree");
 
 }
 
