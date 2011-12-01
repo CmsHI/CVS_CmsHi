@@ -22,6 +22,7 @@
 <use name="DataFormats/DetId"/>
 <use name="DataFormats/GeometryVector"/>
 <use name="DataFormats/JetReco"/>
+<use name="DataFormats/METReco"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="RecoJets/JetProducers"/>
 <use name="DataFormats/HeavyIonEvent"/>
