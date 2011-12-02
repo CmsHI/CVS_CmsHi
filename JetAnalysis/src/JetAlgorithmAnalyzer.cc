@@ -301,13 +301,16 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
      h = hJetTowers[step];
    }
 
+   bool printDebug = 0;
+
    double totet = 0;
    int ntow = 0;
    int nj = jets.size();
 
+   if(printDebug){
    cout<<"step : "<<step<<endl;
    cout<<"Size of input : "<<nj<<endl;
-
+   }
    for(unsigned int i = 0; i < jets.size(); ++i){
      const fastjet::PseudoJet& jet = jets[i];
 
@@ -340,14 +343,14 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
      nt->Fill(jet.eta(),phi,pt,step,iev_);
      h->Fill(jet.eta(),phi,pt);
    }
-   
+   if(printDebug){
    cout<<"-----------------------------"<<endl;
    cout<<"STEP             = "<<step<<endl;   
    cout<<"Total ET         = "<<totet<<endl;
    cout<<"Towers counted   = "<<ntow<<endl;
    cout<<"Average tower ET = "<<totet/ntow<<endl;
    cout<<"-----------------------------"<<endl;     
-   
+   }
 }
 
 
@@ -437,7 +440,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    // For Pileup subtraction using offset correction:
    // set up geometry map
    if ( doPUOffsetCorr_ ) {
-      cout<<"setting up ... "<<endl;
+     //      cout<<"setting up ... "<<endl;
       subtractor_->setupGeometryMap(iEvent, iSetup);
    }
 
@@ -453,9 +456,11 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
      phi0_ = hi->evtPlane();
 
      double b = hi->b();
+     if(0){
      cout<<"===================================="<<endl;
      cout<<"IMPACT PARAMETER OF THE EVENT : "<<b<<endl;
      cout<<"===================================="<<endl;
+     }
    }
 
    if(doRecoEvtPlane_){
@@ -716,7 +721,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
       }
    }
-   cout<<"Start filling jets"<<endl;
+   //   cout<<"Start filling jets"<<endl;
 
    for(int ir = 0; ir < nFill_; ++ir){
       double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
