@@ -348,7 +348,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   }
   
   if (hasGenpTree) {
-    evtTree->SetName("genp");
+    genpTree->SetName("genp");
     if (tree == 0) tree = genpTree; else tree->AddFriend(genpTree);
     setupGenpTree(genpTree,genp);
   }
