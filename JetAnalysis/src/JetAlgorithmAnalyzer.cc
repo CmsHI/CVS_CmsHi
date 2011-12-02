@@ -772,8 +772,8 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    }
   
    // put the jets in the collection
-   iEvent.put(jets,"randomCones");
-   iEvent.put(directions,"directions");
+   //   iEvent.put(jets,"randomCones");
+   //   iEvent.put(directions,"directions");
 }
 
 //void JetAlgorithmAnalyzer::runAlgorithm( edm::Event & iEvent, edm::EventSetup const& iSetup, std::vector<fastjet::PseudoJet>& input )
