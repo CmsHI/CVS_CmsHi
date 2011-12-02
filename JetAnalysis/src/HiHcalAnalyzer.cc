@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Dec  1 10:28:28 EST 2011
-// $Id$
+// $Id: HiHcalAnalyzer.cc,v 1.1 2011/12/01 22:55:20 yilmaz Exp $
 //
 //
 
@@ -179,7 +179,7 @@ HiHcalAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    ts4ts5noiseet= hcalSummary->TS4TS5NoiseSumEt ();
    hasBadRBXTS4TS5= hcalSummary->HasBadRBXTS4TS5 ();
 
-
+   t->Fill();
 }
 
 
