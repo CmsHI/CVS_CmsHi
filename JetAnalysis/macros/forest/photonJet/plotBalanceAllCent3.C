@@ -39,7 +39,7 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(1);
-   plotBalance(2,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
+   plotBalance(2,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,false,false);
    //plotBalance(2,"../output-hypho50-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
    drawText("30-100%",0.7,0.3);
    drawText("(a)",0.25,0.885);
@@ -58,7 +58,7 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(2);
-   plotBalance(1,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,true,true);
+   plotBalance(1,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,true,true);
    drawText("10-30%",0.7,0.3);
    drawText("(b)",0.05,0.885);
    
@@ -70,7 +70,7 @@ void plotBalanceAllCent3(){
    // jetf_PbPb->Draw();
    
    c1->cd(3);
-   plotBalance(0,"../output-data-Photon-v1-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
+   plotBalance(0,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,false,false);
    drawText("0-10%",0.7,0.3);
    drawText("(c)",0.05,0.885);
    
@@ -82,8 +82,8 @@ void plotBalanceAllCent3(){
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 40 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
    
-   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v0.gif");
-   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v0.pdf");
+   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v2.gif");
+   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v2.pdf");
    //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.gif");
    //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.pdf");
 }
