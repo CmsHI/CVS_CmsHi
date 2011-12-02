@@ -39,6 +39,7 @@ public:
    float dphi;
    float Aj;
    float sigmaIetaIeta;
+   float isol;
    void clear() {
       photonEt=-99; photonEta=0; photonPhi=0;
       jetEt=-99; jetEta=0; jetPhi=0;
@@ -48,7 +49,9 @@ public:
 };
 
 void analyzePhotonJet(
-    TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root"
+                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root"
+                      TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50_50k/HiForest_Tree/photon50_50k.root"
+                      
     )
 {
    double cutphotonEt = 60;
@@ -67,7 +70,7 @@ void analyzePhotonJet(
    EvtSel evt;
    GammaJet gj;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:isol");
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -110,6 +113,7 @@ void analyzePhotonJet(
          gj.photonEta=c->photon.eta[leadingIndex];
          gj.photonPhi=c->photon.phi[leadingIndex];
          gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
+         gj.isol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          
          // intialize jet variables
 //         int nJets=c->akPu3PF.nref;
