@@ -27,7 +27,8 @@ public:
    photonEt(-99),photonEta(0),photonPhi(0),
    jetEt(-99),jetEta(0),jetPhi(0),
    deta(-99),dphi(-99), Aj(-99),
-   sigmaIetaIeta(-99)
+   sigmaIetaIeta(-99),
+   nTrk(0)
    {}
    float photonEt;
    float photonEta;
@@ -40,37 +41,48 @@ public:
    float Aj;
    float sigmaIetaIeta;
    float isol;
+   int nTrk;
+   float trkPt[MAXTRK];
+   float trkEta[MAXTRK];
+   float trkPhi[MAXTRK];   
    void clear() {
       photonEt=-99; photonEta=0; photonPhi=0;
       jetEt=-99; jetEta=0; jetPhi=0;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
+      nTrk=0;
    }
 };
 
 void analyzePhotonJet(
-                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root"
-                      TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50_50k/HiForest_Tree/photon50_50k.root"
+                      TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
+                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50_50k/HiForest_Tree/photon50_50k.root"
+                      TString outname="output.root"
                       
     )
 {
-   double cutphotonEt = 60;
+   double cutphotonPt = 20; // highest photon trigger is 20
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
-   
+   double cutEtaTrk = 2.4;	
+
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->hasHltTree = 0;
    c->hasTrackTree=0;
    
    // Output file
-   TFile *output = new TFile(Form("output-%.0f.root",cutphotonEt),"recreate");
+   TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
    
    EvtSel evt;
    GammaJet gj;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:isol");
+   tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
+   tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
+   tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
+   tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -93,17 +105,18 @@ void analyzePhotonJet(
       // initialize
       int leadingIndex=-1;
       int awayIndex=-1;
-      float leadingAwayPt = 0;
       gj.clear();
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.pt[j]<cutphotonEt) break;          // photon pT cut, assuming that et is sorted
+         if (c->photon.pt[j]<cutphotonPt) break;          // photon pT cut, assuming that et is sorted
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
-         if (!c->isGoodPhoton(j)) continue;         // hiGoodPhoton cut
-         leadingIndex = j;
-         break;
+         if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
+         if (c->photon.pt[j]>gj.photonEt) {
+            gj.photonEt = c->photon.pt[j];
+            leadingIndex = j;
+         }
       }
       
       // Found a leading jet which passed basic quality cut!
@@ -116,21 +129,21 @@ void analyzePhotonJet(
          gj.isol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          
          // intialize jet variables
-//         int nJets=c->akPu3PF.nref;
-//         float *jet_pt  = c->akPu3PF.jtpt;
-//         float *jet_eta = c->akPu3PF.jteta;
-//         float *jet_phi = c->akPu3PF.jtphi;
-         int nJets=c->icPu5.nref;
-         float *jet_pt  = c->icPu5.jtpt;
-         float *jet_eta = c->icPu5.jteta;
-         float *jet_phi = c->icPu5.jtphi;
+         int nJets=c->akPu3PF.nref;
+         float *jet_pt  = c->akPu3PF.jtpt;
+         float *jet_eta = c->akPu3PF.jteta;
+         float *jet_phi = c->akPu3PF.jtphi;
+//         int nJets=c->icPu5.nref;
+//         float *jet_pt  = c->icPu5.jtpt;
+//         float *jet_eta = c->icPu5.jteta;
+//         float *jet_phi = c->icPu5.jtphi;
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<nJets;j++) {
             if (jet_pt[j]<40) break;
             if (fabs(jet_eta[j])>cutjetEta) continue;
             if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
-            if (jet_pt[j]>leadingAwayPt) {
-               leadingAwayPt = jet_pt[j];
+            if (jet_pt[j]>gj.jetEt) {
+               gj.jetEt = jet_pt[j];
                awayIndex = j;
             }
             break;
@@ -148,6 +161,17 @@ void analyzePhotonJet(
             gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
          }
+      }
+      
+      // xcheck with tracks
+      gj.nTrk=0;
+      for (int it=0; it<c->track.nTrk; ++it) {
+         if (c->track.trkPt[it] < 7) continue;
+         if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
+         gj.trkPt[gj.nTrk] = c->track.trkPt[it];
+         gj.trkEta[gj.nTrk] = c->track.trkEta[it];
+         gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
+         ++gj.nTrk;
       }
       
       // All done
