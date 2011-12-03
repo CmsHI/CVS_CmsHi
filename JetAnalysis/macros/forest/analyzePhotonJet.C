@@ -166,7 +166,7 @@ void analyzePhotonJet(
       // xcheck with tracks
       gj.nTrk=0;
       for (int it=0; it<c->track.nTrk; ++it) {
-         if (c->track.trkPt[it] < 7) continue;
+         if (c->track.trkPt[it] < 4) continue;
          if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
          gj.trkPt[gj.nTrk] = c->track.trkPt[it];
          gj.trkEta[gj.nTrk] = c->track.trkEta[it];
