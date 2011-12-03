@@ -56,12 +56,13 @@ public:
 
 void analyzePhotonJet(
                       TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
-                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50_50k/HiForest_Tree/photon50_50k.root"
+                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       TString outname="output.root"
                       
     )
 {
-   double cutphotonPt = 20; // highest photon trigger is 20
+   double cutphotonPt = 40; // highest photon trigger is 20
+   double cutjetPt = 30;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
@@ -69,7 +70,6 @@ void analyzePhotonJet(
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->hasHltTree = 0;
-   c->hasTrackTree=0;
    
    // Output file
    TFile *output = new TFile(outname,"recreate");
@@ -139,7 +139,7 @@ void analyzePhotonJet(
 //         float *jet_phi = c->icPu5.jtphi;
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<40) break;
+            if (jet_pt[j]<cutjetPt) break;
             if (fabs(jet_eta[j])>cutjetEta) continue;
             if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
             if (jet_pt[j]>gj.jetEt) {
