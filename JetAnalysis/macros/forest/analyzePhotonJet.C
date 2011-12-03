@@ -62,7 +62,7 @@ void analyzePhotonJet(
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20
-   double cutjetPt = 30;
+   double cutjetPt = 20;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
