@@ -68,6 +68,7 @@ class HiForest : public TNamed
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
+  bool isLoosePhoton(int i);
   //bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
 
   // Jet utility functions

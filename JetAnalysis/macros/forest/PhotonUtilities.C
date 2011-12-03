@@ -9,6 +9,7 @@ bool HiForest::isSpike(int j)
    }
    return 0;
 }
+
 bool HiForest::isGoodPhoton(int j)
 {
 
@@ -24,5 +25,21 @@ bool HiForest::isGoodPhoton(int j)
       return 0;  // Need to update to include endcap photons
    }
 
+   return 1;
+}
+
+bool HiForest::isLoosePhoton(int j)
+{
+   
+   if (photon.isEB[j]) {
+      // Barrel photon                                                                                                                                                                   
+      if (photon.hadronicOverEm[j]>0.2) return 0;
+      if (photon.isEle[j]) return 0;
+      if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
+   } else {
+      // Endcap photon
+      return 0;  // Need to update to include endcap photons
+   }
+   
    return 1;
 }
