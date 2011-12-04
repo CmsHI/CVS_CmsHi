@@ -15,10 +15,11 @@ akPu3PFConesAna = cms.EDProducer(
           useTowersForBkg = cms.bool(True),
           centralityTag = cms.InputTag("hiCentrality"),
           evtPlaneTag = cms.InputTag("hiEvtPlane","recoLevel"),
-
           avoidNegative = cms.bool(False),
-          patJetSrc = cms.untracked.InputTag("akPu3PFpatJets")
-
+          patJetSrc = cms.untracked.InputTag("akPu3PFpatJets"),
+       evtPlaneIndex = cms.untracked.int32(21),
+       doBackToBack  = cms.untracked.bool(True),
+       centrality  = cms.untracked.int32(-1)
           )
 
 akPu3PFConesAna.doPUOffsetCorr = True
