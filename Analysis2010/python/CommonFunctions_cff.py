@@ -55,58 +55,33 @@ def overrideGlobalTag(process):
                  ),
         
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_HydjetBass_v0_offline"),
+                 tag = cms.string("CentralityTable_HFhits40_HydjetBass_vv44x01_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFhitsHydjet_Bass")
                                     ),
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_HydjetBass_v0_offline"),
+                 tag = cms.string("CentralityTable_PixelHits40_HydjetBass_vv44x01_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("PixelHitsHydjet_Bass")
-                 ),
-        
+                 ),               
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_AMPTPiano_v0_mc"),
+                 tag = cms.string("CentralityTable_Tracks40_HydjetBass_vv44x01_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("HFhitsAMPT_Piano")
+                 label = cms.untracked.string("TracksHydjet_Bass")
                  ),
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_AMPTPiano_v0_mc"),
+                 tag = cms.string("CentralityTable_PixelTracks40_HydjetBass_vv44x01_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("PixelHitsAMPT_Piano")
-                 ),
-        
-        cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_HydjetGuitar_v0_mc"),
-                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("HFhitsHydjet_Guitar")
+                 label = cms.untracked.string("PixelTracksHydjet_Bass")
                  ),
 
         cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_HydjetGuitar_v0_mc"),
+                 tag = cms.string("CentralityTable_HFtowers40_HydjetBass_vv44x01_mc"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("PixelHitsHydjet_Guitar")
-                 ),
-        
+                 label = cms.untracked.string("HFtowersHydjet_Bass")   
+                 ),        
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
-
-        cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_PixelHits40_Glauber2010A_v3_effB_offline"),
-                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),                 
-                 label = cms.untracked.string("PixelHits")
-                 ),
-        
-        cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFhits40_Glauber2010A_v3_effB_offline"),
-                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),                 
-                 label = cms.untracked.string("HFhits")
-                 ),
-        
-        cms.PSet(record = cms.string("HeavyIonRcd"),
-                 tag = cms.string("CentralityTable_HFtowers40_Glauber2010A_v3_effB_offline"),
-                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),                 
-                 label = cms.untracked.string("HFtowers")
-                 )
+# NOTHING
         )
     
     return process
