@@ -88,6 +88,8 @@ protected:
    TNtuple* ntJets;
    TNtuple* ntPU;
    TNtuple* ntRandom;
+   TNtuple* ntRandom0;
+   TNtuple* ntRandom1;
 
   edm::Handle<reco::Centrality> cent;
   edm::Handle<pat::JetCollection> patjets;
@@ -246,7 +248,12 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+     if(backToBack_){
+        ntRandom0 = f->make<TNtuple>("ntRandom0","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+        ntRandom1 = f->make<TNtuple>("ntRandom1","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+     }else{
+	ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+     }
 
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
@@ -449,19 +456,6 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    fjInputs_.clear();
    fjJets_.clear();
    inputs_.clear();  
-
-   if(doAnalysis_ && doMC_){
-     Handle<GenHIEvent> hi;
-     iEvent.getByLabel("heavyIon",hi);
-     phi0_ = hi->evtPlane();
-
-     double b = hi->b();
-     if(0){
-     cout<<"===================================="<<endl;
-     cout<<"IMPACT PARAMETER OF THE EVENT : "<<b<<endl;
-     cout<<"===================================="<<endl;
-     }
-   }
 
    if(doRecoEvtPlane_){
       Handle<reco::EvtPlaneCollection> planes;
@@ -722,11 +716,22 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
       }
    }
    //   cout<<"Start filling jets"<<endl;
-
+   
+   if(backToBack_){
+      int ir = 0;
+      double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
+      float entry0[100] = {etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir],evtJetPt};
+      ntRandom0->Fill(entry0);
+      ir = 1;
+      phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
+      float entry1[100] = {etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir],evtJetPt};
+      ntRandom1->Fill(entry1);
+   }
+   
    for(int ir = 0; ir < nFill_; ++ir){
       double phiRel = reco::deltaPhi(phiRandom[ir],phi0_);
       float entry[100] = {etaRandom[ir],phiRandom[ir],phiRel,et[ir],had[ir],em[ir],pileUp[ir],mean[ir],rms[ir],bin_,hf_,sumET_,iev_,dr[ir],rawJetPt[ir],evtJetPt};
-      ntRandom->Fill(entry);
+      if(!backToBack_)ntRandom->Fill(entry);
       if(et[ir] < 0){
 	//	 cout<<"Flipping vector"<<endl;
 	 (*directions)[ir] = false;
