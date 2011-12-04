@@ -80,6 +80,36 @@ def overrideGlobalTag(process):
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                  label = cms.untracked.string("HFtowersHydjet_Bass")   
                  ),        
+
+
+    cms.PSet(record = cms.string("HeavyIonRcd"),
+                              tag = cms.string("CentralityTable_HFhits40_Hydjet18_vv44x01_mc"),
+                              connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                              label = cms.untracked.string("HFhitsHydjet_18")
+                                                 ),
+                cms.PSet(record = cms.string("HeavyIonRcd"),
+                                          tag = cms.string("CentralityTable_PixelHits40_Hydjet18_vv44x01_mc"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("PixelHitsHydjet_18")
+                                          ),
+                cms.PSet(record = cms.string("HeavyIonRcd"),
+                                          tag = cms.string("CentralityTable_Tracks40_Hydjet18_vv44x01_mc"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("TracksHydjet_18")
+                                          ),
+                cms.PSet(record = cms.string("HeavyIonRcd"),
+                                          tag = cms.string("CentralityTable_PixelTracks40_Hydjet18_vv44x01_mc"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("PixelTracksHydjet_18")
+                                          ),
+
+                cms.PSet(record = cms.string("HeavyIonRcd"),
+                                          tag = cms.string("CentralityTable_HFtowers40_Hydjet18_vv44x01_mc"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("HFtowersHydjet_18")
+                                          ),
+        
+
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
 # NOTHING
         )
