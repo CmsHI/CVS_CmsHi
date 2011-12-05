@@ -28,7 +28,8 @@ void plotBalance(int cbin = 0,
                  TString mix = "mix.root",
                  bool useWeight = true,
                  bool drawXLabel = false,
-                 bool drawLeg = false);
+                 bool drawLeg = false,
+                 int refType=1);
 
 void plotPPBalanceAll();
 
@@ -39,7 +40,7 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(1);
-   plotBalance(2,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,false,false);
+   plotBalance(2,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,false,false,0);
    //plotBalance(2,"../output-hypho50-pt60.root","../output-hypho50gen-pt60.root","../output-hypho50gen-pt60.root",true,false,false);
    drawText("30-100%",0.7,0.3);
    drawText("(a)",0.25,0.885);
@@ -58,7 +59,7 @@ void plotBalanceAllCent3(){
    
    
    c1->cd(2);
-   plotBalance(1,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,true,true);
+   plotBalance(1,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,true,true,0);
    drawText("10-30%",0.7,0.3);
    drawText("(b)",0.05,0.885);
    
@@ -70,7 +71,7 @@ void plotBalanceAllCent3(){
    // jetf_PbPb->Draw();
    
    c1->cd(3);
-   plotBalance(0,"../output-data-Photon-v1-pt60_v2.root","../output-hypho50gen-pt60_v2.root","../output-hypho50gen-pt60_v2.root",true,false,false);
+   plotBalance(0,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,false,false,0);
    drawText("0-10%",0.7,0.3);
    drawText("(c)",0.05,0.885);
    
@@ -79,13 +80,15 @@ void plotBalanceAllCent3(){
    tsel.SetTextFont(63);
    tsel.SetTextSize(15);
    tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 60 GeV/c");
-   tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 40 GeV/c");
+   tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 20 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
    
-   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v2.gif");
-   c1->Print("./fig/dijet_imbalance_all_cent_20101130_v2.pdf");
-   //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.gif");
-   //c1->Print("./fig/dijet_mc_imbalance_all_cent_20101130_v0.pdf");
+   //c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4.gif");
+   //c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4.pdf");
+   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.gif");
+   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.pdf");
+   //c1->Print("./fig/photon60_mc_imbalance_all_cent_20101120_v0.gif");
+   //c1->Print("./fig/photon60_mc_imbalance_all_cent_20101120_v0.pdf");
 }
 
 void plotBalance(int cbin,
@@ -94,11 +97,15 @@ void plotBalance(int cbin,
                  TString mix,
                  bool useWeight,
                  bool drawXLabel,
-                 bool drawLeg)
+                 bool drawLeg,
+                 int refType) // 0=gen, 1=reco
 {
    
-   TString cut="photonEt>60 && jetEt>40 && acos(cos(photonPhi-jetPhi))>2.0944";
-   TString cutpp="photonEt>60 && jetEt>40 && acos(cos(photonPhi-jetPhi))>2.0944";
+   //TString cut="offlSel&&photonEt>60 && jetEt>20 && acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.011 && isol<5";
+   //TString cutpp="offlSel&&photonEt>60 && jetEt>20 && acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.011 && isol<5";
+   TString cut="photonEt>70 && jetEt>20 && acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && isol<5";
+   TString cutpp="photonEt>70 && jetEt>20 && acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && isol<5";
+   TString cutgen="photonEt>60 && jetEt>20 && acos(cos(photonPhi-jetPhi))>2.0944";
    
    TString cstring = "";
    if(cbin==-1) {
@@ -140,12 +147,14 @@ void plotBalance(int cbin,
    
    if (useWeight) {
       // use the weight value caluculated by Matt's analysis macro
-      ntMix->Draw("Agj>>hDataMix",Form("(%s)*1",cutpp.Data())); 
+      if (refType==1) ntMix->Draw("Agj>>hDataMix",Form("(%s)*1",cutpp.Data()));
+      else if (refType==0) ntMix->Draw("Agj>>hDataMix",Form("(%s)*1",cutgen.Data()));
    } else {
       // ignore centrality reweighting
-      ntMix->Draw("Agj>>hDataMix",Form("(%s)",cut.Data()));  
+      if (refType==1) ntMix->Draw("Agj>>hDataMix",Form("(%s)",cut.Data()));
+      else if (refType==0) ntMix->Draw("Agj>>hDataMix",Form("(%s)",cutgen.Data()));
    }
-   ntPythia->Draw("Agj>>hPythia",Form("(%s)",cutpp.Data()));
+   //ntPythia->Draw("Agj>>hPythia",Form("(%s)",cutpp.Data()));
    
    // calculate the statistical error and normalize
    h->Sumw2();
@@ -205,7 +214,7 @@ void plotBalance(int cbin,
       TLegend *t3=new TLegend(0.44,0.70,0.91,0.86); 
       t3->AddEntry(h,"PbPb","p");
       //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
-      t3->AddEntry(h,"PYTHIA+HYD Gen","l");
+      t3->AddEntry(hDataMix,"PYTHIA+HYD Gen","l");
       //t3->AddEntry(hPythia,"PYTHIA","lf");  
       //t3->AddEntry(hDataMix,"pp","lf");
       //t3->AddEntry(hDataMix,"pp","lf");
