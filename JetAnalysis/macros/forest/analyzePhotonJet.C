@@ -111,7 +111,7 @@ void analyzePhotonJet(
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.pt[j]<cutphotonPt) break;          // photon pT cut, assuming that et is sorted
+         if (c->photon.pt[j]<cutphotonPt) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
@@ -141,14 +141,13 @@ void analyzePhotonJet(
 //         float *jet_phi = c->icPu5.jtphi;
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<cutjetPt) break;
+            if (jet_pt[j]<cutjetPt) continue;
             if (fabs(jet_eta[j])>cutjetEta) continue;
             if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
             if (jet_pt[j]>gj.jetEt) {
                gj.jetEt = jet_pt[j];
                awayIndex = j;
             }
-            break;
          }	 
          
          // Found an away jet!
