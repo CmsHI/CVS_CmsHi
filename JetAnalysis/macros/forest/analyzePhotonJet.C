@@ -13,9 +13,10 @@ public:
    int nG;
    int nJ;
    int nT;
-   int trig;
-   int offlSel;
-   int noiseFilt;
+   bool trig;
+   bool offlSel;
+   bool noiseFilt;
+   bool anaEvtSel;
    float vz;
 };
 
@@ -55,9 +56,10 @@ public:
 };
 
 void analyzePhotonJet(
-                      TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
+                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
-                      TString outname="output.root"
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      TString outname="output-data-Photon-v2_v5.root"
                       
     )
 {
@@ -77,7 +79,7 @@ void analyzePhotonJet(
    
    EvtSel evt;
    GammaJet gj;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig:offlSel:noiseFilt:vz/F");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:isol");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -96,9 +98,10 @@ void analyzePhotonJet(
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
-      evt.trig = c->hlt.HLT_HIJet80_v1;
-      evt.offlSel = c->skim.pcollisionEventSelection;
-      evt.noiseFilt = c->skim.pHBHENoiseFilter;
+      evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
+      evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+      evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
+      evt.anaEvtSel = c->eventSelection();
       evt.vz = c->track.vz[1];
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << c->track.nTrk <<endl;
       
