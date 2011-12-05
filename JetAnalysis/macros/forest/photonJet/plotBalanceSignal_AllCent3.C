@@ -63,16 +63,19 @@ public:
    }
    
    void MakeHistograms(float fracPhotonBkg) {
-      float nDPhiSigAll = t->GetEntries(rSigAll.cut);
-      float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
-      float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
-      float fracDPhiBkg = nDPhiBkg/nDPhiSigAll;
-      cout << "|dhpi| sig all = " << nDPhiSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
-      cout << "fracPhotonBkg: " << fracPhotonBkg << endl;
-      
       rSigAll.Init(t,20,-0.999,0.999,1.);
-      rBkgDPhi.Init(t,20,-0.999,0.999,fracDPhiBkg);
-      rBkgSShape.Init(t,20,-0.999,0.999,fracPhotonBkg);
+      if (subDPhiSide) {
+         float nDPhiSigAll = t->GetEntries(rSigAll.cut);
+         float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
+         float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+         float fracDPhiBkg = nDPhiBkg/nDPhiSigAll;
+         rBkgDPhi.Init(t,20,-0.999,0.999,fracDPhiBkg);
+         cout << "|dhpi| sig all = " << nDPhiSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
+      }
+      if (subSShapeSide) {
+         cout << "fracPhotonBkg: " << fracPhotonBkg << endl;
+         rBkgSShape.Init(t,20,-0.999,0.999,fracPhotonBkg);
+      }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
@@ -102,7 +105,6 @@ TH1D * plotBalance(int cbin,
    TString cut;
    TString name;
    if (dataType==1) {
-      //cut="offlSel && photonEt>60 && jetEt>30 && isol<5"; // reco
       cut="anaEvtSel && photonEt>60 && jetEt>30 && isol<5"; // reco
       name="reco";
    }
@@ -131,8 +133,6 @@ TH1D * plotBalance(int cbin,
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
    
    SignalCorrector anaAgj(nt,name,TCut(cut),useWeight);
-   anaAgj.subDPhiSide = false;
-   anaAgj.subSShapeSide = false;
    
    // histogram style
    if (dataType==1) {
@@ -140,11 +140,17 @@ TH1D * plotBalance(int cbin,
       if (cbin==0) photonPurity=0.52;
       if (cbin==1) photonPurity=0.56;
       if (cbin==2) photonPurity=0.62;
+      anaAgj.subDPhiSide = false;
+      anaAgj.subSShapeSide = false;
       anaAgj.MakeHistograms(1-photonPurity);
       anaAgj.hSubtracted->SetLineColor(kRed);
       anaAgj.hSubtracted->SetMarkerColor(kRed);
       anaAgj.hSubtracted->SetMarkerStyle(20);
-   } else if (dataType==0) {   
+   } else if (dataType==0) {
+      anaAgj.subDPhiSide = false;
+      anaAgj.subSShapeSide = false;
+      anaAgj.rSigAll.cut = cut;
+      anaAgj.MakeHistograms(0);
       anaAgj.hSubtracted->SetLineColor(kBlue);
       anaAgj.hSubtracted->SetFillColor(kAzure-8);
       anaAgj.hSubtracted->SetFillStyle(3005);
@@ -181,10 +187,17 @@ void plotBalanceSignal_AllCent3()
    
    
    TH1D * hFrame = new TH1D("hFrame","",20,-0.999,0.999);
-   hFrame->SetAxisRange(-0.05,0.4999,"Y");
+   hFrame->SetAxisRange(-0.4999,0.999,"X");
+   hFrame->SetAxisRange(-0.05,0.50499,"Y");
    hFrame->SetStats(0);
    hFrame->SetXTitle("A_{J} = (E_{T}^{j1}-E_{T}^{j2})/(E_{T}^{j1}+E_{T}^{j2})");
    hFrame->SetYTitle("Event Fraction");
+   hFrame->GetXaxis()->SetLabelSize(22);
+   hFrame->GetXaxis()->SetLabelFont(43);
+   hFrame->GetXaxis()->SetTitleSize(24);
+   hFrame->GetXaxis()->SetTitleFont(43);
+   hFrame->GetXaxis()->SetTitleOffset(1.2);
+   hFrame->GetXaxis()->CenterTitle();
    hFrame->GetYaxis()->SetLabelSize(22);
    hFrame->GetYaxis()->SetLabelFont(43);
    hFrame->GetYaxis()->SetTitleSize(22);
@@ -192,11 +205,21 @@ void plotBalanceSignal_AllCent3()
    hFrame->GetYaxis()->SetTitleOffset(1.2);
    hFrame->GetYaxis()->CenterTitle();
    hFrame->GetYaxis()->SetNdivisions(505,true);
+   TH1D * hFrameData = new TH1D("hFrameData","",20,-0.999,0.999);
+   TH1D * hFrameMix = new TH1D("hFrameMix","",20,-0.999,0.999);
+   TH1D * hFrameGen = new TH1D("hFrameGen","",20,-0.999,0.999);
+   hFrameData->SetLineColor(kRed);
+   hFrameData->SetMarkerColor(kRed);
+   hFrameData->SetMarkerStyle(20);
+   hFrameGen->SetLineColor(kBlue);
+   hFrameGen->SetFillColor(kAzure-8);
+   hFrameGen->SetFillStyle(3005);
    
    c1->cd(1);
    hFrame->Draw();
-   //plotBalance(2,"../output-data-Photon-v1_v4.root",false,1,"sameE",true);
-   plotBalance(2,"../output-data-Photon-v2_v5.root",false,1,"sameE",true);
+   plotBalance(2,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   plotBalance(2,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   //plotBalance(2,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
    drawText("30-100%",0.7,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
@@ -215,33 +238,45 @@ void plotBalanceSignal_AllCent3()
    
    c1->cd(2);
    hFrame->Draw();
-   //plotBalance(1,"../output-data-Photon-v1_v4.root",false,1,"sameE",true);
-   plotBalance(1,"../output-data-Photon-v2_v5.root",false,1,"sameE",true);
+   plotBalance(1,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   plotBalance(1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   //plotBalance(1,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   drawText("10-30%",0.7,0.3);
+   drawText("(b)",0.05,0.885);
+
+   TLegend *t3=new TLegend(0.44,0.70,0.91,0.86); 
+   t3->AddEntry(hFrameData,"PbPb","p");
+   //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYD Gen","l");
+   //t3->AddEntry(hPythia,"PYTHIA","lf");  
+   //t3->AddEntry(hDataMix,"pp","lf");
+   //t3->AddEntry(hDataMix,"pp","lf");
+   t3->SetFillColor(0);
+   t3->SetBorderSize(0);
+   t3->SetFillStyle(0);
+   t3->SetTextFont(63);
+   t3->SetTextSize(15);
+   t3->Draw();
 
    c1->cd(3);
    hFrame->Draw();
-   //plotBalance(0,"../output-data-Photon-v1_v4.root",false,1,"sameE",true);
-   plotBalance(0,"../output-data-Photon-v2_v5.root",false,1,"sameE",true);
+   plotBalance(0,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   plotBalance(0,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   //plotBalance(0,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
 
-   //   plotBalance(1,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,true,true,0);
-   //   drawText("10-30%",0.7,0.3);
-   //   drawText("(b)",0.05,0.885);
-   //   
+   TLatex tsel;
+   tsel.SetNDC();
+   tsel.SetTextFont(63);
+   tsel.SetTextSize(15);
+   tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 60 GeV/c");
+   tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
+   tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
+
+   c1->Print("./fig/photon60v1_jet30_imbalance_all_cent_20101205_v6.gif");
+   c1->Print("./fig/photon60v1_jet30_imbalance_all_cent_20101205_v6.pdf");
+
    //   cout<<" mean value of data "<<h->GetMean()<<endl;
    //   if(drawLeg){
-   //      TLegend *t3=new TLegend(0.44,0.70,0.91,0.86); 
-   //      t3->AddEntry(h,"PbPb","p");
-   //      //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
-   //      t3->AddEntry(hDataMix,"PYTHIA+HYD Gen","l");
-   //      //t3->AddEntry(hPythia,"PYTHIA","lf");  
-   //      //t3->AddEntry(hDataMix,"pp","lf");
-   //      //t3->AddEntry(hDataMix,"pp","lf");
-   //      t3->SetFillColor(0);
-   //      t3->SetBorderSize(0);
-   //      t3->SetFillStyle(0);
-   //      t3->SetTextFont(63);
-   //      t3->SetTextSize(15);
-   //      t3->Draw();
    //   }
    //   
    //   TLatex *jetf_PbPb;
@@ -255,16 +290,7 @@ void plotBalanceSignal_AllCent3()
    //   drawText("0-10%",0.7,0.3);
    //   drawText("(c)",0.05,0.885);
    //   
-   //   TLatex tsel;
-   //   tsel.SetNDC();
-   //   tsel.SetTextFont(63);
-   //   tsel.SetTextSize(15);
-   //   tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 60 GeV/c");
-   //   tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 20 GeV/c");
-   //   tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
    //   
-   //   //c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4.gif");
-   //   //c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4.pdf");
    //   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.gif");
    //   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.pdf");
    //   //c1->Print("./fig/photon60_mc_imbalance_all_cent_20101120_v0.gif");
