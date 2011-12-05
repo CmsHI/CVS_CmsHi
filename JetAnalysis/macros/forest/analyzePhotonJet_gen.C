@@ -47,9 +47,12 @@ public:
    }
 };
 
-void analyzePhotonJet_gen(TString inname="/net/hisrv0001/home/frankma/scratch01/work/jet/JeAna11_442p2_hiforest/src/CmsHi/JetAnalysis/test/GenHiForest_HyPhton50_all_v2.root")
+void analyzePhotonJet_gen(
+    //TString inname="/net/hisrv0001/home/frankma/scratch01/work/jet/JeAna11_442p2_hiforest/src/CmsHi/JetAnalysis/test/GenHiForest_HyPhton50_all_v2.root"
+    TString inname="../ntout/GenHiForest_HyPhton50_all_v2.root"
+    )
 {
-   double cutphotonEt = 60;
+   double cutphotonEt = 40;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    
@@ -96,7 +99,10 @@ void analyzePhotonJet_gen(TString inname="/net/hisrv0001/home/frankma/scratch01/
          if(c->genp.status[j]!=3||c->genp.id[j]!=22) continue; // parton photon selection
          if(c->genp.et[j] < cutphotonEt) continue;
          if(fabs(c->genp.eta[j]) > cutphotonEta) continue;
-         leadingIndex = j;
+	 if (c->genp.et[j] > gj.photonEt ) {
+	   gj.photonEt = c->genp.et[j];
+	   leadingIndex = j;
+	 }
          break;
       }
       
@@ -114,7 +120,7 @@ void analyzePhotonJet_gen(TString inname="/net/hisrv0001/home/frankma/scratch01/
          float *jet_phi = c->akPu3PF.genphi;
          // Loop over jet tree to find a away side leading jet
          for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<40) break;
+            if (jet_pt[j]<10) continue;
             if (fabs(jet_eta[j])>cutjetEta) continue;
             if (fabs(deltaPhi(jet_phi[j],c->genp.phi[leadingIndex]))<0.3) continue;
             if (jet_pt[j]>leadingAwayPt) {
