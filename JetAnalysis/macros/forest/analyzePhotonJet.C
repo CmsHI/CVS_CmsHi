@@ -71,7 +71,6 @@ void analyzePhotonJet(
 
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
-   c->hasHltTree = 0;
    
    // Output file
    TFile *output = new TFile(outname,"recreate");
@@ -101,9 +100,9 @@ void analyzePhotonJet(
       evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-      evt.anaEvtSel = c->eventSelection();
+      evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << c->track.nTrk <<endl;
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
       int leadingIndex=-1;
