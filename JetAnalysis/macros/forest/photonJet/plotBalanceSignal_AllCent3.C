@@ -21,6 +21,7 @@
 #include "commonUtility.h"
 #endif
 
+//---------------------------------------------------------------------
 class Region
 {
 public:
@@ -47,6 +48,7 @@ public:
    float fraction;
 };
 
+//---------------------------------------------------------------------
 class SignalCorrector
 {
 public:
@@ -140,8 +142,8 @@ TH1D * plotBalance(int cbin,
       if (cbin==0) photonPurity=0.52;
       if (cbin==1) photonPurity=0.56;
       if (cbin==2) photonPurity=0.62;
-      anaAgj.subDPhiSide = false;
-      anaAgj.subSShapeSide = false;
+      anaAgj.subDPhiSide = true;
+      anaAgj.subSShapeSide = true;
       anaAgj.MakeHistograms(1-photonPurity);
       anaAgj.hSubtracted->SetLineColor(kRed);
       anaAgj.hSubtracted->SetMarkerColor(kRed);
@@ -164,15 +166,17 @@ TH1D * plotBalance(int cbin,
    }
    anaAgj.hSubtracted->Draw(opt);
    if (doCheck) {
-      anaAgj.rSigAll.hScaled->SetMarkerStyle(kOpenCircle);
-      anaAgj.rBkgDPhi.hScaled->SetMarkerStyle(kOpenCircle);
-      anaAgj.rBkgSShape.hScaled->SetMarkerStyle(kOpenCircle);
-      anaAgj.rSigAll.hScaled->SetMarkerColor(kBlue);
-      anaAgj.rBkgDPhi.hScaled->SetMarkerColor(kGreen+2);
-      anaAgj.rBkgSShape.hScaled->SetMarkerColor(kViolet);
+      if (anaAgj.subDPhiSide) {
+         anaAgj.rBkgDPhi.hScaled->SetMarkerStyle(kOpenCircle);
+         anaAgj.rBkgDPhi.hScaled->SetMarkerColor(kGreen+2);
+         anaAgj.rBkgDPhi.hScaled->Draw("sameE");
+      }
+      if (anaAgj.subSShapeSide) {
+         anaAgj.rBkgSShape.hScaled->SetMarkerStyle(kOpenCircle);
+         anaAgj.rBkgSShape.hScaled->SetMarkerColor(kViolet);
+         anaAgj.rBkgSShape.hScaled->Draw("sameE");
+      }
       anaAgj.rSigAll.hScaled->Draw("same hist");
-      if (anaAgj.subDPhiSide) anaAgj.rBkgDPhi.hScaled->Draw("sameE");
-      if (anaAgj.subSShapeSide) anaAgj.rBkgSShape.hScaled->Draw("sameE");
    }
    return anaAgj.hSubtracted;
 }
@@ -206,6 +210,8 @@ void plotBalanceSignal_AllCent3()
    hFrame->GetYaxis()->CenterTitle();
    hFrame->GetYaxis()->SetNdivisions(505,true);
    TH1D * hFrameData = new TH1D("hFrameData","",20,-0.999,0.999);
+   TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,-0.999,0.999);
+   TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,-0.999,0.999);
    TH1D * hFrameMix = new TH1D("hFrameMix","",20,-0.999,0.999);
    TH1D * hFrameGen = new TH1D("hFrameGen","",20,-0.999,0.999);
    hFrameData->SetLineColor(kRed);
@@ -217,16 +223,16 @@ void plotBalanceSignal_AllCent3()
    
    c1->cd(1);
    hFrame->Draw();
-   plotBalance(2,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
    plotBalance(2,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(2,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(2,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   plotBalance(2,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
    drawText("30-100%",0.7,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
    cms->SetTextFont(63);
    cms->SetTextSize(17);
    cms->Draw();
-   TLatex *lumi = new TLatex(0.24,0.30,"#intL dt = 40 #mub^{-1}");
+   TLatex *lumi = new TLatex(0.24,0.30,"#intL dt = 84 #mub^{-1}");
    lumi->SetTextFont(63);
    lumi->SetTextSize(17);
    lumi->Draw();
@@ -238,9 +244,9 @@ void plotBalanceSignal_AllCent3()
    
    c1->cd(2);
    hFrame->Draw();
-   plotBalance(1,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
    plotBalance(1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(1,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(1,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   plotBalance(1,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
    drawText("10-30%",0.7,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -261,8 +267,10 @@ void plotBalanceSignal_AllCent3()
    c1->cd(3);
    hFrame->Draw();
    plotBalance(0,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   plotBalance(0,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
-   //plotBalance(0,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(0,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
+   plotBalance(0,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   drawText("0-10%",0.7,0.3);
+   drawText("(c)",0.05,0.885);
 
    TLatex tsel;
    tsel.SetNDC();
@@ -272,8 +280,8 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print("./fig/photon60v1_jet30_imbalance_all_cent_20101205_v6.gif");
-   c1->Print("./fig/photon60v1_jet30_imbalance_all_cent_20101205_v6.pdf");
+   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101205_v6sub2.gif");
+   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101205_v6sub2.pdf");
 
    //   cout<<" mean value of data "<<h->GetMean()<<endl;
    //   if(drawLeg){
@@ -287,8 +295,6 @@ void plotBalanceSignal_AllCent3()
    //   
    //   c1->cd(3);
    //   plotBalance(0,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,false,false,0);
-   //   drawText("0-10%",0.7,0.3);
-   //   drawText("(c)",0.05,0.885);
    //   
    //   
    //   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.gif");
