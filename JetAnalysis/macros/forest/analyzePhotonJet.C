@@ -84,7 +84,7 @@ void analyzePhotonJet(
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v7test.root"
+                      TString outname="output-data-Photon-v2_v7.root"
                       
     )
 {
