@@ -33,7 +33,7 @@ bool HiForest::isLoosePhoton(int j)
    
    if (photon.isEB[j]) {
       // Barrel photon                                                                                                                                                                   
-      if (photon.hadronicOverEm[j]>0.2) return 0;
+      if (photon.hadronicOverEm[j]>0.1) return 0;
       if (photon.isEle[j]) return 0;
       if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
    } else {
