@@ -88,7 +88,7 @@ void analyzePhotonJet(
                       
     )
 {
-   double cutphotonPt = 40; // highest photon trigger is 20
+   double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
@@ -115,20 +115,20 @@ void analyzePhotonJet(
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
-      {
-	 c->GetEntry(i);
-	 
-	 // Event Info
-	 evt.run = c->evt.run;
-	 evt.evt = c->evt.evt;
-	 evt.cBin = c->evt.hiBin;
-	 evt.nG = c->photon.nPhotons;
-	 evt.nJ = c->icPu5.nref;
-	 evt.nT = c->track.nTrk;
-	 evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
-	 evt.offlSel = (c->skim.pcollisionEventSelection > 0);
-	 evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-	 evt.anaEvtSel = c->selectEvent() && evt.trig;
+   {
+      c->GetEntry(i);
+      
+      // Event Info
+      evt.run = c->evt.run;
+      evt.evt = c->evt.evt;
+      evt.cBin = c->evt.hiBin;
+      evt.nG = c->photon.nPhotons;
+      evt.nJ = c->icPu5.nref;
+      evt.nT = c->track.nTrk;
+      evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
+      evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+      evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
+      evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
@@ -139,13 +139,14 @@ void analyzePhotonJet(
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         float pt1=c->getCorrEt(j);
-         if (pt1<cutphotonPt) continue;          // photon pT cut
+         if (c->photon.pt[j]<cutphotonPt) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
-         if (pt1>gj.photonEt) {
-            gj.photonEt = pt1;
+         // sort using corrected photon pt
+         float corrPt=c->getCorrEt(j);
+         if (corrPt>gj.photonEt) {
+            gj.photonEt = corrPt;
             leadingIndex = j;
          }
       }
