@@ -42,7 +42,8 @@ process.GlobalTag.globaltag = 'GR_P_V27A::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
-overrideCentrality(process)
+addRPFlat(process)
+
 process.HeavyIonGlobalParameters = cms.PSet(
 	centralityVariable = cms.string("HFtowers"),
 	nonDefaultGlauberModel = cms.string(""),
@@ -115,6 +116,7 @@ process.muonTree.doGen = cms.untracked.bool(False)
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
+process.hiEvtAnalyzer.doEvtPlaneFlat = cms.bool(True)
 
 process.ak5CaloJets = process.akPu5CaloJets.clone(doPUOffsetCorr = False)
 process.icPu5JetAnalyzer.useCentrality   = cms.untracked.bool(False) # doesn't fill cent info
@@ -170,7 +172,8 @@ process.hiSelectedTrackHighPurity = cms.EDFilter("TrackSelector",
 )
 
 process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
-process.reco_extra        = cms.Path( process.siPixelRecHits * process.siStripMatchedRecHits *
+process.reco_extra        = cms.Path( process.globalRecoExtra *
+                                      process.siPixelRecHits * process.siStripMatchedRecHits *
                                       process.hiPixel3PrimTracks *
                                       process.hiPixelTrackSeeds *
                                       process.hiSelectedTrackHighPurity *
