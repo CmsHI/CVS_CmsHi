@@ -115,20 +115,20 @@ void analyzePhotonJet(
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
-   {
-      c->GetEntry(i);
-      
-      // Event Info
-      evt.run = c->evt.run;
-      evt.evt = c->evt.evt;
-      evt.cBin = c->evt.hiBin;
-      evt.nG = c->photon.nPhotons;
-      evt.nJ = c->icPu5.nref;
-      evt.nT = c->track.nTrk;
-      evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
-      evt.offlSel = (c->skim.pcollisionEventSelection > 0);
-      evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-      evt.anaEvtSel = c->selectEvent() && evt.trig;
+      {
+	 c->GetEntry(i);
+	 
+	 // Event Info
+	 evt.run = c->evt.run;
+	 evt.evt = c->evt.evt;
+	 evt.cBin = c->evt.hiBin;
+	 evt.nG = c->photon.nPhotons;
+	 evt.nJ = c->icPu5.nref;
+	 evt.nT = c->track.nTrk;
+	 evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
+	 evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+	 evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
+	 evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
