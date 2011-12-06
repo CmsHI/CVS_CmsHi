@@ -52,7 +52,7 @@ public:
 class SignalCorrector
 {
 public:
-   SignalCorrector(TTree * tree, TString n, TCut s="anaEvtSel&&photonEt>60&&jetEta>30&&isol<5", bool w=false) : 
+   SignalCorrector(TTree * tree, TString n, TCut s, bool w=false) : 
    name(n),
    sel(s),
    rSigAll(n+"SignalAll","Agj",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),
@@ -109,7 +109,8 @@ TH1D * plotBalance(int cbin,
    TString cut;
    TString name;
    if (dataType==1) {
-      cut="anaEvtSel && photonEt>60 && jetEt>30 && isol<5"; // reco
+      //cut="anaEvtSel && photonEt>60 && jetEt>30 && sumIsol<5"; // reco
+      cut="anaEvtSel && photonEt>60 && jetEt>30 && optIsol>0.3"; // reco
       name="reco";
    }
    else if (dataType==0) {
@@ -141,9 +142,12 @@ TH1D * plotBalance(int cbin,
    // histogram style
    if (dataType==1) {
       float photonPurity;
-      if (cbin==0) photonPurity=0.52;
-      if (cbin==1) photonPurity=0.56;
-      if (cbin==2) photonPurity=0.62;
+//      if (cbin==0) photonPurity=0.52;
+//      if (cbin==1) photonPurity=0.56;
+//      if (cbin==2) photonPurity=0.62;
+      if (cbin==0) photonPurity=0.76;
+      if (cbin==1) photonPurity=0.78;
+      if (cbin==2) photonPurity=0.83;
       anaAgj.subDPhiSide = true;
       anaAgj.subSShapeSide = true;
       anaAgj.MakeHistograms(1-photonPurity);
@@ -234,8 +238,8 @@ void plotBalanceSignal_AllCent3()
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
    plotBalance(2,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(2,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
-   plotBalance(2,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(2,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
+   plotBalance(2,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
@@ -261,8 +265,8 @@ void plotBalanceSignal_AllCent3()
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
    plotBalance(1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(1,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
-   plotBalance(1,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(1,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
+   plotBalance(1,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -284,8 +288,8 @@ void plotBalanceSignal_AllCent3()
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    plotBalance(0,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(0,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
-   plotBalance(0,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
+   //plotBalance(0,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
+   plotBalance(0,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
@@ -297,6 +301,14 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101206_v6sub2.gif");
-   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101206_v6sub2.pdf");
+   c1->Print("./fig/12.06/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol.gif");
+   c1->Print("./fig/12.06/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol.pdf");
+   
+   TCanvas *call = new TCanvas("call","",500,500);
+   cout << "\n Centrality 0-100\%" << endl;
+   hFrame->Draw();
+   plotBalance(-1,"../output-hypho50gen_v4.root",false,0,"samehist",0);
+   plotBalance(-1,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
+   drawText("0-100%",0.8,0.3);
+   call->Print("./fig/12.06/photon60v2_jet30_imbalance_combine_20101206_v8subAlloptIsol.gif");
 }
