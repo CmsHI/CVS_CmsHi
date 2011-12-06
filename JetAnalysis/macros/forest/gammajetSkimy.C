@@ -141,7 +141,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
       for (int j=0 ; j < yforest->photon.nPhotons ; j++) {
 	 if ( fabs(yforest->photon.eta[j]) > etaCut ) 
 	    continue;
-	 cout << "here2c " << endl;
          if ( yforest->photon.pt[j] > leadingPt ) {
 	    leadingPt =  yforest->photon.pt[j];
 	    leadingEta = yforest->photon.eta[j];
@@ -149,7 +148,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
 	    lhoe    =    yforest->photon.hadronicOverEm[j];
 	    lsee    =    yforest->photon.sigmaIetaIeta[j];
 	 }
-	 cout << "here2d " << endl;
 
       }
       
@@ -157,7 +155,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
       
       // nColl
       ncoll = getNcoll(yforest->evt.hiBin);
-      cout << "here3 " << endl;
       
       newtree->Fill();
       newtreehlt->Fill();
