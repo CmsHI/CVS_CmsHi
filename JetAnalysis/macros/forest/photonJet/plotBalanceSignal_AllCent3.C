@@ -30,9 +30,9 @@ public:
    void Init(TTree * t, int nbins, float xmin, float xmax, float frac) {
       fraction = frac;
       h = new TH1D(name,"",nbins,xmin,xmax);
-      cout << h->GetName() << " with fraction: " << fraction << endl;
-      cout << TString(cut) << endl;
-      t->Project(h->GetName(),var,cut);
+      cout << "=== " << h->GetName() << " with fraction: " << fraction << " ===" << endl;
+      float nSel = t->Project(h->GetName(),var,cut);
+      cout << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
       hNorm->Scale(1./h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
@@ -82,6 +82,8 @@ public:
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
+      // Rescale after subtraction
+      hSubtracted->Scale(1./hSubtracted->Integral());
    }
    TTree * t;
    TString name;
@@ -176,6 +178,7 @@ TH1D * plotBalance(int cbin,
          anaAgj.rBkgSShape.hScaled->SetMarkerColor(kViolet);
          anaAgj.rBkgSShape.hScaled->Draw("sameE");
       }
+      anaAgj.rSigAll.hScaled->SetLineStyle(2);
       anaAgj.rSigAll.hScaled->Draw("same hist");
    }
    return anaAgj.hSubtracted;
@@ -210,8 +213,14 @@ void plotBalanceSignal_AllCent3()
    hFrame->GetYaxis()->CenterTitle();
    hFrame->GetYaxis()->SetNdivisions(505,true);
    TH1D * hFrameData = new TH1D("hFrameData","",20,-0.999,0.999);
+   TH1D * hFrameDataSigAll = new TH1D("hFrameDataSigAll","",20,-0.999,0.999);
+   hFrameDataSigAll->SetLineStyle(2);
    TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,-0.999,0.999);
+   hFrameDataBkg1->SetMarkerStyle(kOpenCircle);
+   hFrameDataBkg1->SetMarkerColor(kGreen+2);
    TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,-0.999,0.999);
+   hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
+   hFrameDataBkg2->SetMarkerColor(kViolet);
    TH1D * hFrameMix = new TH1D("hFrameMix","",20,-0.999,0.999);
    TH1D * hFrameGen = new TH1D("hFrameGen","",20,-0.999,0.999);
    hFrameData->SetLineColor(kRed);
@@ -222,11 +231,12 @@ void plotBalanceSignal_AllCent3()
    hFrameGen->SetFillStyle(3005);
    
    c1->cd(1);
+   cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
    plotBalance(2,"../output-hypho50gen_v4.root",false,0,"samehist",false);
    //plotBalance(2,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
    plotBalance(2,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
-   drawText("30-100%",0.7,0.3);
+   drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
    cms->SetTextFont(63);
@@ -240,23 +250,29 @@ void plotBalanceSignal_AllCent3()
    cme->SetTextFont(63);
    cme->SetTextSize(17);
    cme->Draw();
+   TLatex *jetf_PbPb;
+   jetf_PbPb = new TLatex(0.477,0.14,"Ak PF, R=0.3");
+   jetf_PbPb->SetTextFont(63);
+   jetf_PbPb->SetTextSize(15);
+   jetf_PbPb->Draw();
    
    
    c1->cd(2);
+   cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
    plotBalance(1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
    //plotBalance(1,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
    plotBalance(1,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
-   drawText("10-30%",0.7,0.3);
+   drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.44,0.70,0.91,0.86); 
+   TLegend *t3=new TLegend(0.44,0.68,0.91,0.94); 
    t3->AddEntry(hFrameData,"PbPb","p");
+   t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
+   t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   t3->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
    //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYD Gen","l");
-   //t3->AddEntry(hPythia,"PYTHIA","lf");  
-   //t3->AddEntry(hDataMix,"pp","lf");
-   //t3->AddEntry(hDataMix,"pp","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYD Gen","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
@@ -265,11 +281,12 @@ void plotBalanceSignal_AllCent3()
    t3->Draw();
 
    c1->cd(3);
+   cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    plotBalance(0,"../output-hypho50gen_v4.root",false,0,"samehist",false);
    //plotBalance(0,"../output-data-Photon-v1_v6.root",false,1,"sameE",false);
    plotBalance(0,"../output-data-Photon-v2_v6.root",false,1,"sameE",1);
-   drawText("0-10%",0.7,0.3);
+   drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
    TLatex tsel;
@@ -280,25 +297,6 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101205_v6sub2.gif");
-   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101205_v6sub2.pdf");
-
-   //   cout<<" mean value of data "<<h->GetMean()<<endl;
-   //   if(drawLeg){
-   //   }
-   //   
-   //   TLatex *jetf_PbPb;
-   //   //  jetf_PbPb = new TLatex(0.477,0.14,"Iterative Cone, R=0.5");
-   //   // jetf_PbPb->SetTextFont(63);
-   //   //  jetf_PbPb->SetTextSize(15);
-   //   // jetf_PbPb->Draw();
-   //   
-   //   c1->cd(3);
-   //   plotBalance(0,"../output-data-Photon-v1_v4.root","../output-hypho50gen_v4.root","../output-hypho50gen_v4.root",true,false,false,0);
-   //   
-   //   
-   //   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.gif");
-   //   c1->Print("./fig/photon60_jet20_imbalance_all_cent_20101202_v4_sshapeside.pdf");
-   //   //c1->Print("./fig/photon60_mc_imbalance_all_cent_20101120_v0.gif");
-   //   //c1->Print("./fig/photon60_mc_imbalance_all_cent_20101120_v0.pdf");
+   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101206_v6sub2.gif");
+   c1->Print("./fig/photon60v2_jet30_imbalance_all_cent_20101206_v6sub2.pdf");
 }
