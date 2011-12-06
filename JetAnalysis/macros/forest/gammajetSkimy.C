@@ -25,77 +25,59 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
    
    const int nMaxPho = 3000;
    
-   HiForest *forest = new HiForest(inputFile_.Data());
+   HiForest *yforest = new HiForest(inputFile_.Data());
+   /*
+     hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
+     skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
+     photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
+     if (photonTree==0)  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
+     trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
+     towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
+     icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
+     akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
+     hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
+     ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
+     evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
+     metTree      = (TTree*) inf->Get("anaMET/metTree");
+     genpTree     = (TTree*) inf->Get("genpana/photon");
+   */
    
-   TTree *fChainPhoton;
-   fChainPhoton = (TTree*)inf->Get("NTuples/Analysis");
-   fChainPhoton->SetName("photon11lhf");
+   // now open new root file
+   TFile* newfile_data = new TFile(outputFile.data(),"recreate");
+   cout << "Output file " << outputFile << endl;
    
-   TTree *fChainHLT    = (TTree*)inf->Get("hltanalysis/HltTree");
-   fChainHLT->SetName("fChainHLT341");
+   TTree* newtree = yforest->photonTree->CloneTree(0);
+   newtree->SetName("yongsunPhotonTree");
    
-   TTree *fChainSkim   = (TTree*)inf->Get("skimanalysis/HltTree");
-   fChainSkim->SetName("fChainColl611");
-   
-   TTree *fChainPfjet   = (TTree*)inf->Get("akPu3PFJetAnalyzer/t");
-   fChainPfjet->SetName("fChainPfjet511");
-   
-   TTree *fChainTrack;  
-   if ( doTrack) {
-      fChainTrack =  (TTree*)inf->Get("anaTrack/trackTree");
-      fChainTrack->SetName("fChainTraack233");
-   }
-   TTree *fChainEvt=0;
-  
-   if ( !is2010Data ) {
-      fChainEvt = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
-      fChainEvt->SetName("fChainEvt234");
-   }
-   
-  TTree *fChainGen = (TTree*)inf->Get("genpana/photon");
-  bool isGen(true);
-  if ( fChainGen ==0 ) isGen = false;
-  
-  // now open new root file
-  TFile* newfile_data = new TFile(outputFile.data(),"recreate");
-  cout << "Output file " << outputFile << endl;
-   
-  // clone tree
-  
-  TTree* newtree = fChainPhoton->CloneTree(0);
-  newtree->SetName("yongsunPhotonTree");
-   TTree* newtreehlt = fChainHLT->CloneTree(0);
+   TTree* newtreehlt = yforest->hltTree->CloneTree(0);
    newtreehlt->SetName("yongsunHltTree");
-   TTree* newtreeSkim = fChainSkim->CloneTree(0);
+   
+   TTree* newtreeSkim = yforest->skimTree->CloneTree(0);
    newtreeSkim->SetName("yongsunSkimTree");
-   TTree* newtreePfjet = fChainPfjet->CloneTree(0);
+   
+   TTree* newtreePfjet = yforest->akPu3jetTree->CloneTree(0);
    newtreePfjet->SetName("yongsunPfjetTree");
-   TTree* newtreeTrack;
-   if ( doTrack){ 
-      newtreeTrack = fChainTrack->CloneTree(0);
-      newtreeTrack->SetName("yongsunTrackTree");
-   }
-   TTree* newtreeEvt;
-   if ( !is2010Data) {
-      newtreeEvt = fChainEvt->CloneTree(0);
-      newtreeEvt->SetName("yongsunHiEvt");
-   }
+   
+   TTree* newtreeTrack = yforest->trackTree->CloneTree(0);
+   newtreeTrack->SetName("yongsunTrackTree");
+   
+   TTree* newtreeEvt = yforest->evtTree->CloneTree(0);
+   newtreeEvt->SetName("yongsunHiEvt");
+   
+   int isGen(false);
    TTree* newtreeGen;
-   if ( isGen) {
-     newtreeGen = fChainGen->CloneTree(0);
-     newtreeGen->SetName("yongsunGen");
+   if ( genpT ree !=0 ) { 
+      newtreeGen = yforest->genpTree->CloneTree(0);
+      newtreeGen->SetName("yongsunGen");
+      isGen = true;
    }
 
    newtree->SetMaxTreeSize(4000000000);
    newtreehlt->SetMaxTreeSize(4000000000);
    newtreeSkim->SetMaxTreeSize(4000000000);
    newtreePfjet->SetMaxTreeSize(4000000000);
-   if ( doTrack) newtreeTrack->SetMaxTreeSize(4000000000);
-   if ( !is2010Data) {
-     newtreeEvt->SetMaxTreeSize(4000000000);
-   }
-   if ( isGen) 
-     newtreeGen->SetMaxTreeSize(4000000000);
+   if ( doTrack)   newtreeTrack->SetMaxTreeSize(4000000000);
+   if ( isGen)     newtreeGen->SetMaxTreeSize(4000000000);
    
    Long64_t nentries = fChainPhoton->GetEntries();
    cout << "nentries = " << nentries << endl;
