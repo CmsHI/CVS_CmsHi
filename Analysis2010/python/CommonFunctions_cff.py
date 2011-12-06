@@ -47,7 +47,8 @@ def addRPFlat(process):
                  connect = cms.untracked.string("oracle://cms_orcoff_prep/CMS_COND_TEMP"),
                  ),
         ])
-    
+    return process
+
 
 def overrideGlobalTag(process):
     process.GlobalTag.toGet.extend([
