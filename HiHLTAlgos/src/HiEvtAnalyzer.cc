@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.2 2011/11/02 18:24:57 yjlee Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.3 2011/11/02 18:59:50 yjlee Exp $
 //
 //
 
@@ -70,10 +70,14 @@ private:
    edm::InputTag CentralityTag_;
    edm::InputTag CentralityBinTag_;
    edm::InputTag EvtPlaneTag_;
+  edm::InputTag EvtPlaneFlatTag_;
+
    edm::InputTag HiMCTag_;
    edm::InputTag VertexTag_;
 
    bool doEvtPlane_;
+  bool doEvtPlaneFlat_;
+
    bool doMC_;
    bool doVertex_;
    
@@ -126,9 +130,11 @@ HiEvtAnalyzer::HiEvtAnalyzer(const edm::ParameterSet& iConfig) :
 CentralityTag_(iConfig.getParameter<edm::InputTag> ("Centrality")),
 CentralityBinTag_(iConfig.getParameter<edm::InputTag> ("CentralityBin")),
 EvtPlaneTag_(iConfig.getParameter<edm::InputTag> ("EvtPlane")),
+EvtPlaneFlatTag_(iConfig.getParameter<edm::InputTag> ("EvtPlaneFlat")),
 HiMCTag_(iConfig.getParameter<edm::InputTag> ("HiMC")),
 VertexTag_(iConfig.getParameter<edm::InputTag> ("Vertex")),
 doEvtPlane_(iConfig.getParameter<bool> ("doEvtPlane")),
+doEvtPlaneFlat_(iConfig.getParameter<bool> ("doEvtPlaneFlat")),
 doMC_(iConfig.getParameter<bool> ("doMC")),
 doVertex_(iConfig.getParameter<bool>("doVertex"))
 {
@@ -218,17 +224,29 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    hiEE = centrality->EtEESum();
    hiEB = centrality->EtEBSum();
    hiET = centrality->EtMidRapiditySum();
-   
+
+   nEvtPlanes = 0;   
    if (doEvtPlane_) {
       iEvent.getByLabel(EvtPlaneTag_,evtPlanes);
       if(evtPlanes.isValid()){
-         nEvtPlanes = evtPlanes->size();
+         nEvtPlanes += evtPlanes->size();
          for(unsigned int i = 0; i < evtPlanes->size(); ++i){
             hiEvtPlane[i] = (*evtPlanes)[i].angle();     
          }
       }
    }
    
+   if (doEvtPlaneFlat_) {
+     iEvent.getByLabel(EvtPlaneFlatTag_,evtPlanes);
+     if(evtPlanes.isValid()){
+       for(unsigned int i = 0; i < evtPlanes->size(); ++i){
+	 hiEvtPlane[nEvtPlanes+i] = (*evtPlanes)[i].angle();
+       }
+       nEvtPlanes += evtPlanes->size();
+     }
+   }
+
+
    if (doVertex_) {
       edm::Handle<std::vector<reco::Vertex> > vertex;
       iEvent.getByLabel(VertexTag_, vertex);
