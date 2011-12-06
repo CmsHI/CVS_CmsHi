@@ -17,10 +17,10 @@ void photonSkim(double etCut=40, char *infname = "/d100/yjlee/hiForest/PromptRec
    {
       c->GetEntry(i);
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries()<<endl;
-
+      
       int leadingPhoton=-1;
       int leadingJet=-1;
-
+      
       // Loop over photons to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
          if (c->photon.pt[j]<etCut) break;          // photon pT cut, assuming that et is sorted

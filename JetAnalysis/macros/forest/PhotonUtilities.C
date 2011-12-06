@@ -43,3 +43,32 @@ bool HiForest::isLoosePhoton(int j)
    
    return 1;
 }
+
+
+
+float HiForest::getCorrEt(int j)
+{
+   if ( !photon.isEB[j]) return  -100; 
+ 
+   int icent(0);
+   int isConv(0);
+   if ( photon.r9[j] > 0.94 ) 
+      isConv = 0;
+   else
+      isConv = 1;
+   
+   if ( evt.hiBin < 4 ) 
+      icent = 1;
+   else if ( evt.hiBin < 12 ) 
+      icent = 2;
+   else if ( evt.hiBin < 40 )
+      icent = 3;
+   else
+      return -90;
+   
+   float corrFactor = fEnergyScale[isConv][icent]->Eval( photon.pt[j]);
+   return photon.pt[j]/corrFactor ;
+}
+
+
+

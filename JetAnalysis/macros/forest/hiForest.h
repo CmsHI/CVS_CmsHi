@@ -56,7 +56,9 @@ class HiForest : public TNamed
   void SetOutputFile(const char *name);               		// Set output file name for skim
   void AddCloneTree(TTree* t, const char *dirName, const char *treeName);   // Add a clone tree to the clone forest
   void FillOutput();						// Fill output forest  
-
+  
+  void GetEnergyScaleTable(char *fileNameTable);
+  float getCorrEt(int j);
   Long64_t Draw(const char* varexp, const char* selection, Option_t* option = "", Long64_t nentries = 1000000000, Long64_t firstentry = 0){
      return tree->Draw(varexp,selection,option,nentries,firstentry);
   }
@@ -216,9 +218,12 @@ class HiForest : public TNamed
   FactorizedJetCorrector *_JEC_HI310X;
 
   vector<TrackingCorrections*> trackCorrections;
-
+  TF1* fEnergyScale[2][10];  // [a][b],  a =0 for unconverted,  a=1 for converted.   b: 1,2,3 is centrality bin. b=0 is empty                                                                                       
+  
  private:
-
+  
+  
+  
 };
 
 HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, bool recjec):
@@ -230,7 +235,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
    nEntries(0),
    currentEvent(0)
 {
-  tree = new TTree("tree","");
+   tree = new TTree("tree","");
   SetName(name);
   // Input file
   inf = TFile::Open(infName);
@@ -561,6 +566,17 @@ TCut HiForest::eventSelection(){
     //      select = select && "skim.phfCoincFilter && skim.ppurityFractionFilter";
   }
    return select;
+}
+
+
+void HiForest::GetEnergyScaleTable(char *fileNameTable) {
+   TFile* f = new TFile(fileNameTable);
+   fEnergyScale[0][1] = (TF1*)f->Get("fit_hscale_r9gt94_1");
+   fEnergyScale[0][2] = (TF1*)f->Get("fit_hscale_r9gt94_2");
+   fEnergyScale[0][3] = (TF1*)f->Get("fit_hscale_r9gt94_3");
+   fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_1");
+   fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_2");
+   fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_3");
 }
 
 
