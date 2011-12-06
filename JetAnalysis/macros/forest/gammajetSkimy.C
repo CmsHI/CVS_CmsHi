@@ -14,7 +14,7 @@ using namespace std;
 
 int getNcoll(int cBin=0);
 
-void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.444, float ptCut = 25,  bool doTrack = false)
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.44, float ptCut = 25,  bool doTrack = false)
 {
    
    TString fisherVar = "6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03" ;  
@@ -26,21 +26,7 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
    const int nMaxPho = 3000;
    
    HiForest *yforest = new HiForest(inputFile_.Data());
-   /*
-     hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
-     skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
-     photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
-     if (photonTree==0)  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
-     trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
-     towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
-     icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
-     akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
-     hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
-     ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
-     evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
-     metTree      = (TTree*) inf->Get("anaMET/metTree");
-     genpTree     = (TTree*) inf->Get("genpana/photon");
-   */
+   yforest->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
    
    // now open new root file
    TFile* newfile_data = new TFile(outputFile.data(),"recreate");
@@ -66,7 +52,7 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
    
    int isGen(false);
    TTree* newtreeGen;
-   if ( genpT ree !=0 ) { 
+   if ( yforest->genpTree !=0 ) { 
       newtreeGen = yforest->genpTree->CloneTree(0);
       newtreeGen->SetName("yongsunGen");
       isGen = true;
@@ -79,124 +65,63 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
    if ( doTrack)   newtreeTrack->SetMaxTreeSize(4000000000);
    if ( isGen)     newtreeGen->SetMaxTreeSize(4000000000);
    
-   Long64_t nentries = fChainPhoton->GetEntries();
-   cout << "nentries = " << nentries << endl;
-   
-   TBranch* b_theTrig;
-   Int_t   theTrig;
-   if (doTrigCut)  fChainHLT->SetBranchAddress(triggerName.data(), &theTrig, &b_theTrig);
-   
-   Float_t et[nMaxPho];
-   Float_t eta[nMaxPho];
-   Float_t phi[nMaxPho];
-   Float_t hadronicOverEm[nMaxPho];
-   Float_t sigmaIetaIeta[nMaxPho];
-   Float_t cc4j[nMaxPho];
-   Float_t cr4j[nMaxPho];
-   Float_t ct4j20[nMaxPho];
-
-
-
-   Int_t           hiBin;
    
    Float_t leadingPt, leadingPhi, leadingEta, lcc4j, lcr4j, lct4j20, lsee, lhoe ;
-   
-   TBranch *b_et;
-   TBranch *b_eta;
-   TBranch *b_phi;
-   TBranch *b_hiBin;   //!                                                                                                      
-   TBranch *b_fisher;
-
+   int ncoll;
    int order[nMaxPho];
    float newPt[nMaxPho];
+   float corrPt[nMaxPho];
    float locNtrk[nMaxPho];
-   
-   Int_t cBin;
-   Int_t nPhotons;
-   TBranch *b_nPhotons;
-
-   int ncoll;
    
    Int_t           nTrk;
    Float_t         trkPt [2000];   //[nTrk]                                                                                                                                                                  
    Float_t         trkEta[2000];   //[nTrk]                                                                                                                                      
    Float_t         trkPhi[2000];   //[nTrk]                                                                                                                                   
-   fChainPhoton->SetBranchAddress("pt",et,&b_et);
-   fChainPhoton->SetBranchAddress("eta",eta,&b_eta);
-   fChainPhoton->SetBranchAddress("phi",phi,&b_phi);
-   fChainPhoton->SetBranchAddress("sigmaIetaIeta",sigmaIetaIeta);
-   fChainPhoton->SetBranchAddress("cc4j",cc4j);
-   fChainPhoton->SetBranchAddress("cr4j",cr4j);
-   fChainPhoton->SetBranchAddress("ct4j20",ct4j20);
-   fChainPhoton->SetBranchAddress("hadronicOverEm",hadronicOverEm);
-   fChainPhoton->SetBranchAddress("nPhotons", &nPhotons, &b_nPhotons);
-   
-   if ( doTrack ) {
-      fChainTrack->SetBranchAddress("nTrk", &nTrk);
-      fChainTrack->SetBranchAddress("trkPt", trkPt);
-      fChainTrack->SetBranchAddress("trkEta", trkEta);
-      fChainTrack->SetBranchAddress("trkPhi", trkPhi);
-      newtree->Branch("locNtrk", &locNtrk,"locNtrk[nPhotons]/F");
-   }
-
-   if ( !is2010Data)
-      fChainEvt->SetBranchAddress("hiBin", &hiBin, &b_hiBin);
-   else
-      fChainPhoton->SetBranchAddress("cBin", &hiBin, &b_hiBin);
-   
+    
    newtree->Branch("ncoll", &ncoll,"ncoll/I");
-   newtree->Branch("order",order,"order[nPhotons]/I");
+   newtree->Branch("corrPt", corrPt,"corrPt[nPhotons]/F");
+   newtree->Branch("order",  order,  "order[nPhotons]/I");
    newtree->Branch("lPt", &leadingPt,"lpt/F");
    newtree->Branch("lEta", &leadingEta,"leta/F");
    newtree->Branch("lPhi", &leadingPhi,"lphi/F");
-   newtree->Branch("lcc4j", &lcc4j,"lcc4j/F");
-   newtree->Branch("lcr4j", &lcr4j,"lcr4j/F");
-   newtree->Branch("lct4j20", &lct4j20,"lct4j20/F");
    newtree->Branch("lsee", &lsee,"lsee/F");
    newtree->Branch("lhoe", &lhoe,"lhoe/F");
    
-   
-   
-   
-   cout << " going into loop" << endl;
-
    TH1D* hdr = new TH1D("hdr",";dr;Entries",100,-10,10);
+
+   
+   int nentries = yforest->GetEntries();
+   cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
-      fChainPhoton->GetEntry(jentry);
-      fChainHLT->GetEntry(jentry);
-      fChainSkim->GetEntry(jentry);
-      fChainPfjet->GetEntry(jentry);
-      if( doTrack) 
-	 fChainTrack->GetEntry(jentry);
-      if ( !is2010Data)    
-	 fChainEvt->GetEntry(jentry);
-      if ( isGen)
-	fChainGen->GetEntry(jentry);
-      
-      if ( (!theTrig) && doTrigCut)   
-	continue;    
-      
-      for (int j=0;j<nPhotons;j++) {
+
+      yforest->GetEntry(jentry);
+
+      if ( yforest->skim.pcollisionEventSelection != 1) 
+	 continue;
+
+      for (int j=0;j< yforest->photon.nPhotons;j++) {
 	 order[j] = -1;
-	 if ( fabs(eta[j]) < etaCut ) 
-	    newPt[j] = et[j]; 
-	 else
-	    newPt[j] = -et[j] - 1000;
+	 if ( fabs( yforest->photon.eta[j] ) < etaCut )
+	    newPt[j] = yforest->getCorrEt(j);
+	 else 
+	    newPt[j] = - yforest->photon.pt[j] - 1000;
 	 
+	 corrPt[j] = newPt[j];
+
 	 locNtrk[j] = -1000;
 	 if( doTrack) {
-	    if ( (et[j] > 40) && fabs(eta[j])<1.5) {
+	    if ( ( yforest->photon.pt[j] > 40) && fabs( yforest->photon.eta[j] )<1.5) {
 	       locNtrk[j]=0;
-	       for (int jt=0;jt<nTrk;jt++) {
+	       for (int jt=0 ; jt < yforest->track.nTrk ; jt++) {
 		  //  if ( trkPt[jt] < 2 ) 
 		  //	  continue;
-		  float dPhi = phi[j] - trkPhi[jt];
+		  float dPhi = yforest->photon.phi[j] - yforest->track.trkPhi[jt];
 		  if (dPhi > PI)  
 		     dPhi = dPhi - 2*PI;
 		  if (dPhi < -PI) 
 		     dPhi = dPhi + 2*PI;
-		  float dEta = eta[j] - trkEta[jt];
+		  float dEta = yforest->photon.eta[j] - yforest->track.trkEta[jt];
 		  float dR = sqrt( dPhi*dPhi + dEta*dEta);
 		  //	       hdr->Fill(dPhi);
 		  if ( dR < 0.5 ) 
@@ -207,41 +132,40 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
       }
       
       
-      TMath::Sort(nPhotons, newPt, order);
+      TMath::Sort(yforest->photon.nPhotons, newPt, order);
       
       leadingPt = -100;
       leadingEta = -100;
       leadingPhi = -100;
-          lcc4j = -100; lcr4j= -100;  lct4j20= -100;  lsee= -100;  lhoe= -100; 
-      
-      for (int j=0;j<nPhotons;j++) {
-	 if ( fabs(eta[j]) > etaCut ) 
+
+      for (int j=0 ; j < yforest->photon.nPhotons ; j++) {
+	 if ( fabs(yforest->photon.eta[j]) > etaCut ) 
 	    continue;
-         if ( et[j] > leadingPt ) {
-	    leadingPt = et[j];
-	    leadingEta = eta[j];
-	    leadingPhi = phi[j];
-	    lcc4j   = cc4j[j];
-	    lcr4j   = cr4j[j];
-            lct4j20 = ct4j20[j];
-	    lhoe    = hadronicOverEm[j];
-	    lsee    = sigmaIetaIeta[j];
-	    	 }
+	 cout << "here2c " << endl;
+         if ( yforest->photon.pt[j] > leadingPt ) {
+	    leadingPt =  yforest->photon.pt[j];
+	    leadingEta = yforest->photon.eta[j];
+	    leadingPhi = yforest->photon.phi[j];
+	    lhoe    =    yforest->photon.hadronicOverEm[j];
+	    lsee    =    yforest->photon.sigmaIetaIeta[j];
+	 }
+	 cout << "here2d " << endl;
+
       }
       
       if ( leadingPt < ptCut )   continue;
       
       // nColl
-      ncoll = getNcoll(hiBin);
-       
+      ncoll = getNcoll(yforest->evt.hiBin);
+      cout << "here3 " << endl;
+      
       newtree->Fill();
       newtreehlt->Fill();
       newtreeSkim->Fill();
       newtreePfjet->Fill();
       if( doTrack)
 	 newtreeTrack->Fill();
-      if ( !is2010Data)
-	 newtreeEvt->Fill();
+      newtreeEvt->Fill();
       if ( isGen )
 	newtreeGen->Fill();
    }
@@ -249,21 +173,9 @@ void gammajetSkimy(std::string inputFile_="mc/photon50_25k.root", std::string ou
    
    
    
-   //  newtree2->Print();
-   newtree->AutoSave();
-   newtreehlt->AutoSave();
-   newtreeSkim->AutoSave();
-   newtreePfjet->AutoSave();
-   if( doTrack)
-      newtreeTrack->AutoSave();
-   if ( !is2010Data)
-      newtreeEvt->AutoSave();
-   if ( isGen ) 
-     newtreeGen->AutoSave(0);
-   //   delete newfile_data;
-   //hdr->Draw();
+   newfile_data->Write();
+   newfile_data->Close();
    cout << " Done! "<< endl;
-   inf->Close();
 }
 
 
