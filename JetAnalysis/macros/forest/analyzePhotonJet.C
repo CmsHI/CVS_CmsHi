@@ -139,12 +139,13 @@ void analyzePhotonJet(
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.pt[j]<cutphotonPt) continue;          // photon pT cut
+         float pt1=c->getCorrEt(j);
+         if (pt1<cutphotonPt) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
-         if (c->photon.pt[j]>gj.photonEt) {
-            gj.photonEt = c->photon.pt[j];
+         if (pt1>gj.photonEt) {
+            gj.photonEt = pt1;
             leadingIndex = j;
          }
       }
@@ -152,7 +153,6 @@ void analyzePhotonJet(
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading photon
-         gj.photonEt=c->getCorrEt(leadingIndex);
          gj.photonRawEt=c->photon.pt[leadingIndex];
          gj.photonEta=c->photon.eta[leadingIndex];
          gj.photonPhi=c->photon.phi[leadingIndex];
