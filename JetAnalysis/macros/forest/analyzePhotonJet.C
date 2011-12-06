@@ -41,7 +41,7 @@ public:
    float dphi;
    float Aj;
    float sigmaIetaIeta;
-   float isol;
+   float sumIsol;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
@@ -55,11 +55,36 @@ public:
    }
 };
 
+class Isolation{
+public:
+   float cc1,cc2,cc3,cc4,cc5;
+   float cr1,cr2,cr3,cr4,cr5;
+   float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
+   void Set(HiForest * c, int j) {
+      cc1=c->photon.cc1[j];
+      cc2=c->photon.cc2[j];
+      cc3=c->photon.cc3[j];
+      cc4=c->photon.cc4[j];
+      cc5=c->photon.cc5[j];
+      cr1=c->photon.cr1[j];
+      cr2=c->photon.cr2[j];
+      cr3=c->photon.cr3[j];
+      cr4=c->photon.cr4[j];
+      cr5=c->photon.cr5[j];
+      ct1PtCut20=c->photon.ct1PtCut20[j];
+      ct2PtCut20=c->photon.ct2PtCut20[j];
+      ct3PtCut20=c->photon.ct3PtCut20[j];
+      ct4PtCut20=c->photon.ct4PtCut20[j];
+      ct5PtCut20=c->photon.ct5PtCut20[j];
+   }
+};
+
 void analyzePhotonJet(
-                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
+                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
+                      //TString outname="output-data-Photon-v1_v6.root"
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v5.root"
+                      TString outname="output-data-Photon-v2_v7test.root"
                       
     )
 {
@@ -78,8 +103,10 @@ void analyzePhotonJet(
    
    EvtSel evt;
    GammaJet gj;
+   Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:isol");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:sumIsol");
+   tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
@@ -102,7 +129,7 @@ void analyzePhotonJet(
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " " << evt.run << " " << evt.evt << " " << evt.cBin << " " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
       int leadingIndex=-1;
@@ -128,7 +155,8 @@ void analyzePhotonJet(
          gj.photonEta=c->photon.eta[leadingIndex];
          gj.photonPhi=c->photon.phi[leadingIndex];
          gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
-         gj.isol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
+         gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
+         isol.Set(c,leadingIndex);
          
          // intialize jet variables
          int nJets=c->akPu3PF.nref;
@@ -178,7 +206,9 @@ void analyzePhotonJet(
       // All done
       tgj->Fill();
    }
-   
+
+   // After Event Loop
+   tgj->SetAlias("optIsol","6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03"); // cut at 0.3 from Yongsun's studies
    output->Write();
    output->Close();
    delete c;
