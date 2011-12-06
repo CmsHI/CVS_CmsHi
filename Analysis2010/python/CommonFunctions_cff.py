@@ -44,7 +44,7 @@ def addRPFlat(process):
     process.GlobalTag.toGet.extend([
         cms.PSet(record = cms.string("HeavyIonRPRcd"),
                  tag = cms.string("RPFlatParams_Test_v0_offline"),
-                 connect = cms.untracked.string("oracle://cms_orcoff_prep/CMS_COND_TEMP"),
+                 connect = cms.untracked.string("frontier://FrontierPrep/CMS_COND_TEMP"),
                  ),
         ])
     return process
