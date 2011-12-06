@@ -39,8 +39,18 @@ def overrideBeamSpot(process):
         )
     return process
 
+
+def addRPFlat(process):
+    process.GlobalTag.toGet.extend([
+        cms.PSet(record = cms.string("HeavyIonRPRcd"),
+                 tag = cms.string("RPFlatParams_Test_v0_offline"),
+                 connect = cms.untracked.string("oracle://cms_orcoff_prep/CMS_COND_TEMP"),
+                 ),
+        ])
+    
+
 def overrideGlobalTag(process):
-    process.GlobalTag.toGet = cms.VPSet(
+    process.GlobalTag.toGet.extend([
 
         #==================== MC Tables ====================
         cms.PSet(record = cms.string("HeavyIonRcd"),
@@ -112,7 +122,7 @@ def overrideGlobalTag(process):
 
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
 # NOTHING
-        )
+        ])
     
     return process
 
