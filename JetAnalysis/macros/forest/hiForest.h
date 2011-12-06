@@ -575,8 +575,8 @@ void HiForest::GetEnergyScaleTable(char *fileNameTable) {
    fEnergyScale[0][2] = (TF1*)f->Get("fit_hscale_r9gt94_2");
    fEnergyScale[0][3] = (TF1*)f->Get("fit_hscale_r9gt94_3");
    fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_1");
-   fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_2");
-   fEnergyScale[1][1] = (TF1*)f->Get("fit_hscale_r9lt94_3");
+   fEnergyScale[1][2] = (TF1*)f->Get("fit_hscale_r9lt94_2");
+   fEnergyScale[1][3] = (TF1*)f->Get("fit_hscale_r9lt94_3");
 }
 
 
