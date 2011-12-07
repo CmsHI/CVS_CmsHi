@@ -40,8 +40,7 @@ public:
    float deta;
    float dphi;
    float Aj;
-   float sigmaIetaIeta;
-   float sumIsol;
+   float hovere,sigmaIetaIeta,sumIsol;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
@@ -84,7 +83,7 @@ void analyzePhotonJet(
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v8.root"
+                      TString outname="output-data-Photon-v2d1204_v9.root"
                       
     )
 {
@@ -106,7 +105,7 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta:sumIsol");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -157,6 +156,7 @@ void analyzePhotonJet(
          gj.photonRawEt=c->photon.pt[leadingIndex];
          gj.photonEta=c->photon.eta[leadingIndex];
          gj.photonPhi=c->photon.phi[leadingIndex];
+         gj.hovere=c->photon.hadronicOverEm[leadingIndex];
          gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
          gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          isol.Set(c,leadingIndex);
