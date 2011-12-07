@@ -10,6 +10,22 @@ bool HiForest::isSpike(int j)
    return 0;
 }
 
+bool HiForest::isLoosePhoton(int j)
+{
+
+   if (photon.isEB[j]) {
+      // Barrel photon                                                                                                                       
+      if (photon.hadronicOverEm[j]>0.1) return 0;
+      if (photon.isEle[j]) return 0;
+      if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
+   } else {
+      // Endcap photon                                                                                                  
+      return 0;  // Need to update to include endcap photons                                                            
+   }
+
+   return 1;
+}
+
 bool HiForest::isGoodPhoton(int j)
 {
 
@@ -18,29 +34,13 @@ bool HiForest::isGoodPhoton(int j)
       if (photon.hadronicOverEm[j]>0.1) return 0;
       if (photon.isEle[j]) return 0;
       if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
-      if (photon.sigmaIetaIeta[j]>0.011) return 0;
+      if (photon.sigmaIetaIeta[j]>0.010) return 0;
       if ((photon.cr4[j]+photon.cc4[j]+photon.ct4PtCut20[j])>5) return 0;
    } else {
       // Endcap photon
       return 0;  // Need to update to include endcap photons
    }
 
-   return 1;
-}
-
-bool HiForest::isLoosePhoton(int j)
-{
-   
-   if (photon.isEB[j]) {
-      // Barrel photon                                                                                                                                                                   
-      if (photon.hadronicOverEm[j]>0.1) return 0;
-      if (photon.isEle[j]) return 0;
-      if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
-   } else {
-      // Endcap photon
-      return 0;  // Need to update to include endcap photons
-   }
-   
    return 1;
 }
 
