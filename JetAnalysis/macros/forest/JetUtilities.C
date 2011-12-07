@@ -396,13 +396,9 @@ void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 {
 	std::vector<TBranch *> branch;
 
-	fr01Chg = new Float_t[maxEntry];
-	fr01EM = new Float_t[maxEntry];
-	fr01 = new Float_t[maxEntry];
-
-	branch.push_back(jetTree->Branch("fr01Chg", fr01Chg, "fr01Chg[nref]/F"));
-	branch.push_back(jetTree->Branch("fr01EM", fr01EM, "fr01EM[nref]/F"));
-	branch.push_back(jetTree->Branch("fr01", fr01, "fr01[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01Chg", jets.fr01Chg, "fr01Chg[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01EM", jets.fr01EM, "fr01EM[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01", jets.fr01, "fr01[nref]/F"));
 
 	for (int i = 0; i < (allEvents ? GetEntries() : 1); i++) {
 		if (allEvents) {

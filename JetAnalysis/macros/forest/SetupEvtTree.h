@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  7 12:51:57 2011 by ROOT version 5.27/06b
+// Wed Dec  7 12:57:09 2011 by ROOT version 5.27/06b
 // from TTree HiTree/
-// found on file: ../HiForestDijet_v2.root
+// found on file: ../HiForestMinBias_v2.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>

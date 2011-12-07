@@ -212,10 +212,6 @@ class HiForest : public TNamed
   Float_t* corrLead;
   Float_t* corrSubLead;
 
-  Float_t* fr01Chg;
-  Float_t* fr01EM;
-  Float_t* fr01;
-                        
 
   int nEntries;
   int currentEvent;
@@ -370,7 +366,9 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
 
   // Print the status of thre forest
   PrintStatus();
-  
+
+  //fakeRejection(icPu5jetTree, icPu5, 1);
+  //fakeRejection(akPu3jetTree, akPu3PF, 1);
   //  CheckArraySizes();
 }
 

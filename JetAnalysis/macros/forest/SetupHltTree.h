@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  7 12:51:57 2011 by ROOT version 5.27/06b
+// Wed Dec  7 12:57:09 2011 by ROOT version 5.27/06b
 // from TTree HltTree/
-// found on file: ../HiForestDijet_v2.root
+// found on file: ../HiForestMinBias_v2.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -82,6 +82,8 @@ public :
    Int_t           HLT_HIHcalCalibration_v1_Prescl;
    Int_t           HLT_HIZeroBias_v1;
    Int_t           HLT_HIZeroBias_v1_Prescl;
+   Int_t           HLT_HIL1CaloMonitor_v1;
+   Int_t           HLT_HIL1CaloMonitor_v1_Prescl;
    Int_t           HLT_HIZeroBiasXOR_v1;
    Int_t           HLT_HIZeroBiasXOR_v1_Prescl;
    Int_t           HLT_HIZeroBiasPixel_SingleTrack_v1;
@@ -1060,6 +1062,8 @@ public :
    TBranch        *b_HLT_HIHcalCalibration_v1_Prescl;   //!
    TBranch        *b_HLT_HIZeroBias_v1;   //!
    TBranch        *b_HLT_HIZeroBias_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL1CaloMonitor_v1;   //!
+   TBranch        *b_HLT_HIL1CaloMonitor_v1_Prescl;   //!
    TBranch        *b_HLT_HIZeroBiasXOR_v1;   //!
    TBranch        *b_HLT_HIZeroBiasXOR_v1_Prescl;   //!
    TBranch        *b_HLT_HIZeroBiasPixel_SingleTrack_v1;   //!
@@ -2043,6 +2047,8 @@ void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 0)
    t->SetBranchAddress("HLT_HIHcalCalibration_v1_Prescl", &tHlts.HLT_HIHcalCalibration_v1_Prescl, &tHlts.b_HLT_HIHcalCalibration_v1_Prescl);
    t->SetBranchAddress("HLT_HIZeroBias_v1", &tHlts.HLT_HIZeroBias_v1, &tHlts.b_HLT_HIZeroBias_v1);
    t->SetBranchAddress("HLT_HIZeroBias_v1_Prescl", &tHlts.HLT_HIZeroBias_v1_Prescl, &tHlts.b_HLT_HIZeroBias_v1_Prescl);
+   t->SetBranchAddress("HLT_HIL1CaloMonitor_v1", &tHlts.HLT_HIL1CaloMonitor_v1, &tHlts.b_HLT_HIL1CaloMonitor_v1);
+   t->SetBranchAddress("HLT_HIL1CaloMonitor_v1_Prescl", &tHlts.HLT_HIL1CaloMonitor_v1_Prescl, &tHlts.b_HLT_HIL1CaloMonitor_v1_Prescl);
    t->SetBranchAddress("HLT_HIZeroBiasXOR_v1", &tHlts.HLT_HIZeroBiasXOR_v1, &tHlts.b_HLT_HIZeroBiasXOR_v1);
    t->SetBranchAddress("HLT_HIZeroBiasXOR_v1_Prescl", &tHlts.HLT_HIZeroBiasXOR_v1_Prescl, &tHlts.b_HLT_HIZeroBiasXOR_v1_Prescl);
    t->SetBranchAddress("HLT_HIZeroBiasPixel_SingleTrack_v1", &tHlts.HLT_HIZeroBiasPixel_SingleTrack_v1, &tHlts.b_HLT_HIZeroBiasPixel_SingleTrack_v1);

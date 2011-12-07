@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  7 12:51:57 2011 by ROOT version 5.27/06b
+// Wed Dec  7 12:58:41 2011 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
-// found on file: ../HiForestDijet_v2.root
+// found on file: ../HiForestMinBias_v2.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -21,13 +21,16 @@ public :
    Int_t           evt;
    Float_t         b;
    Int_t           nref;
-   Float_t         rawpt[264];   //[nref]
-   Float_t         jtpt[264];   //[nref]
-   Float_t         jteta[264];   //[nref]
-   Float_t         jty[264];   //[nref]
-   Float_t         jtphi[264];   //[nref]
-   Float_t         jtpu[264];   //[nref]
-   Float_t         smpt[264];   //[nref]
+   Float_t         rawpt[174];   //[nref]
+   Float_t         jtpt[174];   //[nref]
+   Float_t         jteta[174];   //[nref]
+   Float_t         jty[174];   //[nref]
+   Float_t         jtphi[174];   //[nref]
+   Float_t         jtpu[174];   //[nref]
+   Float_t         smpt[174];   //[nref]
+   Float_t         fr01Chg[174];   //[nref]
+   Float_t         fr01EM[174];   //[nref]
+   Float_t         fr01[174];   //[nref]
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -40,6 +43,9 @@ public :
    TBranch        *b_jtphi;   //!
    TBranch        *b_jtpu;   //!
    TBranch        *b_smpt;   //!
+   TBranch        *b_fr01Chg;   //!
+   TBranch        *b_fr01EM;   //!
+   TBranch        *b_fr01;   //!
 
 };
 
@@ -57,8 +63,11 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
    t->SetBranchAddress("jtphi", tJets.jtphi, &tJets.b_jtphi);
    t->SetBranchAddress("jtpu", tJets.jtpu, &tJets.b_jtpu);
    t->SetBranchAddress("smpt", tJets.smpt, &tJets.b_smpt);
+   t->SetBranchAddress("fr01Chg", tJets.fr01Chg, &tJets.b_fr01Chg);
+   t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
+   t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-      if (t->GetMaximum("nref")>264) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
+      if (t->GetMaximum("nref")>174) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
    }
 }
 

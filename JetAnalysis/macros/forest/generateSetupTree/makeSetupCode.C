@@ -28,8 +28,15 @@ void makeSetupCode(char *infname = "../HiForestPhoton.root")
 
   // hack for jet tree
   Float_t smpt[1000];
+  Float_t fr01Chg[1000];
+  Float_t fr01EM[1000];
+  Float_t fr01[1000];
   if (jetTree) {
+     cout <<"Add branches"<<endl;
      jetTree->Branch("smpt",smpt,"smpt[nref]/F");
+     jetTree->Branch("fr01Chg", fr01Chg, "fr01Chg[nref]/F");
+     jetTree->Branch("fr01EM", fr01EM, "fr01EM[nref]/F");
+     jetTree->Branch("fr01", fr01, "fr01[nref]/F");
   }
   
   if (hltTree) makeClass(hltTree,"Hlt","");
