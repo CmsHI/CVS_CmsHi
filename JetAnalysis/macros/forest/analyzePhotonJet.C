@@ -96,7 +96,7 @@ void analyzePhotonJet(
 
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
-   c->GetEnergyScaleTable("photonEnergyScaleTable.root");
+   c->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
    
    // Output file
    TFile *output = new TFile(outname,"recreate");
