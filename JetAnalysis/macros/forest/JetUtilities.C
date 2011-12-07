@@ -401,15 +401,18 @@ void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 	branch.push_back(jetTree->Branch("fr01", jets.fr01, "fr01[nref]/F"));
 
 	for (int i = 0; i < (allEvents ? GetEntries() : 1); i++) {
+                
 		if (allEvents) {
 			jetTree->GetEntry(i);
 			trackTree->GetEntry(i);
 			photonTree->GetEntry(i);
+			if (i % 1000 ==0 ) cout << i <<" / "<<GetEntries()<<endl;
 		}
 
 		for (int j = 0; j < jets.nref; j++) {
 			jets.fr01Chg[j] = 0;
 			jets.fr01EM[j] = 0;
+			jets.fr01[j] = 0;
 
 			for (int k = 0; k < track.nTrk; k++) {
 				float deta = track.trkEta[k] - jets.jteta[j];
@@ -429,7 +432,6 @@ void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 				jets.fr01EM[j] += angular_weight *
 					photon.pt[k] * photon.pt[k];
 			}
-
 			jets.fr01[j] = jets.fr01Chg[j] + jets.fr01EM[j];
 		}
 
