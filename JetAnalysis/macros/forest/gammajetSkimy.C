@@ -11,8 +11,26 @@
 using namespace std;
 
 #define PI 3.141592653589
+static const int MAXTRK = 10000;
 
 int getNcoll(int cBin=0);
+
+class EvtSel {
+public:
+   int run;
+   int evt;
+   int cBin;
+   int nG;
+   int nJ;
+   int nT;
+   int ncoll;
+   bool trig;
+   bool offlSel;
+   bool noiseFilt;
+   bool anaEvtSel;
+   float vz;
+   
+};
 
 class Isolation{
 public:
@@ -38,7 +56,41 @@ public:
    }
 };
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.44, float ptCut = 25,  bool doTrack = false)
+class GammaJet{
+ public:
+   GammaJet() :
+      photonEt(-99),photonEta(0),photonPhi(0),
+      jetEt(-99),jetEta(0),jetPhi(0),
+      deta(-99),dphi(-99), Aj(-99),
+      sigmaIetaIeta(-99),
+      nTrk(0)
+	 {}
+      float photonEt,photonRawEt;
+      float photonEta;
+      float photonPhi;
+      float jetEt;
+      float jetEta;
+      float jetPhi;
+      float deta;
+      float dphi;
+      float Aj;
+      float sigmaIetaIeta;
+      int nTrk;
+      float trkPt[MAXTRK];
+      float trkEta[MAXTRK];
+      float trkPhi[MAXTRK];
+      void clear() {
+	 photonEt=-99; photonEta=0; photonPhi=0;
+	 jetEt=-99; jetEta=0; jetPhi=0;
+	 deta=-99; dphi=-99; Aj=-99;
+	 sigmaIetaIeta=-99;
+	 nTrk=0;
+      }
+};
+
+
+
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.44, float ptCut = 50,  bool doTrack = false)
 {
    
    double cutjetPt = 20;
@@ -89,9 +141,9 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    newtreePfjet->SetMaxTreeSize(4000000000);
    if ( doTrack)   newtreeTrack->SetMaxTreeSize(4000000000);
    if ( isGen)     newtreeGen->SetMaxTreeSize(4000000000);
+
    
    
-   Float_t leadingPt, leadingPhi, leadingEta, lcc4j, lcr4j, lct4j20, lsee, lhoe ;
    int ncoll;
    int order[nMaxPho];
    float newPt[nMaxPho];
@@ -105,24 +157,15 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    int    isoSumBit(0);
    int    optFishBit(0);
    int    iso3dBit(0);
-   
-   
-   newtree->Branch("ncoll", &ncoll,"ncoll/I");
-   newtree->Branch("corrPt", corrPt,"corrPt[nPhotons]/F");
-   newtree->Branch("order",  order,  "order[nPhotons]/I");
-   newtree->Branch("lPt", &leadingPt,"lpt/F");
-   newtree->Branch("lEta", &leadingEta,"leta/F");
-   newtree->Branch("lPhi", &leadingPhi,"lphi/F");
-   newtree->Branch("lsee", &lsee,"lsee/F");
-   newtree->Branch("lhoe", &lhoe,"lhoe/F");
-   
-   newtree->Branch("isoSumBit", &isoSumBit,"isoSumBit/I");
-   newtree->Branch("optFishBit", &optFishBit,"optFishBit/I");
-   newtree->Branch("iso3dBit", &iso3dBit,"iso3dBit/I");
 
+   TTree * tgj = new TTree("tgj","gamma jet tree");
+   GammaJet gj;
+   Isolation isol;
    
+   tgj->Branch("jet",&gj.photonEt,"pt/F:corrEt:eta:phi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
+   tgj->Branch("isolation",&isol.cc1,"cc1/F:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    
-   TH1D* hdr = new TH1D("hdr",";dr;Entries",100,-10,10);
+
    
    int nentries = yforest->GetEntries();
    cout << "number of entries = " << nentries << endl;
@@ -142,35 +185,20 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
 	    newPt[j] = - yforest->photon.pt[j] - 1000;
 	 
 	 corrPt[j] = newPt[j];
-
-	 locNtrk[j] = -1000;
-	 if( doTrack) {
-	    if ( ( yforest->photon.pt[j] > 40) && fabs( yforest->photon.eta[j] )<1.5) {
-	       locNtrk[j]=0;
-	       for (int jt=0 ; jt < yforest->track.nTrk ; jt++) {
-		  //  if ( trkPt[jt] < 2 ) 
-		  //	  continue;
-		  float dPhi = yforest->photon.phi[j] - yforest->track.trkPhi[jt];
-		  if (dPhi > PI)  
-		     dPhi = dPhi - 2*PI;
-		  if (dPhi < -PI) 
-		     dPhi = dPhi + 2*PI;
-		  float dEta = yforest->photon.eta[j] - yforest->track.trkEta[jt];
-		  float dR = sqrt( dPhi*dPhi + dEta*dEta);
-		  //	       hdr->Fill(dPhi);
-		  if ( dR < 0.5 ) 
-		     locNtrk[j] = locNtrk[j] + 1;
-	       }
-	    }
-	 }
+	 
       }
+      
+   
       
       
       TMath::Sort(yforest->photon.nPhotons, newPt, order);
       
-      leadingPt = -100;
-      leadingEta = -100;
-      leadingPhi = -100;
+      
+      
+      float leadingPt = -100;
+      int leadingIndex=-1;
+      int awayIndex=-1;
+      gj.clear();
       
       for (int j=0 ; j < yforest->photon.nPhotons ; j++) {
 	 if ( fabs(yforest->photon.eta[j]) > etaCut )    continue;
@@ -179,22 +207,50 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
 	 if (!yforest->isLoosePhoton(j)) continue;         // final cuts in final plot macro        
 	 
 	 if ( corrPt[j] > leadingPt ) {
+	    leadingIndex = j;
 	    leadingPt =  corrPt[j];
-	    leadingEta = yforest->photon.eta[j];
-	    leadingPhi = yforest->photon.phi[j];
-	    lhoe    =    yforest->photon.hadronicOverEm[j];
-	    lsee    =    yforest->photon.sigmaIetaIeta[j];
-	    if ( yforest->isoSumBit = 
- isoSumBit optFishBit
-
-	    
 	 }
-
+	 
       }
       
+      if (leadingIndex!=-1) {
+         // set leading photon                                                                                                               
+         gj.photonRawEt=yforest->photon.pt[leadingIndex];
+         gj.photonEta=yforest->photon.eta[leadingIndex];
+         gj.photonPhi=yforest->photon.phi[leadingIndex];
+         gj.sigmaIetaIeta=yforest->photon.sigmaIetaIeta[leadingIndex];
+	 isol.Set(yforest,leadingIndex);
+	 int nJets=yforest->akPu3PF.nref;
+         float *jet_pt  = yforest->akPu3PF.jtpt;
+         float *jet_eta = yforest->akPu3PF.jteta;
+         float *jet_phi = yforest->akPu3PF.jtphi;
+         for (int j=0;j<nJets;j++) {
+            if (jet_pt[j]<cutjetPt) continue;
+            if (fabs(jet_eta[j])>cutjetEta) continue;
+            if (fabs(deltaPhi(jet_phi[j],yforest->photon.phi[leadingIndex]))<0.3) continue;
+            if (jet_pt[j]>gj.jetEt) {
+               gj.jetEt = jet_pt[j];
+               awayIndex = j;
+            }
+         }
+	 
+	 if (awayIndex !=-1) {
+            double photonEt = yforest->photon.pt[leadingIndex];
+            double jetEt = jet_pt[awayIndex];
+            double Agj = (photonEt-jetEt)/(photonEt+jetEt);
+            gj.jetEt  = jetEt;
+            gj.jetEta = jet_eta[awayIndex];
+            gj.jetPhi = jet_phi[awayIndex];
+            gj.deta = jet_eta[awayIndex] - yforest->photon.eta[leadingIndex];
+            gj.dphi = deltaPhi(jet_phi[awayIndex],yforest->photon.phi[leadingIndex]);
+            gj.Aj   = Agj;
+         }
+      }
       
-      // nColl
-      ncoll = getNcoll(yforest->evt.hiBin);
+      tgj->Fill();
+      
+   
+      
       
       newtree->Fill();
       newtreehlt->Fill();
@@ -204,11 +260,13 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
 	 newtreeTrack->Fill();
       newtreeEvt->Fill();
       if ( isGen )
-	newtreeGen->Fill();
+	 newtreeGen->Fill();
    }
    
-   
-   
+
+   // After Event Loop                                                                                                                       
+   tgj->SetAlias("optIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
+   tgj->SetAlias("sumIso","(cc4+cr4+ct4PtCut20)/0.9");
    
    newfile_data->Write();
    newfile_data->Close();
