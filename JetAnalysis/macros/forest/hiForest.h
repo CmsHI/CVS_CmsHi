@@ -70,6 +70,7 @@ class HiForest : public TNamed
   // Photon utility functions
   bool isSpike(int i);                          // return true if it is considered as a spike candidate
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
+  bool isIsolatedPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
   bool isLoosePhoton(int i);
   //bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
 
@@ -80,7 +81,8 @@ class HiForest : public TNamed
   int thirdJet();
   double deltaPhiDijet(Jets& jets);
   bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
-
+  void fakeRejection(TTree *jetTree, Jets &jets, bool allEvents);
+  
   // Get track-jet correlated variables. Not needed if correlatePF is run.
   void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
   // Build correlations between jet & its constituents, builds jetIDs
@@ -209,6 +211,11 @@ class HiForest : public TNamed
 
   Float_t* corrLead;
   Float_t* corrSubLead;
+
+  Float_t* fr01Chg;
+  Float_t* fr01EM;
+  Float_t* fr01;
+                        
 
   int nEntries;
   int currentEvent;

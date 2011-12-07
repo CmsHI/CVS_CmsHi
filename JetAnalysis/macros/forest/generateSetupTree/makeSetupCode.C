@@ -1,6 +1,6 @@
 #include "makeClass.h"
 
-void makeSetupCode(char *infname = "../merged_Run181531_HIExpressPhysics_Part.root")
+void makeSetupCode(char *infname = "../HiForestPhoton.root")
 {
 
   TFile *inf = new TFile(infname);  

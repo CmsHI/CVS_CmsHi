@@ -314,7 +314,7 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 	 hltTree->GetEntry(i);
       }
 
-      int cbin = hlt.hiBin;
+      int cbin = evt.hiBin;
       if(pp) cbin = 33;
 
       double eventEta = 0;
@@ -394,7 +394,7 @@ double HiForest::jetFracEM(int i){ return 0;}
 
 void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 {
-	std::vector<TBranch *> branche();
+	std::vector<TBranch *> branch;
 
 	fr01Chg = new Float_t[maxEntry];
 	fr01EM = new Float_t[maxEntry];

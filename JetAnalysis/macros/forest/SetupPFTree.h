@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov 27 11:40:13 2011 by ROOT version 5.27/06b
+// Wed Dec  7 12:51:57 2011 by ROOT version 5.27/06b
 // from TTree pfTree/dijet tree
-// found on file: ../HiForestPhoton.root
+// found on file: ../HiForestDijet_v2.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -19,10 +19,10 @@ public :
 
    // Declaration of leaf types
    Int_t           nPFpart;
-   Int_t           pfId[12820];   //[nPFpart]
-   Float_t         pfPt[12820];   //[nPFpart]
-   Float_t         pfEta[12820];   //[nPFpart]
-   Float_t         pfPhi[12820];   //[nPFpart]
+   Int_t           pfId[12728];   //[nPFpart]
+   Float_t         pfPt[12728];   //[nPFpart]
+   Float_t         pfEta[12728];   //[nPFpart]
+   Float_t         pfPhi[12728];   //[nPFpart]
 
    // List of branches
    TBranch        *b_nPFpart;   //!
@@ -43,7 +43,7 @@ void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
    t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
    t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
    if (doCheck) {
-      if (t->GetMaximum("nPFpart")>12820) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
+      if (t->GetMaximum("nPFpart")>12728) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
    }
 }
 

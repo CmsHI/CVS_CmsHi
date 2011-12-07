@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Nov 27 11:40:13 2011 by ROOT version 5.27/06b
+// Wed Dec  7 12:51:57 2011 by ROOT version 5.27/06b
 // from TTree trackTree/v1
-// found on file: ../HiForestPhoton.root
+// found on file: ../HiForestDijet_v2.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
