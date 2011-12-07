@@ -7,7 +7,6 @@
 #include "TString.h"
 #include "TRandom.h"
 #include "TH1F.h"
-
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1D.h"
@@ -34,7 +33,7 @@ public:
       float nSel = t->Project(h->GetName(),var,cut);
       cout << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
-      hNorm->Scale(1./h->Integral());
+      if (h->Integral()>0) hNorm->Scale(1./h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
       hScaled->Scale(fraction);
    }
@@ -111,11 +110,11 @@ TH1D * plotBalance(int cbin,
    if (dataType==1) {
       //cut="anaEvtSel && photonEt>60 && jetEt>30 && sumIsol<5"; // reco
       cut="anaEvtSel && photonEt>60 && jetEt>30 && optIsol>0.3"; // reco
-      name="reco";
+      name=Form("reco%d",cbin);
    }
    else if (dataType==0) {
       cut="photonEt>60 && jetEt>30 && acos(cos(photonPhi-jetPhi))>2.0944"; // gen
-      name="gen";
+      name=Form("gen%d",cbin);
    }
 
    TString cstring = "";
@@ -196,7 +195,7 @@ void plotBalanceSignal_AllCent3()
    TCanvas *c1 = new TCanvas("c1","",1050,350);
    makeMultiPanelCanvas(c1,3,1,0.0,0.0,0.2,0.2,0.02);
    
-   
+   TFile * fout = new TFile("outhists.root","recreate");
    TH1D * hFrame = new TH1D("hFrame","",20,-0.999,0.999);
    hFrame->SetAxisRange(-0.4999,0.999,"X");
    hFrame->SetAxisRange(-0.05,0.50499,"Y");
@@ -301,14 +300,19 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print("./fig/12.06/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol.gif");
-   c1->Print("./fig/12.06/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol.pdf");
-   
-   TCanvas *call = new TCanvas("call","",500,500);
+   c1->Print("./fig/12.06c/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol_ebar.gif");
+   c1->Print("./fig/12.06c/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol_ebar.pdf");   
+
+   TCanvas * call = new TCanvas("call","",500,500);
    cout << "\n Centrality 0-100\%" << endl;
    hFrame->Draw();
    plotBalance(-1,"../output-hypho50gen_v4.root",false,0,"samehist",0);
    plotBalance(-1,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("0-100%",0.8,0.3);
-   call->Print("./fig/12.06/photon60v2_jet30_imbalance_combine_20101206_v8subAlloptIsol.gif");
+
+   // save histograms
+//   fout->Write();
+//   TCanvas * ctest = new TCanvas("ctest","",500,500);
+//   hFrame->Draw();
+//   plotBalance(0,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
 }
