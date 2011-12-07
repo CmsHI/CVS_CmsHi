@@ -117,10 +117,10 @@ TH1D * plotBalance(int cbin, int isolScheme,
       if (cbin==1) photonPurity=0.56;
       if (cbin==2) photonPurity=0.62;
    } else if (isolScheme==1) { // cut isol
-      cutIsol = "cc4<5&&cr4<5&&ct4PtCut20<5";
-      if (cbin==0) photonPurity=0.;
-      if (cbin==1) photonPurity=0.;
-      if (cbin==2) photonPurity=0.;
+      cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
+      if (cbin==0) photonPurity=0.7;
+      if (cbin==1) photonPurity=0.72;
+      if (cbin==2) photonPurity=0.75;
    } else if (isolScheme==2) { // fisher isol
       nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
       cutIsol = "fisherIsol>0.3";
@@ -245,7 +245,7 @@ void plotBalanceSignal_AllCent3()
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
    
-   int isolScheme=2; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
+   int isolScheme=1; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
    c1->cd(1);
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
