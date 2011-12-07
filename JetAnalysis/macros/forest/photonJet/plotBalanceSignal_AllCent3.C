@@ -97,19 +97,41 @@ public:
 };
 
 //---------------------------------------------------------------------
-TH1D * plotBalance(int cbin,
+TH1D * plotBalance(int cbin, int isolScheme,
                    TString infname,
                    bool useWeight,
                    int dataType, // 0=gen, 1=reco, 2=pp
                    TString opt,
                    bool doCheck=false)
 {
-
-   TString cut;
+   // open the data file
+   TFile *inf = new TFile(infname.Data());
+   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
+   
+   TCut cut,cutIsol;
    TString name;
+   float photonPurity;
+   if (isolScheme==0) { //sum isol
+      cutIsol = "sumIsol/0.9<5";
+      if (cbin==0) photonPurity=0.52;
+      if (cbin==1) photonPurity=0.56;
+      if (cbin==2) photonPurity=0.62;
+   } else if (isolScheme==1) { // cut isol
+      cutIsol = "cc4<5&&cr4<5&&ct4PtCut20<5";
+      if (cbin==0) photonPurity=0.;
+      if (cbin==1) photonPurity=0.;
+      if (cbin==2) photonPurity=0.;
+   } else if (isolScheme==2) { // fisher isol
+      nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
+      cutIsol = "fisherIsol>0.3";
+      if (cbin==0) photonPurity=0.76;
+      if (cbin==1) photonPurity=0.78;
+      if (cbin==2) photonPurity=0.83;
+   }
+   cout << "Isolation: " << TString(cutIsol) << endl;
+   
    if (dataType==1) {
-      //cut="anaEvtSel && photonEt>60 && jetEt>30 && sumIsol<5"; // reco
-      cut="anaEvtSel && photonEt>60 && jetEt>30 && optIsol>0.3"; // reco
+      cut="anaEvtSel && photonEt>60 && jetEt>30"&&cutIsol; // reco
       name=Form("reco%d",cbin);
    }
    else if (dataType==0) {
@@ -120,33 +142,23 @@ TH1D * plotBalance(int cbin,
    TString cstring = "";
    if(cbin==-1) {
       cstring = "0-100%";
-      cut+=" && cBin>=0 && cBin<40";
+      cut= cut&&"cBin>=0 && cBin<40";
    }
    else if(cbin==0) {
       cstring = "0-10%";
-      cut+=" && cBin>=0 && cBin<4";
+      cut=cut&&"cBin>=0 && cBin<4";
    } else if (cbin==1) {
       cstring = "10-30%";
-      cut+=" && cBin>=4 && cBin<12";
+      cut=cut&&"cBin>=4 && cBin<12";
    } else  {
       cstring = "30-100%";
-      cut+=" && cBin>=12 && cBin<40";
+      cut=cut&&"cBin>=12 && cBin<40";
    }
-   // open the data file
-   TFile *inf = new TFile(infname.Data());
-   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   
-   SignalCorrector anaAgj(nt,name,TCut(cut),useWeight);
+
+   SignalCorrector anaAgj(nt,name,cut,useWeight);
    
    // histogram style
    if (dataType==1) {
-      float photonPurity;
-//      if (cbin==0) photonPurity=0.52;
-//      if (cbin==1) photonPurity=0.56;
-//      if (cbin==2) photonPurity=0.62;
-      if (cbin==0) photonPurity=0.76;
-      if (cbin==1) photonPurity=0.78;
-      if (cbin==2) photonPurity=0.83;
       anaAgj.subDPhiSide = true;
       anaAgj.subSShapeSide = true;
       anaAgj.MakeHistograms(1-photonPurity);
@@ -233,12 +245,12 @@ void plotBalanceSignal_AllCent3()
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
    
+   int isolScheme=2; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
    c1->cd(1);
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
-   plotBalance(2,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(2,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
-   plotBalance(2,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
+   plotBalance(2,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   plotBalance(2,isolScheme,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
@@ -263,9 +275,8 @@ void plotBalanceSignal_AllCent3()
    c1->cd(2);
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
-   plotBalance(1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(1,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
-   plotBalance(1,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
+   plotBalance(1,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   plotBalance(1,isolScheme,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -286,9 +297,8 @@ void plotBalanceSignal_AllCent3()
    c1->cd(3);
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
-   plotBalance(0,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   //plotBalance(0,"../output-data-Photon-v1_v8.root",false,1,"sameE",false);
-   plotBalance(0,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
+   plotBalance(0,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
+   plotBalance(0,isolScheme,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
@@ -300,14 +310,14 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print("./fig/12.06c/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol_ebar.gif");
-   c1->Print("./fig/12.06c/photon60v2_jet30_imbalance_all_cent_20101206_v8subAlloptIsol_ebar.pdf");   
+   c1->Print(Form("./fig/12.07/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.07/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
 
    TCanvas * call = new TCanvas("call","",500,500);
    cout << "\n Centrality 0-100\%" << endl;
    hFrame->Draw();
-   plotBalance(-1,"../output-hypho50gen_v4.root",false,0,"samehist",0);
-   plotBalance(-1,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
+   plotBalance(-1,-1,"../output-hypho50gen_v4.root",false,0,"samehist",0);
+   plotBalance(-1,isolScheme,"../output-data-Photon-v2_v8.root",false,1,"sameE",1);
    drawText("0-100%",0.8,0.3);
 
    // save histograms
