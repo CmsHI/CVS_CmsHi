@@ -109,24 +109,27 @@ TH1D * plotBalance(int cbin, int isolScheme,
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
    
    TCut cut,cutIsol;
-   TString name;
+   TString name,nameIsol;
    float photonPurity;
    if (isolScheme==0) { //sum isol
+      nameIsol="Sum(Isol.)";
       cutIsol = "sumIsol/0.9<5";
-      if (cbin==0) photonPurity=0.52;
-      if (cbin==1) photonPurity=0.56;
-      if (cbin==2) photonPurity=0.62;
+      if (cbin==0) photonPurity=0.65;
+      if (cbin==1) photonPurity=0.70;
+      if (cbin==2) photonPurity=0.74;
    } else if (isolScheme==1) { // cut isol
+      nameIsol="3DCutIsol.";
       cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
-      if (cbin==0) photonPurity=0.7;
-      if (cbin==1) photonPurity=0.72;
-      if (cbin==2) photonPurity=0.75;
+      if (cbin==0) photonPurity=0.64;
+      if (cbin==1) photonPurity=0.68;
+      if (cbin==2) photonPurity=0.70;
    } else if (isolScheme==2) { // fisher isol
+      nameIsol="Fisher Isol.";
       nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
       cutIsol = "fisherIsol>0.3";
-      if (cbin==0) photonPurity=0.76;
-      if (cbin==1) photonPurity=0.78;
-      if (cbin==2) photonPurity=0.83;
+      if (cbin==0) photonPurity=0.72;
+      if (cbin==1) photonPurity=0.74;
+      if (cbin==2) photonPurity=0.79;
    }
    cout << "Isolation: " << TString(cutIsol) << endl;
    
@@ -195,6 +198,19 @@ TH1D * plotBalance(int cbin, int isolScheme,
       }
       anaAgj.rSigAll.hScaled->SetLineStyle(2);
       anaAgj.rSigAll.hScaled->Draw("same hist");
+      // Draw count
+      float nPhotonJet = anaAgj.rSigAll.h->GetEntries() - anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7) - anaAgj.rBkgSShape.h->GetEntries();
+      float lx = 0.1;
+      if (cbin<2) lx=-0.1;
+      TLegend *t3=new TLegend(lx,0.75,0.5,0.85);
+      if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,nameIsol,"");
+      t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f gamma-jets",nPhotonJet),"");
+      t3->SetFillColor(0);
+      t3->SetBorderSize(0);
+      t3->SetFillStyle(0);
+      t3->SetTextFont(63);
+      t3->SetTextSize(15);
+      t3->Draw();
    }
    return anaAgj.hSubtracted;
 }
@@ -245,7 +261,7 @@ void plotBalanceSignal_AllCent3()
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
    
-   int isolScheme=1; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
+   int isolScheme=2; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
    c1->cd(1);
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
@@ -310,8 +326,8 @@ void plotBalanceSignal_AllCent3()
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print(Form("./fig/12.07/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.07/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.07b/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.07b/photon60v2_v8_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
 
    TCanvas * call = new TCanvas("call","",500,500);
    cout << "\n Centrality 0-100\%" << endl;
