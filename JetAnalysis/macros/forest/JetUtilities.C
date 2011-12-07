@@ -186,7 +186,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 }
       }
 
-      for(UInt_t ib = 0; ib < branches.size(); ++ib){
+      for(int ib = 0; ib < branches.size(); ++ib){
 	 branches[ib]->Fill();
       }
 
@@ -311,10 +311,10 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       if(allEvents){
 	 jetTree->GetEntry(i);
 	 trackTree->GetEntry(i);
-	 evtTree->GetEntry(i);
+	 hltTree->GetEntry(i);
       }
 
-      int cbin = evt.hiBin;
+      int cbin = hlt.hiBin;
       if(pp) cbin = 33;
 
       double eventEta = 0;
@@ -392,4 +392,55 @@ double HiForest::jetFracEM(int i){ return 0;}
 
 
 
+void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
+{
+	std::vector<TBranch *> branche();
+
+	fr01Chg = new Float_t[maxEntry];
+	fr01EM = new Float_t[maxEntry];
+	fr01 = new Float_t[maxEntry];
+
+	branch.push_back(jetTree->Branch("fr01Chg", fr01Chg, "fr01Chg[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01EM", fr01EM, "fr01EM[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01", fr01, "fr01[nref]/F"));
+
+	for (int i = 0; i < (allEvents ? GetEntries() : 1); i++) {
+		if (allEvents) {
+			jetTree->GetEntry(i);
+			trackTree->GetEntry(i);
+			photonTree->GetEntry(i);
+		}
+
+		for (int j = 0; j < jets.nref; j++) {
+			jets.fr01Chg[j] = 0;
+			jets.fr01EM[j] = 0;
+
+			for (int k = 0; k < track.nTrk; k++) {
+				float deta = track.trkEta[k] - jets.jteta[j];
+				float dphi = deltaPhi(track.trkPhi[k], jets.jtphi[j]);
+				float angular_weight =
+					exp(-50.0F * (deta * deta + dphi * dphi));
+
+				jets.fr01Chg[j] += angular_weight *
+					track.trkPt[k] * track.trkPt[k];
+			}
+			for (int k = 0; k < photon.nPhotons; k++) {
+				float deta = photon.eta[k] - jets.jteta[j];
+				float dphi = deltaPhi(photon.phi[k], jets.jtphi[j]);
+				float angular_weight =
+					exp(-50.0F * (deta * deta + dphi * dphi));
+
+				jets.fr01EM[j] += angular_weight *
+					photon.pt[k] * photon.pt[k];
+			}
+
+			jets.fr01[j] = jets.fr01Chg[j] + jets.fr01EM[j];
+		}
+
+		for(std::vector<TBranch *>::const_iterator iterator = branch.begin();
+			iterator != branch.end(); iterator++) {
+			(*iterator)->Fill();
+		}
+	}
+}
 
