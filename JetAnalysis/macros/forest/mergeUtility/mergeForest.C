@@ -6,7 +6,7 @@ void mergeForest(){
 
    const char* fname = "HiForest_*.root";
 
-   string dir[15] = {
+   string dir[16] = {
       "hltanalysis",
       "skimanalysis",
       "icPu5JetAnalyzer",
@@ -21,10 +21,11 @@ void mergeForest(){
       "rechitanalyzer",
       "rechitanalyzer",
       "rechitanalyzer",
-      "hiEvtAnalyzer"
+      "hiEvtAnalyzer",
+      "hcalNoise"
    };
 
-   string trees[15] = {
+   string trees[16] = {
       "HltTree",
       "HltTree",
       "t",
@@ -39,13 +40,14 @@ void mergeForest(){
       "hbhe",
       "hf",
       "tower",
-      "HiTree"
+      "HiTree",
+      "hcalNoise"
    };
 
 
-   TChain* ch[15];
+   TChain* ch[16];
 
-   int N = 15;
+   int N = 16;
 
    for(int i = 0; i < N; ++i){
       ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
