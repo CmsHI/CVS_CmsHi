@@ -14,10 +14,35 @@ using namespace std;
 
 int getNcoll(int cBin=0);
 
+class Isolation{
+public:
+   float cc1,cc2,cc3,cc4,cc5;
+   float cr1,cr2,cr3,cr4,cr5;
+   float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
+   void Set(HiForest * c, int j) {
+      cc1=c->photon.cc1[j];
+      cc2=c->photon.cc2[j];
+      cc3=c->photon.cc3[j];
+      cc4=c->photon.cc4[j];
+      cc5=c->photon.cc5[j];
+      cr1=c->photon.cr1[j];
+      cr2=c->photon.cr2[j];
+      cr3=c->photon.cr3[j];
+      cr4=c->photon.cr4[j];
+      cr5=c->photon.cr5[j];
+      ct1PtCut20=c->photon.ct1PtCut20[j];
+      ct2PtCut20=c->photon.ct2PtCut20[j];
+      ct3PtCut20=c->photon.ct3PtCut20[j];
+      ct4PtCut20=c->photon.ct4PtCut20[j];
+      ct5PtCut20=c->photon.ct5PtCut20[j];
+   }
+};
+
 void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.44, float ptCut = 25,  bool doTrack = false)
 {
    
-   TString fisherVar = "6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03" ;  
+   double cutjetPt = 20;
+   double cutjetEta = 2;
    
    
    bool doTrigCut(false);
@@ -72,12 +97,16 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    float newPt[nMaxPho];
    float corrPt[nMaxPho];
    float locNtrk[nMaxPho];
-   
    Int_t           nTrk;
-   Float_t         trkPt [2000];   //[nTrk]                                                                                                                                                                  
-   Float_t         trkEta[2000];   //[nTrk]                                                                                                                                      
-   Float_t         trkPhi[2000];   //[nTrk]                                                                                                                                   
-    
+   Float_t         trkPt [2000];   //[nTrk] 
+   Float_t         trkEta[2000];   //[nTrk] 
+   Float_t         trkPhi[2000];   //[nTrk] 
+
+   int    isoSumBit(0);
+   int    optFishBit(0);
+   int    iso3dBit(0);
+   
+   
    newtree->Branch("ncoll", &ncoll,"ncoll/I");
    newtree->Branch("corrPt", corrPt,"corrPt[nPhotons]/F");
    newtree->Branch("order",  order,  "order[nPhotons]/I");
@@ -87,8 +116,13 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    newtree->Branch("lsee", &lsee,"lsee/F");
    newtree->Branch("lhoe", &lhoe,"lhoe/F");
    
-   TH1D* hdr = new TH1D("hdr",";dr;Entries",100,-10,10);
+   newtree->Branch("isoSumBit", &isoSumBit,"isoSumBit/I");
+   newtree->Branch("optFishBit", &optFishBit,"optFishBit/I");
+   newtree->Branch("iso3dBit", &iso3dBit,"iso3dBit/I");
 
+   
+   
+   TH1D* hdr = new TH1D("hdr",";dr;Entries",100,-10,10);
    
    int nentries = yforest->GetEntries();
    cout << "number of entries = " << nentries << endl;
@@ -137,21 +171,27 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
       leadingPt = -100;
       leadingEta = -100;
       leadingPhi = -100;
-
+      
       for (int j=0 ; j < yforest->photon.nPhotons ; j++) {
-	 if ( fabs(yforest->photon.eta[j]) > etaCut ) 
-	    continue;
-         if ( corrPt[j] > leadingPt ) {
+	 if ( fabs(yforest->photon.eta[j]) > etaCut )    continue;
+	 if ( corrPt[j] < ptCut) continue;          // photon pT cut                           
+	 if ( yforest->isSpike(j)) continue;               // spike removal            
+	 if (!yforest->isLoosePhoton(j)) continue;         // final cuts in final plot macro        
+	 
+	 if ( corrPt[j] > leadingPt ) {
 	    leadingPt =  corrPt[j];
 	    leadingEta = yforest->photon.eta[j];
 	    leadingPhi = yforest->photon.phi[j];
 	    lhoe    =    yforest->photon.hadronicOverEm[j];
 	    lsee    =    yforest->photon.sigmaIetaIeta[j];
+	    if ( yforest->isoSumBit = 
+ isoSumBit optFishBit
+
+	    
 	 }
 
       }
       
-      if ( leadingPt < ptCut )   continue;
       
       // nColl
       ncoll = getNcoll(yforest->evt.hiBin);
