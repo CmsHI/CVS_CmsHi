@@ -90,8 +90,10 @@ class GammaJet{
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root", float etaCut=1.44, float ptCut = 50,  bool doTrack = false)
-{
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outputFile = "barrelPhoton50_25k.root") {
+   
+   float etaCut=1.44;
+   float ptCut = 50;
    
    double cutjetPt = 20;
    double cutjetEta = 2;
@@ -102,35 +104,35 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    
    const int nMaxPho = 3000;
    
-   HiForest *yforest = new HiForest(inputFile_.Data());
-   yforest->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
+   HiForest *c = new HiForest(inputFile_.Data());
+   c->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
    
    // now open new root file
    TFile* newfile_data = new TFile(outputFile.data(),"recreate");
    cout << "Output file " << outputFile << endl;
    
-   TTree* newtree = yforest->photonTree->CloneTree(0);
+   TTree* newtree = c->photonTree->CloneTree(0);
    newtree->SetName("yongsunPhotonTree");
    
-   TTree* newtreehlt = yforest->hltTree->CloneTree(0);
+   TTree* newtreehlt = c->hltTree->CloneTree(0);
    newtreehlt->SetName("yongsunHltTree");
    
-   TTree* newtreeSkim = yforest->skimTree->CloneTree(0);
+   TTree* newtreeSkim = c->skimTree->CloneTree(0);
    newtreeSkim->SetName("yongsunSkimTree");
    
-   TTree* newtreePfjet = yforest->akPu3jetTree->CloneTree(0);
+   TTree* newtreePfjet = c->akPu3jetTree->CloneTree(0);
    newtreePfjet->SetName("yongsunPfjetTree");
    
-   TTree* newtreeTrack = yforest->trackTree->CloneTree(0);
+   TTree* newtreeTrack = c->trackTree->CloneTree(0);
    newtreeTrack->SetName("yongsunTrackTree");
    
-   TTree* newtreeEvt = yforest->evtTree->CloneTree(0);
+   TTree* newtreeEvt = c->evtTree->CloneTree(0);
    newtreeEvt->SetName("yongsunHiEvt");
    
    int isGen(false);
    TTree* newtreeGen;
-   if ( yforest->genpTree !=0 ) { 
-      newtreeGen = yforest->genpTree->CloneTree(0);
+   if ( c->genpTree !=0 ) { 
+      newtreeGen = c->genpTree->CloneTree(0);
       newtreeGen->SetName("yongsunGen");
       isGen = true;
    }
@@ -145,7 +147,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    
    
    int ncoll;
-   int order[nMaxPho];   float newPt[nMaxPho];
    float corrPt[nMaxPho];
    float locNtrk[nMaxPho];
    Int_t           nTrk;
@@ -157,31 +158,38 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    int    optFishBit(0);
    int    iso3dBit(0);
 
+   // Output file                                                                                                                            
+   TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
+   
    GammaJet gj;
    Isolation isol;
-   
-   tgj->Branch("jet",&gj.photonEt,"pt/F:corrPt:eta:phi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
-   tgj->Branch("isolation",&isol.cc1,"cc1/F:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
-   
+   EvtSel evt;
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
+   tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
+   tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
+   tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
+   tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
+   tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
 
-   
-   int nentries = yforest->GetEntries();
+    
+   int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
 
-      yforest->GetEntry(jentry);
+      c->GetEntry(jentry);
 
-      if ( yforest->skim.pcollisionEventSelection != 1) 
+      if ( c->skim.pcollisionEventSelection != 1) 
 	 continue;
 
-      for (int j=0;j< yforest->photon.nPhotons;j++) {
+      for (int j=0;j< c->photon.nPhotons;j++) {
 	 order[j] = -1;
-	 if ( fabs( yforest->photon.eta[j] ) < etaCut )
-	    newPt[j] = yforest->getCorrEt(j);
+	 if ( fabs( c->photon.eta[j] ) < etaCut )
+	    newPt[j] = c->getCorrEt(j);
 	 else 
-	    newPt[j] = - yforest->photon.pt[j] - 1000;
+	    newPt[j] = - c->photon.pt[j] - 1000;
 	 
 	 corrPt[j] = newPt[j];
 	 
@@ -190,7 +198,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    
       
       
-      TMath::Sort(yforest->photon.nPhotons, newPt, order);
+      TMath::Sort(c->photon.nPhotons, newPt, order);
       
       
       
@@ -199,11 +207,11 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
       int awayIndex=-1;
       gj.clear();
       
-      for (int j=0 ; j < yforest->photon.nPhotons ; j++) {
-	 if ( fabs(yforest->photon.eta[j]) > etaCut )    continue;
+      for (int j=0 ; j < c->photon.nPhotons ; j++) {
+	 if ( fabs(c->photon.eta[j]) > etaCut )    continue;
 	 if ( corrPt[j] < ptCut) continue;          // photon pT cut                           
-	 if ( yforest->isSpike(j)) continue;               // spike removal            
-	 if (!yforest->isLoosePhoton(j)) continue;         // final cuts in final plot macro        
+	 if ( c->isSpike(j)) continue;               // spike removal            
+	 if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro        
 	 
 	 if ( corrPt[j] > leadingPt ) {
 	    leadingIndex = j;
@@ -217,19 +225,19 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
          
 	 gj.photonEt=corrPt[leadingIndex];
 	 
-	 gj.photonRawEt=yforest->photon.pt[leadingIndex];
-         gj.photonEta=yforest->photon.eta[leadingIndex];
-         gj.photonPhi=yforest->photon.phi[leadingIndex];
-         gj.sigmaIetaIeta=yforest->photon.sigmaIetaIeta[leadingIndex];
-	 isol.Set(yforest,leadingIndex);
-	 int nJets=yforest->akPu3PF.nref;
-         float *jet_pt  = yforest->akPu3PF.jtpt;
-         float *jet_eta = yforest->akPu3PF.jteta;
-         float *jet_phi = yforest->akPu3PF.jtphi;
+	 gj.photonRawEt=c->photon.pt[leadingIndex];
+         gj.photonEta=c->photon.eta[leadingIndex];
+         gj.photonPhi=c->photon.phi[leadingIndex];
+         gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
+	 isol.Set(c,leadingIndex);
+	 int nJets=c->akPu3PF.nref;
+         float *jet_pt  = c->akPu3PF.jtpt;
+         float *jet_eta = c->akPu3PF.jteta;
+         float *jet_phi = c->akPu3PF.jtphi;
          for (int j=0;j<nJets;j++) {
             if (jet_pt[j]<cutjetPt) continue;
             if (fabs(jet_eta[j])>cutjetEta) continue;
-            if (fabs(deltaPhi(jet_phi[j],yforest->photon.phi[leadingIndex]))<0.3) continue;
+            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
             if (jet_pt[j]>gj.jetEt) {
                gj.jetEt = jet_pt[j];
                awayIndex = j;
@@ -237,14 +245,14 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
          }
 	 
 	 if (awayIndex !=-1) {
-            double photonEt = yforest->photon.pt[leadingIndex];
+            double photonEt = c->photon.pt[leadingIndex];
             double jetEt = jet_pt[awayIndex];
             double Agj = (photonEt-jetEt)/(photonEt+jetEt);
             gj.jetEt  = jetEt;
             gj.jetEta = jet_eta[awayIndex];
             gj.jetPhi = jet_phi[awayIndex];
-            gj.deta = jet_eta[awayIndex] - yforest->photon.eta[leadingIndex];
-            gj.dphi = deltaPhi(jet_phi[awayIndex],yforest->photon.phi[leadingIndex]);
+            gj.deta = jet_eta[awayIndex] - c->photon.eta[leadingIndex];
+            gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
          }
       }
