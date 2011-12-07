@@ -145,8 +145,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    
    
    int ncoll;
-   int order[nMaxPho];
-   float newPt[nMaxPho];
+   int order[nMaxPho];   float newPt[nMaxPho];
    float corrPt[nMaxPho];
    float locNtrk[nMaxPho];
    Int_t           nTrk;
@@ -162,7 +161,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
    GammaJet gj;
    Isolation isol;
    
-   tgj->Branch("jet",&gj.photonEt,"pt/F:corrEt:eta:phi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
+   tgj->Branch("jet",&gj.photonEt,"pt/F:corrPt:eta:phi:jetEt:jetEta:jetPhi:deta:dphi:Agj:sigmaIetaIeta");
    tgj->Branch("isolation",&isol.cc1,"cc1/F:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    
 
@@ -215,7 +214,10 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string output
       
       if (leadingIndex!=-1) {
          // set leading photon                                                                                                               
-         gj.photonRawEt=yforest->photon.pt[leadingIndex];
+         
+	 gj.photonEt=corrPt[leadingIndex];
+	 
+	 gj.photonRawEt=yforest->photon.pt[leadingIndex];
          gj.photonEta=yforest->photon.eta[leadingIndex];
          gj.photonPhi=yforest->photon.phi[leadingIndex];
          gj.sigmaIetaIeta=yforest->photon.sigmaIetaIeta[leadingIndex];
