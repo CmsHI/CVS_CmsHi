@@ -202,9 +202,10 @@ TH1D * plotBalance(int cbin, int isolScheme,
       float nPhotonJet = anaAgj.rSigAll.h->GetEntries() - anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7) - anaAgj.rBkgSShape.h->GetEntries();
       float lx = 0.1;
       if (cbin<2) lx=-0.1;
-      TLegend *t3=new TLegend(lx,0.75,0.5,0.85);
+      TLegend *t3=new TLegend(lx,0.7,0.5,0.85);
       if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,nameIsol,"");
-      t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f gamma-jets",nPhotonJet),"");
+      t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
+      t3->AddEntry(anaAgj.rSigAll.h,Form("#gamma purity %.2f",photonPurity),"");
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
       t3->SetFillStyle(0);
@@ -261,7 +262,7 @@ void plotBalanceSignal_AllCent3()
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
    
-   int isolScheme=2; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
+   int isolScheme=0; // 0=sumIsol, 1=cutIsol, 2=fisherIsol
    c1->cd(1);
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
