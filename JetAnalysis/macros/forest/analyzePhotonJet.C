@@ -18,7 +18,7 @@ public:
    bool offlSel;
    bool noiseFilt;
    bool anaEvtSel;
-   float vz;
+   float vz,weight;
 };
 
 static const int MAXTRK = 10000;
@@ -79,21 +79,50 @@ public:
    }
 };
 
-float GetCentWeight(TTree * tdata, TTree * tmc, TH1D * hData, TH1D * hMc)
-{
-   cout << tdata->GetTreeName() << endl;
-   cout << tmc->GetTreeName() << endl;
-   //tdata->Project("hCentData");
-}
+class CentralityReWeight {
+public:
+   CentralityReWeight(TCut s) : sel(s) {}
+   void Init()
+   {
+      TChain * tdata = new TChain("tgj");
+      TChain * tmc = new TChain("tgj");
+      tdata->Add("output-data-Photon-v3_v9.root");
+      tmc->Add("output-hypho50v2_v9.root");
+
+      hCentData = new TH1D("hCentData","",40,0,40);
+      hCentMc = new TH1D("hCentMc","",40,0,40);
+
+      //cout << "data: " << tdata->GetName() << " " << tdata->GetEntries() << endl;
+      //cout << "mc: " << tmc->GetName() << " " << tmc->GetEntries() << endl;
+      tdata->Project("hCentData","cBin",sel&&"trig&&noiseFilt");
+      tmc->Project("hCentMc","cBin",sel);
+      hCentData->Scale(1./hCentData->Integral());
+      hCentMc->Scale(1./hCentMc->Integral());
+   }
+   float GetWeight(int cBin) {
+      if (hCentData->GetBinContent(cBin)==0 || hCentMc->GetBinContent(cBin)==0) {
+         return 0; 
+      }
+      return hCentData->GetBinContent(cBin)/hCentMc->GetBinContent(cBin);
+   }
+   TCut sel;
+   TH1D * hCentData;
+   TH1D * hCentMc;
+};
 
 void analyzePhotonJet(
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
-                      TString outname="output-data-Photon-v3_v10.root",
-                      bool doCentReWeight=false
-                      
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      //TString outname="output-data-Photon-v2_v8.root"
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      //TString outname="output-data-Photon-v2d1204_v9.root"
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
+                      //TString outname="output-data-Photon-v3_v10.root",
+                      TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree/photon50_25k.root",
+                      TString outname="output-hypho50v2_v10.root",
+                      bool doCentReWeight=true
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -103,26 +132,23 @@ void analyzePhotonJet(
    double cutEtaTrk = 2.4;	
 
    // Centrality reweiting
-   TH1D * hCentData = new TH1D("hCentData","",40,0,40);
-   TH1D * hCentMc = new TH1D("hCentMc","",40,0,40);
-   TChain * tdata = new TChain("tgj");
-   if (doCentReWeight) {
-      tdata->Add("output-data-Photon-v3_v9.root");
-   }
+   CentralityReWeight cw("offlSel&&photonEt>50");
+
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
-   
-   GetCentWeight(tdata,c->tree,hCentData,hCentMc);
-   
+      
    // Output file
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
+   if (doCentReWeight) {
+      cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
+   }
    
    EvtSel evt;
    GammaJet gj;
    Isolation isol;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -147,6 +173,9 @@ void analyzePhotonJet(
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
+      // Get Centrality Weight
+      if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
+      else evt.weight = 1;
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
