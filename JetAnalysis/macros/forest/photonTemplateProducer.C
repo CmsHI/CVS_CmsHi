@@ -34,7 +34,7 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
       hSig[icent]   = (TH1D*)hData[icent]->Clone(Form("hSig_cent%d",icent));
       hBkg[icent]   = (TH1D*)hData[icent]->Clone(Form("hBkg_cent%d",icent));
 	 
-      getTemplate(hSig[icent],"barrelHiForestPhoton_MCphoton50_25k.root",isoChoice,kSig,lowCent,highCent);
+      getTemplate(hSig[icent],"meaningless",isoChoice,kSig,lowCent,highCent);
       getTemplate(hData[icent],"barrelHiForestPhoton_Skim2011-Dec07-withTracks.root",isoChoice,kData,lowCent,highCent);
       getTemplate(hBkg[icent],"barrelHiForestPhoton_Skim2011-Dec07-withTracks.root",isoChoice,kSBB,lowCent,highCent);
       
@@ -124,37 +124,53 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 }
 
 void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent, int highCent, TCut addCut) { 
+ 
+   char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_75k.root";
+   char* fnamePho80 = "barrelHiForestPhoton_MCphoton80_25k.root";
    
-   TFile *f1  =new TFile(fname1.Data());
-   TTree *photon1 = (TTree*)f1->Get("yongsunPhotonTree");
-   photon1->AddFriend("yEvt=yongsunHiEvt"    ,fname1.Data());
-   photon1->AddFriend("tgj",                   fname1.Data());
+   char* fnameData  = "barrelHiForestPhoton_Skim2011-Dec07-withTracks.root";
    
    TCut evtSelCut = "tgj.anaEvtSel";
    TCut centCut     = Form("(yEvt.hiBin >= %d) && (yEvt.hiBin<= %d)",lowCent,highCent);
    TCut photonJetCut  = "tgj.photonEt>60  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
-   
-   TCut generalCutMC   = photonJetCut && dphiCut && lPhotCut && centCut && addCut; 
+
+   TCut generalCutMC   = photonJetCut && dphiCut && lPhotCut && centCut && addCut;
    TCut generalCutData = generalCutMC && evtSelCut;
-   
+
    TCut sbIsoCut ="(cc4+cr4+ct4PtCut20)/0.9>6";
    TCut srIsoCut = getIsoCut(isoChoice);
-   
+
    TCut finalCut="";
-   if ( iTemp == kData ) 
+   if ( iTemp == kData )
       finalCut = generalCutData && srIsoCut ;
-   if ( iTemp == kSig ) 
-      finalCut = generalCutMC && genMatchCut1  && srIsoCut ; 
+   if ( iTemp == kSig )
+      finalCut = generalCutMC && genMatchCut1  && srIsoCut ;
    if ( iTemp == kSBB )
       finalCut = generalCutData && sbIsoCut;
+   
+   multiTreeUtil* photon1 = new multiTreeUtil();
+   
+   float csPho50 = 10;
+   float csPho80 = 1;
+      
+   if ( iTemp  == kSig) {
+      photon1->addFile( fnamePho50,  "yongsunPhotonTree", "" , csPho50);
+   }
+   else {  // if this is data
+      photon1->addFile( fname1 , "yongsunPhotonTree", "" , csPho50);
+   }
+   photon1->AddFriend("yEvt=yongsunHiEvt");
+   photon1->AddFriend("tgj");
+   
    
    h1->Reset();
    h1->Sumw2();
    TH1D* htemp = (TH1D*)h1->Clone("htemp");
-   photon1->Draw(Form("sigmaIetaIeta>>%s",htemp->GetName()),finalCut);
+   photon1->Draw2(htemp,  "sigmaIetaIeta",   finalCut);
    h1->Add(htemp);
    htemp->Reset();
    
+   delete photon1;
 }
