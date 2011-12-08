@@ -233,8 +233,8 @@ void plotBalanceSignal_AllCent3(
    hFrame->SetAxisRange(-0.4999,0.999,"X");
    hFrame->SetAxisRange(-0.05,0.50499,"Y");
    hFrame->SetStats(0);
-   hFrame->SetXTitle("A_{J} = (E_{T}^{j1}-E_{T}^{j2})/(E_{T}^{j1}+E_{T}^{j2})");
-   hFrame->SetYTitle("Event Fraction");
+   hFrame->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
+   hFrame->SetYTitle("N_{evt}^{-1} dN/dA_{#gamma J}");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);
@@ -326,8 +326,8 @@ void plotBalanceSignal_AllCent3(
    tsel.SetNDC();
    tsel.SetTextFont(63);
    tsel.SetTextSize(15);
-   tsel.DrawLatex(0.55,0.85,"p_{T,#gamma} > 60 GeV/c");
-   tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
+   tsel.DrawLatex(0.55,0.85,"p_{T}^{#gamma} > 60 GeV/c");
+   tsel.DrawLatex(0.55,0.75,"p_{T}^{jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
    c1->Print(Form("./fig/12.08/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
@@ -344,5 +344,6 @@ void plotBalanceSignal_AllCent3(
 //   fout->Write();
 //   TCanvas * ctest = new TCanvas("ctest","",500,500);
 //   hFrame->Draw();
+//   plotBalance(0,"../output-data-Photon-v2d1204_v9.root",false,1,"sameE",1);
 //   plotBalance(0,"../output-data-Photon-v3_v9.root",false,1,"sameE",1);
 }
