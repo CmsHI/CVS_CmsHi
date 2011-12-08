@@ -391,54 +391,130 @@ double HiForest::jetFracNeut(int i){ return 0;}
 double HiForest::jetFracEM(int i){ return 0;}
 
 
-
 void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 {
 	std::vector<TBranch *> branch;
 
-	branch.push_back(jetTree->Branch("fr01Chg", jets.fr01Chg, "fr01Chg[nref]/F"));
-	branch.push_back(jetTree->Branch("fr01EM", jets.fr01EM, "fr01EM[nref]/F"));
-	branch.push_back(jetTree->Branch("fr01", jets.fr01, "fr01[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01Chg", jets.fr01Chg,
+									 "fr01Chg[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01EM", jets.fr01EM,
+									 "fr01EM[nref]/F"));
+	branch.push_back(jetTree->Branch("fr01", jets.fr01,
+									 "fr01[nref]/F"));
 
 	for (int i = 0; i < (allEvents ? GetEntries() : 1); i++) {
-                
 		if (allEvents) {
 			jetTree->GetEntry(i);
 			trackTree->GetEntry(i);
 			photonTree->GetEntry(i);
-			if (i % 1000 ==0 ) cout << i <<" / "<<GetEntries()<<endl;
+			if (i % 1000 == 0) {
+				std::cout << i <<" / "<< GetEntries() << endl;
+			}
 		}
 
 		for (int j = 0; j < jets.nref; j++) {
+			float pseudorapidity_adapt = jets.jteta[j];
+			float azimuth_adapt = jets.jtphi[j];
+			float max_weighted_perp = 0;
+			float sum;
+
 			jets.fr01Chg[j] = 0;
 			jets.fr01EM[j] = 0;
-			jets.fr01[j] = 0;
 
+			// Unadapted discriminant with adaption search
+			sum = 0;
 			for (int k = 0; k < track.nTrk; k++) {
-				float deta = track.trkEta[k] - jets.jteta[j];
-				float dphi = deltaPhi(track.trkPhi[k], jets.jtphi[j]);
-				float angular_weight =
-					exp(-50.0F * (deta * deta + dphi * dphi));
+				const float dpseudorapidity =
+					track.trkEta[k] - jets.jteta[j];
+				const float dazimuth =
+					deltaPhi(track.trkPhi[k], jets.jtphi[j]);
+				const float angular_weight =
+					exp(-50.0F * (dpseudorapidity * dpseudorapidity +
+								  dazimuth * dazimuth));
+				const float weighted_perp =
+					angular_weight * track.trkPt[k] * track.trkPt[k];
+				const float weighted_perp_square =
+					weighted_perp * track.trkPt[k];
 
-				jets.fr01Chg[j] += angular_weight *
-					track.trkPt[k] * track.trkPt[k];
+				sum += weighted_perp_square;
+				if (weighted_perp >= max_weighted_perp) {
+					pseudorapidity_adapt = track.trkEta[k];
+					azimuth_adapt = track.trkPhi[k];
+					max_weighted_perp = weighted_perp;
+				}
 			}
+			jets.fr01Chg[j] = std::max(jets.fr01Chg[j], sum);
+			sum = 0;
 			for (int k = 0; k < photon.nPhotons; k++) {
-				float deta = photon.eta[k] - jets.jteta[j];
-				float dphi = deltaPhi(photon.phi[k], jets.jtphi[j]);
-				float angular_weight =
-					exp(-50.0F * (deta * deta + dphi * dphi));
+				const float dpseudorapidity =
+					photon.eta[k] - jets.jteta[j];
+				const float dazimuth =
+					deltaPhi(photon.phi[k], jets.jtphi[j]);
+				const float angular_weight =
+					exp(-50.0F * (dpseudorapidity * dpseudorapidity +
+								  dazimuth * dazimuth));
+				const float weighted_perp =
+					angular_weight * photon.pt[k] * photon.pt[k];
+				const float weighted_perp_square =
+					weighted_perp * photon.pt[k];
 
-				jets.fr01EM[j] += angular_weight *
-					photon.pt[k] * photon.pt[k];
+				sum += weighted_perp_square;
+				if (weighted_perp >= max_weighted_perp) {
+					pseudorapidity_adapt = photon.eta[k];
+					azimuth_adapt = photon.phi[k];
+					max_weighted_perp = weighted_perp;
+				}
 			}
+			jets.fr01EM[j] = std::max(jets.fr01EM[j], sum);
+			// (First order) adapted discriminant
+			sum = 0;
+			for (int k = 0; k < track.nTrk; k++) {
+				const float dpseudorapidity =
+					track.trkEta[k] - pseudorapidity_adapt;
+				const float dazimuth =
+					deltaPhi(track.trkPhi[k], azimuth_adapt);
+				const float angular_weight =
+					exp(-50.0F * (dpseudorapidity * dpseudorapidity +
+								  dazimuth * dazimuth));
+				const float weighted_perp =
+					angular_weight * track.trkPt[k] * track.trkPt[k];
+				const float weighted_perp_square =
+					weighted_perp * track.trkPt[k];
+
+				sum += weighted_perp_square;
+			}
+			jets.fr01Chg[j] = std::max(jets.fr01Chg[j], sum);
+			sum = 0;
+			for (int k = 0; k < photon.nPhotons; k++) {
+				const float dpseudorapidity =
+					photon.eta[k] - jets.jteta[j];
+				const float dazimuth =
+					deltaPhi(photon.phi[k], jets.jtphi[j]);
+				const float angular_weight =
+					exp(-50.0F * (dpseudorapidity * dpseudorapidity +
+								  dazimuth * dazimuth));
+				const float weighted_perp =
+					angular_weight * photon.pt[k] * photon.pt[k];
+				const float weighted_perp_square =
+					weighted_perp * photon.pt[k];
+
+				sum += weighted_perp_square;
+				if (weighted_perp >= max_weighted_perp) {
+					pseudorapidity_adapt = photon.eta[k];
+					azimuth_adapt = photon.phi[k];
+					max_weighted_perp = weighted_perp;
+				}
+			}
+			jets.fr01EM[j] = std::max(jets.fr01EM[j], sum);
+			// Combine charged track and ECAL energy (HCAL is too
+			// coarse for fake rejection purpose)
 			jets.fr01[j] = jets.fr01Chg[j] + jets.fr01EM[j];
 		}
 
-		for(std::vector<TBranch *>::const_iterator iterator = branch.begin();
+		for(std::vector<TBranch *>::const_iterator iterator =
+				branch.begin();
 			iterator != branch.end(); iterator++) {
 			(*iterator)->Fill();
 		}
 	}
 }
-
