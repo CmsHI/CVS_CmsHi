@@ -122,13 +122,13 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v2_v8.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2d1204_v9.root"
-                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
-                      //TString outname="output-data-Photon-v3_v10.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
+                      TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
-                      TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
-                      TString outname="output-hypho50v2_50kyongsun_v10.root",
-                      bool doCentReWeight=true
+                      //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
+                      //TString outname="output-hypho50v2_50kyongsun_v10.root",
+                      bool doCentReWeight=false
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
