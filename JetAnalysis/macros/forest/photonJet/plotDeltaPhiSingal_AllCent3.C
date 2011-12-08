@@ -202,8 +202,8 @@ TH1D * plotBalance(int cbin, int isolScheme,
       float nPhotonJet = anaAgj.rSigAll.h->GetEntries();
       if (anaAgj.subDPhiSide) nPhotonJet -= anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7);
       if (anaAgj.subSShapeSide) nPhotonJet -= anaAgj.rBkgSShape.h->GetEntries();
-      float lx = 0.7;
-      if (cbin<2) lx-=0.2;
+      float lx = 0.5;
+      if (cbin>=2) lx+=0.1;
       TLegend *t3=new TLegend(lx,0.7,0.9,0.85);
       if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,nameIsol,"");
       t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
@@ -298,7 +298,7 @@ void plotDeltaPhiSingal_AllCent3(
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(-0.1,0.60,0.54,0.86); 
+   TLegend *t3=new TLegend(0.,0.60,0.54,0.86); 
    t3->AddEntry(hFrameData,"PbPb","p");
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    //t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
