@@ -3,6 +3,7 @@
 #include <TH1D.h>
 #include <TNtuple.h>
 #include <iostream>
+#include "TChain.h"
 
 // Convinient Output Classes
 class EvtSel {
@@ -78,12 +79,20 @@ public:
    }
 };
 
+float GetCentWeight(TTree * tdata, TTree * tmc, TH1D * hData, TH1D * hMc)
+{
+   cout << tdata->GetTreeName() << endl;
+   cout << tmc->GetTreeName() << endl;
+   //tdata->Project("hCentData");
+}
+
 void analyzePhotonJet(
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
-                      TString outname="output-data-Photon-v3_v9.root"
+                      TString outname="output-data-Photon-v3_v10.root",
+                      bool doCentReWeight=false
                       
     )
 {
@@ -93,9 +102,18 @@ void analyzePhotonJet(
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
 
+   // Centrality reweiting
+   TH1D * hCentData = new TH1D("hCentData","",40,0,40);
+   TH1D * hCentMc = new TH1D("hCentMc","",40,0,40);
+   TChain * tdata = new TChain("tgj");
+   if (doCentReWeight) {
+      tdata->Add("output-data-Photon-v3_v9.root");
+   }
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
+   
+   GetCentWeight(tdata,c->tree,hCentData,hCentMc);
    
    // Output file
    TFile *output = new TFile(outname,"recreate");
