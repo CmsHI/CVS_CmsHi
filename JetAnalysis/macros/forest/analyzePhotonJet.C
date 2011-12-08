@@ -87,10 +87,11 @@ public:
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
       tdata->Add("output-data-Photon-v3_v9.root");
-      tmc->Add("output-hypho50v2_v9.root");
+      tmc->Add("output-hypho50v2_50kyongsun_v10_noreweight.root");
 
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
+      hReWt = new TH1D("hReWt","",40,0,40);
 
       //cout << "data: " << tdata->GetName() << " " << tdata->GetEntries() << endl;
       //cout << "mc: " << tmc->GetName() << " " << tmc->GetEntries() << endl;
@@ -98,16 +99,19 @@ public:
       tmc->Project("hCentMc","cBin",sel);
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
+      hReWt->Divide(hCentData,hCentMc);
    }
    float GetWeight(int cBin) {
-      if (hCentData->GetBinContent(cBin)==0 || hCentMc->GetBinContent(cBin)==0) {
+      int bin=cBin+1;
+      if (hCentData->GetBinContent(bin)==0 || hCentMc->GetBinContent(bin)==0) {
          return 0; 
       }
-      return hCentData->GetBinContent(cBin)/hCentMc->GetBinContent(cBin);
+      return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
    }
    TCut sel;
    TH1D * hCentData;
    TH1D * hCentMc;
+   TH1D * hReWt;
 };
 
 void analyzePhotonJet(
@@ -120,8 +124,10 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v2d1204_v9.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
-                      TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree/photon50_25k.root",
-                      TString outname="output-hypho50v2_v10.root",
+                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
+                      //TString outname="output-hypho50v2_2_v10.root",
+                      TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
+                      TString outname="output-hypho50v2_50kyongsun_v10.root",
                       bool doCentReWeight=true
     )
 {
