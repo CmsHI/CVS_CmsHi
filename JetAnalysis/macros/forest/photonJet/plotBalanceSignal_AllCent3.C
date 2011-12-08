@@ -199,7 +199,9 @@ TH1D * plotBalance(int cbin, int isolScheme,
       anaAgj.rSigAll.hScaled->SetLineStyle(2);
       anaAgj.rSigAll.hScaled->Draw("same hist");
       // Draw count
-      float nPhotonJet = anaAgj.rSigAll.h->GetEntries() - anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7) - anaAgj.rBkgSShape.h->GetEntries();
+      float nPhotonJet = anaAgj.rSigAll.h->GetEntries();
+      if (anaAgj.subDPhiSide) nPhotonJet -= anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7);
+      if (anaAgj.subSShapeSide) nPhotonJet -= anaAgj.rBkgSShape.h->GetEntries();
       float lx = 0.1;
       if (cbin<2) lx=-0.1;
       TLegend *t3=new TLegend(lx,0.7,0.5,0.85);
@@ -328,8 +330,8 @@ void plotBalanceSignal_AllCent3(
    tsel.DrawLatex(0.55,0.75,"p_{T,jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print(Form("./fig/12.07c/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.07c/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.08/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.08/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
 
    TCanvas * call = new TCanvas("call","",500,500);
    cout << "\n Centrality 0-100\%" << endl;
