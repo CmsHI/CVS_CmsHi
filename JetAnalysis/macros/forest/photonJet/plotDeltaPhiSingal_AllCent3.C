@@ -174,6 +174,7 @@ TH1D * plotBalance(int cbin, int isolScheme,
    } else if (dataType==1) {
       anaAgj.subDPhiSide = false;
       anaAgj.subSShapeSide = true;
+      if (!isData) anaAgj.subSShapeSide = false; // todo: get purity for mc sample
       anaAgj.MakeHistograms(1-photonPurity);
    }
 
@@ -187,10 +188,12 @@ TH1D * plotBalance(int cbin, int isolScheme,
          anaAgj.hSubtracted->SetLineColor(kBlue);
          anaAgj.hSubtracted->SetFillColor(kAzure-8);
          anaAgj.hSubtracted->SetFillStyle(3005);
+         anaAgj.hSubtracted->SetMarkerStyle(0);
       } else if (dataType==1) {   
          anaAgj.hSubtracted->SetLineColor(kBlue);
          anaAgj.hSubtracted->SetFillColor(kAzure-8);
          anaAgj.hSubtracted->SetFillStyle(3005);
+         anaAgj.hSubtracted->SetMarkerStyle(0);
       } else if (dataType==2) {   
          anaAgj.hSubtracted->SetLineColor(kBlue);
          anaAgj.hSubtracted->SetFillColor(kAzure-8);
@@ -240,14 +243,13 @@ void plotDeltaPhiSingal_AllCent3(
                                 )
 {
    TH1::SetDefaultSumw2();
-   // todo: reweight mc
    
    TCanvas *c1 = new TCanvas("c1","",1050,350);
    makeMultiPanelCanvas(c1,3,1,0.0,0.0,0.2,0.2,0.02);
    
    TFile * fout = new TFile("outhists.root","recreate");
    TH1D * hFrame = new TH1D("hFrame","",20,0.0001,3.1415926);
-   //hFrame->SetAxisRange(-0.4999,0.999,"X");
+   hFrame->SetAxisRange(0.0001,3.1415926,"X");
    hFrame->SetAxisRange(1e-3,1,"Y");
    hFrame->SetStats(0);
    hFrame->SetXTitle("|#Delta#phi|");
@@ -288,7 +290,7 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",false,false,1,"samehist",0);
+   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
    plotBalance(2,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
@@ -312,7 +314,7 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
    //plotBalance(1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",false,false,1,"samehist",0);
+   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
    plotBalance(1,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
@@ -322,8 +324,7 @@ void plotDeltaPhiSingal_AllCent3(
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    //t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    t3->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
-   //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYD","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
@@ -336,7 +337,7 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    //plotBalance(0,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",false,false,1,"samehist",0);
+   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
    plotBalance(0,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
@@ -352,8 +353,8 @@ void plotDeltaPhiSingal_AllCent3(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c1->Print(Form("./fig/12.08d/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_p0subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.08d/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.08svn/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.08svn/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.pdf",isolScheme));   
 
    //TCanvas * call = new TCanvas("call","",500,500);
    //gPad->SetLogy();

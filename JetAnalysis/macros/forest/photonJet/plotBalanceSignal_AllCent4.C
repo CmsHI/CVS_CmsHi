@@ -24,18 +24,21 @@
 class Region
 {
 public:
-   Region(TString n, TString v, TCut c) :
-   name(n),var(v),cut(c) {}
+   Region(TString n, TString v, TCut c, bool w) :
+   name(n),var(v),cut(c),useWeight {}
    void Init(TTree * t, int nbins, float xmin, float xmax, float frac) {
       fraction = frac;
       h = new TH1D(name,"",nbins,xmin,xmax);
       cout << "=== " << h->GetName() << " with fraction: " << fraction << " ===" << endl;
+      if (useWeight) cut*="weight";
       float nSel = t->Project(h->GetName(),var,cut);
       cout << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
       if (h->Integral()>0) hNorm->Scale(1./h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
       hScaled->Scale(fraction);
+      // check
+      t->Draw("cBin>>"+name+"_cbin(40,0,40)",cut,"goff");
    }
    
    TH1D * h;

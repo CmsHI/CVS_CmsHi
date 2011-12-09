@@ -24,18 +24,21 @@
 class Region
 {
 public:
-   Region(TString n, TString v, TCut c) :
-   name(n),var(v),cut(c) {}
+   Region(TString n, TString v, TCut c, bool w) :
+   name(n),var(v),cut(c),useWeight(w) {}
    void Init(TTree * t, int nbins, float xmin, float xmax, float frac) {
       fraction = frac;
       h = new TH1D(name,"",nbins,xmin,xmax);
       cout << "=== " << h->GetName() << " with fraction: " << fraction << " ===" << endl;
+      if (useWeight) cut*="weight";
       float nSel = t->Project(h->GetName(),var,cut);
       cout << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
       if (h->Integral()>0) hNorm->Scale(1./h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
       hScaled->Scale(fraction);
+      // check
+      t->Draw("cBin>>"+name+"_cbin(40,0,40)",cut,"goff");
    }
    
    TH1D * h;
@@ -44,6 +47,7 @@ public:
    TString name;
    TString var;
    TCut cut;
+   bool useWeight;
    float fraction;
 };
 
@@ -54,9 +58,9 @@ public:
    SignalCorrector(TTree * tree, TString n, TCut s, bool w=false) : 
    name(n),
    sel(s),
-   rSigAll(n+"SignalAll","Agj",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),
-   rBkgDPhi(n+"BkgDPhi","Agj",s&&"acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01"),
-   rBkgSShape(n+"BkgSShape","Agj",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011"),
+   rSigAll(n+"SignalAll","Agj",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",w),
+   rBkgDPhi(n+"BkgDPhi","Agj",s&&"acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
+   rBkgSShape(n+"BkgSShape","Agj",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011",w),
    useWeight(w),
    subDPhiSide(true),
    subSShapeSide(true) {
@@ -99,15 +103,14 @@ public:
 //---------------------------------------------------------------------
 TH1D * plotBalance(int cbin, int isolScheme,
                    TString infname,
-                   bool useWeight,
-                   int dataType, // 0=gen, 1=reco, 2=pp
+                   bool useWeight, bool isData, int dataType, // 0=mc gen, 1=reco
                    TString opt,
                    bool doCheck=false)
 {
    // open the data file
    TFile *inf = new TFile(infname.Data());
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   
+   cout << "useWeight: " << useWeight << " isData: " << isData << endl;
    TCut cut,cutIsol;
    TString name,nameIsol;
    float photonPurity;
@@ -133,11 +136,13 @@ TH1D * plotBalance(int cbin, int isolScheme,
    }
    cout << "Isolation: " << TString(cutIsol) << endl;
    
-   if (dataType==1) {
-      cut="anaEvtSel && photonEt>60 && jetEt>30"&&cutIsol; // reco
+   if (dataType==1) { // reco
+      cut="photonEt>60 && jetEt>30"&&cutIsol;
+      if (isData) cut = "anaEvtSel"&&cut;
+      else cut = "offlSel"&&cut;
       name=Form("reco%d",cbin);
    }
-   else if (dataType==0) {
+   else if (dataType==0) { // gen
       cut="photonEt>60 && jetEt>30 && acos(cos(photonPhi-jetPhi))>2.0944"; // gen
       name=Form("gen%d",cbin);
    }
@@ -160,29 +165,43 @@ TH1D * plotBalance(int cbin, int isolScheme,
 
    SignalCorrector anaAgj(nt,name,cut,useWeight);
    
-   // histogram style
-   if (dataType==1) {
-      anaAgj.subDPhiSide = true;
-      anaAgj.subSShapeSide = true;
-      anaAgj.MakeHistograms(1-photonPurity);
-      anaAgj.hSubtracted->SetLineColor(kRed);
-      anaAgj.hSubtracted->SetMarkerColor(kRed);
-      anaAgj.hSubtracted->SetMarkerStyle(20);
-   } else if (dataType==0) {
+   // analyze tree
+   if (dataType==0) {
       anaAgj.subDPhiSide = false;
       anaAgj.subSShapeSide = false;
       anaAgj.rSigAll.cut = cut;
       anaAgj.MakeHistograms(0);
-      anaAgj.hSubtracted->SetLineColor(kBlue);
-      anaAgj.hSubtracted->SetFillColor(kAzure-8);
-      anaAgj.hSubtracted->SetFillStyle(3005);
-   } else if (dataType==2) {   
-      anaAgj.hSubtracted->SetLineColor(kBlue);
-      anaAgj.hSubtracted->SetFillColor(kAzure-8);
-      anaAgj.hSubtracted->SetFillStyle(3004);
-      anaAgj.hSubtracted->SetStats(0);
-      anaAgj.hSubtracted->SetLineStyle(2);
-      anaAgj.hSubtracted->SetMarkerStyle(0);
+   } else if (dataType==1) {
+      anaAgj.subDPhiSide = true;
+      anaAgj.subSShapeSide = true;
+      if (!isData) anaAgj.subSShapeSide = false; // todo: get purity for mc sample
+      anaAgj.MakeHistograms(1-photonPurity);
+   }
+   
+   // histogram style
+   if (isData) {
+      anaAgj.hSubtracted->SetLineColor(kRed);
+      anaAgj.hSubtracted->SetMarkerColor(kRed);
+      anaAgj.hSubtracted->SetMarkerStyle(20);
+   } else {
+      if (dataType==0) {
+         anaAgj.hSubtracted->SetLineColor(kBlue);
+         anaAgj.hSubtracted->SetFillColor(kAzure-8);
+         anaAgj.hSubtracted->SetFillStyle(3005);
+         anaAgj.hSubtracted->SetMarkerStyle(0);
+      } else if (dataType==1) {   
+         anaAgj.hSubtracted->SetLineColor(kBlue);
+         anaAgj.hSubtracted->SetFillColor(kAzure-8);
+         anaAgj.hSubtracted->SetFillStyle(3005);
+         anaAgj.hSubtracted->SetMarkerStyle(0);
+      } else if (dataType==2) {   
+         anaAgj.hSubtracted->SetLineColor(kBlue);
+         anaAgj.hSubtracted->SetFillColor(kAzure-8);
+         anaAgj.hSubtracted->SetFillStyle(3004);
+         anaAgj.hSubtracted->SetStats(0);
+         anaAgj.hSubtracted->SetLineStyle(2);
+         anaAgj.hSubtracted->SetMarkerStyle(0);
+      }
    }
    anaAgj.hSubtracted->Draw(opt);
    if (doCheck) {
@@ -269,8 +288,9 @@ void plotBalanceSignal_AllCent3(
    c1->cd(1);
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
-   plotBalance(2,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   plotBalance(2,isolScheme,"../output-data-Photon-v3_v9.root",false,1,"sameE",1);
+   //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
+   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
+   plotBalance(2,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.24,0.43,"CMS Preliminary");
@@ -295,8 +315,9 @@ void plotBalanceSignal_AllCent3(
    c1->cd(2);
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
-   plotBalance(1,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   plotBalance(1,isolScheme,"../output-data-Photon-v3_v9.root",false,1,"sameE",1);
+   //plotBalance(1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
+   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
+   plotBalance(1,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -305,8 +326,7 @@ void plotBalanceSignal_AllCent3(
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    t3->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
-   //t3->AddEntry(h,"PYTHIA+HYD Reco","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYD Gen","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
@@ -317,8 +337,9 @@ void plotBalanceSignal_AllCent3(
    c1->cd(3);
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
-   plotBalance(0,-1,"../output-hypho50gen_v4.root",false,0,"samehist",false);
-   plotBalance(0,isolScheme,"../output-data-Photon-v3_v9.root",false,1,"sameE",1);
+   //plotBalance(0,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
+   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
+   plotBalance(0,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
@@ -330,15 +351,8 @@ void plotBalanceSignal_AllCent3(
    tsel.DrawLatex(0.55,0.75,"p_{T}^{jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print(Form("./fig/12.08/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.08/photon60v3_v9_jet30_imbalance_all_cent_p0subAll_Isol%d.pdf",isolScheme));   
-
-   TCanvas * call = new TCanvas("call","",500,500);
-   cout << "\n Centrality 0-100\%" << endl;
-   hFrame->Draw();
-   plotBalance(-1,-1,"../output-hypho50gen_v4.root",false,0,"samehist",0);
-   plotBalance(-1,isolScheme,"../output-data-Photon-v3_v9.root",false,1,"sameE",1);
-   drawText("0-100%",0.8,0.3);
+   c1->Print(Form("./fig/12.08svn/photon60v3_v9_jet30_imbalance_all_cent_subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.08svn/photon60v3_v9_jet30_imbalance_all_cent_subAll_Isol%d.pdf",isolScheme));   
 
    // save histograms
 //   fout->Write();
