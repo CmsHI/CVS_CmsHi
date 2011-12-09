@@ -36,6 +36,40 @@ public:
    float vz,weight;
 };
 
+static const int MAXTRK = 10000;
+
+class GammaJet{
+public:
+   GammaJet() :
+   photonEt(-99),photonEta(0),photonPhi(0),
+   jetEt(-99),jetEta(0),jetPhi(0),
+   deta(-99),dphi(-99), Aj(-99),
+   sigmaIetaIeta(-99),
+   nTrk(0)
+   {}
+   float photonEt,photonRawEt;
+   float photonEta;
+   float photonPhi;
+   float jetEt;
+   float jetEta;
+   float jetPhi;
+   float deta;
+   float dphi;
+   float Aj;
+   float hovere,sigmaIetaIeta,sumIsol;
+   int nTrk;
+   float trkPt[MAXTRK];
+   float trkEta[MAXTRK];
+   float trkPhi[MAXTRK];   
+   void clear() {
+      photonEt=-99; photonEta=0; photonPhi=0;
+      jetEt=-99; jetEta=0; jetPhi=0;
+      deta=-99; dphi=-99; Aj=-99;
+      sigmaIetaIeta=-99;
+      nTrk=0;
+   }
+};
+
 TGraphAsymmErrors *divideGraph(TGraphAsymmErrors *a,TGraphAsymmErrors *b)
 {
    TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
@@ -68,7 +102,7 @@ TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart)
       double errYH = gEfficiency->GetErrorYhigh(i);
       gEfficiency->SetPointError(i,0,0,errYL,errYH);
       gEfficiency->SetPoint(i,npart[h1->FindBin(x)-1],y);
-      cout <<x<<" "<<h1->FindBin(x)<<" "<<npart[h1->FindBin(x)-1]<<endl;
+      cout <<"x: " << x<<" "<<h1->FindBin(x)<<" "<<npart[h1->FindBin(x)-1]<< " y: " << y << endl;
    }
    return gEfficiency;
 }
@@ -91,52 +125,8 @@ TGraphAsymmErrors *calcEffpythia(TH1* h1, TH1* hCut,double *npart)
    return gEfficiency;
 }
 
-
-
-
-void plotRBSignal(double ajCut= 0.9,
-                  double ajCut2 = 0.9,
-                  TString infname = "../output-data-Photon-v3_v10.root",
-                  TString pythia = "output-40-pp.root",
-                  TString mix = "mix.root",
-                  TString titleForComparison = "PYTHIA+DATA",
-                  TString titleForFile = "Result",
-                  bool useWeight = true,
-                  bool drawXLabel = false,
-                  bool drawLeg = true)
-{		
-   int threshold1 = 60;
-   int threshold2 = 40;
-   gStyle->SetErrorX(0); 
-   TString cut1=Form("photonEt>%d",threshold1);
-   TString cut2=Form("photonEt>%d",threshold2);
-   cout <<cut1.Data()<<endl;
-   cout <<cut2.Data()<<endl;
-   
-   TString trigcut = "";
-   TString cstring = "";
-   
-   // open the data file
-   TFile *inf = new TFile(infname.Data());
-   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   
-   // open the pythia (MC) file
-//   TFile *infPythia = new TFile(pythia.Data());
-//   TTree *ntPythia = (TTree*) infPythia->FindObjectAny("nt");
-   
-   // open the datamix file
-   //TFile *infMix = new TFile(mix.Data());
-   //TTree *ntMix =(TTree*)infMix->FindObjectAny("nt");
-   
-   // open output
-   TFile *outfile = new TFile("output.root","recreate");
-   TNtuple *ntOut = new TNtuple("ntOut","","npart");
-   
-   const int nBin = 6;
-   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
-   double npart[nBin] = {2,358.623,232.909,97.9521};
-   double npart2[nBin] = {2,358.623,232.909,97.9521};
-   
+void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1)
+{
    double npartValue[40];
    npartValue[0] = 393.633;
    npartValue[1] = 368.819;
@@ -179,183 +169,91 @@ void plotRBSignal(double ajCut= 0.9,
    npartValue[38] = 3.16107;
    npartValue[39] = 2.7877;
    
-   TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
-   TH1D *h = new TH1D("h","",nBin,m);
-   TH1D *hCut = new TH1D("hCut","",nBin,m);
-   TH1D *h2 = new TH1D("h2","",nBin,m);
-   TH1D *h2Cut = new TH1D("h2Cut","",nBin,m);
-   
    TH1D *hStat = new TH1D("hStat","",nBin,m);
    TH1D *hNpartSum = new TH1D("hNpartSum","",nBin,m);
-   TH1D *hStat2 = new TH1D("hStat2","",nBin,m);
-   TH1D *hNpartSum2 = new TH1D("hNpartSum2","",nBin,m);
-   
-   EvtSel evt;
-   nt->SetBranchAddress("evt",&evt.run);
-   
+
    for (int i=0;i<nt->GetEntries();i++)
    {
       nt->GetEntry(i);
-      cout << "cBin: " << evt.cBin << endl;
-//      if (et1<threshold1) continue;
-//      
-//      if (et1>threshold2) {
-//         hNpartSum2->Fill(bin,npartValue[(int)bin]);
-//         hStat2->Fill(bin); 
-//         if (et1>threshold1) {
-//            hNpartSum->Fill(bin,npartValue[(int)bin]);
-//            hStat->Fill(bin); 
-//         }
-//      }	 
+      if (i%10000==0) cout <<i<<" / "<< nt->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      
+      if (gj.photonEt>threshold1) {
+         hNpartSum->Fill(evt.cBin,npartValue[evt.cBin]);
+         hStat->Fill(evt.cBin); 
+      }
    }
    
-//   hNpartSum->Divide(hStat);
-//   hNpartSum2->Divide(hStat2);
-//   
-//   for (int i=1;i<nBin;i++)
-//   {
-//      cout <<hNpartSum->GetBinContent(i+1)<<endl;
-//      npart[i]=hNpartSum->GetBinContent(i+1);
-//      cout <<hNpartSum2->GetBinContent(i+1)<<endl;
-//      npart2[i]=hNpartSum2->GetBinContent(i+1);
-//      
-//   }
-//   
-//   nt->Draw("cBin>>h",Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut,cut1.Data()));
-//   nt->Draw("cBin>>hCut",Form("%s",cut1.Data()));
-//   TGraphAsymmErrors *g = calcEff(hCut,h,npart);
-//   g->SetMarkerSize(1.25);
-//   
-//   cout <<cut2.Data()<<endl;
-//   nt->Draw("cBin>>h2",Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut2,cut2.Data()));
-//   nt->Draw("cBin>>h2Cut",Form("%s",cut2.Data()));
-//   TGraphAsymmErrors *g2 = calcEff(h2Cut,h2,npart2);
-//   g2->SetMarkerSize(1.25);
-//   
-//   
-//   ntPythia->Draw("cBin>>h",Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut2,cut2.Data()));
-//   ntPythia->Draw("cBin>>hCut",Form("%s",cut2.Data()));
-//   cout<<" pythia "<<endl;
-//   TGraphAsymmErrors *gPythia = calcEffpythia(hCut,h,npart);
-//   gPythia->SetMarkerSize(1.7);
-//   
-//   
-//   //ntMix->Draw("cBin>>h",Form("weight*(Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s)",ajCut2,cut2.Data()));
-//   //ntMix->Draw("cBin>>hCut",Form("weight*(%s)",cut2.Data()));
-//   //TGraphAsymmErrors *gMix = calcEff(hCut,h,npart);
-//   //gMix->SetMarkerSize(1.25);
-//   
-//   TCanvas *c = new TCanvas("c","",600,600);
-//   //  hTmp->SetMaximum(g->GetY()[0]*2.2);
-//   //hTmp->SetMaximum(1.4*gPythia->GetY()[0]);
-//   hTmp->SetMaximum(0.7);
-//   hTmp->SetMinimum(0.);
-//   
-//   hTmp->SetXTitle("N_{part}");
-//   //  hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
-//   hTmp->SetYTitle(Form("R_{B}",ajCut));
-//   hTmp->GetXaxis()->CenterTitle();
-//   hTmp->GetYaxis()->CenterTitle();
-//   hTmp->GetYaxis()->SetTitleOffset(1.4);
-//   hTmp->GetYaxis()->SetTitleSize(0.05);
-//   hTmp->SetAxisRange(0,0.35,"Y");
-//   hTmp->Draw();
-//   
-//   double errorbar = 0.02;
-//   /*
-//    for(int i = 0; i < g->GetN(); ++i){
-//    double *x = g->GetX();
-//    double *y = g->GetY();
-//    //    DrawTick(y[i],0.18*y[i],0.18*y[i],x[i],0.012,8.1,16);
-//    }
-//    g->Draw("p same");
-//    g2->SetMarkerStyle(4);
-//    */
-//   for(int i = 0; i < g2->GetN(); ++i){
-//      double *x = g2->GetX();
-//      double *y = g2->GetY();
-//      double errBck = 1-(0.4848-(6.581e-05)*x[i])/0.5;
-//      double err = sqrt(0.063*0.063+0.048*0.048+errBck*errBck);
-//      //    err= 0.14;
-//      DrawTick(y[i],err*y[i],err*y[i],x[i],0.012,8.1,1);
-//   }
-//   gPythia->SetMarkerColor(4);
-//   gPythia->SetLineColor(4);
-//   g2->SetMarkerColor(2);
-//   g2->SetLineColor(2);
-//   gPythia->SetMarkerStyle(29);
-//   //gMix->SetMarkerColor(2);
-//   //gMix->SetLineColor(2);
-//   //gMix->Draw("p same");
-//   //gMix->SetMarkerStyle(21);
-//   gPythia->Draw("p same");
-//   g2->Draw("p same");
-//   
-//   
-//   TLine* pline = new TLine(0,gPythia->GetY()[0],400,gPythia->GetY()[0]);
-//   pline->SetLineColor(4);
-//   pline->SetLineStyle(4);
-//   pline->Draw();
-//   
-//   if(drawLeg){
-//      TLegend *t3=new TLegend(0.5,0.77,0.9,0.93); 
-//      t3->AddEntry(g2,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
-//      t3->AddEntry(gPythia,"pp","p");  
-//      //t3->AddEntry(gMix,titleForComparison.Data(),"p");
-//      t3->SetFillColor(0);
-//      t3->SetBorderSize(0);
-//      t3->SetFillStyle(0);
-//      t3->SetTextFont(63);
-//      t3->SetTextSize(15);
-//      t3->Draw();
-//   }
-//   
-//   
-//   TLatex *cms = new TLatex(0.20,0.88,"CMS Preliminary");
-//   cms->SetNDC();
-//   cms->SetTextFont(63);
-//   cms->SetTextSize(18);
-//   cms->Draw();                                                                                                                                        
-//   TLatex tsel;
-//   tsel.SetNDC();
-//   tsel.SetTextFont(63);
-//   tsel.SetTextSize(15);
-//   tsel.DrawLatex(0.25,0.275,"p_{T,#gamma} > 60 GeV/c");
-//   tsel.DrawLatex(0.25,0.325,"p_{T,Jet} > 40 GeV/c");
-//   tsel.DrawLatex(0.25,0.375,"#Delta#phi_{12} > #frac{2}{3}#pi");
-//   
-//   TLatex *lumi = new TLatex(0.20,0.81,"#intL dt = 40 #mub^{-1}");
-//   lumi->SetNDC();
-//   lumi->SetTextFont(63);
-//   lumi->SetTextSize(15);
-//   lumi->Draw(); 
-//   
-//   c->Print(Form("fig/RB_%f_%s_vs_Npart.eps",ajCut,titleForFile.Data()));
-//   c->Print(Form("fig/RB_%f_%s_vs_Npart.C",ajCut,titleForFile.Data()));
-//   c->Print(Form("fig/RB_%f_%s_vs_Npart.gif",ajCut,titleForFile.Data()));
-//   
-//   /*
-//    TCanvas *c1 = new TCanvas("c1","",500,500);
-//    
-//    gMix->Draw("ap");
-//    gMix->Fit("pol1");
-//    */
-//   TCanvas *c2 = new TCanvas("c2","",500,500);
-//   
-//   TGraphAsymmErrors *gRatio = divideGraph(g2,gMix);
-//   gRatio->Draw("ap");
-//   gRatio->Fit("pol1");
-//   gRatio->Fit("pol0");
-//   
-//   c2->Print(Form("fig/RB_Ratio_%f_%s_vs_Npart.eps",ajCut,titleForFile.Data()));
-//   c2->Print(Form("fig/RB_Ratio_%f_%s_vs_Npart.C",ajCut,titleForFile.Data()));
-//   c2->Print(Form("fig/RB_Ratio_%f_%s_vs_Npart.gif",ajCut,titleForFile.Data()));
-//   
+   hNpartSum->Divide(hStat);
+   
+   for (int i=1;i<nBin;i++)
+   {
+      cout <<hNpartSum->GetBinContent(i+1)<<endl;
+      npart[i]=hNpartSum->GetBinContent(i+1);
+   }
 }
 
 
-// 6.3 % for smearing
-// 4.8% for energy correction
-
-
-
+void plotRBSignal(double ajCut= 0.9,
+                  double ajCut2 = 0.9,
+                  TString infname = "../output-data-Photon-v3_v10.root",
+                  TString pythia = "output-40-pp.root",
+                  TString mix = "mix.root",
+                  TString titleForComparison = "PYTHIA+DATA",
+                  TString titleForFile = "Result",
+                  bool useWeight = true,
+                  bool drawXLabel = false,
+                  bool drawLeg = true)
+{		
+   double threshold1 = 60;
+   gStyle->SetErrorX(0); 
+   TString cut1=Form("photonEt>%f",threshold1);
+   cout <<cut1.Data()<<endl;
+   
+   TString trigcut = "";
+   TString cstring = "";
+   
+   // open the data file
+   TFile *inf = new TFile(infname.Data());
+   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
+   
+   // open output
+   TFile *outfile = new TFile("output.root","recreate");
+   TNtuple *ntOut = new TNtuple("ntOut","","npart");
+   
+   const int nBin = 6;
+   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   double npart[nBin] = {2,358.623,232.909,97.9521};
+   EvtSel evt;
+   GammaJet gj;
+   nt->SetBranchAddress("evt",&evt.run);
+   nt->SetBranchAddress("jet",&gj.photonEt);
+   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1);
+   cout << "got npart" << endl;
+  
+   TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
+   TH1D *h = new TH1D("h","",nBin,m);
+   TH1D *hCut = new TH1D("hCut","",nBin,m);
+   
+   TCanvas *c0 = new TCanvas("c0","",500,500);
+   cout << "cut: " << Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut,cut1.Data()) << endl;
+   nt->Draw("cBin>>h",Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut,cut1.Data()));
+   nt->Draw("cBin>>hCut",Form("%s",cut1.Data()),"sameE");
+   TGraphAsymmErrors *g = calcEff(hCut,h,npart);
+   
+   TCanvas *c = new TCanvas("c","",500,500);
+   hTmp->SetXTitle("N_{part}");
+   hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
+   hTmp->SetYTitle(Form("R_{B}",ajCut));
+   hTmp->GetXaxis()->CenterTitle();
+   hTmp->GetYaxis()->CenterTitle();
+   hTmp->GetYaxis()->SetTitleOffset(1.4);
+   hTmp->GetYaxis()->SetTitleSize(0.05);
+   hTmp->SetAxisRange(0,1,"Y");
+   hTmp->Draw();
+   
+   g->SetMarkerSize(1.25);
+   g->SetMarkerStyle(kFullCircle);
+   g->SetMarkerColor(2);
+   g->SetLineColor(2);
+   g->Draw("p same");
+}
