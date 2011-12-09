@@ -6,16 +6,22 @@ const int kSBB  = 2;
 const int kSumIso = 1;
 const int k3dIso =  2;
 const int kFisher = 3;
-
+const int kNoIso  = 4;
 void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="");
 
 TCut getIsoCut( int isoChoice=0 ) {
    if         (isoChoice == kSumIso) return isoSumCut;
    else    if (isoChoice == k3dIso ) return iso3dCut;
    else    if (isoChoice == kFisher) return FisherCut;
+   else    if (isoChoice == kNoIso) return "";
    else   cout << "!!!!!!! No such isolation choice" << endl;
 }
-
+TString getIsoLabel ( int isoChoice=0) {
+   if ( isoChoice == kSumIso) return "sumIso";
+   if ( isoChoice == k3dIso)  return "3dIso";
+   if ( isoChoice == kFisher) return "fisherIso";
+   else   cout << "!!!!!!! No such isolation choice" << endl;
+}
 void photonTemplateProducer(int isoChoice = kSumIso) {
    
    
@@ -26,6 +32,20 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
    TH1D* hSig[5];
    TH1D* hBkg[5];
    
+   TH1D* hPurity = new TH1D(Form("hPurity_%s",getIsoLabel(isoChoice).Data()),";Cent Bin;purity",3,0.5,3.5);
+   TH1D* hNsig   = (TH1D*)hPurity->Clone(Form("hNsig_%s",getIsoLabel(isoChoice).Data()));
+   hNsig->SetYTitle("number of signals");
+   TH1D* hEff   = (TH1D*)hPurity->Clone(Form("hEff_%s",getIsoLabel(isoChoice).Data()));
+   hEff->SetYTitle("Calo Iso Efficiency");
+   
+   TH1D* hN   = (TH1D*)hPurity->Clone(Form("hN_%s",getIsoLabel(isoChoice).Data()));
+   hN->SetYTitle("Efficiency corrected photon counts");
+   hN->Sumw2();
+
+   
+   TH1D* htemp3 = new TH1D("htemp3","",25,0,0.250);
+   getTemplate(htemp3,"barrelHiForestPhotonV2.root",kNoIso ,kData,0,39);
+   
    for ( int icent = 1 ; icent<=nCent_std ; icent++) { 
       int lowCent = centBin_std[icent-1];    
       int highCent = centBin_std[icent]-1;
@@ -35,8 +55,8 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
       hBkg[icent]   = (TH1D*)hData[icent]->Clone(Form("hBkg_cent%d",icent));
 	 
       getTemplate(hSig[icent],"meaningless",isoChoice,kSig,lowCent,highCent);
-      getTemplate(hData[icent],"barrelHiForestPhoton_Skim2011-Dec07-withTracks.root",isoChoice,kData,lowCent,highCent);
-      getTemplate(hBkg[icent],"barrelHiForestPhoton_Skim2011-Dec07-withTracks.root",isoChoice,kSBB,lowCent,highCent);
+      getTemplate(hData[icent],"barrelHiForestPhotonV2.root",isoChoice,kData,lowCent,highCent);
+      getTemplate(hBkg[icent], "barrelHiForestPhotonV2.root",isoChoice,kSBB,lowCent,highCent);
       
    }
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
@@ -45,9 +65,19 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
       
       double nSig, nSigErr, chisq,purity10;
       c1->cd(nCent_std-icent+1);
-      double purity = doFit ( hSig[icent], hBkg[icent], hData[icent], nSig, nSigErr, 0,0.025, (icent==3),chisq,purity10);
-      cout << " purity = " << purity << endl;
-      drawText(Form("%.0f % ~ %.0f %", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5980963,0.4569118);
+      fitResult fitr = doFit ( hSig[icent], hBkg[icent], hData[icent], nSig, nSigErr, 0.001,0.025, (icent==3),chisq,purity10);
+      cout << " purity = " << fitr.purity010 << endl;
+      cout << " nSig   = " << fitr.nSig << endl;
+      drawText(Form("%.0f % ~ %.0f %", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.4569118);
+      if ( icent == 3) 
+	 drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.5680963,0.3569118,1,15);
+      else 
+	 drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
+      hPurity->SetBinContent(icent, fitr.purity010);
+      hPurity->SetBinError  (icent, fitr.purity010* fitr.nSigErr/fitr.nSig);
+      hNsig->SetBinContent(icent, fitr.nSig);
+      hNsig->SetBinError  (icent, fitr.nSigErr);
+
       TString aa = "";
       if (isoChoice == kSumIso)  aa = "Sum Iso Method";
       if (isoChoice == k3dIso)   aa = "3d Cut Method";
@@ -59,10 +89,13 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
    c1->cd(2*nCent_std);
    
    // efficiency plots
-   const int nPtBin = 5;
-   double ptBin[nPtBin+1] = {60,70,90,110,140,200};
+   const int nPtBin = 3;
+   double ptBin[nPtBin+1] = {60,80,110,200};
    TH1D* heff[7][5];
+   TH1D* effSingleBin = new TH1D("effSingleBin","",1,60,100000);
    TGraphAsymmErrors* geff[7][5];
+   TGraphAsymmErrors* gSingleBin = new TGraphAsymmErrors();
+
    for (int icent = 1; icent <=nCent_std; icent++) {
       for ( int iid=1 ; iid<=5; iid++) {
          heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";Leading Photon E_{T} (GeV);",nPtBin, ptBin);
@@ -85,6 +118,10 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
       getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && srIsoCut);
       nId++;
       getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1 && sigmaIetaIeta<0.010"&& srIsoCut);
+      effSingleBin->Reset();
+      getEff(effSingleBin, gSingleBin, centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && srIsoCut);
+      hEff->SetBinContent(icent, effSingleBin->GetBinContent(1));
+      hEff->SetBinError(icent,0.05);
    }
    
    for (int icent = 1; icent <=nCent_std; icent++) {
@@ -113,21 +150,47 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
             TLegend* leg1 =  new TLegend(0.25,0.20,0.95,0.55,NULL,"brNDC");
             easyLeg(leg1,"Photon ID efficiency");
             leg1->AddEntry(heff[icent][1],"spike rejection","lp");
-            leg1->AddEntry(heff[icent][2],"+ H/E < 0.2","lp");
+            leg1->AddEntry(heff[icent][2],"+ H/E < 0.1","lp");
             leg1->AddEntry(heff[icent][3],"+ Calo Isolation","lp");
             leg1->AddEntry(heff[icent][4],"+ #sigma_{#eta#eta} <0.010","lp");
             leg1->Draw();
          }
    }
+   c1->SaveAs(Form("fittingPurity_%s.gif",getIsoLabel(isoChoice).Data()));
+
+   TCanvas* c2 = new TCanvas("cPurity","",1000,500);
+   c2->Divide(2,1);
+   c2->Draw();
+   c2->cd(1);
+   handsomeTH1(hPurity);
+   hPurity->SetAxisRange(0,1.1,"Y");
+   hPurity->Draw();
+   handsomeTH1(hEff,2);
+   hEff->Draw("same");
+
+   c2->cd(2);
+   hN->Reset();
+   hN->Add(hNsig);
+   hN->Divide(hEff);
+   hN->Draw();
+   
+   c2->SaveAs(Form("crossSection_%s.gif",getIsoLabel(isoChoice).Data()));
+   TFile outf = TFile("photonPurityCollection.root","update");
+   hN->Write();
+   hEff->Write();
+   hPurity->Write();
+   outf.Close();
    
    
 }
 
 void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent, int highCent, TCut addCut) { 
  
-   char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_75k.root";
-   char* fnamePho80 = "barrelHiForestPhoton_MCphoton80_25k.root";
-   
+   char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_51k.root";
+   float nEvtPho50     = 50720;
+   char* fnamePho80 = "barrelHiForestPhoton_MCphoton80_26k.root";
+   float nEvtPho80     = 26000;
+
    char* fnameData  = "barrelHiForestPhoton_Skim2011-Dec07-withTracks.root";
    
    TCut evtSelCut = "tgj.anaEvtSel";
@@ -135,11 +198,10 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
    TCut photonJetCut  = "tgj.photonEt>60  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
-
    TCut generalCutMC   = photonJetCut && dphiCut && lPhotCut && centCut && addCut;
    TCut generalCutData = generalCutMC && evtSelCut;
-
-   TCut sbIsoCut ="(cc4+cr4+ct4PtCut20)/0.9>6";
+   
+   TCut sbIsoCut ="(cc4+cr4+ct4PtCut20)/0.9>6 && (cc4+cr4+ct4PtCut20)/0.9 < 11 ";
    TCut srIsoCut = getIsoCut(isoChoice);
 
    TCut finalCut="";
@@ -152,14 +214,20 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
    
    multiTreeUtil* photon1 = new multiTreeUtil();
    
-   float csPho50 = 10;
-   float csPho80 = 1;
-      
+   float csPho50 = 6.663e-7;
+   float csPho80 = 8.731e-8;
+   float weightPho50 = csPho50/nEvtPho50;
+   float weightPho80 = csPho80/nEvtPho80;
+   
+   TString weightBit = "";
    if ( iTemp  == kSig) {
-      photon1->addFile( fnamePho50,  "yongsunPhotonTree", "" , csPho50);
+      photon1->addFile( fnamePho50,  "yongsunPhotonTree", "" , weightPho50);
+      photon1->addFile( fnamePho80,  "yongsunPhotonTree", "" , weightPho80);
+      weightBit = "ncoll";
    }
    else {  // if this is data
-      photon1->addFile( fname1 , "yongsunPhotonTree", "" , csPho50);
+      photon1->addFile( fname1 , "yongsunPhotonTree", "" ,1);
+      weightBit = "";
    }
    photon1->AddFriend("yEvt=yongsunHiEvt");
    photon1->AddFriend("tgj");
@@ -168,9 +236,24 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
    h1->Reset();
    h1->Sumw2();
    TH1D* htemp = (TH1D*)h1->Clone("htemp");
-   photon1->Draw2(htemp,  "sigmaIetaIeta",   finalCut);
+   htemp->Reset();
+   htemp->Sumw2();
+   photon1->Draw2(htemp,  "sigmaIetaIeta",   finalCut,  weightBit);
+   TH1D* hcBins = new TH1D("hncoll","",40,-.5,39.5);
+   if ( iTemp == kData ) {
+      cout << "Data entries = "<<  htemp->Integral() << endl;
+      cout << "cut = " << finalCut.GetTitle() <<  endl;
+      photon1->Draw2(hcBins,  "yEvt.hiBin",   finalCut);
+      for ( int j = 0 ; j<40 ; j++) {
+	 cout << "weightCbin["<<j<<"] = "<< hcBins->GetBinContent( hcBins->FindBin(j)) << endl;
+      }
+   }
+   
    h1->Add(htemp);
    htemp->Reset();
    
+      
    delete photon1;
+   
+   
 }
