@@ -115,9 +115,12 @@ public:
 };
 
 void analyzePhotonJet2010(
-                      TString inname="/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod02.root",
-                      TString outname="output-data-HI2010-Photon40_prod02_v10.root",
-                      bool doCentReWeight=false
+                          //TString inname="/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod02.root",
+                          //TString outname="output-data-HI2010-Photon40_prod02_v10.root",
+                          TString inname="/d100/yjlee/hiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
+                          TString outname="output-data-pp_prod3_v10.root",
+                          bool doCentReWeight=false,
+                          bool isPp=true
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -151,13 +154,20 @@ void analyzePhotonJet2010(
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    
-   int runNum=-1,evtNum=-1,centBin=-1;
+   int runNum=-1,evtNum=-1,centBin=-1,HLT_Photon15_CaloIdVL_v1=0;
+   int phfCoincFilter=0,ppurityFractionFilter=0,pHBHENoiseFilter=0;
    c->hltTree->SetBranchAddress("Run",&runNum);
    c->hltTree->SetBranchAddress("Event",&evtNum);
    c->hltTree->SetBranchAddress("hiBin",&centBin);
-
+   if (isPp) {
+      c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
+      c->skimTree->SetBranchAddress("phfCoincFilter",&phfCoincFilter);
+      c->skimTree->SetBranchAddress("ppurityFractionFilter",&ppurityFractionFilter);
+      c->skimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+   }
    // Main loop
-   for (int i=0;i<c->GetEntries();i++)
+   //for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<100000;i++)
    {
       c->GetEntry(i);
       
@@ -172,11 +182,16 @@ void analyzePhotonJet2010(
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig;
+      if (isPp) {
+         evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
+         evt.offlSel = phfCoincFilter && ppurityFractionFilter && pHBHENoiseFilter;
+         evt.anaEvtSel = evt.offlSel && evt.trig;
+      }
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
       else evt.weight = 1;
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%10000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " offlSel: " << evt.offlSel <<endl;
       
       // initialize
       int leadingIndex=-1;
