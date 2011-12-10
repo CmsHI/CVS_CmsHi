@@ -118,7 +118,7 @@ void analyzePhotonJet2010(
                           //TString inname="/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod02.root",
                           //TString outname="output-data-HI2010-Photon40_prod02_v10.root",
                           TString inname="/d100/yjlee/hiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
-                          TString outname="output-data-pp_prod3_v10.root",
+                          TString outname="output-data-pp2010-prod3-photon_v10.root",
                           bool doCentReWeight=false,
                           bool isPp=true
     )
@@ -191,6 +191,7 @@ void analyzePhotonJet2010(
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
       else evt.weight = 1;
       if (i%10000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " offlSel: " << evt.offlSel <<endl;
+      if (!evt.trig) continue;
       
       // initialize
       int leadingIndex=-1;
