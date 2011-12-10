@@ -5,7 +5,7 @@
 #include "TString.h"
 #include "TRandom.h"
 #include "TH1F.h"
-
+#include "TCut.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TNtuple.h"
@@ -93,7 +93,7 @@ TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart)
 {
    TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
    gEfficiency->BayesDivide(hCut,h1);
-   cout <<gEfficiency->GetN()<<endl;
+   cout << "graph N points: " << gEfficiency->GetN()<<endl;
    for (int i=0;i<gEfficiency->GetN();i++)
    {
       double x,y;
@@ -175,7 +175,9 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * np
    for (int i=0;i<nt->GetEntries();i++)
    {
       nt->GetEntry(i);
-      if (i%10000==0) cout <<i<<" / "<< nt->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%5000==0) {
+         if (gj.photonEt>0) cout <<i<<" / "<< nt->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " gamma pt: " << gj.photonEt <<endl;
+      }
       
       if (gj.photonEt>threshold1) {
          hNpartSum->Fill(evt.cBin,npartValue[evt.cBin]);
@@ -193,24 +195,16 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * np
 }
 
 
-void plotRBSignal(double ajCut= 0.9,
-                  double ajCut2 = 0.9,
-                  TString infname = "../output-data-Photon-v3_v10.root",
-                  TString pythia = "output-40-pp.root",
-                  TString mix = "mix.root",
-                  TString titleForComparison = "PYTHIA+DATA",
-                  TString titleForFile = "Result",
-                  bool useWeight = true,
-                  bool drawXLabel = false,
-                  bool drawLeg = true)
+void plotRBSignal(
+                  double ajCut= 1,
+                  TString infname = "../output-data-Photon-v3_v10.root"
+)
 {		
    double threshold1 = 60;
-   gStyle->SetErrorX(0); 
-   TString cut1=Form("photonEt>%f",threshold1);
-   cout <<cut1.Data()<<endl;
-   
-   TString trigcut = "";
-   TString cstring = "";
+   TCut cut1=Form("anaEvtSel&&photonEt>%.1f",threshold1);
+   TCut cutAna = cut1&&Form("jetEt>0&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.1f",ajCut);
+   cout <<cut1<<endl;
+   cout <<cutAna<<endl;
    
    // open the data file
    TFile *inf = new TFile(infname.Data());
@@ -231,14 +225,13 @@ void plotRBSignal(double ajCut= 0.9,
    cout << "got npart" << endl;
   
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
-   TH1D *h = new TH1D("h","",nBin,m);
-   TH1D *hCut = new TH1D("hCut","",nBin,m);
+   TH1D *h1 = new TH1D("h1","",nBin,m);
+   TH1D *hAna = new TH1D("hAna","",nBin,m);
    
    TCanvas *c0 = new TCanvas("c0","",500,500);
-   cout << "cut: " << Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut,cut1.Data()) << endl;
-   nt->Draw("cBin>>h",Form("Agj<%f&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&%s",ajCut,cut1.Data()));
-   nt->Draw("cBin>>hCut",Form("%s",cut1.Data()),"sameE");
-   TGraphAsymmErrors *g = calcEff(hCut,h,npart);
+   nt->Draw("cBin>>h1",cut1,"");
+   nt->Draw("cBin>>hAna",cutAna,"sameE");
+   TGraphAsymmErrors *g = calcEff(h1,hAna,npart);
    
    TCanvas *c = new TCanvas("c","",500,500);
    hTmp->SetXTitle("N_{part}");
