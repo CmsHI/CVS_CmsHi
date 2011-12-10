@@ -195,12 +195,14 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * np
 }
 
 
-void plotRBSignal(
-                  double ajCut= 1,
-                  TString infname = "../output-data-Photon-v3_v10.root"
+TGraphAsymmErrors * getRBSignal(
+                                double threshold1 = 60,
+                                double ajCut= 1,
+                                TString infname = "../output-data-Photon-v3_v10.root",
+                                int dataType=0 // 0=mc, 1=data
 )
 {		
-   double threshold1 = 60;
+   TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut cut1=Form("anaEvtSel&&photonEt>%.1f",threshold1);
    TCut cutAna = cut1&&Form("jetEt>0&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.1f",ajCut);
    cout <<cut1<<endl;
@@ -211,8 +213,8 @@ void plotRBSignal(
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
    
    // open output
-   TFile *outfile = new TFile("output.root","recreate");
-   TNtuple *ntOut = new TNtuple("ntOut","","npart");
+   //TFile *outfile = new TFile("output.root","recreate");
+   //TNtuple *ntOut = new TNtuple("ntOut","","npart");
    
    const int nBin = 6;
    double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
@@ -224,29 +226,36 @@ void plotRBSignal(
    GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1);
    cout << "got npart" << endl;
   
-   TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    TH1D *h1 = new TH1D("h1","",nBin,m);
    TH1D *hAna = new TH1D("hAna","",nBin,m);
    
-   TCanvas *c0 = new TCanvas("c0","",500,500);
-   nt->Draw("cBin>>h1",cut1,"");
-   nt->Draw("cBin>>hAna",cutAna,"sameE");
+   //TCanvas *c0 = new TCanvas("c0","",500,500);
+   nt->Draw("cBin>>h1",cut1,"goff");
+   nt->Draw("cBin>>hAna",cutAna,"sameEgoff");
    TGraphAsymmErrors *g = calcEff(h1,hAna,npart);
    
+   return g;
+}
+
+void plotRBSignal(
+                  double ajCut= 0.2
+)
+{
    TCanvas *c = new TCanvas("c","",500,500);
+   TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
-   hTmp->SetYTitle(Form("R_{B}",ajCut));
+   hTmp->SetYTitle("R_{B}");
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
    hTmp->SetAxisRange(0,1,"Y");
    hTmp->Draw();
-   
-   g->SetMarkerSize(1.25);
-   g->SetMarkerStyle(kFullCircle);
-   g->SetMarkerColor(2);
-   g->SetLineColor(2);
-   g->Draw("p same");
+
+   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v3_v10.root",1);
+   gdata->SetMarkerSize(1.25);
+   gdata->SetMarkerColor(2);
+   gdata->SetLineColor(2);
+   gdata->Draw("p same");
 }
