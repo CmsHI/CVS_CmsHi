@@ -203,7 +203,9 @@ TGraphAsymmErrors * getRBSignal(
 )
 {		
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
-   TCut cut1=Form("anaEvtSel&&photonEt>%.1f",threshold1);
+   TCut evtSel="offlSel";
+   if (dataType==1) evtSel="anaEvtSel";
+   TCut cut1=evtSel&&Form("photonEt>%.1f",threshold1);
    TCut cutAna = cut1&&Form("jetEt>0&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.1f",ajCut);
    cout <<cut1<<endl;
    cout <<cutAna<<endl;
@@ -245,7 +247,6 @@ void plotRBSignal(
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
-   hTmp->SetYTitle("R_{B}");
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
@@ -258,4 +259,11 @@ void plotRBSignal(
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
+
+   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_v10.root",0);
+   ghypho->SetMarkerSize(1.25);
+   ghypho->SetMarkerColor(kBlue);
+   ghypho->SetLineColor(kBlue);
+   ghypho->SetMarkerStyle(kOpenSquare);
+   ghypho->Draw("p same");
 }
