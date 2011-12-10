@@ -166,8 +166,7 @@ void analyzePhotonJet2010(
       c->skimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
    }
    // Main loop
-   //for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<100000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       
