@@ -240,10 +240,10 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotRBSignal(
-                  double ajCut= 0.2
+                  double ajCut= 0.15
 )
 {
-   TCanvas *c = new TCanvas("c","",500,500);
+   TCanvas *c2 = new TCanvas("c","",500,500);
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
@@ -251,7 +251,7 @@ void plotRBSignal(
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   hTmp->SetAxisRange(0,1,"Y");
+   hTmp->SetAxisRange(0,0.7,"Y");
    hTmp->Draw();
 
    TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v3_v10.root",1);
@@ -262,8 +262,41 @@ void plotRBSignal(
 
    TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_v10.root",0);
    ghypho->SetMarkerSize(1.25);
-   ghypho->SetMarkerColor(kBlue);
-   ghypho->SetLineColor(kBlue);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
+   
+   // Annotation
+   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+   pline->SetLineColor(4);
+   pline->SetLineStyle(4);
+   pline->Draw();
+   
+   TLatex *cms = new TLatex(0.1,0.91,"CMS Preliminary");
+   cms->SetTextFont(63);
+   cms->SetTextSize(17);
+   cms->Draw();
+   TLegend *leg=new TLegend(0.55,0.81,0.85,0.91);
+   //leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
+   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+   leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
+   leg->SetFillColor(0);
+   leg->SetBorderSize(0);
+   leg->SetFillStyle(0);
+   leg->SetTextFont(63);
+   leg->SetTextSize(17);
+   leg->Draw();
+   
+   TLegend *leg2=new TLegend(0.16,0.27,0.49,0.35);
+   leg2->AddEntry(gdata,"p_{T,#gamma} > 60 GeV/c","");
+   //leg2->AddEntry(gdata,"p_{T,jet} > 30 GeV/c","");
+   //leg2->AddEntry(gdata,"#Delta#phi_{12} > #frac{2}{3}#pi","");
+   leg2->SetFillColor(0);
+   leg2->SetBorderSize(0);
+   leg2->SetFillStyle(0);
+   leg2->SetTextFont(63);
+   leg2->SetTextSize(17);
+   leg2->Draw();
+
+   c2->Print(Form("fig/12.08svn/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.08svn/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
