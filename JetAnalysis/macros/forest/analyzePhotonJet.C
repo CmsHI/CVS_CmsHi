@@ -18,7 +18,7 @@ public:
    bool offlSel;
    bool noiseFilt;
    bool anaEvtSel;
-   float vz,weight;
+   float vz,weight,npart,ncoll,sampleWeight;
 };
 
 static const int MAXTRK = 10000;
@@ -114,20 +114,23 @@ public:
    TH1D * hReWt;
 };
 
+float getNpart(int cBin);
+float getNcoll(int cBin);
+
 void analyzePhotonJet(
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v8.root"
-                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      //TString outname="output-data-Photon-v2d1204_v9.root"
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
-                      TString outname="output-data-Photon-v3_v10.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      TString outname="output-data-Photon-v2_v11.root",
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
+                      //TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
                       //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
-                      //TString outname="output-hypho50v2_50kyongsun_v10.root",
+                      //TString outname="output-hypho50v2_50kyongsun_v11.root",
                       bool doCentReWeight=false
     )
 {
@@ -154,7 +157,7 @@ void analyzePhotonJet(
    EvtSel evt;
    GammaJet gj;
    Isolation isol;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -182,6 +185,9 @@ void analyzePhotonJet(
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
       else evt.weight = 1;
+      evt.npart = getNpart(evt.cBin);
+      evt.ncoll = getNcoll(evt.cBin);
+      evt.sampleWeight = 1; // for different mc sample, 1 for data
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
@@ -269,4 +275,92 @@ void analyzePhotonJet(
    output->Write();
    output->Close();
    delete c;
+}
+
+float getNpart(int cBin) { 
+   if (cBin ==0) return 393.633;
+   if (cBin ==1) return 368.819;
+   if (cBin ==2) return 343.073;
+   if (cBin ==3) return 317.625;
+   if (cBin ==4) return 292.932;
+   if (cBin ==5) return 271.917;
+   if (cBin ==6) return 249.851;
+   if (cBin ==7) return 230.72;
+   if (cBin ==8) return 212.465;
+   if (cBin ==9) return 194.752;
+   if (cBin ==10) return 178.571;
+   if (cBin ==11) return 163.23;
+   if (cBin ==12) return 149.187;
+   if (cBin ==13) return 136.011;
+   if (cBin ==14) return 123.414;
+   if (cBin ==15) return 111.7;
+   if (cBin ==16) return 100.831;
+   if (cBin ==17) return 90.7831;
+   if (cBin ==18) return 80.9823;
+   if (cBin ==19) return 72.6236;
+   if (cBin ==20) return 64.1508;
+   if (cBin ==21) return 56.6284;
+   if (cBin ==22) return 49.9984;
+   if (cBin ==23) return 43.3034;
+   if (cBin ==24) return 37.8437;
+   if (cBin ==25) return 32.6659;
+   if (cBin ==26) return 27.83;
+   if (cBin ==27) return 23.7892;
+   if (cBin ==28) return 20.1745;
+   if (cBin ==29) return 16.8453;
+   if (cBin ==30) return 14.0322;
+   if (cBin ==31) return 11.602;
+   if (cBin ==32) return 9.52528;
+   if (cBin ==33) return 7.6984;
+   if (cBin ==34) return 6.446;
+   if (cBin ==35) return 4.96683;
+   if (cBin ==36) return 4.23649;
+   if (cBin ==37) return 3.50147;
+   if (cBin ==38) return 3.16107;
+   if (cBin ==39) return 2.7877;
+   return -1;
+}
+
+float getNcoll(int cBin) { 
+   if (cBin == 0) return  1747.86 ;
+   if (cBin == 1) return  1567.53 ;
+   if (cBin == 2) return  1388.39 ;
+   if (cBin == 3) return  1231.77 ;
+   if (cBin == 4) return  1098.2 ;
+   if (cBin == 5) return  980.439 ;
+   if (cBin == 6) return  861.609 ;
+   if (cBin == 7) return  766.042 ;
+   if (cBin == 8) return  676.515 ;
+   if (cBin == 9) return  593.473 ;
+   if (cBin == 10) return  521.912 ;
+   if (cBin == 11) return  456.542 ;
+   if (cBin == 12) return  398.546 ;
+   if (cBin == 13) return  346.647 ;
+   if (cBin == 14) return  299.305 ;
+   if (cBin == 15) return  258.344 ;
+   if (cBin == 16) return  221.216 ;
+   if (cBin == 17) return  188.677 ;
+   if (cBin == 18) return  158.986 ;
+   if (cBin == 19) return  134.7 ;
+   if (cBin == 20) return  112.547 ;
+   if (cBin == 21) return  93.4537 ;
+   if (cBin == 22) return  77.9314 ;
+   if (cBin == 23) return  63.5031 ;
+   if (cBin == 24) return  52.0469 ;
+   if (cBin == 25) return  42.3542 ;
+   if (cBin == 26) return  33.9204 ;
+   if (cBin == 27) return  27.3163 ;
+   if (cBin == 28) return  21.8028 ;
+   if (cBin == 29) return  17.2037 ;
+   if (cBin == 30) return  13.5881 ;
+   if (cBin == 31) return  10.6538 ;
+   if (cBin == 32) return  8.35553 ;
+   if (cBin == 33) return  6.40891 ;
+   if (cBin == 34) return  5.13343 ;
+   if (cBin == 35) return  3.73215 ;
+   if (cBin == 36) return  3.06627 ;
+   if (cBin == 37) return  2.41926 ;
+   if (cBin == 38) return  2.11898 ;
+   if (cBin == 39) return  1.76953 ;
+   return -1;
 }
