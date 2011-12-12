@@ -290,8 +290,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
-   plotBalance(2,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
+   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
+   plotBalance(2,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.53,0.43,"CMS Preliminary");
@@ -314,8 +314,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
    //plotBalance(1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
-   plotBalance(1,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
+   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
+   plotBalance(1,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -337,8 +337,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    //plotBalance(0,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehistE",0);
-   plotBalance(0,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
+   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
+   plotBalance(0,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
@@ -353,15 +353,15 @@ void plotDeltaPhiSingal_AllCent3(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c1->Print(Form("./fig/12.08svn/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.08svn/photon60v3_v9_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.12/photon60v2_v11_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.gif",isolScheme));
+   c1->Print(Form("./fig/12.12/photon60v2_v11_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.pdf",isolScheme));   
 
    //TCanvas * call = new TCanvas("call","",500,500);
    //gPad->SetLogy();
    //cout << "\n Centrality 0-100\%" << endl;
    //hFrame->Draw();
    //plotBalance(-1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",0);
-   //plotBalance(-1,isolScheme,"../output-hypho50v2_50kyongsun_v10.root",true,false,1,"samehist",1);
-   //plotBalance(-1,isolScheme,"../output-data-Photon-v3_v9.root",false,true,1,"sameE",1);
+   //plotBalance(-1,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehist",1);
+   //plotBalance(-1,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
    //drawText("0-100%",0.8,0.3);
 }
