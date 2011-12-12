@@ -197,7 +197,7 @@ TGraphAsymmErrors * getRBSignal(
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut evtSel="offlSel";
    if (dataType!=0) evtSel="anaEvtSel";
-   TCut cut1=evtSel&&Form("photonEt>%.3f&&jetEt>30",threshold1);
+   TCut cut1=evtSel&&Form("optIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>%.3f&&jetEt>30",threshold1);
    TCut cutAna = cut1&&Form("acos(cos(photonPhi-jetPhi))>%.3f",ajCut);
    cout <<cut1<<endl;
    cout <<cutAna<<endl;
@@ -210,8 +210,10 @@ TGraphAsymmErrors * getRBSignal(
    //TFile *outfile = new TFile("output.root","recreate");
    //TNtuple *ntOut = new TNtuple("ntOut","","npart");
    
-   const int nBin = 7;
-   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
+   const int nBin = 6;
+   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   //const int nBin = 7;
+   //double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
    double npart[nBin] = {2,358.623,232.909,97.9521};
    EvtSel evt;
    GammaJet gj;

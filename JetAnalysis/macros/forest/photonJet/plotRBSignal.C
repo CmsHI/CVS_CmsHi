@@ -197,7 +197,7 @@ TGraphAsymmErrors * getRBSignal(
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut evtSel="offlSel";
    if (dataType!=0) evtSel="anaEvtSel";
-   TCut cut1=evtSel&&Form("photonEt>%.3f",threshold1);
+   TCut cut1=evtSel&&Form("fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>%.3f",threshold1);
    TCut cutAna = cut1&&Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.3f",ajCut);
    cout <<cut1<<endl;
    cout <<cutAna<<endl;
@@ -205,13 +205,17 @@ TGraphAsymmErrors * getRBSignal(
    // open the data file
    TFile *inf = new TFile(infname.Data());
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
+   nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
+
    
    // open output
    //TFile *outfile = new TFile("output.root","recreate");
    //TNtuple *ntOut = new TNtuple("ntOut","","npart");
    
-   const int nBin = 7;
-   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
+   const int nBin = 6;
+   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+//   const int nBin = 7;
+//   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
    double npart[nBin] = {2,358.623,232.909,97.9521};
    EvtSel evt;
    GammaJet gj;
@@ -296,6 +300,6 @@ void plotRBSignal(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.12/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-   c2->Print(Form("fig/12.12/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
