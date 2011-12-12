@@ -199,8 +199,8 @@ TGraphAsymmErrors * getRBSignal(
       nameIsol="Fisher Isol.";
       nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
       cutIsol = "fisherIsol>0.3";
-      photonPurity=1;
-      //photonPurity=0.5;
+      //photonPurity=0.72;
+      photonPurity=0.79;
    }
    cout << "Isolation: " << TString(cutIsol) << endl;
 
@@ -233,6 +233,13 @@ TGraphAsymmErrors * getRBSignal(
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
    
    if (dataType==1) {
+      TGraphAsymmErrors *gSigAll = calcEff(anaDen.rSigAll.hScaled,anaNum.rSigAll.hScaled,npart,dataType);
+      gSigAll->SetMarkerSize(1.25);
+      gSigAll->SetLineColor(kGray+2);
+      gSigAll->SetLineStyle(2);
+      gSigAll->SetMarkerColor(kGray+2);
+      gSigAll->SetMarkerStyle(kOpenCircle);
+      gSigAll->Draw("p");
       if (anaNum.subDPhiSide) {
          TGraphAsymmErrors *gDPhiSide = calcEff(anaDen.rSigAll.hScaled,anaNum.rBkgDPhi.hScaled,npart,dataType);
          gDPhiSide->SetMarkerSize(1.25);
@@ -302,9 +309,24 @@ void plotRBSubtracted(
    cms->SetTextFont(63);
    cms->SetTextSize(17);
    cms->Draw();
-   TLegend *leg=new TLegend(0.55,0.75,0.85,0.91);
+
+   TH1D * hFrameDataSigAll = new TH1D("hFrameDataSigAll","",20,-0.999,0.999);
+   hFrameDataSigAll->SetMarkerStyle(kOpenCircle);
+   hFrameDataSigAll->SetMarkerColor(kGray+2);
+   TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,-0.999,0.999);
+   hFrameDataBkg1->SetMarkerStyle(kOpenCircle);
+   hFrameDataBkg1->SetMarkerColor(kGreen+2);
+   TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,-0.999,0.999);
+   hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
+   hFrameDataBkg2->SetMarkerColor(kViolet);
+   
+   //TLegend *leg=new TLegend(0.55,0.75,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.68,0.85,0.91);
    //leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+   leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
@@ -325,6 +347,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.12brbfix/RBSShapeSide_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-   c2->Print(Form("fig/12.12brbfix/RBSSahpeSide_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.12csub/RBSubAll_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.12csub/RBSubAll_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
