@@ -35,9 +35,13 @@ public:
       float nSel = t->Project(h->GetName(),var,cut);
       cout << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
-      if (h->Integral()>0) hNorm->Scale(area/h->Integral());
+      if (h->Integral()>0) hNorm->Scale(1./h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
-      hScaled->Scale(fraction);
+      cout << hScaled->GetName() << " ";
+      cout << "scale by: " << area*fraction << endl;
+      hScaled->Scale(area*fraction);
+      for (int i=1; i<=hScaled->GetNbinsX()+1 ; ++i) cout << hScaled->GetBinLowEdge(i) << " (" << hScaled->GetBinContent(i) << ") ";
+      cout << endl;
       // check
       t->Draw("cBin>>"+name+"_cbin(40,0,40)",cut,"goff");
    }
@@ -110,17 +114,28 @@ public:
 
 TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart, int dataType)
 {
-   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
    cout << "Divide: " << hCut->GetName() << " by: " << h1->GetName() << endl;
-   //cout << "hCut bins: ";
-   //for (int i=1; i<=hCut->GetNbinsX()+1 ; ++i) cout << hCut->GetBinLowEdge(i) << " ";
-   //cout << endl << "h1 bins: ";
-   //for (int i=1; i<=h1->GetNbinsX()+1 ; ++i) cout << h1->GetBinLowEdge(i) << " ";
-   //cout << endl;
-   //h1->Draw();
-   //hCut->Draw("sameE");
-   gEfficiency->BayesDivide(hCut,h1);
+   if (dataType==2) { // pp
+      h1->Rebin(h1->GetNbinsX());
+      hCut->Rebin(hCut->GetNbinsX());
+   }
+//   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
+//   cout << "hCut bins: ";
+//   for (int i=1; i<=hCut->GetNbinsX()+1 ; ++i) cout << hCut->GetBinLowEdge(i) << " (" << hCut->GetBinContent(i) << ") ";
+//   cout << endl << "h1 bins: ";
+//   for (int i=1; i<=h1->GetNbinsX()+1 ; ++i) cout << h1->GetBinLowEdge(i) << " (" << h1->GetBinContent(i) << ") ";
+//   cout << endl;
+//   TCanvas * cc2 = new TCanvas("cc2","",500,500);
+//   h1->Draw();
+//   hCut->Draw("sameE");
+//   gEfficiency->BayesDivide(hCut,h1);
+   TH1D * hDiv = (TH1D*)hCut->Clone(Form("%s_div",hCut->GetName()));
+   hDiv->Divide(hCut,h1,1,1,"B");
+   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors(hDiv);
    cout << "graph N points: " << gEfficiency->GetN()<<endl;
+//   TCanvas * cc3 = new TCanvas("cc3","",500,500);
+//   gEfficiency->Draw("ap");
+//   return gEfficiency;
    for (int i=0;i<gEfficiency->GetN();i++)
    {
       double x,y;
@@ -154,11 +169,13 @@ TGraphAsymmErrors * getRBSignal(
    //cout << "useWeight: " << useWeight << " isData: " << isData << endl;
    
    // Get npart
-   const int nBin = 6;
-   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   const int nBin = 5;
+   double m[nBin+1] = {-0.5,3.5,7.5,11.5,20.5,40.5};
+   //const int nBin = 6;
+   //double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
    //   const int nBin = 7;
    //   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
-   double npart[nBin] = {2,358.623,232.909,97.9521};
+   double npart[nBin];// = {2,358.623,232.909,97.9521};
    EvtSel evt;
    GammaJet gj;
    nt->SetBranchAddress("evt",&evt.run);
@@ -182,7 +199,8 @@ TGraphAsymmErrors * getRBSignal(
       nameIsol="Fisher Isol.";
       nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
       cutIsol = "fisherIsol>0.3";
-      photonPurity=0.72;
+      photonPurity=1;
+      //photonPurity=0.5;
    }
    cout << "Isolation: " << TString(cutIsol) << endl;
 
@@ -201,19 +219,39 @@ TGraphAsymmErrors * getRBSignal(
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den",cut1,"sigmaIetaIeta<0.01",useWeight,0);   
    anaDen.subDPhiSide = false;
-   anaDen.subSShapeSide = false;
+   anaDen.subSShapeSide = true;
    if (dataType==0) anaDen.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaDen.MakeHistograms(1-photonPurity,nBin,m);
    
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num",cutAna,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",useWeight,0);   
-   anaNum.subDPhiSide = false;
-   anaNum.subSShapeSide = false;
+   anaNum.subDPhiSide = true;
+   anaNum.subSShapeSide = true;
    if (dataType==0) anaNum.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaNum.MakeHistograms(1-photonPurity,nBin,m);
 
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
    
+   if (dataType==1) {
+      if (anaNum.subDPhiSide) {
+         TGraphAsymmErrors *gDPhiSide = calcEff(anaDen.rSigAll.hScaled,anaNum.rBkgDPhi.hScaled,npart,dataType);
+         gDPhiSide->SetMarkerSize(1.25);
+         gDPhiSide->SetLineColor(kGreen+2);
+         gDPhiSide->SetLineStyle(2);
+         gDPhiSide->SetMarkerColor(kGreen+2);
+         gDPhiSide->SetMarkerStyle(kOpenCircle);
+         gDPhiSide->Draw("p");
+      }
+      if (anaNum.subSShapeSide) {
+         TGraphAsymmErrors *gSShapeSide = calcEff(anaDen.rSigAll.hScaled,anaNum.rBkgSShape.hScaled,npart,dataType);
+         gSShapeSide->SetMarkerSize(1.25);
+         gSShapeSide->SetLineColor(kViolet);
+         gSShapeSide->SetLineStyle(2);
+         gSShapeSide->SetMarkerColor(kViolet);
+         gSShapeSide->SetMarkerStyle(kOpenCircle);
+         gSShapeSide->Draw("p");
+      }
+   }
    return g;
 }
 
@@ -221,6 +259,7 @@ void plotRBSubtracted(
                   double ajCut= 0.15
 )
 {
+   TH1::SetDefaultSumw2();
    TCanvas *c2 = new TCanvas("c","",500,500);
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
@@ -286,6 +325,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-//   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-//   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.12brbfix/RBSShapeSide_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.12brbfix/RBSSahpeSide_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
