@@ -125,7 +125,7 @@ TGraphAsymmErrors *calcEffpythia(TH1* h1, TH1* hCut,double *npart)
    return gEfficiency;
 }
 
-void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1)
+void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1, int dataType)
 {
    double npartValue[40];
    npartValue[0] = 393.633;
@@ -175,7 +175,13 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * np
    for (int i=0;i<nt->GetEntries();i++)
    {
       nt->GetEntry(i);
-      if (i%5000==0) {
+      if (i%10000==0) {
+         if (dataType==1) { // data
+            if (!evt.anaEvtSel) continue;
+         }
+         else if (dataType==0) { //mc
+            if (!evt.offlSel) continue;
+         }
          if (gj.photonEt>0) cout <<i<<" / "<< nt->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " gamma pt: " << gj.photonEt <<endl;
       }
       
@@ -225,7 +231,7 @@ TGraphAsymmErrors * getRBSignal(
    GammaJet gj;
    nt->SetBranchAddress("evt",&evt.run);
    nt->SetBranchAddress("jet",&gj.photonEt);
-   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1);
+   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1,dataType);
    cout << "got npart" << endl;
   
    TH1D *h1 = new TH1D("h1","",nBin,m);
@@ -254,13 +260,13 @@ void plotRBSignal(
    hTmp->SetAxisRange(0,1.4,"Y");
    hTmp->Draw();
 
-   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v3_v10.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v2_v11.root",1);
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
 
-   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_v10.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
@@ -297,6 +303,6 @@ void plotRBSignal(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.08svn/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-   c2->Print(Form("fig/12.08svn/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.12/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.12/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
