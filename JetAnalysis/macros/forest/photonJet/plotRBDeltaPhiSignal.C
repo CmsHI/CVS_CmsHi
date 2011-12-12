@@ -89,7 +89,7 @@ TGraphAsymmErrors *divideGraph(TGraphAsymmErrors *a,TGraphAsymmErrors *b)
    return gEfficiency;
 }
 
-TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart)
+TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart, int dataType)
 {
    TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
    gEfficiency->BayesDivide(hCut,h1);
@@ -101,31 +101,17 @@ TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart)
       double errYL = gEfficiency->GetErrorYlow(i);
       double errYH = gEfficiency->GetErrorYhigh(i);
       gEfficiency->SetPointError(i,0,0,errYL,errYH);
-      gEfficiency->SetPoint(i,npart[h1->FindBin(x)-1],y);
+      if (dataType!=2) gEfficiency->SetPoint(i,npart[h1->FindBin(x)-1],y);
+      else {
+         gEfficiency->SetPoint(i,2,y);
+         cout<<" Setting PYTHIA point to npart=2 by hand"<<endl;
+      }
       cout <<"x: " << x<<" "<<h1->FindBin(x)<<" "<<npart[h1->FindBin(x)-1]<< " y: " << y << endl;
    }
    return gEfficiency;
 }
 
-TGraphAsymmErrors *calcEffpythia(TH1* h1, TH1* hCut,double *npart)
-{
-   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
-   gEfficiency->BayesDivide(hCut,h1);
-   cout <<gEfficiency->GetN()<<endl;
-   for (int i=0;i<gEfficiency->GetN();i++)
-   {
-      double x,y;
-      gEfficiency->GetPoint(i,x,y);
-      double errYL = gEfficiency->GetErrorYlow(i);
-      double errYH = gEfficiency->GetErrorYhigh(i);
-      gEfficiency->SetPointError(i,0,0,errYL,errYH);
-      gEfficiency->SetPoint(i,2,y);
-      cout<<" Setting PYTHIA point to npart=2 by hand, Yen-Jie please check -Matt "<<endl;
-   }
-   return gEfficiency;
-}
-
-void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1)
+void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1, int dataType)
 {
    double npartValue[40];
    npartValue[0] = 393.633;
@@ -175,7 +161,13 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * np
    for (int i=0;i<nt->GetEntries();i++)
    {
       nt->GetEntry(i);
-      if (i%5000==0) {
+      if (i%50000==0) {
+         if (dataType!=0) { // data or pp
+            if (!evt.anaEvtSel) continue;
+         }
+         else { //mc
+            if (!evt.offlSel) continue;
+         }
          if (gj.photonEt>0) cout <<i<<" / "<< nt->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " gamma pt: " << gj.photonEt <<endl;
       }
       
@@ -199,12 +191,12 @@ TGraphAsymmErrors * getRBSignal(
                                 double threshold1 = 60,
                                 double ajCut= 1,
                                 TString infname = "../output-data-Photon-v3_v10.root",
-                                int dataType=0 // 0=mc, 1=data
+                                int dataType=0 // 0=mc, 1=data, 2=pp
 )
 {		
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut evtSel="offlSel";
-   if (dataType==1) evtSel="anaEvtSel";
+   if (dataType!=0) evtSel="anaEvtSel";
    TCut cut1=evtSel&&Form("photonEt>%.3f&&jetEt>30",threshold1);
    TCut cutAna = cut1&&Form("acos(cos(photonPhi-jetPhi))>%.3f",ajCut);
    cout <<cut1<<endl;
@@ -218,14 +210,14 @@ TGraphAsymmErrors * getRBSignal(
    //TFile *outfile = new TFile("output.root","recreate");
    //TNtuple *ntOut = new TNtuple("ntOut","","npart");
    
-   const int nBin = 6;
-   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   const int nBin = 7;
+   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
    double npart[nBin] = {2,358.623,232.909,97.9521};
    EvtSel evt;
    GammaJet gj;
    nt->SetBranchAddress("evt",&evt.run);
    nt->SetBranchAddress("jet",&gj.photonEt);
-   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1);
+   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1,dataType);
    cout << "got npart" << endl;
   
    TH1D *h1 = new TH1D("h1","",nBin,m);
@@ -234,37 +226,43 @@ TGraphAsymmErrors * getRBSignal(
    //TCanvas *c0 = new TCanvas("c0","",500,500);
    nt->Draw("cBin>>h1",cut1,"goff");
    nt->Draw("cBin>>hAna",cutAna,"sameEgoff");
-   TGraphAsymmErrors *g = calcEff(h1,hAna,npart);
+   TGraphAsymmErrors *g = calcEff(h1,hAna,npart,dataType);
    
    return g;
 }
 
 void plotRBDeltaPhiSignal(
-                  double ajCut= 0.15
+                  double ajCut= 3.03
 )
 {
    TCanvas *c2 = new TCanvas("c","",500,500);
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
-   hTmp->SetYTitle(Form("R_{B}(|#Delta#phi| > %.2f)",ajCut));
+   hTmp->SetYTitle(Form("|#Delta#phi| > %.2f)",ajCut));
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   hTmp->SetAxisRange(0,0.7,"Y");
+   hTmp->SetAxisRange(0,1.,"Y");
    hTmp->Draw();
 
-   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v3_v10.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v2_v11.root",1);
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
 
-   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_v10.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
+   TGraphAsymmErrors * gpp = getRBSignal(60,ajCut,"../output-data-pp2010-prod3-photon_v10.root",2);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->Draw("p same");
+
    // Annotation
    TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
    pline->SetLineColor(4);
@@ -275,10 +273,11 @@ void plotRBDeltaPhiSignal(
    cms->SetTextFont(63);
    cms->SetTextSize(17);
    cms->Draw();
-   TLegend *leg=new TLegend(0.55,0.81,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.75,0.85,0.91);
    //leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
+   leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
    leg->SetFillStyle(0);
@@ -286,7 +285,7 @@ void plotRBDeltaPhiSignal(
    leg->SetTextSize(17);
    leg->Draw();
    
-   TLegend *leg2=new TLegend(0.16,0.24,0.49,0.35);
+   TLegend *leg2=new TLegend(0.16,0.27,0.49,0.35);
    leg2->AddEntry(gdata,"p_{T,#gamma} > 60 GeV/c","");
    leg2->AddEntry(gdata,"p_{T,jet} > 30 GeV/c","");
    //leg2->AddEntry(gdata,"#Delta#phi_{12} > #frac{2}{3}#pi","");
@@ -297,6 +296,6 @@ void plotRBDeltaPhiSignal(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.08svn/RBDeltaPhi_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-   c2->Print(Form("fig/12.08svn/RBDeltaPhi_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.12/RBDeltaPhi_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+   c2->Print(Form("fig/12.12/RBDeltaPhi_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
 }
