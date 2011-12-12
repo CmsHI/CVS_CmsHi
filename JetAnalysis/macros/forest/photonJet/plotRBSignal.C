@@ -205,8 +205,8 @@ TGraphAsymmErrors * getRBSignal(
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut evtSel="offlSel";
    if (dataType==1) evtSel="anaEvtSel";
-   TCut cut1=evtSel&&Form("photonEt>%.1f",threshold1);
-   TCut cutAna = cut1&&Form("jetEt>0&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.1f",ajCut);
+   TCut cut1=evtSel&&Form("photonEt>%.3f",threshold1);
+   TCut cutAna = cut1&&Form("jetEt>0&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.3f",ajCut);
    cout <<cut1<<endl;
    cout <<cutAna<<endl;
    
@@ -251,7 +251,7 @@ void plotRBSignal(
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   hTmp->SetAxisRange(0,0.7,"Y");
+   hTmp->SetAxisRange(0,1.4,"Y");
    hTmp->Draw();
 
    TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v3_v10.root",1);

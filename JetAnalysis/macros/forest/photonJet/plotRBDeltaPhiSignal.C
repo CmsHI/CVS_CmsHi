@@ -205,8 +205,8 @@ TGraphAsymmErrors * getRBSignal(
    TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut,dataType);
    TCut evtSel="offlSel";
    if (dataType==1) evtSel="anaEvtSel";
-   TCut cut1=evtSel&&Form("photonEt>%.1f&&jetEt>30",threshold1);
-   TCut cutAna = cut1&&Form("acos(cos(photonPhi-jetPhi))>%.1f",ajCut);
+   TCut cut1=evtSel&&Form("photonEt>%.3f&&jetEt>30",threshold1);
+   TCut cutAna = cut1&&Form("acos(cos(photonPhi-jetPhi))>%.3f",ajCut);
    cout <<cut1<<endl;
    cout <<cutAna<<endl;
    
