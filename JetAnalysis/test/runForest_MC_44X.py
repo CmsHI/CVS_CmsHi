@@ -6,6 +6,9 @@ process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
 )
 
+# option to turn off electrons
+doElectrons = True
+
 #####################################################################################
 # Input source
 #####################################################################################
@@ -13,12 +16,12 @@ process.options = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
  duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
     fileNames = cms.untracked.vstring(
-    'file:/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon30/RECO/edmOut_364.root',
+    'file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Dijet80/RECO/edmOut_878.root',
     ))
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(5))
+            input = cms.untracked.int32(-1))
 
 
 #####################################################################################
@@ -128,12 +131,15 @@ process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiSelectedTracks")
 
 # Muons 
-process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
+process.load("HiMuonAlgos.HLTMuTree.hltMuTree_cfi")
 process.muonTree = process.hltMuTree.clone()
 process.muonTree.doGen = cms.untracked.bool(True)
 
+process.load("MNguyen.ElectronAnalyzer.electronAnalyzer_cff")
+process.electronAnalyzer.mcTag = 'hiSignal'
+
 # Event tree
-process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
+process.load("CmsHi.HiHLTAlgos.hievtanalyzer_cfi")
 # Not working for the moment..
 #process.hiEvtAnalyzer.doMC = cms.bool(True)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
@@ -220,16 +226,36 @@ process.hiSelectedTrackHighPurity = cms.EDFilter("TrackSelector",
 
 process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
 #process.reco = cms.Path(process.RawToDigi * process.reconstructionHeavyIons_withPF)
-process.reco_extra        = cms.Path( process.siPixelRecHits * process.siStripMatchedRecHits *
-                                                                            process.hiPixel3PrimTracks *
-                                                                            process.hiPixelTrackSeeds *
-                                                                            process.hiSelectedTrackHighPurity *
-                                                                            process.electronGsfTrackingHi *
-                                                                            process.hiElectronSequence *
-                                                                            process.HiParticleFlowReco *
-                                                                            process.iterativeConePu5CaloJets *
-                                                                            process.PFTowers
-                                                                            )
+
+# turn electrons off
+
+
+
+if doElectrons:
+    process.reco_extra        = cms.Path( process.siPixelRecHits * process.siStripMatchedRecHits *
+                                          process.hiPixel3PrimTracks *
+                                          process.hiPixelTrackSeeds *
+                                          process.hiSelectedTrackHighPurity *
+                                          process.electronGsfTrackingHi *
+                                          process.hiElectronSequence *
+                                          process.HiParticleFlowReco *
+                                          process.iterativeConePu5CaloJets *
+                                          process.PFTowers
+                                          )
+
+else:
+    process.pfTrack.GsfTracksInEvents = cms.bool(False)
+    process.HiParticleFlowReco.remove(process.electronsWithPresel)
+    process.HiParticleFlowReco.remove(process.electronsCiCLoose)
+    process.particleFlowTmp.usePFElectrons = cms.bool(False)
+    process.particleFlowTmp.useEGammaElectrons = cms.bool(False)
+
+    process.reco_extra        = cms.Path( process.hiSelectedTrackHighPurity *
+                                          process.HiParticleFlowLocalReco *
+                                          process.HiParticleFlowReco *
+                                          process.iterativeConePu5CaloJets *
+                                          process.PFTowers
+                                          )
 
 process.reco_extra_jet    = cms.Path( process.iterativeConePu5CaloJets * process.akPu3PFJets * process.akPu5PFJets * process.photon_extra_reco)
 process.gen_step          = cms.Path( process.hiGenParticles * process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
@@ -252,6 +278,8 @@ process.ana_step          = cms.Path( process.icPu5JetAnalyzer + process.akPu3PF
 				      process.hiEvtAnalyzer +
                                       process.randomCones
                                       )
+if doElectrons:
+    process.ana_step*=process.electronAnalyzer
 
 
 process.phltJetHI = cms.Path( process.hltJetHI )
