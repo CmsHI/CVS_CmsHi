@@ -1,0 +1,291 @@
+#include <iostream>
+#include "TCanvas.h"
+#include "TError.h"
+#include "TPad.h"
+#include "TString.h"
+#include "TRandom.h"
+#include "TH1F.h"
+#include "TCut.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TNtuple.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TCanvas.h"
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TGraphAsymmErrors.h"
+#include "TStyle.h"
+#include "TLine.h"
+#include "DrawTick.C"
+#include "npart.h"
+using namespace std;
+
+//---------------------------------------------------------------------
+class Region
+{
+public:
+   Region(TString n, TString v, TCut c, bool w) :
+   name(n),var(v),cut(c),useWeight(w) {}
+   void Init(TTree * t, int nbins, double * x, float frac, float area=1.) {
+      fraction = frac;
+      h = new TH1D(name,"",nbins,x);
+      cout << " ** " << h->GetName() << " with fraction: " << fraction << ", area: " << area << " **" << endl;
+      if (useWeight) cut*="weight";
+      float nSel = t->Project(h->GetName(),var,cut);
+      cout << TString(cut) << ": " << nSel << endl;
+      hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
+      if (h->Integral()>0) hNorm->Scale(area/h->Integral());
+      hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
+      hScaled->Scale(fraction);
+      // check
+      t->Draw("cBin>>"+name+"_cbin(40,0,40)",cut,"goff");
+   }
+   
+   TH1D * h;
+   TH1D * hNorm;
+   TH1D * hScaled;
+   TString name;
+   TString var;
+   TCut cut;
+   bool useWeight;
+   float fraction;
+};
+
+//---------------------------------------------------------------------
+class SignalCorrector
+{
+public:
+   SignalCorrector(TTree * tree, TString n, TCut s, TCut cutSig, bool w=false, int nm=1) : 
+   name(n),
+   sel(s),
+   rSigAll(n+"SignalAll","cBin",s&&cutSig,w),
+   rBkgDPhi(n+"BkgDPhi","cBin",s&&"acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
+   rBkgSShape(n+"BkgSShape","cBin",s&&"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011",w),
+   useWeight(w),
+   normMode(nm), // 0=area is signal region count, 1=unit normalization
+   subDPhiSide(true),
+   subSShapeSide(true) {
+      t = tree;
+   }
+   
+   void MakeHistograms(float fracPhotonBkg, int nBin, double * m) {
+      // number of events in signal region
+      float nSigAll = t->GetEntries(rSigAll.cut);
+      float area=1.;
+      if (normMode==0) area=nSigAll;
+      rSigAll.Init(t,nBin,m,1,area);
+      if (subDPhiSide) {
+         // number of events in dphi sideband region
+         float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
+         float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+         float fracDPhiBkg = nDPhiBkg/nSigAll;
+         rBkgDPhi.Init(t,nBin,m,fracDPhiBkg,area);
+         cout << "|dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
+      }
+      if (subSShapeSide) {
+         cout << "fracPhotonBkg: " << fracPhotonBkg << endl;
+         rBkgSShape.Init(t,nBin,m,fracPhotonBkg,area);
+      }
+      
+      hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
+      if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
+      if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
+      if (normMode==1) { // if unity normalization, rescale after subtraction
+         hSubtracted->Scale(1./hSubtracted->Integral());
+      }
+   }
+   TTree * t;
+   TString name;
+   TCut sel;
+   Region rSigAll;
+   Region rBkgDPhi;
+   Region rBkgSShape;
+   TH1D * hSubtracted;
+   bool useWeight;
+   int normMode;
+   bool subDPhiSide;
+   bool subSShapeSide;
+};
+
+TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,double *npart, int dataType)
+{
+   TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors();
+   cout << "Divide: " << hCut->GetName() << " by: " << h1->GetName() << endl;
+   //cout << "hCut bins: ";
+   //for (int i=1; i<=hCut->GetNbinsX()+1 ; ++i) cout << hCut->GetBinLowEdge(i) << " ";
+   //cout << endl << "h1 bins: ";
+   //for (int i=1; i<=h1->GetNbinsX()+1 ; ++i) cout << h1->GetBinLowEdge(i) << " ";
+   //cout << endl;
+   //h1->Draw();
+   //hCut->Draw("sameE");
+   gEfficiency->BayesDivide(hCut,h1);
+   cout << "graph N points: " << gEfficiency->GetN()<<endl;
+   for (int i=0;i<gEfficiency->GetN();i++)
+   {
+      double x,y;
+      gEfficiency->GetPoint(i,x,y);
+      double errYL = gEfficiency->GetErrorYlow(i);
+      double errYH = gEfficiency->GetErrorYhigh(i);
+      gEfficiency->SetPointError(i,0,0,errYL,errYH);
+      if (dataType!=2) gEfficiency->SetPoint(i,npart[h1->FindBin(x)-1],y);
+      else {
+         gEfficiency->SetPoint(i,2,y);
+         cout<<" Setting PYTHIA point to npart=2 by hand"<<endl;
+      }
+      cout <<"x: " << x<<" "<<h1->FindBin(x)<<" "<<npart[h1->FindBin(x)-1]<< " y: " << y << endl;
+   }
+   return gEfficiency;
+}
+
+TGraphAsymmErrors * getRBSignal(
+                                double threshold1 = 60,
+                                double ajCut= 1,
+                                TString infname = "../output-data-Photon-v3_v10.root",
+                                int dataType=0, // 0=mc, 1=data, 2=pp
+                                int isolScheme=2
+)
+{
+   TString name=Form("photon%.0fAj%.0fdata%d",threshold1,ajCut*100,dataType);
+   // open the data file
+   TFile *inf = new TFile(infname.Data());
+   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
+   cout << inf->GetName() << " dataType: " << dataType << endl;
+   //cout << "useWeight: " << useWeight << " isData: " << isData << endl;
+   
+   // Get npart
+   const int nBin = 6;
+   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   //   const int nBin = 7;
+   //   double m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
+   double npart[nBin] = {2,358.623,232.909,97.9521};
+   EvtSel evt;
+   GammaJet gj;
+   nt->SetBranchAddress("evt",&evt.run);
+   nt->SetBranchAddress("jet",&gj.photonEt);
+   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1,dataType);
+   cout << "got npart" << endl;
+
+   // Analysis gamma-jet
+   TCut cut1,cutIsol,cutAna;
+   TString nameIsol;
+   float photonPurity;
+   if (isolScheme==0) { //sum isol
+      nameIsol="Sum(Isol.)";
+      cutIsol = "sumIsol/0.9<5";
+      photonPurity=0.65;
+   } else if (isolScheme==1) { // cut isol
+      nameIsol="3DCutIsol.";
+      cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
+      photonPurity=0.64;
+   } else if (isolScheme==2) { // fisher isol
+      nameIsol="Fisher Isol.";
+      nt->SetAlias("fisherIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
+      cutIsol = "fisherIsol>0.3";
+      photonPurity=0.72;
+   }
+   cout << "Isolation: " << TString(cutIsol) << endl;
+
+   // Setup cuts
+   if (dataType==0) { // mc
+      cut1=Form("offlSel&&photonEt>%.3f",threshold1)&&cutIsol;
+   } else { // hi data or pp data
+      cut1=Form("anaEvtSel&&photonEt>%.3f",threshold1)&&cutIsol;
+   }
+   cutAna = cut1&&Form("jetEt>30&&Agj<%.3f",ajCut);
+   cout <<cut1<<endl;
+   cout <<cutAna<<endl;
+     
+   // Get counts for numorator vs denominator
+   bool useWeight=false;
+   cout << " === Get Denominator === " << endl;
+   SignalCorrector anaDen(nt,name+"Den",cut1,"sigmaIetaIeta<0.01",useWeight,0);   
+   anaDen.subDPhiSide = false;
+   anaDen.subSShapeSide = false;
+   if (dataType==0) anaDen.subSShapeSide = false; // assume 100% purity for gamma-jet mc
+   anaDen.MakeHistograms(1-photonPurity,nBin,m);
+   
+   cout << " === Get Numerator === " << endl;
+   SignalCorrector anaNum(nt,name+"Num",cutAna,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",useWeight,0);   
+   anaNum.subDPhiSide = false;
+   anaNum.subSShapeSide = false;
+   if (dataType==0) anaNum.subSShapeSide = false; // assume 100% purity for gamma-jet mc
+   anaNum.MakeHistograms(1-photonPurity,nBin,m);
+
+   TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
+   
+   return g;
+}
+
+void plotRBSubtracted(
+                  double ajCut= 0.15
+)
+{
+   TCanvas *c2 = new TCanvas("c","",500,500);
+   TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
+   hTmp->SetXTitle("N_{part}");
+   hTmp->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
+   hTmp->GetXaxis()->CenterTitle();
+   hTmp->GetYaxis()->CenterTitle();
+   hTmp->GetYaxis()->SetTitleOffset(1.4);
+   hTmp->GetYaxis()->SetTitleSize(0.05);
+   hTmp->SetAxisRange(0,1.,"Y");
+   hTmp->Draw();
+
+   cout << "     Data" << endl;
+   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v2_v11.root",1);
+   //cout << "returned graph with N points: " << gdata->GetN()<<endl;
+   gdata->SetMarkerSize(1.25);
+   gdata->SetMarkerColor(2);
+   gdata->SetLineColor(2);
+   gdata->Draw("p same");
+
+   cout << "     MC" << endl;
+   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
+   ghypho->SetMarkerSize(1.25);
+   ghypho->SetMarkerStyle(kOpenSquare);
+   ghypho->Draw("p same");
+   
+   cout << "     pp" << endl;
+   TGraphAsymmErrors * gpp = getRBSignal(60,ajCut,"../output-data-pp2010-prod3-photon_v10.root",2);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->Draw("p same");
+
+   // Annotation
+   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+   pline->SetLineColor(4);
+   pline->SetLineStyle(4);
+   pline->Draw();
+   
+   TLatex *cms = new TLatex(0.1,0.91,"CMS Preliminary");
+   cms->SetTextFont(63);
+   cms->SetTextSize(17);
+   cms->Draw();
+   TLegend *leg=new TLegend(0.55,0.75,0.85,0.91);
+   //leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
+   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+   leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
+   leg->AddEntry(gpp,"pp","p");
+   leg->SetFillColor(0);
+   leg->SetBorderSize(0);
+   leg->SetFillStyle(0);
+   leg->SetTextFont(63);
+   leg->SetTextSize(17);
+   leg->Draw();
+   
+   TLegend *leg2=new TLegend(0.16,0.27,0.49,0.35);
+   leg2->AddEntry(gdata,"p_{T,#gamma} > 60 GeV/c","");
+   //leg2->AddEntry(gdata,"p_{T,jet} > 30 GeV/c","");
+   //leg2->AddEntry(gdata,"#Delta#phi_{12} > #frac{2}{3}#pi","");
+   leg2->SetFillColor(0);
+   leg2->SetBorderSize(0);
+   leg2->SetFillStyle(0);
+   leg2->SetTextFont(63);
+   leg2->SetTextSize(17);
+   leg2->Draw();
+
+//   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.gif",ajCut*100));
+//   c2->Print(Form("fig/12.12brbfix/RB_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+}
