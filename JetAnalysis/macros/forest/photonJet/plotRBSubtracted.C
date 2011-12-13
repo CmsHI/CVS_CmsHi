@@ -219,14 +219,14 @@ TGraphAsymmErrors * getRBSignal(
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den",cut1,"sigmaIetaIeta<0.01",useWeight,0);   
    anaDen.subDPhiSide = false;
-   anaDen.subSShapeSide = true;
+   anaDen.subSShapeSide = false;
    if (dataType==0) anaDen.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaDen.MakeHistograms(1-photonPurity,nBin,m);
    
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num",cutAna,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",useWeight,0);   
    anaNum.subDPhiSide = true;
-   anaNum.subSShapeSide = true;
+   anaNum.subSShapeSide = false;
    if (dataType==0) anaNum.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaNum.MakeHistograms(1-photonPurity,nBin,m);
 
@@ -263,7 +263,8 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotRBSubtracted(
-                  double ajCut= 0.15
+                      double ajCut= 0.15,
+                      float photonMinPt=60
 )
 {
    TH1::SetDefaultSumw2();
@@ -279,7 +280,7 @@ void plotRBSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(60,ajCut,"../output-data-Photon-v2_v11.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"../output-data-Photon-v2_v11.root",1);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -287,13 +288,13 @@ void plotRBSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(60,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(60,ajCut,"../output-data-pp2010-prod3-photon_v10.root",2);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"../output-data-pp2010-prod3-photon_v10.root",2);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
@@ -326,7 +327,7 @@ void plotRBSubtracted(
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
    leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
+   //leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
@@ -337,7 +338,7 @@ void plotRBSubtracted(
    leg->Draw();
    
    TLegend *leg2=new TLegend(0.16,0.27,0.49,0.35);
-   leg2->AddEntry(gdata,"p_{T,#gamma} > 60 GeV/c","");
+   leg2->AddEntry(gdata,Form("p_{T,#gamma} > %.0f GeV/c",photonMinPt),"");
    //leg2->AddEntry(gdata,"p_{T,jet} > 30 GeV/c","");
    //leg2->AddEntry(gdata,"#Delta#phi_{12} > #frac{2}{3}#pi","");
    leg2->SetFillColor(0);
@@ -347,6 +348,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.12csub/RBSubAll_Ratio_%.0f_vs_Npart.gif",ajCut*100));
-   c2->Print(Form("fig/12.12csub/RBSubAll_Ratio_%.0f_vs_Npart.pdf",ajCut*100));
+   c2->Print(Form("fig/12.13csub/RBSubDPhi_PhotonMin%.0f_Ratio_%.0f_vs_Npart.gif",photonMinPt,ajCut*100));
+   c2->Print(Form("fig/12.13csub/RBSubDPhi_PhotonMin%.0f_Ratio_%.0f_vs_Npart.pdf",photonMinPt,ajCut*100));
 }
