@@ -263,7 +263,7 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotRBSubtracted(
-                      double ajCut= 0.15,
+                      double ajCut= 0.12,
                       float photonMinPt=60
 )
 {
@@ -280,7 +280,7 @@ void plotRBSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"../output-data-Photon-v2_v11.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"output-data-Photon-v2_v11.root",1);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -288,13 +288,13 @@ void plotRBSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"../output-hypho50v2_50kyongsun_v11.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"output-hypho50v2_50kyongsun_v11.root",0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"../output-data-pp2010-prod3-photon_v10.root",2);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"output-data-pp2010-prod3-photon_v10.root",2);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
