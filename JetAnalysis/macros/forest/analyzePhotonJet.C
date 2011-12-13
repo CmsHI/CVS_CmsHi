@@ -123,16 +123,18 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v8.root"
-                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      //TString outname="output-data-Photon-v2_v11.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      TString outname="output-data-Photon-v2_v12.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
                       //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
-                      TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
-                      TString outname="output-hypho50v2_50kyongsun_v11.root",
-                      bool doCentReWeight=true
+                      //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
+                      //TString outname="output-hypho50v2_50kyongsun_v11.root",
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
+                      //TString outname="output-data-Photon-v4_v11.root",
+                      bool doCentReWeight=false
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -198,7 +200,7 @@ void analyzePhotonJet(
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.pt[j]<cutphotonPt) continue;          // photon pT cut
+         if (c->photon.pt[j]<cutphotonPt||c->photon.pt[j]>1000) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
