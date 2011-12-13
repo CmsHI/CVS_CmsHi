@@ -22,11 +22,12 @@ void syscheckPhotonPurity(double fluc = 0.2) {
    syscheckPhotonPurityDiff(2,fluc,true);
    TF1* yt3 = new TF1("yt3",ytrapezoid,-.5,.7,1);
    yt3->SetParameter(0,0.005);
-   yt3->SetLineColor(kYellow-6);
+   yt3->SetLineColor(kRed-4);
+   TH1D* yt3h = (TH1D*)yt3->GetHistogram();
    yt3->Draw("same l");
    TF1* yt3m = new TF1("yt3m",ytrapezoid,-.5,.7,1);
    yt3m->SetParameter(0,-0.005);
-   yt3m->SetLineColor(kYellow-6);
+   yt3m->SetLineColor(kRed-4);
    yt3m->Draw("same l");
    
    c1->cd(2);
@@ -36,11 +37,11 @@ void syscheckPhotonPurity(double fluc = 0.2) {
    syscheckPhotonPurityDiff(1,fluc,true);
    TF1* yt4 = new TF1("yt4",ytrapezoid,-.5,.7,1);
    yt4->SetParameter(0,0.005);
-   yt4->SetLineColor(kYellow-6);
+   yt4->SetLineColor(kRed-4);
    yt4->Draw("same l");
    TF1* yt4m = new TF1("yt4m",ytrapezoid,-.5,.7,1);
    yt4m->SetParameter(0,-0.005);
-   yt4m->SetLineColor(kYellow-6);
+   yt4m->SetLineColor(kRed-4);
    yt4m->Draw("same l");  
    c1->cd(3);
    syscheckPhotonPurityDiff(0,fluc);
@@ -49,15 +50,15 @@ void syscheckPhotonPurity(double fluc = 0.2) {
    syscheckPhotonPurityDiff(0,fluc,true);
    TF1* yt5 = new TF1("yt5",ytrapezoid,-.5,.7,1);
    yt5->SetParameter(0,0.012);
-   yt5->SetLineColor(kYellow-6);
+   yt5->SetLineColor(kRed-4);
    yt5->Draw("same l");
    TF1* yt5m = new TF1("yt5m",ytrapezoid,-.5,.7,1);
    yt5m->SetParameter(0,-0.012);
-   yt5m->SetLineColor(kYellow-6);
+   yt5m->SetLineColor(kRed-4);
    yt5m->Draw("same l"); 
    
    c1->SaveAs("systematics_purity.gif");
-   c1->SaveAs("systematics_purity.eps");
+   c1->SaveAs("systematics_purity.pdf");
 
 }
 void syscheckPhotonPurityDiff(int icent, double fluc, bool drawDiff)
@@ -131,7 +132,7 @@ void syscheckPhotonPurityDiff(int icent, double fluc, bool drawDiff)
    hTemp->DrawCopy();
    
  
-   drawSysAbs(href,hFluc);
+   drawSysAbs(href,hFluc,kRed-7);
    href->DrawCopy("same");
    if ( !drawDiff)
       hBkg->DrawCopy("same");
