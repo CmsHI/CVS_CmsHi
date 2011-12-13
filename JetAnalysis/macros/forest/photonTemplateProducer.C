@@ -105,7 +105,7 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 
    for (int icent = 1; icent <=nCent_std; icent++) {
       for ( int iid=1 ; iid<=5; iid++) {
-         heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";Leading Photon E_{T} (GeV);",nPtBin, ptBin);
+         heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";photon E_{T} (GeV);Efficiency",nPtBin, ptBin);
          geff[icent][iid] = new TGraphAsymmErrors();
          geff[icent][iid]->SetName(Form("geff_%s",heff[icent][iid]->GetName()));
       }
