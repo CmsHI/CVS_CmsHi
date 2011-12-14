@@ -133,15 +133,15 @@ TH1D * plotBalance(int cbin, int isolScheme,
    if (isolScheme==0) { //sum isol
       nameIsol="Sum(Isol.)";
       cutIsol = "sumIsol/0.9<5";
-      if (cbin==0) photonPurity=0.65;
-      if (cbin==1) photonPurity=0.70;
-      if (cbin==2) photonPurity=0.74;
+      if (cbin==0) photonPurity=0.50;
+      if (cbin==1) photonPurity=0.64;
+      if (cbin==2) photonPurity=0.57;
    } else if (isolScheme==1) { // cut isol
       nameIsol="3DCutIsol.";
       cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
-      if (cbin==0) photonPurity=0.64;
-      if (cbin==1) photonPurity=0.68;
-      if (cbin==2) photonPurity=0.70;
+      if (cbin==0) photonPurity=0.46;
+      if (cbin==1) photonPurity=0.62;
+      if (cbin==2) photonPurity=0.54;
    } else if (isolScheme==2) { // fisher isol
       nameIsol="Fisher Isol.";
       nt->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
@@ -367,8 +367,8 @@ void plotBalanceSignal_AllCent3(
    tsel.DrawLatex(0.55,0.75,"p_{T}^{jet} > 30 GeV/c");
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
-   c1->Print(Form("./fig/12.13photonNorm/photon60v2_v12_jet30_imbalance_all_cent_subAll_Isol%d_photonNorm.gif",isolScheme));
-   c1->Print(Form("./fig/12.13photonNorm/photon60v2_v12_jet30_imbalance_all_cent_subAll_Isol%d_photonNorm.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.14updatePurity/photon60v2_v12_jet30_imbalance_all_cent_subAll_Isol%d_photonNorm.gif",isolScheme));
+   c1->Print(Form("./fig/12.14updatePurity/photon60v2_v12_jet30_imbalance_all_cent_subAll_Isol%d_photonNorm.pdf",isolScheme));   
 
    // save histograms
 //   fout->Write();
