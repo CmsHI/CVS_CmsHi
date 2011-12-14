@@ -82,10 +82,11 @@ public:
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
       rSigAll.Init(t,20,0.0001,3.1415926,1.,area);
+      float fracDPhiBkg=0;
       if (subDPhiSide) {
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
-         float fracDPhiBkg = nDPhiBkg/nSigAll;
+         fracDPhiBkg = nDPhiBkg/nSigAll;
          rBkgDPhi.Init(t,20,0.0001,3.1415926,fracDPhiBkg,area);
          cout << "|dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
@@ -98,7 +99,9 @@ public:
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
       // Rescale after subtraction
-      hSubtracted->Scale(area*fracPhotonBkg/hSubtracted->Integral());
+      if (normMode==2&&subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-fracPhotonBkg)/(1-fracPhotonBkg);
+      rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
+      hSubtracted->Scale(area/hSubtracted->Integral());
    }
    TTree * t;
    TString name;
