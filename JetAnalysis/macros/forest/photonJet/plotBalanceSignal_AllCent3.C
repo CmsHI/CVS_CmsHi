@@ -98,7 +98,7 @@ public:
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
       // Rescale after subtraction
-      hSubtracted->Scale(area/hSubtracted->Integral());
+      hSubtracted->Scale(area*fracPhotonBkg/hSubtracted->Integral());
    }
    TTree * t;
    TString name;

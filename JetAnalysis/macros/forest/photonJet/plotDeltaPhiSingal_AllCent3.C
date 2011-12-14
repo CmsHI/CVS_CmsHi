@@ -98,7 +98,7 @@ public:
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
       // Rescale after subtraction
-      hSubtracted->Scale(area/hSubtracted->Integral());
+      hSubtracted->Scale(area*fracPhotonBkg/hSubtracted->Integral());
    }
    TTree * t;
    TString name;
@@ -266,7 +266,7 @@ void plotDeltaPhiSingal_AllCent3(
    hFrame->SetAxisRange(1e-3,1,"Y");
    hFrame->SetStats(0);
    hFrame->SetXTitle("|#Delta#phi|");
-   hFrame->SetYTitle("Event Fraction");
+   hFrame->SetYTitle("N_{#gamma}^{-1} dN/dA_{#gamma J}");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);
