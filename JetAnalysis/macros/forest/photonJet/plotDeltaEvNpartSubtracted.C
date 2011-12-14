@@ -216,14 +216,14 @@ TGraphAsymmErrors * getRBSignal(
    // Get counts for numorator vs denominator
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","1==1",0);   
-   anaDen.subDPhiSide = false;
+   anaDen.subDPhiSide = true;
    anaDen.subSShapeSide = false;
    if (dataType==0) anaDen.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaDen.MakeHistograms(1-photonPurity,nBin,m);
    
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
-   anaNum.subDPhiSide = false;
+   anaNum.subDPhiSide = true;
    anaNum.subSShapeSide = false;
    if (dataType==0) anaNum.subSShapeSide = false; // assume 100% purity for gamma-jet mc
    anaNum.MakeHistograms(1-photonPurity,nBin,m);
@@ -261,11 +261,11 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotDeltaEvNpartSubtracted(
-                                float ajCut=0.15,
                                 float photonMinPt=60
 )
 {
    TH1::SetDefaultSumw2();
+   float ajCut=0.15;
    TCanvas *c2 = new TCanvas("c","",500,500);
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
@@ -322,8 +322,8 @@ void plotDeltaEvNpartSubtracted(
    TLegend *leg=new TLegend(0.55,0.68,0.85,0.91);
    leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
-   //leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-   //leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+   leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    //leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
@@ -345,6 +345,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-//   c2->Print(Form("fig/12.13csub/DeltaEvNpart_PhotonMin%.0f_Ratio_vs_Npart.gif",photonMinPt));
-//   c2->Print(Form("fig/12.13csub/DeltaEvNpart_PhotonMin%.0f_Ratio_vs_Npart.pdf",photonMinPt));
+   c2->Print(Form("fig/12.13photonNorm/DeltaESubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.gif",photonMinPt));
+   c2->Print(Form("fig/12.13photonNorm/DeltaESubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.pdf",photonMinPt));
 }
