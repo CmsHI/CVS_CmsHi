@@ -68,21 +68,22 @@ public:
    weight(w),
    normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
-   subSShapeSide(true) {
+   subSShapeSide(true),
+   nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),fracPhotonBkg(0) {
       t = tree;
    }
    
-   void MakeHistograms(float fracPhotonBkg) {
+   void MakeHistograms(float frac2) {
+      fracPhotonBkg=frac2;
       // photon normalization
-      float nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
-      cout << "Number of selection photons: " << nSelPhoton << endl;
+      nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
       // number of events in signal region
-      float nSigAll = t->GetEntries(rSigAll.cut);
+      nSigAll = t->GetEntries(rSigAll.cut);
+      cout << "Number of selection photons: " << nSelPhoton << " gamma-jets: " << nSigAll << endl;
       float area=1.;
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
       rSigAll.Init(t,20,-0.999,0.999,1.,area);
-      float fracDPhiBkg=0;
       if (subDPhiSide) {
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
@@ -114,6 +115,10 @@ public:
    int normMode;
    bool subDPhiSide;
    bool subSShapeSide;
+   float nSelPhoton;
+   float nSigAll;
+   float fracDPhiBkg;
+   float fracPhotonBkg;
 };
 
 //---------------------------------------------------------------------
@@ -234,9 +239,9 @@ TH1D * plotBalance(int cbin, int isolScheme,
       anaAgj.rSigAll.hScaled->SetLineStyle(2);
       anaAgj.rSigAll.hScaled->Draw("same hist");
       // Draw count
-      float nPhotonJet = anaAgj.rSigAll.h->GetEntries();
-      if (anaAgj.subDPhiSide) nPhotonJet -= anaAgj.rBkgDPhi.h->GetEntries()*(3.14159-2.0944)/(3.14159/2.-0.7);
-      if (anaAgj.subSShapeSide) nPhotonJet -= anaAgj.rBkgSShape.h->GetEntries();
+      float nPhotonJet = anaAgj.nSigAll;
+      if (anaAgj.subDPhiSide) nPhotonJet -= anaAgj.nSigAll * anaAgj.fracDPhiBkg;
+      if (anaAgj.subSShapeSide) nPhotonJet -= anaAgj.nSigAll * anaAgj.fracPhotonBkg;
       float lx = 0.1;
       if (cbin<2) lx=-0.1;
       TLegend *t3=new TLegend(lx,0.7,0.5,0.85);
