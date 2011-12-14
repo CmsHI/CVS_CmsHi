@@ -97,6 +97,7 @@ public:
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
+      // Rescale after subtraction
       hSubtracted->Scale(area/hSubtracted->Integral());
    }
    TTree * t;

@@ -24,19 +24,23 @@
 class Region
 {
 public:
-   Region(TString n, TString v, TCut c, bool w) :
-   name(n),var(v),cut(c),useWeight(w) {}
-   void Init(TTree * t, int nbins, float xmin, float xmax, float frac) {
+   Region(TString n, TString v, TCut c, TString w) :
+   name(n),var(v),cut(c),weight(w) {}
+   void Init(TTree * t, int nbins, float xmin, float xmax, float frac, float area=1.) {
       fraction = frac;
+      cut*=weight;
       h = new TH1D(name,"",nbins,xmin,xmax);
-      cout << "=== " << h->GetName() << " with fraction: " << fraction << " ===" << endl;
-      if (useWeight) cut*="weight";
+      cout << " ** " << h->GetName() << " with fraction: " << fraction << " area: " << area << " **" << endl;
       float nSel = t->Project(h->GetName(),var,cut);
-      cout << TString(cut) << ": " << nSel << endl;
+      cout << "draw: " << var << " cut: " << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
-      if (h->Integral()>0) hNorm->Scale(1./h->Integral());
+      if (h->Integral()>0) hNorm->Scale(area/h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
+      cout << hScaled->GetName() << " ";
+      cout << "scale by: " << area*fraction << endl;
       hScaled->Scale(fraction);
+      //for (int i=1; i<=hScaled->GetNbinsX()+1 ; ++i) cout << hScaled->GetBinLowEdge(i) << " (" << hScaled->GetBinContent(i) << ") ";
+      //cout << endl;
       // check
       t->Draw("cBin>>"+name+"_cbin(40,0,40)",cut,"goff");
    }
@@ -47,7 +51,7 @@ public:
    TString name;
    TString var;
    TCut cut;
-   bool useWeight;
+   TString weight;
    float fraction;
 };
 
@@ -55,38 +59,46 @@ public:
 class SignalCorrector
 {
 public:
-   SignalCorrector(TTree * tree, TString n, TCut s, bool w=false) : 
+   SignalCorrector(TTree * tree, TString n, TCut s, TString w="(1==1)", int nm=1) : 
    name(n),
    sel(s),
-   rSigAll(n+"SignalAll","acos(cos(photonPhi-jetPhi))",s&&"acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",w),
-   rBkgDPhi(n+"BkgDPhi","acos(cos(photonPhi-jetPhi))",s&&"acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
-   rBkgSShape(n+"BkgSShape","acos(cos(photonPhi-jetPhi))",s&&"acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta>0.011",w),
-   useWeight(w),
+   rSigAll(n+"SignalAll","acos(cos(photonPhi-jetPhi))",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",w),
+   rBkgDPhi(n+"BkgDPhi","acos(cos(photonPhi-jetPhi))",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
+   rBkgSShape(n+"BkgSShape","acos(cos(photonPhi-jetPhi))",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta>0.011",w),
+   weight(w),
+   normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
    subSShapeSide(true) {
       t = tree;
    }
    
    void MakeHistograms(float fracPhotonBkg) {
-      rSigAll.Init(t,20,0.0001,3.1415926,1.);
+      // photon normalization
+      float nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
+      cout << "Number of selection photons: " << nSelPhoton << endl;
+      // number of events in signal region
+      float nSigAll = t->GetEntries(rSigAll.cut);
+      float area=1.;
+      if (normMode==0) area=nSigAll;
+      if (normMode==2) area=nSigAll/nSelPhoton;
+      rSigAll.Init(t,20,0.0001,3.1415926,1.,area);
       if (subDPhiSide) {
-         float nDPhiSigAll = t->GetEntries(rSigAll.cut);
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
-         float fracDPhiBkg = nDPhiBkg/nDPhiSigAll;
-         rBkgDPhi.Init(t,20,0.0001,3.1415926,fracDPhiBkg);
-         cout << "|dhpi| sig all = " << nDPhiSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
+         float fracDPhiBkg = nDPhiBkg/nSigAll;
+         rBkgDPhi.Init(t,20,0.0001,3.1415926,fracDPhiBkg,area);
+         cout << "|dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
       if (subSShapeSide) {
          cout << "fracPhotonBkg: " << fracPhotonBkg << endl;
-         rBkgSShape.Init(t,20,0.0001,3.1415926,fracPhotonBkg);
+         rBkgSShape.Init(t,20,0.0001,3.1415926,fracPhotonBkg,area);
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
       // Rescale after subtraction
-      hSubtracted->Scale(1./hSubtracted->Integral());
+      hSubtracted->Scale(area/hSubtracted->Integral());
    }
    TTree * t;
    TString name;
@@ -95,7 +107,8 @@ public:
    Region rBkgDPhi;
    Region rBkgSShape;
    TH1D * hSubtracted;
-   bool useWeight;
+   TString weight;
+   int normMode;
    bool subDPhiSide;
    bool subSShapeSide;
 };
@@ -103,14 +116,14 @@ public:
 //---------------------------------------------------------------------
 TH1D * plotBalance(int cbin, int isolScheme,
                    TString infname,
-                   bool useWeight, bool isData, int dataType, // 0=mc gen, 1=reco
+                   TString weight, bool isData, int dataType, // 0=mc gen, 1=reco
                    TString opt,
                    bool doCheck=false)
 {
    // open the data file
    TFile *inf = new TFile(infname.Data());
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   cout << "useWeight: " << useWeight << " isData: " << isData << endl;
+   cout << "useWeight: " << weight << " isData: " << isData << endl;
    TCut cut,cutIsol;
    TString name,nameIsol;
    float photonPurity;
@@ -137,7 +150,7 @@ TH1D * plotBalance(int cbin, int isolScheme,
    cout << "Isolation: " << TString(cutIsol) << endl;
    
    if (dataType==1) { // reco
-      cut="photonEt>60 && jetEt>30"&&cutIsol;
+      cut="photonEt>60"&&cutIsol;
       if (isData) cut = "anaEvtSel"&&cut;
       else cut = "offlSel"&&cut;
       name=Form("reco%d",cbin);
@@ -163,7 +176,7 @@ TH1D * plotBalance(int cbin, int isolScheme,
       cut=cut&&"cBin>=12 && cBin<40";
    }
    
-   SignalCorrector anaAgj(nt,name,cut,useWeight);
+   SignalCorrector anaAgj(nt,name,cut,weight,2);
 
    // analyze tree
    if (dataType==0) {
@@ -290,8 +303,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 30-100\%" << endl;
    hFrame->Draw();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
-   plotBalance(2,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
+   plotBalance(2,isolScheme,"../output-hypho50v2_50kyongsun_v12.root","weight",false,1,"samehistE",0);
+   plotBalance(2,isolScheme,"../output-data-Photon-v2_v12.root","1==1",true,1,"sameE",1);
    drawText("30-100%",0.83,0.3);
    drawText("(a)",0.25,0.885);
    TLatex *cms = new TLatex(0.53,0.43,"CMS Preliminary");
@@ -314,8 +327,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 10-30\%" << endl;
    hFrame->Draw();
    //plotBalance(1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
-   plotBalance(1,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
+   plotBalance(1,isolScheme,"../output-hypho50v2_50kyongsun_v12.root","weight",false,1,"samehistE",0);
+   plotBalance(1,isolScheme,"../output-data-Photon-v2_v12.root","1==1",true,1,"sameE",1);
    drawText("10-30%",0.8,0.3);
    drawText("(b)",0.05,0.885);
 
@@ -337,8 +350,8 @@ void plotDeltaPhiSingal_AllCent3(
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    //plotBalance(0,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehistE",0);
-   plotBalance(0,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
+   plotBalance(0,isolScheme,"../output-hypho50v2_50kyongsun_v12.root","weight",false,1,"samehistE",0);
+   plotBalance(0,isolScheme,"../output-data-Photon-v2_v12.root","1==1",true,1,"sameE",1);
    drawText("0-10%",0.8,0.3);
    drawText("(c)",0.05,0.885);
 
@@ -353,15 +366,15 @@ void plotDeltaPhiSingal_AllCent3(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c1->Print(Form("./fig/12.13newfisher/photon60v2_v11_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.gif",isolScheme));
-   c1->Print(Form("./fig/12.13newfisher/photon60v2_v11_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d.pdf",isolScheme));   
+   c1->Print(Form("./fig/12.13photonNorm/photon60v2_v12_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d_photonNorm.gif",isolScheme));
+   c1->Print(Form("./fig/12.13photonNorm/photon60v2_v12_mcv2yongsun_jet30_dphi_all_cent_subAll_Isol%d_photonNorm.pdf",isolScheme));   
 
    //TCanvas * call = new TCanvas("call","",500,500);
    //gPad->SetLogy();
    //cout << "\n Centrality 0-100\%" << endl;
    //hFrame->Draw();
    //plotBalance(-1,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",0);
-   //plotBalance(-1,isolScheme,"../output-hypho50v2_50kyongsun_v11.root",true,false,1,"samehist",1);
-   //plotBalance(-1,isolScheme,"../output-data-Photon-v2_v11.root",false,true,1,"sameE",1);
+   //plotBalance(-1,isolScheme,"../output-hypho50v2_50kyongsun_v12.root",true,false,1,"samehist",1);
+   //plotBalance(-1,isolScheme,"../output-data-Photon-v2_v12.root",false,true,1,"sameE",1);
    //drawText("0-100%",0.8,0.3);
 }
