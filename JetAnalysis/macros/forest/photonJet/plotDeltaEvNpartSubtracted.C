@@ -222,7 +222,8 @@ TGraphAsymmErrors * getRBSignal(
    anaDen.MakeHistograms(1-photonPurity,nBin,m);
    
    cout << " === Get Numerator === " << endl;
-   SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
+   //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
+   SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","(photonEt-jetEt)/photonEt",0);   
    anaNum.subDPhiSide = true;
    anaNum.subSShapeSide = false;
    if (dataType==0) anaNum.subSShapeSide = false; // assume 100% purity for gamma-jet mc
@@ -269,12 +270,14 @@ void plotDeltaEvNpartSubtracted(
    TCanvas *c2 = new TCanvas("c","",500,500);
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
-   hTmp->SetYTitle("<#DeltaE_{T}> (GeV)");
+   //hTmp->SetYTitle("<#DeltaE_{T}> (GeV)");
+   hTmp->SetYTitle("<#DeltaE_{T}/E_{T,#gamma}> (GeV)");
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   hTmp->SetAxisRange(0,35.,"Y");
+   float ymax=0.4; // 35, 2
+   hTmp->SetAxisRange(0,ymax,"Y");
    hTmp->Draw();
 
    cout << "     Data" << endl;
@@ -304,7 +307,7 @@ void plotDeltaEvNpartSubtracted(
    pline->SetLineStyle(4);
    pline->Draw();
    
-   TLatex *cms = new TLatex(0.1,0.91*35,"CMS Preliminary");
+   TLatex *cms = new TLatex(0.1,0.91*ymax,"CMS Preliminary");
    cms->SetTextFont(63);
    cms->SetTextSize(17);
    cms->Draw();
@@ -345,6 +348,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.13photonNorm/DeltaESubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.gif",photonMinPt));
-   c2->Print(Form("fig/12.13photonNorm/DeltaESubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.pdf",photonMinPt));
+   c2->Print(Form("fig/12.13photonNorm/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.gif",photonMinPt));
+   c2->Print(Form("fig/12.13photonNorm/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.pdf",photonMinPt));
 }
