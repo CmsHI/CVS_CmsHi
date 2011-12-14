@@ -86,8 +86,8 @@ public:
    {
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
-      tdata->Add("output-data-Photon-v3_v9.root");
-      tmc->Add("output-hypho50v2_50kyongsun_v10.root");
+      tdata->Add("output-data-Photon-v4_v11.root");
+      tmc->Add("output-hypho50v2_50kyongsun_v11.root");
 
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
@@ -123,18 +123,18 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v8.root"
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v12.root",
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      //TString outname="output-data-Photon-v2_v12.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
                       //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
-                      //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
-                      //TString outname="output-hypho50v2_50kyongsun_v11.root",
+                      TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
+                      TString outname="output-hypho50v2_50kyongsun_v12.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
-                      bool doCentReWeight=false
+                      bool doCentReWeight=true
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
