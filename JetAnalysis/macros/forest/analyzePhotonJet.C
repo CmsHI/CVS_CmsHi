@@ -130,8 +130,15 @@ void analyzePhotonJet(
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
                       //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
-                      TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
-                      TString outname="output-hypho50v2_50kyongsun_v12.root",
+                      //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
+                      //TString outname="output-hypho50v2_50kyongsun_v12_frac62.root",
+                      //double sampleWeight = 0.62, // data: 1, mc: s = 0.62, b = 0.38
+                      //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet80_60k.root",
+                      //TString outname="output-hyuq80em_yongsun60k_v12_frac38.root",
+                      //double sampleWeight = 0.38, // data: 1, mc: s = 0.62, b = 0.38
+                      TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet120_14k.root",
+                      TString outname="output-hyuq120em_yongsun14k_v12_frac38.root",
+                      double sampleWeight = 0.38001, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=true
@@ -142,7 +149,6 @@ void analyzePhotonJet(
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
-
    // Centrality reweiting
    CentralityReWeight cw("offlSel&&photonEt>50");
 
@@ -190,7 +196,7 @@ void analyzePhotonJet(
       else evt.weight = 1;
       evt.npart = getNpart(evt.cBin);
       evt.ncoll = getNcoll(evt.cBin);
-      evt.sampleWeight = 1; // for different mc sample, 1 for data
+      evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
