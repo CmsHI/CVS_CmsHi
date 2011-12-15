@@ -294,7 +294,7 @@ void plotBalanceSignal_SideSubClosure(
    h2->SetLineColor(kGray+1);
    h2->SetFillColor(kGray);
    h2->Draw("hist sameE");
-   TH1D * h3 = plotBalance(0,"offlSel&&cBin>=0&&cBin<40",isolScheme,"../output-hypho50mixdj80emdj120em_yongsun_v12.root","(sampleWeight>0.5)*1+(sampleWeight<0.5)*13.9645",true,1,"samehistE",1);
+   TH1D * h3 = plotBalance(0,"offlSel&&cBin>=0&&cBin<40",isolScheme,"../output-hypho50mixdj80emdj120em_yongsun_v12.root","(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(382./14038)",true,1,"samehistE",1);
    h3->Draw("sameE");
    drawText("0-100%",0.8,0.3);
 
