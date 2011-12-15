@@ -1,8 +1,11 @@
 #include "CutAndBinCollection2011.h"
 #include "photonIDEfficiency.C"
-const int kData = 0;
-const int kSig  = 1;
-const int kSBB  = 2;
+const int kData =  0;
+const int kSig  =  1;
+const int kSBB  =  2;
+const int kMCBsr = 3;
+const int kMCBsb = 4;
+
 const int kSumIso = 1;
 const int k3dIso =  2;
 const int kFisher = 3;
@@ -56,7 +59,7 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 	 
       getTemplate(hSig[icent],"meaningless",isoChoice,kSig,lowCent,highCent);
       getTemplate(hData[icent],"barrelHiForestPhotonV3.root",isoChoice,kData,lowCent,highCent);
-      getTemplate(hBkg[icent], "barrelHiForestPhotonV3.root",isoChoice,kSBB,lowCent,highCent);
+      getTemplate(hBkg[icent], "barrelHiForestPhotonV3.root",isoChoice,kMCBsb,lowCent,highCent);
       
    }
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
@@ -205,6 +208,18 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
    char* fnamePho80 = "barrelHiForestPhoton_MCphoton80_26k.root";
    float nEvtPho80     = 26000;
 
+
+   char* fnameEmj80 = "barrelHiForestPhoton_MCemJet800_60k.root";
+   char* fnameEmj120 = "barrelHiForestPhoton_MCemJet120_14k.root";
+   double csDij80 = 9.869e-5;
+   float nEvtEmj80     = 60000;
+   float effEmj80     = 0.204;
+   float weightEmj80 = csDij80*effEmj80/nEvtEmj80;
+   float nEvtEmj120     = 14000;
+   double csDij120 = 1.127e-5;
+   float effEmj120     = 0.54;
+   float weightEmj120 = csDij120*effEmj120/nEvtEmj120;
+   
    char* fnameData  = "barrelHiForestPhoton_Skim2011-Dec07-withTracks.root";
    
    TCut evtSelCut = "tgj.anaEvtSel";
@@ -225,7 +240,11 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
       finalCut = generalCutMC && genMatchCut1  && srIsoCut ;
    if ( iTemp == kSBB )
       finalCut = generalCutData && sbIsoCut;
-   
+   if ( iTemp == kMCBsr )
+      finalCut = generalCutMC && srIsoCut;
+   if ( iTemp == kMCBsb )
+      finalCut = generalCutMC && sbIsoCut;
+
    multiTreeUtil* photon1 = new multiTreeUtil();
    
    float csPho50 = 6.663e-7;
@@ -239,10 +258,20 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
       photon1->addFile( fnamePho80,  "yongsunPhotonTree", "" , weightPho80);
       weightBit = "ncoll";
    }
-   else {  // if this is data
+   else if ( (iTemp == kSBB) || (iTemp == kData)) {
+      // if this is data
       photon1->addFile( fname1 , "yongsunPhotonTree", "" ,1);
       weightBit = "";
    }
+   
+   else if ( (iTemp == kMCBsr) || (iTemp == kMCBsb)){
+      photon1->addFile(fnameEmj80,  "yongsunPhotonTree", "" , weightEmj80);
+      photon1->addFile(fnameEmj120, "yongsunPhotonTree", "" , weightEmj120);
+      weightBit = "ncoll";
+   }
+   
+   
+   
    photon1->AddFriend("yEvt=yongsunHiEvt");
    photon1->AddFriend("tgj");
    
