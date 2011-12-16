@@ -153,6 +153,8 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme,
       nt->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
       cutIsol = "fisherIsol>0.2";
       if (cbin==0) photonPurity=0.62;
+      //if (cbin==0) photonPurity=0.744; // +20%
+      //if (cbin==0) photonPurity=0.496; // -20%
       if (cbin==1) photonPurity=0.66;
       if (cbin==2) photonPurity=0.64;
    }
@@ -296,6 +298,7 @@ void plotBalanceSignal_SideSubClosure(
    h2->SetLineColor(kGreen+2);
    h2->Draw("hist sameE");
    TH1D * h3 = plotBalance(0,"offlSel&&cBin>=0&&cBin<40",isolScheme,"../output-hypho50mixdj80emdj120em_yongsun_v12.root","(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(382./14038)",true,1,"samehistE",1);
+   TH1D * h4 = plotBalance(0,"offlSel&&cBin>=0&&cBin<40",isolScheme,"../output-hypho50mixdj80emdj120em_yongsun_v12.root","(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(382./14038)",false,1,"samehistE",0);
    h3->Draw("sameE");
    drawText("0-100%",0.8,0.3);
 
@@ -314,17 +317,22 @@ void plotBalanceSignal_SideSubClosure(
    t3->Draw();
    
    c1->cd(2);
-   TH1D * hRat = (TH1D*)h3->Clone("hRat");
-   hRat->Divide(h);
-   hRat->SetYTitle("Ratio");
-   hRat->SetAxisRange(-0.4999,0.999,"X");
-   hRat->SetAxisRange(0,2,"Y");
-   hRat->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
-   hRat->Draw("E");
+   TH1D * hRat3 = (TH1D*)h3->Clone("hRat3");
+   hRat3->Divide(h);
+   hRat3->SetYTitle("Ratio");
+   hRat3->SetAxisRange(-0.4999,0.999,"X");
+   hRat3->SetAxisRange(-2,4,"Y");
+   hRat3->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
+   hRat3->Draw("E");
+   TH1D * hRat4 = (TH1D*)h4->Clone("hRat");
+   hRat4->Divide(h);
+   hRat4->SetMarkerStyle(kOpenCircle);
+   hRat4->SetMarkerColor(kBlack);
+   hRat4->SetLineColor(kBlack);
+   hRat4->SetLineStyle(2);
+   hRat4->Draw("sameE");
    TLine * l1 = new TLine(-0.4999,1,0.999,1);
-   l1->SetLineStyle(2);
    l1->Draw();
    
    c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosure.gif",isolScheme));
-   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosure.pdf",isolScheme));   
 }
