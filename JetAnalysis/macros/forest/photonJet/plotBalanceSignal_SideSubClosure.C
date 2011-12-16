@@ -246,7 +246,8 @@ void plotBalanceSignal_SideSubClosure(
 {
    TH1::SetDefaultSumw2();
    
-   TCanvas *c1 = new TCanvas("c1","",500,500);
+   TCanvas *c1 = new TCanvas("c1","",1000,500);
+   c1->Divide(2,1);
    
    TFile * fout = new TFile("outhists.root","recreate");
    TH1D * hFrame = new TH1D("hFrame","",20,-0.999,0.999);
@@ -286,6 +287,7 @@ void plotBalanceSignal_SideSubClosure(
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
    
+   c1->cd(1);
    hFrame->Draw();
    TH1D * h = plotBalance(0,"offlSel&&cBin>=0&&cBin<40&&sampleWeight>0.5",isolScheme,"../output-hypho50mixdj80emdj120em_yongsun_v12.root","",false,1,"samehistE",0);
    h->Draw("hist sameE");
@@ -310,6 +312,18 @@ void plotBalanceSignal_SideSubClosure(
    t3->SetTextFont(63);
    t3->SetTextSize(15);
    t3->Draw();
+   
+   c1->cd(2);
+   TH1D * hRat = (TH1D*)h3->Clone("hRat");
+   hRat->Divide(h);
+   hRat->SetYTitle("Ratio");
+   hRat->SetAxisRange(-0.4999,0.999,"X");
+   hRat->SetAxisRange(0,2,"Y");
+   hRat->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
+   hRat->Draw("E");
+   TLine * l1 = new TLine(-0.4999,1,0.999,1);
+   l1->SetLineStyle(2);
+   l1->Draw();
    
    c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosure.gif",isolScheme));
    c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosure.pdf",isolScheme));   
