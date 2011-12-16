@@ -25,19 +25,22 @@ void checkPhotonSideBand(){
    TH1D * hSSBkg = new TH1D("hSSBkg",";#sigma_{#eta#eta};u.n.",20,0,0.02);
    TH1D * hSSMix = new TH1D("hSSMix",";#sigma_{#eta#eta};u.n.",20,0,0.02);
    nSig = tgj->Draw("sigmaIetaIeta>>hSSSig",(sel)*"(sampleWeight>0.5)","");
-   hSSSig->Scale(1./hSSSig->Integral());
    nBkg = tgj->Draw("sigmaIetaIeta>>hSSBkg",(sel)*"(sampleWeight<0.5)","");
-   hSSBkg->Scale(1./hSSBkg->Integral());
    nMix = tgj->Draw("sigmaIetaIeta>>hSSMix",(sel)*Form("(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(%f/%f)",nBkg,nSig),"");
    hSSMix->Scale(1./hSSMix->Integral());
+   hSSSig->Scale(1./hSSSig->Integral()*0.62);
+   hSSBkg->Scale(1./hSSBkg->Integral()*0.38);
+   hSSSig->Add(hSSBkg);
    hSSSig->SetLineColor(kBlue);
    hSSSig->SetFillColor(kAzure-8);
    hSSSig->SetFillStyle(3005);
    hSSBkg->SetLineColor(kGreen+2);
+   hSSBkg->SetFillColor(kGreen+2);
+   hSSBkg->SetFillStyle(1001);
    
    hSSSig->SetAxisRange(0,0.8,"Y");
    hSSSig->Draw("histf");
-   hSSBkg->Draw("histsame");
+   hSSBkg->Draw("histfsame");
    hSSMix->Draw("sameE");
    hSSMix->SetLineColor(kRed);
    hSSMix->SetMarkerColor(kRed);
