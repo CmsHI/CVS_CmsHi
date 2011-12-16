@@ -59,7 +59,8 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 	 
       getTemplate(hSig[icent],"meaningless",isoChoice,kSig,lowCent,highCent);
       getTemplate(hData[icent],"barrelHiForestPhotonV3.root",isoChoice,kData,lowCent,highCent);
-      getTemplate(hBkg[icent], "barrelHiForestPhotonV3.root",isoChoice,kMCBsb,lowCent,highCent);
+      // getTemplate(hBkg[icent], "barrelHiForestPhotonV3.root",isoChoice,kSBB,lowCent,highCent);
+      getTemplate(hBkg[icent], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent);
       
    }
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
