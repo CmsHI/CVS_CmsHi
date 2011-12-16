@@ -34,19 +34,21 @@ public:
    {}
    float photonEt,photonRawEt,photonEta,photonPhi;
    float jetEt,jetEta,jetPhi;
-   float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float deta,dphi,Aj;
    float hovere,sigmaIetaIeta,sumIsol;
+   float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
+   float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];   
    void clear() {
-      photonEt=-99; photonEta=0; photonPhi=0;
-      jetEt=-99; jetEta=0; jetPhi=0;
-      phoMatJetEt=-99; phoMatJetEta=0; phoMatJetPhi=0;
+      photonEt=-99; photonEta=-99; photonPhi=-99;
+      jetEt=-99; jetEta=-99; jetPhi=-99;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
+      phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
+      ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       nTrk=0;
    }
 };
@@ -120,7 +122,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v8.root"
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v13.root",
+                      TString outname="output-data-Photon-v2_v14.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -163,7 +165,7 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:phoMatJetEt:phoMatJetEta:phoMatJetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -279,6 +281,13 @@ void analyzePhotonJet(
          gj.trkPt[gj.nTrk] = c->track.trkPt[it];
          gj.trkEta[gj.nTrk] = c->track.trkEta[it];
          gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
+         // find leading track
+         if (gj.trkPt[gj.nTrk]>gj.ltrkPt) {
+            gj.ltrkPt = gj.trkPt[gj.nTrk];
+            gj.ltrkEta = gj.trkEta[gj.nTrk];
+            gj.ltrkPhi = gj.trkPhi[gj.nTrk];
+            gj.ltrkJetDr = deltaR(gj.ltrkEta,gj.ltrkPhi,gj.jetEta,gj.jetPhi);
+         }
          ++gj.nTrk;
       }
       
