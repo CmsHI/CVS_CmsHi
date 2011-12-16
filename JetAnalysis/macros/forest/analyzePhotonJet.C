@@ -32,15 +32,10 @@ public:
    sigmaIetaIeta(-99),
    nTrk(0)
    {}
-   float photonEt,photonRawEt;
-   float photonEta;
-   float photonPhi;
-   float jetEt;
-   float jetEta;
-   float jetPhi;
-   float deta;
-   float dphi;
-   float Aj;
+   float photonEt,photonRawEt,photonEta,photonPhi;
+   float jetEt,jetEta,jetPhi;
+   float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
+   float deta,dphi,Aj;
    float hovere,sigmaIetaIeta,sumIsol;
    int nTrk;
    float trkPt[MAXTRK];
@@ -49,6 +44,7 @@ public:
    void clear() {
       photonEt=-99; photonEta=0; photonPhi=0;
       jetEt=-99; jetEta=0; jetPhi=0;
+      phoMatJetEt=-99; phoMatJetEta=0; phoMatJetPhi=0;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
       nTrk=0;
@@ -123,8 +119,8 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v8.root"
-                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      //TString outname="output-data-Photon-v2_v12.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
+                      TString outname="output-data-Photon-v2_v13.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -136,12 +132,12 @@ void analyzePhotonJet(
                       //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet80_60k.root",
                       //TString outname="output-hyuq80em_yongsun60k_v12_frac38.root",
                       //double sampleWeight = 0.38, // data: 1, mc: s = 0.62, b = 0.38
-                      TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet120_14k.root",
-                      TString outname="output-hyuq120em_yongsun14k_v12_frac38.root",
-                      double sampleWeight = 0.38001, // data: 1, mc: s = 0.62, b = 0.38
+                      //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet120_14k.root",
+                      //TString outname="output-hyuq120em_yongsun14k_v12_frac38.root",
+                      double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
-                      bool doCentReWeight=true
+                      bool doCentReWeight=false
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -167,7 +163,7 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:phoMatJetEt:phoMatJetEta:phoMatJetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -261,6 +257,18 @@ void analyzePhotonJet(
             gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
          }
+         
+         // Loop over jet tree to find a photon matching jet
+         for (int j=0;j<nJets;j++) {
+            if (jet_pt[j]<cutjetPt) continue;
+            if (fabs(jet_eta[j])>cutjetEta) continue;
+            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))>0.3) continue;
+            if (jet_pt[j]>gj.phoMatJetEt) {
+               gj.phoMatJetEt = jet_pt[j];
+               gj.phoMatJetEta = jet_eta[j];
+               gj.phoMatJetPhi = jet_phi[j];
+            }
+         }         
       }
       
       // xcheck with tracks
