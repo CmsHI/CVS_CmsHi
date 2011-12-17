@@ -38,10 +38,12 @@ public:
    float hovere,sigmaIetaIeta,sumIsol;
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
+   float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];   
+   float trkJetDr[MAXTRK];   
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
       jetEt=-99; jetEta=-99; jetPhi=-99;
@@ -49,6 +51,7 @@ public:
       sigmaIetaIeta=-99;
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
+      jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
       nTrk=0;
    }
 };
@@ -120,23 +123,24 @@ void analyzePhotonJet(
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      //TString outname="output-data-Photon-v2_v8.root"
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      TString outname="output-data-Photon-v2_v14.root",
+                      //TString outname="output-data-Photon-v2_v14.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
+                      TString outname="output-data-Photon-v4_v15.root",
+                      double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
+                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
                       //TString outname="output-data-Photon-v3_v10.root",
-                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString outname="output-hypho50v2_2_v10.root",
                       //TString inname="/net/hidsk0001/d00/scratch/jazzitup/temp/photon50New.root",
                       //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_corrCentralityv12.root",
-                      //TString outname="output-hypho50v2_50kyongsun_v12_frac62.root",
+                      //TString outname="output-hypho50v2_50kyongsun_v14_frac62.root",
                       //double sampleWeight = 0.62, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet80_60k.root",
                       //TString outname="output-hyuq80em_yongsun60k_v12_frac38.root",
                       //double sampleWeight = 0.38, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d101/kimy/macro/hiPhotonAna2011/rootFiles/EM_enriched_Dijet120_14k.root",
                       //TString outname="output-hyuq120em_yongsun14k_v12_frac38.root",
-                      double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
+                      //double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=false
@@ -165,12 +169,13 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
+   tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -240,10 +245,17 @@ void analyzePhotonJet(
          for (int j=0;j<nJets;j++) {
             if (jet_pt[j]<cutjetPt) continue;
             if (fabs(jet_eta[j])>cutjetEta) continue;
-            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
-            if (jet_pt[j]>gj.jetEt) {
-               gj.jetEt = jet_pt[j];
-               awayIndex = j;
+            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))>0.5) {
+               if (jet_pt[j]>gj.jetEt) {
+                  gj.jetEt = jet_pt[j];
+                  awayIndex = j;
+               }
+            } else { // Loop over jet tree to find a photon matching jet
+               if (jet_pt[j]>gj.phoMatJetEt) {
+                  gj.phoMatJetEt = jet_pt[j];
+                  gj.phoMatJetEta = jet_eta[j];
+                  gj.phoMatJetPhi = jet_phi[j];
+               }
             }
          }	 
          
@@ -259,18 +271,6 @@ void analyzePhotonJet(
             gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
          }
-         
-         // Loop over jet tree to find a photon matching jet
-         for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<cutjetPt) continue;
-            if (fabs(jet_eta[j])>cutjetEta) continue;
-            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))>0.3) continue;
-            if (jet_pt[j]>gj.phoMatJetEt) {
-               gj.phoMatJetEt = jet_pt[j];
-               gj.phoMatJetEta = jet_eta[j];
-               gj.phoMatJetPhi = jet_phi[j];
-            }
-         }         
       }
       
       // xcheck with tracks
@@ -281,12 +281,20 @@ void analyzePhotonJet(
          gj.trkPt[gj.nTrk] = c->track.trkPt[it];
          gj.trkEta[gj.nTrk] = c->track.trkEta[it];
          gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
+         gj.trkJetDr[gj.nTrk] = deltaR(gj.trkEta[gj.nTrk],gj.trkPhi[gj.nTrk],gj.jetEta,gj.jetPhi);
          // find leading track
          if (gj.trkPt[gj.nTrk]>gj.ltrkPt) {
             gj.ltrkPt = gj.trkPt[gj.nTrk];
             gj.ltrkEta = gj.trkEta[gj.nTrk];
             gj.ltrkPhi = gj.trkPhi[gj.nTrk];
-            gj.ltrkJetDr = deltaR(gj.ltrkEta,gj.ltrkPhi,gj.jetEta,gj.jetPhi);
+            gj.ltrkJetDr = gj.trkJetDr[gj.nTrk];
+         }
+         // find leading track in jet
+         if (gj.trkJetDr[gj.nTrk]<0.3 && gj.trkPt[gj.nTrk]>gj.jltrkPt) {
+            gj.jltrkPt = gj.trkPt[gj.nTrk];
+            gj.jltrkEta = gj.trkEta[gj.nTrk];
+            gj.jltrkPhi = gj.trkPhi[gj.nTrk];
+            gj.jltrkJetDr = gj.trkJetDr[gj.nTrk];
          }
          ++gj.nTrk;
       }
@@ -296,7 +304,7 @@ void analyzePhotonJet(
    }
 
    // After Event Loop
-   tgj->SetAlias("optIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
+   tgj->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
    // * cut at 0.3 from Yongsun's studies
    output->Write();
    output->Close();
