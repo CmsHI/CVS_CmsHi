@@ -334,5 +334,6 @@ void plotBalanceSignal_SideSubClosure(
    TLine * l1 = new TLine(-0.4999,1,0.999,1);
    l1->Draw();
    
-   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosure.gif",isolScheme));
+   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.gif",isolScheme));
+   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.pdf",isolScheme));
 }
