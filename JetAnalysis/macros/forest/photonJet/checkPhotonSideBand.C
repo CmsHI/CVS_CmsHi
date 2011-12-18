@@ -7,6 +7,7 @@
 #include "TLine.h"
 #include "TLegend.h"
 #include <iostream>
+#include "commonUtility.h"
 using namespace std;
 
 void checkPhotonSideBand(){
@@ -49,6 +50,18 @@ void checkPhotonSideBand(){
    l->SetLineStyle(2);
    l->SetLineColor(kViolet);
    l->Draw();
+   TLegend *t2=new TLegend(0.23,0.68,0.62,0.90);
+   t2->AddEntry(hSSSig,"Sig Sample","lf");
+   t2->AddEntry(hSSBkg,"Bkg Sample","lf");
+   t2->AddEntry(hSSMix,"Mixed Sample (0.62 Sig + 0.38 Bkg)","p");
+   t2->SetFillColor(0);
+   t2->SetBorderSize(0);
+   t2->SetFillStyle(0);
+   t2->SetTextSize(0.04);
+   t2->Draw();
+   drawText("Signal Region",0.23,0.55);
+   drawText("Sideband Region",0.646,0.55);
+
    
    c2->cd(2);
    TH1D * hAjSig = new TH1D("hAjSig",";A_{GJ};u.n.",20,-1,1);
@@ -83,11 +96,13 @@ void checkPhotonSideBand(){
    hAjBkgSide->Draw("sameE");
    hAjMix->Draw("sameE");
    
-   TLegend *t3=new TLegend(0.58,0.75,0.97,0.93);
+   TLegend *t3=new TLegend(0.23,0.68,0.62,0.93);
+   t3->AddEntry(hAjSig,"#sigma_{#eta#eta} < 0.01 (Signal Region)","");
    t3->AddEntry(hAjSig,"Sig Sample","lf");
    t3->AddEntry(hAjBkg,"Bkg Sample","l");
    t3->AddEntry(hAjMix,"S+B Mixed","p");
-   t3->AddEntry(hAjBkgSide,"#sigma_{i#etai#eta} sideband","p");
+   t3->AddEntry(hAjBkgSide,"#sigma_{#eta#eta} > 0.011 (Sideband Region)","");
+   t3->AddEntry(hAjBkgSide,"S+B Mixed","p");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
@@ -95,4 +110,5 @@ void checkPhotonSideBand(){
    t3->Draw();
 
    c2->Print("./fig/12.15smixb/photon60mix_sig_vs_bkg.gif");
+   c2->Print("./fig/12.15smixb/photon60mix_sig_vs_bkg.pdf");
 }
