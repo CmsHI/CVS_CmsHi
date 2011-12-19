@@ -95,9 +95,10 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
          anaAgj.hSSSideDPhiSub->Draw("sameE");
          anaAgj.rBkgSShape.hScaled->SetMarkerStyle(kOpenCircle);
          anaAgj.rBkgSShape.hScaled->SetMarkerColor(kBlack);
-         anaAgj.rBkgSShape.hScaled->Draw("sameE");
+         //anaAgj.rBkgSShape.hScaled->Draw("sameE");
+         anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerSize(0.8);
          anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerStyle(kOpenCircle);
-         anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerColor(kGray+2);
+         anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerColor(kGray+1);
          anaAgj.rBkgSShapeDPhi.hScaled->Draw("sameE");
       }
       anaAgj.rSigAll.hScaled->SetLineStyle(2);
