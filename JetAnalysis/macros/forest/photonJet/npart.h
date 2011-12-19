@@ -42,9 +42,9 @@ public:
    float hovere,sigmaIetaIeta,sumIsol;
 };
 
-void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, double * npart, double * m, double threshold1, int dataType)
+void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, float * npart, float * m, float threshold1, int dataType)
 {
-   double npartValue[40];
+   float npartValue[40];
    npartValue[0] = 393.633;
    npartValue[1] = 368.819;
    npartValue[2] = 343.073;
