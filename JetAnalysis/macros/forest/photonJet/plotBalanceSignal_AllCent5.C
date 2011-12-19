@@ -53,7 +53,6 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
    } else if (dataType==1) {
       anaAgj.subDPhiSide = subDPhiSide;
       anaAgj.subSShapeSide = subSShapeSide;
-      if (!isData) anaAgj.subSShapeSide = false; // todo: get purity for mc sample
       anaAgj.SetPhotonIsolation(isolScheme,cbin);
       anaAgj.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",20,-0.999,0.999);
    }
@@ -172,7 +171,7 @@ void plotBalanceSignal_AllCent5(
    cout << "\n Centrality 50-100\%" << endl;
    hFrame->Draw();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide);
+   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(4,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    //plotBalance(2,"sampleWeight>0.5",isolScheme,"../output-hypho50q_v15_frac62.root","weight",true,1,"sameE",1);
    drawText("50-100%",0.83,0.25);
@@ -199,7 +198,7 @@ void plotBalanceSignal_AllCent5(
    c1->cd(2);
    cout << "\n Centrality 30-50\%" << endl;
    hFrame->Draw();
-   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide);
+   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("30-50%",0.8,0.25);
    drawText("(b)",0.05,0.885);
@@ -221,7 +220,7 @@ void plotBalanceSignal_AllCent5(
    c1->cd(3);
    cout << "\n Centrality 20-30\%" << endl;
    hFrame->Draw();
-   plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide);
+   plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(2,"anaEvtSel&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("20-30%",0.8,0.25);
    drawText("(c)",0.05,0.885);
@@ -237,7 +236,7 @@ void plotBalanceSignal_AllCent5(
    c1->cd(4);
    cout << "\n Centrality 10-20\%" << endl;
    hFrame->Draw();
-   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide);
+   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("10-20%",0.8,0.3);
    drawText("(c)",0.05,0.885);
@@ -245,7 +244,7 @@ void plotBalanceSignal_AllCent5(
    c1->cd(5);
    cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
-   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide);
+   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("0-10%",0.8,0.3);
    drawText("(e)",0.05,0.885);
