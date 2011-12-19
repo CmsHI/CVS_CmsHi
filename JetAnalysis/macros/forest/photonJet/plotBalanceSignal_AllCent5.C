@@ -174,9 +174,11 @@ void plotBalanceSignal_AllCent5(
    hFrameGen->SetLineColor(kBlue);
    hFrameGen->SetFillColor(kAzure-8);
    hFrameGen->SetFillStyle(3005);
+   TH1D * hFrameNoY = (TH1D*)hFrame->Clone("hFrameNoY");
+   hFrameNoY->SetYTitle("");
    
    c1->cd(1);
-   hFrame->Draw();
+   hFrame->DrawClone();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
    plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(4,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
@@ -203,7 +205,7 @@ void plotBalanceSignal_AllCent5(
    
    
    c1->cd(2);
-   hFrame->Draw();
+   hFrameNoY->DrawClone();
    plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("30-50%",0.8,0.25);
@@ -224,7 +226,7 @@ void plotBalanceSignal_AllCent5(
    t3->Draw();
 
    c1->cd(3);
-   hFrame->Draw();
+   hFrameNoY->DrawClone();
    plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(2,"anaEvtSel&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("20-30%",0.8,0.25);
@@ -239,14 +241,14 @@ void plotBalanceSignal_AllCent5(
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
    c1->cd(4);
-   hFrame->Draw();
+   hFrame->DrawClone();
    plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("10-20%",0.8,0.3);
    drawText("(c)",0.05,0.885);
    
    c1->cd(5);
-   hFrame->Draw();
+   hFrameNoY->DrawClone();
    plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("0-10%",0.8,0.3);
