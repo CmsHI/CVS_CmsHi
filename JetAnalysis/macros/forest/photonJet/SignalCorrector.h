@@ -5,8 +5,8 @@
 class Region
 {
 public:
-   Region(TString n, TString v, TCut c, TString w) :
-   name(n),var(v),cut(c),weight(w) {}
+   Region(TString n, TString v, TCut c, TString w, int nm) :
+   name(n),var(v),cut(c),weight(w),normMode(nm) {}
    void Init(TTree * t, int nbins, float *bins, float frac, float area=1.) {
       fraction = frac;
       cut*=weight;
@@ -15,9 +15,9 @@ public:
       float nSel = t->Project(h->GetName(),var,cut);
       cout << "  draw: " << var << " cut: " << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
-      if (h->Integral()>0) hNorm->Scale(area/h->Integral());
+      if (normMode>0&&h->Integral()>0) hNorm->Scale(area/h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
-      cout << "  " << hScaled->GetName() << " scale by: " << area*fraction << endl;
+      cout << "  " << hScaled->GetName() << " scale by: " << fraction << endl;
       hScaled->Scale(fraction);
       //for (int i=1; i<=hScaled->GetNbinsX()+1 ; ++i) cout << hScaled->GetBinLowEdge(i) << " (" << hScaled->GetBinContent(i) << ") ";
       //cout << endl;
@@ -32,6 +32,7 @@ public:
    TString var;
    TCut cut;
    TString weight;
+   int normMode;
    float fraction;
 };
 
@@ -42,10 +43,10 @@ public:
    SignalCorrector(TTree * tree, TString n, TString var, TCut s, TString w="(1==1)", int nm=1) : 
    name(n),
    sel(s),
-   rSigAll(n+"SignalAll",var,s,w),
-   rBkgDPhi(n+"BkgDPhi",var,s,w),
-   rBkgSShape(n+"BkgSShape",var,s,w),
-   rBkgSShapeDPhi(n+"BkgSShapeDPhi",var,s,w),
+   rSigAll(n+"SignalAll",var,s,w,nm),
+   rBkgDPhi(n+"BkgDPhi",var,s,w,nm),
+   rBkgSShape(n+"BkgSShape",var,s,w,nm),
+   rBkgSShapeDPhi(n+"BkgSShapeDPhi",var,s,w,nm),
    weight(w),
    normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
@@ -130,11 +131,13 @@ public:
          hSSSideDPhiSub->Add(rBkgSShapeDPhi.hScaled,-1);
          hSubtracted->Add(hSSSideDPhiSub,-1);
       }
-      // Rescale after subtraction
-      if (normMode==2&&subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
-      rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
-      //if (subSShapeSide) rBkgSShape.hScaled->Scale(area/rBkgSShape.hScaled->Integral());
-      hSubtracted->Scale(area/hSubtracted->Integral());
+      if (normMode>0) {
+         // Rescale after subtraction
+         if (subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
+         rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
+         //if (subSShapeSide) rBkgSShape.hScaled->Scale(area/rBkgSShape.hScaled->Integral());
+         hSubtracted->Scale(area/hSubtracted->Integral());
+      }
    }
    TTree * t;
    TString name,nameIsol;
