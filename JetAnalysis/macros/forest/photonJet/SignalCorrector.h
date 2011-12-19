@@ -81,7 +81,7 @@ public:
    }
    
    void MakeHistograms(TCut sigSel, int nbin, float xmax, float xmin) {
-      cout << "Base Selection: " << sel << endl;
+      cout << endl << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
       rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011";

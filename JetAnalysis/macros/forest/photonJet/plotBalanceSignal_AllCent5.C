@@ -121,7 +121,8 @@ void plotBalanceSignal_AllCent5(
                                 int isolScheme=2, // 0=sumIsol, 1=cutIsol, 2=fisherIsol
                                 int normMode=2, // 1=unity, 2=per photon
                                 int subDPhiSide = 1,
-                                int subSShapeSide = 1
+                                int subSShapeSide = 1,
+                                TString outdir = "./fig/12.19datav5_4"
                                 )
 {
    TH1::SetDefaultSumw2();
@@ -168,7 +169,6 @@ void plotBalanceSignal_AllCent5(
    hFrameGen->SetFillStyle(3005);
    
    c1->cd(1);
-   cout << "\n Centrality 50-100\%" << endl;
    hFrame->Draw();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
    plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
@@ -196,7 +196,6 @@ void plotBalanceSignal_AllCent5(
    
    
    c1->cd(2);
-   cout << "\n Centrality 30-50\%" << endl;
    hFrame->Draw();
    plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
@@ -218,7 +217,6 @@ void plotBalanceSignal_AllCent5(
    t3->Draw();
 
    c1->cd(3);
-   cout << "\n Centrality 20-30\%" << endl;
    hFrame->Draw();
    plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(2,"anaEvtSel&&cBin>=8&&cBin<12",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
@@ -234,7 +232,6 @@ void plotBalanceSignal_AllCent5(
    tsel.DrawLatex(0.55,0.65,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
    c1->cd(4);
-   cout << "\n Centrality 10-20\%" << endl;
    hFrame->Draw();
    plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<8",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
@@ -242,15 +239,14 @@ void plotBalanceSignal_AllCent5(
    drawText("(c)",0.05,0.885);
    
    c1->cd(5);
-   cout << "\n Centrality 0-10\%" << endl;
    hFrame->Draw();
    plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
    plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("0-10%",0.8,0.3);
    drawText("(e)",0.05,0.885);
 
-   c1->Print(Form("./fig/12.19datav5_3/photon60_v15_jet30q_imbalance_all_cent5_subDPhi%dSS%d_Isol%d_Norm%d.gif",subDPhiSide,subSShapeSide,isolScheme,normMode));
-   c1->Print(Form("./fig/12.19datav5_3/photon60_v15_jet30q_imbalance_all_cent5_subDPhi%dSS%d_Isol%d_Norm%d.pdf",subDPhiSide,subSShapeSide,isolScheme,normMode));
+   c1->Print(Form("%s/photon60_v15_jet30q_imbalance_all_cent5_subDPhi%dSS%d_Isol%d_Norm%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
+   c1->Print(Form("%s/photon60_v15_jet30q_imbalance_all_cent5_subDPhi%dSS%d_Isol%d_Norm%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
 
    // save histograms
 //   fout->Write();
