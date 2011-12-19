@@ -90,9 +90,15 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
          anaAgj.rBkgDPhi.hScaled->Draw("sameE");
       }
       if (anaAgj.subSShapeSide) {
+         anaAgj.hSSSideDPhiSub->SetMarkerStyle(kOpenCircle);
+         anaAgj.hSSSideDPhiSub->SetMarkerColor(kViolet);
+         anaAgj.hSSSideDPhiSub->Draw("sameE");
          anaAgj.rBkgSShape.hScaled->SetMarkerStyle(kOpenCircle);
-         anaAgj.rBkgSShape.hScaled->SetMarkerColor(kViolet);
+         anaAgj.rBkgSShape.hScaled->SetMarkerColor(kBlack);
          anaAgj.rBkgSShape.hScaled->Draw("sameE");
+         anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerStyle(kOpenCircle);
+         anaAgj.rBkgSShapeDPhi.hScaled->SetMarkerColor(kGray+2);
+         anaAgj.rBkgSShapeDPhi.hScaled->Draw("sameE");
       }
       anaAgj.rSigAll.hScaled->SetLineStyle(2);
       anaAgj.rSigAll.hScaled->Draw("same hist");
@@ -122,7 +128,7 @@ void plotBalanceSignal_AllCent3(
                                 int normMode=2, // 1=unity, 2=per photon
                                 int subDPhiSide = 1,
                                 int subSShapeSide = 1,
-                                TString outdir = "./fig/12.19datav5_4"
+                                TString outdir = "./fig/12.19datav5_5sssubsub"
                                 )
 {
    TH1::SetDefaultSumw2();

@@ -45,11 +45,12 @@ public:
    rSigAll(n+"SignalAll",var,s,w),
    rBkgDPhi(n+"BkgDPhi",var,s,w),
    rBkgSShape(n+"BkgSShape",var,s,w),
+   rBkgSShapeDPhi(n+"BkgSShapeDPhi",var,s,w),
    weight(w),
    normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
    subSShapeSide(true),
-   nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0) {
+   nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0),fracPhotonBkgDPhiBkg(0) {
       t = tree;
    }
    
@@ -85,6 +86,7 @@ public:
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
       rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011";
+      rBkgSShapeDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011";
 
       // photon normalization
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
@@ -105,13 +107,22 @@ public:
       if (subSShapeSide) {
          cout << "  fracPhotonBkg: " << fracPhotonBkg << endl;
          rBkgSShape.Init(t,nbin,xmax,xmin,fracPhotonBkg,area);
+         float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
+         float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+         fracPhotonBkgDPhiBkg = fracPhotonBkg*(nDPhiBkg/(nSigAll));
+         //fracPhotonBkgDPhiBkg = 0;
+         rBkgSShapeDPhi.Init(t,nbin,xmax,xmin,fracPhotonBkgDPhiBkg,area);
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
-      if (subSShapeSide) hSubtracted->Add(rBkgSShape.hScaled,-1);
+      if (subSShapeSide) {
+         hSSSideDPhiSub = (TH1D*)rBkgSShape.hScaled->Clone(Form("%sDPhiSub",rBkgSShape.hScaled->GetName()));
+         hSSSideDPhiSub->Add(rBkgSShapeDPhi.hScaled,-1);
+         hSubtracted->Add(hSSSideDPhiSub,-1);
+      }
       // Rescale after subtraction
-      if (normMode==2&&subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-fracPhotonBkg)/(1-fracPhotonBkg);
+      if (normMode==2&&subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
       rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
       //if (subSShapeSide) rBkgSShape.hScaled->Scale(area/rBkgSShape.hScaled->Integral());
       hSubtracted->Scale(area/hSubtracted->Integral());
@@ -122,7 +133,9 @@ public:
    Region rSigAll;
    Region rBkgDPhi;
    Region rBkgSShape;
+   Region rBkgSShapeDPhi;
    TH1D * hSubtracted;
+   TH1D * hSSSideDPhiSub;
    TString weight;
    int normMode;
    bool subDPhiSide;
@@ -132,6 +145,7 @@ public:
    float fracDPhiBkg;
    float photonPurity;
    float fracPhotonBkg;
+   float fracPhotonBkgDPhiBkg;
 };
 
 #endif
