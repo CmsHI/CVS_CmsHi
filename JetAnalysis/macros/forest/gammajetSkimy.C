@@ -165,7 +165,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    GammaJet gj;
    Isolation isol;
    EvtSel evt;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:ncoll:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -176,8 +176,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
     
    int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
-   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-      //for (Long64_t jentry=0; jentry<100;jentry++) {
+     for (Long64_t jentry=0; jentry<nentries;jentry++) {
+   //   for (Long64_t jentry=0; jentry<5000;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
 
       c->GetEntry(jentry);
@@ -193,7 +193,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
-      
+
       // calculate corrected pt
       for (int j=0;j< c->photon.nPhotons;j++) {
 	 order[j] = -1;
@@ -288,7 +288,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       
       ncoll = getNcoll(evt.cBin);
       
-      
+           
       newtree->Fill();
       newtreehlt->Fill();
       newtreeSkim->Fill();
@@ -304,7 +304,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    
    
    newfile_data->Write();
-   newfile_data->Close();
+   //newfile_data->Close();
+   tgj->Draw("offlSel");
    cout << " Done! "<< endl;
 }
 
