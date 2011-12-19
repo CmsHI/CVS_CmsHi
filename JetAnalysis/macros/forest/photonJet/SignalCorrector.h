@@ -7,10 +7,10 @@ class Region
 public:
    Region(TString n, TString v, TCut c, TString w) :
    name(n),var(v),cut(c),weight(w) {}
-   void Init(TTree * t, int nbins, float xmin, float xmax, float frac, float area=1.) {
+   void Init(TTree * t, int nbins, float *bins, float frac, float area=1.) {
       fraction = frac;
       cut*=weight;
-      h = new TH1D(name,"",nbins,xmin,xmax);
+      h = new TH1D(name,"",nbins,bins);
       cout << "  " << h->GetName() << " with fraction: " << fraction << " area: " << area << endl;
       float nSel = t->Project(h->GetName(),var,cut);
       cout << "  draw: " << var << " cut: " << TString(cut) << ": " << nSel << endl;
@@ -81,13 +81,22 @@ public:
       sel = sel&&cutIsol;      
    }
    
-   void MakeHistograms(TCut sigSel, int nbin, float xmax, float xmin) {
+   void MakeHistograms(TCut sigSel, int nbin, float xmin, float xmax) {
+      float * bins = new float[nbin+1];
+      float dx = (xmax-xmin)/nbin;
+      for (int i=0; i<nbin+1; ++i) {
+         bins[i] = xmin+i*dx;
+      }
+      MakeHistograms(sigSel,nbin,bins);
+   }
+   
+   void MakeHistograms(TCut sigSel, int nbin, float * bins) {
       cout << endl << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
       rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011";
       rBkgSShapeDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011";
-
+      
       // photon normalization
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
       // number of events in signal region
@@ -96,22 +105,22 @@ public:
       float area=1.;
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
-      rSigAll.Init(t,nbin,xmax,xmin,1.,area);
+      rSigAll.Init(t,nbin,bins,1.,area);
       if (subDPhiSide) {
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
          fracDPhiBkg = nDPhiBkg/nSigAll;
-         rBkgDPhi.Init(t,nbin,xmax,xmin,fracDPhiBkg,area);
+         rBkgDPhi.Init(t,nbin,bins,fracDPhiBkg,area);
          cout << "  |dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
       if (subSShapeSide) {
          cout << "  fracPhotonBkg: " << fracPhotonBkg << endl;
-         rBkgSShape.Init(t,nbin,xmax,xmin,fracPhotonBkg,area);
+         rBkgSShape.Init(t,nbin,bins,fracPhotonBkg,area);
          float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
          fracPhotonBkgDPhiBkg = fracPhotonBkg*(nDPhiBkg/(nSigAll));
          //fracPhotonBkgDPhiBkg = 0;
-         rBkgSShapeDPhi.Init(t,nbin,xmax,xmin,fracPhotonBkgDPhiBkg,area);
+         rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
