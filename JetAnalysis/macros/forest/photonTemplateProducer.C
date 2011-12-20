@@ -11,7 +11,7 @@ const int k3dIso =  2;
 const int kFisher = 3;
 const int kNoIso  = 4;
 const int kSumIso2= 5;
-void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="");
+void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true);
 
 TCut getIsoCut( int isoChoice=0, float isoCut = -100 ) {
    
@@ -31,9 +31,9 @@ TString getIsoLabel ( int isoChoice=0) {
    
    else   cout << "!!!!!!! No such isolation choice" << endl;
 }
-void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
+void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true) {
    
-   
+
    TCanvas* c1[5];
     
    TH1D* hData[5][5];
@@ -77,11 +77,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 	 hBkgMCsr[icent][ipt] = (TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsr_cent%d_pt%d",icent,ipt));
 	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
 
-	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut);
-	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut);
-	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut);
+	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents);
+	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents);
+	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents);
 	 
-	 // getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent,ptCut);
+	 // getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent,ptCut,onlygjEvents);
 	 
       }
       for ( int icent = 1 ; icent<=nCent_std ; icent++) {
@@ -277,8 +277,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    for (int icent = 1; icent <=nCent_std; icent++) {
       int lowCent = centBin_std[icent-1];
       int highCent = centBin_std[icent]-1;
-      getTemplate(hBkgMCsr[icent][1], "meaningless",isoChoice,isoCut,kMCBsr,lowCent,highCent,"corrPt>60");
-      getTemplate(hBkgMCsb[icent][1], "meaningless",isoChoice,isoCut,kMCBsb,lowCent,highCent,"corrPt>60");
+      getTemplate(hBkgMCsr[icent][1], "meaningless",isoChoice,isoCut,kMCBsr,lowCent,highCent,"corrPt>60",onlygjEvents);
+      getTemplate(hBkgMCsb[icent][1], "meaningless",isoChoice,isoCut,kMCBsb,lowCent,highCent,"corrPt>60",onlygjEvents);
       handsomeTH1(hBkgMCsb[icent][1],2);
       handsomeTH1(hBkgMCsr[icent][1],1);
       scaleInt(hBkgMCsb[icent][1]);
@@ -320,7 +320,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    
 }
 
-void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut) { 
+void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents) { 
  
    char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_37k.root";
    float nEvtPho50     = 37188;
@@ -354,7 +354,10 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    TCut photonJetCut  = "tgj.photonEt>50  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
-   TCut generalCutMC   = photonJetCut && dphiCut && lPhotCut && centCut && addCut;
+   TCut generalCutMC   = lPhotCut && centCut && addCut;
+   if (onlygjEvents)
+      generalCutMC = generalCutMC && photonJetCut && dphiCut;
+    
    TCut generalCutData = generalCutMC && evtSelCut;
 
    TCut srIsoCut = getIsoCut(isoChoice,isoCut);
