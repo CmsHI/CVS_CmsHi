@@ -20,13 +20,13 @@ static const int MAXTRK = 10000;
 class GammaJet{
 public:
    GammaJet() :
-   isEle(0),photonEt(-99),photonEta(0),photonPhi(0),
+   photonEt(-99),photonEta(0),photonPhi(0),
    jetEt(-99),jetEta(0),jetPhi(0),
    deta(-99),dphi(-99), Aj(-99),
    sigmaIetaIeta(-99),
+   isEle(false),
    nTrk(0)
    {}
-   bool isEle;
    float photonEt,photonRawEt,photonEta,photonPhi;
    float jetEt,jetEta,jetPhi;
    float deta,dphi,Aj;
@@ -34,6 +34,7 @@ public:
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
+   bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
@@ -47,6 +48,7 @@ public:
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
+      isEle=false;
       nTrk=0;
    }
 };
@@ -164,7 +166,7 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"isEle/O:photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:isEle/O");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -220,6 +222,7 @@ void analyzePhotonJet(
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading photon
+         gj.isEle=c->photon.isEle[leadingIndex];
          gj.photonRawEt=c->photon.pt[leadingIndex];
          gj.photonEta=c->photon.eta[leadingIndex];
          gj.photonPhi=c->photon.phi[leadingIndex];
