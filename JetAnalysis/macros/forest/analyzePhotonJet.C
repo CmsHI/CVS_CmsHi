@@ -8,16 +8,10 @@
 // Convinient Output Classes
 class EvtSel {
 public:
-   int run;
-   int evt;
+   int run,evt;
    int cBin;
-   int nG;
-   int nJ;
-   int nT;
-   bool trig;
-   bool offlSel;
-   bool noiseFilt;
-   bool anaEvtSel;
+   int nG,nJ,nT;
+   bool trig,offlSel,noiseFilt,anaEvtSel;
    float vz,weight,npart,ncoll,sampleWeight;
 };
 
@@ -26,12 +20,13 @@ static const int MAXTRK = 10000;
 class GammaJet{
 public:
    GammaJet() :
-   photonEt(-99),photonEta(0),photonPhi(0),
+   isEle(0),photonEt(-99),photonEta(0),photonPhi(0),
    jetEt(-99),jetEta(0),jetPhi(0),
    deta(-99),dphi(-99), Aj(-99),
    sigmaIetaIeta(-99),
    nTrk(0)
    {}
+   bool isEle;
    float photonEt,photonRawEt,photonEta,photonPhi;
    float jetEt,jetEta,jetPhi;
    float deta,dphi,Aj;
@@ -125,7 +120,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
-                      TString outname="output-data-Photon-v4_v15.root",
+                      TString outname="output-data-Photon-v4_v16.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -169,7 +164,7 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr");
+   tgj->Branch("jet",&gj.photonEt,"isEle/O:photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -212,7 +207,8 @@ void analyzePhotonJet(
          if (c->photon.pt[j]<cutphotonPt||c->photon.pt[j]>1000) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
-         if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro
+         //if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut
+         if (!c->isLooseEGamma(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut, include electrons
          // sort using corrected photon pt
          float corrPt=c->getCorrEt(j);
          if (corrPt>gj.photonEt) {
