@@ -18,13 +18,20 @@ void compareIsoCuts() {
       }
    }
    
-   TCanvas* c2  = new TCanvas("c2","",1000,400);
-   makeMultiPanelCanvas(c2,3,1,0.0,0.0,0.2,0.15,0.02);
+   TCanvas* c2  = new TCanvas("c2","",100 + 300 * nCent_std,400);
+   makeMultiPanelCanvas(c2,nCent_std,1,0.0,0.0,0.2,0.15,0.02);
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
       c2->cd(nCent_std - icent + 1 );
       fluc[icent]->Scale(1./  fluc[icent]->GetBinContent(  fluc[icent]->FindBin(1)));
       fluc[icent]->SetAxisRange(0.8,1.2,"Y");
       handsomeTH1(fluc[icent]);
       fluc[icent]->Draw();
+      int lowerCent = centBin_std[icent-1];
+      int upperCent = centBin_std[icent]-1;
+      drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.2369118);
+
+      
    }
+   c2->SaveAs("compareYieldsInVariousIsoCut.pdf");
+   
 }
