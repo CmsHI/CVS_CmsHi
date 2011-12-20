@@ -58,11 +58,16 @@ public:
    void SetPhotonIsolation(int isolScheme, int cBin)
    {
       if (isolScheme==0) { //sum isol
-         nameIsol="Sum(Isol.)";
-         cutIsol = "sumIsol/0.9<5";
-         if (cBin==0) photonPurity=0.50;
-         if (cBin>=1&&cBin<=2) photonPurity=0.64;
-         if (cBin>=3&&cBin<=4) photonPurity=0.57;
+//         nameIsol="Sum(Isol.)<5";
+//         cutIsol = "sumIsol/0.9<5";
+//         if (cBin==0) photonPurity=0.50;
+//         if (cBin>=1&&cBin<=2) photonPurity=0.64;
+//         if (cBin>=3&&cBin<=4) photonPurity=0.57;
+         nameIsol="Sum(Isol.)<1";
+         cutIsol = "(cc4+cr4+ct4PtCut20)/0.9 <1";
+         if (cBin==0) photonPurity=0.74;
+         if (cBin>=1&&cBin<=2) photonPurity=0.78;
+         if (cBin>=3&&cBin<=4) photonPurity=0.77;
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
@@ -95,8 +100,8 @@ public:
       cout << endl << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
-      rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011";
-      rBkgSShapeDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011";
+      rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+      rBkgSShapeDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
       
       // photon normalization
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
