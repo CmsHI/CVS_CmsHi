@@ -69,7 +69,7 @@ TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,float *npart, int dataType)
 TGraphAsymmErrors * getRBSignal(
                                 float threshold1 = 60,
                                 float ajCut= 1,
-                                TCut mycut="offlSel",
+                                TCut mycut="offlSel", TString myweight="1.",
                                 TString infname = "../output-data-Photon-v3_v10.root",
                                 int dataType=0, // 0=mc, 1=data, 2=pp
                                 int isolScheme=2
@@ -104,8 +104,8 @@ TGraphAsymmErrors * getRBSignal(
      
    // Get counts for numorator vs denominator
    cout << " === Get Denominator === " << endl;
-   SignalCorrector anaDen(nt,name+"Den","cBin","photonEt>60"&&mycut,"(1.)",0); // normalization type 1=unity, 2=per sel photon
-   anaDen.subDPhiSide = false;
+   SignalCorrector anaDen(nt,name+"Den","cBin","photonEt>60"&&mycut,myweight,0); // normalization type 1=unity, 2=per sel photon
+   anaDen.subDPhiSide = true;
    anaDen.subSShapeSide = false;
    anaDen.SetPhotonIsolation(isolScheme,0);
    anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m);
@@ -113,7 +113,7 @@ TGraphAsymmErrors * getRBSignal(
    cout << " === Get Numerator === " << endl;
    //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
    //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","(photonEt-jetEt)/photonEt",0);   
-   SignalCorrector anaNum(nt,name+"Num","cBin","photonEt>60"&&mycut,"(photonEt-jetEt)/photonEt",0); // normalization type 1=unity, 2=per sel photon
+   SignalCorrector anaNum(nt,name+"Num","cBin","photonEt>60"&&mycut,"(photonEt-jetEt)/photonEt*"+myweight,0); // normalization type 1=unity, 2=per sel photon
    anaNum.subDPhiSide = true;
    anaNum.subSShapeSide = false;
    anaNum.SetPhotonIsolation(isolScheme,0);
@@ -172,7 +172,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","../output-data-Photon-v5_v15.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -180,13 +180,13 @@ void plotDeltaEvNpartSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"offlSel","../output-data-pp2010-prod3-photon_v10.root",2);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"offlSel","(1==1)","../output-data-pp2010-prod3-photon_v10.root",2);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
@@ -214,7 +214,7 @@ void plotDeltaEvNpartSubtracted(
    hFrameDataBkg2->SetMarkerColor(kViolet);
    
    TLegend *leg=new TLegend(0.55,0.68,0.85,0.91);
-   leg->AddEntry(gdata,"#intL dt = 84 #mub^{-1}","");
+   leg->AddEntry(gdata,"#intL dt = 112 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
    leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
@@ -239,6 +239,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.gif",photonMinPt));
-   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart.pdf",photonMinPt));
+   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_mcWeighted.gif",photonMinPt));
+   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_mcWeighted.pdf",photonMinPt));
 }
