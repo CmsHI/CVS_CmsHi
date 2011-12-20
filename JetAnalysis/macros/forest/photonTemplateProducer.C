@@ -62,7 +62,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    hN->Sumw2();
 
    
-   for (int ipt = 1; ipt <=3 ; ipt++) { 
+   for (int ipt = 1; ipt <= nPtBin ; ipt++) { 
       c1[ipt] = new TCanvas(Form("c1_ipt%d",ipt),"",700,700);
       makeMultiPanelCanvas(c1[ipt],nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
       
@@ -232,7 +232,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    hN->Draw();
    
    
-   TCanvas* c4 = new TCanvas("efficienycCorrection","",500,500);
+   TCanvas* c4 = new TCanvas("efficienycCorrection","",1000,500);
+   c4->Divide(2,1);
+   c4->cd(1);
    for (int icent = 1; icent <=nCent_std; icent++) {
       TH1ScaleByWidth(rawSpectra[icent]);    // divide by width
       finSpectra[icent] = (TH1D*)rawSpectra[icent]->Clone(Form("finSpec_icent%d_%s",icent,getIsoLabel(isoChoice).Data()));
@@ -254,22 +256,45 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    finSpectra[1]->SetXTitle("E_{T} (GeV)");
    finSpectra[1]->SetYTitle("Photon Yield / T_{AA} (Arbitrary Unit)");
    
+   finSpectra[1]->SetAxisRange(1.e8,1.e11,"Y");
    finSpectra[1]->Draw();
    finSpectra[2]->Draw("same");
    finSpectra[3]->Draw("same");
    finSpectra[4]->Draw("same");
+   jumSun(60,1.e8,60,1.e11,2);
 
-   TLegend* leg2 =  new TLegend(0.358871,0.6440678,0.9919355,0.8707627,NULL,"brNDC");
+   TLegend* leg2 =  new TLegend(0.458871,0.6440678,0.9919355,0.8707627,NULL,"brNDC");
    easyLeg(leg2,"dN/dE_{T} of isolated photons");
    leg2->AddEntry(finSpectra[1],"0-10%","pl");
    leg2->AddEntry(finSpectra[2],"10-30%","pl");
    leg2->AddEntry(finSpectra[3],"30-50%","pl");
    leg2->AddEntry(finSpectra[4],"50-100%","pl");
    leg2->Draw();
-   
+
+
    gPad->SetLogy();
-   gPad->SetLogx();
-      
+   //   gPad->SetLogx();
+
+   c4->cd(2);
+   TH1D* finSpectraMB = (TH1D*)finSpectra[1]->Clone("finSpectraMB");
+   finSpectraMB->Reset();
+   finSpectraMB->Add( finSpectra[1], taa[1]*0.1);
+   finSpectraMB->Add( finSpectra[2], taa[2]*0.2);
+   finSpectraMB->Add( finSpectra[3], taa[3]*0.2);
+   finSpectraMB->Add( finSpectra[4], taa[4]*0.5);
+   finSpectraMB->Scale(1./(taa[1]*0.1+ taa[2]*0.2 + taa[3]*0.2 + taa[4]*0.5));
+   TH1D* finSpectraR[10];
+   for ( int icent =1 ; icent<= nCent_std; icent++) {
+      finSpectraR[icent] = (TH1D*)finSpectra[icent]->Clone(Form("finSpectraR_icent%d",icent));
+      finSpectraR[icent]->Divide(finSpectraMB);
+   }
+   finSpectraR[1]->SetYTitle("dN/dE_{T} / dN/dE_{T}^{MB} after T_{AA} scaling"); 
+   finSpectraR[1]->SetAxisRange(0,2,"Y");
+   finSpectraR[1]->Draw();
+   finSpectraR[2]->Draw("same");
+   finSpectraR[3]->Draw("same");
+   finSpectraR[4]->Draw("same");
+   jumSun(60,0,60,2,2);
    c4->SaveAs("taaScaling.pdf");
 
    TCanvas* c5 = new TCanvas("c5","",700,700);
