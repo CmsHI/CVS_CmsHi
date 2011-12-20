@@ -104,7 +104,7 @@ TGraphAsymmErrors * getRBSignal(
      
    // Get counts for numorator vs denominator
    cout << " === Get Denominator === " << endl;
-   SignalCorrector anaDen(nt,name+"Den","cBin","photonEt>60"&&mycut,myweight,0); // normalization type 1=unity, 2=per sel photon
+   SignalCorrector anaDen(nt,name+"Den","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
    anaDen.subDPhiSide = true;
    anaDen.subSShapeSide = false;
    anaDen.SetPhotonIsolation(isolScheme,0);
@@ -113,7 +113,7 @@ TGraphAsymmErrors * getRBSignal(
    cout << " === Get Numerator === " << endl;
    //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
    //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","(photonEt-jetEt)/photonEt",0);   
-   SignalCorrector anaNum(nt,name+"Num","cBin","photonEt>60"&&mycut,"(photonEt-jetEt)/photonEt*"+myweight,0); // normalization type 1=unity, 2=per sel photon
+   SignalCorrector anaNum(nt,name+"Num","cBin",cut1,"(photonEt-jetEt)/photonEt*"+myweight,0); // normalization type 1=unity, 2=per sel photon
    anaNum.subDPhiSide = true;
    anaNum.subSShapeSide = false;
    anaNum.SetPhotonIsolation(isolScheme,0);
