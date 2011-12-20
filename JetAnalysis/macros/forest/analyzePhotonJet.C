@@ -34,6 +34,7 @@ public:
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
+   float refJetEt,refJetEta,refJetPhi;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -48,6 +49,7 @@ public:
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
+      refJetEt=-99; refJetEta=-99; refJetPhi=-99;
       isEle=false;
       nTrk=0;
    }
@@ -122,7 +124,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
-                      TString outname="output-data-Photon-v4_v16.root",
+                      TString outname="output-data-Photon-v4_v17.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -166,7 +168,10 @@ void analyzePhotonJet(
    GammaJet gj;
    Isolation isol;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:isEle/O");
+   TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
+   ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
+   ":refJetEt:refJetEta:refJetPhi:isEle/O";
+   tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -175,7 +180,8 @@ void analyzePhotonJet(
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
    // Main loop
-   for (int i=0;i<c->GetEntries();i++)
+   //for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<5000;i++)
    {
       c->GetEntry(i);
       
@@ -209,8 +215,8 @@ void analyzePhotonJet(
          if (c->photon.pt[j]<cutphotonPt||c->photon.pt[j]>1000) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
-         //if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut
-         if (!c->isLooseEGamma(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut, include electrons
+         if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut
+         //if (!c->isLooseEGamma(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut, include electrons
          // sort using corrected photon pt
          float corrPt=c->getCorrEt(j);
          if (corrPt>gj.photonEt) {
@@ -236,7 +242,10 @@ void analyzePhotonJet(
          float *jet_pt  = c->akPu3PF.jtpt;
          float *jet_eta = c->akPu3PF.jteta;
          float *jet_phi = c->akPu3PF.jtphi;
-//         int nJets=c->icPu5.nref;
+         float *refjet_pt  = c->akPu3PF.refpt;
+         float *refjet_eta = c->akPu3PF.refeta;
+         float *refjet_phi = c->akPu3PF.refphi;
+         //         int nJets=c->icPu5.nref;
 //         float *jet_pt  = c->icPu5.jtpt;
 //         float *jet_eta = c->icPu5.jteta;
 //         float *jet_phi = c->icPu5.jtphi;
@@ -269,6 +278,9 @@ void analyzePhotonJet(
             gj.deta = jet_eta[awayIndex] - c->photon.eta[leadingIndex];
             gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
+            gj.refJetEt = refjet_pt[awayIndex];
+            gj.refJetEta = refjet_eta[awayIndex];
+            gj.refJetPhi = refjet_phi[awayIndex];
          }
       }
       
