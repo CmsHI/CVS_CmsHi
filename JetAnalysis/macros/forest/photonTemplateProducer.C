@@ -34,6 +34,9 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
    TH1D* hSig[5][5];
    TH1D* hBkg[5][5];
    
+   TH1D* hBkgMCsr[5][5];
+   TH1D* hBkgMCsb[5][5];
+
    TH1D* rawSpectra[5];
    TH1D* finSpectra[5];
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
@@ -65,10 +68,13 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 	 hData[icent][ipt]  = new TH1D(Form("hData_cent%d_pt%d",icent,ipt),";shower shape (#sigma_{#eta#eta});Entries per photon candidate;",25,0,0.025);
 	 hSig[icent][ipt]   = (TH1D*)hData[icent][ipt]->Clone(Form("hSig_cent%d_pt%d",icent,ipt));
 	 hBkg[icent][ipt]   = (TH1D*)hData[icent][ipt]->Clone(Form("hBkg_cent%d_pt%d",icent,ipt));
+	 hBkgMCsr[icent][ipt] = (TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsr_cent%d_pt%d",icent,ipt));
+	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
 
 	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,kSig,lowCent,highCent,ptCut);
 	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,kData,lowCent,highCent,ptCut);
 	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,kSBB,lowCent,highCent,ptCut);
+	 
 	 // getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent,ptCut);
 	 
       }
@@ -82,14 +88,17 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==3),chisq,purity10);
 	 cout << " purity = " << fitr.purity010 << endl;
 	 cout << " nSig   = " << fitr.nSig << endl;
-	 drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.4369118);
 	 drawText(Form("%d - %d GeV", (int)ptBin[ipt-1], (int)ptBin[ipt]),0.5680963,0.529118);
+	 drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.4369118);
+	 
 	 //      TCut ptCut = Form("corrPt>%.2f && corrPt<%.2f",(float)ptBin[ipt-1],(float)ptBin[ipt]);
 	 
 	 if ( icent == 3) 
 	 drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.5680963,0.3569118,1,15);
 	 else 
 	    drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
+	 drawText(Form("#pm %.0f%% (stat)", float( 100. * fitr.purity010 * (float)fitr.nSigErr / (float)fitr.nSig ) ),0.6680963,0.2869118,1,15);
+	 
 	 hPurity->SetBinContent(icent, fitr.purity010);
 	 hPurity->SetBinError  (icent, fitr.purity010* fitr.nSigErr/fitr.nSig);
 	 //	 hNsig->SetBinContent(icent, fitr.nSig);
@@ -230,6 +239,39 @@ void photonTemplateProducer(int isoChoice = kSumIso) {
    gPad->SetLogx();
       
 
+
+   TCanvas* c5 = new TCanvas("c5","",1200,500);
+   makeMultiPanelCanvas(c5,3,1,0.0,0.0,0.2,0.15,0.02);
+   for (int icent = 1; icent <=nCent_std; icent++) {
+      int lowCent = centBin_std[icent-1];
+      int highCent = centBin_std[icent]-1;
+      getTemplate(hBkgMCsr[icent][1], "meaningless",isoChoice,kMCBsr,lowCent,highCent,"corrPt>60");
+      getTemplate(hBkgMCsb[icent][1], "meaningless",isoChoice,kMCBsb,lowCent,highCent,"corrPt>60");
+      handsomeTH1(hBkgMCsb[icent][1],2);
+      handsomeTH1(hBkgMCsr[icent][1],1);
+      scaleInt(hBkgMCsb[icent][1]);
+      scaleInt(hBkgMCsr[icent][1]);
+      
+   }
+   for (int icent = 1; icent <=nCent_std; icent++) {
+      int lowerCent = centBin_std[icent-1];
+      int upperCent = centBin_std[icent]-1;
+      c5->cd(nCent_std - icent+1);
+      hBkgMCsb[icent][1]->SetAxisRange(0,0.4,"Y");
+      hBkgMCsb[icent][1]->Draw("hist");
+      hBkgMCsr[icent][1]->Draw("same");
+      drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.3680963,0.8369118);
+      if (  icent == 3) {
+	 TLegend* leg1 =  new  TLegend(0.5977464,0.6159073,0.9986159,0.8138776,NULL,"brNDC");
+	 easyLeg(leg1,"MC Bkg template");
+	 leg1->AddEntry(hBkgMCsr[icent][1],"signal region","pl");
+	 leg1->AddEntry(hBkgMCsb[icent][1],"side-band","l");
+	 leg1->Draw();
+      }
+   }
+   
+   
+
    c3->SaveAs(Form("crossSection_%s.gif",getIsoLabel(isoChoice).Data()));
    TFile outf = TFile("photonPurityCollection.root","update");
    hN->Write();
@@ -254,13 +296,13 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, int iTemp, int lowCent
    float nEvtPho80     = 25308;
 
 
-   char* fnameEmj80 = "barrelHiForestPhoton_MCemJet800_60k.root";
-   char* fnameEmj120 = "barrelHiForestPhoton_MCemJet120_14k.root";
+   char* fnameEmj80 = "barrelHiForestPhoton_MCemJet80_41007events.root";
+   char* fnameEmj120 = "barrelHiForestPhoton_MCemJet120_25308events.root";
    double csDij80 = 9.869e-5;
-   float nEvtEmj80     = 60000;
+   float nEvtEmj80     = 41007;
    float effEmj80     = 0.204;
    float weightEmj80 = csDij80*effEmj80/nEvtEmj80;
-   float nEvtEmj120     = 14000;
+   float nEvtEmj120     = 25308;
    double csDij120 = 1.127e-5;
    float effEmj120     = 0.54;
    float weightEmj120 = csDij120*effEmj120/nEvtEmj120;
