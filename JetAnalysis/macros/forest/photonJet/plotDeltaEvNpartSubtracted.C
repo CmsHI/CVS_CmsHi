@@ -72,7 +72,9 @@ TGraphAsymmErrors * getRBSignal(
                                 TCut mycut="offlSel", TString myweight="1.",
                                 TString infname = "../output-data-Photon-v3_v10.root",
                                 int dataType=0, // 0=mc, 1=data, 2=pp
-                                int isolScheme=1
+                                int isolScheme=0,
+                                bool subDPhiSide=true,
+                                bool subSShapeSide=true
 )
 {
    // open the data file
@@ -84,11 +86,11 @@ TGraphAsymmErrors * getRBSignal(
 
    // Get npart
    const int nBin = 5;
-   float m[nBin+1] = {-0.5,3.5,7.5,11.5,20.5,40.5};
+   float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
    //const int nBin = 6;
-   //float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,40.5};
+   //float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,40.5};
    //   const int nBin = 7;
-   //   float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
+   //   float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,31.5,40.5};
    float npart[nBin];// = {2,358.623,232.909,97.9521};
    EvtSel evt;
    GammaJet gj;
@@ -105,19 +107,16 @@ TGraphAsymmErrors * getRBSignal(
    // Get counts for numorator vs denominator
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
-   anaDen.subDPhiSide = true;
-   anaDen.subSShapeSide = false;
+   anaDen.subDPhiSide = subDPhiSide;
+   anaDen.subSShapeSide = subSShapeSide;
    anaDen.SetPhotonIsolation(isolScheme,0);
    anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m);
 
    cout << " === Get Numerator === " << endl;
-   //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","photonEt-jetEt",0);   
-   //SignalCorrector anaNum(nt,name+"Num",cut1,"acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01","(photonEt-jetEt)/photonEt",0);   
    SignalCorrector anaNum(nt,name+"Num","cBin",cut1,"(photonEt-jetEt)/photonEt*"+myweight,0); // normalization type 1=unity, 2=per sel photon
-   anaNum.subDPhiSide = true;
-   anaNum.subSShapeSide = false;
+   anaNum.subDPhiSide = subDPhiSide;
+   anaNum.subSShapeSide = subSShapeSide;
    anaNum.SetPhotonIsolation(isolScheme,0);
-   //anaNum.MakeHistograms(1-photonPurity,nBin,m);
    anaNum.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m);
 
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
@@ -148,13 +147,43 @@ TGraphAsymmErrors * getRBSignal(
          gSShapeSide->SetMarkerStyle(kOpenCircle);
          gSShapeSide->Draw("p");
       }
+      // Draw count
+      float nPhotonJet = anaNum.nSigAll;
+      if (anaNum.subDPhiSide) nPhotonJet -= anaNum.nSigAll * anaNum.fracDPhiBkg;
+      if (anaNum.subSShapeSide) nPhotonJet -= anaNum.nSigAll * anaNum.fracPhotonBkg;
+      if (dataType==1) {
+         TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
+         t3->AddEntry(anaNum.rSigAll.h,anaNum.nameIsol,"");
+         t3->AddEntry(anaNum.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaNum.rSigAll.h,Form("#gamma purity %.2f",anaNum.photonPurity),"");
+         t3->SetFillColor(0);
+         t3->SetBorderSize(0);
+         t3->SetFillStyle(0);
+         t3->SetTextFont(63);
+         t3->SetTextSize(15);
+         t3->Draw();      
+      }
+      if (dataType==2) {
+         TLegend *t3=new TLegend(0.22,0.7,0.62,0.85);
+         t3->AddEntry(anaNum.rSigAll.h,"","");
+         t3->AddEntry(anaNum.rSigAll.h,Form(" pp: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaNum.rSigAll.h,"","");
+         t3->SetFillColor(0);
+         t3->SetBorderSize(0);
+         t3->SetFillStyle(0);
+         t3->SetTextFont(63);
+         t3->SetTextSize(15);
+         t3->Draw();      
+      }
    }
    return g;
 }
 
 void plotDeltaEvNpartSubtracted(
                                 float photonMinPt=60,
-                                int isolScheme=0
+                                int isolScheme=0,
+                                int subDPhiSide=1,
+                                int subSShapeSide=1
 )
 {
    TH1::SetDefaultSumw2();
@@ -173,7 +202,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1,isolScheme);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1,isolScheme,subDPhiSide,subSShapeSide);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -181,13 +210,13 @@ void plotDeltaEvNpartSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0,isolScheme);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0,isolScheme,subDPhiSide,subSShapeSide);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"offlSel","(1==1)","../output-data-pp2010-prod3-photon_v10.root",2,isolScheme);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v10.root",2,isolScheme,subDPhiSide,subSShapeSide);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
@@ -214,12 +243,12 @@ void plotDeltaEvNpartSubtracted(
    hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg2->SetMarkerColor(kViolet);
    
-   TLegend *leg=new TLegend(0.55,0.68,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
    leg->AddEntry(gdata,"#intL dt = 112 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-   leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   //leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
+   if (subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
@@ -229,7 +258,7 @@ void plotDeltaEvNpartSubtracted(
    leg->SetTextSize(17);
    leg->Draw();
    
-   TLegend *leg2=new TLegend(0.16,0.62,0.49,0.80);
+   TLegend *leg2=new TLegend(0.17,0.17,0.49,0.32);
    leg2->AddEntry(hTmp,Form("p_{T,#gamma} > %.0f GeV/c",photonMinPt),"");
    leg2->AddEntry(hTmp,"p_{T,jet} > 30 GeV/c","");
    leg2->AddEntry(hTmp,"#Delta#phi_{12} > #frac{2}{3}#pi","");
@@ -240,6 +269,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.gif",photonMinPt,isolScheme));
-   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.pdf",photonMinPt,isolScheme));
+   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhi%dSS%d_v_Npart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.gif",subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
+   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhi%dSS%d_v_Npart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.pdf",subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
 }
