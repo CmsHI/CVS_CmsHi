@@ -151,16 +151,30 @@ TGraphAsymmErrors * getRBSignal(
       float nPhotonJet = anaNum.nSigAll;
       if (anaNum.subDPhiSide) nPhotonJet -= anaNum.nSigAll * anaNum.fracDPhiBkg;
       if (anaNum.subSShapeSide) nPhotonJet -= anaNum.nSigAll * anaNum.fracPhotonBkg;
-      TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
-      t3->AddEntry(anaNum.rSigAll.h,anaNum.nameIsol,"");
-      t3->AddEntry(anaNum.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
-      t3->AddEntry(anaNum.rSigAll.h,Form("#gamma purity %.2f",anaNum.photonPurity),"");
-      t3->SetFillColor(0);
-      t3->SetBorderSize(0);
-      t3->SetFillStyle(0);
-      t3->SetTextFont(63);
-      t3->SetTextSize(15);
-      t3->Draw();      
+      if (dataType==1) {
+         TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
+         t3->AddEntry(anaNum.rSigAll.h,anaNum.nameIsol,"");
+         t3->AddEntry(anaNum.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaNum.rSigAll.h,Form("#gamma purity %.2f",anaNum.photonPurity),"");
+         t3->SetFillColor(0);
+         t3->SetBorderSize(0);
+         t3->SetFillStyle(0);
+         t3->SetTextFont(63);
+         t3->SetTextSize(15);
+         t3->Draw();      
+      }
+      if (dataType==2) {
+         TLegend *t3=new TLegend(0.22,0.7,0.62,0.85);
+         t3->AddEntry(anaNum.rSigAll.h,"","");
+         t3->AddEntry(anaNum.rSigAll.h,Form(" pp: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaNum.rSigAll.h,"","");
+         t3->SetFillColor(0);
+         t3->SetBorderSize(0);
+         t3->SetFillStyle(0);
+         t3->SetTextFont(63);
+         t3->SetTextSize(15);
+         t3->Draw();      
+      }
    }
    return g;
 }
@@ -229,12 +243,12 @@ void plotRBSubtracted(
    hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg2->SetMarkerColor(kViolet);
    
-   TLegend *leg=new TLegend(0.55,0.68,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
    leg->AddEntry(gdata,"#intL dt = 112 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-   leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   //leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
+   if (subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
@@ -244,7 +258,7 @@ void plotRBSubtracted(
    leg->SetTextSize(17);
    leg->Draw();
    
-   TLegend *leg2=new TLegend(0.18,0.19,0.50,0.37);
+   TLegend *leg2=new TLegend(0.58,0.40,0.90,0.58);
    leg2->AddEntry(hTmp,Form("p_{T,#gamma} > %.0f GeV/c",photonMinPt),"");
    //leg2->AddEntry(hTmp,"p_{T,jet} > 30 GeV/c","");
    //leg2->AddEntry(hTmp,"#Delta#phi_{12} > #frac{2}{3}#pi","");
