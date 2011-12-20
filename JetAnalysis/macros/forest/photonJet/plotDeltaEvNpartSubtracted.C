@@ -72,7 +72,7 @@ TGraphAsymmErrors * getRBSignal(
                                 TCut mycut="offlSel", TString myweight="1.",
                                 TString infname = "../output-data-Photon-v3_v10.root",
                                 int dataType=0, // 0=mc, 1=data, 2=pp
-                                int isolScheme=2
+                                int isolScheme=1
 )
 {
    // open the data file
@@ -153,7 +153,8 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotDeltaEvNpartSubtracted(
-                                float photonMinPt=60
+                                float photonMinPt=60,
+                                int isolScheme=0
 )
 {
    TH1::SetDefaultSumw2();
@@ -172,7 +173,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1,isolScheme);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -180,13 +181,13 @@ void plotDeltaEvNpartSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0,isolScheme);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"offlSel","(1==1)","../output-data-pp2010-prod3-photon_v10.root",2);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,ajCut,"offlSel","(1==1)","../output-data-pp2010-prod3-photon_v10.root",2,isolScheme);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
@@ -239,6 +240,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_mcWeighted.gif",photonMinPt));
-   c2->Print(Form("fig/12.19datav5_5sssubsub/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_mcWeighted.pdf",photonMinPt));
+   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.gif",photonMinPt,isolScheme));
+   c2->Print(Form("fig/12.20AN/DeltaEFracSubDPhivNpart_PhotonMin%.0f_Ratio_vs_Npart_Isol%d.pdf",photonMinPt,isolScheme));
 }
