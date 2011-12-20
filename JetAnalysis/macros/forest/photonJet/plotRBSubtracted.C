@@ -248,7 +248,7 @@ void plotRBSubtracted(
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
    if (subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{i#etai#eta} sideband","p");
+   if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
