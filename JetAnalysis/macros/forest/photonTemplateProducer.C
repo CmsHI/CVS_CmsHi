@@ -63,8 +63,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 
    
    for (int ipt = 1; ipt <=3 ; ipt++) { 
-      c1[ipt] = new TCanvas(Form("c1_ipt%d",ipt),"",1300,400);
-      makeMultiPanelCanvas(c1[ipt],nCent_std,1,0.0,0.0,0.2,0.15,0.02);
+      c1[ipt] = new TCanvas(Form("c1_ipt%d",ipt),"",700,700);
+      makeMultiPanelCanvas(c1[ipt],nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
       
       TCut ptCut = Form("corrPt>%.2f && corrPt<%.2f",(float)ptBin[ipt-1],(float)ptBin[ipt]); 
       for ( int icent = 1 ; icent<=nCent_std ; icent++) { 
@@ -91,7 +91,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 
 	 double nSig, nSigErr, chisq,purity10;
 	 c1[ipt]->cd(nCent_std-icent+1);
-	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==3),chisq,purity10);
+	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==nCent_std),chisq,purity10);
 	 cout << " purity = " << fitr.purity010 << endl;
 	 cout << " nSig   = " << fitr.nSig << endl;
 	 if ( ptBin[ipt]> 200)
@@ -102,7 +102,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 	 
 	 //      TCut ptCut = Form("corrPt>%.2f && corrPt<%.2f",(float)ptBin[ipt-1],(float)ptBin[ipt]);
 	 
-	 if ( icent == nCent_std) 
+	 if ( (icent == nCent_std) || (icent == 2)) 
 	 drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.5680963,0.3569118,1,15);
 	 else 
 	    drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
@@ -120,11 +120,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 	 if (isoChoice == k3dIso)   aa = "3d Cut Method";
 	 if (isoChoice == kFisher)  aa = "Fisher Method";
 	 
-	 if ( icent==nCent_std ) drawText(aa.Data(),0.1980963,0.8569118,1,20);
+	 if ( icent==nCent_std -1) drawText(aa.Data(),0.1980963,0.8569118,1,20);
 	 
 	 
-	 if ( icent!=nCent_std) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
-	 drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
+	 if ( icent<= 2) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
+	 //	 drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
       }   
       
       c1[ipt]->SaveAs(Form("fittingPurity_%s_pt%d.pdf",getIsoLabel(isoChoice).Data(),ipt));
@@ -133,8 +133,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    
    
    // efficiency plots          
-   TCanvas* c2  = new TCanvas("c2","",100 + nCent_std*300,400);
-   makeMultiPanelCanvas(c2,nCent_std,1,0.0,0.0,0.2,0.15,0.02);
+   TCanvas* c2  = new TCanvas("c2","",700,700); //100 + nCent_std*300,400);
+   makeMultiPanelCanvas(c2,nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
    
    //   const int nPtBin = 3;
    //   double ptBin[nPtBin+1] = {60,80,110,200};
@@ -144,6 +144,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    TGraphAsymmErrors* gSingleBin = new TGraphAsymmErrors();
 
    for (int icent = 1; icent <=nCent_std; icent++) {
+      int lowerCent = centBin_std[icent-1];
+      int upperCent = centBin_std[icent]-1;
       for ( int iid=1 ; iid<=5; iid++) {
          heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";photon E_{T} (GeV);Efficiency",nPtBin, ptBin);
          geff[icent][iid] = new TGraphAsymmErrors();
@@ -184,6 +186,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    handsomeTH1(htmp);
    
    for (int icent = 1; icent <=nCent_std; icent++) {
+      int lowerCent = centBin_std[icent-1];
+      int upperCent = centBin_std[icent]-1;
       c2->cd(nCent_std - icent + 1);
       htmp->DrawCopy();
       for ( int iid=1 ; iid<=nId ; iid++) {
@@ -201,15 +205,16 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
             leg1->AddEntry(heff[icent][4],"+ #sigma_{#eta#eta} <0.010","lp");
             leg1->Draw();
          }
-
-      if ( icent!=3) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
-      drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
+      drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.8369118);
+      if ( icent<=2) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
+      //  drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
       
    }
    //   c1[ipt]->SaveAs(Form("fittingPurity_%s.eps",getIsoLabel(isoChoice).Data()));
    //  c2[ipt]->SaveAs(Form("photonID_efficiency_%s.eps",getIsoLabel(isoChoice).Data()));
    //  c2[ipt]->SaveAs(Form("photonID_efficiency_%s.gif",getIsoLabel(isoChoice).Data()));
-  
+
+   c2->SaveAs(Form("photonID_efficiency_%s.pdf",getIsoLabel(isoChoice).Data()));  
    TCanvas* c3 = new TCanvas("cPurity","",1000,500);
    c3->Divide(2,1);
    c3->Draw();
@@ -239,24 +244,36 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    handsomeTH1(finSpectra[1],1);
    handsomeTH1(finSpectra[2],2);
    handsomeTH1(finSpectra[3],4);
-   // TAA and centrality 
+   handsomeTH1(finSpectra[4],6);
+  // TAA and centrality 
    finSpectra[1]->Scale( 1 / (0.1*taa[1]));
    finSpectra[2]->Scale( 1 / (0.2*taa[2]));
-   finSpectra[3]->Scale( 1 / (0.7*taa[3]));
-   
+   finSpectra[3]->Scale( 1 / (0.2*taa[3]));
+   finSpectra[4]->Scale( 1 / (0.5*taa[4]));
+
    finSpectra[1]->SetXTitle("E_{T} (GeV)");
    finSpectra[1]->SetYTitle("Photon Yield / T_{AA} (Arbitrary Unit)");
    
    finSpectra[1]->Draw();
    finSpectra[2]->Draw("same");
    finSpectra[3]->Draw("same");
+   finSpectra[4]->Draw("same");
+
+   TLegend* leg2 =  new TLegend(0.358871,0.6440678,0.9919355,0.8707627,NULL,"brNDC");
+   easyLeg(leg2,"dN/dE_{T} of isolated photons");
+   leg2->AddEntry(finSpectra[1],"0-10%","pl");
+   leg2->AddEntry(finSpectra[2],"10-30%","pl");
+   leg2->AddEntry(finSpectra[3],"30-50%","pl");
+   leg2->AddEntry(finSpectra[4],"50-100%","pl");
+   leg2->Draw();
+   
    gPad->SetLogy();
    gPad->SetLogx();
       
+   c4->SaveAs("taaScaling.pdf");
 
-
-   TCanvas* c5 = new TCanvas("c5","",100 + nCent_std*300,500);
-   makeMultiPanelCanvas(c5,nCent_std,1,0.0,0.0,0.2,0.15,0.02);
+   TCanvas* c5 = new TCanvas("c5","",700,700);
+   makeMultiPanelCanvas(c5,nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
    for (int icent = 1; icent <=nCent_std; icent++) {
       int lowCent = centBin_std[icent-1];
       int highCent = centBin_std[icent]-1;
@@ -266,7 +283,6 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
       handsomeTH1(hBkgMCsr[icent][1],1);
       scaleInt(hBkgMCsb[icent][1]);
       scaleInt(hBkgMCsr[icent][1]);
-      
    }
    for (int icent = 1; icent <=nCent_std; icent++) {
       int lowerCent = centBin_std[icent-1];
@@ -286,7 +302,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
       }
    }
    
-   
+   c5->SaveAs(Form("backgroundTemplateInMC_%s.pdf",getIsoLabel(isoChoice).Data()));   
 
    c3->SaveAs(Form("crossSection_%s.gif",getIsoLabel(isoChoice).Data()));
    TFile outf = TFile("photonPurityCollection.root","update");
@@ -314,6 +330,10 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
 
    char* fnameEmj80 = "barrelHiForestPhoton_MCemJet80_41007events.root";
    char* fnameEmj120 = "barrelHiForestPhoton_MCemJet120_25308events.root";
+   char* fnameEmj80_cent10 = "barrelHiForestPhoton_emJet80_cent10_10016evnts.root";
+   char* fnameEmj120_cent10 = "barrelHiForestPhoton_emJet120_cent10_9540Evts.root";
+
+   
    double csDij80 = 9.869e-5;
    float nEvtEmj80     = 41007;
    float effEmj80     = 0.204;
@@ -322,6 +342,11 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    double csDij120 = 1.127e-5;
    float effEmj120     = 0.54;
    float weightEmj120 = csDij120*effEmj120/nEvtEmj120;
+   
+   float nEvtEmj80_cent10      = 9540;
+   float nEvtEmj120_cent10     = 10016;
+   float weightEmj80_cent10 = csDij80*effEmj80/nEvtEmj80_cent10;
+   float weightEmj120_cent10 = csDij120*effEmj120/nEvtEmj120_cent10;
    
    
    TCut evtSelCut = "tgj.anaEvtSel";
@@ -368,6 +393,8 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    else if ( (iTemp == kMCBsr) || (iTemp == kMCBsb)){
       photon1->addFile(fnameEmj80,  "yongsunPhotonTree", "" , weightEmj80);
       photon1->addFile(fnameEmj120, "yongsunPhotonTree", "" , weightEmj120);
+      photon1->addFile(fnameEmj80_cent10,  "yongsunPhotonTree", "yEvt.hiBin<4" , weightEmj80_cent10);
+      photon1->addFile(fnameEmj120_cent10,  "yongsunPhotonTree", "yEvt.hiBin<4" , weightEmj120_cent10);
       weightBit = "tgj.reweight";
    }
    
