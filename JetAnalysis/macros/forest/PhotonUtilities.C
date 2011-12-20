@@ -10,6 +10,21 @@ bool HiForest::isSpike(int j)
    return 0;
 }
 
+bool HiForest::isLooseEGamma(int j)
+{
+   
+   if (photon.isEB[j]) {
+      // Barrel photon                                                                                                                       
+      if (photon.hadronicOverEm[j]>0.1) return 0;
+      if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
+   } else {
+      // Endcap photon                                                                                                  
+      return 0;  // Need to update to include endcap photons                                                            
+   }
+   
+   return 1;
+}
+
 bool HiForest::isLoosePhoton(int j)
 {
 
