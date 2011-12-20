@@ -63,11 +63,12 @@ public:
 //         if (cBin==0) photonPurity=0.50;
 //         if (cBin>=1&&cBin<=2) photonPurity=0.64;
 //         if (cBin>=3&&cBin<=4) photonPurity=0.57;
-         nameIsol="Sum(Isol.)<1";
+         nameIsol="Sum(Isol.)<1GeV";
          cutIsol = "(cc4+cr4+ct4PtCut20)/0.9 <1";
          if (cBin==0) photonPurity=0.74;
          if (cBin>=1&&cBin<=2) photonPurity=0.78;
-         if (cBin>=3&&cBin<=4) photonPurity=0.77;
+         if (cBin==3) photonPurity=0.76;
+         if (cBin==4) photonPurity=0.82;
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
