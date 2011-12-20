@@ -155,7 +155,7 @@ void analyzePhotonJet(
 
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
-   c->GetEnergyScaleTable("photonEnergyScaleTable_Hydjet_GammaJet.root");
+   c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v4.root");
       
    // Output file
    TFile *output = new TFile(outname,"recreate");
@@ -180,8 +180,7 @@ void analyzePhotonJet(
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
    // Main loop
-   //for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<5000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       
