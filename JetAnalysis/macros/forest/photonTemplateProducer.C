@@ -63,8 +63,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 
    
    for (int ipt = 1; ipt <=3 ; ipt++) { 
-      c1[ipt] = new TCanvas(Form("c1_ipt%d",ipt),"",1000,400);
-      makeMultiPanelCanvas(c1[ipt],3,1,0.0,0.0,0.2,0.15,0.02);
+      c1[ipt] = new TCanvas(Form("c1_ipt%d",ipt),"",1300,400);
+      makeMultiPanelCanvas(c1[ipt],nCent_std,1,0.0,0.0,0.2,0.15,0.02);
       
       TCut ptCut = Form("corrPt>%.2f && corrPt<%.2f",(float)ptBin[ipt-1],(float)ptBin[ipt]); 
       for ( int icent = 1 ; icent<=nCent_std ; icent++) { 
@@ -94,12 +94,15 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==3),chisq,purity10);
 	 cout << " purity = " << fitr.purity010 << endl;
 	 cout << " nSig   = " << fitr.nSig << endl;
-	 drawText(Form("%d - %d GeV", (int)ptBin[ipt-1], (int)ptBin[ipt]),0.5680963,0.529118);
+	 if ( ptBin[ipt]> 200)
+	    drawText(Form(" E_{T}^{#gamma} > %d GeV", (int)ptBin[ipt-1]),0.5680963,0.529118);
+	 else
+	    drawText(Form("%d - %d GeV", (int)ptBin[ipt-1], (int)ptBin[ipt]),0.5680963,0.529118);
 	 drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.5680963,0.4369118);
 	 
 	 //      TCut ptCut = Form("corrPt>%.2f && corrPt<%.2f",(float)ptBin[ipt-1],(float)ptBin[ipt]);
 	 
-	 if ( icent == 3) 
+	 if ( icent == nCent_std) 
 	 drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.5680963,0.3569118,1,15);
 	 else 
 	    drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
@@ -117,21 +120,21 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
 	 if (isoChoice == k3dIso)   aa = "3d Cut Method";
 	 if (isoChoice == kFisher)  aa = "Fisher Method";
 	 
-	 if ( icent==2) drawText(aa.Data(),0.1980963,0.8569118,1,20);
+	 if ( icent==nCent_std ) drawText(aa.Data(),0.1980963,0.8569118,1,20);
 	 
 	 
-	 if ( icent!=3) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
+	 if ( icent!=nCent_std) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
 	 drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
       }   
       
-      //      c1[ipt]->SaveAs(Form("fittingPurity_%s_pt%d.gif",getIsoLabel(isoChoice).Data(),ipt));
+      c1[ipt]->SaveAs(Form("fittingPurity_%s_pt%d.pdf",getIsoLabel(isoChoice).Data(),ipt));
       
    }
    
    
    // efficiency plots          
-   TCanvas* c2  = new TCanvas("c2","",1000,400);
-   makeMultiPanelCanvas(c2,3,1,0.0,0.0,0.2,0.15,0.02);
+   TCanvas* c2  = new TCanvas("c2","",100 + nCent_std*300,400);
+   makeMultiPanelCanvas(c2,nCent_std,1,0.0,0.0,0.2,0.15,0.02);
    
    //   const int nPtBin = 3;
    //   double ptBin[nPtBin+1] = {60,80,110,200};
@@ -188,7 +191,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
          geff[icent][iid]->Draw("p");
 	 
       }
-      if ( icent == 3 )
+      if ( icent == nCent_std )
          {
             TLegend* leg1 =  new TLegend(0.25,0.20,0.95,0.55,NULL,"brNDC");
             easyLeg(leg1,"Photon ID efficiency");
@@ -241,6 +244,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    finSpectra[2]->Scale( 1 / (0.2*taa[2]));
    finSpectra[3]->Scale( 1 / (0.7*taa[3]));
    
+   finSpectra[1]->SetXTitle("E_{T} (GeV)");
+   finSpectra[1]->SetYTitle("Photon Yield / T_{AA} (Arbitrary Unit)");
+   
    finSpectra[1]->Draw();
    finSpectra[2]->Draw("same");
    finSpectra[3]->Draw("same");
@@ -249,8 +255,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
       
 
 
-   TCanvas* c5 = new TCanvas("c5","",1200,500);
-   makeMultiPanelCanvas(c5,3,1,0.0,0.0,0.2,0.15,0.02);
+   TCanvas* c5 = new TCanvas("c5","",100 + nCent_std*300,500);
+   makeMultiPanelCanvas(c5,nCent_std,1,0.0,0.0,0.2,0.15,0.02);
    for (int icent = 1; icent <=nCent_std; icent++) {
       int lowCent = centBin_std[icent-1];
       int highCent = centBin_std[icent]-1;
@@ -267,10 +273,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
       int upperCent = centBin_std[icent]-1;
       c5->cd(nCent_std - icent+1);
       hBkgMCsb[icent][1]->SetAxisRange(0,0.4,"Y");
+      hBkgMCsb[icent][1]->SetYTitle("Event Fraction");
       hBkgMCsb[icent][1]->Draw("hist");
       hBkgMCsr[icent][1]->Draw("same");
       drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.3680963,0.8369118);
-      if (  icent == 3) {
+      if (  icent == nCent_std) {
 	 TLegend* leg1 =  new  TLegend(0.5977464,0.6159073,0.9986159,0.8138776,NULL,"brNDC");
 	 easyLeg(leg1,"MC Bkg template");
 	 leg1->AddEntry(hBkgMCsr[icent][1],"signal region","pl");
@@ -286,7 +293,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100) {
    hN->Write();
    hEff->Write();
    hPurity->Write();
-   for ( int icent =1 ; icent<=3 ; icent++) {
+   for ( int icent =1 ; icent<=nCent_std ; icent++) {
       finSpectra[icent]->Write();
    }
    outf.Close();
