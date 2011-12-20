@@ -57,6 +57,9 @@ public:
    
    void SetPhotonIsolation(int isolScheme, int cBin)
    {
+      //
+      // Centrality bins: 0=0-4, 1=4-8, 2=8-12, 3=12-20, 4=20-40
+      // 
       if (isolScheme==0) { //sum isol
 //         nameIsol="Sum(Isol.)<5";
 //         cutIsol = "sumIsol/0.9<5";
