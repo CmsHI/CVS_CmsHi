@@ -189,7 +189,7 @@ void plotBalanceSignal_AllCent5(
    cms->SetTextFont(63);
    cms->SetTextSize(17);
    cms->Draw();
-   TLatex *lumi = new TLatex(0.24,0.30,"#intL dt = 120 #mub^{-1}");
+   TLatex *lumi = new TLatex(0.24,0.30,"#intL dt = 112 #mub^{-1}");
    lumi->SetTextFont(63);
    lumi->SetTextSize(17);
    lumi->Draw();
