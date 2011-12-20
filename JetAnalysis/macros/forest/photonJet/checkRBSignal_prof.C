@@ -21,14 +21,14 @@
 #include "DrawTick.C"
 
 void checkRBSignal_prof(
-                        //double ajCut= 0.15
-                        double ajCut= 3.03
+                        double ajCut= 0.12
+                        //double ajCut= 3.03
 )
 {
-   const int nBin = 6;
-   double m[nBin+1] = {-0.5,3.5,7.5,11.5,20.5,31.5,40.5};
-//   const int nBin = 5;
-//   double m[nBin+1] = {-0.5,3.5,7.5,11.5,20.5,40.5};
+//   const int nBin = 6;
+//   double m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,31.5,40.5};
+   const int nBin = 5;
+   double m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
 
    TFile * fdata = TFile::Open("../output-data-Photon-v5_v15.root");
    TTree * tgjdata = (TTree*)fdata->Get("tgj");
@@ -47,14 +47,15 @@ void checkRBSignal_prof(
 //   TProfile *hRBPp = new TProfile("hRBPp","",10,0,40);
    
    TCanvas * c0 = new TCanvas("c0","",500,500);
-//   TString drawvar=Form("(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.3f):cBin",ajCut);
-//   TString sel="(fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>60.0)";
+   TString drawvar=Form("(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3&&Agj<%.3f):cBin",ajCut);
+   TString sel="((cc4+cr4+ct4PtCut20)/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0)";
 //   TString drawvar=Form("(acos(cos(photonPhi-jetPhi))>%.3f):cBin",ajCut);
-//   TString sel="(fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30.0)";
+//   TString sel="((cc4+cr4+ct4PtCut20)/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30.0)";
 //   TString drawvar=Form("(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3.)*(photonEt-jetEt):cBin");
-//   TString sel="(fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>60.0)";
-   TString drawvar=Form("(photonEt-jetEt)/photonEt:cBin");
-   TString sel="(sumIsol<1&&sigmaIetaIeta<0.01&&photonEt>60.0)&&(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3.)";
+//   TString sel="((cc4+cr4+ct4PtCut20)/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0)";
+//   TString drawvar=Form("(photonEt-jetEt)/photonEt:cBin");
+//   TString sel="(sumIsol<1&&sigmaIetaIeta<0.01&&photonEt>60.0)&&(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3.)";
+
    cout << sel << " " << drawvar << endl;
    tgjdata->Project("hRBData",drawvar,TCut("(anaEvtSel)&&"+sel),"prof");
    tgjmix->Project("hRBMix",drawvar,TCut("(offlSel&&sampleWeight>0.5)&&"+sel)*"weight","prof");
@@ -66,11 +67,10 @@ void checkRBSignal_prof(
    hRBMix->SetMarkerStyle(kOpenSquare);
    hRBPp->SetMarkerStyle(kOpenStar);
    hRBPp->SetMarkerColor(kBlue);
-   //hRBData->SetAxisRange(0,1.,"Y");
-   hRBData->SetAxisRange(0,0.4,"Y");
-   //hRBData->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
-   //hRBData->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
-   hRBData->SetYTitle(Form("<#DeltaE>",ajCut));
+   hRBData->SetAxisRange(0,1.,"Y");
+   //hRBData->SetAxisRange(0,0.4,"Y");
+   hRBData->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
+   //hRBData->SetYTitle(Form("<#DeltaE>",ajCut));
    hRBData->Draw("E");
    hRBMix->Draw("sameE");
    hRBPp->Draw("sameE");
