@@ -24,7 +24,7 @@ using namespace std;
 
 TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,float *npart, int dataType)
 {
-   cout << "Divide: " << hCut->GetName() << " by: " << h1->GetName() << endl;
+   cout << "Divide: " << hCut->GetName() << " by: " << h1->GetName() << "( " << hCut->Integral() <<"/" << h1->Integral() << " )" << endl;
    if (dataType==2) { // pp
       h1->Rebin(h1->GetNbinsX());
       hCut->Rebin(hCut->GetNbinsX());
@@ -109,15 +109,25 @@ TGraphAsymmErrors * getRBSignal(
    SignalCorrector anaDen(nt,name+"Den","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
    anaDen.subDPhiSide = false;
    anaDen.subSShapeSide = subSShapeSide;
+   if (dataType==0) anaDen.subSShapeSide = false; // no photon subtraction for mc sig
+   anaDen.subSShapeSideDPhiSide = false; // no dphi subtraction for photon sideband
    anaDen.SetPhotonIsolation(isolScheme,0);
    anaDen.MakeHistograms("sigmaIetaIeta<0.01",nBin,m);
+   //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
+   anaNum.cutBkgDPhi = anaNum.cutBkgDPhi&&TCut(Form("Agj<%.3f",ajCut));
+   anaNum.cutSShape = anaNum.cutSShape&&TCut(Form("Agj<%.3f",ajCut));
+   anaNum.cutSShapeDPhi = anaNum.cutSShapeDPhi&&TCut(Form("Agj<%.3f",ajCut));
    anaNum.subDPhiSide = subDPhiSide;
    anaNum.subSShapeSide = subSShapeSide;
+   if (dataType==0) anaNum.subSShapeSide = false; // no photon subtraction for mc sig
+   if (dataType==2) anaNum.subSShapeSideDPhiSide = false; // no dphi subtraction for photon sideband
+   anaNum.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaNum.SetPhotonIsolation(isolScheme,0);
    anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01&&Agj<%.3f",ajCut),nBin,m);
+   //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
    
@@ -270,6 +280,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
-   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+//   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+//   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
 }

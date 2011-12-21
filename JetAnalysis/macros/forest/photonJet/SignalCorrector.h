@@ -17,8 +17,10 @@ public:
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
       if (normMode>0&&h->Integral()>0) hNorm->Scale(area/h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
-      cout << "  " << hScaled->GetName() << " scale by: " << fraction << endl;
-      hScaled->Scale(fraction);
+      if (fraction<1e8) {
+         cout << "  " << hScaled->GetName() << " scale by: " << fraction << endl;
+         hScaled->Scale(fraction);
+      }
       //for (int i=1; i<=hScaled->GetNbinsX()+1 ; ++i) cout << hScaled->GetBinLowEdge(i) << " (" << hScaled->GetBinContent(i) << ") ";
       //cout << endl;
       // check
@@ -124,28 +126,47 @@ public:
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
          fracDPhiBkg = nDPhiBkg/nSigAll;
-         rBkgDPhi.Init(t,nbin,bins,fracDPhiBkg,area);
+         if (normMode>0) {
+            rBkgDPhi.Init(t,nbin,bins,fracDPhiBkg,area);
+         } else {
+            rBkgDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,0);
+         }
          cout << "  |dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
       if (subSShapeSide) {
          cout << "  fracPhotonBkg: " << fracPhotonBkg << endl;
-         rBkgSShape.Init(t,nbin,bins,fracPhotonBkg,area);
+         if (normMode>0) {
+            rBkgSShape.Init(t,nbin,bins,fracPhotonBkg,area);
+         } else {
+            float nSShapeSide = t->GetEntries(rBkgSShape.cut);
+            rBkgSShape.Init(t,nbin,bins,fracPhotonBkg*nSigAll/nSShapeSide,0);
+         }
          if (subSShapeSideDPhiSide) {
             float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
             float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
-            fracPhotonBkgDPhiBkg = fracPhotonBkg*(nDPhiBkg/(nSigAll));
+            fracPhotonBkgDPhiBkg = nDPhiBkg/nSigAll;
             //fracPhotonBkgDPhiBkg = 0;
-            rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
+            if (normMode>0) {
+               rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
+            } else {
+               rBkgSShapeDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,0);
+            }
          }
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
-      if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
+      cout << "Final subtraction: " << rSigAll.hScaled->Integral();
+      if (subDPhiSide) {
+         hSubtracted->Add(rBkgDPhi.hScaled,-1);
+         cout << " - " << rBkgDPhi.hScaled->Integral();
+      }
       if (subSShapeSide) {
          hSSSideDPhiSub = (TH1D*)rBkgSShape.hScaled->Clone(Form("%sDPhiSub",rBkgSShape.hScaled->GetName()));
          if (subSShapeSideDPhiSide) hSSSideDPhiSub->Add(rBkgSShapeDPhi.hScaled,-1);
          hSubtracted->Add(hSSSideDPhiSub,-1);
+         cout << " - " << hSSSideDPhiSub->Integral();
       }
+      cout << "=? " << hSubtracted->Integral() << endl;
       if (normMode>0) {
          // Rescale after subtraction
          if (subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
