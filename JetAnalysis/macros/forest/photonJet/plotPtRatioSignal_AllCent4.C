@@ -125,7 +125,7 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
 
 //---------------------------------------------------------------------
 void plotPtRatioSignal_AllCent4(
-                                int isolScheme=2, // 0=sumIsol, 1=cutIsol, 2=fisherIsol
+                                int isolScheme=0, // 0=sumIsol, 1=cutIsol, 2=fisherIsol
                                 int normMode=2, // 1=unity, 2=per photon
                                 int subDPhiSide = 1,
                                 int subSShapeSide = 1,
