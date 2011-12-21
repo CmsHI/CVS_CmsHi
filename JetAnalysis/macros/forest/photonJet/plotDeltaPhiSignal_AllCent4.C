@@ -220,7 +220,7 @@ void plotDeltaPhiSignal_AllCent4(
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    if (subDPhiSide) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (subSShapeSide) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);

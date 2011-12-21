@@ -206,13 +206,13 @@ void plotPtRatioSignal_AllCent4(
    drawText("30-50%",0.75,0.25);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.44,0.68,0.91,0.94); 
+   TLegend *t3=new TLegend(0.43,0.68,0.91,0.94); 
    t3->AddEntry(hFrameData,"PbPb","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    if (subDPhiSide) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (subSShapeSide) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
