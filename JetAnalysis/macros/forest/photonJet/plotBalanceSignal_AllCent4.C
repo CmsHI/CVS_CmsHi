@@ -181,8 +181,8 @@ void plotBalanceSignal_AllCent4(
    c1->cd(1);
    hFrame->DrawClone();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
-   plotBalance(4,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
+   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v17.root","weight",false,1,"samehistE",subDPhiSide,0);
+   plotBalance(4,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v5_v17.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    //plotBalance(2,"sampleWeight>0.5",isolScheme,"../output-hypho50q_v15_frac62.root","weight",true,1,"sameE",1);
    drawText("50-100%",0.8,0.25);
    drawText("(a)",0.25,0.885);
@@ -201,18 +201,18 @@ void plotBalanceSignal_AllCent4(
    
    c1->cd(2);
    hFrameNoY->DrawClone();
-   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
-   plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
+   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v17.root","weight",false,1,"samehistE",subDPhiSide,0);
+   plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v5_v17.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("30-50%",0.8,0.25);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.44,0.68,0.91,0.94); 
+   TLegend *t3=new TLegend(0.43,0.68,0.91,0.94); 
    t3->AddEntry(hFrameData,"PbPb","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    if (subDPhiSide) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (subSShapeSide) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET","lf");
+   t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
    t3->SetFillColor(0);
    t3->SetBorderSize(0);
    t3->SetFillStyle(0);
@@ -222,12 +222,12 @@ void plotBalanceSignal_AllCent4(
 
    c1->cd(3);
    hFrame->DrawClone();
-   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
-   plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
+   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v17.root","weight",false,1,"samehistE",subDPhiSide,0);
+   plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v5_v17.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("10-30%",0.8,0.4);
    drawText("(c)",0.25,0.885);
 
-   TLegend *t4=new TLegend(0.44,0.7,0.91,0.94);
+   TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
    t4->AddEntry(hFrameData,"p_{T}^{#gamma} > 60 GeV/c","");
    t4->AddEntry(hFrameData,"p_{T}^{jet} > 30 GeV/c","");
    t4->AddEntry(hFrameData,"#Delta#phi_{12} > #frac{2}{3}#pi","");
@@ -240,13 +240,13 @@ void plotBalanceSignal_AllCent4(
 
    c1->cd(4);
    hFrameNoY->DrawClone();
-   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hypho50mixdj80emdj120em_yongsun_v15.root","weight",false,1,"samehistE",subDPhiSide,0);
-   plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v5_v15.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
+   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v17.root","weight",false,1,"samehistE",subDPhiSide,0);
+   plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v5_v17.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,1);
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/photon60_v15_jet30_imbalance_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
-   c1->Print(Form("%s/photon60_v15_jet30_imbalance_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
+   c1->Print(Form("%s/Photonv5_v17_jet30_imbalance_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
+   c1->Print(Form("%s/Photonv5_v17_jet30_imbalance_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,isolScheme,normMode));
 
    // save histograms
 //   fout->Write();
