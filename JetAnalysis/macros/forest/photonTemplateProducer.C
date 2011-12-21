@@ -11,13 +11,16 @@ const int k3dIso =  2;
 const int kFisher = 3;
 const int kNoIso  = 4;
 const int kSumIso2= 5;
-void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true);
+const int kSumIso3= 6;
+
+void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true, float specialSbCut=10);
 
 TCut getIsoCut( int isoChoice=0, float isoCut = -100 ) {
    
    if ( (isoChoice== kSumIso2) && ( isoCut > -99))
       return Form("(cc4+cr4+ct4PtCut20)/0.9 < %f",isoCut);
    if         (isoChoice == kSumIso) return isoSumCut;
+   if         (isoChoice == kSumIso3) return isoSumCut;
    else    if (isoChoice == k3dIso ) return iso3dCut;
    else    if (isoChoice == kFisher) return FisherCut;
    else    if (isoChoice == kNoIso) return "";
@@ -28,10 +31,11 @@ TString getIsoLabel ( int isoChoice=0) {
    if ( isoChoice == k3dIso)  return "3dIso";
    if ( isoChoice == kFisher) return "fisherIso";
    if ( isoChoice == kSumIso2) return "sumIso";
-   
+   if ( isoChoice == kSumIso3) return "sumIso";
+
    else   cout << "!!!!!!! No such isolation choice" << endl;
 }
-void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true) {
+void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true, float specialSbCut=10) {
    
 
    TCanvas* c1[5];
@@ -77,9 +81,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 	 hBkgMCsr[icent][ipt] = (TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsr_cent%d_pt%d",icent,ipt));
 	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
 
-	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents);
-	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents);
-	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents);
+	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
+	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
+	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
 	 
 	 // getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent,ptCut,onlygjEvents);
 	 
@@ -150,8 +154,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
          heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";photon E_{T} (GeV);Efficiency",nPtBin, ptBin);
 	 if ( isoChoice == kSumIso2)
 	    heff[icent][iid]->SetName(Form("heff_icent%d_id%d_isoCut%d",icent,iid,(int)isoCut));
+	 if ( isoChoice == kSumIso3)
+            heff[icent][iid]->SetName(Form("heff_icent%d_id%d_sbIsoCut%d",icent,iid,(int)specialSbCut));
+
 	 geff[icent][iid] = new TGraphAsymmErrors();
-         geff[icent][iid]->SetName(Form("geff_%s",heff[icent][iid]->GetName()));
+	 geff[icent][iid]->SetName(Form("geff_%s",heff[icent][iid]->GetName()));
       }
    }
    
@@ -242,6 +249,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
       finSpectra[icent] = (TH1D*)rawSpectra[icent]->Clone(Form("finSpec_icent%d_%s",icent,getIsoLabel(isoChoice).Data()));
       if ( isoChoice == kSumIso2)
 	 finSpectra[icent]->SetName(Form("finSpec_icent%d_%s_isoCut%d",icent,getIsoLabel(isoChoice).Data(),(int)isoCut));
+      if ( isoChoice == kSumIso3)
+         finSpectra[icent]->SetName(Form("finSpec_icent%d_%s_sbisoCut%d",icent,getIsoLabel(isoChoice).Data(),(int)specialSbCut));
       
       finSpectra[icent]->Divide(heff[icent][3]);
    }
@@ -350,7 +359,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    
 }
 
-void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents) { 
+void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents, float specialSbCut) { 
  
    char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_37k.root";
    float nEvtPho50     = 37188;
@@ -403,7 +412,11 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
       finalCut = generalCutMC && srIsoCut;
    if ( iTemp == kMCBsb )
       finalCut = generalCutMC && sbIsoCut;
-
+   
+   if ( (isoChoice == kSumIso3) && ( iTemp == kSBB )) {
+      finalCut = generalCutMC && Form("( (cc4+cr4+ct4PtCut20)/0.9 > %f) && ( (cc4+cr4+ct4PtCut20)/0.9 < %f)",(float)specialSbCut,(float)(specialSbCut+5) );
+      cout << " special cut : " << Form("( (cc4+cr4+ct4PtCut20)/0.9 > %f) && ( (cc4+cr4+ct4PtCut20)/0.9 < %f)",(float)specialSbCut,(float)(specialSbCut+5)) << " is used " << endl;
+   }
    multiTreeUtil* photon1 = new multiTreeUtil();
    
    float csPho50 = 6.663e-7;
