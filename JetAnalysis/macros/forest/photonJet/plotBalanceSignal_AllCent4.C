@@ -129,7 +129,7 @@ void plotBalanceSignal_AllCent4(
                                 int normMode=2, // 1=unity, 2=per photon
                                 int subDPhiSide = 1,
                                 int subSShapeSide = 1,
-                                TString outdir = "./fig/12.20AN"
+                                TString outdir = "./fig/12.21v17AN"
                                 )
 {
    TH1::SetDefaultSumw2();
@@ -139,7 +139,7 @@ void plotBalanceSignal_AllCent4(
    
    TFile * fout = new TFile("outhists.root","recreate");
    TH1D * hFrame = new TH1D("hFrame","",20,-0.999,0.999);
-   hFrame->SetAxisRange(-0.4999,0.999,"X");
+   hFrame->SetAxisRange(-0.999,0.999,"X");
    hFrame->SetAxisRange(-0.05,0.50499,"Y");
    hFrame->SetStats(0);
    hFrame->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
