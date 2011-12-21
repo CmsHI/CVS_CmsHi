@@ -227,7 +227,7 @@ void plotPtRatioSignal_AllCent4(
    drawText("10-30%",0.8,0.4);
    drawText("(c)",0.25,0.885);
 
-   TLegend *t4=new TLegend(0.44,0.7,0.91,0.94);
+   TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
    t4->AddEntry(hFrameData,"p_{T}^{#gamma} > 60 GeV/c","");
    t4->AddEntry(hFrameData,"p_{T}^{jet} > 30 GeV/c","");
    t4->AddEntry(hFrameData,"#Delta#phi_{12} > #frac{2}{3}#pi","");
