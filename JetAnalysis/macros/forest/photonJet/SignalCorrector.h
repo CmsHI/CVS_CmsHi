@@ -51,6 +51,10 @@ public:
    normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
    subSShapeSide(true),
+   subSShapeSideDPhiSide(true),
+   cutBkgDPhi("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01"),
+   cutSShape("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017"),
+   cutSShapeDPhi("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017"),   
    nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0),fracPhotonBkgDPhiBkg(0) {
       t = tree;
    }
@@ -103,9 +107,9 @@ public:
    void MakeHistograms(TCut sigSel, int nbin, float * bins) {
       cout << endl << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
-      rBkgDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
-      rBkgSShape.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
-      rBkgSShapeDPhi.cut = sel&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+      rBkgDPhi.cut = sel&&cutBkgDPhi;
+      rBkgSShape.cut = sel&&cutSShape;
+      rBkgSShapeDPhi.cut = sel&&cutSShapeDPhi;
       
       // photon normalization
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
@@ -126,18 +130,20 @@ public:
       if (subSShapeSide) {
          cout << "  fracPhotonBkg: " << fracPhotonBkg << endl;
          rBkgSShape.Init(t,nbin,bins,fracPhotonBkg,area);
-         float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
-         float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
-         fracPhotonBkgDPhiBkg = fracPhotonBkg*(nDPhiBkg/(nSigAll));
-         //fracPhotonBkgDPhiBkg = 0;
-         rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
+         if (subSShapeSideDPhiSide) {
+            float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
+            float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+            fracPhotonBkgDPhiBkg = fracPhotonBkg*(nDPhiBkg/(nSigAll));
+            //fracPhotonBkgDPhiBkg = 0;
+            rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
+         }
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       if (subDPhiSide) hSubtracted->Add(rBkgDPhi.hScaled,-1);
       if (subSShapeSide) {
          hSSSideDPhiSub = (TH1D*)rBkgSShape.hScaled->Clone(Form("%sDPhiSub",rBkgSShape.hScaled->GetName()));
-         hSSSideDPhiSub->Add(rBkgSShapeDPhi.hScaled,-1);
+         if (subSShapeSideDPhiSide) hSSSideDPhiSub->Add(rBkgSShapeDPhi.hScaled,-1);
          hSubtracted->Add(hSSSideDPhiSub,-1);
       }
       if (normMode>0) {
@@ -161,6 +167,10 @@ public:
    int normMode;
    bool subDPhiSide;
    bool subSShapeSide;
+   bool subSShapeSideDPhiSide;
+   TCut cutBkgDPhi;
+   TCut cutSShape;
+   TCut cutSShapeDPhi;   
    float nSelPhoton;
    float nSigAll;
    float fracDPhiBkg;
