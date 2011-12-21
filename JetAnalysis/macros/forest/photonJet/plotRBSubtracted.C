@@ -184,7 +184,8 @@ void plotRBSubtracted(
                       float photonMinPt=60,
                       int isolScheme=0,
                       int subDPhiSide=1,
-                      int subSShapeSide=1
+                      int subSShapeSide=1,
+                      TString outdir = "./fig/12.21v17AN"
                       )
 {
    TH1::SetDefaultSumw2();
@@ -202,7 +203,7 @@ void plotRBSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v15.root",1,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,ajCut,"anaEvtSel","(1==1)","../output-data-Photon-v5_v17.root",1,isolScheme,subDPhiSide,subSShapeSide);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -210,7 +211,7 @@ void plotRBSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hypho50mixdj80emdj120em_yongsun_v15.root",0,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hy18pho50mixdj80emdj120em_v17.root",0,isolScheme,subDPhiSide,subSShapeSide);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
@@ -249,7 +250,7 @@ void plotRBSubtracted(
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
    if (subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   leg->AddEntry(ghypho,"PYTHIA+HYDJET","p");
+   leg->AddEntry(ghypho,"PYTHIA+HYDJET1.8","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
@@ -269,6 +270,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("fig/12.20AN/RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
-   c2->Print(Form("fig/12.20AN/RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+   c2->Print(Form("%s/Photonv5_v17_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
 }
