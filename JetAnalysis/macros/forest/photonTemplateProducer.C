@@ -148,7 +148,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
       int upperCent = centBin_std[icent]-1;
       for ( int iid=1 ; iid<=5; iid++) {
          heff[icent][iid] = new TH1D(Form("heff_icent%d_id%d",icent,iid),";photon E_{T} (GeV);Efficiency",nPtBin, ptBin);
-         geff[icent][iid] = new TGraphAsymmErrors();
+	 if ( isoChoice == kSumIso2)
+	    heff[icent][iid]->SetName(Form("heff_icent%d_id%d_isoCut%d",icent,iid,(int)isoCut));
+	 geff[icent][iid] = new TGraphAsymmErrors();
          geff[icent][iid]->SetName(Form("geff_%s",heff[icent][iid]->GetName()));
       }
    }
@@ -167,8 +169,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
       getEff(effSingleBin, gSingleBin, centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && srIsoCut);
       hEff->SetBinContent(icent, effSingleBin->GetBinContent(1));
       hEff->SetBinError(icent,0.05);
-      for (int ipt = 1 ; ipt<=nPtBin ; ipt++) 
-	 heff[icent][3]->SetBinError(ipt,0);
+      // for (int ipt = 1 ; ipt<=nPtBin ; ipt++) 
+	 //	 heff[icent][3]->SetBinError(ipt,0);
    }
    
    for (int icent = 1; icent <=nCent_std; icent++) {
@@ -333,6 +335,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    TFile outf = TFile("photonPurityCollection.root","update");
    hN->Write();
    hEff->Write();
+   for ( int icent=1 ; icent<=nCent_std ; icent++) {
+      heff[icent][3]->Write();
+   }
    hPurity->Write();
    for ( int icent =1 ; icent<=nCent_std ; icent++) {
       finSpectra[icent]->Write();
