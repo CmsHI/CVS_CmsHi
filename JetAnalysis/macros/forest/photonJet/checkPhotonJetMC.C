@@ -1,6 +1,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1.h"
+#include "TProfile.h"
 #include "TCanvas.h"
 #include "TCut.h"
 #include "TString.h"
@@ -26,7 +27,7 @@ void checkPhotonJetMC(){
    tgj->Draw("cBin","(offlSel&&photonEt>60)*weight","E");
    tgj->Draw("cBin","(offlSel&&photonEt>60)","same hist");
    TCanvas * c2_3 = new TCanvas("c2_3","",500,500);
-   TH1D * hPhoScale = new TH1D("hPhoScale","",50,0,200);
+   TProfile * hPhoScale = new TProfile("hPhoScale","",50,0,200);
    tgj->Draw("photonEt/refPhoPt:refPhoPt>>hPhoScale",sel&&"refPhoPt>0","prof");
    hPhoScale->SetAxisRange(0,1.5,"Y");
    hPhoScale->Draw();
@@ -44,7 +45,7 @@ void checkPhotonJetMC(){
    hRecPtRat->SetAxisRange(0,1000,"Y");
    hGenPtRat->SetLineColor(kRed);
    hPartonPtRat->SetLineColor(kBlue);
-   hTreePtRat->SetLineColor(Blue);
+   hTreePtRat->SetLineColor(kBlue);
    hTreePtRat->SetLineStyle(2);
    hRecPtRat->Draw("E");
    hGenPtRat->Draw("same hist");
