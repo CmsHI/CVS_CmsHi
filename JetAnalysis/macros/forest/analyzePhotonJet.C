@@ -34,7 +34,7 @@ public:
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
-   float refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   float refPhoPt,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -49,7 +49,7 @@ public:
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
-      refJetEt=-99; refJetEta=-99; refJetPhi=-99;
+      refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       isEle=false;
       nTrk=0;
    }
@@ -170,7 +170,7 @@ void analyzePhotonJet(
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
    ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
-   ":refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+   ":refPhoPt:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
    ":isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
@@ -236,6 +236,8 @@ void analyzePhotonJet(
          gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
          gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          isol.Set(c,leadingIndex);
+         gj.refPhoPt = c->photon.genMatchedPt[leadingIndex];
+         gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
          
          // intialize jet variables
          int nJets=c->akPu3PF.nref;
