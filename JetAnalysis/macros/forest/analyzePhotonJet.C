@@ -34,7 +34,7 @@ public:
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
-   float refJetEt,refJetEta,refJetPhi;
+   float refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -170,7 +170,8 @@ void analyzePhotonJet(
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
    ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
-   ":refJetEt:refJetEta:refJetPhi:isEle/O";
+   ":refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+   ":isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -244,6 +245,8 @@ void analyzePhotonJet(
          float *refjet_pt  = c->akPu3PF.refpt;
          float *refjet_eta = c->akPu3PF.refeta;
          float *refjet_phi = c->akPu3PF.refphi;
+         float *parton_pt  = c->akPu3PF.refparton_pt;
+         float *parton_flavor = c->akPu3PF.refparton_flavor;
          //         int nJets=c->icPu5.nref;
 //         float *jet_pt  = c->icPu5.jtpt;
 //         float *jet_eta = c->icPu5.jteta;
@@ -280,6 +283,8 @@ void analyzePhotonJet(
             gj.refJetEt = refjet_pt[awayIndex];
             gj.refJetEta = refjet_eta[awayIndex];
             gj.refJetPhi = refjet_phi[awayIndex];
+            gj.refPartonPt = parton_pt[awayIndex];
+            gj.refPartonFlavor = parton_flavor[awayIndex];
          }
       }
       
