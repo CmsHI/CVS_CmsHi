@@ -86,8 +86,8 @@ public:
    {
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
-      tdata->Add("output-data-Photon-v4_v11.root");
-      tmc->Add("output-hypho50v2_50kyongsun_v11.root");
+      tdata->Add("output-data-Photon-v6_v18.root");
+      tmc->Add("output-hy18pho50_37k_v18_frac74_rewtit0.root");
 
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
