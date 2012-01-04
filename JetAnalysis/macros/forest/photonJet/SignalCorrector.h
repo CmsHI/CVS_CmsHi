@@ -59,6 +59,8 @@ public:
    cutSShapeDPhi("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017"),   
    nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0),fracPhotonBkgDPhiBkg(0) {
       t = tree;
+      hFracPhotonBkg = (TH1D*)gDirectory->FindObjectAny("hFracPhotonBkg");
+      if (!hFracPhotonBkg) hFracPhotonBkg = new TH1D("hFracPhotonBkg","",5,0,5);
    }
    
    void SetPhotonIsolation(int isolScheme, int cBin)
@@ -78,6 +80,11 @@ public:
          if (cBin>=1&&cBin<=2) photonPurity=0.78;
          if (cBin==3) photonPurity=0.76;
          if (cBin==4) photonPurity=0.82;
+         hFracPhotonBkg->SetBinContent(1,0.74);
+         hFracPhotonBkg->SetBinContent(2,0.78);
+         hFracPhotonBkg->SetBinContent(3,0.78);
+         hFracPhotonBkg->SetBinContent(4,0.76);
+         hFracPhotonBkg->SetBinContent(5,0.82);
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
@@ -91,6 +98,11 @@ public:
          if (cBin==0) photonPurity=0.62;
          if (cBin>=1&&cBin<=2) photonPurity=0.66;
          if (cBin>=3&&cBin<=4) photonPurity=0.64;
+         hFracPhotonBkg->SetBinContent(1,0.62);
+         hFracPhotonBkg->SetBinContent(2,0.66);
+         hFracPhotonBkg->SetBinContent(3,0.66);
+         hFracPhotonBkg->SetBinContent(4,0.64);
+         hFracPhotonBkg->SetBinContent(5,0.64);         
       }
       fracPhotonBkg=1-photonPurity;
       // Isolation Cut
@@ -175,6 +187,31 @@ public:
          hSubtracted->Scale(area/hSubtracted->Integral());
       }
    }
+   
+   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin) {
+      for (int i=1; i<=h->GetNbinsX(); ++i) {
+         TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
+         float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0;
+         if (subDPhiSideInBin) {
+            float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
+            float nDPhiSide = t->GetEntries(rBkgDPhi.cut&&varCut);
+            float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+            if (nSigAllInBin>0) fracDPhiBkgInBin = nDPhiBkg/nSigAllInBin;
+         }
+         if (subSShapeSideInBin) {
+            if (rSigAll.var=="cBin") {
+               if (h->GetBinCenter(i)>=0&&h->GetBinCenter(i)<4) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(1);
+               if (h->GetBinCenter(i)>=4&&h->GetBinCenter(i)<12) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(2);
+               if (h->GetBinCenter(i)>=12&&h->GetBinCenter(i)<20) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(4);
+               if (h->GetBinCenter(i)>=20&&h->GetBinCenter(i)<40) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(5);
+            }
+         }
+         cout << "varCut: " << varCut << " fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << endl;
+         h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-fracSShapeBkgInBin));
+         h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-fracSShapeBkgInBin));
+      }
+   }
+   
    TTree * t;
    TString name,nameIsol;
    TCut sel,cutIsol;
@@ -198,6 +235,7 @@ public:
    float photonPurity;
    float fracPhotonBkg;
    float fracPhotonBkgDPhiBkg;
+   TH1D * hFracPhotonBkg;
 };
 
 #endif
