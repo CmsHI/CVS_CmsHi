@@ -80,7 +80,9 @@ TGraphAsymmErrors * getRBSignal(
    // open the data file
    TFile *inf = new TFile(infname.Data());
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
-   cout << inf->GetName() << " dataType: " << dataType << endl;
+   cout << "# " << endl;
+   cout << "# " << inf->GetName() << " dataType: " << dataType << endl;
+   cout << "# " << endl;
    
    TString name=Form("photon%.0fdata%d",threshold1,dataType);
    if (dataType==0) subSShapeSide = false; // no photon subtraction for mc sig
@@ -194,7 +196,7 @@ void plotRBSubtracted(
                       int isolScheme=0,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/02.03v18"
+                      TString outdir = "./fig/02.04v18"
                       )
 {
    TH1::SetDefaultSumw2();
@@ -279,6 +281,6 @@ void plotRBSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-//   c2->Print(Form("%s/Photonv6_v18_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
-//   c2->Print(Form("%s/Photonv6_v18_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+   c2->Print(Form("%s/Photonv6_v18_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
+   c2->Print(Form("%s/Photonv6_v18_RBSubDPhi%dSS%d_PhotonMin%.0f_Ratio_%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,ajCut*100,isolScheme));
 }

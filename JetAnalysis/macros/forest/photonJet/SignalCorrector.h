@@ -119,7 +119,7 @@ public:
    }
    
    void MakeHistograms(TCut sigSel, int nbin, float * bins) {
-      cout << endl << "Base Selection: " << sel << endl;
+      cout << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&cutBkgDPhi;
       rBkgSShape.cut = sel&&cutSShape;
