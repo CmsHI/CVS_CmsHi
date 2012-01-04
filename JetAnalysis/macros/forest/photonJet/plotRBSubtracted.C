@@ -72,7 +72,7 @@ TGraphAsymmErrors * getRBSignal(
                                 TCut mycut="offlSel", TString myweight="1.",
                                 TString infname = "../output-data-Photon-v3_v10.root",
                                 int dataType=0, // 0=mc, 1=data, 2=pp
-                                int isolScheme=0,
+                                int isolScheme=2,
                                 bool subDPhiSide=true,
                                 bool subSShapeSide=true
 )
@@ -178,7 +178,7 @@ TGraphAsymmErrors * getRBSignal(
          TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
          t3->AddEntry(anaNum.rSigAll.h,"","");
          t3->AddEntry(anaNum.rSigAll.h,"","");
-         t3->AddEntry(anaNum.rSigAll.h,Form(" pp: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaNum.rSigAll.h,Form("pp: %.0f #gamma-jets",nPhotonJet),"");
          t3->SetFillColor(0);
          t3->SetBorderSize(0);
          t3->SetFillStyle(0);
@@ -193,7 +193,7 @@ TGraphAsymmErrors * getRBSignal(
 void plotRBSubtracted(
                       float ajCut=0.12,
                       float photonMinPt=60,
-                      int isolScheme=0,
+                      int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
                       TString outdir = "./fig/02.04v18"
