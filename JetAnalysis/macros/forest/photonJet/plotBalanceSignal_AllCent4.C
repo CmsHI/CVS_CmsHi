@@ -62,6 +62,7 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
 //      anaAgj.cutSShapeDPhi = anaAgj.cutSShapeDPhi&&"Agj<0.0999";
 //      anaAgj.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01&&Agj<0.0999",20,-0.999,0.999);
    }
+   anaAgj.SubtractBkg();
    
    // histogram style
    if (isData) {

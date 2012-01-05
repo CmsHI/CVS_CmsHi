@@ -24,7 +24,7 @@ public:
       //for (int i=1; i<=hScaled->GetNbinsX()+1 ; ++i) cout << hScaled->GetBinLowEdge(i) << " (" << hScaled->GetBinContent(i) << ") ";
       //cout << endl;
       // check
-      t->Draw("cBin>>"+name+"_cBin(40,0,40)",cut,"goff");
+      //t->Draw("cBin>>"+name+"_cBin(40,0,40)",cut,"goff");
    }
    
    TH1D * h;
@@ -57,7 +57,7 @@ public:
    cutBkgDPhi("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01"),
    cutSShape("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017"),
    cutSShapeDPhi("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017"),   
-   nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0),fracPhotonBkgDPhiBkg(0) {
+   nSelPhoton(0),nSigAll(0),fracDPhiBkg(0),photonPurity(0),fracPhotonBkg(0),fracPhotonBkgDPhiBkg(0),area(1) {
       t = tree;
       hFracPhotonBkg = (TH1D*)gDirectory->FindObjectAny("hFracPhotonBkg");
       if (!hFracPhotonBkg) hFracPhotonBkg = new TH1D("hFracPhotonBkg","",5,0,5);
@@ -137,7 +137,7 @@ public:
       // number of events in signal region
       nSigAll = t->GetEntries(rSigAll.cut);
       cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << nSigAll << " ** " << endl;
-      float area=1.;
+      area=1.;
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
       rSigAll.Init(t,nbin,bins,1.,area);
@@ -172,7 +172,9 @@ public:
             }
          }
       }
-      
+   }
+
+   void SubtractBkg() {
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       cout << "Raw area: " << hSubtracted->Integral() << endl;   // check rb
       float ajcut=0.12;
@@ -256,6 +258,7 @@ public:
    float photonPurity;
    float fracPhotonBkg;
    float fracPhotonBkgDPhiBkg;
+   float area;
    TH1D * hFracPhotonBkg;
 };
 
