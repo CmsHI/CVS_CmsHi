@@ -89,7 +89,8 @@ TGraphAsymmErrors * getRBSignal(
 
    // Get npart
    const int nBin = 5;
-   float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
+   //float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
+   float m[nBin+1] = {0,4,8,12,20,40};
    //const int nBin = 6;
    //float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,40.5};
    //   const int nBin = 7;
@@ -196,7 +197,7 @@ void plotRBSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/02.04v18"
+                      TString outdir = "./fig/02.05v18"
                       )
 {
    TH1::SetDefaultSumw2();

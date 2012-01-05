@@ -119,6 +119,13 @@ public:
    }
    
    void MakeHistograms(TCut sigSel, int nbin, float * bins) {
+      // initialize vars
+      fracDPhiBkg=0;
+      if (!subSShapeSide) {
+         fracPhotonBkg=0;
+         fracPhotonBkgDPhiBkg=0;
+      }
+      // setup cuts
       cout << "Base Selection: " << sel << endl;
       rSigAll.cut = sel&&sigSel;
       rBkgDPhi.cut = sel&&cutBkgDPhi;
@@ -167,7 +174,11 @@ public:
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
-      cout << "Final subtraction: " << rSigAll.hScaled->Integral();
+      cout << "Raw area: " << hSubtracted->Integral() << endl;   // check rb
+      float ajcut=0.12;
+      float rb = hSubtracted->Integral(1,hSubtracted->FindBin(ajcut)-1);
+      cout << "# Check raw RB " << hSubtracted->GetBinLowEdge(1) << " to " << hSubtracted->GetBinLowEdge(hSubtracted->FindBin(ajcut)) << ": " << rb << endl;
+      
       if (subDPhiSide) {
          hSubtracted->Add(rBkgDPhi.hScaled,-1);
          cout << " - " << rBkgDPhi.hScaled->Integral();
@@ -180,20 +191,25 @@ public:
       }
       cout << "=? " << hSubtracted->Integral() << endl;
       if (normMode>0) {
+         rb = hSubtracted->Integral(1,hSubtracted->FindBin(ajcut)-1);
+         //cout << "# Check RB before rescale " << hSubtracted->GetBinLowEdge(1) << " to " << hSubtracted->GetBinLowEdge(hSubtracted->FindBin(ajcut)) << ": " << rb << endl;
          // Rescale after subtraction
-         if (subDPhiSide&&subSShapeSide) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
+         //cout << "old area: " << area << ", to be scaled: " << fracDPhiBkg << " " << fracPhotonBkg << " " << fracPhotonBkgDPhiBkg << endl;
+         area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
+         //cout << "rescaled area: " << area << endl;
          rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
          //if (subSShapeSide) rBkgSShape.hScaled->Scale(area/rBkgSShape.hScaled->Integral());
          hSubtracted->Scale(area/hSubtracted->Integral());
+         //cout << "After Subtraction area: " << hSubtracted->Integral() << endl;
       }
    }
    
    void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin) {
       for (int i=1; i<=h->GetNbinsX(); ++i) {
          TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
-         float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0;
+         float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracPhotonBkgDPhiBkgInBin=0;
+         float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
          if (subDPhiSideInBin) {
-            float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
             float nDPhiSide = t->GetEntries(rBkgDPhi.cut&&varCut);
             float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
             if (nSigAllInBin>0) fracDPhiBkgInBin = nDPhiBkg/nSigAllInBin;
@@ -204,11 +220,16 @@ public:
                if (h->GetBinCenter(i)>=4&&h->GetBinCenter(i)<12) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(2);
                if (h->GetBinCenter(i)>=12&&h->GetBinCenter(i)<20) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(4);
                if (h->GetBinCenter(i)>=20&&h->GetBinCenter(i)<40) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(5);
+               if (subDPhiSideInBin) {
+                  float nDPhiSideInBin = t->GetEntries(rBkgSShapeDPhi.cut&&varCut);
+                  float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-2.0944)/(3.14159/2.-0.7);
+                  if (nSigAllInBin>0) fracPhotonBkgDPhiBkgInBin = nDPhiBkgInBin/nSigAllInBin;
+               }                  
             }
          }
-         cout << "varCut: " << varCut << " fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << endl;
-         h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-fracSShapeBkgInBin));
-         h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-fracSShapeBkgInBin));
+         cout << "varCut: " << varCut << ", bin" << i << ": " << h->GetBinContent(i) << ", fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << " fracPhotonBkgDPhiBkgInBin: " << fracPhotonBkgDPhiBkgInBin << endl;
+         h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracPhotonBkgDPhiBkgInBin)));
+         h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracPhotonBkgDPhiBkgInBin)));
       }
    }
    
