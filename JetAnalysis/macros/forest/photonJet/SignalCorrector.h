@@ -218,7 +218,7 @@ public:
       }
    }
    
-   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944, int histMode=0) {
+   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944, int histMode=1) {
       for (int i=1; i<=h->GetNbinsX(); ++i) {
          TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
          float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracSShapeBkgDPhiBkgInBin=0;
@@ -245,10 +245,10 @@ public:
             }
          }
          cout << "varCut: " << varCut << ", bin" << i << ": " << h->GetBinContent(i) << ", fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << " fracSShapeBkgDPhiBkgInBin: " << fracSShapeBkgDPhiBkgInBin << endl;
-         if (histMode==0) { // scale input histogram
+         if (histMode==1) { // scale input histogram
             h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
             h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
-         } else if (histMode==2) { // scale bck histograms
+         } else if (histMode==0) { // scale bck histograms
             if (fracDPhiBkgInBin>0&&nDPhiSideInBin>0) {
                rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
                rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);

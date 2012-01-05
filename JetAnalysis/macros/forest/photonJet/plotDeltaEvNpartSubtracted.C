@@ -116,8 +116,8 @@ TGraphAsymmErrors * getRBSignal(
    anaDen.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaDen.SetPhotonIsolation(isolScheme,-1);
    anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m,false);
+   anaDen.ScaleToPureSignal(anaDen.rSigAll.h,subDPhiSide,subSShapeSide,0);
    anaDen.SubtractBkg(false);
-   //anaDen.ScaleToPureSignal(anaDen.hSubtracted,false,subSShapeSide);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
@@ -127,8 +127,8 @@ TGraphAsymmErrors * getRBSignal(
    anaNum.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaNum.SetPhotonIsolation(isolScheme,-1);
    anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),nBin,m,false);
+   anaNum.ScaleToPureSignal(anaNum.rSigAll.h,subDPhiSide,subSShapeSide,0);
    anaNum.SubtractBkg(false);
-   //anaNum.ScaleToPureSignal(anaNum.hSubtracted,subDPhiSide,subSShapeSide);
    //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);
@@ -142,7 +142,7 @@ TGraphAsymmErrors * getRBSignal(
       gSigAll->SetMarkerStyle(kOpenCircle);
       gSigAll->Draw("p");
       if (anaNum.subDPhiSide) {
-         TGraphAsymmErrors *gDPhiSide = calcEff(anaDen.rSigAll.hScaled,anaNum.rBkgDPhi.hScaled,npart,dataType);
+         TGraphAsymmErrors *gDPhiSide = calcEff(anaDen.rBkgDPhi.hScaled,anaNum.rBkgDPhi.hScaled,npart,dataType);
          gDPhiSide->SetMarkerSize(1.25);
          gDPhiSide->SetLineColor(kGreen+2);
          gDPhiSide->SetLineStyle(2);
@@ -151,7 +151,7 @@ TGraphAsymmErrors * getRBSignal(
          gDPhiSide->Draw("p");
       }
       if (anaNum.subSShapeSide) {
-         TGraphAsymmErrors *gSShapeSide = calcEff(anaDen.rSigAll.hScaled,anaNum.rBkgSShape.hScaled,npart,dataType);
+         TGraphAsymmErrors *gSShapeSide = calcEff(anaDen.rBkgSShape.hScaled,anaNum.rBkgSShape.hScaled,npart,dataType);
          gSShapeSide->SetMarkerSize(1.25);
          gSShapeSide->SetLineColor(kViolet);
          gSShapeSide->SetLineStyle(2);
