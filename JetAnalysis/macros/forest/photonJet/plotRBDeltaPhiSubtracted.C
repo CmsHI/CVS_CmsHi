@@ -112,20 +112,20 @@ TGraphAsymmErrors * getRBSignal(
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
    anaDen.cutBkgDPhi = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
-   anaDen.cutSShape = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+   anaDen.cutSShape = "jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159/2 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
    anaDen.cutSShapeDPhi = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";   
    anaDen.subDPhiSide = false;
    anaDen.subSShapeSide = false;
    anaDen.subSShapeSideDPhiSide = false;
    anaDen.SetPhotonIsolation(isolScheme,-1);
-   anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",nBin,m);
-   anaDen.ScaleToPureSignal(anaDen.hSubtracted,subDPhiSide,subSShapeSide,0.7);
+   anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159/2 && sigmaIetaIeta<0.01",nBin,m);
+   anaDen.ScaleToPureSignal(anaDen.hSubtracted,subDPhiSide,subSShapeSide,3.14159/2);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
    anaNum.cutBkgDPhi = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
-   anaNum.cutSShape = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+   anaNum.cutSShape = Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>%.3f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",ajCut);
    anaNum.cutSShapeDPhi = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";   
    anaNum.subDPhiSide = false;
    anaNum.subSShapeSide = false;
@@ -207,7 +207,7 @@ void plotRBDeltaPhiSubtracted(
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    //hTmp->SetYTitle("<#DeltaE_{T}> (GeV)");
-   hTmp->SetYTitle(Form("R_{B}({|#Delta#phi|} < %.2f)",ajCut));
+   hTmp->SetYTitle(Form("R_{B}(|#Delta#phi| < %.2f)",ajCut));
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
@@ -224,6 +224,7 @@ void plotRBDeltaPhiSubtracted(
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
+   return;
 
    cout << "     MC" << endl;
    TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hy18pho50mixdj80emdj120em_v18.root",0,isolScheme,subDPhiSide,subSShapeSide);
