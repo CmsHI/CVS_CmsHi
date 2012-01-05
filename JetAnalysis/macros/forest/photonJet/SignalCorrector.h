@@ -204,14 +204,14 @@ public:
       }
    }
    
-   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin) {
+   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944) {
       for (int i=1; i<=h->GetNbinsX(); ++i) {
          TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
          float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracPhotonBkgDPhiBkgInBin=0;
          float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
          if (subDPhiSideInBin) {
             float nDPhiSide = t->GetEntries(rBkgDPhi.cut&&varCut);
-            float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
+            float nDPhiBkg = nDPhiSide * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
             if (nSigAllInBin>0) fracDPhiBkgInBin = nDPhiBkg/nSigAllInBin;
          }
          if (subSShapeSideInBin) {
@@ -222,7 +222,7 @@ public:
                if (h->GetBinCenter(i)>=20&&h->GetBinCenter(i)<40) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(5);
                if (subDPhiSideInBin) {
                   float nDPhiSideInBin = t->GetEntries(rBkgSShapeDPhi.cut&&varCut);
-                  float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-2.0944)/(3.14159/2.-0.7);
+                  float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
                   if (nSigAllInBin>0) fracPhotonBkgDPhiBkgInBin = nDPhiBkgInBin/nSigAllInBin;
                }                  
             }
