@@ -218,15 +218,19 @@ public:
       }
    }
    
-   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944) {
+   void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944, int histMode=0) {
       for (int i=1; i<=h->GetNbinsX(); ++i) {
          TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
-         float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracPhotonBkgDPhiBkgInBin=0;
+         float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracSShapeBkgDPhiBkgInBin=0;
+         // Count
          float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
+         float nDPhiSideInBin = t->GetEntries(rBkgDPhi.cut&&varCut);
+         float nSShapeSideInBin = t->GetEntries(rBkgSShape.cut&&varCut);
+         float nSShapeSideDPhiSideInBin = t->GetEntries(rBkgSShapeDPhi.cut&&varCut);
+         // Scales
          if (subDPhiSideInBin) {
-            float nDPhiSide = t->GetEntries(rBkgDPhi.cut&&varCut);
-            float nDPhiBkg = nDPhiSide * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
-            if (nSigAllInBin>0) fracDPhiBkgInBin = nDPhiBkg/nSigAllInBin;
+            float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
+            if (nSigAllInBin>0) fracDPhiBkgInBin = nDPhiBkgInBin/nSigAllInBin;
          }
          if (subSShapeSideInBin) {
             if (rSigAll.var=="cBin") {
@@ -235,15 +239,29 @@ public:
                if (h->GetBinCenter(i)>=12&&h->GetBinCenter(i)<20) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(4);
                if (h->GetBinCenter(i)>=20&&h->GetBinCenter(i)<40) fracSShapeBkgInBin = 1-hFracPhotonBkg->GetBinContent(5);
                if (subDPhiSideInBin) {
-                  float nDPhiSideInBin = t->GetEntries(rBkgSShapeDPhi.cut&&varCut);
-                  float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
-                  if (nSigAllInBin>0) fracPhotonBkgDPhiBkgInBin = nDPhiBkgInBin/nSigAllInBin;
+                  float nSShapeSideDPhiBkgInBin = nSShapeSideDPhiSideInBin * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
+                  if (nSigAllInBin>0) fracSShapeBkgDPhiBkgInBin = nSShapeSideDPhiBkgInBin/nSigAllInBin;
                }                  
             }
          }
-         cout << "varCut: " << varCut << ", bin" << i << ": " << h->GetBinContent(i) << ", fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << " fracPhotonBkgDPhiBkgInBin: " << fracPhotonBkgDPhiBkgInBin << endl;
-         h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracPhotonBkgDPhiBkgInBin)));
-         h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracPhotonBkgDPhiBkgInBin)));
+         cout << "varCut: " << varCut << ", bin" << i << ": " << h->GetBinContent(i) << ", fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << " fracSShapeBkgDPhiBkgInBin: " << fracSShapeBkgDPhiBkgInBin << endl;
+         if (histMode==0) { // scale input histogram
+            h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
+            h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
+         } else if (histMode==2) { // scale bck histograms
+            if (fracDPhiBkgInBin>0&&nDPhiSideInBin>0) {
+               rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
+               rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
+            }
+            if (fracSShapeBkgInBin>0&&nSShapeSideInBin>0) {
+               rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
+               rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
+            }
+            if (fracSShapeBkgDPhiBkgInBin>0&&nSShapeSideDPhiSideInBin>0) {
+               rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
+               rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
+            }
+         }
       }
    }
    
