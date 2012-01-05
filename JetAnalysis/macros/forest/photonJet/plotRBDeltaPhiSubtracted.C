@@ -119,6 +119,7 @@ TGraphAsymmErrors * getRBSignal(
    anaDen.subSShapeSideDPhiSide = false;
    anaDen.SetPhotonIsolation(isolScheme,-1);
    anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159/2 && sigmaIetaIeta<0.01",nBin,m);
+   anaDen.SubtractBkg();
    anaDen.ScaleToPureSignal(anaDen.hSubtracted,subDPhiSide,subSShapeSide,3.14159/2);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
@@ -132,6 +133,7 @@ TGraphAsymmErrors * getRBSignal(
    anaNum.subSShapeSideDPhiSide = false;
    anaNum.SetPhotonIsolation(isolScheme,-1);
    anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>%.3f && sigmaIetaIeta<0.01",ajCut),nBin,m);
+   anaNum.SubtractBkg();
    anaNum.ScaleToPureSignal(anaNum.hSubtracted,subDPhiSide,subSShapeSide,ajCut);
    //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 
@@ -224,7 +226,6 @@ void plotRBDeltaPhiSubtracted(
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
-   return;
 
    cout << "     MC" << endl;
    TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,ajCut,"offlSel&&sampleWeight>0.5","(weight)","../output-hy18pho50mixdj80emdj120em_v18.root",0,isolScheme,subDPhiSide,subSShapeSide);

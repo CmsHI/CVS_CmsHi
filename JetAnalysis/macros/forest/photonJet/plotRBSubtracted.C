@@ -116,6 +116,7 @@ TGraphAsymmErrors * getRBSignal(
    anaDen.subSShapeSideDPhiSide = false;
    anaDen.SetPhotonIsolation(isolScheme,-1);
    anaDen.MakeHistograms("sigmaIetaIeta<0.01",nBin,m);
+   anaDen.SubtractBkg();
    anaDen.ScaleToPureSignal(anaDen.hSubtracted,false,subSShapeSide);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
@@ -129,6 +130,7 @@ TGraphAsymmErrors * getRBSignal(
    anaNum.subSShapeSideDPhiSide = false;
    anaNum.SetPhotonIsolation(isolScheme,-1);
    anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01&&Agj<%.3f",ajCut),nBin,m);
+   anaNum.SubtractBkg();
    anaNum.ScaleToPureSignal(anaNum.hSubtracted,subDPhiSide,subSShapeSide);
    //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 

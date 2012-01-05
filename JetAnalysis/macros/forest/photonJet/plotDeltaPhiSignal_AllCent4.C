@@ -62,7 +62,8 @@ TH1D * plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       anaAgj.SetPhotonIsolation(isolScheme,cbin);
       anaAgj.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",20,0.0001,3.1415926);
    }
-   
+   anaAgj.SubtractBkg();
+
    // histogram style
    if (isData) {
       anaAgj.hSubtracted->SetLineColor(kRed);
