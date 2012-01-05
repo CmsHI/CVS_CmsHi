@@ -15,9 +15,9 @@ public:
       float nSel = t->Project(h->GetName(),var,cut);
       cout << "  draw: " << var << " cut: " << TString(cut) << ": " << nSel << endl;
       hNorm = (TH1D*)h->Clone(Form("%sNorm",h->GetName()));
-      if (normMode>0&&h->Integral()>0) hNorm->Scale(area/h->Integral());
+      if (area>0&&normMode>0&&h->Integral()>0) hNorm->Scale(area/h->Integral());
       hScaled = (TH1D*)hNorm->Clone(Form("%sScaled",hNorm->GetName()));
-      if (fraction<1e8) {
+      if (fraction>0&&fraction<1e8) {
          cout << "  " << hScaled->GetName() << " scale by: " << fraction << endl;
          hScaled->Scale(fraction);
       }
@@ -118,7 +118,7 @@ public:
       MakeHistograms(sigSel,nbin,bins);
    }
    
-   void MakeHistograms(TCut sigSel, int nbin, float * bins) {
+   void MakeHistograms(TCut sigSel, int nbin, float * bins, bool doScale=true) {
       // initialize vars
       fracDPhiBkg=0;
       if (!subSShapeSide) {
@@ -132,6 +132,17 @@ public:
       rBkgSShape.cut = sel&&cutSShape;
       rBkgSShapeDPhi.cut = sel&&cutSShapeDPhi;
       
+      // no scale mode (simply make the histograms and worry about the scale later)
+      if (!doScale) {
+         rSigAll.Init(t,nbin,bins,-1,-1);
+         rBkgDPhi.Init(t,nbin,bins,-1,-1);
+         rBkgSShape.Init(t,nbin,bins,-1,-1);
+         rBkgSShapeDPhi.Init(t,nbin,bins,-1,-1);
+         // done
+         return;
+      }
+      
+      // if doScale, then 1. find the scales 2. scale!
       // photon normalization
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
       // number of events in signal region
@@ -148,7 +159,7 @@ public:
          if (normMode>0) {
             rBkgDPhi.Init(t,nbin,bins,fracDPhiBkg,area);
          } else {
-            rBkgDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,0);
+            rBkgDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,-1);
          }
          cout << "  |dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
@@ -158,7 +169,7 @@ public:
             rBkgSShape.Init(t,nbin,bins,fracPhotonBkg,area);
          } else {
             float nSShapeSide = t->GetEntries(rBkgSShape.cut);
-            rBkgSShape.Init(t,nbin,bins,fracPhotonBkg*nSigAll/nSShapeSide,0);
+            rBkgSShape.Init(t,nbin,bins,fracPhotonBkg*nSigAll/nSShapeSide,-1);
          }
          if (subSShapeSideDPhiSide) {
             float nDPhiSide = t->GetEntries(rBkgSShapeDPhi.cut);
@@ -168,18 +179,19 @@ public:
             if (normMode>0) {
                rBkgSShapeDPhi.Init(t,nbin,bins,fracPhotonBkgDPhiBkg,area);
             } else {
-               rBkgSShapeDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,0);
+               rBkgSShapeDPhi.Init(t,nbin,bins,nDPhiBkg/nDPhiSide,-1);
             }
          }
       }
    }
 
-   void SubtractBkg() {
+   void SubtractBkg(bool doSubtraction=true) {
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
       cout << "Raw area: " << hSubtracted->Integral() << endl;   // check rb
       float ajcut=0.12;
       float rb = hSubtracted->Integral(1,hSubtracted->FindBin(ajcut)-1);
       cout << "# Check raw RB " << hSubtracted->GetBinLowEdge(1) << " to " << hSubtracted->GetBinLowEdge(hSubtracted->FindBin(ajcut)) << ": " << rb << endl;
+      if (!doSubtraction) return;
       
       if (subDPhiSide) {
          hSubtracted->Add(rBkgDPhi.hScaled,-1);

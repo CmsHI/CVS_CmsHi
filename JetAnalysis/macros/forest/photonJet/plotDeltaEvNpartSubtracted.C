@@ -111,23 +111,23 @@ TGraphAsymmErrors * getRBSignal(
    // Get counts for numorator vs denominator
    cout << " === Get Denominator === " << endl;
    SignalCorrector anaDen(nt,name+"Den","cBin",cut1,myweight,0); // normalization type 1=unity, 2=per sel photon
-   anaDen.subDPhiSide = false;
-   anaDen.subSShapeSide = false;
-   anaDen.subSShapeSideDPhiSide = false;
+   anaDen.subDPhiSide = subDPhiSide;
+   anaDen.subSShapeSide = subSShapeSide;
+   anaDen.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaDen.SetPhotonIsolation(isolScheme,-1);
-   anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m);
-   anaDen.SubtractBkg();
+   anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m,false);
+   anaDen.SubtractBkg(false);
    //anaDen.ScaleToPureSignal(anaDen.hSubtracted,false,subSShapeSide);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
    SignalCorrector anaNum(nt,name+"Num","cBin",cut1,"((photonEt-jetEt)/photonEt)*"+myweight,0); // normalization type 1=unity, 2=per sel photon
-   anaNum.subDPhiSide = false;
-   anaNum.subSShapeSide = false;
-   anaNum.subSShapeSideDPhiSide = false;
+   anaNum.subDPhiSide = subDPhiSide;
+   anaNum.subSShapeSide = subSShapeSide;
+   anaNum.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaNum.SetPhotonIsolation(isolScheme,-1);
-   anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),nBin,m);
-   anaNum.SubtractBkg();
+   anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),nBin,m,false);
+   anaNum.SubtractBkg(false);
    //anaNum.ScaleToPureSignal(anaNum.hSubtracted,subDPhiSide,subSShapeSide);
    //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 
