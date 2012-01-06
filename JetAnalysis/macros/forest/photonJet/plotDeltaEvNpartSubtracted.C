@@ -20,6 +20,7 @@
 #include "DrawTick.C"
 #include "npart.h"
 #include "SignalCorrector.h"
+#include "commonUtility.h"
 using namespace std;
 
 TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,float *npart, int dataType)
@@ -162,7 +163,7 @@ TGraphAsymmErrors * getRBSignal(
       // Draw count
       float nPhotonJet = anaNum.area;
       if (dataType==1) {
-         TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
+         TLegend *t3=new TLegend(0.1,0.73,0.5,0.88);
          t3->AddEntry(anaNum.rSigAll.h,anaNum.nameIsol,"");
          t3->AddEntry(anaNum.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
          t3->AddEntry(anaNum.rSigAll.h,"","");
@@ -175,7 +176,7 @@ TGraphAsymmErrors * getRBSignal(
          t3->Draw();      
       }
       if (dataType==2) {
-         TLegend *t3=new TLegend(0.1,0.7,0.5,0.85);
+         TLegend *t3=new TLegend(0.1,0.73,0.5,0.88);
          t3->AddEntry(anaNum.rSigAll.h,"","");
          t3->AddEntry(anaNum.rSigAll.h,"","");
          t3->AddEntry(anaNum.rSigAll.h,Form("pp: %.0f #gamma-jets",nPhotonJet),"");
@@ -195,7 +196,7 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/02.05v18"
+                      TString outdir = "./fig/02.06v18"
                       )
 {
    TH1::SetDefaultSumw2();
@@ -206,8 +207,8 @@ void plotDeltaEvNpartSubtracted(
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   float ymax=0.4; // 35, 2, 0.4
-   hTmp->SetAxisRange(0,ymax,"Y");
+   float ymin=-0.08,ymax=0.52; // 35, 2, 0.4
+   hTmp->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hTmp->Draw();
 
@@ -233,15 +234,11 @@ void plotDeltaEvNpartSubtracted(
    gpp->Draw("p same");
 
    // Annotation
+   drawText("CMS Preliminary",0.198,0.89,17);
    TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
    pline->SetLineColor(4);
    pline->SetLineStyle(4);
-   pline->Draw();
-   
-   TLatex *cms = new TLatex(0.1,0.91*ymax,"CMS Preliminary");
-   cms->SetTextFont(63);
-   cms->SetTextSize(17);
-   cms->Draw();
+   pline->Draw();   
 
    TH1D * hFrameDataSigAll = new TH1D("hFrameDataSigAll","",20,-0.999,0.999);
    hFrameDataSigAll->SetMarkerStyle(kOpenCircle);
