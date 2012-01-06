@@ -117,8 +117,8 @@ TGraphAsymmErrors * getRBSignal(
    anaDen.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaDen.SetPhotonIsolation(isolScheme,-1);
    anaDen.MakeHistograms("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",nBin,m,false);
-   anaDen.ScaleToPureSignal(anaDen.rSigAll.h,subDPhiSide,subSShapeSide,0);
-   anaDen.SubtractBkg(false);
+   anaDen.ScaleToPureSignal(anaDen.rSigAll.h,subDPhiSide,subSShapeSide,2.0944,0);
+   anaDen.SubtractBkg(true);
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
@@ -128,8 +128,8 @@ TGraphAsymmErrors * getRBSignal(
    anaNum.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
    anaNum.SetPhotonIsolation(isolScheme,-1);
    anaNum.MakeHistograms(Form("jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01"),nBin,m,false);
-   anaNum.ScaleToPureSignal(anaNum.rSigAll.h,subDPhiSide,subSShapeSide,0);
-   anaNum.SubtractBkg(false);
+   anaNum.ScaleToPureSignal(anaNum.rSigAll.h,subDPhiSide,subSShapeSide,2.0944,0);
+   anaNum.SubtractBkg(true);
    //cout << "Num: got subtracted integral: " << anaNum.hSubtracted->Integral() << endl;
 
    TGraphAsymmErrors *g = calcEff(anaDen.hSubtracted,anaNum.hSubtracted,npart,dataType);

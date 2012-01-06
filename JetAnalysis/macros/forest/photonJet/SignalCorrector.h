@@ -245,19 +245,24 @@ public:
             }
          }
          cout << "varCut: " << varCut << ", bin" << i << ": " << h->GetBinContent(i) << ", fracDPhiBkgInBin: " << fracDPhiBkgInBin << " fracSShapeBkgInBin: " << fracSShapeBkgInBin << " fracSShapeBkgDPhiBkgInBin: " << fracSShapeBkgDPhiBkgInBin << endl;
+         //cout << " Count: nSigAll: " << nSigAllInBin << " sideband: dphi: " << nDPhiSideInBin << " ss: " << nSShapeSideInBin << " ssdphi: " << nSShapeSideDPhiSideInBin << endl;
          if (histMode==1) { // scale input histogram
             h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
             h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
          } else if (histMode==0) { // scale bck histograms
+            //cout << " Bkg scale in bin: ";
             if (fracDPhiBkgInBin>0&&nDPhiSideInBin>0) {
+               //cout << " dphi: " << nSigAllInBin << " " << fracDPhiBkgInBin << " " << nDPhiSideInBin << " = " << nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin;
                rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
                rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
             }
             if (fracSShapeBkgInBin>0&&nSShapeSideInBin>0) {
+               //cout << " ss: " << nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin;
                rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
                rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
             }
             if (fracSShapeBkgDPhiBkgInBin>0&&nSShapeSideDPhiSideInBin>0) {
+               //cout << " ssdphi: " << nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin << endl;
                rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
                rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
             }
