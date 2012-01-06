@@ -50,8 +50,10 @@ void checkRBSignal_prof(
 //   TString sel="((cc4+cr4+ct4PtCut20)/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0)";
 //   TString drawvar=Form("(acos(cos(photonPhi-jetPhi))>%.3f):cBin",ajCut);
 //   TString sel="((cc4+cr4+ct4PtCut20)/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30.0)";
-   TString drawvar=Form("(photonEt-jetEt):cBin");
-   TString sel="(fisherIsol>0.2&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))<3.14159*0.5)";
+   TString drawvar=Form("(photonEt-jetEt)/photonEt:cBin");
+   //TString sel="(fisherIsol>0.2&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+   TString sel="(fisherIsol>0.2&&sigmaIetaIeta>0.011&& sigmaIetaIeta<0.017 &&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+   //TString sel="(fisherIsol>0.2&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7&&acos(cos(photonPhi-jetPhi))<3.14159/2)";
 //   TString drawvar=Form("(photonEt-jetEt)/photonEt:cBin");
 //   TString sel="(sumIsol<1&&sigmaIetaIeta<0.01&&photonEt>60.0)&&(jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2/3.)";
 
@@ -70,8 +72,8 @@ void checkRBSignal_prof(
    hRBPp->SetMarkerStyle(kOpenStar);
    hRBPp->SetMarkerColor(kBlue);
    //hRBData->SetAxisRange(0,1.,"Y");
-   //hRBData->SetAxisRange(0,0.4,"Y");
-   hRBData->SetAxisRange(0,30,"Y");
+   hRBData->SetAxisRange(-0.08,0.52,"Y");
+   //hRBData->SetAxisRange(0,30,"Y");
    //hRBData->SetYTitle(Form("R_{B}(A_{GJ} < %.2f)",ajCut));
    //hRBData->SetYTitle(Form("<#DeltaE>",ajCut));
    hRBData->Draw("E");
