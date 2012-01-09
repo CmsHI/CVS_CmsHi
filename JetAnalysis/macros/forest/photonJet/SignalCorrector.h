@@ -248,35 +248,29 @@ public:
          cout << " Count: nSigAll: " << nSigAllInBin << endl;
          cout << " Count: sideband dphi: " << nDPhiSideInBin << endl;
          cout << " Count: sideband ss: " << nSShapeSideInBin << " ssdphi: " << nSShapeSideDPhiSideInBin << endl;
+         float dphisidescale = (3.14159-dphiSigCut)/(3.14159/2.-0.7);
+         float sssidescale = 0;
+         if (nSShapeSideInBin>0) sssidescale = nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin;
+
          if (histMode==1) { // scale input histogram
             h->SetBinContent(i,h->GetBinContent(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
             h->SetBinError(i,h->GetBinError(i)*(1-fracDPhiBkgInBin-(fracSShapeBkgInBin-fracSShapeBkgDPhiBkgInBin)));
          } else if (histMode==0) { // scale bck histograms
-            cout << " Bkg scale dphi: " << nSigAllInBin << "*" << fracDPhiBkgInBin << "/" << nDPhiSideInBin << " = " << nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin << endl;
-            cout << " Bkg scale ss: " << nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin << endl;
-            cout << " Bkg scale ssdphi: " << nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin << endl;
-            if (fracDPhiBkgInBin>0&&nDPhiSideInBin>0) {
-               rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
-               rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracDPhiBkgInBin/nDPhiSideInBin);
+            cout << " Bkg scale dphi: " << dphisidescale << endl;
+            cout << " Bkg scale ss: " << sssidescale << endl;
+            cout << " Bkg scale ssdphi: " << dphisidescale << endl;
+            if (fracDPhiBkgInBin>0) {
+               rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*dphisidescale);
+               rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*dphisidescale);
             }
-            if (fracSShapeBkgInBin>0&&nSShapeSideInBin>0) {
-               rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
-               rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgInBin/nSShapeSideInBin);
+            if (fracSShapeBkgInBin>0) {
+               rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*sssidescale);
+               rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*sssidescale);
             }
-            if (fracSShapeBkgDPhiBkgInBin>0&&nSShapeSideDPhiSideInBin>0) {
-               rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
-               rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*nSigAllInBin*fracSShapeBkgDPhiBkgInBin/nSShapeSideDPhiSideInBin);
+            if (fracSShapeBkgDPhiBkgInBin>0) {
+               rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*dphisidescale);
+               rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*dphisidescale);
             }
-//            float dphiscale = 1.20257, ssscale = 1.1;
-//            float dphiscale = 1.20257, ssscale = 0;
-//            rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*dphiscale);
-//            rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*dphiscale);
-//
-//            rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*ssscale);
-//            rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*ssscale);
-//
-//            rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*dphiscale);
-//            rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*dphiscale);
          }
       }
    }
