@@ -3,13 +3,15 @@
 #include <TH1D.h>
 #include <TNtuple.h>
 #include <iostream>
+#include <algorithm>
+#include <utility>
+#include <vector>
 #include "TChain.h"
 
 // Convinient Output Classes
 class EvtSel {
 public:
-   int run,evt;
-   int cBin;
+   int run,evt,nOccur,cBin;
    int nG,nJ,nT;
    bool trig,offlSel,noiseFilt,anaEvtSel;
    float vz,weight,npart,ncoll,sampleWeight;
@@ -117,14 +119,41 @@ public:
 float getNpart(int cBin);
 float getNcoll(int cBin);
 
+class DuplicateEvents {
+public:
+   DuplicateEvents(HiForest * forest) : nDup(0) {
+      c=forest;
+   };
+   void MakeList() {
+      cout << "Starting Making List to check for duplicate events" << endl;
+      //for (int i=0;i<c->GetEntries();i++) {
+      for (int i=0;i<10000;i++) {
+         c->GetEntry(i);
+         if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << c->evt.run << " evt: " << c->evt.evt << endl;
+         evts.push_back(std::make_pair(c->evt.run,c->evt.evt));
+      }         
+   }
+   int FindOccurrences(int run, int evt) {
+      int noccur = count(evts.begin(), evts.end(), std::make_pair(run,evt));
+      if (noccur>1) {
+         cout << "Found duplicate: " << run << " " << evt << endl;
+         ++nDup;
+      }
+      return noccur;
+   }
+   HiForest * c;
+   vector<pair<int, int> > evts;
+   int nDup;
+};
+
 void analyzePhotonJet(
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
-                      TString outname="output-data-Photon-v4_v17.root",
+                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
+                      TString outname="output-data-Photon-v4_v19.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -156,6 +185,10 @@ void analyzePhotonJet(
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v4.root");
+   
+   // Check for duplicate events
+   DuplicateEvents dupEvt(c);
+   dupEvt.MakeList();
       
    // Output file
    TFile *output = new TFile(outname,"recreate");
@@ -167,11 +200,11 @@ void analyzePhotonJet(
    EvtSel evt;
    GammaJet gj;
    Isolation isol;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
+   tgj->Branch("evt",&evt.run,"run/I:evt:nOccur:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
    ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
    ":refPhoPt:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
-   ":isEle/O";
+   "isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -181,10 +214,10 @@ void analyzePhotonJet(
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
    // Main loop
-   for (int i=0;i<c->GetEntries();i++)
+   //for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<10000;i++)
    {
       c->GetEntry(i);
-      
       // Event Info
       evt.run = c->evt.run;
       evt.evt = c->evt.evt;
@@ -203,6 +236,10 @@ void analyzePhotonJet(
       evt.npart = getNpart(evt.cBin);
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
+
+      // check if event is duplicate
+      evt.nOccur = dupEvt.FindOccurrences(evt.run,evt.evt);
+      
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
