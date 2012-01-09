@@ -204,7 +204,7 @@ void analyzePhotonJet(
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
    ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
    ":refPhoPt:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
-   "isEle/O";
+   ":isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
