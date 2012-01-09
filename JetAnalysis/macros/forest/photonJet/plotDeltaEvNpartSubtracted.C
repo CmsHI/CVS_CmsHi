@@ -279,6 +279,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("%s/Photonv6_v18_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
-   c2->Print(Form("%s/Photonv6_v18_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
+   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
+   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
 }
