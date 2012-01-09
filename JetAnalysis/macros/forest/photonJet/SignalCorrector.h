@@ -44,6 +44,7 @@ class SignalCorrector
 public:
    SignalCorrector(TTree * tree, TString n, TString var, TCut s, TString w="(1==1)", int nm=1) : 
    name(n),
+   observable(var),
    sel(s),
    rSigAll(n+"SignalAll",var,s,w,nm),
    rBkgDPhi(n+"BkgDPhi",var,s,w,nm),
@@ -219,14 +220,18 @@ public:
    }
    
    void ScaleToPureSignal(TH1D * h, bool subDPhiSideInBin, bool subSShapeSideInBin, float dphiSigCut=2.0944, int histMode=1) {
+      TH1D * hSigAllTmp = (TH1D*)rSigAll.hNorm->Clone("hSigAllTmp");
+      TH1D * hDPhiSideTmp = (TH1D*)rSigAll.hNorm->Clone("hDPhiSideTmp");
+      TH1D * hSShapeSideTmp = (TH1D*)rSigAll.hNorm->Clone("hSShapeSideTmp");
+      TH1D * hSShapeSideDPhiTmp = (TH1D*)rSigAll.hNorm->Clone("hSShapeSideDPhiTmp");
       for (int i=1; i<=h->GetNbinsX(); ++i) {
          TCut varCut = Form("%s>=%.4f&&%s<%.4f",rSigAll.var.Data(),h->GetBinLowEdge(i),rSigAll.var.Data(),h->GetBinLowEdge(i+1));
          float fracDPhiBkgInBin=0, fracSShapeBkgInBin=0,fracSShapeBkgDPhiBkgInBin=0;
          // Count
-         float nSigAllInBin = t->GetEntries(rSigAll.cut&&varCut);
-         float nDPhiSideInBin = t->GetEntries(rBkgDPhi.cut&&varCut);
-         float nSShapeSideInBin = t->GetEntries(rBkgSShape.cut&&varCut);
-         float nSShapeSideDPhiSideInBin = t->GetEntries(rBkgSShapeDPhi.cut&&varCut);
+         float nSigAllInBin = t->Project("hSigAllTmp",observable,rSigAll.cut&&varCut);
+         float nDPhiSideInBin = t->Project("hDPhiSideTmp",observable,rBkgDPhi.cut&&varCut);
+         float nSShapeSideInBin = t->Project("hSShapeSideTmp",observable,rBkgSShape.cut&&varCut);
+         float nSShapeSideDPhiSideInBin = t->Project("hSShapeSideDPhiTmp",observable,rBkgSShapeDPhi.cut&&varCut);
          // Scales
          if (subDPhiSideInBin) {
             float nDPhiBkgInBin = nDPhiSideInBin * (3.14159-dphiSigCut)/(3.14159/2.-0.7);
@@ -259,24 +264,36 @@ public:
             cout << " Bkg scale dphi: " << dphisidescale << endl;
             cout << " Bkg scale ss: " << sssidescale << endl;
             cout << " Bkg scale ssdphi: " << dphisidescale << endl;
+            //cout << " hSigAllTmp RMS: " << hSigAllTmp->GetRMS() << " / sqrt(n) = " << hSigAllTmp->GetRMS()/sqrt(nSigAllInBin) << endl;
+            //rSigAll.hScaled->SetBinError(i,hSigAllTmp->GetRMS()/sqrt(nSigAllInBin));
             if (fracDPhiBkgInBin>0) {
                rBkgDPhi.hScaled->SetBinContent(i,rBkgDPhi.hNorm->GetBinContent(i)*dphisidescale);
-               rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i)*dphisidescale);
+               rBkgDPhi.hScaled->SetBinError(i,rBkgDPhi.hNorm->GetBinError(i));
+               //cout << " hDPhiSideTmp RMS: " << hDPhiSideTmp->GetRMS() << " / sqrt(n) = "<< hDPhiSideTmp->GetRMS()/sqrt(nDPhiSideInBin) << endl;
+               //rBkgDPhi.hScaled->SetBinError(i,hDPhiSideTmp->GetRMS()/sqrt(nDPhiSideInBin));
             }
             if (fracSShapeBkgInBin>0) {
                rBkgSShape.hScaled->SetBinContent(i,rBkgSShape.hNorm->GetBinContent(i)*sssidescale);
-               rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i)*sssidescale);
+               rBkgSShape.hScaled->SetBinError(i,rBkgSShape.hNorm->GetBinError(i));
+               //cout << " hSShapeSideTmp RMS: " << hSShapeSideTmp->GetRMS() << " / sqrt(n) = "<< hSShapeSideTmp->GetRMS()/sqrt(nSShapeSideInBin) << endl;
+               //rBkgSShape.hScaled->SetBinError(i,hSShapeSideTmp->GetRMS()/sqrt(nSShapeSideInBin));
             }
             if (fracSShapeBkgDPhiBkgInBin>0) {
                rBkgSShapeDPhi.hScaled->SetBinContent(i,rBkgSShapeDPhi.hNorm->GetBinContent(i)*dphisidescale);
-               rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i)*dphisidescale);
+               rBkgSShapeDPhi.hScaled->SetBinError(i,rBkgSShapeDPhi.hNorm->GetBinError(i));
+               //rBkgSShapeDPhi.hScaled->SetBinError(i,hSShapeSideDPhiTmp->GetRMS()/sqrt(nSShapeSideDPhiSideInBin));
+               //cout << " hSShapeSideDPhiTmp RMS: " << hSShapeSideDPhiTmp->GetRMS() << " / sqrt(n) = "<< hSShapeSideDPhiTmp->GetRMS()/sqrt(nSShapeSideDPhiSideInBin) << endl;
             }
          }
       }
+      delete hSigAllTmp;
+      delete hDPhiSideTmp;
+      delete hSShapeSideTmp;
+      delete hSShapeSideDPhiTmp;
    }
    
    TTree * t;
-   TString name,nameIsol;
+   TString name,nameIsol,observable;
    TCut sel,cutIsol;
    Region rSigAll;
    Region rBkgDPhi;
