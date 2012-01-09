@@ -121,29 +121,29 @@ float getNcoll(int cBin);
 
 class DuplicateEvents {
 public:
-   DuplicateEvents(HiForest * forest) : nDup(0) {
+   DuplicateEvents(HiForest * forest) {
       c=forest;
    };
    void MakeList() {
       cout << "Starting Making List to check for duplicate events" << endl;
-      //for (int i=0;i<c->GetEntries();i++) {
-      for (int i=0;i<10000;i++) {
+      evts.clear();
+      occurrence.clear();
+      for (int i=0;i<c->GetEntries();i++) {
          c->GetEntry(i);
          if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << c->evt.run << " evt: " << c->evt.evt << endl;
+         int occur = (int)FindOccurrences(c->evt.run,c->evt.evt);
+         if (occur==0) occurrence.push_back(1);
+         else occurrence.push_back(2);
          evts.push_back(std::make_pair(c->evt.run,c->evt.evt));
       }         
    }
    int FindOccurrences(int run, int evt) {
       int noccur = count(evts.begin(), evts.end(), std::make_pair(run,evt));
-      if (noccur>1) {
-         cout << "Found duplicate: " << run << " " << evt << endl;
-         ++nDup;
-      }
       return noccur;
    }
    HiForest * c;
    vector<pair<int, int> > evts;
-   int nDup;
+   vector<int> occurrence;
 };
 
 void analyzePhotonJet(
@@ -214,10 +214,11 @@ void analyzePhotonJet(
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
    // Main loop
-   //for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<10000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
+      // check if event is duplicate
+      evt.nOccur = dupEvt.occurrence[i];
       // Event Info
       evt.run = c->evt.run;
       evt.evt = c->evt.evt;
@@ -226,9 +227,9 @@ void analyzePhotonJet(
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
       evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
-      evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+      evt.offlSel = (c->skim.pcollisionEventSelection > 0 && evt.nOccur==1);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-      evt.anaEvtSel = c->selectEvent() && evt.trig;
+      evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel;
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
@@ -237,8 +238,6 @@ void analyzePhotonJet(
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
 
-      // check if event is duplicate
-      evt.nOccur = dupEvt.FindOccurrences(evt.run,evt.evt);
       
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
@@ -359,6 +358,7 @@ void analyzePhotonJet(
 
    // After Event Loop
    tgj->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
+   tgj->SetAlias("xgj","(jetEt/photonEt)");
    // * cut at 0.3 from Yongsun's studies
    output->Write();
    output->Close();
