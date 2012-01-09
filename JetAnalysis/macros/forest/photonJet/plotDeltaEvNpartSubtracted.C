@@ -43,8 +43,8 @@ TGraphAsymmErrors *calcEff(TH1* h1, TH1* hCut,float *npart, int dataType)
 //   hCut->Draw("sameE");
 //   gEfficiency->BayesDivide(hCut,h1);
    TH1D * hDiv = (TH1D*)hCut->Clone(Form("%s_div",hCut->GetName()));
-   //hDiv->Divide(hCut,h1,1,1,"B");
-   hDiv->Divide(hCut,h1,1,1);
+   hDiv->Divide(hCut,h1,1,1,"B");
+   //hDiv->Divide(hCut,h1,1,1);
    TGraphAsymmErrors *gEfficiency = new TGraphAsymmErrors(hDiv);
    cout << "graph N points: " << gEfficiency->GetN()<<endl;
 //   TCanvas * cc3 = new TCanvas("cc3","",500,500);
@@ -198,7 +198,7 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/01.19v18"
+                      TString outdir = "./fig/01.19v19"
                       )
 {
    TH1::SetDefaultSumw2();
@@ -216,7 +216,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-Photon-v6_v18.root",1,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-Photon-v7_v19.root",1,isolScheme,subDPhiSide,subSShapeSide);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -228,6 +228,7 @@ void plotDeltaEvNpartSubtracted(
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
+   return;
    
    cout << "     pp" << endl;
    TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide);
