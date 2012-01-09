@@ -89,9 +89,11 @@ TGraphAsymmErrors * getRBSignal(
    if (dataType==0) subSShapeSide = false; // no photon subtraction for mc sig
 
    // Get npart
-   const int nBin = 5;
+   //const int nBin = 5;
    //float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
-   float m[nBin+1] = {0,4,8,12,20,40};
+   //float m[nBin+1] = {0,4,8,12,20,40};
+   const int nBin = 4;
+   float m[nBin+1] = {0,4,12,20,40};
    //const int nBin = 6;
    //float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,40.5};
    //   const int nBin = 7;
@@ -122,7 +124,7 @@ TGraphAsymmErrors * getRBSignal(
    //cout << "Den: got subtracted integral: " << anaDen.hSubtracted->Integral() << endl;
 
    cout << " === Get Numerator === " << endl;
-   SignalCorrector anaNum(nt,name+"Num","cBin",cut1,"((photonEt-jetEt)/photonEt)*"+myweight,0); // normalization type 1=unity, 2=per sel photon
+   SignalCorrector anaNum(nt,name+"Num","cBin",cut1,"(jetEt/photonEt)*"+myweight,0); // normalization type 1=unity, 2=per sel photon
    anaNum.subDPhiSide = subDPhiSide;
    anaNum.subSShapeSide = subSShapeSide;
    anaNum.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
@@ -161,7 +163,7 @@ TGraphAsymmErrors * getRBSignal(
          gSShapeSide->Draw("p");
       }
       // Draw count
-      float nPhotonJet = anaNum.area;
+      float nPhotonJet = anaNum.hSubtracted->Integral();
       if (dataType==1) {
          TLegend *t3=new TLegend(0.1,0.73,0.5,0.88);
          t3->AddEntry(anaNum.rSigAll.h,anaNum.nameIsol,"");
@@ -196,18 +198,19 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/02.06v18"
+                      TString outdir = "./fig/01.19v18"
                       )
 {
    TH1::SetDefaultSumw2();
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
-   hTmp->SetYTitle("<#DeltaE_{T}/E_{T,#gamma}> (GeV)");
+   //hTmp->SetYTitle("<#DeltaE_{T}/E_{T,#gamma}> (GeV)");
+   hTmp->SetYTitle("<E_{T,jet}>/E_{T,#gamma}>");
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   float ymin=-0.08,ymax=0.52; // 35, 2, 0.4
+   float ymin=0.55,ymax=1.1; // 35, 2, 0.4
    hTmp->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hTmp->Draw();
