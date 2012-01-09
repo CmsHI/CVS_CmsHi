@@ -77,15 +77,15 @@ public:
 //         if (cBin>=3&&cBin<=4) photonPurity=0.57;
          nameIsol="Sum(Isol.)<1GeV";
          cutIsol = "(cc4+cr4+ct4PtCut20)/0.9 <1";
-         if (cBin==0) photonPurity=0.74;
-         if (cBin>=1&&cBin<=2) photonPurity=0.78;
-         if (cBin==3) photonPurity=0.76;
-         if (cBin==4) photonPurity=0.82;
-         hFracPhotonBkg->SetBinContent(1,0.74);
-         hFracPhotonBkg->SetBinContent(2,0.78);
-         hFracPhotonBkg->SetBinContent(3,0.78);
-         hFracPhotonBkg->SetBinContent(4,0.76);
-         hFracPhotonBkg->SetBinContent(5,0.82);
+         if (cBin==0) photonPurity=0.73;
+         if (cBin>=1&&cBin<=2) photonPurity=0.77;
+         if (cBin==3) photonPurity=0.79;
+         if (cBin==4) photonPurity=0.84;
+         hFracPhotonBkg->SetBinContent(1,0.73);
+         hFracPhotonBkg->SetBinContent(2,0.77);
+         hFracPhotonBkg->SetBinContent(3,0.77);
+         hFracPhotonBkg->SetBinContent(4,0.79);
+         hFracPhotonBkg->SetBinContent(5,0.84);
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
@@ -93,17 +93,27 @@ public:
          if (cBin>=1&&cBin<=2) photonPurity=0.62;
          if (cBin>=3&&cBin<=4) photonPurity=0.54;
       } else if (isolScheme==2) { // fisher isol
-         nameIsol="Fisher Isol.";
+         nameIsol="Fisher Isol. > 0.3";
          t->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
-         cutIsol = "fisherIsol>0.2";
-         if (cBin==0) photonPurity=0.62;
-         if (cBin>=1&&cBin<=2) photonPurity=0.66;
-         if (cBin>=3&&cBin<=4) photonPurity=0.64;
-         hFracPhotonBkg->SetBinContent(1,0.62);
-         hFracPhotonBkg->SetBinContent(2,0.66);
-         hFracPhotonBkg->SetBinContent(3,0.66);
-         hFracPhotonBkg->SetBinContent(4,0.64);
-         hFracPhotonBkg->SetBinContent(5,0.64);         
+//         cutIsol = "fisherIsol>0.2";
+//         if (cBin==0) photonPurity=0.62;
+//         if (cBin>=1&&cBin<=2) photonPurity=0.66;
+//         if (cBin>=3&&cBin<=4) photonPurity=0.64;
+//         hFracPhotonBkg->SetBinContent(1,0.62);
+//         hFracPhotonBkg->SetBinContent(2,0.66);
+//         hFracPhotonBkg->SetBinContent(3,0.66);
+//         hFracPhotonBkg->SetBinContent(4,0.64);
+//         hFracPhotonBkg->SetBinContent(5,0.64);         
+         cutIsol = "fisherIsol>0.3";
+         if (cBin==0) photonPurity=0.76;
+         if (cBin>=1&&cBin<=2) photonPurity=0.77;
+         if (cBin==3) photonPurity=0.74;
+         if (cBin==4) photonPurity=0.78;
+         hFracPhotonBkg->SetBinContent(1,0.76);
+         hFracPhotonBkg->SetBinContent(2,0.77);
+         hFracPhotonBkg->SetBinContent(3,0.77);
+         hFracPhotonBkg->SetBinContent(4,0.74);
+         hFracPhotonBkg->SetBinContent(5,0.78);         
       }
       fracPhotonBkg=1-photonPurity;
       // Isolation Cut
