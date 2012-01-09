@@ -198,7 +198,7 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/01.19v19"
+                      TString outdir = "./fig/01.19v19AN"
                       )
 {
    TH1::SetDefaultSumw2();
