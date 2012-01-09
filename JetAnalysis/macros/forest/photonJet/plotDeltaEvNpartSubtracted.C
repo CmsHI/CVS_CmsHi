@@ -210,7 +210,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   float ymin=0.55,ymax=1.1; // 35, 2, 0.4
+   float ymin=0.5,ymax=1.1; // 35, 2, 0.4
    hTmp->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hTmp->Draw();
@@ -228,7 +228,6 @@ void plotDeltaEvNpartSubtracted(
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
-   return;
    
    cout << "     pp" << endl;
    TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide);
