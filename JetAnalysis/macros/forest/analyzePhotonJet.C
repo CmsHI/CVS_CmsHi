@@ -121,27 +121,35 @@ float getNcoll(int cBin);
 
 class DuplicateEvents {
 public:
-   DuplicateEvents(HiForest * forest) {
-      c=forest;
+   DuplicateEvents(TString infname) {
+      inf = TFile::Open(infname);
+      t = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
    };
+   ~DuplicateEvents() {
+      delete inf;
+   }
    void MakeList() {
       cout << "Starting Making List to check for duplicate events" << endl;
       evts.clear();
       occurrence.clear();
-      for (int i=0;i<c->GetEntries();i++) {
-         c->GetEntry(i);
-         if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << c->evt.run << " evt: " << c->evt.evt << endl;
-         int occur = (int)FindOccurrences(c->evt.run,c->evt.evt);
+      int run,evt;
+      t->SetBranchAddress("run",&run);
+      t->SetBranchAddress("evt",&evt);
+      for (int i=0;i<t->GetEntries();i++) {
+         t->GetEntry(i);
+         if (i%1000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
+         int occur = (int)FindOccurrences(run,evt);
          if (occur==0) occurrence.push_back(1);
          else occurrence.push_back(2);
-         evts.push_back(std::make_pair(c->evt.run,c->evt.evt));
+         evts.push_back(std::make_pair(run,evt));
       }         
    }
    int FindOccurrences(int run, int evt) {
       int noccur = count(evts.begin(), evts.end(), std::make_pair(run,evt));
       return noccur;
    }
-   HiForest * c;
+   TFile * inf;
+   TTree * t;
    vector<pair<int, int> > evts;
    vector<int> occurrence;
 };
@@ -182,14 +190,14 @@ void analyzePhotonJet(
    // Centrality reweiting
    CentralityReWeight cw("offlSel&&photonEt>50");
 
+   // Check for duplicate events
+   DuplicateEvents dupEvt(inname);
+   dupEvt.MakeList();
+   
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v4.root");
    
-   // Check for duplicate events
-   DuplicateEvents dupEvt(c);
-   dupEvt.MakeList();
-      
    // Output file
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
