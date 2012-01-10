@@ -911,7 +911,7 @@ fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, dou
       t3->SetTextFont(63);
       t3->SetTextSize(15);
       t3->Draw();
-      drawCMS2011(0.53,0.9,120,16);
+      drawCMS2011(0.53,0.9,150,16);
    }
    
 
