@@ -56,8 +56,12 @@ TString fnameDATA_2010   = "/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod0
 TString fnameDATA_2011   = "/d100/velicanu/forest/HiForestPhoton35_Skim.root";
 
 
-const int nPtBin = 2;
-double ptBin[nPtBin+1] = {50,60,300};
+const int nPtBin = 4;
+double ptBin[nPtBin+1] = {50,60,80,120,200};
+
+//const int nPtBin = 2;
+//double ptBin[nPtBin+1] = {50,60,300};
+
 
 const int nCent_std = 4;
 double centBin_std[nCent_std+1] = {0,4,12,20,40};

@@ -82,8 +82,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
 
 	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
-	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV5.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
-	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV5.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
+	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV7.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
+	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV7.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
 	 
 	 // getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV3.root",isoChoice,kMCBsr,lowCent,highCent,ptCut,onlygjEvents);
 	 
@@ -389,7 +389,7 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    
    
    TCut evtSelCut = "tgj.anaEvtSel";
-   TCut centCut     = Form("(yEvt.hiBin >= %d) && (yEvt.hiBin<= %d)",lowCent,highCent);
+   TCut centCut     = Form("yEvt.hiBin >= %d && yEvt.hiBin<= %d",lowCent,highCent);
    TCut photonJetCut  = "tgj.photonEt>50  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
@@ -414,8 +414,10 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
       finalCut = generalCutMC && sbIsoCut;
    
    if ( (isoChoice == kSumIso3) && ( iTemp == kSBB )) {
-      finalCut = generalCutMC && Form("( (cc4+cr4+ct4PtCut20)/0.9 > %f) && ( (cc4+cr4+ct4PtCut20)/0.9 < %f)",(float)specialSbCut,(float)(specialSbCut+5) );
-      cout << " special cut : " << Form("( (cc4+cr4+ct4PtCut20)/0.9 > %f) && ( (cc4+cr4+ct4PtCut20)/0.9 < %f)",(float)specialSbCut,(float)(specialSbCut+5)) << " is used " << endl;
+      finalCut = generalCutMC && (TCut)(Form(" (cc4+cr4+ct4PtCut20)/0.9 > %f &&  (cc4+cr4+ct4PtCut20)/0.9 < %f",(float)specialSbCut,(float)(specialSbCut+10.))) ;
+      if ( specialSbCut == -1 ) 
+	 finalCut = generalCutMC && "(cc4+cr4+ct4PtCut20)/0.9 > 10 &&  (cc4+cr4+ct4PtCut20)/0.9 < 20";
+      //cout << " special cut : " << Form("( (cc4+cr4+ct4PtCut20)/0.9 > %f) && ( (cc4+cr4+ct4PtCut20)/0.9 < %f)",(float)specialSbCut,(float)(specialSbCut+10)) << " is used " << endl;
    }
    multiTreeUtil* photon1 = new multiTreeUtil();
    
@@ -455,11 +457,15 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    TH1D* htemp = (TH1D*)h1->Clone("htemp");
    htemp->Reset();
    htemp->Sumw2();
+   cout << "cut = " << finalCut.GetTitle() <<  endl;
+
    photon1->Draw2(htemp,  "sigmaIetaIeta",   finalCut,  weightBit);
+   cout << " this is it" << endl;
+   //  cout << " MC final Cut = " << finalCut.GetTitle() <<endl;
    TH1D* hcBins = new TH1D("hncoll","",40,-.5,39.5);
    if ( iTemp == kData ) {
       cout << "Data entries = "<<  htemp->Integral() << endl;
-      cout << "cut = " << finalCut.GetTitle() <<  endl;
+      //   cout << "cut = " << finalCut.GetTitle() <<  endl;
       photon1->Draw2(hcBins,  "yEvt.hiBin",   finalCut);
    }
    
