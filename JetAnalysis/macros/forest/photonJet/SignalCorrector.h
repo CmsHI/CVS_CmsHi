@@ -194,6 +194,34 @@ public:
             }
          }
       }
+      // special case for dphi
+      if (observable=="acos(cos(photonPhi-jetPhi))") {
+         TF1 *p0 = new TF1("p0","pol0",0.7,3.14/2);
+         if (subDPhiSide&&rBkgDPhi.hNorm->GetEntries()>10) {
+            rBkgDPhi.hNorm->Fit("p0","0");
+            for (int i=rBkgDPhi.hNorm->FindBin(0.7); i<rBkgDPhi.hNorm->GetNbinsX(); ++i) {
+               rBkgDPhi.hNorm->SetBinContent(i,p0->GetParameter(0));
+               rBkgDPhi.hNorm->SetBinError(i,p0->GetParError(0));
+            }
+            rBkgDPhi.hScaled->Fit("p0","0");
+            for (int i=rBkgDPhi.hScaled->FindBin(0.7); i<rBkgDPhi.hScaled->GetNbinsX(); ++i) {
+               rBkgDPhi.hScaled->SetBinContent(i,p0->GetParameter(0));
+               rBkgDPhi.hScaled->SetBinError(i,p0->GetParError(0));
+            }
+         }
+         if (subSShapeSideDPhiSide&&rBkgSShapeDPhi.hNorm->GetEntries()>10) {
+            rBkgSShapeDPhi.hNorm->Fit("p0","0");
+            for (int i=rBkgSShapeDPhi.hNorm->FindBin(0.7); i<rBkgSShapeDPhi.hNorm->GetNbinsX(); ++i) {
+               rBkgSShapeDPhi.hNorm->SetBinContent(i,p0->GetParameter(0));
+               rBkgSShapeDPhi.hNorm->SetBinError(i,p0->GetParError(0));
+            }
+            rBkgSShapeDPhi.hScaled->Fit("p0","0");
+            for (int i=rBkgSShapeDPhi.hScaled->FindBin(0.7); i<rBkgSShapeDPhi.hScaled->GetNbinsX(); ++i) {
+               rBkgSShapeDPhi.hScaled->SetBinContent(i,p0->GetParameter(0));
+               rBkgSShapeDPhi.hScaled->SetBinError(i,p0->GetParError(0));
+            }
+         }
+      }
    }
 
    void SubtractBkg(bool doSubtraction=true) {
@@ -220,7 +248,7 @@ public:
          //cout << "# Check RB before rescale " << hSubtracted->GetBinLowEdge(1) << " to " << hSubtracted->GetBinLowEdge(hSubtracted->FindBin(ajcut)) << ": " << rb << endl;
          // Rescale after subtraction
          //cout << "old area: " << area << ", to be scaled: " << fracDPhiBkg << " " << fracPhotonBkg << " " << fracPhotonBkgDPhiBkg << endl;
-         area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
+         if (normMode==2) area*=(1-fracDPhiBkg-(fracPhotonBkg-fracPhotonBkgDPhiBkg))/(1-fracPhotonBkg);
          //cout << "rescaled area: " << area << endl;
          rSigAll.hScaled->Scale(area/rSigAll.hScaled->Integral());
          //if (subSShapeSide) rBkgSShape.hScaled->Scale(area/rBkgSShape.hScaled->Integral());

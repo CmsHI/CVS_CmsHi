@@ -7,9 +7,7 @@
 //---------------------------------------------------------------------
 class EvtSel {
 public:
-   int run;
-   int evt;
-   int cBin;
+   int run,evt,nOccur,cBin;
    int nG;
    int nJ;
    int nT;

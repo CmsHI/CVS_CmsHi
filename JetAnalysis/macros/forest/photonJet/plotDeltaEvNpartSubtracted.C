@@ -198,7 +198,7 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/01.19v19AN"
+                      TString outdir = "./fig/01.09v19UpdatedPurityForAN"
                       )
 {
    TH1::SetDefaultSumw2();
@@ -210,7 +210,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   float ymin=0.5,ymax=1.1; // 35, 2, 0.4
+   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
    hTmp->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hTmp->Draw();
