@@ -75,7 +75,8 @@ TGraphAsymmErrors * getRBSignal(
                                 int dataType=0, // 0=mc, 1=data, 2=pp
                                 int isolScheme=2,
                                 bool subDPhiSide=true,
-                                bool subSShapeSide=true
+                                bool subSShapeSide=true,
+                                bool drawCheck=false
 )
 {
    // open the data file
@@ -144,7 +145,7 @@ TGraphAsymmErrors * getRBSignal(
       gSigAll->SetMarkerColor(kGray+2);
       gSigAll->SetMarkerStyle(kOpenCircle);
       gSigAll->Draw("p");
-      if (anaNum.subDPhiSide) {
+      if (drawCheck&&anaNum.subDPhiSide) {
          TGraphAsymmErrors *gDPhiSide = calcEff(anaDen.rBkgDPhi.hScaled,anaNum.rBkgDPhi.hScaled,npart,dataType);
          gDPhiSide->SetMarkerSize(1.25);
          gDPhiSide->SetLineColor(kGreen+2);
@@ -153,7 +154,7 @@ TGraphAsymmErrors * getRBSignal(
          gDPhiSide->SetMarkerStyle(kOpenCircle);
          gDPhiSide->Draw("p");
       }
-      if (anaNum.subSShapeSide) {
+      if (drawCheck&&anaNum.subSShapeSide) {
          TGraphAsymmErrors *gSShapeSide = calcEff(anaDen.rBkgSShape.hScaled,anaNum.rBkgSShape.hScaled,npart,dataType);
          gSShapeSide->SetMarkerSize(1.25);
          gSShapeSide->SetLineColor(kViolet);
@@ -202,6 +203,8 @@ void plotDeltaEvNpartSubtracted(
                       )
 {
    TH1::SetDefaultSumw2();
+   int drawCheck = 0;
+
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    //hTmp->SetYTitle("<#DeltaE_{T}/E_{T,#gamma}> (GeV)");
@@ -216,7 +219,7 @@ void plotDeltaEvNpartSubtracted(
    hTmp->Draw();
 
    cout << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-Photon-v7_v19.root",1,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-Photon-v7_v19.root",1,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -224,13 +227,13 @@ void plotDeltaEvNpartSubtracted(
    gdata->Draw("p same");
 
    cout << "     MC" << endl;
-   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,-1,"offlSel&&sampleWeight>0.5","weight","../output-hy18pho50mixdj80emdj120em_v18.root",0,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * ghypho = getRBSignal(photonMinPt,-1,"offlSel&&sampleWeight>0.5","weight","../output-hy18pho50mixdj80emdj120em_v18.root",0,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << "     pp" << endl;
-   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide);
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
@@ -257,8 +260,8 @@ void plotDeltaEvNpartSubtracted(
    leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
    leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-   //if (subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   //if (subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET1.8","p");
    leg->AddEntry(gpp,"pp","p");
    leg->SetFillColor(0);
@@ -279,6 +282,6 @@ void plotDeltaEvNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
-   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme));
+   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v19_DeltaESubDPhi%dSS%d_PhotonMin%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,isolScheme,drawCheck));
 }

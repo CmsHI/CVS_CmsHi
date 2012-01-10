@@ -1,5 +1,6 @@
 #ifndef SignalCorrector_h
 #define SignalCorrector_h
+#include "TF1.h"
 
 //---------------------------------------------------------------------
 class Region
