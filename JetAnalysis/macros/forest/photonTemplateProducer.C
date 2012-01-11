@@ -49,21 +49,12 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 
    TH1D* rawSpectra[5];
    TH1D* finSpectra[5];
+   TH1D* hPurity[5];
+   
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
       rawSpectra[icent] = new TH1D(Form("rawSpec_icent%d_%s",icent,getIsoLabel(isoChoice).Data()),"",nPtBin,ptBin);
+      hPurity[icent]    = new TH1D(Form("purity_icent%d_%s",icent,getIsoLabel(isoChoice).Data()),"",nPtBin,ptBin);
    }
-   
-   
-   
-   TH1D* hPurity = new TH1D(Form("hPurity_%s",getIsoLabel(isoChoice).Data()),";Cent Bin;purity",3,0.5,3.5);
-   TH1D* hNsig   = (TH1D*)hPurity->Clone(Form("hNsig_%s",getIsoLabel(isoChoice).Data()));
-   hNsig->SetYTitle("number of signals");
-   TH1D* hEff   = (TH1D*)hPurity->Clone(Form("hEff_%s",getIsoLabel(isoChoice).Data()));
-   hEff->SetYTitle("Calo Iso Efficiency");
-   
-   TH1D* hN   = (TH1D*)hPurity->Clone(Form("hN_%s",getIsoLabel(isoChoice).Data()));
-   hN->SetYTitle("Efficiency corrected photon counts");
-   hN->Sumw2();
 
    
    for (int ipt = 1; ipt <= nPtBin ; ipt++) { 
@@ -112,10 +103,9 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 	    drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
 	 drawText(Form("#pm %.0f%% (stat)", float( 100. * fitr.purity010 * (float)fitr.nSigErr / (float)fitr.nSig ) ),0.6680963,0.2869118,1,15);
 	 
-	 hPurity->SetBinContent(icent, fitr.purity010);
-	 hPurity->SetBinError  (icent, fitr.purity010* fitr.nSigErr/fitr.nSig);
-	 //	 hNsig->SetBinContent(icent, fitr.nSig);
-	 //	 hNsig->SetBinError  (icent, fitr.nSigErr);
+	 hPurity[icent]->SetBinContent(ipt, fitr.purity010);
+	 hPurity[icent]->SetBinError(ipt, fitr.purity010* fitr.nSigErr/fitr.nSig);
+	 
 	 rawSpectra[icent]->SetBinContent( ipt, fitr.nSig);
 	 rawSpectra[icent]->SetBinError(   ipt,fitr.nSigErr);
 
@@ -140,8 +130,6 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    TCanvas* c2  = new TCanvas("c2","",700,700); //100 + nCent_std*300,400);
    makeMultiPanelCanvas(c2,nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
    
-   //   const int nPtBin = 3;
-   //   double ptBin[nPtBin+1] = {60,80,110,200};
    TH1D* heff[7][5];
    TH1D* effSingleBin = new TH1D("effSingleBin","",1,60,100000);
    TGraphAsymmErrors* geff[7][5];
@@ -174,10 +162,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
       getEff(heff[icent][4],geff[icent][4],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1 && sigmaIetaIeta<0.010"&& srIsoCut);
       effSingleBin->Reset();
       getEff(effSingleBin, gSingleBin, centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && srIsoCut);
-      hEff->SetBinContent(icent, effSingleBin->GetBinContent(1));
-      hEff->SetBinError(icent,0.05);
-      // for (int ipt = 1 ; ipt<=nPtBin ; ipt++) 
-	 //	 heff[icent][3]->SetBinError(ipt,0);
+      
    }
    
    for (int icent = 1; icent <=nCent_std; icent++) {
@@ -224,24 +209,34 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    //  c2[ipt]->SaveAs(Form("photonID_efficiency_%s.gif",getIsoLabel(isoChoice).Data()));
 
    c2->SaveAs(Form("photonID_efficiency_%s.pdf",getIsoLabel(isoChoice).Data()));  
-   TCanvas* c3 = new TCanvas("cPurity","",1000,500);
-   c3->Divide(2,1);
-   c3->Draw();
-   c3->cd(1);
-   handsomeTH1(hPurity);
-   hPurity->SetAxisRange(0,1.1,"Y");
-   hPurity->Draw();
-   handsomeTH1(hEff,2);
-   hEff->Draw("same");
+   TCanvas* c3 = new TCanvas("cPurity","",500,500);
 
-   c3->cd(2);
-   hN->Reset();
-   hN->Add(hNsig);
-   hN->Divide(hEff);
-   hN->Draw();
+   TH1D* tempPurity = (TH1D*)hPurity[1]->Clone("tempPurity");
+   tempPurity->Reset();
+   handsomeTH1(tempPurity,1);
+   tempPurity->SetXTitle("pT (Gev)");
+   tempPurity->SetYTitle("Purity");
+   tempPurity->SetAxisRange(0,1,"Y");
+   tempPurity->Draw();
+   for (int icent = 1; icent <=nCent_std; icent++) {
+     handsomeTH1(hPurity[icent],color[icent]);
+     hPurity[icent]->Draw("same");
+   }
+   TLegend* legPurity =  new TLegend(0.2580645,0.1881356,0.7923387,0.4148305,NULL,"brNDC");
+   easyLeg(legPurity,"Purity");
+   if (isoChoice == kSumIso)  easyLeg(legPurity,"SumIso Method");
+   if (isoChoice == kFisher)  easyLeg(legPurity,"Fisher Method");
+   for (int icent = 1; icent <=nCent_std; icent++){
+     int lowerCent = centBin_std[icent-1];     int upperCent = centBin_std[icent]-1;
+     legPurity->AddEntry(hPurity[icent],Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),"pl");
+   }
+   legPurity->Draw();
+
+
    
+   c3->SaveAs("purity.gif");  
    
-   TCanvas* c4 = new TCanvas("efficienycCorrection","",1000,500);
+   TCanvas* c4 = new TCanvas("efficiencyCorrection","",1000,500);
    c4->Divide(2,1);
    c4->cd(1);
    for (int icent = 1; icent <=nCent_std; icent++) {
@@ -342,14 +337,12 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 
    c3->SaveAs(Form("crossSection_%s.gif",getIsoLabel(isoChoice).Data()));
    TFile outf = TFile("photonPurityCollection.root","update");
-   hN->Write();
-   hEff->Write();
    for ( int icent=1 ; icent<=nCent_std ; icent++) {
       heff[icent][3]->Write();
    }
-   hPurity->Write();
    for ( int icent =1 ; icent<=nCent_std ; icent++) {
-      finSpectra[icent]->Write();
+     finSpectra[icent]->Write();
+     hPurity[icent]->Write();
    }
    outf.Close();
 
@@ -390,6 +383,16 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    
    TCut evtSelCut = "tgj.anaEvtSel";
    TCut centCut     = Form("yEvt.hiBin >= %d && yEvt.hiBin<= %d",lowCent,highCent);
+   /*TCut centCut;
+   if ( lowCent ==0)
+     centCut = " c4-cc4 > 10";
+   if ( lowCent ==4)
+     centCut = " (c4-cc4) < 10 && (c4-cc4) >4 ";
+   if ( lowCent ==12)
+     centCut = " (c4-cc4) < 4 && (c4-cc4) >2 ";
+   if ( lowCent ==20)
+     centCut = " (c4-cc4) < 2";
+   */
    TCut photonJetCut  = "tgj.photonEt>50  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
