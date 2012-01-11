@@ -8,14 +8,9 @@
 class EvtSel {
 public:
    int run,evt,nOccur,cBin;
-   int nG;
-   int nJ;
-   int nT;
-   bool trig;
-   bool offlSel;
-   bool noiseFilt;
-   bool anaEvtSel;
-   float vz,weight;
+   int nG,nJ,nT;
+   bool trig,offlSel,noiseFilt,anaEvtSel;
+   float vz,weight,npart,ncoll,sampleWeight;
 };
 
 static const int MAXTRK = 10000;
@@ -26,21 +21,24 @@ public:
    photonEt(-99),photonEta(0),photonPhi(0),
    jetEt(-99),jetEta(0),jetPhi(0),
    deta(-99),dphi(-99), Aj(-99),
-   sigmaIetaIeta(-99)
+   sigmaIetaIeta(-99),
+   isEle(false),
+   nTrk(0)
    {}
-   float photonEt,photonRawEt;
-   float photonEta;
-   float photonPhi;
-   float jetEt;
-   float jetEta;
-   float jetPhi;
-   float deta;
-   float dphi;
-   float Aj;
+   float photonEt,photonRawEt,photonEta,photonPhi;
+   float jetEt,jetEta,jetPhi;
+   float deta,dphi,Aj;
    float hovere,sigmaIetaIeta,sumIsol;
+   float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
+   float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
+   float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
+   float refPhoPt,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   bool isEle;
+   int nTrk;
 };
 
-void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, float * npart, float * m, float threshold1, int dataType)
+
+void GetNPartBins(TString infname, const int nBin, float * npart, const float * m, float threshold1, int dataType)
 {
    float npartValue[40];
    npartValue[0] = 393.633;
@@ -86,7 +84,13 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, float * npa
    
    TH1D *hStat = new TH1D("hStat","",nBin,m);
    TH1D *hNpartSum = new TH1D("hNpartSum","",nBin,m);
-   
+
+   TFile *inf = TFile::Open(infname);
+   TTree *nt =(TTree*)inf->FindObjectAny("tgj");
+   EvtSel evt;
+   GammaJet gj;
+   nt->SetBranchAddress("evt",&evt.run);
+   nt->SetBranchAddress("jet",&gj.photonEt);
    for (int i=0;i<nt->GetEntries();i++)
    {
       nt->GetEntry(i);
@@ -114,5 +118,8 @@ void GetNPartBins(TTree * nt, EvtSel & evt, GammaJet & gj, int nBin, float * npa
       cout <<hNpartSum->GetBinContent(i+1)<<endl;
       npart[i]=hNpartSum->GetBinContent(i+1);
    }
+   
+   //done
+   inf->Close();
 }
 #endif

@@ -79,8 +79,19 @@ TGraphAsymmErrors * getRBSignal(
                                 bool drawCheck=false
 )
 {
+   // Get npart
+   //const int nBin = 5;
+   //float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
+   //float m[nBin+1] = {0,4,8,12,20,40};
+   const int nBin = 4;
+   float m[nBin+1] = {0,4,12,20,40};
+   float npart[nBin];// = {2,358.623,232.909,97.9521};
+   GetNPartBins(infname, nBin, npart, m, threshold1,dataType);
+   cout << "got npart" << endl;
+
+   // Analysis gamma-jet
    // open the data file
-   TFile *inf = new TFile(infname.Data());
+   TFile *inf = TFile::Open(infname);
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
    cout << "# " << endl;
    cout << "# " << inf->GetName() << " dataType: " << dataType << endl;
@@ -89,25 +100,6 @@ TGraphAsymmErrors * getRBSignal(
    TString name=Form("photon%.0fdata%d",threshold1,dataType);
    if (dataType==0) subSShapeSide = false; // no photon subtraction for mc sig
 
-   // Get npart
-   //const int nBin = 5;
-   //float m[nBin+1] = {-0.5,3.5,7.5,11.5,19.5,40.5};
-   //float m[nBin+1] = {0,4,8,12,20,40};
-   const int nBin = 4;
-   float m[nBin+1] = {0,4,12,20,40};
-   //const int nBin = 6;
-   //float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,40.5};
-   //   const int nBin = 7;
-   //   float m[nBin+1] = {-1.5,-0.5,3.5,7.5,11.5,19.5,31.5,40.5};
-   float npart[nBin];// = {2,358.623,232.909,97.9521};
-   EvtSel evt;
-   GammaJet gj;
-   nt->SetBranchAddress("evt",&evt.run);
-   nt->SetBranchAddress("jet",&gj.photonEt);
-   GetNPartBins(nt, evt, gj, nBin, npart, m, threshold1,dataType);
-   cout << "got npart" << endl;
-
-   // Analysis gamma-jet
    // Setup cuts
    TCut cut1=Form("photonEt>%.3f",threshold1)&&mycut;
    cout <<cut1<<endl;
@@ -199,11 +191,11 @@ void plotDeltaEvNpartSubtracted(
                       int isolScheme=2,
                       int subDPhiSide=1,
                       int subSShapeSide=1,
-                      TString outdir = "./fig/01.09v19UpdatedPurityForAN"
+                      TString outdir = "./fig/01.11v19"
                       )
 {
    TH1::SetDefaultSumw2();
-   int drawCheck = 0;
+   int drawCheck = 1;
 
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
@@ -231,6 +223,7 @@ void plotDeltaEvNpartSubtracted(
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
+   return;
    
    cout << "     pp" << endl;
    TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
