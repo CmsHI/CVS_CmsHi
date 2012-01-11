@@ -159,6 +159,7 @@ public:
       nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
       // number of events in signal region
       nSigAll = t->GetEntries(rSigAll.cut);
+      cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << nSigAll << " ** " << endl;
       area=1.;
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
