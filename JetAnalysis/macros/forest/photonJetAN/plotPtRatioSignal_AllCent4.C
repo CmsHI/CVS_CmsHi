@@ -158,7 +158,7 @@ void plotPtRatioSignal_AllCent4(
    hFrame->SetAxisRange(0.001,1.999,"X");
    hFrame->SetAxisRange(-0.05,0.45,"Y");
    hFrame->SetStats(0);
-   hFrame->SetXTitle("x_{GJ} = p_{T}^{J}/p_{T}^{#gamma}");
+   hFrame->SetXTitle("x_{JG} = p_{T}^{J}/p_{T}^{#gamma}");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/dx");
    if (normMode==1) hFrame->SetYTitle("Event Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);

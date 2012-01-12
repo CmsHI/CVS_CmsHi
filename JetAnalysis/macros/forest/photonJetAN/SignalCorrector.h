@@ -181,12 +181,12 @@ public:
    void Normalize(int normMode=1) { // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
       float area=1;
       if (normMode==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
-      cout << "Norlamize to: " << area << endl;
       rSigAll.Normalize(area);
       rBkgDPhi.Normalize(area*fracDPhiBkg);
       rBkgSShape.Normalize(area*fracPhotonBkg);
       rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
       rSubtracted.Normalize(area);
+      cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
    }
    
    TTree * t;
