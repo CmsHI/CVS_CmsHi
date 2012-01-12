@@ -66,7 +66,8 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       anaAgj.MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",minJet),20,0.0001,3.1415926);
    }
 
-   anaAgj.Extrapolate(2.0944);
+   anaAgj.Extrapolate(0.7,true);
+   anaAgj.ExtrapolateDPhiHist(0.7);
    anaAgj.SubtractBkg();
    anaAgj.Normalize(normMode);
 
@@ -100,9 +101,14 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
    // check subtraction
    if (doCheck) {
       if (anaAgj.subDPhiSide) {
-         anaAgj.rBkgDPhi.hExtrapNorm->SetMarkerStyle(kOpenCircle);
+         anaAgj.rBkgDPhi.hExtrapNorm->SetMarkerStyle(0);
          anaAgj.rBkgDPhi.hExtrapNorm->SetMarkerColor(kGreen+2);
-         anaAgj.rBkgDPhi.hExtrapNorm->Draw("sameE");
+         anaAgj.rBkgDPhi.hExtrapNorm->SetLineColor(kGreen+2);
+         anaAgj.rBkgDPhi.hExtrapNorm->Draw("samehist");
+         if (normMode==0&&anaAgj.rBkgDPhi.hExtrap->GetFunction("p0")) {
+            anaAgj.rBkgDPhi.hExtrap->GetFunction("p0")->SetLineWidth(1);
+            anaAgj.rBkgDPhi.hExtrap->GetFunction("p0")->Draw("same");
+         }
       }
       if (anaAgj.subSShapeSide) {
          anaAgj.rBkgSShape.hExtrapNorm->SetMarkerStyle(kOpenCircle);
@@ -157,7 +163,8 @@ void plotDeltaPhiSignal_AllCent4(
    TH1D * hFrame = new TH1D("hFrame","",20,0.0001,3.1415926);
    hFrame->SetAxisRange(0.0001,3.1415926,"X");
    //hFrame->SetAxisRange(1e-3,1,"Y");
-   hFrame->SetAxisRange(-0.2,1,"Y");
+   if (normMode>0) hFrame->SetAxisRange(-0.2,1,"Y");
+   else hFrame->SetAxisRange(-100,500,"Y");
    hFrame->SetStats(0);
    hFrame->SetXTitle("|#Delta#phi|");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/d|#Delta#phi|");
@@ -182,6 +189,7 @@ void plotDeltaPhiSignal_AllCent4(
    TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,0.0001,3.1415926);
    hFrameDataBkg1->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg1->SetMarkerColor(kGreen+2);
+   hFrameDataBkg1->SetLineColor(kGreen+2);
    TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,0.0001,3.1415926);
    hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg2->SetMarkerColor(kViolet);
@@ -226,7 +234,7 @@ void plotDeltaPhiSignal_AllCent4(
    t3->AddEntry(hFrameData,"PbPb","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
-   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","l");
    if (subSShapeSide&&drawCheck) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
    t3->SetFillColor(0);

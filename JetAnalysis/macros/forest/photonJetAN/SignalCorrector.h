@@ -129,7 +129,7 @@ public:
       cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << rSigAll.n << " ** " << endl;
    }
    
-   void Extrapolate(float dphiSigCut=2.0944) {
+   void Extrapolate(float dphiSigCut=2.0944, bool doDPhiExtend=false) {
       // Scales
       float dphisidescale = (3.14159-dphiSigCut)/(3.14159/2.-0.7);
       float sssidescale = 0,ssdphisidescale=0;
@@ -142,9 +142,14 @@ public:
       cout << " Bkg scale ssdphi: " << ssdphisidescale << endl;
 
       rSigAll.Extrapolate(1.);
-      rBkgDPhi.Extrapolate(dphisidescale);
       rBkgSShape.Extrapolate(sssidescale);
-      rBkgSShapeDPhi.Extrapolate(ssdphisidescale);
+      if (!doDPhiExtend) {
+         rBkgDPhi.Extrapolate(dphisidescale);
+         rBkgSShapeDPhi.Extrapolate(ssdphisidescale);
+      } else {
+         rBkgDPhi.Extrapolate(1.);
+         rBkgSShapeDPhi.Extrapolate(1.);
+      }
 
       // Fractions
       if (rSigAll.n>0) {
@@ -153,6 +158,25 @@ public:
       }
    }
 
+   // special case for dphi
+   void ExtrapolateDPhiHist(float dphiSigCut=0.7) {
+      TF1 *p0 = new TF1("p0","pol0",dphiSigCut,3.14/2);
+      if (subDPhiSide&&rBkgDPhi.n>=10) {
+         rBkgDPhi.hExtrap->Fit("p0","0");
+         for (int i=rBkgDPhi.hExtrap->FindBin(dphiSigCut); i<=rBkgDPhi.hExtrap->GetNbinsX(); ++i) {
+            rBkgDPhi.hExtrap->SetBinContent(i,p0->GetParameter(0));
+            rBkgDPhi.hExtrap->SetBinError(i,p0->GetParError(0));
+         }
+      }
+      if (subSShapeSideDPhiSide&&rBkgSShapeDPhi.n>=10) {
+         rBkgSShapeDPhi.hExtrap->Fit("p0","0");
+         for (int i=rBkgSShapeDPhi.hExtrap->FindBin(dphiSigCut); i<=rBkgSShapeDPhi.hExtrap->GetNbinsX(); ++i) {
+            rBkgSShapeDPhi.hExtrap->SetBinContent(i,p0->GetParameter(0));
+            rBkgSShapeDPhi.hExtrap->SetBinError(i,p0->GetParError(0));
+         }
+      }
+   }
+   
    void SubtractBkg() {
       rSubtracted.hExtrap = (TH1D*)rSigAll.h->Clone(rSubtracted.name+"Extrap");
       rSubtracted.nExtrap = rSigAll.nExtrap;
@@ -179,14 +203,22 @@ public:
    }
    
    void Normalize(int normMode=1) { // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
-      float area=1;
-      if (normMode==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
-      rSigAll.Normalize(area);
-      rBkgDPhi.Normalize(area*fracDPhiBkg);
-      rBkgSShape.Normalize(area*fracPhotonBkg);
-      rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
-      rSubtracted.Normalize(area);
-      cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
+      if (normMode==0) {
+         rSigAll.hExtrapNorm = (TH1D*)rSigAll.hExtrap->Clone(Form("%sExtrapNorm",rSigAll.hExtrap->GetName()));
+         rBkgDPhi.hExtrapNorm = (TH1D*)rBkgDPhi.hExtrap->Clone(Form("%sExtrapNorm",rBkgDPhi.hExtrap->GetName()));
+         rBkgSShape.hExtrapNorm = (TH1D*)rBkgSShape.hExtrap->Clone(Form("%sExtrapNorm",rBkgSShape.hExtrap->GetName()));
+         rBkgSShapeDPhi.hExtrapNorm = (TH1D*)rBkgSShapeDPhi.hExtrap->Clone(Form("%sExtrapNorm",rBkgSShapeDPhi.hExtrap->GetName()));
+         rSubtracted.hExtrapNorm = (TH1D*)rSubtracted.hExtrap->Clone(Form("%sExtrapNorm",rSubtracted.hExtrap->GetName()));
+      } else {
+         float area=1;
+         if (normMode==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
+         rSigAll.Normalize(area);
+         rBkgDPhi.Normalize(area*fracDPhiBkg);
+         rBkgSShape.Normalize(area*fracPhotonBkg);
+         rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
+         rSubtracted.Normalize(area);
+         cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
+      }
    }
    
    TTree * t;
