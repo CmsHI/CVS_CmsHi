@@ -200,7 +200,7 @@ void plotPtRatioSignal_AllCent4(
    c1->cd(1);
    hFrame->DrawClone();
    //plotBalance(2,-1,"../output-hypho50gen_v4.root",true,false,0,"samehist",false);
-   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide,minPhoton,minJet,0);
+   plotBalance(4,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(4,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v7_v19.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    //plotBalance(2,"sampleWeight>0.5",isolScheme,"../output-hypho50q_v15_frac62.root","weight",true,1,"sameE",1);
    drawText("50-100%",0.8,0.25);
@@ -220,7 +220,7 @@ void plotPtRatioSignal_AllCent4(
    
    c1->cd(2);
    hFrameNoY->DrawClone();
-   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide,minPhoton,minJet,0);
+   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(3,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v7_v19.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    drawText("30-50%",0.8,0.25);
    drawText("(b)",0.05,0.885);
@@ -241,14 +241,14 @@ void plotPtRatioSignal_AllCent4(
 
    c1->cd(3);
    hFrame->DrawClone();
-   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide,minPhoton,minJet,0);
+   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v7_v19.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    drawText("10-30%",0.8,0.4);
    drawText("(c)",0.25,0.885);
 
    TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
-   t4->AddEntry(hFrameData,"p_{T}^{#gamma} > 60 GeV/c","");
-   t4->AddEntry(hFrameData,"p_{T}^{jet} > 30 GeV/c","");
+   t4->AddEntry(hFrameData,Form("p_{T}^{#gamma} > %.0f GeV/c",minPhoton),"");
+   t4->AddEntry(hFrameData,Form("p_{T}^{jet} > %.0f GeV/c",minJet),"");
    t4->AddEntry(hFrameData,"#Delta#phi_{12} > #frac{2}{3}#pi","");
    t4->SetFillColor(0);
    t4->SetBorderSize(0);
@@ -259,7 +259,7 @@ void plotPtRatioSignal_AllCent4(
 
    c1->cd(4);
    hFrameNoY->DrawClone();
-   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,subSShapeSide,minPhoton,minJet,0);
+   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v7_v19.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
