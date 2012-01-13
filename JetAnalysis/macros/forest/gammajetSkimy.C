@@ -8,6 +8,7 @@
 #include <string>
 #include <TMath.h>
 #include "hiForest.h"
+#include "commonUtility.h"
 using namespace std;
 
 #define PI 3.141592653589
@@ -23,12 +24,12 @@ public:
    int nG;
    int nJ;
    int nT;
-   int ncoll;
    bool trig;
    bool offlSel;
    bool noiseFilt;
    bool anaEvtSel;
    float vz;
+   float reweight;
    
 };
 
@@ -90,11 +91,14 @@ public:
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root") {
-   
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 50) {
+
+   // Data weighting funcition                                                                                                
+   TFile* reweightF = new TFile("centBinDataV3.root");
+   TH1D* dWeight = (TH1D*)reweightF->Get("dataCentBin");
+      
    float cutphotonEta =1.44;
-   float cutphotonPt  = 50;
-   
+     
    double cutjetPt = 20;
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;
@@ -158,6 +162,16 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    newtree->Branch("leading",isLeading,"leading[nPhotons]/I");
    
 
+   // For centrality reweighting
+   TH1D* oWeight = new TH1D("oWeight","",40,-.5,39.5);
+   c->evtTree->Draw("hiBin>>oWeight");
+   TCanvas* c1212 = new TCanvas("c1212","",500,500);
+   oWeight->Draw();
+   TCanvas* c1212a = new TCanvas("c12a12","",500,500);
+
+   TH1D* rWeight = (TH1D*)dWeight->Clone("rWeight");
+   rWeight->Divide(oWeight);
+   scaleInt(rWeight);
 
    // Output file                                                                                                                            
    TTree * tgj = new TTree("tgj","gamma jet tree");
@@ -165,7 +179,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    GammaJet gj;
    Isolation isol;
    EvtSel evt;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:ncoll:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F");
+   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:reweight/F");
    tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
@@ -176,8 +190,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
     
    int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
-     for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //   for (Long64_t jentry=0; jentry<5000;jentry++) {
+   for (Long64_t jentry=0; jentry<nentries;jentry++) {
+      // for (Long64_t jentry=0; jentry<5000;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
 
       c->GetEntry(jentry);
@@ -188,6 +202,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
+      evt.reweight = rWeight->GetBinContent(c->evt.hiBin);
       evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
@@ -225,8 +240,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
          }
       }
       
-      if ( gj.photonEt < cutphotonPt )    // high pt photon cut 
-	 continue;
+      //   if ( gj.photonEt < cutphotonPt )    // high pt photon cut 
+      // continue;
 
       
       // give the leading bit to the photon candidates 
@@ -234,7 +249,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	 if ( j==leadingIndex)       isLeading[j] = 1; 
 	 else                        isLeading[j] = 0;
       }
-            
+      
       if (leadingIndex!=-1) {
          // set leading photon                                                                                                               
 	 gj.photonRawEt=c->photon.pt[leadingIndex];
