@@ -12,6 +12,7 @@
 #include "SetupEvtTree.h"
 #include "SetupMetTree.h"
 #include "SetupGenpTree.h"
+#include "SetupPFTree.h"
 #include "TrackingCorrections.h"
 
 #include <TTree.h>
