@@ -4,9 +4,10 @@
 
 void mergeForest(){
 
-   const char* fname = "HiForest_*.root";
+   const char* fname = "/mnt/hadoop/cms/store/user/jazzitup/mix/Hydjet1.8/fragPho80/forest/*.root";
+   TString outfname="/net/hidsk0001/d00/scratch/frankma/tmp/hy18fragpho80.root";
 
-   string dir[16] = {
+   string dir[17] = {
       "hltanalysis",
       "skimanalysis",
       "icPu5JetAnalyzer",
@@ -22,10 +23,11 @@ void mergeForest(){
       "rechitanalyzer",
       "rechitanalyzer",
       "hiEvtAnalyzer",
-      "hcalNoise"
+      "hcalNoise",
+      "genpana"
    };
 
-   string trees[16] = {
+   string trees[17] = {
       "HltTree",
       "HltTree",
       "t",
@@ -41,13 +43,14 @@ void mergeForest(){
       "hf",
       "tower",
       "HiTree",
-      "hcalNoise"
+      "hcalNoise",
+      "photon"
    };
 
 
-   TChain* ch[16];
+   TChain* ch[17];
 
-   int N = 16;
+   int N = 17;
 
    for(int i = 0; i < N; ++i){
       ch[i] = new TChain(string(dir[i]+"/"+trees[i]).data());
@@ -55,7 +58,7 @@ void mergeForest(){
    }
    
 
-   TFile* file = new TFile("newfile.root", "RECREATE");
+   TFile* file = new TFile(outfname, "RECREATE");
 
    for(int i = 0; i < N; ++i){
       file->cd();
