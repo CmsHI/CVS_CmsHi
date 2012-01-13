@@ -41,10 +41,13 @@ void checkRBSignal_subprof(
    
    TCanvas * c0 = new TCanvas("c0","",500,500);
    TString drawvar=Form("jetEt/photonEt:cBin");
-   TString selSigAll="(fisherIsol>0.2&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
-   TString selBkgDPhi="(fisherIsol>0.2&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7&&acos(cos(photonPhi-jetPhi))<3.14159/2)";
-   TString selBkgSS="(fisherIsol>0.2&&sigmaIetaIeta>0.011&& sigmaIetaIeta<0.017 &&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
-
+   TString selSigAll="(fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+   TString selBkgDPhi="(fisherIsol>0.3&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7&&acos(cos(photonPhi-jetPhi))<3.14159/2)";
+   TString selBkgSS="(fisherIsol>0.3&&sigmaIetaIeta>0.011&& sigmaIetaIeta<0.017 &&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+//   TString selSigAll="(sumIsol/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+//   TString selBkgDPhi="(sumIsol/0.9<1&&sigmaIetaIeta<0.01&&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7&&acos(cos(photonPhi-jetPhi))<3.14159/2)";
+//   TString selBkgSS="(sumIsol/0.9<1&&sigmaIetaIeta>0.011&& sigmaIetaIeta<0.017 &&photonEt>60.0&&jetEt>30&&acos(cos(photonPhi-jetPhi))>3.14159*2./3)";
+   
    cout << selSigAll << " " << drawvar << endl;
    float nSigAll = tgjdata->Project("hSigAll",drawvar,TCut("(anaEvtSel)&&"+selSigAll),"colz");
    cout << "nSigAll: " << nSigAll << endl;
@@ -89,7 +92,7 @@ void checkRBSignal_subprof(
    hBkgDPhiScaled->Scale(1.20257);
 
    TH2D * hBkgSSScaled = (TH2D*)hBkgSS->Clone(Form("%sScaled",hBkgSS->GetName()));
-   hBkgSSScaled->Scale(1.2);
+   hBkgSSScaled->Scale(0.91);
    
    // Subtract
    TH2D * hSubDPhi = (TH2D*)hSigAll->Clone("hSubDPhi");
@@ -136,7 +139,7 @@ void checkRBSignal_subprof(
    hBkgSS_pfx->SetMarkerColor(kMagenta);
    hBkgSS_pfx->SetLineColor(kMagenta);
    hBkgSS_pfx->SetMarkerStyle(kOpenCircle);
-   hSigAll_pfx->SetAxisRange(0.5,1.1,"Y");
+   hSigAll_pfx->SetAxisRange(0.45,1.12,"Y");
    hSigAll_pfx->Draw();
    hBkgDPhi_pfx->Draw("sameE");
    hBkgSS_pfx->Draw("sameE");
@@ -154,7 +157,7 @@ void checkRBSignal_subprof(
    hSubAll_pfx->SetMarkerColor(kRed);
    hSubAll_pfx->SetLineColor(kRed);
 
-   hSigAll_pfx->SetAxisRange(0.5,1.1,"Y");
+   hSigAll_pfx->SetAxisRange(0.45,1.2,"Y");
    hSigAll_pfx->Draw();
    hSubDPhi_pfx->Draw("sameE");
    hSubSS_pfx->Draw("sameE");
