@@ -37,7 +37,7 @@ public:
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
    float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
-   float refPhoPt,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -163,7 +163,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v20.root",
+                      TString outname="output-data-Photon-v7_v21.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -222,7 +222,7 @@ void analyzePhotonJet(
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
    ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
    ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
-   ":refPhoPt:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+   ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
    ":isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
@@ -293,6 +293,8 @@ void analyzePhotonJet(
          gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          isol.Set(c,leadingIndex);
          gj.refPhoPt = c->photon.genMatchedPt[leadingIndex];
+         gj.refPhoEta = c->photon.genMatchedEta[leadingIndex];
+         gj.refPhoPhi = c->photon.genMatchedPhi[leadingIndex];
          gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
          
          // intialize jet variables
