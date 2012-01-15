@@ -37,8 +37,8 @@ TString getIsoLabel ( int isoChoice=0) {
 }
 void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true, float specialSbCut=10) {
    
-
-   TCanvas* c1[5];
+  
+  TCanvas* c1[5];
     
    TH1D* hData[5][5];
    TH1D* hSig[5][5];
@@ -50,6 +50,8 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    TH1D* rawSpectra[5];
    TH1D* finSpectra[5];
    TH1D* hPurity[5];
+   
+   
    
    for ( int icent = 1 ; icent<=nCent_std ; icent++) {
       rawSpectra[icent] = new TH1D(Form("rawSpec_icent%d_%s",icent,getIsoLabel(isoChoice).Data()),"",nPtBin,ptBin);
@@ -222,7 +224,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
      handsomeTH1(hPurity[icent],color[icent]);
      hPurity[icent]->Draw("same");
    }
-   TLegend* legPurity =  new TLegend(0.2580645,0.1881356,0.7923387,0.4148305,NULL,"brNDC");
+   TLegend* legPurity =  new TLegend(0.2580645,0.3381356,0.7923387,0.5648305,NULL,"brNDC");
    easyLeg(legPurity,"Purity");
    if (isoChoice == kSumIso)  easyLeg(legPurity,"SumIso Method");
    if (isoChoice == kFisher)  easyLeg(legPurity,"Fisher Method");
@@ -231,10 +233,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
      legPurity->AddEntry(hPurity[icent],Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),"pl");
    }
    legPurity->Draw();
-
-
    
-   c3->SaveAs("purity.gif");  
+   if ( !onlygjEvents) 
+     drawText("inclusive photon",0.25,0.2);
+   
+   c3->SaveAs(Form("purity_%s.pdf",getIsoLabel(isoChoice).Data()));
    
    TCanvas* c4 = new TCanvas("efficiencyCorrection","",1000,500);
    c4->Divide(2,1);
@@ -401,6 +404,9 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
       generalCutMC = generalCutMC && photonJetCut && dphiCut;
     
    TCut generalCutData = generalCutMC && evtSelCut;
+   if (onlygjEvents)
+     generalCutData = generalCutData && photonJetCut && dphiCut;
+   
 
    TCut srIsoCut = getIsoCut(isoChoice,isoCut);
 
