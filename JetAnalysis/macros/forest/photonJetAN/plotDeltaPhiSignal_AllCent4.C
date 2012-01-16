@@ -168,12 +168,11 @@ void plotDeltaPhiSignal_AllCent4(
                                  float minPhoton=60,
                                  float minJet=30,
                                  int log=1,
-                                 TString outdir = "./fig/01.16qcdPho2"
+                                 int drawCheck = 0,
+                                 TString outdir = "./fig/01.16qcdPho_pp2760"
                                  )
 {
    TH1::SetDefaultSumw2();
-
-   int drawCheck = 1;
 
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
@@ -230,7 +229,8 @@ void plotDeltaPhiSignal_AllCent4(
    //plotBalance(3,"offlSel&&sampleWeight<0.2&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    //plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",false,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(3,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v7_v19.root","1==1",true,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
-   SignalCorrector ppana = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-pp7TeV-test_v21.root","1==1",true,1,"sameE",subDPhiSide,0,minPhoton,minJet,drawCheck);
+   //SignalCorrector ppana = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-pp7TeV-test_v21.root","1==1",true,1,"sameE",subDPhiSide,0,minPhoton,minJet,drawCheck);
+   SignalCorrector ppana = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v18.root","1==1",true,1,"sameE",subDPhiSide,0,minPhoton,minJet,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
    drawText("50-100%",0.25,0.05);
    drawText("(a)",0.25,0.885);
@@ -259,7 +259,8 @@ void plotDeltaPhiSignal_AllCent4(
 
    TLegend *t3=new TLegend(0.03,0.39,0.50,0.65); 
    t3->AddEntry(hFrameData,"PbPb","p");
-   t3->AddEntry(hFrame,"pp 7 TeV","p");
+   t3->AddEntry(hFrame,"pp 2.76 TeV","p");
+   //t3->AddEntry(hFrame,"pp 7 TeV","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(hFrameDataSigAll,"No Subtraction","l");
    if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","l");
@@ -306,6 +307,6 @@ void plotDeltaPhiSignal_AllCent4(
    drawText("0-10%",0.1,0.25);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v19_qcdPho_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v19_qcdPho_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v19_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v19_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 }
