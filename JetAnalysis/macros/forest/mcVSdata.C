@@ -7,17 +7,16 @@ void drawVarAllCent (double lowPt=0, double highPt=0, TH1D* hvar=0, TString var=
 void mcVSdata() { 
   TString var = "";
 
-
-  TH1D* hsee   = new TH1D("hsee",";#sigma_{#eta#eta};Normalized Entries",25,0,0.025);
-  var= "sigmaIetaIeta";        
-  drawVarAllCent(60,10000,hsee, var, "#sigma_{#eta#eta}", "hadronicOverEm<0.1",false,"see",false,1,false);        
-
   /*
-    TH1D* hhoe   = new TH1D("hhoe",";H/E ratio;Normalized Entries",40,0,2);
-    var= "hadronicOverEm";
-    drawVarAllCent(60,10000,hhoe, var, "H/E", "",true,"hadronicOverEm",true,2,false);
+    TH1D* hsee   = new TH1D("hsee",";#sigma_{#eta#eta};Normalized Entries",25,0,0.025);
+    var= "sigmaIetaIeta";        
+    drawVarAllCent(60,10000,hsee, var, "#sigma_{#eta#eta}", "",false,"see",false,1,false);        
   */
   
+  TH1D* hhoe   = new TH1D("hhoe",";H/E ratio;Normalized Entries",50,0,1);
+  var= "hadronicOverEm";
+  drawVarAllCent(60,10000,hhoe, var, "H/E", "",true,"hadronicOverEm",false,2,false);
+    
   
    /*
    TH1D* hpt   = new TH1D("hpt",";E_{T} (GeV);Normalized Entries",10,60,300);
@@ -185,7 +184,10 @@ void drawVariable(int lowCent, int highCent, double lowPt, double highPt, TH1D* 
    TCut photonJetCut  = "tgj.photonEt>60  &&  tgj.jetEt>30";
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.0944";
    TCut lPhotCut= "leading==1";
-   TCut generalCutMC   = photonJetCut && dphiCut && lPhotCut && centCut && addCut;
+   TCut phoPtCut = "pt>60 && abs(eta)<1.44"; 
+   if ( var == "hadronicOverEm" ) 
+     lPhotCut = "leading<1.e9";
+   TCut generalCutMC   = phoPtCut && lPhotCut && centCut && addCut;
    TCut generalCutData = generalCutMC && evtSelCut ;
 
    //   TCut srIsoCut = FisherCut && "sigmaIetaIeta <0.010";
@@ -199,7 +201,7 @@ void drawVariable(int lowCent, int highCent, double lowPt, double highPt, TH1D* 
    TH1D* tempHistMC2 = (TH1D*)hvar->Clone(Form("%s_MC2",hvar->GetName()));
    
    tdata->Draw(Form("%s>>%s",var.Data(),tempHist->GetName()), finalCutData);
-   photon1->Draw2(tempHistMC1, var.Data(), finalCutPho,"ncoll");
+   photon1->Draw2(tempHistMC1, var.Data(), finalCutPho && "isGenMatched" ,"ncoll");
    bkgs1->Draw2  (tempHistMC2, var.Data(), finalCutPho,"ncoll");
    
    tempHist->Sumw2();
