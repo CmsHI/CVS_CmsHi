@@ -86,9 +86,12 @@ public:
 class CentralityReWeight {
 public:
    CentralityReWeight(TString data, TString mc,TCut s) : 
-     datafname(data),mcfname(mc)sel(s) {}
+     datafname(data),mcfname(mc),sel(s) {}
    void Init()
    {
+      cout << "Reweight Centrality: " << endl;
+      cout << "Data file: " << datafname << endl;
+      cout << "MC file:   " << mcfname << endl;
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
       tdata->Add(datafname);
@@ -184,8 +187,8 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=false,
-		      TString cdataname="",
-		      TString cmcname=""
+		      TString mcfname="",
+		      TString datafname="output-data-Photon-v7_v21.root"
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -194,7 +197,7 @@ void analyzePhotonJet(
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
    // Centrality reweiting
-   CentralityReWeight cw(datafname,mcfname"offlSel&&photonEt>60");
+   CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
@@ -215,7 +218,7 @@ void analyzePhotonJet(
    // Output file
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
-   if (doCentReWeight) {
+   if (doCentReWeight&&mcfname!="") {
       cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
    }
    
