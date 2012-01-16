@@ -85,13 +85,14 @@ public:
 
 class CentralityReWeight {
 public:
-   CentralityReWeight(TCut s) : sel(s) {}
+   CentralityReWeight(TString data, TString mc,TCut s) : 
+     datafname(data),mcfname(mc)sel(s) {}
    void Init()
    {
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
-      tdata->Add("output-data-Photon-v6_v18.root");
-      tmc->Add("output-hy18pho50_37k_v18_frac74_rewtit0.root");
+      tdata->Add(datafname);
+      tmc->Add(mcfname);
 
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
@@ -99,7 +100,7 @@ public:
 
       //cout << "data: " << tdata->GetName() << " " << tdata->GetEntries() << endl;
       //cout << "mc: " << tmc->GetName() << " " << tmc->GetEntries() << endl;
-      tdata->Project("hCentData","cBin",sel&&"trig&&noiseFilt");
+      tdata->Project("hCentData","cBin",sel&&"anaEvtSel");
       tmc->Project("hCentMc","cBin",sel);
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
@@ -112,6 +113,7 @@ public:
       }
       return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
    }
+   TString datafname,mcfname;
    TCut sel;
    TH1D * hCentData;
    TH1D * hCentMc;
@@ -181,7 +183,9 @@ void analyzePhotonJet(
                       //double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v4.root",
                       //TString outname="output-data-Photon-v4_v11.root",
-                      bool doCentReWeight=false
+                      bool doCentReWeight=false,
+		      TString cdataname="",
+		      TString cmcname=""
     )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -190,7 +194,7 @@ void analyzePhotonJet(
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
    // Centrality reweiting
-   CentralityReWeight cw("offlSel&&photonEt>50");
+   CentralityReWeight cw(datafname,mcfname"offlSel&&photonEt>60");
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
