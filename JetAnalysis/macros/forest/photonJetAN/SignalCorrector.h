@@ -211,12 +211,18 @@ public:
          rSubtracted.hExtrapNorm = (TH1D*)rSubtracted.hExtrap->Clone(Form("%sExtrapNorm",rSubtracted.hExtrap->GetName()));
       } else {
          float area=1;
-         if (normMode==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
+         if (normMode%10==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
          rSigAll.Normalize(area);
-         rBkgDPhi.Normalize(area*fracDPhiBkg);
-         rBkgSShape.Normalize(area*fracPhotonBkg);
-         rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
          rSubtracted.Normalize(area);
+         if (normMode<10) {
+            rBkgDPhi.Normalize(area*fracDPhiBkg);
+            rBkgSShape.Normalize(area*fracPhotonBkg);
+            rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
+         } else if (normMode>=20) {
+            rBkgDPhi.Normalize(area*fracDPhiBkg);
+            rBkgSShape.Normalize(area);
+            rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
+         }
          cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
       }
    }
