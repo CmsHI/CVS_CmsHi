@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.3 2011/11/02 18:59:50 yjlee Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.4 2011/12/06 11:05:56 yilmaz Exp $
 //
 //
 
@@ -76,7 +76,8 @@ private:
    edm::InputTag VertexTag_;
 
    bool doEvtPlane_;
-  bool doEvtPlaneFlat_;
+   bool doEvtPlaneFlat_;
+   bool doCentrality_;
 
    bool doMC_;
    bool doVertex_;
@@ -134,6 +135,7 @@ EvtPlaneFlatTag_(iConfig.getParameter<edm::InputTag> ("EvtPlaneFlat")),
 HiMCTag_(iConfig.getParameter<edm::InputTag> ("HiMC")),
 VertexTag_(iConfig.getParameter<edm::InputTag> ("Vertex")),
 doEvtPlane_(iConfig.getParameter<bool> ("doEvtPlane")),
+doCentrality_(iConfig.getParameter<bool> ("doCentrality")),
 doEvtPlaneFlat_(iConfig.getParameter<bool> ("doEvtPlaneFlat")),
 doMC_(iConfig.getParameter<bool> ("doMC")),
 doVertex_(iConfig.getParameter<bool>("doVertex"))
@@ -193,38 +195,40 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    
    //iEvent.getByLabel(CentralityBinTag_,binHandle);
    //hiBin = *binHandle;
-   
-   iEvent.getByLabel(CentralityTag_,centrality);
-   if (!centProvider) centProvider = new CentralityProvider(iSetup);
 
-   // make supre you do this first in every event
-   centProvider->newEvent(iEvent,iSetup); 
+   if (doCentrality_) {      
+      iEvent.getByLabel(CentralityTag_,centrality);
+      if (!centProvider) centProvider = new CentralityProvider(iSetup);
+ 
+     // make supre you do this first in every event
+      centProvider->newEvent(iEvent,iSetup); 
 
-   hiBin = centProvider->getBin();
-   hiNpix = centrality->multiplicityPixel();
-   hiNpixelTracks = centrality->NpixelTracks();
-   hiNtracks = centrality->Ntracks();
-   hiNtracksPtCut = centrality->NtracksPtCut();
-   hiNtracksEtaCut = centrality->NtracksEtaCut();
-   hiNtracksEtaPtCut = centrality->NtracksEtaPtCut();
+      hiBin = centProvider->getBin();
+      hiNpix = centrality->multiplicityPixel();
+      hiNpixelTracks = centrality->NpixelTracks();
+      hiNtracks = centrality->Ntracks();
+      hiNtracksPtCut = centrality->NtracksPtCut();
+      hiNtracksEtaCut = centrality->NtracksEtaCut();
+      hiNtracksEtaPtCut = centrality->NtracksEtaPtCut();
    
-   hiHF = centrality->EtHFtowerSum();
-   hiHFplus = centrality->EtHFtowerSumPlus();
-   hiHFminus = centrality->EtHFtowerSumMinus();
-   hiHFhit = centrality->EtHFhitSum();
-   hiHFhitPlus = centrality->EtHFhitSumPlus();
-   hiHFhitMinus = centrality->EtHFhitSumMinus();
+      hiHF = centrality->EtHFtowerSum();
+      hiHFplus = centrality->EtHFtowerSumPlus();
+      hiHFminus = centrality->EtHFtowerSumMinus();
+      hiHFhit = centrality->EtHFhitSum();
+      hiHFhitPlus = centrality->EtHFhitSumPlus();
+      hiHFhitMinus = centrality->EtHFhitSumMinus();
    
-   hiZDC = centrality->zdcSum();
-   hiZDCplus = centrality->zdcSumPlus();
-   hiZDCminus = centrality->zdcSumMinus();
+      hiZDC = centrality->zdcSum();
+      hiZDCplus = centrality->zdcSumPlus();
+      hiZDCminus = centrality->zdcSumMinus();
    
-   hiEEplus = centrality->EtEESumPlus();
-   hiEEminus = centrality->EtEESumMinus();
-   hiEE = centrality->EtEESum();
-   hiEB = centrality->EtEBSum();
-   hiET = centrality->EtMidRapiditySum();
-
+      hiEEplus = centrality->EtEESumPlus();
+      hiEEminus = centrality->EtEESumMinus();
+      hiEE = centrality->EtEESum();
+      hiEB = centrality->EtEBSum();
+      hiET = centrality->EtMidRapiditySum();
+   }
+  
    nEvtPlanes = 0;   
    if (doEvtPlane_) {
       iEvent.getByLabel(EvtPlaneTag_,evtPlanes);
