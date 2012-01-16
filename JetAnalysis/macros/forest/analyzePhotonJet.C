@@ -236,7 +236,7 @@ void analyzePhotonJet(
    for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
-      pfTree->GetEntry(i);
+      if (pfTree) pfTree->GetEntry(i);
       // check if event is duplicate
       evt.nOccur = dupEvt.occurrence[i];
       // Event Info
