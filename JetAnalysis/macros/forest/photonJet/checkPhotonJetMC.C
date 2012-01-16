@@ -13,12 +13,19 @@ using namespace std;
 
 void checkPhotonJetMC(){
    TH1::SetDefaultSumw2();
-   TFile * inf = TFile::Open("../output-hy18pho50_37k_v18_frac74.root");
+   TFile * inf = TFile::Open("../output-hy18fragpho80_v21_frac10.root");
    TTree * tgj = (TTree*)inf->Get("tgj");
-   //tgj->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
-   //TCut isolCut = "fisherIsol>0.2";
-   TCut isolCut = "(cc4+cr4+ct4PtCut20)/0.9<1";
-   TCut sel = "offlSel&&cBin<12&&photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
+   TCut isolCut = "fisherIsol>0.3";
+   //TCut isolCut = "(cc4+cr4+ct4PtCut20)/0.9<1";
+   TCut sel = "offlSel&&photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
+   cout << "photon Sel: " << sel << " " << tgj->GetEntries(sel) << endl;
+   cout << "photonJet Sel: " << TString(sel&&"jetEt>30&&abs(dphi)>2.0944") << " " << tgj->GetEntries(sel&&"jetEt>30&&abs(dphi)>2.0944") << endl;
+   
+   // Centrality bin cuts
+   const int nBin = 4;
+   float m[nBin+1] = {0,4,12,20,40};
+   vector<TCut> vcutCent;
+   for (int ib=0; ib<nBin; ++ib) vcutCent.push_back(Form("cBin>=%.1f&&cBin<%.1f",m[ib],m[ib+1]));
    
    TCanvas * c2 = new TCanvas("c2","",500,500);
    //tgj.Draw("isEle",sel,"")
@@ -32,36 +39,70 @@ void checkPhotonJetMC(){
    hPhoScale->SetAxisRange(0,1.5,"Y");
    hPhoScale->Draw();
    
-   TCanvas * c3 = new TCanvas("c3","",500,500);
-   TH1D * hRecPtRat = new TH1D("hRecPtRat","",20,0,2);
-   TH1D * hGenPtRat = new TH1D("hGenPtRat","",20,0,2);
-   TH1D * hPartonPtRat = new TH1D("hPartonPtRat","",20,0,2);
-   TH1D * hTreePtRat = new TH1D("hTreePtRat","",20,0,2);
-   tgj->Draw("jetEt/photonEt>>hRecPtRat",sel&&"jetEt>30&&abs(dphi)>2.0944","E");
-   tgj->Draw("refJetEt/photonEt>>hGenPtRat",sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
-   tgj->Draw("refPartonPt/photonEt>>hPartonPtRat",sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
-   tgj->Draw("refPartonPt/refPhoPt>>hTreePtRat",sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
-   hRecPtRat->SetTitle(";jet p_{T} / photon p_{T};");
-   hRecPtRat->SetAxisRange(0,1000,"Y");
-   hGenPtRat->SetLineColor(kRed);
-   hPartonPtRat->SetLineColor(kBlue);
-   hTreePtRat->SetLineColor(kBlue);
-   hTreePtRat->SetLineStyle(2);
-   hRecPtRat->Draw("E");
-   hGenPtRat->Draw("same hist");
-   hPartonPtRat->Draw("same hist");
-   hTreePtRat->Draw("same hist");
+   TCanvas * c3 = new TCanvas("c3","",700,700);
+   cout << endl;
+   c3->Divide(2,2);
+   for (int i=0; i<vcutCent.size(); ++i) {
+      c3->cd(i+1);
+      int ib=3-i;
+      TH1D * hRecPtRat = new TH1D(Form("hRecPtRat_%d",ib),"",30,0,4);
+      TH1D * hGenPtRat = new TH1D(Form("hGenPtRat_%d",ib),"",30,0,4);
+      TH1D * hPartonPtRat = new TH1D(Form("hPartonPtRat_%d",ib),"",30,0,4);
+      tgj->Draw(Form("jetEt/photonEt>>%s",hRecPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","E");
+      tgj->Draw(Form("refJetEt/refPhoPt>>%s",hGenPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
+      tgj->Draw(Form("refPartonPt/refPhoPt>>%s",hPartonPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
+      cout << TString(vcutCent[i]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << endl;
+      hRecPtRat->SetTitle(";jet p_{T} / photon p_{T};");
+      hRecPtRat->SetAxisRange(0,100,"Y");
+      hGenPtRat->SetLineColor(kRed);
+      hPartonPtRat->SetLineColor(kBlue);
+      hRecPtRat->Draw("E");
+      hGenPtRat->Draw("same hist");
+      //hPartonPtRat->Draw("same hist");
+      TLegend *leg2=new TLegend(0.22,0.71,0.53,0.90);
+      leg2->AddEntry(hRecPtRat,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
+      if (i==1) {
+         leg2->AddEntry(hRecPtRat,"(Rec #gamma, Rec Jet)","p");
+         leg2->AddEntry(hGenPtRat,"(Gen #gamma, Gen Jet)","l");
+      }
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->SetFillStyle(0);
+      leg2->SetTextSize(0.04);
+      leg2->Draw();
+   }
 
-   TCanvas * c4 = new TCanvas("c4","",500,500);
-   gPad->SetLogy();
-   TH1D * hRecDPhi = new TH1D("hRecDPhi","",40,0,3.14159);
-   TH1D * hGenDPhi = new TH1D("hGenDPhi","",40,0,3.14159);
-   TH1D * hPartonDPhi = new TH1D("hPartonDPhi","",40,0,3.14159);
-   tgj->Draw("acos(cos(jetPhi-photonPhi))>>hRecDPhi",sel&&"jetEt>30","E");
-   tgj->Draw("acos(cos(refJetPhi-photonPhi))>>hGenDPhi",sel&&"jetEt>30","same hist");
-   hRecDPhi->SetTitle(";#Delta#phi;");
-   hRecDPhi->SetAxisRange(0.1,1e4,"Y");
-   hGenDPhi->SetLineColor(kRed);
-   hRecDPhi->Draw("E");
-   hGenDPhi->Draw("same hist");
+
+   TCanvas * c4_0 = new TCanvas("c4_0","",500,500);
+   tgj->Draw("refPhoFlavor",sel,"hist");
+
+   TCanvas * c4 = new TCanvas("c4","",700,700);
+   cout << endl;
+   c4->Divide(2,2);
+   for (int i=0; i<vcutCent.size(); ++i) {
+      c4->cd(i+1);
+      gPad->SetLogy();
+      int ib=3-i;
+      TH1D * hRecDPhi = new TH1D(Form("hRecDPhi_%d",ib),"",40,0,3.14159);
+      TH1D * hGenDPhi = new TH1D(Form("hGenDPhi_%d",ib),"",40,0,3.14159);
+      tgj->Draw(Form("acos(cos(jetPhi-photonPhi))>>%s",hRecDPhi->GetName()),vcutCent[ib]&&sel&&"jetEt>30","E");
+      cout << TString(vcutCent[i]&&sel&&"jetEt>30") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30") << endl;
+      tgj->Draw(Form("acos(cos(refJetPhi-refPhoPhi))>>%s",hGenDPhi->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&refJetEt>0&&refPhoPt>0","same hist");
+      hRecDPhi->SetTitle(";#Delta#phi;");
+      hRecDPhi->SetAxisRange(0.1,1e4,"Y");
+      hGenDPhi->SetLineColor(kRed);
+      hRecDPhi->Draw("E");
+      hGenDPhi->Draw("same hist");
+      TLegend *leg2=new TLegend(0.22,0.71,0.53,0.90);
+      leg2->AddEntry(hRecDPhi,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
+      if (i==1) {
+         leg2->AddEntry(hRecDPhi,"(Rec #gamma, Rec Jet)","p");
+         leg2->AddEntry(hGenDPhi,"(Gen #gamma, Gen Jet)","l");
+      }
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->SetFillStyle(0);
+      leg2->SetTextSize(0.04);
+      leg2->Draw();
+   }
 }
