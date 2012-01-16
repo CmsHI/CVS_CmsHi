@@ -59,18 +59,22 @@ TString fnameDATA_2011   = "/d100/velicanu/forest/HiForestPhoton35_Skim.root";
 const int nPtBin = 4;
 double ptBin[nPtBin+1] = {50,60,80,120,200};
 
-//const int nPtBin = 2;
-//double ptBin[nPtBin+1] = {50,60,300};
+//const int nPtBin = 1;
+//double ptBin[nPtBin+1] = {60,300};
 
 
 const int nCent_std = 4;
 double centBin_std[nCent_std+1] = {0,4,12,20,40};
 
 TCut univHoECutPP = "(hadronicOverEm<0.05)";
-TCut univHoECutHI = "(hadronicOverEm<0.2)";
+TCut univHoECutHI = "(hadronicOverEm<0.1)";
 
 float isolationCut = 5.0;
 
+TCut isFragment = "abs(genMomId)<22";
+TCut isPrompt = "abs(genMomId)==22";
+
+TCut genMatchCut0      = "isGenMatched";
 TCut genMatchCut1      = Form("isGenMatched && genMomId==22 && genCalIsoDR04 < %.1f",isolationCut);
 TCut genMatchCut      = Form("(isGenMatched && abs(genMatchedEta)<1.44 && abs(etCorrected/genMatchedPt-1)<.3 && abs(genMomId) <= 22 && genCalIsoDR04 < %.1f)",isolationCut);
 TCut genMatchCutBkg      = "(isGenMatched && abs(genMatchedEta)<1.44 && abs(etCorrected/genMatchedPt-1)<.6)  &&  ( (abs(genMomId) > 22) || (genCalIsoDR04 > 5.0) ) ";
