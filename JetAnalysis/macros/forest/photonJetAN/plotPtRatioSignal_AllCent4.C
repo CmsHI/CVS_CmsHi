@@ -176,7 +176,7 @@ void plotPtRatioSignal_AllCent4(
    if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
    hFrame->SetStats(0);
    hFrame->SetMarkerStyle(kOpenSquare);
-   hFrame->SetXTitle("x_{JG} = p_{T}^{J}/p_{T}^{#gamma}");
+   hFrame->SetXTitle("x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma}");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/dx");
    if (normMode==1) hFrame->SetYTitle("Event Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);
