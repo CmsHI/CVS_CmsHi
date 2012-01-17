@@ -101,9 +101,6 @@ void checkPhotonJetData(
       TLegend *leg2=new TLegend(0.138,0.81,0.38,0.94);
       leg2->AddEntry(hx_dphi,dataSrcTitle,"");
       if (dataSrcType<=1) leg2->AddEntry(hx_dphi,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
-      //      if (i==1) {
-      //         leg2->AddEntry(hx_dphi,"","");
-      //      }
       leg2->SetFillColor(0);
       leg2->SetBorderSize(0);
       leg2->SetFillStyle(0);
@@ -117,4 +114,35 @@ void checkPhotonJetData(
    }
    c4->Print(Form("fig/check/x_vs_dphi_src%d_Isol%d.gif",dataSrcType,isolScheme));
    c4->Print(Form("fig/check/x_vs_dphi_src%d_Isol%d.pdf",dataSrcType,isolScheme));
+
+   TCanvas * c5 = new TCanvas("c5","",500,500);
+   c5->Divide(1,1);
+   cout << "Jet pt vs dphi" << endl;
+   for (int i=vcutCent.size()-1; i<vcutCent.size(); ++i) {
+      c5->cd(i+1);
+      gPad->SetRightMargin(0.15);
+      int ib=vcutCent.size()-1-i;
+      TH2D * hjpt_dphi = new TH2D(Form("hjpt_dphi_%d",ib),"",40,0,3.14159,40,0,200);
+      TCut selInBin = selPhoJetAllDPhi;
+      if (dataSrcType<=1) selInBin = selInBin&&vcutCent[ib];
+      tgj->Project(hjpt_dphi->GetName(),"jetEt:acos(cos(jetPhi-photonPhi))",selInBin,"E");
+      cout << TString(selInBin) << " " << tgj->GetEntries(selInBin) << endl;
+      hjpt_dphi->SetTitle(";|#Delta#phi|;Jet p_{T} (GeV/c)");
+      hjpt_dphi->Draw("colz");
+      TLegend *leg2=new TLegend(0.138,0.81,0.38,0.94);
+      leg2->AddEntry(hjpt_dphi,dataSrcTitle,"");
+      if (dataSrcType<=1) leg2->AddEntry(hjpt_dphi,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->SetFillStyle(0);
+      leg2->SetTextSize(0.04);
+      leg2->Draw();
+      TLine * l0 = new TLine(2.0944,0,2.0944,200);
+      l0->SetLineColor(kRed);
+      l0->SetLineStyle(2);
+      l0->SetLineWidth(3);
+      l0->Draw();      
+   }
+   c5->Print(Form("fig/check/jpt_vs_dphi_src%d_Isol%d.gif",dataSrcType,isolScheme));
+   c5->Print(Form("fig/check/jpt_vs_dphi_src%d_Isol%d.pdf",dataSrcType,isolScheme));
 }
