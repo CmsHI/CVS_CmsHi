@@ -12,13 +12,24 @@
 #include "commonUtility.h"
 using namespace std;
 
-void checkPhotonJetData(){
+void checkPhotonJetData(
+                        int dataSrcType=1 // 0=mc, 1=data, 2=pp
+                        ){
    TH1::SetDefaultSumw2();
    TFile * inf = TFile::Open("../output-data-Photon-v7_v21.root");
    TTree * tgj = (TTree*)inf->Get("tgj");
+   TCut selPre = "anaEvtSel";
+   TString dataSrcTitle="PbPb Data";
+   if (!dataSrcType) {
+      selPre = "offlSel";
+      dataSrcTitle="MC";
+   } else if (dataSrcType==1) {
+   } else if (dataSrcType==2) {
+      dataSrcTitle="pp Data";
+   }
    TCut isolCut = "fisherIsol>0.3";
    //TCut isolCut = "(cc4+cr4+ct4PtCut20)/0.9<1";
-   TCut selPho = "anaEvtSel&&photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
+   TCut selPho = selPre&&"photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
    TCut selPhoJet = selPho&&"jetEt>30&&abs(dphi)>2.0944";
    cout << "photon Sel: " << selPho << " " << tgj->GetEntries(selPho) << endl;
    cout << "photonJet Sel: " << selPhoJet << " " << tgj->GetEntries(selPhoJet) << endl;
@@ -48,7 +59,7 @@ void checkPhotonJetData(){
       hPt2D->SetAxisRange(0,200,"Y");
       hPt2D->Draw("colz");
       TLegend *leg2=new TLegend(0.138,0.81,0.38,0.94);
-      leg2->AddEntry(hPt2D,"Data","");
+      leg2->AddEntry(hPt2D,dataSrcTitle,"");
       leg2->AddEntry(hPt2D,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
 //      if (i==1) {
 //         leg2->AddEntry(hPt2D,"","");
