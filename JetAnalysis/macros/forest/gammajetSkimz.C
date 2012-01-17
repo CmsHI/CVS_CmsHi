@@ -9,6 +9,7 @@
 #include <TMath.h>
 #include "hiForest.h"
 #include "commonUtility.h"
+#include <TLorentzVector.h>
 using namespace std;
 
 #define PI 3.141592653589
@@ -60,11 +61,13 @@ public:
 
 class zpair{
 public:
-  float pt1,eta1,phi1,hoe1,iso1;
-  float pt2,eta2,phi2,hoe2,iso2;
+  float pt1,eta1,phi1,hoe1,iso1,see1;
+  float pt2,eta2,phi2,hoe2,iso2,see2;
+  float invm;
   void clear() {
     pt1=-99; pt2=-99; eta1=-99; eta2=-99; phi1=-99;  phi2=-99; 
-    hoe1=-99; hoe2=-99; iso1=-99; iso2=-99;
+    hoe1=-99; hoe2=-99; iso1=-99; iso2=-99; see1=-99; see2=-99;
+    invm=-99;
   }  
 };
 
@@ -102,7 +105,7 @@ public:
 
 
 
-void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiForest/skimmed/HiForestPhoton_v7.root", std::string outname = "v7Test.root",float cutphotonPt  = 50) {
+void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiForest/skimmed/HiForestPhoton_v7.root", std::string outname = "v7Test2.root",float cutphotonPt  = 50) {
 
    // Data weighting funcition                                                                                                
    TFile* reweightF = new TFile("centBinDataV3.root");
@@ -167,9 +170,7 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
    Float_t         trkEta[2000];   //[nTrk] 
    Float_t         trkPhi[2000];   //[nTrk] 
    
-   float invm;
    newtree->Branch("ncoll", &ncoll,"ncoll/I");
-   newtree->Branch("invMass", &invm ,"invm/F");
    newtree->Branch("order",  order, "order[nPhotons]/I");
    newtree->Branch("corrPt", corrPt,"corrPt[nPhotons]/F");
    newtree->Branch("leading",isLeading,"leading[nPhotons]/I");
@@ -203,12 +204,12 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
    // New tree for z pair
    TTree * tz = new TTree("tz","z2ee pair");
    zpair z;
-   tz->Branch("zpair",&z.pt1,"pt1:eta1:phi1:hoe1:iso1:pt2:eta2:phi2:hoe2:iso2");  
+   tz->Branch("zpair",&z.pt1,"pt1:eta1:phi1:hoe1:iso1:see1:pt2:eta2:phi2:hoe2:iso2:see2:invm");  
    
    int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
    //   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   for (Long64_t jentry=0; jentry<5000;jentry++) {
+   for (Long64_t jentry=0; jentry<50000;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
 
       c->GetEntry(jentry);
@@ -237,7 +238,6 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
       }
       // sort the order of photon pt
       TMath::Sort(c->photon.nPhotons, newPt, order);
-      invm=-1000;
     
       
       z.clear();
@@ -249,16 +249,24 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
 	  z.eta1 = c->photon.eta[j];
 	  z.phi1 = c->photon.phi[j];
 	  z.hoe1 = c->photon.hadronicOverEm[j];
-	  z.iso1 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j]);
-	  
+	  z.iso1 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j])/0.9;
+	  z.see1 = c->photon.sigmaIetaIeta[j];
 	}
 	if ( order[j] == 1 ) {
           z.pt2 = corrPt[j];
           z.eta2 = c->photon.eta[j];
           z.phi2 = c->photon.phi[j];
           z.hoe2 = c->photon.hadronicOverEm[j];
-          z.iso2 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j]);
+          z.iso2 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j])/0.9;
+	  z.see2 = c->photon.sigmaIetaIeta[j];
         }
+	if ( z.pt2 > 0 ){
+	  TLorentzVector v1, v2, vSum;
+	  v1.SetPtEtaPhiM( z.pt1, z.eta1, z.phi1, 0);
+	  v2.SetPtEtaPhiM( z.pt2, z.eta2, z.phi2, 0);
+	  vSum = v1+v2;
+	  z.invm = vSum.M();
+	}
       }
       
       int leadingIndex=-1;
