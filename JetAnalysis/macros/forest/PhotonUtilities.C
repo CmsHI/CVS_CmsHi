@@ -67,7 +67,7 @@ bool HiForest::isIsolatedPhoton(int j)
       if (photon.hadronicOverEm[j]>0.1) return 0;
       if (photon.isEle[j]) return 0;
       if ((photon.rawEnergy[j]/photon.energy[j])<0.5) return 0;
-      if ((photon.cr4[j]+photon.cc4[j]+photon.ct4PtCut20[j])/0.9> 5.0 ) return 0;
+      if ((photon.cr4[j]+photon.cc4[j]+photon.ct4PtCut20[j])/0.9> 1.0 ) return 0;
    } else {
       // Endcap photon
       return 0;  // Need to update to include endcap photons
@@ -76,6 +76,36 @@ bool HiForest::isIsolatedPhoton(int j)
    return 1;
 }
 
+
+bool HiForest::isMCSignal(int j)
+{
+
+  if ( photon.isGenMatched[j] != 1) 
+    return 0;
+  if ( fabs(photon.genMomId[j]) > 22)
+    return 0;
+  return 1;
+}
+
+bool HiForest::isDirectPhoton(int j)
+{
+
+  if ( photon.isGenMatched[j] != 1)
+    return 0;
+  if ( photon.genMomId[j] !=22)
+    return 0;
+  
+  return 1;
+}
+
+bool HiForest::isFragPhoton(int j)
+{
+  if ( photon.isGenMatched[j] != 1)
+    return 0;
+  if ( fabs(photon.genMomId[j]) >= 22)
+    return 0;
+  return 1;
+}
 
 
 float HiForest::getCorrEt(int j)

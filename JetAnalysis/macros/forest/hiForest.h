@@ -74,6 +74,11 @@ class HiForest : public TNamed
   bool isLoosePhoton(int i);
   bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
   bool isIsolatedPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
+  bool isMCSignal(int i);
+  bool isDirectPhoton(int i);
+  bool isFragPhoton(int i);
+
+
   //bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
 
   // Jet utility functions
