@@ -40,6 +40,7 @@ void checkPhotonJetData(
    
    TCut selPho = selPre&&"photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
    TCut selPhoJet = selPho&&"jetEt>30&&abs(dphi)>2.0944";
+   TCut selPhoJetAllDPhi = selPho&&"jetEt>30";
    cout << "photon Sel: " << selPho << " " << tgj->GetEntries(selPho) << endl;
    cout << "photonJet Sel: " << selPhoJet << " " << tgj->GetEntries(selPhoJet) << endl;
    
@@ -81,4 +82,39 @@ void checkPhotonJetData(
    }
    c3->Print(Form("fig/check/Pt2D_src%d_Isol%d.gif",dataSrcType,isolScheme));
    c3->Print(Form("fig/check/Pt2D_src%d_Isol%d.pdf",dataSrcType,isolScheme));
+
+
+   TCanvas * c4 = new TCanvas("c4","",500,500);
+   c4->Divide(1,1);
+   cout << "x vs dphi" << endl;
+   for (int i=vcutCent.size()-1; i<vcutCent.size(); ++i) {
+      c4->cd(i+1);
+      gPad->SetRightMargin(0.15);
+      int ib=vcutCent.size()-1-i;
+      TH2D * hx_dphi = new TH2D(Form("hx_dphi_%d",ib),"",40,0,3.14159,40,0,2);
+      TCut selInBin = selPhoJetAllDPhi;
+      if (dataSrcType<=1) selInBin = selInBin&&vcutCent[ib];
+      tgj->Project(hx_dphi->GetName(),"jetEt/photonEt:acos(cos(jetPhi-photonPhi))",selInBin,"E");
+      cout << TString(selInBin) << " " << tgj->GetEntries(selInBin) << endl;
+      hx_dphi->SetTitle(";|#Delta#phi|;x_{J,#gamma}");
+      hx_dphi->Draw("colz");
+      TLegend *leg2=new TLegend(0.138,0.81,0.38,0.94);
+      leg2->AddEntry(hx_dphi,dataSrcTitle,"");
+      if (dataSrcType<=1) leg2->AddEntry(hx_dphi,Form("%.0f to %.0f %%",m[ib]*2.5,m[ib+1]*2.5),"");
+      //      if (i==1) {
+      //         leg2->AddEntry(hx_dphi,"","");
+      //      }
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->SetFillStyle(0);
+      leg2->SetTextSize(0.04);
+      leg2->Draw();
+      TLine * l0 = new TLine(2.0944,0,2.0944,2);
+      l0->SetLineColor(kRed);
+      l0->SetLineStyle(2);
+      l0->SetLineWidth(3);
+      l0->Draw();      
+   }
+   c4->Print(Form("fig/check/x_vs_dphi_src%d_Isol%d.gif",dataSrcType,isolScheme));
+   c4->Print(Form("fig/check/x_vs_dphi_src%d_Isol%d.pdf",dataSrcType,isolScheme));
 }
