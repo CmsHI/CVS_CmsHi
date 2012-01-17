@@ -51,7 +51,7 @@ void checkPhotonJetMC(){
       tgj->Draw(Form("jetEt/photonEt>>%s",hRecPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","E");
       tgj->Draw(Form("refJetEt/refPhoPt>>%s",hGenPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
       tgj->Draw(Form("refPartonPt/refPhoPt>>%s",hPartonPtRat->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944","same hist");
-      cout << TString(vcutCent[i]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << endl;
+      cout << TString(vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30&&abs(dphi)>2.0944") << endl;
       hRecPtRat->SetTitle(";jet p_{T} / photon p_{T};");
       hRecPtRat->SetAxisRange(0,100,"Y");
       hGenPtRat->SetLineColor(kRed);
@@ -86,7 +86,7 @@ void checkPhotonJetMC(){
       TH1D * hRecDPhi = new TH1D(Form("hRecDPhi_%d",ib),"",40,0,3.14159);
       TH1D * hGenDPhi = new TH1D(Form("hGenDPhi_%d",ib),"",40,0,3.14159);
       tgj->Draw(Form("acos(cos(jetPhi-photonPhi))>>%s",hRecDPhi->GetName()),vcutCent[ib]&&sel&&"jetEt>30","E");
-      cout << TString(vcutCent[i]&&sel&&"jetEt>30") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30") << endl;
+      cout << TString(vcutCent[ib]&&sel&&"jetEt>30") << " " << tgj->GetEntries(vcutCent[ib]&&sel&&"jetEt>30") << endl;
       tgj->Draw(Form("acos(cos(refJetPhi-refPhoPhi))>>%s",hGenDPhi->GetName()),vcutCent[ib]&&sel&&"jetEt>30&&refJetEt>0&&refPhoPt>0","same hist");
       hRecDPhi->SetTitle(";#Delta#phi;");
       hRecDPhi->SetAxisRange(0.1,1e4,"Y");
