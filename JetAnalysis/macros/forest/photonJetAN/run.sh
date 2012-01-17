@@ -1,5 +1,6 @@
 #for m in plotPtRatioSignal_AllCent4.C plotDeltaPhiSignal_AllCent4.C; do
-for m in plotPtRatioSignal_AllCent4.C; do
+for m in plotDeltaPhiSignal_AllCent4.C; do
+#for m in plotPtRatioSignal_AllCent4.C; do
   for log in 0 1; do
     for doChk in 0 1; do
       for phoMin in 60; do
