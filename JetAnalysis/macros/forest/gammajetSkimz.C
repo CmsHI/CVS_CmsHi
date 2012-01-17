@@ -61,12 +61,12 @@ public:
 
 class zpair{
 public:
-  float pt1,eta1,phi1,hoe1,iso1,see1;
-  float pt2,eta2,phi2,hoe2,iso2,see2;
+   float pt1,eta1,phi1,hoe1,iso1,see1, isEle1;
+   float pt2,eta2,phi2,hoe2,iso2,see2, isEle2;
   float invm;
   void clear() {
-    pt1=-99; pt2=-99; eta1=-99; eta2=-99; phi1=-99;  phi2=-99; 
-    hoe1=-99; hoe2=-99; iso1=-99; iso2=-99; see1=-99; see2=-99;
+     pt1=-99; pt2=-99; eta1=-99; eta2=-99; phi1=-99;  phi2=-99; isEle1=0;
+     hoe1=-99; hoe2=-99; iso1=-99; iso2=-99; see1=-99; see2=-99; isEle2=0;
     invm=-99;
   }  
 };
@@ -105,7 +105,7 @@ public:
 
 
 
-void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiForest/skimmed/HiForestPhoton_v7.root", std::string outname = "v7Test2.root",float cutphotonPt  = 50) {
+void gammajetSkimz(TString inputFile_="/d102/yjlee/hiForest/diphoton/diphoton_v1.root", std::string outname = "v7Test2.root",float cutphotonPt  = 50) {
 
    // Data weighting funcition                                                                                                
    TFile* reweightF = new TFile("centBinDataV3.root");
@@ -204,12 +204,12 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
    // New tree for z pair
    TTree * tz = new TTree("tz","z2ee pair");
    zpair z;
-   tz->Branch("zpair",&z.pt1,"pt1:eta1:phi1:hoe1:iso1:see1:pt2:eta2:phi2:hoe2:iso2:see2:invm");  
+   tz->Branch("zpair",&z.pt1,"pt1:eta1:phi1:hoe1:iso1:see1:isEle1:pt2:eta2:phi2:hoe2:iso2:see2:isEle2:invm");  
    
    int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
-   //   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   for (Long64_t jentry=0; jentry<50000;jentry++) {
+   for (Long64_t jentry=0; jentry<nentries;jentry++) {
+      // for (Long64_t jentry=0; jentry<50000;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
 
       c->GetEntry(jentry);
@@ -251,6 +251,8 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
 	  z.hoe1 = c->photon.hadronicOverEm[j];
 	  z.iso1 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j])/0.9;
 	  z.see1 = c->photon.sigmaIetaIeta[j];
+	  if ( c->photon.isEle[j]) z.isEle1 = 1;
+	  else z.isEle1 = 0;
 	}
 	if ( order[j] == 1 ) {
           z.pt2 = corrPt[j];
@@ -259,6 +261,8 @@ void gammajetSkimz(TString inputFile_="/mnt/hadoop/cms/store/user/jazzitup/hiFor
           z.hoe2 = c->photon.hadronicOverEm[j];
           z.iso2 = (c->photon.cc4[j] + c->photon.cr4[j] + c->photon.ct4PtCut20[j])/0.9;
 	  z.see2 = c->photon.sigmaIetaIeta[j];
+	  if ( c->photon.isEle[j]) z.isEle2 = 1;
+          else z.isEle2 = 0;
         }
 	if ( z.pt2 > 0 ){
 	  TLorentzVector v1, v2, vSum;
