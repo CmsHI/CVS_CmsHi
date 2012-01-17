@@ -13,22 +13,31 @@
 using namespace std;
 
 void checkPhotonJetData(
-                        int dataSrcType=1 // 0=mc, 1=data, 2=pp
-                        ){
+                        int dataSrcType=1, // 0=mc, 1=data, 2=pp
+                        int isolScheme=0
+                        )
+{
    TH1::SetDefaultSumw2();
-   TFile * inf = TFile::Open("../output-data-Photon-v7_v21.root");
+   TFile * inf;
+   if (dataSrcType==0) inf = TFile::Open("../output-hy18pho50_37k_v21_frac74.root");
+   if (dataSrcType==1) inf = TFile::Open("../output-data-Photon-v7_v21.root");
+   if (dataSrcType==2) inf = TFile::Open("../output-data-pp2010-prod3-photon_v18.root");
+   if (dataSrcType==3) inf = TFile::Open("../output-pp7TeV-test2_v21.root");
    TTree * tgj = (TTree*)inf->Get("tgj");
    TCut selPre = "anaEvtSel";
-   TString dataSrcTitle="PbPb Data";
+   TString dataSrcTitle="PbPb";
    if (!dataSrcType) {
       selPre = "offlSel";
-      dataSrcTitle="MC";
+      dataSrcTitle="MC #gamma Jet";
    } else if (dataSrcType==1) {
    } else if (dataSrcType==2) {
-      dataSrcTitle="pp Data";
+      dataSrcTitle="pp 2.76 TeV";
+   } else if (dataSrcType==3) {
+      dataSrcTitle="pp 7 TeV";
    }
-   TCut isolCut = "fisherIsol>0.3";
-   //TCut isolCut = "(cc4+cr4+ct4PtCut20)/0.9<1";
+   TCut isolCut = "(cc4+cr4+ct4PtCut20)/0.9<1";
+   if (isolScheme==2) isolCut = "fisherIsol>0.3";
+   
    TCut selPho = selPre&&"photonEt>60&&sigmaIetaIeta<0.01"&&isolCut;
    TCut selPhoJet = selPho&&"jetEt>30&&abs(dphi)>2.0944";
    cout << "photon Sel: " << selPho << " " << tgj->GetEntries(selPho) << endl;
@@ -70,4 +79,6 @@ void checkPhotonJetData(
       leg2->SetTextSize(0.04);
       leg2->Draw();
    }
+   c3->Print(Form("fig/check/Pt2D_src%d_Isol%d.gif",dataSrcType,isolScheme));
+   c3->Print(Form("fig/check/Pt2D_src%d_Isol%d.pdf",dataSrcType,isolScheme));
 }
