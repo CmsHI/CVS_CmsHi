@@ -84,8 +84,8 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
          anaAgj.rSubtracted.hExtrapNorm->SetMarkerColor(kBlack);
          anaAgj.rSubtracted.hExtrapNorm->SetMarkerStyle(kOpenSquare);
       } else if (dataSrcType==3) {
-         anaAgj.rSubtracted.hExtrapNorm->SetLineColor(kOrange+7);
-         anaAgj.rSubtracted.hExtrapNorm->SetMarkerColor(kOrange+7);
+         anaAgj.rSubtracted.hExtrapNorm->SetLineColor(kOrange+2);
+         anaAgj.rSubtracted.hExtrapNorm->SetMarkerColor(kOrange+2);
          anaAgj.rSubtracted.hExtrapNorm->SetMarkerStyle(kOpenStar);
       }
    } else {
@@ -109,7 +109,18 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       }
    }
    anaAgj.rSubtracted.hExtrapNorm->Draw(opt);
-
+   // fit width
+   TF1 *fdphi = new TF1("fdphi","[0]+[1]*exp(-(3.1415926-x)/[2])",0,3.1415926);
+   fdphi->SetParameters(0.01,1,0.1);
+   anaAgj.rSubtracted.hExtrapNorm->Fit("fdphi","0","",0.7,3.1415926);
+   fdphi->SetLineWidth(1);
+   if (dataSrcType) {
+      if (dataSrcType==1) fdphi->SetLineColor(kRed);
+      else if (dataSrcType==3) fdphi->SetLineColor(kOrange+2);
+   } else fdphi->SetLineColor(kBlue);
+   fdphi->Draw("same");
+   float dphiWidth = fdphi->GetParameter(2);
+   
    // check subtraction
    if (doCheck) {
       if (anaAgj.subDPhiSide) {
@@ -139,27 +150,36 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       float nPhotonJet = anaAgj.rSubtracted.nExtrap;
       float lx = 0.1;
       if (cbin==2||cbin==0) lx=-0.1;
-      TLegend *t3=new TLegend(lx,0.62,0.5,0.85);
+      TLegend *t3=new TLegend(lx,0.45,0.5,0.85);
       if (dataSrcType==1) {
          anaAgj.rSigAll.hExtrapNorm->SetLineStyle(2);
          anaAgj.rSigAll.hExtrapNorm->Draw("same hist");
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,anaAgj.nameIsol,"");
          t3->AddEntry(anaAgj.rSigAll.h,Form("#gamma purity %.2f",1-anaAgj.fracPhotonBkg),"");
          t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("  #sigma_{|#Delta#phi|}: %.2f",dphiWidth),"");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
       } else if (dataSrcType==2) {
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,Form("pp: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("  #sigma_{|#Delta#phi|}: %.2f",dphiWidth),"");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
       } else if (dataSrcType==3) {
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
+         t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,Form("pp 7TeV: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("  #sigma_{|#Delta#phi|}: %.2f",dphiWidth),"");
       }
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
@@ -181,7 +201,7 @@ void plotDeltaPhiSignal_AllCent4(
                                  float minJet=30,
                                  int log=1,
                                  int drawCheck = 0,
-                                 TString outdir = "./fig/01.17_pp7TeV"
+                                 TString outdir = "./fig/01.18_dphiwidth"
                                  )
 {
    TH1::SetDefaultSumw2();
@@ -270,7 +290,7 @@ void plotDeltaPhiSignal_AllCent4(
    drawText("30-50%",0.1,0.05);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.03,0.34,0.50,0.65); 
+   TLegend *t3=new TLegend(0.34,0.62,0.81,0.94); 
    t3->AddEntry(hFrameData,"PbPb","p");
    t3->AddEntry(hFrame,"pp 2.76 TeV","p");
    t3->AddEntry(ppana7.rSubtracted.hExtrapNorm,"pp 7 TeV","p");
