@@ -44,7 +44,7 @@ TGraphAsymmErrors * getRBSignal(
    m[2]=12;
    m[3]=20;
    m[4]=40;
-   if (dataType==2) { // pp
+   if (dataType>=2) { // pp
       nBin = 1;
       m[0]=0;
       m[1]=40;
@@ -73,6 +73,8 @@ TGraphAsymmErrors * getRBSignal(
          name=Form("hi%d",ib);
       } else if (dataType==2) { // reco
          name=Form("pp%d",ib);
+      } else if (dataType==3) { // reco
+         name=Form("pp7%d",ib);
       }      
       vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-jetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],myweight,ib));
       vana[ib]->cutBkgDPhi= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
@@ -84,10 +86,15 @@ TGraphAsymmErrors * getRBSignal(
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
          vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>0.7",minJet),20,0.001,3.14159);
-      } else if (dataType==1||dataType==2) {
+      } else {
          vana[ib]->subDPhiSide = subDPhiSide;
-         vana[ib]->subSShapeSide = subSShapeSide;
-         vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
+         if (dataType==1) {
+            vana[ib]->subSShapeSide = subSShapeSide;
+            vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
+         } else {
+            vana[ib]->subSShapeSide = false;
+            vana[ib]->subSShapeSideDPhiSide = false;
+         }
          vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>0.7 && sigmaIetaIeta<0.01",minJet),20,0.001,3.14159);
       }
@@ -101,6 +108,7 @@ TGraphAsymmErrors * getRBSignal(
    // make graph
    TGraphAsymmErrors * gAve = new TGraphAsymmErrors(nBin);
 
+   float nPhotonJet=0;
    for (int ib=0;ib<gAve->GetN();++ib)
    {
 //      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
@@ -115,42 +123,45 @@ TGraphAsymmErrors * getRBSignal(
       float errYH = fdphi->GetParError(2);
       
       gAve->SetPointError(ib,0,0,errYL,errYH);
-      if (dataType!=2) gAve->SetPoint(ib,npart[ib],y);
+      if (dataType<=1) gAve->SetPoint(ib,npart[ib],y);
       else {
          gAve->SetPoint(ib,2,y);
          cout<<" Setting PYTHIA point to npart=2 by hand"<<endl;
       }
       cout <<"bin: " << ib <<" npart: "<<npart[ib]<< " y: " << y << " yerr: " << errYH << endl;
+      nPhotonJet+=vana[ib]->rSubtracted.nExtrap;
    }
    
    // Draw count
+   TLegend *t3=new TLegend(0.1,0.68,0.51,0.89);
    if (dataType==1) {
-      TLegend *t3=new TLegend(0.1,0.2,0.5,0.45);
       t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,vana[0]->nameIsol,"");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("PbPb: %.0f #gamma-j",nPhotonJet),"");
       t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
-      for (int ib=nBin-1;ib>=0;--ib) {
-         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("%.0f to %.0f \%: %.0f #gamma-j",m[ib]*2.5,m[ib+1]*2.5,vana[ib]->rSubtracted.nExtrap),"");
-      }
-      //t3->AddEntry(anaNum.rSigAll.h,Form("#gamma purity %.2f",anaNum.photonPurity),"");
-      t3->SetFillColor(0);
-      t3->SetBorderSize(0);
-      t3->SetFillStyle(0);
-      t3->SetTextFont(63);
-      t3->SetTextSize(15);
-      t3->Draw();      
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+//      for (int ib=nBin-1;ib>=0;--ib) {
+//         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("%.0f to %.0f \%: %.0f #gamma-j",m[ib]*2.5,m[ib+1]*2.5,vana[ib]->rSubtracted.nExtrap),"");
+//      }
+   } else if (dataType==2) {
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76GeV: %.0f #gamma-j",nPhotonJet),"");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+//      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
+   } else if (dataType==3) {
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 7TeV: %.0f #gamma-j",nPhotonJet),"");
+      //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
    }
-   if (dataType==2) {
-      TLegend *t3=new TLegend(0.1,0.2,0.5,0.45);
-      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp: %.0f #gamma-j",vana[0]->rSubtracted.nExtrap),"");
-      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
-      t3->SetFillColor(0);
-      t3->SetBorderSize(0);
-      t3->SetFillStyle(0);
-      t3->SetTextFont(63);
-      t3->SetTextSize(15);
-      t3->Draw();      
-   }
-
+   t3->SetFillColor(0);
+   t3->SetBorderSize(0);
+   t3->SetFillStyle(0);
+   t3->SetTextFont(63);
+   t3->SetTextSize(15);
+   t3->Draw();      
+   
    return gAve;
 }
 
@@ -182,7 +193,7 @@ void plotDeltaPhivNpartSubtracted(
    hTmp->Draw();
 
    cout << endl << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-Photon-v7_v19.root",1,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
+   TGraphAsymmErrors * gdata = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-Photon-v7_v21.root",1,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
    //cout << "returned graph with N points: " << gdata->GetN()<<endl;
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
@@ -195,12 +206,21 @@ void plotDeltaPhivNpartSubtracted(
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
-   cout << endl << "     pp" << endl;
+   cout << endl << "     pp 2.76" << endl;
    TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
+   gpp->SetLineColor(kBlue);
    gpp->Draw("p same");
+
+   cout << endl << "     pp 7" << endl;
+   TGraphAsymmErrors * gpp7 = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-pp7TeV-test_v21.root",3,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
+   gpp7->SetMarkerSize(1.25);
+   gpp7->SetMarkerStyle(kOpenStar);
+   gpp7->SetMarkerColor(kOrange+2);
+   gpp7->SetLineColor(kOrange+2);
+   gpp7->Draw("p same");
 
    // Annotation
    drawText("CMS Preliminary",0.198,0.89,17);
@@ -226,7 +246,8 @@ void plotDeltaPhivNpartSubtracted(
    if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"PYTHIA+HYDJET1.8","p");
-   leg->AddEntry(gpp,"pp","p");
+   leg->AddEntry(gpp,"pp 2.76TeV","p");
+   leg->AddEntry(gpp7,"pp 7TeV","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
    leg->SetFillStyle(0);
