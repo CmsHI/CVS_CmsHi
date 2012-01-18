@@ -221,10 +221,8 @@ void analyzePhotonJet2010(
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
-   int runNum=-1,evtNum=-1,centBin=-1,HLT_Photon15_CaloIdVL_v1=0;
+   int centBin=-1,HLT_Photon15_CaloIdVL_v1=0;
    int phfCoincFilter=0,ppurityFractionFilter=0,pHBHENoiseFilter=0;
-   c->hltTree->SetBranchAddress("Run",&runNum);
-   c->hltTree->SetBranchAddress("Event",&evtNum);
    c->hltTree->SetBranchAddress("hiBin",&centBin);
    if (isPp) {
       c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
@@ -241,8 +239,8 @@ void analyzePhotonJet2010(
       // check if event is duplicate
       evt.nOccur = dupEvt.occurrence[i];
       // Event Info
-      evt.run = runNum;
-      evt.evt = evtNum;
+      evt.run = c->hlt.Run;
+      evt.evt = c->hlt.Event;
       evt.cBin = centBin;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
