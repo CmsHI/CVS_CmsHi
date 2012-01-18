@@ -183,7 +183,7 @@ void analyzePhotonJet2010(
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
-   dupEvt.MakeList();
+   //dupEvt.MakeList();
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
@@ -237,7 +237,7 @@ void analyzePhotonJet2010(
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
       // check if event is duplicate
-      evt.nOccur = dupEvt.occurrence[i];
+      evt.nOccur = 1;//dupEvt.occurrence[i];
       // Event Info
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
