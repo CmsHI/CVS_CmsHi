@@ -205,6 +205,12 @@ void plotDeltaPhivNpartSubtracted(
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
+
+   TGraphAsymmErrors * ghyqcdpho = getRBSignal(photonMinPt,minJet,-1,"offlSel&&sampleWeight>0.5","weight","../output-hy18qcdpho80_v21_frac74_0to10.root",0,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
+   for (int i=1;i<ghyqcdpho->GetN();i++) ghyqcdpho->SetPoint(i,2,-1);
+   ghyqcdpho->SetMarkerSize(1.25);
+   ghyqcdpho->SetMarkerStyle(kOpenCircle);
+   ghyqcdpho->Draw("p same");
    
    cout << endl << "     pp 2.76" << endl;
    TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v18.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
@@ -239,13 +245,14 @@ void plotDeltaPhivNpartSubtracted(
    hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg2->SetMarkerColor(kViolet);
    
-   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.62,0.85,0.91);
    leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
-   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+   //leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
    if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
    if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   leg->AddEntry(ghypho,"PYTHIA+HYDJET1.8","p");
+   leg->AddEntry(ghypho,"MC: #gamma-Jet","p");
+   leg->AddEntry(ghyqcdpho,"MC: All QCD #gamma","p");
    leg->AddEntry(gpp,"pp 2.76TeV","p");
    leg->AddEntry(gpp7,"pp 7TeV","p");
    leg->SetFillColor(0);
