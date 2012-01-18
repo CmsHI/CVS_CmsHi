@@ -341,6 +341,6 @@ void plotDeltaPhiSignal_AllCent4(
    drawText("0-10%",0.1,0.25);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d_fit.gif",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_dphi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d_fit.pdf",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 }
