@@ -162,6 +162,7 @@ public:
 };
 
 void analyzePhotonJet(
+                      int jetAlgo = 0, // 0=akpu3pf, 10=icpu5
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
@@ -305,33 +306,22 @@ void analyzePhotonJet(
          gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
          
          // intialize jet variables
-         int nJets=c->akPu3PF.nref;
-         float *jet_pt  = c->akPu3PF.jtpt;
-         float *jet_eta = c->akPu3PF.jteta;
-         float *jet_phi = c->akPu3PF.jtphi;
-         float *refjet_pt  = c->akPu3PF.refpt;
-         float *refjet_eta = c->akPu3PF.refeta;
-         float *refjet_phi = c->akPu3PF.refphi;
-         float *parton_pt  = c->akPu3PF.refparton_pt;
-         float *parton_flavor = c->akPu3PF.refparton_flavor;
-         //         int nJets=c->icPu5.nref;
-//         float *jet_pt  = c->icPu5.jtpt;
-//         float *jet_eta = c->icPu5.jteta;
-//         float *jet_phi = c->icPu5.jtphi;
+         Jets * anajet = &(c->akPu3PF);
+         if (jetAlgo==10) anajet = &(c->icPu5);
          // Loop over jet tree to find a away side leading jet
-         for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<cutjetPt) continue;
-            if (fabs(jet_eta[j])>cutjetEta) continue;
-            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))>0.5) {
-               if (jet_pt[j]>gj.jetEt) {
-                  gj.jetEt = jet_pt[j];
+         for (int j=0;j<anajet->nref;j++) {
+            if (anajet->jtpt[j]<cutjetPt) continue;
+            if (fabs(anajet->jteta[j])>cutjetEta) continue;
+            if (fabs(deltaPhi(anajet->jtphi[j],c->photon.phi[leadingIndex]))>0.5) {
+               if (anajet->jtpt[j]>gj.jetEt) {
+                  gj.jetEt = anajet->jtpt[j];
                   awayIndex = j;
                }
             } else { // Loop over jet tree to find a photon matching jet
-               if (jet_pt[j]>gj.phoMatJetEt) {
-                  gj.phoMatJetEt = jet_pt[j];
-                  gj.phoMatJetEta = jet_eta[j];
-                  gj.phoMatJetPhi = jet_phi[j];
+               if (anajet->jtpt[j]>gj.phoMatJetEt) {
+                  gj.phoMatJetEt = anajet->jtpt[j];
+                  gj.phoMatJetEta = anajet->jteta[j];
+                  gj.phoMatJetPhi = anajet->jtphi[j];
                }
             }
          }	 
@@ -339,19 +329,19 @@ void analyzePhotonJet(
          // Found an away jet!
          if (awayIndex !=-1) {
             double photonEt = c->photon.pt[leadingIndex];
-            double jetEt = jet_pt[awayIndex];
+            double jetEt = anajet->jtpt[awayIndex];
             double Agj = (photonEt-jetEt)/(photonEt+jetEt);
             gj.jetEt  = jetEt;
-            gj.jetEta = jet_eta[awayIndex];
-            gj.jetPhi = jet_phi[awayIndex];
-            gj.deta = jet_eta[awayIndex] - c->photon.eta[leadingIndex];
-            gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
+            gj.jetEta = anajet->jteta[awayIndex];
+            gj.jetPhi = anajet->jtphi[awayIndex];
+            gj.deta = anajet->jteta[awayIndex] - c->photon.eta[leadingIndex];
+            gj.dphi = deltaPhi(anajet->jtphi[awayIndex],c->photon.phi[leadingIndex]);
             gj.Aj   = Agj;
-            gj.refJetEt = refjet_pt[awayIndex];
-            gj.refJetEta = refjet_eta[awayIndex];
-            gj.refJetPhi = refjet_phi[awayIndex];
-            gj.refPartonPt = parton_pt[awayIndex];
-            gj.refPartonFlavor = parton_flavor[awayIndex];
+            gj.refJetEt = anajet->refpt[awayIndex];
+            gj.refJetEta = anajet->refeta[awayIndex];
+            gj.refJetPhi = anajet->refphi[awayIndex];
+            gj.refPartonPt = anajet->refparton_pt[awayIndex];
+            gj.refPartonFlavor = anajet->refparton_flavor[awayIndex];
          }
 
          // pfid
