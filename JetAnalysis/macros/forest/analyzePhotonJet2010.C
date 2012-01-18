@@ -3,13 +3,15 @@
 #include <TH1D.h>
 #include <TNtuple.h>
 #include <iostream>
+#include <algorithm>
+#include <utility>
+#include <vector>
 #include "TChain.h"
 
 // Convinient Output Classes
 class EvtSel {
 public:
-   int run,evt;
-   int cBin;
+   int run,evt,nOccur,cBin;
    int nG,nJ,nT;
    bool trig,offlSel,noiseFilt,anaEvtSel;
    float vz,weight,npart,ncoll,sampleWeight;
@@ -34,7 +36,8 @@ public:
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
-   float refPhoPt,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
+   float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -49,6 +52,7 @@ public:
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
+      jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       isEle=false;
       nTrk=0;
@@ -81,13 +85,17 @@ public:
 
 class CentralityReWeight {
 public:
-   CentralityReWeight(TCut s) : sel(s) {}
+   CentralityReWeight(TString data, TString mc,TCut s) : 
+     datafname(data),mcfname(mc),sel(s) {}
    void Init()
    {
+      cout << "Reweight Centrality: " << endl;
+      cout << "Data file: " << datafname << endl;
+      cout << "MC file:   " << mcfname << endl;
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
-      tdata->Add("output-data-Photon-v4_v11.root");
-      tmc->Add("output-hypho50v2_50kyongsun_v11.root");
+      tdata->Add(datafname);
+      tmc->Add(mcfname);
 
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
@@ -95,7 +103,7 @@ public:
 
       //cout << "data: " << tdata->GetName() << " " << tdata->GetEntries() << endl;
       //cout << "mc: " << tmc->GetName() << " " << tmc->GetEntries() << endl;
-      tdata->Project("hCentData","cBin",sel&&"trig&&noiseFilt");
+      tdata->Project("hCentData","cBin",sel&&"anaEvtSel");
       tmc->Project("hCentMc","cBin",sel);
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
@@ -108,6 +116,7 @@ public:
       }
       return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
    }
+   TString datafname,mcfname;
    TCut sel;
    TH1D * hCentData;
    TH1D * hCentMc;
@@ -117,14 +126,50 @@ public:
 float getNpart(int cBin);
 float getNcoll(int cBin);
 
+class DuplicateEvents {
+public:
+   DuplicateEvents(TString infname) {
+      inf = TFile::Open(infname);
+      t = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
+   };
+   ~DuplicateEvents() {
+      delete inf;
+   }
+   void MakeList() {
+      cout << "Starting Making List to check for duplicate events" << endl;
+      evts.clear();
+      occurrence.clear();
+      int run,evt;
+      t->SetBranchAddress("run",&run);
+      t->SetBranchAddress("evt",&evt);
+      for (int i=0;i<t->GetEntries();i++) {
+         t->GetEntry(i);
+         if (i%100000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
+         int occur = (int)FindOccurrences(run,evt);
+         if (occur==0) occurrence.push_back(1);
+         else occurrence.push_back(2);
+         evts.push_back(std::make_pair(run,evt));
+      }         
+   }
+   int FindOccurrences(int run, int evt) {
+      int noccur = count(evts.begin(), evts.end(), std::make_pair(run,evt));
+      return noccur;
+   }
+   TFile * inf;
+   TTree * t;
+   vector<pair<int, int> > evts;
+   vector<int> occurrence;
+};
+
 void analyzePhotonJet2010(
-                          //TString inname="/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod02.root",
-                          //TString outname="output-data-HI2010-Photon40_prod02_v10.root",
-                          TString inname="rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
-                          TString outname="output-data-pp2010-prod3-photon_v18.root",
+                          //TString inname="rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
+                          //TString outname="output-data-pp2010-prod3-photon_v21.root",
+                          TString inname="rfio:/castor/cern.ch/user/p/pkurt/dijet/hiforest_Collision_pp_276_dijet.root",
+                          TString outname="output-data-pp2010-pkurt-photon_v21.root",
                           double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                           bool doCentReWeight=false,
-                          bool isPp=true
+                          TString mcfname="",
+                          TString datafname="output-data-Photon-v7_v21.root"
                           )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -133,26 +178,39 @@ void analyzePhotonJet2010(
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;	
    // Centrality reweiting
-   CentralityReWeight cw("offlSel&&photonEt>50");
+   CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
+   // Check for duplicate events
+   DuplicateEvents dupEvt(inname);
+   dupEvt.MakeList();
+   
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname);
    c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v4.root");
+   
+   // pfid
+   TTree * pfTree = (TTree*) c->inf->Get("pfcandAnalyzer/pfTree");
+   PFs pfs;
+   if (pfTree) {
+      c->CheckTree(pfTree,"PfTree");
+      setupPFTree(pfTree,pfs,1);
+   }
       
    // Output file
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
-   if (doCentReWeight) {
+   if (doCentReWeight&&mcfname!="") {
       cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
    }
    
    EvtSel evt;
    GammaJet gj;
    Isolation isol;
-   tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
+   tgj->Branch("evt",&evt.run,"run/I:evt:nOccur:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight");
    TString jetleaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
-   ":phoMatJetEt:phoMatJetEta:phoMatJetPhi:ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
-   ":refPhoPt:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+   ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
+   ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
+   ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
    ":isEle/O";
    tgj->Branch("jet",&gj.photonEt,jetleaves);
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
@@ -162,39 +220,24 @@ void analyzePhotonJet2010(
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
-   int runNum=-1,evtNum=-1,centBin=-1,HLT_Photon15_CaloIdVL_v1=0;
-   int phfCoincFilter=0,ppurityFractionFilter=0,pHBHENoiseFilter=0;
-   c->hltTree->SetBranchAddress("Run",&runNum);
-   c->hltTree->SetBranchAddress("Event",&evtNum);
-   c->hltTree->SetBranchAddress("hiBin",&centBin);
-   if (isPp) {
-      c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
-      c->skimTree->SetBranchAddress("phfCoincFilter",&phfCoincFilter);
-      c->skimTree->SetBranchAddress("ppurityFractionFilter",&ppurityFractionFilter);
-      c->skimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
-   }
-   
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
-      
+      if (pfTree) pfTree->GetEntry(i);
+      // check if event is duplicate
+      evt.nOccur = dupEvt.occurrence[i];
       // Event Info
-      evt.run = runNum;
-      evt.evt = evtNum;
-      evt.cBin = centBin;
+      evt.run = c->evt.run;
+      evt.evt = c->evt.evt;
+      evt.cBin = c->evt.hiBin;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
       evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-      evt.anaEvtSel = c->selectEvent() && evt.trig;
-      if (isPp) {
-         evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
-         evt.offlSel = phfCoincFilter && ppurityFractionFilter && pHBHENoiseFilter;
-         evt.anaEvtSel = evt.offlSel && evt.trig;
-      }
+      evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.nOccur==1;
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
@@ -202,8 +245,9 @@ void analyzePhotonJet2010(
       evt.npart = getNpart(evt.cBin);
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
-      if (i%10000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " offlSel: " << evt.offlSel <<endl;
-      if (!evt.trig) continue;
+
+      
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
       
       // initialize
       int leadingIndex=-1;
@@ -237,6 +281,8 @@ void analyzePhotonJet2010(
          gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
          isol.Set(c,leadingIndex);
          gj.refPhoPt = c->photon.genMatchedPt[leadingIndex];
+         gj.refPhoEta = c->photon.genMatchedEta[leadingIndex];
+         gj.refPhoPhi = c->photon.genMatchedPhi[leadingIndex];
          gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
          
          // intialize jet variables
@@ -288,7 +334,21 @@ void analyzePhotonJet2010(
             gj.refPartonPt = parton_pt[awayIndex];
             gj.refPartonFlavor = parton_flavor[awayIndex];
          }
-      }
+
+         // pfid
+         for (int it=0; it<pfs.nPFpart; ++it) {
+            if (pfs.pfPt[it] < 4) continue;
+            if (fabs(pfs.pfEta[it]) > 3) continue;
+            // find leading pfcand in jet
+            float dr = deltaR(pfs.pfEta[it],pfs.pfPhi[it],gj.jetEta,gj.jetPhi);
+            if (dr<0.3 && pfs.pfPt[it]>gj.jlpfPt) {
+               gj.jlpfPt = pfs.pfPt[it];
+               gj.jlpfEta = pfs.pfEta[it];
+               gj.jlpfPhi = pfs.pfPhi[it];
+               gj.jlpfId = pfs.pfId[it];
+            }
+         }
+      } // end of if jet
       
       // xcheck with tracks
       gj.nTrk=0;
@@ -322,6 +382,7 @@ void analyzePhotonJet2010(
 
    // After Event Loop
    tgj->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
+   tgj->SetAlias("xgj","(jetEt/photonEt)");
    // * cut at 0.3 from Yongsun's studies
    output->Write();
    output->Close();
