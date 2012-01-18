@@ -108,6 +108,7 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       }
    }
    anaAgj.rSubtracted.hExtrapNorm->Draw(opt);
+   float mean=anaAgj.rSubtracted.hExtrapNorm->GetMean();
 
    // check subtraction
    if (doCheck) {
@@ -132,27 +133,27 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       float nPhotonJet = anaAgj.rSubtracted.nExtrap;
       float lx = 0.1;
       if (cbin==2||cbin==0) lx=-0.1;
-      TLegend *t3=new TLegend(lx,0.62,0.5,0.85);
+      TLegend *t3=new TLegend(lx,0.45,0.5,0.82);
       if (dataSrcType==1) {
          anaAgj.rSigAll.hExtrapNorm->SetLineStyle(2);
          anaAgj.rSigAll.hExtrapNorm->Draw("same hist");
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,anaAgj.nameIsol,"");
          t3->AddEntry(anaAgj.rSigAll.h,Form("#gamma purity %.2f",1-anaAgj.fracPhotonBkg),"");
-         t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("%.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
       } else if (dataSrcType==2) {
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
-         t3->AddEntry(anaAgj.rSigAll.h,Form("pp 2.76TeV: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("pp 2.76TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
       } else if (dataSrcType==3) {
          if (cbin==0) t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
          t3->AddEntry(anaAgj.rSigAll.h,"","");
-         t3->AddEntry(anaAgj.rSigAll.h,Form("pp 7TeV: %.0f #gamma-jets",nPhotonJet),"");
+         t3->AddEntry(anaAgj.rSigAll.h,Form("pp 7TeV: %.0f #gamma-, <x>: %.2f",nPhotonJet,mean),"");
       }
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
@@ -174,7 +175,7 @@ void plotPtRatioSignal_AllCent4(
                                 float minJet=30,
                                 int log=0,
                                 int drawCheck = 0,
-                                TString outdir = "./fig/01.17_pp7TeV"
+                                TString outdir = "./fig/01.18_dphiwidth"
                                 )
 {
    TH1::SetDefaultSumw2();
@@ -259,6 +260,7 @@ void plotPtRatioSignal_AllCent4(
    //plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(2,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
+   ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("30-50%",0.8,0.25);
    drawText("(b)",0.05,0.885);
 
@@ -288,6 +290,7 @@ void plotPtRatioSignal_AllCent4(
    //plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
+   ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("10-30%",0.8,0.4);
    drawText("(c)",0.25,0.885);
 
@@ -310,6 +313,7 @@ void plotPtRatioSignal_AllCent4(
    plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18qcdpho80_v21_frac74_0to10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
    plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
+   ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
