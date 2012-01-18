@@ -85,21 +85,25 @@ public:
 
 class CentralityReWeight {
 public:
-   CentralityReWeight(TCut s) : sel(s) {}
+   CentralityReWeight(TString data, TString mc,TCut s) : 
+   datafname(data),mcfname(mc),sel(s) {}
    void Init()
    {
+      cout << "Reweight Centrality: " << endl;
+      cout << "Data file: " << datafname << endl;
+      cout << "MC file:   " << mcfname << endl;
       TChain * tdata = new TChain("tgj");
       TChain * tmc = new TChain("tgj");
-      tdata->Add("output-data-Photon-v6_v18.root");
-      tmc->Add("output-hy18pho50_37k_v18_frac74_rewtit0.root");
-
+      tdata->Add(datafname);
+      tmc->Add(mcfname);
+      
       hCentData = new TH1D("hCentData","",40,0,40);
       hCentMc = new TH1D("hCentMc","",40,0,40);
       hReWt = new TH1D("hReWt","",40,0,40);
-
+      
       //cout << "data: " << tdata->GetName() << " " << tdata->GetEntries() << endl;
       //cout << "mc: " << tmc->GetName() << " " << tmc->GetEntries() << endl;
-      tdata->Project("hCentData","cBin",sel&&"trig&&noiseFilt");
+      tdata->Project("hCentData","cBin",sel&&"anaEvtSel");
       tmc->Project("hCentMc","cBin",sel);
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
@@ -112,6 +116,7 @@ public:
       }
       return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
    }
+   TString datafname,mcfname;
    TCut sel;
    TH1D * hCentData;
    TH1D * hCentMc;
@@ -157,10 +162,13 @@ public:
 };
 
 void analyzePhotonJetPp7TeV(
-                            TString inname="rfio:/castor/cern.ch/user/y/yjlee/ppData2011/HiForest-pp7TeV-test.root",
-                            TString outname="output-pp7TeV-test_v21.root",
+                            //TString inname="rfio:/castor/cern.ch/user/y/yjlee/ppData2011/HiForest-pp7TeV-test.root",
+                            TString inname="rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/test.root",
+                            TString outname="output-pp7TeV-test2_v21.root",
                             double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
-                            bool doCentReWeight=false
+                            bool doCentReWeight=false,
+                            TString mcfname="",
+                            TString datafname="output-data-Photon-v7_v21.root"
                             )
 {
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
@@ -169,7 +177,7 @@ void analyzePhotonJetPp7TeV(
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;
    // Centrality reweiting
-   CentralityReWeight cw("offlSel&&photonEt>50");
+   CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
@@ -190,7 +198,7 @@ void analyzePhotonJetPp7TeV(
    // Output file
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
-   if (doCentReWeight) {
+   if (doCentReWeight&&mcfname!="") {
       cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
    }
    
