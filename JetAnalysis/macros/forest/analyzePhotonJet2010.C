@@ -130,7 +130,7 @@ class DuplicateEvents {
 public:
    DuplicateEvents(TString infname) {
       inf = TFile::Open(infname);
-      t = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
+      t = (TTree*)inf->Get("hltanalysis/HltTree");
    };
    ~DuplicateEvents() {
       delete inf;
@@ -140,8 +140,8 @@ public:
       evts.clear();
       occurrence.clear();
       int run,evt;
-      t->SetBranchAddress("run",&run);
-      t->SetBranchAddress("evt",&evt);
+      t->SetBranchAddress("Run",&run);
+      t->SetBranchAddress("Event",&evt);
       for (int i=0;i<t->GetEntries();i++) {
          t->GetEntry(i);
          if (i%100000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
@@ -162,11 +162,12 @@ public:
 };
 
 void analyzePhotonJet2010(
-                          //TString inname="rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
-                          //TString outname="output-data-pp2010-prod3-photon_v21.root",
-                          TString inname="rfio:/castor/cern.ch/user/p/pkurt/dijet/hiforest_Collision_pp_276_dijet.root",
-                          TString outname="output-data-pp2010-pkurt-photon_v21.root",
+                          TString inname="rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
+                          TString outname="output-data-pp2010-prod3-photon_v21.root",
+                          //TString inname="rfio:/castor/cern.ch/user/p/pkurt/dijet/hiforest_Collision_pp_276_dijet.root",
+                          //TString outname="output-data-pp2010-pkurt-photon_v21.root",
                           double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
+                          bool isPp=true,
                           bool doCentReWeight=false,
                           TString mcfname="",
                           TString datafname="output-data-Photon-v7_v21.root"
@@ -220,6 +221,18 @@ void analyzePhotonJet2010(
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
    
+   int runNum=-1,evtNum=-1,centBin=-1,HLT_Photon15_CaloIdVL_v1=0;
+   int phfCoincFilter=0,ppurityFractionFilter=0,pHBHENoiseFilter=0;
+   c->hltTree->SetBranchAddress("Run",&runNum);
+   c->hltTree->SetBranchAddress("Event",&evtNum);
+   c->hltTree->SetBranchAddress("hiBin",&centBin);
+   if (isPp) {
+      c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
+      c->skimTree->SetBranchAddress("phfCoincFilter",&phfCoincFilter);
+      c->skimTree->SetBranchAddress("ppurityFractionFilter",&ppurityFractionFilter);
+      c->skimTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
+   }
+   
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
    {
@@ -228,9 +241,9 @@ void analyzePhotonJet2010(
       // check if event is duplicate
       evt.nOccur = dupEvt.occurrence[i];
       // Event Info
-      evt.run = c->evt.run;
-      evt.evt = c->evt.evt;
-      evt.cBin = c->evt.hiBin;
+      evt.run = runNum;
+      evt.evt = evtNum;
+      evt.cBin = centBin;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
@@ -238,6 +251,11 @@ void analyzePhotonJet2010(
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.nOccur==1;
+      if (isPp) {
+         evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
+         evt.offlSel = phfCoincFilter && ppurityFractionFilter && pHBHENoiseFilter;
+         evt.anaEvtSel = evt.offlSel && evt.trig && evt.nOccur==1;
+      }
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
@@ -247,7 +265,8 @@ void analyzePhotonJet2010(
       evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
 
       
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%10000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " offlSel: " << evt.offlSel <<endl;
+      if (!evt.trig) continue;
       
       // initialize
       int leadingIndex=-1;
