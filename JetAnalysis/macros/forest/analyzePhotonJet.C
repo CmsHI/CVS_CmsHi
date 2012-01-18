@@ -162,14 +162,14 @@ public:
 };
 
 void analyzePhotonJet(
-                      int jetAlgo = 0, // 0=akpu3pf, 10=icpu5
+                      int jetAlgo = 232, // calo: 1xx, pf 2xx; cone: x3x,x5x, algo: icpu xx1, akpu xx2, ic xx10, ak xx20
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
                       //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v21_jetalo0.root",
+                      TString outname="output-data-Photon-v7_v21.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -192,6 +192,7 @@ void analyzePhotonJet(
 		      TString datafname="output-data-Photon-v7_v21.root"
     )
 {
+   outname.ReplaceAll(".root",Form("_jetalo%d.root",jetAlgo));
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;

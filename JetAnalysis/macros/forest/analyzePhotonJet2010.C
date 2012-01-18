@@ -162,9 +162,9 @@ public:
 };
 
 void analyzePhotonJet2010(
-                          int jetAlgo = 0, // 0=akpu3pf, 10=icpu5
+                          int jetAlgo = 232, // calo: 1xx, pf 2xx; cone: x3x,x5x, algo: icpu xx1, akpu xx2, ic xx10, ak xx20
                           TString inname="rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root",
-                          TString outname="output-data-pp2010-prod3-photon_v21_jetalo0.root",
+                          TString outname="output-data-pp2010-prod3-photon_v21.root",
                           //TString inname="rfio:/castor/cern.ch/user/p/pkurt/dijet/hiforest_Collision_pp_276_dijet.root",
                           //TString outname="output-data-pp2010-pkurt-photon_v21_jetalo0.root",
                           double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
@@ -174,6 +174,7 @@ void analyzePhotonJet2010(
                           TString datafname="output-data-Photon-v7_v21.root"
                           )
 {
+   outname.ReplaceAll(".root",Form("_jetalo%d.root",jetAlgo));
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;

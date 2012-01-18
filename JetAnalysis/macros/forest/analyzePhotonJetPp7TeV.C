@@ -162,16 +162,19 @@ public:
 };
 
 void analyzePhotonJetPp7TeV(
-                            int jetAlgo = 0, // 0=akpu3pf, 10=icpu5
+                            int jetAlgo = 232, // calo: 1xx, pf 2xx; cone: x3x,x5x, algo: icpu xx1, akpu xx2, ic xx10, ak xx20
                             //TString inname="rfio:/castor/cern.ch/user/y/yjlee/ppData2011/HiForest-pp7TeV-test.root",
-                            TString inname="rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/test.root",
-                            TString outname="output-pp7TeV-test2_v21_jetalgo0.root",
+                            //TString inname="rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/test.root",
+                            //TString outname="output-pp7TeV-test2_v21_jetalgo0.root",
+                            TString inname="rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v2.root",
+                            TString outname="output-pp-photon-7TeV-v2_v21.root",
                             double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                             bool doCentReWeight=false,
                             TString mcfname="",
                             TString datafname="output-data-Photon-v7_v21.root"
                             )
 {
+   outname.ReplaceAll(".root",Form("_jetalo%d.root",jetAlgo));
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;
@@ -197,6 +200,7 @@ void analyzePhotonJetPp7TeV(
    }
       
    // Output file
+   cout << "Output: " << outname << endl;
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
    if (doCentReWeight&&mcfname!="") {
