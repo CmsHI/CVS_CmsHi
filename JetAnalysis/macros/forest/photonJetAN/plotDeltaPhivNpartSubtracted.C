@@ -103,9 +103,17 @@ TGraphAsymmErrors * getRBSignal(
 
    for (int ib=0;ib<gAve->GetN();++ib)
    {
-      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
-      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
-      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+//      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
+//      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+//      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      // fit width
+      TF1 *fdphi = new TF1("fdphi","[0]+[1]*exp(-(3.1415926-x)/[2])",0,3.1415926);
+      fdphi->SetParameters(0.01,1,0.1);
+      vana[ib]->rSubtracted.hExtrapNorm->Fit("fdphi","0","",0.7,3.1415926);
+      float y=fdphi->GetParameter(2);
+      float errYL = fdphi->GetParError(2);
+      float errYH = fdphi->GetParError(2);
+      
       gAve->SetPointError(ib,0,0,errYL,errYH);
       if (dataType!=2) gAve->SetPoint(ib,npart[ib],y);
       else {
@@ -147,26 +155,28 @@ TGraphAsymmErrors * getRBSignal(
 }
 
 void plotDeltaPhivNpartSubtracted(
-                                float photonMinPt=60,
-                                float minJet = 30,
-                                int isolScheme=2,
-                                int subDPhiSide=1,
-                                int subSShapeSide=1,
-                                TString outdir = "./fig/01.11v19AN"
-                                )
+                                  float photonMinPt=60,
+                                  float minJet = 30,
+                                  int isolScheme=2,
+                                  int subDPhiSide=1,
+                                  int subSShapeSide=1,
+                                  int drawCheck = 0,
+                                  TString outdir = "./fig/01.18_dphiwidth"
+                                  )
 {
    TH1::SetDefaultSumw2();
-   int drawCheck = 0;
 
    TH1D *hTmp = new TH1D("hTmp","",100,-10,400);
    hTmp->SetXTitle("N_{part}");
    //hTmp->SetYTitle("<#DeltaE_{T}/E_{T,#gamma}> (GeV)");
-   hTmp->SetYTitle("<|#Delta#phi|>");
+   //hTmp->SetYTitle("<|#Delta#phi|>");
+   hTmp->SetYTitle("#sigma(|#Delta#phi|)");
    hTmp->GetXaxis()->CenterTitle();
    hTmp->GetYaxis()->CenterTitle();
    hTmp->GetYaxis()->SetTitleOffset(1.4);
    hTmp->GetYaxis()->SetTitleSize(0.05);
-   float ymin=3.14/2,ymax=4;
+   //float ymin=3.14/2,ymax=4;
+   float ymin=0,ymax=0.5;
    hTmp->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hTmp->Draw();
@@ -235,6 +245,6 @@ void plotDeltaPhivNpartSubtracted(
    leg2->SetTextSize(17);
    leg2->Draw();
 
-   c2->Print(Form("%s/Photonv7_v19_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,minJet,isolScheme,drawCheck));
-   c2->Print(Form("%s/Photonv7_v19_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,minJet,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v19_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d_fit.gif",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,minJet,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v19_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d_fit.pdf",outdir.Data(),subDPhiSide,subSShapeSide,photonMinPt,minJet,isolScheme,drawCheck));
 }
