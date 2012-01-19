@@ -199,6 +199,7 @@ void analyzePhotonJetPp7TeV(
             double jetEt = anajet->jtpt[awayIndex];
             double Agj = (photonEt-jetEt)/(photonEt+jetEt);
             gj.jetEt  = jetEt;
+            gj.jetRawEt = anajet->rawpt[awayIndex];
             gj.jetEta = anajet->jteta[awayIndex];
             gj.jetPhi = anajet->jtphi[awayIndex];
             gj.deta = anajet->jteta[awayIndex] - c->photon.eta[leadingIndex];
