@@ -1,14 +1,25 @@
 #
 # Data
 #
-#root -b -q analyzePhotonJet.C+'("/d102/yjlee/hiForest/HiForestPhoton-v7-noDuplicate.root","output-data-Photon-v7nodup_v21.root",1.,0)'
-root -b -q analyzePhotonJet.C+'("akPu3PF","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v22.root",1.,0)'
-root -b -q analyzePhotonJet.C+'("icPu5","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v22.root",1.,0)'
+#root -b -q analyzePhotonJet.C+'("/d102/yjlee/hiForest/HiForestPhoton-v7-noDuplicate.root","output-data-Photon-v7nodup_v23.root",1,1.,0)'
+root -b -q analyzePhotonJet.C+'("akPu3PF","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v23.root",1,1.,0)'
+root -b -q analyzePhotonJet.C+'("icPu5","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v23.root",1,1.,0)'
+
+#
+# pp 7 TeV
+#
+root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v2.root","output-pp-photon-7TeV-v2_v23.root",3,1.,0)'
+root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","/d100/yjlee/hiForest/hiForest/HiForest-pp-photon50-test.root","output-pypho50-test_v23.root",0,1.,0)'
+
+#
+# pp 2.76 TeV
+#
+root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root","output-data-pp2010-prod3-photon_v23.root",2,1.,0)'
 
 #
 # MC
 #
-#root -b -q analyzePhotonJet.C+'("akPu3PF","/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_37k.root","output-hy18pho50_37k_v22_frac74.root",0.74,1,"output-hy18pho50_37k_v21_frac74.root")'
+#root -b -q analyzePhotonJet.C+'("akPu3PF","/d101/kimy/macro/hiPhotonAna2011/rootFiles/photon50_37k.root","output-hy18pho50_37k_v23_frac74.root",0.74,1,"output-hy18pho50_37k_v21_frac74.root")'
 #root -b -q analyzePhotonJet.C+'("/d101/kimy/macro/hiPhotonAna2011/rootFiles/emJet80_41007events.root","output-hy18uq80em_41k_v21_frac26.root",0.259,1)'
 #root -b -q analyzePhotonJet.C+'("/d101/kimy/macro/hiPhotonAna2011/rootFiles/emJet120_25308events.root","output-hy18uq120em_25k_v21_frac26.root",0.261,1)'
 #hadd -f output-hy18pho50mixdj80emdj120em_v21.root output-hy18pho50_37k_v21_frac74.root output-hy18uq80em_41k_v21_frac26.root output-hy18uq120em_25k_v21_frac26.root
@@ -20,8 +31,3 @@ root -b -q analyzePhotonJet.C+'("icPu5","/d102/velicanu/forest/merged/HiForestPh
 
 #root -b -q analyzePhotonJet_gen.C+'("/d101/kimy/macro/hiPhotonAna2011/rootFiles/hydjet1.6/photon50_corrCentralityv12.root","output-hypho50v2gen_yongsun50k_v21_frac62.root",0.62,1)'
 #root -b -q analyzePhotonJet.C+'("/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50Q/HiForest_Tree/photon50_QuenchOn_Test.root","output-hypho50q_v21_frac62.root",0.62,1)'
-
-#
-# pp
-#
-#root -b -q analyzePhotonJet.C+'("/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/test.root","output-data-Photon-v7nodup_v21.root",1.,0)'
