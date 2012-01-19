@@ -32,6 +32,7 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
                             int subSShapeSide = 1,
                             float minPhoton=60,
                             float minJet=30,
+                            float sigDPhi=2.0944,
                             bool doCheck=false)
 {
    // open the data file
@@ -51,7 +52,7 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
 
    SignalCorrector anaAgj(nt,name,"(jetEt/photonEt)",Form("photonEt>%.3f",minPhoton)&&mycut,weight,cbin);
    anaAgj.cutBkgDPhi= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
-   anaAgj.cutSShape= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
+   anaAgj.cutSShape= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
    anaAgj.cutSShapeDPhi= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
    
    // analyze tree
@@ -59,16 +60,16 @@ SignalCorrector plotBalance(int cbin, TCut mycut, int isolScheme, int normMode,
       anaAgj.subDPhiSide = false;
       anaAgj.subSShapeSide = false;
       anaAgj.subSShapeSideDPhiSide = false;
-      anaAgj.MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>2.0944",minJet),20,0.001,1.999);
+      anaAgj.MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),20,0.001,1.999);
    } else if (dataType==1) {
       anaAgj.subDPhiSide = subDPhiSide;
       anaAgj.subSShapeSide = subSShapeSide;
       anaAgj.subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
       anaAgj.SetPhotonIsolation(isolScheme);
-      anaAgj.MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",minJet),20,0.001,1.999);
+      anaAgj.MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),20,0.001,1.999);
    }
 
-   anaAgj.Extrapolate(2.0944);
+   anaAgj.Extrapolate(sigDPhi);
    anaAgj.SubtractBkg();
    anaAgj.Normalize(normMode);
 
@@ -175,10 +176,11 @@ void plotPtRatioSignal_AllCent4(
                                 float minJet=30,
                                 int log=0,
                                 int drawCheck = 0,
-                                TString outdir = "./fig/01.18_dphiwidth"
+                                TString outdir = "./fig/01.19_qcdpho30"
                                 )
 {
    TH1::SetDefaultSumw2();
+   float sigDPhi=3.1415926*7./8;
 
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
@@ -231,11 +233,11 @@ void plotPtRatioSignal_AllCent4(
    c1->cd(1);
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
-   //plotBalance(3,"offlSel&&sampleWeight<0.2&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   //plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   plotBalance(3,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
-   SignalCorrector ppana = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v18.root","1==1",2,1,"sameE",subDPhiSide,0,minPhoton,minJet,drawCheck);
-   SignalCorrector ppana7 = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-pp7TeV-test2_v21.root","1==1",3,1,"sameE",subDPhiSide,0,minPhoton,minJet,drawCheck);
+   //plotBalance(3,"offlSel&&sampleWeight<0.2&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(3,"offlSel&&sampleWeight>0.5&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(3,"anaEvtSel&&cBin>=20&&cBin<40",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi,drawCheck);
+   SignalCorrector ppana = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v21.root","1==1",2,1,"sameE",subDPhiSide,0,minPhoton,minJet,sigDPhi,drawCheck);
+   SignalCorrector ppana7 = plotBalance(3,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v2_v22_akPu3PF.root","1==1",3,1,"sameE",subDPhiSide,0,minPhoton,minJet,sigDPhi,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
    ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("50-100%",0.8,0.25);
@@ -256,9 +258,9 @@ void plotPtRatioSignal_AllCent4(
    c1->cd(2);
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
-   //plotBalance(2,"offlSel&&sampleWeight<0.2&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   //plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   plotBalance(2,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
+   //plotBalance(2,"offlSel&&sampleWeight<0.2&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(2,"offlSel&&sampleWeight>0.5&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(2,"anaEvtSel&&cBin>=12&&cBin<20",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
    ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("30-50%",0.8,0.25);
@@ -286,9 +288,9 @@ void plotPtRatioSignal_AllCent4(
    c1->cd(3);
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
-   //plotBalance(1,"offlSel&&sampleWeight<0.2&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   //plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
+   //plotBalance(1,"offlSel&&sampleWeight<0.2&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(1,"offlSel&&sampleWeight>0.5&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(1,"anaEvtSel&&cBin>=4&&cBin<12",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
    ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("10-30%",0.8,0.4);
@@ -297,7 +299,7 @@ void plotPtRatioSignal_AllCent4(
    TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
    t4->AddEntry(hFrameData,Form("p_{T}^{#gamma} > %.0f GeV/c",minPhoton),"");
    t4->AddEntry(hFrameData,Form("p_{T}^{jet} > %.0f GeV/c",minJet),"");
-   t4->AddEntry(hFrameData,"#Delta#phi_{12} > #frac{2}{3}#pi","");
+   t4->AddEntry(hFrameData,"#Delta#phi_{12} > #frac{7}{8}#pi","");
    t4->SetFillColor(0);
    t4->SetBorderSize(0);
    t4->SetFillStyle(0);
@@ -308,17 +310,17 @@ void plotPtRatioSignal_AllCent4(
    c1->cd(4);
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
-   //plotBalance(0,"offlSel&&sampleWeight<0.2&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   //plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18qcdpho80_v21_frac74_0to10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,0);
-   plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v7_v21.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,drawCheck);
+   //plotBalance(0,"offlSel&&sampleWeight<0.2&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18fragpho80_frac10.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   //plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(0,"offlSel&&sampleWeight>0.5&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,"samehistE",subDPhiSide,0,minPhoton,minJet,sigDPhi,0);
+   plotBalance(0,"anaEvtSel&&cBin>=0&&cBin<4",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,"sameE",subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi,drawCheck);
    ppana.rSubtracted.hExtrapNorm->Draw("same");
    ppana7.rSubtracted.hExtrapNorm->Draw("same");
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v21_qcdPho_pp2760_gamma%.0fjet%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
 //   save histograms
 //   fout->Write();
