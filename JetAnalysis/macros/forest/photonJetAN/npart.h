@@ -5,12 +5,17 @@
 #include "TH1F.h"
 
 //---------------------------------------------------------------------
+// Convinient Output Classes
 class EvtSel {
 public:
    int run,evt,nOccur,cBin;
    int nG,nJ,nT;
    bool trig,offlSel,noiseFilt,anaEvtSel;
    float vz,weight,npart,ncoll,sampleWeight;
+   TString leaves;
+   EvtSel(){
+      leaves="run/I:evt:nOccur:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight";
+   }
 };
 
 static const int MAXTRK = 10000;
@@ -23,18 +28,42 @@ public:
    deta(-99),dphi(-99), Aj(-99),
    sigmaIetaIeta(-99),
    isEle(false),
-   nTrk(0)
-   {}
+   nTrk(0) {
+      leaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetRawEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
+      ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
+      ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
+      ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+      ":isEle/O";
+   }
    float photonEt,photonRawEt,photonEta,photonPhi;
-   float jetEt,jetEta,jetPhi;
+   float jetEt,jetRawEt,jetEta,jetPhi;
    float deta,dphi,Aj;
    float hovere,sigmaIetaIeta,sumIsol;
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
-   float refPhoPt,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
+   float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
+   float trkPt[MAXTRK];
+   float trkEta[MAXTRK];
+   float trkPhi[MAXTRK];   
+   float trkJetDr[MAXTRK];
+   TString leaves;
+   void clear() {
+      photonEt=-99; photonEta=-99; photonPhi=-99;
+      jetEt=-99; jetRawEt=-99; jetEta=-99; jetPhi=-99;
+      deta=-99; dphi=-99; Aj=-99;
+      sigmaIetaIeta=-99;
+      phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
+      ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
+      jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
+      jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
+      refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
+      isEle=false;
+      nTrk=0;
+   }
 };
 
 
