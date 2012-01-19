@@ -49,7 +49,7 @@ public:
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
-      jetEt=-99; jetEta=-99; jetPhi=-99;
+      jetEt=-99; jetRawEt=-99; jetEta=-99; jetPhi=-99;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
