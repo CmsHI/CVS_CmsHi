@@ -43,7 +43,7 @@ class HiForest : public TNamed
 {
 
   public: 
-   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0, bool isrecorrected = 0);
+   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0, bool isrecorrected = 0, TString jetAlgo="akPu3PF");
   ~HiForest();
 
   // Utility functions
@@ -236,7 +236,7 @@ class HiForest : public TNamed
   
 };
 
-HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, bool recjec):
+HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, bool recjec, TString jetAlgo):
    tree(0),
    fGauss(0),
    verbose(0),
@@ -261,7 +261,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
-  akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
+  akPu3jetTree = (TTree*) inf->Get(jetAlgo+"JetAnalyzer/t");
   hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
   ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
