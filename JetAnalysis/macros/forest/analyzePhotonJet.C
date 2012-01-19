@@ -52,7 +52,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v21.root",
+                      TString outname="output-data-Photon-v7_v22.root",
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
