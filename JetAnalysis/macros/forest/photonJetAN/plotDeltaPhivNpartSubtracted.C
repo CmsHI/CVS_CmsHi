@@ -213,13 +213,13 @@ void plotDeltaPhivNpartSubtracted(
    ghyqcdpho->SetMarkerStyle(kOpenCircle);
    ghyqcdpho->Draw("p same");
    
-//   cout << endl << "     pp 2.76" << endl;
-//   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v21.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
-//   gpp->SetMarkerSize(1.25);
-//   gpp->SetMarkerStyle(kOpenStar);
-//   gpp->SetMarkerColor(kBlue);
-//   gpp->SetLineColor(kBlue);
-//   gpp->Draw("p same");
+   cout << endl << "     pp 2.76" << endl;
+   TGraphAsymmErrors * gpp = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-data-pp2010-prod3-photon_v21.root",2,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->SetLineColor(kBlue);
+   gpp->Draw("p same");
 
    cout << endl << "     pp 7" << endl;
    TGraphAsymmErrors * gpp7 = getRBSignal(photonMinPt,minJet,-1,"anaEvtSel","(1==1)","../output-pp-photon-7TeV-v2_v22_akPu3PF.root",3,isolScheme,subDPhiSide,subSShapeSide,drawCheck);
@@ -254,7 +254,7 @@ void plotDeltaPhivNpartSubtracted(
    if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"MC: #gamma-Jet","p");
    leg->AddEntry(ghyqcdpho,"MC: All QCD #gamma","p");
-//   leg->AddEntry(gpp,"pp 2.76TeV","p");
+   leg->AddEntry(gpp,"pp 2.76TeV","p");
    leg->AddEntry(gpp7,"pp 7TeV","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
