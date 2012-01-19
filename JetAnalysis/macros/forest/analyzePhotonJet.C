@@ -13,7 +13,7 @@ class DuplicateEvents {
 public:
    DuplicateEvents(TString infname) {
       inf = TFile::Open(infname);
-      t = (TTree*)inf->Get("hiEvtAnalyzer/HiTree");
+      t = (TTree*)inf->Get("hltanalysis/HltTree");
    };
    ~DuplicateEvents() {
       delete inf;
@@ -23,8 +23,8 @@ public:
       evts.clear();
       occurrence.clear();
       int run,evt;
-      t->SetBranchAddress("run",&run);
-      t->SetBranchAddress("evt",&evt);
+      t->SetBranchAddress("Run",&run);
+      t->SetBranchAddress("Event",&evt);
       for (int i=0;i<t->GetEntries();i++) {
          t->GetEntry(i);
          if (i%100000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
@@ -53,6 +53,7 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
                       TString outname="output-data-Photon-v7_v22.root",
+                      int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -86,7 +87,7 @@ void analyzePhotonJet(
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
-   dupEvt.MakeList();
+   if (dataSrcType!=2) dupEvt.MakeList();
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
@@ -103,6 +104,7 @@ void analyzePhotonJet(
    }
       
    // Output file
+   cout << "Output: " << outname << endl;
    TFile *output = new TFile(outname,"recreate");
    TTree * tgj = new TTree("tgj","gamma jet tree");
    if (doCentReWeight&&mcfname!="") {
@@ -120,6 +122,17 @@ void analyzePhotonJet(
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
+
+   // pp triggers
+   int HLT_Photon15_CaloIdVL_v1=0;
+   int HLT_Photon50_CaloIdVL_v3=0;
+   int HLT_Photon50_CaloIdVL_IsoL_v6=0;
+   if (dataSrcType==2) {
+      c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
+   } else if (dataSrcType==3) {
+      c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_v3",&HLT_Photon50_CaloIdVL_v3);
+      c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_IsoL_v6",&HLT_Photon50_CaloIdVL_IsoL_v6);
+   }
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -127,11 +140,13 @@ void analyzePhotonJet(
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
       // check if event is duplicate
-      evt.nOccur = dupEvt.occurrence[i];
+      if (dataSrcType!=2) evt.nOccur = dupEvt.occurrence[i];
+      else evt.nOccur = 1;
       // Event Info
-      evt.run = c->evt.run;
-      evt.evt = c->evt.evt;
+      evt.run = c->hlt.Run;
+      evt.evt = c->hlt.Event;
       evt.cBin = c->evt.hiBin;
+      if (dataSrcType>1) evt.cBin = 39;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
@@ -139,6 +154,15 @@ void analyzePhotonJet(
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.nOccur==1;
+      if (dataSrcType>1) {
+         if (dataSrcType==2) {
+            evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
+         } else if (dataSrcType==3) {
+            evt.trig = (HLT_Photon50_CaloIdVL_v3>0)||(HLT_Photon50_CaloIdVL_IsoL_v6>0);
+         }
+         evt.offlSel = (c->skim.phfCoincFilter && c->skim.ppurityFractionFilter);
+         evt.anaEvtSel = evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
+      }
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
@@ -148,7 +172,8 @@ void analyzePhotonJet(
       evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
 
       
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (dataSrcType==2&&!evt.trig) continue;
       
       // initialize
       int leadingIndex=-1;
