@@ -169,6 +169,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    int cbin=3;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("50-100%",0.8,0.25);
@@ -191,6 +192,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=2;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("30-50%",0.8,0.25);
@@ -198,7 +200,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
 
    TLegend *t3=new TLegend(0.43,0.63,0.91,0.94); 
    t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
-   //t3->AddEntry(hFrame,"pp 2.76 TeV","p");
+   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
    t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
@@ -219,6 +221,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    cbin=1;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("10-30%",0.8,0.4);
@@ -240,6 +243,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=0;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("0-10%",0.75,0.4);
@@ -328,7 +332,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
    leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
    leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
-   leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{2}{3}#pi","");
+   leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{7}{8}#pi","");
    leg2->SetFillColor(0);
    leg2->SetBorderSize(0);
    leg2->SetFillStyle(0);
@@ -336,8 +340,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    leg2->SetTextSize(17);
    leg2->Draw();
    
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,isolScheme,drawCheck));
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,isolScheme,drawCheck));   
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
