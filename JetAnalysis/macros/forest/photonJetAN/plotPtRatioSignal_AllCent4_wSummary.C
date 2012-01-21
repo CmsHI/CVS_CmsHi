@@ -56,7 +56,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),20,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),15,0.001,1.999);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          if (dataSrcType==1) {
@@ -67,7 +67,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
             vana[ib]->subSShapeSideDPhiSide = false;
          }
          vana[ib]->SetPhotonIsolation(isolScheme);
-         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),20,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),15,0.001,1.999);
       }
       
       vana[ib]->Extrapolate(sigDPhi);
@@ -126,7 +126,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    TH1D * hFrame = (TH1D*)vanahi[0]->rSubtracted.hExtrapNorm->Clone("hFrame");
    hFrame->Reset();
    hFrame->SetAxisRange(0.001,1.999,"X");
-   hFrame->SetAxisRange(-0.05,0.45,"Y");
+   hFrame->SetAxisRange(-0.05,0.3,"Y");
+   if (normMode==1) hFrame->SetAxisRange(-0.05,0.35,"Y");
    if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
    hFrame->SetStats(0);
    hFrame->SetMarkerStyle(kOpenSquare);
@@ -202,7 +203,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
 
    c1->cd(3);
    if (log==1) gPad->SetLogy();
-   hFrameNoY->DrawClone();
+   hFrame->DrawClone();
    cbin=1;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
@@ -303,29 +304,17 @@ void plotHistograms(const SignalCorrector* ana,
    if (dataSrcType) {
       // Draw count
       float nPhotonJet = ana->rSubtracted.nExtrap;
-      float lx = 0.1;
-      if (cbin==2||cbin==0) lx=-0.1;
-      TLegend *t3=new TLegend(lx,0.45,0.5,0.82);
+      float dx = 0,dy = 0;
+      if (cbin==2||cbin==0) dx=-0.2;
+      if (cbin<=1) dy = 0.04;
+      TLegend *t3=new TLegend(0.13+dx,0.65+dy,0.5+dx,0.85+dy);
       if (dataSrcType==1) {
          ana->rSigAll.hExtrapNorm->SetLineStyle(2);
          ana->rSigAll.hExtrapNorm->Draw("same hist");
          if (cbin==0) t3->AddEntry(ana->rSigAll.h,ana->nameIsol,"");
          t3->AddEntry(ana->rSigAll.h,Form("#gamma purity %.2f",1-ana->fracPhotonBkg),"");
-         t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-      } else if (dataSrcType==2) {
-         if (cbin==0) t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,Form("pp 2.76TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
-         t3->AddEntry(ana->rSigAll.h,"","");
-      } else if (dataSrcType==3) {
-         if (cbin==0) t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,"","");
-         t3->AddEntry(ana->rSigAll.h,Form("pp 7TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
+         if (drawCheck) t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
+         else t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j",nPhotonJet),"");
       }
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
@@ -333,5 +322,24 @@ void plotHistograms(const SignalCorrector* ana,
       t3->SetTextFont(63);
       t3->SetTextSize(15);
       t3->Draw();
+
+      TLegend *t4=new TLegend(0.7+dx,0.75+dy,0.85+dx,0.85+dy);
+      if (cbin==0) {
+         if (dataSrcType==2) {
+            if (drawCheck) t4->AddEntry(ana->rSigAll.h,Form("pp2.76TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
+            else t4->AddEntry(ana->rSigAll.h,Form("pp2.76TeV: %.0f #gamma-j",nPhotonJet),"");
+            t4->AddEntry(ana->rSigAll.h,"","");
+         } else if (dataSrcType==3) {
+            t4->AddEntry(ana->rSigAll.h,"","");
+            if (drawCheck) t4->AddEntry(ana->rSigAll.h,Form("pp7TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
+            else t4->AddEntry(ana->rSigAll.h,Form("pp7TeV: %.0f #gamma-j",nPhotonJet),"");
+         }
+         t4->SetFillColor(0);
+         t4->SetBorderSize(0);
+         t4->SetFillStyle(0);
+         t4->SetTextFont(63);
+         t4->SetTextSize(15);
+         t4->Draw();
+      }
    }
 }
