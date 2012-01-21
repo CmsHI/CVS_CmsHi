@@ -72,7 +72,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
       
       vana[ib]->Extrapolate(sigDPhi);
       vana[ib]->SubtractBkg();
-      vana[ib]->Normalize(1);
+      vana[ib]->Normalize(normMode);
    }
 //   inf->Close();
 }
@@ -112,7 +112,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahypho;
-   getHistograms(vanahypho, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanahypho, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
 //   vector<SignalCorrector*> vanapp;
 //   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v21.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -154,7 +154,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
    int cbin=3;
-   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehist");
+   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("50-100%",0.8,0.25);
@@ -176,7 +176,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
    cbin=2;
-   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehist");
+   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("30-50%",0.8,0.25);
@@ -204,7 +204,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
    cbin=1;
-   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehist");
+   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("10-30%",0.8,0.4);
@@ -225,7 +225,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
    cbin=0;
-   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehist");
+   plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("0-10%",0.75,0.4);
@@ -269,7 +269,7 @@ void plotHistograms(const SignalCorrector* ana,
          ana->rSubtracted.hExtrapNorm->SetFillColor(kAzure-8);
          ana->rSubtracted.hExtrapNorm->SetFillStyle(3005);
          ana->rSubtracted.hExtrapNorm->SetMarkerStyle(0);
-      } else if (dataType==2) {   
+      } else if (dataType==2) {
          ana->rSubtracted.hExtrapNorm->SetLineColor(kBlue);
          ana->rSubtracted.hExtrapNorm->SetFillColor(kAzure-8);
          ana->rSubtracted.hExtrapNorm->SetFillStyle(3004);
