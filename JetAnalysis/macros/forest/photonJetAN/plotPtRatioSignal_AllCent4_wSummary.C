@@ -19,6 +19,7 @@
 
 #include "commonUtility.h"
 #include "SignalCorrector.h"
+#include "npart.h"
 #endif
 
 //---------------------------------------------------------------------
@@ -85,6 +86,15 @@ void plotHistograms(const SignalCorrector* ana,
                     TString opt = "sameE"
                     );
 
+TGraphAsymmErrors * getSummary(
+                               int nBin,
+                               float * npart,
+                               const vector<SignalCorrector*> & vana,
+                               int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
+                               int dataType, // 0=mc gen, 1=reco
+                               int drawCheck = 0
+                               );
+
 //---------------------------------------------------------------------
 void plotPtRatioSignal_AllCent4_wSummary(
                                          int isolScheme=0, // 0=sumIsol, 1=cutIsol, 2=fisherIsol
@@ -114,6 +124,9 @@ void plotPtRatioSignal_AllCent4_wSummary(
    vector<SignalCorrector*> vanahypho;
    getHistograms(vanahypho, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
+   vector<SignalCorrector*> vanahygj;
+   getHistograms(vanahygj, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+
 //   vector<SignalCorrector*> vanapp;
 //   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v21.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
@@ -126,8 +139,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    TH1D * hFrame = (TH1D*)vanahi[0]->rSubtracted.hExtrapNorm->Clone("hFrame");
    hFrame->Reset();
    hFrame->SetAxisRange(0.001,1.999,"X");
-   hFrame->SetAxisRange(-0.05,0.3,"Y");
-   if (normMode==1) hFrame->SetAxisRange(-0.05,0.35,"Y");
+   hFrame->SetAxisRange(-0.02,0.2999,"Y");
+   if (normMode==1) hFrame->SetAxisRange(-0.02,0.3499,"Y");
    if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
    hFrame->SetStats(0);
    hFrame->SetMarkerStyle(kOpenSquare);
@@ -234,6 +247,59 @@ void plotPtRatioSignal_AllCent4_wSummary(
 
    c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
    c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+
+   //
+   // Summary Plot
+   //
+   float npart[nBin];// = {2,358.623,232.909,97.9521};
+   GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
+   cout << "got npart" << endl;
+
+   TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
+   hNpartFrame->SetXTitle("N_{part}");
+   hNpartFrame->SetYTitle("<x_{JG}>");
+   hNpartFrame->GetXaxis()->CenterTitle();
+   hNpartFrame->GetYaxis()->CenterTitle();
+   hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
+   hNpartFrame->GetYaxis()->SetTitleSize(0.05);
+   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
+   hNpartFrame->SetAxisRange(ymin,ymax,"Y");
+   TCanvas *c2 = new TCanvas("c","",500,500);
+   hNpartFrame->Draw();
+   
+   cout << endl << "     MC Isol Pho" << endl;
+   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,0);
+   ghypho->SetMarkerSize(1.25);
+   ghypho->SetMarkerStyle(kOpenSquare);
+   ghypho->Draw("p same");
+   
+   cout << endl << "     MC Gamma-jet" << endl;
+   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,0);
+   ghygj->SetMarkerSize(1.25);
+   ghygj->SetMarkerStyle(kOpenCircle);
+   ghygj->Draw("p same");
+   
+//   cout << endl << "     pp" << endl;
+//   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
+//   gpp->SetMarkerSize(1.25);
+//   gpp->SetMarkerStyle(kOpenStar);
+//   gpp->SetMarkerColor(kBlue);
+//   gpp->Draw("p same");
+
+   cout << endl << "     pp 7" << endl;
+   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,0);
+   gpp7->SetMarkerSize(1.25);
+   gpp7->SetMarkerStyle(kOpenStar);
+   gpp7->SetMarkerColor(kOrange+2);
+   gpp7->SetLineColor(kOrange+2);
+   gpp7->Draw("p same");
+   
+   cout << endl << "     Data" << endl;
+   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,drawCheck);
+   gdata->SetMarkerSize(1.25);
+   gdata->SetMarkerColor(2);
+   gdata->SetLineColor(2);
+   gdata->Draw("p same");
 }
 
 void plotHistograms(const SignalCorrector* ana,
@@ -342,4 +408,66 @@ void plotHistograms(const SignalCorrector* ana,
          t4->Draw();
       }
    }
+}
+
+TGraphAsymmErrors * getSummary(
+                               int nBin,
+                               float * npart,
+                               const vector<SignalCorrector*> & vana,
+                               int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
+                               int dataType, // 0=mc gen, 1=reco
+                               int drawCheck
+                               )
+{
+   // make graph
+   TGraphAsymmErrors * gAve = new TGraphAsymmErrors(nBin);
+   
+   float nPhotonJet=0;
+   for (int ib=0;ib<gAve->GetN();++ib)
+   {
+      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
+      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      
+      gAve->SetPointError(ib,0,0,errYL,errYH);
+      if (dataSrcType<=1) gAve->SetPoint(ib,npart[ib],y);
+      else {
+         gAve->SetPoint(ib,2,y);
+         cout<<" Setting PYTHIA point to npart=2 by hand"<<endl;
+      }
+      cout <<"bin: " << ib <<" npart: "<<npart[ib]<< " y: " << y << " yerr: " << errYH << endl;
+      nPhotonJet+=vana[ib]->rSubtracted.nExtrap;
+   }
+   
+   // Draw count
+   TLegend *t3=new TLegend(0.1,0.68,0.51,0.89);
+   if (dataSrcType==1) {
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,vana[0]->nameIsol,"");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("PbPb: %.0f #gamma-j",nPhotonJet),"");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      //      for (int ib=nBin-1;ib>=0;--ib) {
+      //         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("%.0f to %.0f \%: %.0f #gamma-j",m[ib]*2.5,m[ib+1]*2.5,vana[ib]->rSubtracted.nExtrap),"");
+      //      }
+   } else if (dataSrcType==2) {
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76GeV: %.0f #gamma-j",nPhotonJet),"");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
+   } else if (dataSrcType==3) {
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
+      t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 7TeV: %.0f #gamma-j",nPhotonJet),"");
+      //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
+   }
+   t3->SetFillColor(0);
+   t3->SetBorderSize(0);
+   t3->SetFillStyle(0);
+   t3->SetTextFont(63);
+   t3->SetTextSize(15);
+   t3->Draw();      
+   
+   return gAve;
 }
