@@ -127,8 +127,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    vector<SignalCorrector*> vanahygj;
    getHistograms(vanahygj, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
-//   vector<SignalCorrector*> vanapp;
-//   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v21.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   vector<SignalCorrector*> vanapp;
+   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v23_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
    getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v2_v22_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -245,8 +245,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v22_akPu3PF_qcdPho_pp2760_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
    //
    // Summary Plot
@@ -279,12 +279,12 @@ void plotPtRatioSignal_AllCent4_wSummary(
    ghygj->SetMarkerStyle(kOpenCircle);
    ghygj->Draw("p same");
    
-//   cout << endl << "     pp" << endl;
-//   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
-//   gpp->SetMarkerSize(1.25);
-//   gpp->SetMarkerStyle(kOpenStar);
-//   gpp->SetMarkerColor(kBlue);
-//   gpp->Draw("p same");
+   cout << endl << "     pp 2.76" << endl;
+   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->Draw("p same");
 
    cout << endl << "     pp 7" << endl;
    TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,0);
@@ -300,6 +300,44 @@ void plotPtRatioSignal_AllCent4_wSummary(
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
+   
+   // Annotation
+   drawText("CMS Preliminary",0.198,0.89,17);
+   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+   pline->SetLineColor(4);
+   pline->SetLineStyle(4);
+   pline->Draw();   
+   
+   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
+   leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
+   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+//   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+//   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+//   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+   leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
+   leg->AddEntry(ghygj,"#gammaJet + HYDJET1.8","p");
+   leg->AddEntry(gpp,"pp 2.76 TeV","p");
+   leg->AddEntry(gpp7,"pp 7 TeV","p");
+   leg->SetFillColor(0);
+   leg->SetBorderSize(0);
+   leg->SetFillStyle(0);
+   leg->SetTextFont(63);
+   leg->SetTextSize(17);
+   leg->Draw();
+   
+   TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
+   leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
+   leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
+   leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{2}{3}#pi","");
+   leg2->SetFillColor(0);
+   leg2->SetBorderSize(0);
+   leg2->SetFillStyle(0);
+   leg2->SetTextFont(63);
+   leg2->SetTextSize(17);
+   leg2->Draw();
+   
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,isolScheme,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
