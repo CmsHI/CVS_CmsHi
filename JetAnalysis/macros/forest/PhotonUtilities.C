@@ -84,6 +84,9 @@ bool HiForest::isMCSignal(int j)
     return 0;
   if ( fabs(photon.genMomId[j]) > 22)
     return 0;
+  if ( photon.genCalIsoDR04[j] > 5) 
+    return 0;
+  
   return 1;
 }
 
