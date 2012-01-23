@@ -170,6 +170,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    int cbin=3;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanahygj[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
@@ -193,6 +194,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=2;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanahygj[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
@@ -222,6 +224,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    cbin=1;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanahygj[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
@@ -244,6 +247,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=0;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
+   plotHistograms(vanahygj[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
@@ -262,12 +266,12 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
 
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
-   hNpartFrame->SetYTitle("<x_{JG}>");
+   hNpartFrame->SetYTitle("#sigma(|#Delta#phi|)");
    hNpartFrame->GetXaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
    hNpartFrame->GetYaxis()->SetTitleSize(0.05);
-   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
+   float ymin=0,ymax=0.5;
    hNpartFrame->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hNpartFrame->Draw();
@@ -320,7 +324,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
 //   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
-   leg->AddEntry(ghygj,"#gammaJet + HYDJET1.8","p");
+   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
    leg->AddEntry(gpp,"pp 2.76 TeV","p");
    leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->SetFillColor(0);
@@ -483,9 +487,16 @@ TGraphAsymmErrors * getSummary(
    float nPhotonJet=0;
    for (int ib=0;ib<gAve->GetN();++ib)
    {
-      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
-      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
-      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      float y=0,errYL=0,errYH=0;
+//      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
+//      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+//      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      TF1 * fdphi = vana[ib]->rSubtracted.hExtrapNorm->GetFunction("fdphi");
+      if (fdphi) {
+         y=fdphi->GetParameter(2);
+         errYL = fdphi->GetParError(2);
+         errYH = fdphi->GetParError(2);
+      }
       
       gAve->SetPointError(ib,0,0,errYL,errYH);
       if (dataSrcType<=1) gAve->SetPoint(ib,npart[ib],y);
