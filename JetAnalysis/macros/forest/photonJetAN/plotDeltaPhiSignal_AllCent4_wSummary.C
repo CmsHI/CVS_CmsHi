@@ -256,93 +256,93 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    //
    // Summary Plot
    //
-//   float npart[nBin];// = {2,358.623,232.909,97.9521};
-//   GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
-//   cout << "got npart" << endl;
-//
-//   TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
-//   hNpartFrame->SetXTitle("N_{part}");
-//   hNpartFrame->SetYTitle("<x_{JG}>");
-//   hNpartFrame->GetXaxis()->CenterTitle();
-//   hNpartFrame->GetYaxis()->CenterTitle();
-//   hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
-//   hNpartFrame->GetYaxis()->SetTitleSize(0.05);
-//   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
-//   hNpartFrame->SetAxisRange(ymin,ymax,"Y");
-//   TCanvas *c2 = new TCanvas("c","",500,500);
-//   hNpartFrame->Draw();
-//   
-//   cout << endl << "     MC Isol Pho" << endl;
-//   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,0);
-//   ghypho->SetMarkerSize(1.25);
-//   ghypho->SetMarkerStyle(kOpenSquare);
-//   ghypho->Draw("p same");
-//   
-//   cout << endl << "     MC Gamma-jet" << endl;
-//   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,0);
-//   ghygj->SetMarkerSize(1.25);
-//   ghygj->SetMarkerStyle(kOpenCircle);
-//   ghygj->Draw("p same");
-//   
-//   cout << endl << "     pp 2.76" << endl;
-//   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
-//   gpp->SetMarkerSize(1.25);
-//   gpp->SetMarkerStyle(kOpenStar);
-//   gpp->SetMarkerColor(kBlue);
-//   gpp->Draw("p same");
-//
-//   cout << endl << "     pp 7" << endl;
-//   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,0);
-//   gpp7->SetMarkerSize(1.25);
-//   gpp7->SetMarkerStyle(kOpenStar);
-//   gpp7->SetMarkerColor(kOrange+2);
-//   gpp7->SetLineColor(kOrange+2);
-//   gpp7->Draw("p same");
-//   
-//   cout << endl << "     Data" << endl;
-//   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,drawCheck);
-//   gdata->SetMarkerSize(1.25);
-//   gdata->SetMarkerColor(2);
-//   gdata->SetLineColor(2);
-//   gdata->Draw("p same");
-//   
-//   // Annotation
-//   drawText("CMS Preliminary",0.198,0.89,17);
-//   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
-//   pline->SetLineColor(4);
-//   pline->SetLineStyle(4);
-//   pline->Draw();   
-//   
-//   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
-//   leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
-//   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
-////   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-////   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-////   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-//   leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
-//   leg->AddEntry(ghygj,"#gammaJet + HYDJET1.8","p");
-//   leg->AddEntry(gpp,"pp 2.76 TeV","p");
-//   leg->AddEntry(gpp7,"pp 7 TeV","p");
-//   leg->SetFillColor(0);
-//   leg->SetBorderSize(0);
-//   leg->SetFillStyle(0);
-//   leg->SetTextFont(63);
-//   leg->SetTextSize(17);
-//   leg->Draw();
-//   
-//   TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
-//   leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
-//   leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
-//   leg2->AddEntry(hNpartFrame,Form("#Delta#phi_{12} > %.1f",sigDPhi),"");
-//   leg2->SetFillColor(0);
-//   leg2->SetBorderSize(0);
-//   leg2->SetFillStyle(0);
-//   leg2->SetTextFont(63);
-//   leg2->SetTextSize(17);
-//   leg2->Draw();
-//   
-//   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
-//   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
+   float npart[nBin];
+   GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
+   cout << "got npart" << endl;
+
+   TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
+   hNpartFrame->SetXTitle("N_{part}");
+   hNpartFrame->SetYTitle("<x_{JG}>");
+   hNpartFrame->GetXaxis()->CenterTitle();
+   hNpartFrame->GetYaxis()->CenterTitle();
+   hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
+   hNpartFrame->GetYaxis()->SetTitleSize(0.05);
+   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
+   hNpartFrame->SetAxisRange(ymin,ymax,"Y");
+   TCanvas *c2 = new TCanvas("c","",500,500);
+   hNpartFrame->Draw();
+   
+   cout << endl << "     MC Isol Pho" << endl;
+   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,0);
+   ghypho->SetMarkerSize(1.25);
+   ghypho->SetMarkerStyle(kOpenSquare);
+   ghypho->Draw("p same");
+   
+   cout << endl << "     MC Gamma-jet" << endl;
+   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,0);
+   ghygj->SetMarkerSize(1.25);
+   ghygj->SetMarkerStyle(kOpenCircle);
+   ghygj->Draw("p same");
+   
+   cout << endl << "     pp 2.76" << endl;
+   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->Draw("p same");
+
+   cout << endl << "     pp 7" << endl;
+   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,0);
+   gpp7->SetMarkerSize(1.25);
+   gpp7->SetMarkerStyle(kOpenStar);
+   gpp7->SetMarkerColor(kOrange+2);
+   gpp7->SetLineColor(kOrange+2);
+   gpp7->Draw("p same");
+   
+   cout << endl << "     Data" << endl;
+   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,drawCheck);
+   gdata->SetMarkerSize(1.25);
+   gdata->SetMarkerColor(2);
+   gdata->SetLineColor(2);
+   gdata->Draw("p same");
+   
+   // Annotation
+   drawText("CMS Preliminary",0.198,0.89,17);
+   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+   pline->SetLineColor(4);
+   pline->SetLineStyle(4);
+   pline->Draw();   
+   
+   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
+   leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
+   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+//   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+//   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+//   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+   leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
+   leg->AddEntry(ghygj,"#gammaJet + HYDJET1.8","p");
+   leg->AddEntry(gpp,"pp 2.76 TeV","p");
+   leg->AddEntry(gpp7,"pp 7 TeV","p");
+   leg->SetFillColor(0);
+   leg->SetBorderSize(0);
+   leg->SetFillStyle(0);
+   leg->SetTextFont(63);
+   leg->SetTextSize(17);
+   leg->Draw();
+   
+   TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
+   leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
+   leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
+   leg2->AddEntry(hNpartFrame,Form("#Delta#phi_{12} > %.1f",sigDPhi),"");
+   leg2->SetFillColor(0);
+   leg2->SetBorderSize(0);
+   leg2->SetFillStyle(0);
+   leg2->SetTextFont(63);
+   leg2->SetTextSize(17);
+   leg2->Draw();
+   
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
@@ -397,10 +397,12 @@ void plotHistograms(const SignalCorrector* ana,
    fdphi->SetParameters(0.01,1,0.1);
    ana->rSubtracted.hExtrapNorm->Fit("fdphi","0","",2.0944,3.1415926);
    fdphi->SetLineWidth(1);
+   fdphi->SetLineStyle(2);
    if (dataSrcType) {
       if (dataSrcType==1) fdphi->SetLineColor(kRed);
       else if (dataSrcType==3) fdphi->SetLineColor(kOrange+2);
    } else fdphi->SetLineColor(kBlue);
+   fdphi->Draw("same");
    float dphiWidth = fdphi->GetParameter(2);
    
    // check subtraction
@@ -433,8 +435,8 @@ void plotHistograms(const SignalCorrector* ana,
          ana->rSigAll.hExtrapNorm->Draw("same hist");
          if (cbin==0) t3->AddEntry(ana->rSigAll.h,ana->nameIsol,"");
          t3->AddEntry(ana->rSigAll.h,Form("#gamma purity %.2f",1-ana->fracPhotonBkg),"");
-         if (drawCheck) t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
-         else t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j",nPhotonJet),"");
+         t3->AddEntry(ana->rSigAll.h,Form("%.0f #gamma-j",nPhotonJet),"");
+         t3->AddEntry(ana->rSigAll.h,Form("  #sigma(|#Delta#phi|): %.2f",dphiWidth),"");
       }
       t3->SetFillColor(0);
       t3->SetBorderSize(0);
@@ -443,16 +445,18 @@ void plotHistograms(const SignalCorrector* ana,
       t3->SetTextSize(15);
       t3->Draw();
 
-      TLegend *t4=new TLegend(0.7+dx,0.75+dy,0.85+dx,0.85+dy);
-      if (cbin==0) {
+      TLegend *t4=new TLegend(0.13+dx,0.4+dy,0.5+dx,0.58+dy);
+      if (cbin==2) {
          if (dataSrcType==2) {
-            if (drawCheck) t4->AddEntry(ana->rSigAll.h,Form("pp2.76TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
-            else t4->AddEntry(ana->rSigAll.h,Form("pp2.76TeV: %.0f #gamma-j",nPhotonJet),"");
+            t4->AddEntry(ana->rSigAll.h,Form("pp2.76TeV: %.0f #gamma-j",nPhotonJet),"");
+            t4->AddEntry(ana->rSigAll.h,Form("  #sigma(|#Delta#phi|): %.2f",dphiWidth),"");
+            t4->AddEntry(ana->rSigAll.h,"","");
             t4->AddEntry(ana->rSigAll.h,"","");
          } else if (dataSrcType==3) {
             t4->AddEntry(ana->rSigAll.h,"","");
-            if (drawCheck) t4->AddEntry(ana->rSigAll.h,Form("pp7TeV: %.0f #gamma-j, <x>: %.2f",nPhotonJet,mean),"");
-            else t4->AddEntry(ana->rSigAll.h,Form("pp7TeV: %.0f #gamma-j",nPhotonJet),"");
+            t4->AddEntry(ana->rSigAll.h,"","");
+            t4->AddEntry(ana->rSigAll.h,Form("pp7TeV: %.0f #gamma-j",nPhotonJet),"");
+            t4->AddEntry(ana->rSigAll.h,Form("  #sigma(|#Delta#phi|): %.2f",dphiWidth),"");
          }
          t4->SetFillColor(0);
          t4->SetBorderSize(0);
