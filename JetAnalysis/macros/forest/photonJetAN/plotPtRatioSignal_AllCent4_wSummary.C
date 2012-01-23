@@ -256,7 +256,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    //
    // Summary Plot
    //
-   int summaryMode = 0; // 0 = average, 2 = area
+   int summaryMode = 2; // 0 = average, 2 = area
    float npart[nBin];// = {2,358.623,232.909,97.9521};
    GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
