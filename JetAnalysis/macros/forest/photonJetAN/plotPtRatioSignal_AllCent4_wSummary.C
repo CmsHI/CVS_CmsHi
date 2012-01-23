@@ -319,7 +319,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
 //   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
-   leg->AddEntry(ghygj,"#gammaJet + HYDJET1.8","p");
+   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
    leg->AddEntry(gpp,"pp 2.76 TeV","p");
    leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->SetFillColor(0);
@@ -363,8 +363,8 @@ void plotHistograms(const SignalCorrector* ana,
          ana->rSubtracted.hExtrapNorm->SetMarkerColor(kBlack);
          ana->rSubtracted.hExtrapNorm->SetMarkerStyle(kOpenSquare);
       } else if (dataSrcType==3) {
-         ana->rSubtracted.hExtrapNorm->SetLineColor(kOrange+7);
-         ana->rSubtracted.hExtrapNorm->SetMarkerColor(kOrange+7);
+         ana->rSubtracted.hExtrapNorm->SetLineColor(kOrange+2);
+         ana->rSubtracted.hExtrapNorm->SetMarkerColor(kOrange+2);
          ana->rSubtracted.hExtrapNorm->SetMarkerStyle(kOpenStar);
       }
    } else {
