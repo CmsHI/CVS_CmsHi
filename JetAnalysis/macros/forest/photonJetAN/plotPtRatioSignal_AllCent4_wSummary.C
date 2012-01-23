@@ -92,6 +92,7 @@ TGraphAsymmErrors * getSummary(
                                const vector<SignalCorrector*> & vana,
                                int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
                                int dataType, // 0=mc gen, 1=reco
+                               int anaMode = 0, // 0=get mean, 1 = get fit, 2 = get area
                                int drawCheck = 0
                                );
 
@@ -122,7 +123,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v22_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahypho;
-   getHistograms(vanahypho, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18qcdpho30_v22_frac74_akPu3PF.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanahypho, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18qcdpho30_v23_frac74_akPu3PF.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahygj;
    getHistograms(vanahygj, vcutCent,"offlSel&&sampleWeight>0.5",isolScheme,normMode,"../output-hy18pho50mixdj80emdj120em_v18.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -255,6 +256,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    //
    // Summary Plot
    //
+   int summaryMode = 0; // 0 = average, 2 = area
    float npart[nBin];// = {2,358.623,232.909,97.9521};
    GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
@@ -262,36 +264,38 @@ void plotPtRatioSignal_AllCent4_wSummary(
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
    hNpartFrame->SetYTitle("<x_{JG}>");
+   if (summaryMode==2) hNpartFrame->SetYTitle("R(x_{#gamma,J}>0)");
    hNpartFrame->GetXaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
    hNpartFrame->GetYaxis()->SetTitleSize(0.05);
    float ymin=0.45,ymax=1.2; // 35, 2, 0.4
+   if (summaryMode==2) { ymin=0; ymax=1; }
    hNpartFrame->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hNpartFrame->Draw();
    
    cout << endl << "     MC Isol Pho" << endl;
-   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,0);
+   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,summaryMode,0);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
    cout << endl << "     MC Gamma-jet" << endl;
-   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,0);
+   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,summaryMode,0);
    ghygj->SetMarkerSize(1.25);
    ghygj->SetMarkerStyle(kOpenCircle);
    ghygj->Draw("p same");
    
    cout << endl << "     pp 2.76" << endl;
-   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,0);
+   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,0);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kBlue);
    gpp->Draw("p same");
 
    cout << endl << "     pp 7" << endl;
-   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,0);
+   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,0);
    gpp7->SetMarkerSize(1.25);
    gpp7->SetMarkerStyle(kOpenStar);
    gpp7->SetMarkerColor(kOrange+2);
@@ -299,7 +303,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    gpp7->Draw("p same");
    
    cout << endl << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,drawCheck);
+   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck);
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
@@ -340,8 +344,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    leg2->SetTextSize(17);
    leg2->Draw();
    
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
+   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
@@ -458,18 +462,29 @@ TGraphAsymmErrors * getSummary(
                                const vector<SignalCorrector*> & vana,
                                int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
                                int dataType, // 0=mc gen, 1=reco
+                               int anaMode, // 0=get mean, 1 = get fit, 2 = get area
                                int drawCheck
                                )
 {
    // make graph
+   cout << "Summary mode: " << anaMode << endl;
    TGraphAsymmErrors * gAve = new TGraphAsymmErrors(nBin);
    
    float nPhotonJet=0;
    for (int ib=0;ib<gAve->GetN();++ib)
    {
-      float y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
-      float errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
-      float errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      float y=0, errYL=0, errYH =0;
+      if (anaMode ==0) {
+         y=vana[ib]->rSubtracted.hExtrapNorm->GetMean();
+         errYL = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+         errYH = vana[ib]->rSubtracted.hExtrapNorm->GetMeanError();
+      } else if (anaMode ==2 ) {
+         int imin = vana[ib]->rSubtracted.hExtrapNorm->FindBin(0);
+         int imax = vana[ib]->rSubtracted.hExtrapNorm->FindBin(10);
+         y=vana[ib]->rSubtracted.hExtrapNorm->Integral(imin,imax);
+         errYL = y/sqrt(vana[ib]->rSubtracted.nExtrap);
+         errYH = y/sqrt(vana[ib]->rSubtracted.nExtrap);
+      }
       
       gAve->SetPointError(ib,0,0,errYL,errYH);
       if (dataSrcType<=1) gAve->SetPoint(ib,npart[ib],y);
