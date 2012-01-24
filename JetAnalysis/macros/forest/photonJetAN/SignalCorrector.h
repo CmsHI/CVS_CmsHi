@@ -210,18 +210,21 @@ public:
          rBkgSShapeDPhi.hExtrapNorm = (TH1D*)rBkgSShapeDPhi.hExtrap->Clone(Form("%sExtrapNorm",rBkgSShapeDPhi.hExtrap->GetName()));
          rSubtracted.hExtrapNorm = (TH1D*)rSubtracted.hExtrap->Clone(Form("%sExtrapNorm",rSubtracted.hExtrap->GetName()));
       } else {
-         float area=1;
-         if (normMode%10==2) area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
-         rSigAll.Normalize(area);
+         float rawarea=1,area=1;
+         if (normMode%10==2) {
+            rawarea*=(rSigAll.n)/nSelPhoton;
+            area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
+         }
+         rSigAll.Normalize(rawarea);
          rSubtracted.Normalize(area);
          if (normMode<10) {
-            rBkgDPhi.Normalize(area*fracDPhiBkg);
-            rBkgSShape.Normalize(area*fracPhotonBkg);
-            rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
+            rBkgDPhi.Normalize(rawarea*fracDPhiBkg);
+            rBkgSShape.Normalize(rawarea*fracPhotonBkg);
+            rBkgSShapeDPhi.Normalize(rawarea*fracPhotonDPhiBkg);
          } else if (normMode>=20) {
-            rBkgDPhi.Normalize(area*fracDPhiBkg);
-            rBkgSShape.Normalize(area);
-            rBkgSShapeDPhi.Normalize(area*fracPhotonDPhiBkg);
+            rBkgDPhi.Normalize(rawarea*fracDPhiBkg);
+            rBkgSShape.Normalize(rawarea);
+            rBkgSShapeDPhi.Normalize(rawarea*fracPhotonDPhiBkg);
          }
          cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
       }
