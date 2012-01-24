@@ -250,15 +250,15 @@ void plotPtRatioSignal_AllCent4_wSummary(
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
    //
    // Summary Plot
    //
    int summaryMode = 2; // 0 = average, 2 = area
    float npart[nBin];// = {2,358.623,232.909,97.9521};
-   GetNPartBins("../output-data-Photon-v7_v22_akPu3PF.root", nBin, npart, m, minPhoton,1);
+   GetNPartBins("../output-data-Photon-v7_v23_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
 
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
@@ -270,7 +270,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
    hNpartFrame->GetYaxis()->SetTitleSize(0.05);
    float ymin=0.45,ymax=1.2; // 35, 2, 0.4
-   if (summaryMode==2) { ymin=0; ymax=1; }
+   if (summaryMode==2) { ymin=0; ymax=1.5; }
    hNpartFrame->SetAxisRange(ymin,ymax,"Y");
    TCanvas *c2 = new TCanvas("c","",500,500);
    hNpartFrame->Draw();
@@ -344,8 +344,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    leg2->SetTextSize(17);
    leg2->Draw();
    
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
-   c2->Print(Form("%s/Photonv7_v22_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
+   c2->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
+   c2->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
