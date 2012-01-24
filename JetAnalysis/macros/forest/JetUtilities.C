@@ -518,3 +518,31 @@ void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 		}
 	}
 }
+
+double jetHadFraction(Jets& jets, int ijet, Hits& hbhe, double radius = 0.3){
+
+  double x = 0;
+  double jeteta = jets.jteta[ijet];
+  double jetphi = jets.jtphi[ijet];
+  double jetenergy = jets.rawpt[ijet] + jets.jtpu[ijet];
+
+  for(int i = 0; i < hbhe.n; ++i){
+    double eta = hbhe.eta[i];
+    double phi = hbhe.phi[i];
+
+    double dr = deltaR(jeteta,jetphi,eta,phi);
+    if(dr < radius){
+      x+= hbhe.et[i];
+    }
+
+  }
+
+
+  return x/jetenergy;
+
+}
+
+
+
+
+

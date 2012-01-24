@@ -1,6 +1,10 @@
 #include "makeClass.h"
 
+<<<<<<< makeSetupCode.C
+void makeSetupCode(char *infname = "/d102/velicanu/forest/merged/HiForestPhoton_v2.root")
+=======
 void makeSetupCode(char *infname = "../HiForestPhoton.root")
+>>>>>>> 1.8
 {
 
   TFile *inf = new TFile(infname);  
