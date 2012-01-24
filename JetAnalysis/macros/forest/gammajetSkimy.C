@@ -16,6 +16,51 @@ static const int MAXTRK = 10000;
 
 int getNcoll(int cBin=0);
 
+class CentralityReWeight {
+public:
+   CentralityReWeight(TString data, TString mc,TCut s) :
+      datafname(data),mcfname(mc),sel(s) {}
+   void Init()
+   {
+      cout << "Reweight Centrality: " << endl;
+      cout << "Data file: " << datafname << endl;
+      cout << "MC file:   " << mcfname << endl;
+      
+      hCentData = new TH1D("hCentData","",40,0,40);
+      hCentMc = new TH1D("hCentMc","",40,0,40);
+      hReWt = new TH1D("hReWt","",40,0,40);
+      
+      TChain * tdata = new TChain("multiPhotonAnalyzer/photon");
+      tdata->Add(datafname);
+      tdata->AddFriend("yEvt=hiEvtAnalyzer/HiTree",datafname.Data());
+      tdata->Draw("yEvt.hiBin>>hCentData","pt[0]>60 && abs(eta[0])<1.44 && swissCrx[0]<0.9");
+
+      TChain * tmc = new TChain("multiPhotonAnalyzer/photon");
+      tmc->Add(mcfname);
+      tmc->AddFriend("yEvt=hiEvtAnalyzer/HiTree",mcfname.Data());
+      tmc->Draw("yEvt.hiBin>>hCentMc","pt[0]>60 && abs(eta[0])<1.44 && swissCrx[0]<0.9");
+
+      hCentData->Scale(1./hCentData->Integral());
+      hCentMc->Scale(1./hCentMc->Integral());
+      hReWt->Divide(hCentData,hCentMc);
+      
+   }
+   float GetWeight(int cBin) {
+      int bin=cBin+1;
+      if (hCentData->GetBinContent(bin)==0 || hCentMc->GetBinContent(bin)==0) {
+         return 0;
+      }
+      return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
+   }
+   TString datafname,mcfname;
+   TCut sel;
+   TH1D * hCentData;
+   TH1D * hCentMc;
+   TH1D * hReWt;
+};
+
+
+
 class EvtSel {
 public:
    int run;
@@ -91,12 +136,10 @@ public:
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 50) {
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 50, bool needReweight=true) {
 
    // Data weighting funcition                                                                                                
-   TFile* reweightF = new TFile("centBinDataV3.root");
-   TH1D* dWeight = (TH1D*)reweightF->Get("dataCentBin");
-      
+   TString datafname  = "/d102/yjlee/hiForest/HiForestPhoton-v7-noDuplicate.root";
    float cutphotonEta =1.44;
      
    double cutjetPt = 20;
@@ -163,15 +206,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    
 
    // For centrality reweighting
-   TH1D* oWeight = new TH1D("oWeight","",40,-.5,39.5);
-   c->evtTree->Draw("hiBin>>oWeight");
-   TCanvas* c1212 = new TCanvas("c1212","",500,500);
-   oWeight->Draw();
-   TCanvas* c1212a = new TCanvas("c12a12","",500,500);
-
-   TH1D* rWeight = (TH1D*)dWeight->Clone("rWeight");
-   rWeight->Divide(oWeight);
-   scaleInt(rWeight);
+   CentralityReWeight cw(datafname,inputFile_,"");
+   if (needReweight ) cw.Init();
 
    // Output file                                                                                                                            
    TTree * tgj = new TTree("tgj","gamma jet tree");
@@ -202,7 +238,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
-      evt.reweight = rWeight->GetBinContent(c->evt.hiBin);
+      evt.reweight = 1;
+      if (needReweight) evt.reweight = cw.GetWeight(c->evt.hiBin);
       evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
