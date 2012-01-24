@@ -30,15 +30,18 @@ public:
       hCentMc = new TH1D("hCentMc","",40,0,40);
       hReWt = new TH1D("hReWt","",40,0,40);
       
-      TChain * tdata = new TChain("multiPhotonAnalyzer/photon");
+      TCut addCut = "pt[0]>60 && abs(eta[0])<1.44 && swissCrx[0]<0.9";
+      TChain * tdata = new TChain("yongsunPhotonTree");
       tdata->Add(datafname);
-      tdata->AddFriend("yEvt=hiEvtAnalyzer/HiTree",datafname.Data());
-      tdata->Draw("yEvt.hiBin>>hCentData","pt[0]>60 && abs(eta[0])<1.44 && swissCrx[0]<0.9");
+      tdata->AddFriend("yEvt=yongsunHiEvt",datafname.Data());
+      tdata->AddFriend("ySkim=yongsunSkimTree",datafname.Data());
+      tdata->Draw("yEvt.hiBin>>hCentData","ySkim.pHBHENoiseFilter>0 && ySkim.pcollisionEventSelection>0" && addCut);
 
       TChain * tmc = new TChain("multiPhotonAnalyzer/photon");
       tmc->Add(mcfname);
       tmc->AddFriend("yEvt=hiEvtAnalyzer/HiTree",mcfname.Data());
-      tmc->Draw("yEvt.hiBin>>hCentMc","pt[0]>60 && abs(eta[0])<1.44 && swissCrx[0]<0.9");
+      tmc->AddFriend("ySkim=skimanalysis/HltTree",mcfname.Data());
+      tmc->Draw("yEvt.hiBin>>hCentMc","ySkim.pcollisionEventSelection>0" && addCut);
 
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
@@ -139,7 +142,7 @@ public:
 void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 50, bool needReweight=true) {
 
    // Data weighting funcition                                                                                                
-   TString datafname  = "/d102/yjlee/hiForest/HiForestPhoton-v7-noDuplicate.root";
+   TString datafname  = "barrelHiForestPhotonV7.root";
    float cutphotonEta =1.44;
      
    double cutjetPt = 20;
