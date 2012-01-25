@@ -61,7 +61,7 @@ public:
       h2->SetTitle(title);
       h2->SetLineColor(kRed);
       h2->SetMarkerColor(kRed);
-      h2->SetMarkerStyle(kOpenCircle);
+      h2->SetMarkerStyle(0);
       h1->GetXaxis()->CenterTitle();
       h1->GetYaxis()->CenterTitle();
       h2->GetXaxis()->CenterTitle();
@@ -74,9 +74,9 @@ public:
       
       if (h1->GetMaximum()>h2->GetMaximum()) {
          h1->Draw("E");
-         h2->Draw("same hist");
+         h2->Draw("same hist E");
       } else {
-         h2->Draw("hist");
+         h2->Draw("hist E");
          h1->Draw("same E");
       }
 
@@ -93,6 +93,7 @@ public:
       TH1D * hr = (TH1D*)h1->Clone(name1+"_div_"+name2);
       hr->Divide(h2);
       hr->SetYTitle(ytitle);
+      //hr->Fit("pol1","");
       return hr;
    }
 };
