@@ -77,6 +77,8 @@ void analyzePhotonJet(
                       )
 {
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
+   mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
+   datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;
