@@ -342,6 +342,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    TFile outf = TFile("photonPurityCollection.root","update");
    for ( int icent=1 ; icent<=nCent_std ; icent++) {
       heff[icent][3]->Write();
+      heff[icent][4]->Write();
    }
    for ( int icent =1 ; icent<=nCent_std ; icent++) {
      finSpectra[icent]->Write();
