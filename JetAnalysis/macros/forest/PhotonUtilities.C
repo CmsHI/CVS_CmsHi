@@ -114,7 +114,7 @@ bool HiForest::isFragPhoton(int j)
 float HiForest::getCorrEt(int j)
 {
    if ( !photon.isEB[j]) return  -100; // photon correction valid only for barrel photons
-   if ( photon.pt[j]<40 ) return -100; // photon correction valid only for photon pt > 40 GeV b/c we are using photon embedded sample
+   if ( photon.pt[j]<20 ) return -100; // photon correction valid only for photon pt > 20 GeV b/c we are using photon embedded sample
  
    int icent(0);
    int isConv(0);
