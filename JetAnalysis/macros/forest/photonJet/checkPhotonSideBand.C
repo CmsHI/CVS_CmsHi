@@ -64,19 +64,19 @@ void checkPhotonSideBand(){
 
    
    c2->cd(2);
-   TH1D * hAjSig = new TH1D("hAjSig",";A_{GJ};u.n.",20,-1,1);
-   TH1D * hAjBkg = new TH1D("hAjBkg",";A_{GJ};u.n.",20,-1,1);
-   TH1D * hAjBkgSide = new TH1D("hAjBkgSide",";A_{GJ};u.n.",20,-1,1);
-   TH1D * hAjMix = new TH1D("hAjMix",";A_{GJ};u.n.",20,-1,1);
+   TH1D * hAjSig = new TH1D("hAjSig",";x_{J,#gamma};u.n.",20,0,2);
+   TH1D * hAjBkg = new TH1D("hAjBkg",";x_{J,#gamma};u.n.",20,0,2);
+   TH1D * hAjBkgSide = new TH1D("hAjBkgSide",";A_{GJ};u.n.",20,0,2);
+   TH1D * hAjMix = new TH1D("hAjMix",";A_{GJ};u.n.",20,0,2);
    
-   nSig = tgj->Draw("Agj>>hAjSig",(sel&&"sigmaIetaIeta<0.01")*"(sampleWeight>0.5)","");
+   nSig = tgj->Draw("(jetEt/photonEt)>>hAjSig",(sel&&"sigmaIetaIeta<0.01")*"(sampleWeight>0.5)","");
    hAjSig->Scale(1./hAjSig->Integral());
-   nBkg = tgj->Draw("Agj>>hAjBkg",TCut(sel&&"sigmaIetaIeta<0.01")*"(sampleWeight<0.5)","");
+   nBkg = tgj->Draw("(jetEt/photonEt)>>hAjBkg",TCut(sel&&"sigmaIetaIeta<0.01")*"(sampleWeight<0.5)","");
    hAjBkg->Scale(1./hAjBkg->Integral());
-   nBkgSide = tgj->Draw("Agj>>hAjBkgSide",TCut(sel&&"sigmaIetaIeta>0.011")*Form("(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(%f/%f)",nBkg,nSig),"");
+   nBkgSide = tgj->Draw("(jetEt/photonEt)>>hAjBkgSide",TCut(sel&&"sigmaIetaIeta>0.011")*Form("(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(%f/%f)",nBkg,nSig),"");
    hAjBkgSide->Scale(1./hAjBkgSide->Integral());
    cout << "nSig: " << nSig << " nBkg: " << nBkg << " nBkgSide: " << nBkgSide << endl;
-   nMix = tgj->Draw("Agj>>hAjMix",TCut(sel&&"sigmaIetaIeta<0.01")*Form("(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(%f/%f)",nBkg,nSig),"");
+   nMix = tgj->Draw("(jetEt/photonEt)>>hAjMix",TCut(sel&&"sigmaIetaIeta<0.01")*Form("(sampleWeight>0.5)*0.62+(sampleWeight<0.5)*0.38/(%f/%f)",nBkg,nSig),"");
    hAjMix->Scale(1./hAjMix->Integral());
    
    hAjSig->SetLineColor(kBlue);
@@ -109,6 +109,6 @@ void checkPhotonSideBand(){
    t3->SetTextSize(0.04);
    t3->Draw();
 
-   c2->Print("./fig/12.15smixb/photon60mix_sig_vs_bkg.gif");
-   c2->Print("./fig/12.15smixb/photon60mix_sig_vs_bkg.pdf");
+   c2->Print("./fig/01.26_ANclosure/photon60mix_sig_vs_bkg.gif");
+   c2->Print("./fig/01.26_ANclosure/photon60mix_sig_vs_bkg.pdf");
 }

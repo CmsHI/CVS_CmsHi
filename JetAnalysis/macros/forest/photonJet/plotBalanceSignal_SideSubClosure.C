@@ -62,9 +62,9 @@ public:
    SignalCorrector(TTree * tree, TString n, TCut s, TString w="(1==1)", int nm=1) : 
    name(n),
    sel(s),
-   rSigAll(n+"SignalAll","Agj",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",w),
-   rBkgDPhi(n+"BkgDPhi","Agj",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
-   rBkgSShape(n+"BkgSShape","Agj",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011",w),
+   rSigAll(n+"SignalAll","(jetEt/photonEt)",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta<0.01",w),
+   rBkgDPhi(n+"BkgDPhi","(jetEt/photonEt)",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",w),
+   rBkgSShape(n+"BkgSShape","(jetEt/photonEt)",s&&"jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011",w),
    weight(w),
    normMode(nm), // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
    subDPhiSide(true),
@@ -83,17 +83,17 @@ public:
       float area=1.;
       if (normMode==0) area=nSigAll;
       if (normMode==2) area=nSigAll/nSelPhoton;
-      rSigAll.Init(t,20,-0.999,0.999,1.,area);
+      rSigAll.Init(t,20,0,2,1.,area);
       if (subDPhiSide) {
          float nDPhiSide = t->GetEntries(rBkgDPhi.cut);
          float nDPhiBkg = nDPhiSide * (3.14159-2.0944)/(3.14159/2.-0.7);
          fracDPhiBkg = nDPhiBkg/nSigAll;
-         rBkgDPhi.Init(t,20,-0.999,0.999,fracDPhiBkg,area);
+         rBkgDPhi.Init(t,20,0,2,fracDPhiBkg,area);
          cout << "|dhpi| sig all = " << nSigAll << "|dphi| side = " << nDPhiSide << " bck contamination: " << nDPhiBkg << " = " << fracDPhiBkg << endl;
       }
       if (subSShapeSide) {
          cout << "fracPhotonBkg: " << fracPhotonBkg << endl;
-         rBkgSShape.Init(t,20,-0.999,0.999,fracPhotonBkg,area);
+         rBkgSShape.Init(t,20,0,2,fracPhotonBkg,area);
       }
       
       hSubtracted = (TH1D*)rSigAll.hScaled->Clone(name+"Subtracted");
@@ -252,11 +252,11 @@ void plotBalanceSignal_SideSubClosure(
    c1->Divide(2,1);
    
    TFile * fout = new TFile("outhists.root","recreate");
-   TH1D * hFrame = new TH1D("hFrame","",20,-0.999,0.999);
-   hFrame->SetAxisRange(-0.4999,0.999,"X");
+   TH1D * hFrame = new TH1D("hFrame","",20,0,2);
+   hFrame->SetAxisRange(0,2,"X");
    hFrame->SetAxisRange(-0.05,0.50499,"Y");
    hFrame->SetStats(0);
-   hFrame->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
+   hFrame->SetXTitle("x_{J,#gamma}");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/dA_{#gamma J}");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
@@ -271,17 +271,17 @@ void plotBalanceSignal_SideSubClosure(
    hFrame->GetYaxis()->SetTitleOffset(1.2);
    hFrame->GetYaxis()->CenterTitle();
    hFrame->GetYaxis()->SetNdivisions(505,true);
-   TH1D * hFrameData = new TH1D("hFrameData","",20,-0.999,0.999);
-   TH1D * hFrameDataSigAll = new TH1D("hFrameDataSigAll","",20,-0.999,0.999);
+   TH1D * hFrameData = new TH1D("hFrameData","",20,0,2);
+   TH1D * hFrameDataSigAll = new TH1D("hFrameDataSigAll","",20,0,2);
    hFrameDataSigAll->SetLineStyle(2);
-   TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,-0.999,0.999);
+   TH1D * hFrameDataBkg1 = new TH1D("hFrameDataBkg1","",20,0,2);
    hFrameDataBkg1->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg1->SetMarkerColor(kGreen+2);
-   TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,-0.999,0.999);
+   TH1D * hFrameDataBkg2 = new TH1D("hFrameDataBkg2","",20,0,2);
    hFrameDataBkg2->SetMarkerStyle(kOpenCircle);
    hFrameDataBkg2->SetMarkerColor(kViolet);
-   TH1D * hFrameMix = new TH1D("hFrameMix","",20,-0.999,0.999);
-   TH1D * hFrameGen = new TH1D("hFrameGen","",20,-0.999,0.999);
+   TH1D * hFrameMix = new TH1D("hFrameMix","",20,0,2);
+   TH1D * hFrameGen = new TH1D("hFrameGen","",20,0,2);
    hFrameData->SetLineColor(kRed);
    hFrameData->SetMarkerColor(kRed);
    hFrameData->SetMarkerStyle(20);
@@ -320,9 +320,9 @@ void plotBalanceSignal_SideSubClosure(
    TH1D * hRat3 = (TH1D*)h3->Clone("hRat3");
    hRat3->Divide(h);
    hRat3->SetYTitle("Ratio");
-   hRat3->SetAxisRange(-0.4999,0.999,"X");
+   hRat3->SetAxisRange(0,2,"X");
    hRat3->SetAxisRange(-2,4,"Y");
-   hRat3->SetXTitle("A_{#gamma J} = (p_{T}^{#gamma}-p_{T}^{J})/(p_{T}^{#gamma}+p_{T}^{J})");
+   hRat3->SetXTitle("x_{J,#gamma}");
    hRat3->Draw("E");
    TH1D * hRat4 = (TH1D*)h4->Clone("hRat");
    hRat4->Divide(h);
@@ -331,9 +331,9 @@ void plotBalanceSignal_SideSubClosure(
    hRat4->SetLineColor(kBlack);
    hRat4->SetLineStyle(2);
    hRat4->Draw("sameE");
-   TLine * l1 = new TLine(-0.4999,1,0.999,1);
+   TLine * l1 = new TLine(0,1,2,1);
    l1->Draw();
    
-   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.gif",isolScheme));
-   c1->Print(Form("./fig/12.15smixb/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.pdf",isolScheme));
+   c1->Print(Form("./fig/01.26_ANclosure/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.gif",isolScheme));
+   c1->Print(Form("./fig/01.26_ANclosure/photon60mix_v12_jet30_imbalance_Isol%d_photonNorm_PhotonSubClosurePurity.pdf",isolScheme));
 }
