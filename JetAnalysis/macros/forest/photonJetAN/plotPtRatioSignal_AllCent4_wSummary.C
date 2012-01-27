@@ -532,7 +532,7 @@ TGraphAsymmErrors * getSummary(
       } else if (dataSrcType==2) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
-         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76GeV: %.0f #gamma-j",nPhotonJet),"");
+         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76TeV: %.0f #gamma-j",nPhotonJet),"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
       } else if (dataSrcType==3) {
