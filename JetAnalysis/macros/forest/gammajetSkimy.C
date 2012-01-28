@@ -259,6 +259,10 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	  newPt[j]  =  c->photon.pt[j] - 10000;
 	
 	corrPt[j] = newPt[j];
+
+	//  Count out spikes, HoE < 0.2   These should be always synchrinized with the loose cut below. 
+	if ( (c->isSpike(j)) || (c->photon.hadronicOverEm[j]>0.2) ||  (c->photon.isEle[j]) )
+	  newPt[j] = newPt[j] - 5000;
       }
       // sort the order of photon pt
       TMath::Sort(c->photon.nPhotons, newPt, order);
@@ -271,8 +275,9 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       for (int j=0;j<c->photon.nPhotons;j++) {
 	if ( c->photon.pt[j]  < preCutPhotonEt ) continue;          // photon pT cut   
 	if ( fabs(c->photon.eta[j]) > cutphotonEta ) continue;
+
+	// further loose cuts 
 	if (c->isSpike(j)) continue;               // spike removal                                  
-	//if (!c->isLoosePhoton(j)) continue;         // HoE<0.1, No electron, energy well calibrated..
 	if (c->photon.hadronicOverEm[j]>0.2) continue;
 	if (c->photon.isEle[j]) continue;
 	
