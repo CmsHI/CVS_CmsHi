@@ -269,8 +269,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       gj.clear();
       
       for (int j=0;j<c->photon.nPhotons;j++) {
-	order[j] = -1;
-	
 	if ( c->photon.pt[j]  < preCutPhotonEt ) continue;          // photon pT cut   
 	if ( fabs(c->photon.eta[j]) > cutphotonEta ) continue;
 	if (c->isSpike(j)) continue;               // spike removal                                  
