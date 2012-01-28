@@ -48,83 +48,83 @@ public:
       hReWt->Divide(hCentData,hCentMc);
       
    }
-   float GetWeight(int cBin) {
-      int bin=cBin+1;
-      if (hCentData->GetBinContent(bin)==0 || hCentMc->GetBinContent(bin)==0) {
-         return 0;
-      }
-      return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
-   }
-   TString datafname,mcfname;
-   TCut sel;
-   TH1D * hCentData;
-   TH1D * hCentMc;
-   TH1D * hReWt;
+  float GetWeight(int cBin) {
+    int bin=cBin+1;
+    if (hCentData->GetBinContent(bin)==0 || hCentMc->GetBinContent(bin)==0) {
+      return 0;
+    }
+    return hCentData->GetBinContent(bin)/hCentMc->GetBinContent(bin);
+  }
+  TString datafname,mcfname;
+  TCut sel;
+  TH1D * hCentData;
+  TH1D * hCentMc;
+  TH1D * hReWt;
 };
 
 
 
 class EvtSel {
 public:
-   int run;
-   int evt;
-   int cBin;
-   int nG;
-   int nJ;
-   int nT;
-   bool trig;
-   bool offlSel;
-   bool noiseFilt;
-   bool anaEvtSel;
-   float vz;
-   float reweight;
-   
+  int run;
+  int evt;
+  int cBin;
+  int nG;
+  int nJ;
+  int nT;
+  bool trig;
+  bool offlSel;
+  bool noiseFilt;
+  bool anaEvtSel;
+  float vz;
+  float reweight;
+  
 };
 
 class Isolation{
 public:
-   float cc1,cc2,cc3,cc4,cc5;
-   float cr1,cr2,cr3,cr4,cr5;
-   float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
-   void Set(HiForest * c, int j) {
-      cc1=c->photon.cc1[j];
-      cc2=c->photon.cc2[j];
-      cc3=c->photon.cc3[j];
-      cc4=c->photon.cc4[j];
-      cc5=c->photon.cc5[j];
-      cr1=c->photon.cr1[j];
-      cr2=c->photon.cr2[j];
-      cr3=c->photon.cr3[j];
-      cr4=c->photon.cr4[j];
-      cr5=c->photon.cr5[j];
-      ct1PtCut20=c->photon.ct1PtCut20[j];
-      ct2PtCut20=c->photon.ct2PtCut20[j];
-      ct3PtCut20=c->photon.ct3PtCut20[j];
-      ct4PtCut20=c->photon.ct4PtCut20[j];
-      ct5PtCut20=c->photon.ct5PtCut20[j];
-   }
+  float cc1,cc2,cc3,cc4,cc5;
+  float cr1,cr2,cr3,cr4,cr5;
+  float ct1PtCut20,ct2PtCut20,ct3PtCut20,ct4PtCut20,ct5PtCut20;
+  void Set(HiForest * c, int j) {
+    cc1=c->photon.cc1[j];
+    cc2=c->photon.cc2[j];
+    cc3=c->photon.cc3[j];
+    cc4=c->photon.cc4[j];
+    cc5=c->photon.cc5[j];
+    cr1=c->photon.cr1[j];
+    cr2=c->photon.cr2[j];
+    cr3=c->photon.cr3[j];
+    cr4=c->photon.cr4[j];
+    cr5=c->photon.cr5[j];
+    ct1PtCut20=c->photon.ct1PtCut20[j];
+    ct2PtCut20=c->photon.ct2PtCut20[j];
+    ct3PtCut20=c->photon.ct3PtCut20[j];
+    ct4PtCut20=c->photon.ct4PtCut20[j];
+    ct5PtCut20=c->photon.ct5PtCut20[j];
+  }
 };
 
 class GammaJet{
 public:
-   GammaJet() :
-      photonEt(-99),photonEta(0),photonPhi(0),
-      jetEt(-99),jetEta(0),jetPhi(0),
-      deta(-99),dphi(-99), Aj(-99),
-      sigmaIetaIeta(-99),
-      nTrk(0)
-   {}
-   float photonEt,photonRawEt;
-   float photonEta;
-   float photonPhi;
+  GammaJet() :
+    photonEt(-99),photonEta(0),photonPhi(0),
+    jetEt(-99),jetEta(0),jetPhi(0),
+    deta(-99),dphi(-99), Aj(-99),
+    sigmaIetaIeta(-99),
+    nTrk(0)
+  {}
+  float photonEt,photonRawEt;
+  float photonEta;
+  float photonPhi;
    float jetEt;
-   float jetEta;
-   float jetPhi;
+  float jetEta;
+  float jetPhi;
    float deta;
-   float dphi;
+  float dphi;
    float Aj;
-   float hovere,sigmaIetaIeta,sumIsol;
-   int nTrk;
+  float hovere,sigmaIetaIeta,sumIsol;
+  int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];
@@ -139,16 +139,17 @@ public:
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 50, bool needReweight=true) {
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true) {
 
    // Data weighting funcition                                                                                                
    TString datafname  = "barrelHiForestPhotonV7.root";
-   float cutphotonEta =1.44;
-     
+
+   float cutphotonEta = 1.44;
+   float preCutPhotonEt = 25;
    double cutjetPt = 20;
    double cutjetEta = 2;
    double cutEtaTrk = 2.4;
-
+   
    
    bool doTrigCut(false);
    std::string triggerName = "";
@@ -230,9 +231,9 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    int nentries = c->GetEntries();
    cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-      // for (Long64_t jentry=0; jentry<5000;jentry++) {
+     // for (Long64_t jentry=0; jentry<5000;jentry++) {
       if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
-
+      
       c->GetEntry(jentry);
       // Event Info                                                                                                                                                                                                 
       evt.run = c->evt.run;
@@ -248,15 +249,16 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig;
       evt.vz = c->track.vz[1];
-
+      
       // calculate corrected pt
       for (int j=0;j< c->photon.nPhotons;j++) {
-	 order[j] = -1;
-	 if ( fabs( c->photon.eta[j] ) < cutphotonEta )
-	    newPt[j] = c->getCorrEt(j);
-	 else 
-	    newPt[j] = - c->photon.pt[j] - 1000;
-	 corrPt[j] = newPt[j];
+	
+	if (   ( c->photon.pt[j] > preCutPhotonEt )  && ( fabs( c->photon.eta[j] ) < cutphotonEta ) )
+	  newPt[j] = c->getCorrEt(j);
+	else 
+	  newPt[j]  =  c->photon.pt[j] - 10000;
+	
+	corrPt[j] = newPt[j];
       }
       // sort the order of photon pt
       TMath::Sort(c->photon.nPhotons, newPt, order);
@@ -266,93 +268,100 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       
       gj.clear();
       
-      // Loop over jets to look for leading jet candidate in the event                                                                                                                                              
       for (int j=0;j<c->photon.nPhotons;j++) {
-         if (c->photon.pt[j]<cutphotonPt) continue;          // photon pT cut                                                                                                                                  
-	 if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44                                                                                                                         
-	 if (c->isSpike(j)) continue;               // spike removal                                                                                                                                    
-	 if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro                                                                                                                 
-	 // sort using corrected photon pt                                                                                                                                                     
-	 float theCorrPt=c->getCorrEt(j);
-         if ( theCorrPt>gj.photonEt) {
-            gj.photonEt = theCorrPt;
-            leadingIndex = j;
-         }
+	order[j] = -1;
+	
+	if ( c->photon.pt[j]  < preCutPhotonEt ) continue;          // photon pT cut   
+	if ( fabs(c->photon.eta[j]) > cutphotonEta ) continue;
+	if (c->isSpike(j)) continue;               // spike removal                                  
+	//if (!c->isLoosePhoton(j)) continue;         // HoE<0.1, No electron, energy well calibrated..
+	if (c->photon.hadronicOverEm[j]>0.2) continue;
+	if (c->photon.isEle[j]) continue;
+	
+	// sort using corrected photon pt                                                                                                                                                     
+	float theCorrPt= corrPt[j];
+	if ( theCorrPt> gj.photonEt) {
+	  gj.photonEt = theCorrPt;
+	  leadingIndex = j;
+	}
       }
       
-      //   if ( gj.photonEt < cutphotonPt )    // high pt photon cut 
-      // continue;
-
+      if ( gj.photonEt < cutphotonPt ) 
+	continue;
+      // todo   Save Leading Intex in the ntuple!!!!!!!!!!!!!!!
+      
+      
       
       // give the leading bit to the photon candidates 
       for (int j=0;j<c->photon.nPhotons;j++) {
-	 if ( j==leadingIndex)       isLeading[j] = 1; 
-	 else                        isLeading[j] = 0;
+	if ( j==leadingIndex)       isLeading[j] = 1; 
+	else                        isLeading[j] = 0;
       }
       
-      if (leadingIndex!=-1) {
-         // set leading photon                                                                                                               
-	 gj.photonRawEt=c->photon.pt[leadingIndex];
-         gj.photonEta=c->photon.eta[leadingIndex];
-         gj.photonPhi=c->photon.phi[leadingIndex];
-         gj.hovere=c->photon.hadronicOverEm[leadingIndex];
-         gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
-         gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
-	 isol.Set(c,leadingIndex);
-	
-	 // intialize jet variables                                                                                                                                                                                 
-         int nJets=c->akPu3PF.nref;
-         float *jet_pt  = c->akPu3PF.jtpt;
-         float *jet_eta = c->akPu3PF.jteta;
-         float *jet_phi = c->akPu3PF.jtphi;
-         // Loop over jet tree to find a away side leading jet                                                                                                                                                      
-         for (int j=0;j<nJets;j++) {
-            if (jet_pt[j]<cutjetPt) continue;
-            if (fabs(jet_eta[j])>cutjetEta) continue;
-            if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
-            if (jet_pt[j]>gj.jetEt) {
-	       gj.jetEt = jet_pt[j];
-               awayIndex = j;
-            }
-         }
 
+	if (leadingIndex!=-1) {
+	// set leading photon                                                                                                               
+	gj.photonRawEt=c->photon.pt[leadingIndex];
+	gj.photonEta=c->photon.eta[leadingIndex];
+	gj.photonPhi=c->photon.phi[leadingIndex];
+	gj.hovere=c->photon.hadronicOverEm[leadingIndex];
+	gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
+	gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
+	isol.Set(c,leadingIndex);
+	
+	// intialize jet variables                                                                                                                                                                                 
+	int nJets=c->akPu3PF.nref;
+	float *jet_pt  = c->akPu3PF.jtpt;
+	float *jet_eta = c->akPu3PF.jteta;
+	float *jet_phi = c->akPu3PF.jtphi;
+	// Loop over jet tree to find a away side leading jet                                                                                                                                                      
+	for (int j=0;j<nJets;j++) {
+	  if (jet_pt[j]<cutjetPt) continue;
+	  if (fabs(jet_eta[j])>cutjetEta) continue;
+	  if (fabs(deltaPhi(jet_phi[j],c->photon.phi[leadingIndex]))<0.3) continue;
+	  if (jet_pt[j]>gj.jetEt) {
+	    gj.jetEt = jet_pt[j];
+	    awayIndex = j;
+	  }
+	}
+	
 	 // Found an away jet!                                                                                                                                                                                      
          if (awayIndex !=-1) {
-            double photonEt = c->photon.pt[leadingIndex];
-            double jetEt = jet_pt[awayIndex];
-            double Agj = (photonEt-jetEt)/(photonEt+jetEt);
-            gj.jetEt  = jetEt;
-            gj.jetEta = jet_eta[awayIndex];
-            gj.jetPhi = jet_phi[awayIndex];
-            gj.deta = jet_eta[awayIndex] - c->photon.eta[leadingIndex];
-            gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
-            gj.Aj   = Agj;
+	   double photonEt = c->photon.pt[leadingIndex];
+	   double jetEt = jet_pt[awayIndex];
+	   double Agj = (photonEt-jetEt)/(photonEt+jetEt);
+	   gj.jetEt  = jetEt;
+	   gj.jetEta = jet_eta[awayIndex];
+	   gj.jetPhi = jet_phi[awayIndex];
+	   gj.deta = jet_eta[awayIndex] - c->photon.eta[leadingIndex];
+	   gj.dphi = deltaPhi(jet_phi[awayIndex],c->photon.phi[leadingIndex]);
+	   gj.Aj   = Agj;
          }
       }
       gj.nTrk=0;
       for (int it=0; it<c->track.nTrk; ++it) {
-         if (c->track.trkPt[it] < 4) continue;
-         if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
-         gj.trkPt[gj.nTrk] = c->track.trkPt[it];
-         gj.trkEta[gj.nTrk] = c->track.trkEta[it];
-         gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
-         ++gj.nTrk;
+	if (c->track.trkPt[it] < 4) continue;
+	if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
+	gj.trkPt[gj.nTrk] = c->track.trkPt[it];
+	gj.trkEta[gj.nTrk] = c->track.trkEta[it];
+	gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
+	++gj.nTrk;
       }
       
       tgj->Fill();
       
       ncoll = getNcoll(evt.cBin);
       
-           
+      
       newtree->Fill();
       newtreehlt->Fill();
       newtreeSkim->Fill();
       newtreeEvt->Fill();
       if ( isGen )
-	 newtreeGen->Fill();
+	newtreeGen->Fill();
    }
    
-
+   
    // After Event Loop                                                                                                                       
    tgj->SetAlias("optIsol","(6.5481e-01 +cc5*8.127033e-03 +cc4*-1.275908e-02 +cc3*-2.24332e-02 +cc2*-6.96778e-02 +cc1*4.682052e-02 +cr5*-2.35164e-02 +cr4*1.74567e-03 +cr3*-2.39334e-04 +cr2*-3.1724e-02 +cr1*-3.65306e-02 +ct4PtCut20*1.8335e-02 +ct3PtCut20*-2.609068e-02 +ct2PtCut20*-4.523171e-02 +ct1PtCut20*-1.270661e-02 +ct5PtCut20*9.218723e-03)");
    tgj->SetAlias("sumIso","(cc4+cr4+ct4PtCut20)/0.9");
