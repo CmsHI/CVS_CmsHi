@@ -172,7 +172,10 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    TTree* newtreeSkim = c->skimTree->CloneTree(0);
    newtreeSkim->SetName("yongsunSkimTree");
    
-    
+   TTree* newtreeAk3Jet = c->akPu3jetTree->CloneTree(0);
+   newtreeAk3Jet->SetName("yongsunJetakPu3PF");
+   
+   
    TTree* newtreeEvt = c->evtTree->CloneTree(0);
    newtreeEvt->SetName("yongsunHiEvt");
    
@@ -188,6 +191,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    newtreehlt->SetMaxTreeSize(4000000000);
    newtreeSkim->SetMaxTreeSize(4000000000);
    newtreeEvt->SetMaxTreeSize(4000000000);
+   newtreeAk3Jet->SetMaxTreeSize(4000000000);
    if ( isGen)     newtreeGen->SetMaxTreeSize(4000000000);
 
    
@@ -213,7 +217,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    CentralityReWeight cw(datafname,inputFile_,"");
    if (needReweight ) cw.Init();
 
-   // Output file                                                                                                                            
+   // Output file  // the best photon and best jet should go here.   
    TTree * tgj = new TTree("tgj","gamma jet tree");
    
    GammaJet gj;
@@ -360,6 +364,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       newtreehlt->Fill();
       newtreeSkim->Fill();
       newtreeEvt->Fill();
+      newtreeAk3Jet->Fill();
       if ( isGen )
 	newtreeGen->Fill();
    }
