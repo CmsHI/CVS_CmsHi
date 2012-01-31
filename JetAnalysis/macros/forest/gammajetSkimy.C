@@ -147,7 +147,7 @@ public:
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true) {
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true, int maxEvents=-1) {
 
    // Data weighting funcition                                                                                                
    TString datafname  = "barrelHiForestPhotonV7-noDupl.root";
@@ -240,6 +240,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 
     
    int nentries = c->GetEntries();
+   if (maxEvents > 0 ) 
+      nentries = maxEvents;
    cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      // for (Long64_t jentry=0; jentry<5000;jentry++) {
@@ -300,11 +302,10 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	}
       }
       
-      if ( gj.photonEt < cutphotonPt ) 
-	continue;
-      // todo   Save Leading Intex in the ntuple!!!!!!!!!!!!!!!
-      
-      
+      if ( cutphotonPt > 0 ) {   // otherwise we don't cut any events!!
+	 if ( gj.photonEt < cutphotonPt ) 
+	    continue;
+      }
       
       // give the leading bit to the photon candidates 
       for (int j=0;j<c->photon.nPhotons;j++) {
