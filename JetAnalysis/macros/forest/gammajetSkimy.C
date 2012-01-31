@@ -147,7 +147,7 @@ public:
 void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true) {
 
    // Data weighting funcition                                                                                                
-   TString datafname  = "barrelHiForestPhotonV7-temp.root";
+   TString datafname  = "barrelHiForestPhotonV7-noDupl.root";
 
    float cutphotonEta = 1.44;
    float preCutPhotonEt = 25;
@@ -228,7 +228,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    Isolation isol;
    EvtSel evt;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:reweight/F");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:genMomId");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:genMomId/I");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -361,7 +361,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       }
       
       tgj->Fill();
-      
+
       ncoll = getNcoll(evt.cBin);
       
       
