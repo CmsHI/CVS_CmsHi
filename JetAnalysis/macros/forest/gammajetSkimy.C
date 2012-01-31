@@ -112,6 +112,8 @@ public:
     jetEt(-99),jetEta(0),jetPhi(0),
     deta(-99),dphi(-99), Aj(-99),
     sigmaIetaIeta(-99),
+    sumIsol(-9999),
+    genMomId(-999999),
     nTrk(0)
   {}
   float photonEt,photonRawEt;
@@ -124,7 +126,8 @@ public:
   float dphi;
    float Aj;
   float hovere,sigmaIetaIeta,sumIsol;
-  int nTrk;
+   int genMomId;
+   int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];
@@ -133,6 +136,8 @@ public:
       jetEt=-99; jetEta=0; jetPhi=0;
       deta=-99; dphi=-99; Aj=-99;
       sigmaIetaIeta=-99;
+      genMomId = -999999;
+      sumIsol = -99;
       nTrk=0;
    }
 };
@@ -142,7 +147,7 @@ public:
 void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true) {
 
    // Data weighting funcition                                                                                                
-   TString datafname  = "barrelHiForestPhotonV7.root";
+   TString datafname  = "barrelHiForestPhotonV7-temp.root";
 
    float cutphotonEta = 1.44;
    float preCutPhotonEt = 25;
@@ -174,7 +179,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    
    TTree* newtreeAk3Jet = c->akPu3jetTree->CloneTree(0);
    newtreeAk3Jet->SetName("yongsunJetakPu3PF");
-   
    
    TTree* newtreeEvt = c->evtTree->CloneTree(0);
    newtreeEvt->SetName("yongsunHiEvt");
@@ -224,7 +228,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    Isolation isol;
    EvtSel evt;
    tgj->Branch("evt",&evt.run,"run/I:evt:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:reweight/F");
-   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol");
+   tgj->Branch("jet",&gj.photonEt,"photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol:genMomId");
    tgj->Branch("isolation",&isol.cc1,"cc1:cc2:cc3:cc4:cc5:cr1:cr2:cr3:cr4:cr5:ct1PtCut20:ct2PtCut20:ct3PtCut20:ct4PtCut20:ct5PtCut20");
    tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
@@ -313,6 +317,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	gj.photonPhi=c->photon.phi[leadingIndex];
 	gj.hovere=c->photon.hadronicOverEm[leadingIndex];
 	gj.sigmaIetaIeta=c->photon.sigmaIetaIeta[leadingIndex];
+	gj.genMomId = c->photon.genMomId[leadingIndex];
 	gj.sumIsol=(c->photon.cr4[leadingIndex]+c->photon.cc4[leadingIndex]+c->photon.ct4PtCut20[leadingIndex]);
 	isol.Set(c,leadingIndex);
 	
