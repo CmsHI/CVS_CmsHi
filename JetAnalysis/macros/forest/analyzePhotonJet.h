@@ -28,7 +28,7 @@ public:
       leaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetRawEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
       ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
       ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
-      ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
+      ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:genCalIsoDR04:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
       ":isEle/O";
    }
    float photonEt,photonRawEt,photonEta,photonPhi;
@@ -39,13 +39,17 @@ public:
    float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
    float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
-   float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
+   float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,genCalIsoDR04,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];   
    float trkJetDr[MAXTRK];
+   int nJet;
+   float inclJetPt[MAXTRK];
+   float inclJetEta[MAXTRK];
+   float inclJetPhi[MAXTRK];   
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;

@@ -52,7 +52,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v23.root",
+                      TString outname="output-data-Photon-v7_v24.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -124,7 +124,11 @@ void analyzePhotonJet(
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
-
+   tgj->Branch("nJet",&gj.nJet,"nJet/I");
+   tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
+   tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
+   tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
+   
    // pp triggers
    int HLT_Photon15_CaloIdVL_v1=0;
    int HLT_Photon50_CaloIdVL_v3=0;
@@ -171,7 +175,7 @@ void analyzePhotonJet(
       else evt.weight = 1;
       evt.npart = getNpart(evt.cBin);
       evt.ncoll = getNcoll(evt.cBin);
-      evt.sampleWeight = sampleWeight; // for different mc sample, 1 for data
+      evt.sampleWeight = sampleWeight/c->GetEntries(); // for different mc sample, 1 for data
 
       
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
@@ -212,11 +216,16 @@ void analyzePhotonJet(
          gj.refPhoEta = c->photon.genMatchedEta[leadingIndex];
          gj.refPhoPhi = c->photon.genMatchedPhi[leadingIndex];
          gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
+         gj.genCalIsoDR04 = c->photon.genCalIsoDR04[leadingIndex];
          
          // Loop over jet tree to find a away side leading jet
+         gj.nJet=0;
          for (int j=0;j<anajet->nref;j++) {
             if (anajet->jtpt[j]<cutjetPt) continue;
             if (fabs(anajet->jteta[j])>cutjetEta) continue;
+            gj.inclJetPt[gj.nJet] = anajet->jtpt[j];
+            gj.inclJetEta[gj.nJet] = anajet->jteta[j];
+            gj.inclJetPhi[gj.nJet] = anajet->jtphi[j];
             if (fabs(deltaPhi(anajet->jtphi[j],c->photon.phi[leadingIndex]))>0.5) {
                if (anajet->jtpt[j]>gj.jetEt) {
                   gj.jetEt = anajet->jtpt[j];
@@ -229,6 +238,7 @@ void analyzePhotonJet(
                   gj.phoMatJetPhi = anajet->jtphi[j];
                }
             }
+            ++gj.nJet;
          }	 
          
          // Found an away jet!

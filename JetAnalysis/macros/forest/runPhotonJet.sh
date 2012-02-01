@@ -1,26 +1,21 @@
 #
 # Data
 #
-#root -b -q analyzePhotonJet.C+'("/d102/yjlee/hiForest/HiForestPhoton-v7-noDuplicate.root","output-data-Photon-v7nodup_v23.root",1,1.,0)'
-#root -b -q analyzePhotonJet.C+'("akPu3PF","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v23.root",1,1.,0)'
+#root -b -q analyzePhotonJet.C+'("akPu3PF","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v24.root",1,1.,0)'
 #root -b -q analyzePhotonJet.C+'("icPu5","/d102/velicanu/forest/merged/HiForestPhoton_v7.root","output-data-Photon-v7_v23.root",1,1.,0)'
 
 #
 # pp 7 TeV
 #
 for algo in akPu3PF ak5Calo; do
-  root -b -q analyzePhotonJet.C+'("'$algo'","rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v2.root","output-pp-photon-7TeV-v2_v23.root",3,1.,0)'
-  root -b -q analyzePhotonJet.C+'("'$algo'","rfio:/castor/cern.ch/user/y/yjlee/HiForestMC/hiForest-pp7TeV-allPhoton30_v1.root","output-py7TeV-pho30-v1_v23.root",0,1.,0)'
+  root -b -q analyzePhotonJet.C+'("'$algo'","rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v3.root","output-pp-photon-7TeV-v3_v24.root",3,1.,0)'
+  root -b -q analyzePhotonJet.C+'("'$algo'","rfio:/castor/cern.ch/user/y/yjlee/HiForestMC/hiForest-pp7TeV-allPhoton30_v1.root","output-py7TeV-pho30-v1_v24.root",0,1.,0)'
 done
-
-#root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v2.root","output-pp-photon-7TeV-v2_v23.root",3,1.,0)'
-#root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","/d100/yjlee/hiForest/hiForest/HiForest-pp-photon50-test.root","output-pypho50-test_v23.root",0,1.,0)'
-#root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/castor/cern.ch/user/y/yjlee/HiForestMC/hiForest-pp7TeV-allPhoton30_v1.root","output-py7TeV-pho30-v1_v23.root",0,1.,0)'
 
 #
 # pp 2.76 TeV
 #
-#root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root","output-data-pp2010-prod3-photon_v23.root",2,1.,0)'
+root -b -q analyzePhotonJetPp7TeV.C+'("akPu3PF","rfio:/castor/cern.ch/user/y/yjlee/HiForest/merged_pp2760_AllPhysics_Part_Prod03.root","output-data-pp2010-prod3-photon_v24.root",2,1.,0)'
 
 #
 # MC
