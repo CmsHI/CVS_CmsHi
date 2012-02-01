@@ -42,7 +42,7 @@ public:
       tmc->AddFriend("yEvt=hiEvtAnalyzer/HiTree",mcfname.Data());
       tmc->AddFriend("ySkim=skimanalysis/HltTree",mcfname.Data());
       tmc->Draw("yEvt.hiBin>>hCentMc","ySkim.pcollisionEventSelection>0" && addCut);
-
+   
       hCentData->Scale(1./hCentData->Integral());
       hCentMc->Scale(1./hCentMc->Integral());
       hReWt->Divide(hCentData,hCentMc);
@@ -147,17 +147,20 @@ public:
 
 
 
-void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true, int maxEvents=-1) {
 
-   // Data weighting funcition                                                                                                
-   TString datafname  = "barrelHiForestPhotonV7-noDupl.root";
-
-   float cutphotonEta = 1.44;
-   float preCutPhotonEt = 25;
-   double cutjetPt = 20;
-   double cutjetEta = 2;
-   double cutEtaTrk = 2.4;
-   
+void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outname = "barrelPhoton50_25k.root",float cutphotonPt  = 45, bool needReweight=true, int maxEvents=-1, TString MinbiasFname="", bool isMC=false) {  // isMC is used for the HbHe noise in MB mixing
+  
+  
+  
+  // Data weighting funcition                                                                                                
+  TString datafname  = "barrelHiForestPhotonV7-noDupl.root";
+  
+  float cutphotonEta = 1.44;
+  float preCutPhotonEt = 25;
+  double cutjetPt = 20;
+  double cutjetEta = 2;
+  double cutEtaTrk = 2.4;
+  
    
    bool doTrigCut(false);
    std::string triggerName = "";
@@ -193,15 +196,14 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       newtreeGen->SetName("yongsunGen");
       isGen = true;
    }
-
    newtree->SetMaxTreeSize(4000000000);
    newtreehlt->SetMaxTreeSize(4000000000);
    newtreeSkim->SetMaxTreeSize(4000000000);
    newtreeEvt->SetMaxTreeSize(4000000000);
    newtreeAk3Jet->SetMaxTreeSize(4000000000);
    if ( isGen)     newtreeGen->SetMaxTreeSize(4000000000);
-
    
+
    
    int ncoll;
    int isLeading[nMaxPho];
@@ -237,16 +239,65 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
-
-    
+   
+   
+   TTree * tmixJet = new TTree("tmixJet","jets from minbias events");
+   int nmjet;
+   float ptMjet[400];
+   float etaMjet[400];
+   float phiMjet[400];
+   tmixJet->Branch("njet",&nmjet,"njet/I");
+   tmixJet->Branch("pt",&ptMjet,"pt[njet]/F");
+   tmixJet->Branch("eta",&etaMjet,"eta[njet]/F");
+   tmixJet->Branch("phi",&phiMjet,"phi[njet]/F");
+   
+   //For the MB mixing
+   const int nMixing = 5;
+   TH1D* hrand;
+   TChain *tjmb;
+   Int_t           nimbj;
+   Float_t         imbjpt[200];
+   Float_t         imbjeta[200];
+   Float_t         imbjphi[200];
+   Int_t           ipcoll;
+   Int_t           iphcal;
+   Int_t           imbcent;
+   TBranch        *b_nimbj;
+   TBranch        *b_imbjpt;
+   TBranch        *b_imbjphi;
+   TBranch        *b_imbjeta;
+   TBranch        *b_ipcoll;
+   TBranch        *b_iphcal;
+   TBranch        *b_imbcent;
+   
+   if ( MinbiasFname !="") {
+     tjmb = new TChain("yongsunJetakPu3PF");
+     tjmb->Add(MinbiasFname);
+     tjmb->AddFriend("yongsunSkimTree",MinbiasFname.Data());
+     tjmb->AddFriend("yongsunHiEvt",MinbiasFname.Data());
+     tjmb->SetBranchAddress("nref", &nimbj ,&b_nimbj);
+     tjmb->SetBranchAddress("jtpt", imbjpt, &b_imbjpt);
+     tjmb->SetBranchAddress("jteta", imbjeta, &b_imbjeta);
+     tjmb->SetBranchAddress("jtphi", imbjphi, &b_imbjphi);
+     tjmb->SetBranchAddress("yongsunSkimTree.pcollisionEventSelection", &ipcoll, &b_ipcoll);
+     tjmb->SetBranchAddress("yongsunSkimTree.pHBHENoiseFilter",         &iphcal, &b_iphcal);
+     tjmb->SetBranchAddress("yongsunHiEvt.hiBin",                  &imbcent,    &b_imbcent);
+     hrand = new TH1D("hrand","",1, 1, tjmb->GetEntries()-1);
+     hrand->Fill(2);
+     cout << "mb Entries = " << tjmb->GetEntries();
+   }
+   
+   
+   /// LOOP!!
    int nentries = c->GetEntries();
    if (maxEvents > 0 ) 
-      nentries = maxEvents;
+     nentries = maxEvents;
+   
    cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      // for (Long64_t jentry=0; jentry<5000;jentry++) {
-      if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
-      
+     if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
+     
       c->GetEntry(jentry);
       // Event Info                                                                                                                                                                                                 
       evt.run = c->evt.run;
@@ -313,8 +364,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	else                        isLeading[j] = 0;
       }
       
-
-	if (leadingIndex!=-1) {
+      
+      if (leadingIndex!=-1) {
 	// set leading photon                                                                                                               
 	gj.photonRawEt=c->photon.pt[leadingIndex];
 	gj.photonEta=c->photon.eta[leadingIndex];
@@ -342,7 +393,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	  }
 	}
 	
-	 // Found an away jet!                                                                                                                                                                                      
+	// Found an away jet!                                                                                                                                                                                      
          if (awayIndex !=-1) {
 	   double photonEt = c->photon.pt[leadingIndex];
 	   double jetEt = jet_pt[awayIndex];
@@ -364,19 +415,52 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
 	++gj.nTrk;
       }
-      
-      tgj->Fill();
 
+      // Add MB jet 
+      int iCounter=0;
+      nmjet =0;
+      while ( (MinbiasFname !="") && (iCounter<nMixing) ) {
+	int theEntry = hrand->GetRandom();
+	tjmb->GetEntry(theEntry);
+	if ( ipcoll == 0 )   
+	  continue;
+	if ( (!isMC) && ( iphcal == 0  )) 
+	  continue;  
+	if ( evt.cBin != imbcent ) 
+	  continue;
+	
+	// Now, this is clean minbias events with centrality matched
+	// nimbj    imbjpt, imbjeta, imbjphi
+	for (int ij = 0 ; ij<nimbj ; ij++) {
+	  ptMjet[nmjet] =  imbjpt[ij];
+	  etaMjet[nmjet] =  imbjeta[ij];
+          phiMjet[nmjet] =  imbjphi[ij];
+	  nmjet++;
+	}
+	//	cout << iCounter<<"th mb events" << endl;
+	iCounter++;
+      }
+      
+      //	tjmb->AddFriend("mbSkim=yongsunSkimTree",MinbiasFname.Data());
+      //	cout << "mb entreis = " << tjmb->GetEntries();
+      //	for ( int jj =  0 ; jj<=20 ; jj++)
+      //  cout << " rand = " << (int)hrand->GetRandom() << endl;
+      
       ncoll = getNcoll(evt.cBin);
       
-      
-      newtree->Fill();
+
+      tgj->Fill();
+      newtree->Fill();;
       newtreehlt->Fill();
       newtreeSkim->Fill();
       newtreeEvt->Fill();
       newtreeAk3Jet->Fill();
       if ( isGen )
 	newtreeGen->Fill();
+
+      if (MinbiasFname !="")
+	tmixJet->Fill();
+      
    }
    
    
