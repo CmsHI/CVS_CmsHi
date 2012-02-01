@@ -51,6 +51,7 @@ void analyzePhotonJetPp7TeV(
                             //TString outname="output-pp7TeV-test2_v21_jetalgo0.root",
                             TString inname="rfio:/afs/cern.ch/cms/CAF/CMSPHYS/PHYS_HEAVYIONS/prod/pp/process/HiForest-pp-photon-7TeV-v2.root",
                             TString outname="output-pp-photon-7TeV-v2_v22.root",
+                            int dataSrcType = 1, // 0 mc, 2 pp 2.76 TeV, 3 pp 7TeV
                             double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                             bool doCentReWeight=false,
                             TString mcfname="",
@@ -68,7 +69,7 @@ void analyzePhotonJetPp7TeV(
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
-   dupEvt.MakeList();
+   if (dataSrcType!=2) dupEvt.MakeList();
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
@@ -105,10 +106,15 @@ void analyzePhotonJetPp7TeV(
    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
 
    // pp triggers
+   int HLT_Photon15_CaloIdVL_v1=0;
    int HLT_Photon50_CaloIdVL_v3=0;
    int HLT_Photon50_CaloIdVL_IsoL_v6=0;
-   c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_v3",&HLT_Photon50_CaloIdVL_v3);
-   c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_IsoL_v6",&HLT_Photon50_CaloIdVL_IsoL_v6);
+   if (dataSrcType==2) {
+      c->hltTree->SetBranchAddress("HLT_Photon15_CaloIdVL_v1",&HLT_Photon15_CaloIdVL_v1);
+   } else if (dataSrcType==3) {
+      c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_v3",&HLT_Photon50_CaloIdVL_v3);
+      c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_IsoL_v6",&HLT_Photon50_CaloIdVL_IsoL_v6);
+   }
    
    // Main loop
    for (int i=0;i<c->GetEntries();i++)
@@ -116,7 +122,8 @@ void analyzePhotonJetPp7TeV(
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
       // check if event is duplicate
-      evt.nOccur = dupEvt.occurrence[i];
+      if (dataSrcType!=2) evt.nOccur = dupEvt.occurrence[i];
+      else evt.nOccur = 1;
       // Event Info
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
@@ -124,7 +131,11 @@ void analyzePhotonJetPp7TeV(
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
-      evt.trig = (HLT_Photon50_CaloIdVL_v3>0)||(HLT_Photon50_CaloIdVL_IsoL_v6>0);
+      if (dataSrcType==2) {
+         evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
+      } else if (dataSrcType==3) {
+         evt.trig = (HLT_Photon50_CaloIdVL_v3>0)||(HLT_Photon50_CaloIdVL_IsoL_v6>0);
+      }
       evt.offlSel = (c->skim.phfCoincFilter && c->skim.ppurityFractionFilter);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
@@ -138,6 +149,7 @@ void analyzePhotonJetPp7TeV(
 
       
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  c->hlt.HLT_HISinglePhoton30_v2 << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (dataSrcType==2&&!evt.trig) continue;
       
       // initialize
       int leadingIndex=-1;
