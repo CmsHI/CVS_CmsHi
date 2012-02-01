@@ -426,6 +426,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	  continue;
 	if ( (!isMC) && ( iphcal == 0  )) 
 	  continue;  
+	//	cout << "theEntry= "<< theEntry << "    imbcent = " << imbcent  <<"   and evt.cBin = " << evt.cBin << endl;
 	if ( evt.cBin != imbcent ) 
 	  continue;
 	
