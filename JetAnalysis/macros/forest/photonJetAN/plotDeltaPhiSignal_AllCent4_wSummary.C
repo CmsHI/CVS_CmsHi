@@ -412,7 +412,7 @@ void plotHistograms(const SignalCorrector* ana,
       else if (dataSrcType==3) fdphi->SetLineColor(kOrange+2);
    } else fdphi->SetLineColor(kBlue);
    fdphi->Draw("same");
-   float dphiWidth = fdphi->GetParameter(2);
+   float dphiWidth = fdphi->GetParameter(1);
    
    // check subtraction
    if (drawCheck) {
