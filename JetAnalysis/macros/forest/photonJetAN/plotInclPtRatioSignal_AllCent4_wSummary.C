@@ -298,21 +298,21 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    ghygj->Draw("p same");
    
    cout << endl << "     pythia z2" << endl;
-   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,-1);
+   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,99);
    gpyz2->SetMarkerSize(1.25);
    gpyz2->SetMarkerStyle(kOpenSquare);
    gpyz2->SetMarkerColor(kBlue);
    gpyz2->Draw("p same");
    
    cout << endl << "     pythia d6t" << endl;
-   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,-1);
+   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,99);
    gpyd6t->SetMarkerSize(1.25);
    gpyd6t->SetMarkerStyle(kOpenCircle);
    gpyd6t->SetMarkerColor(kBlue);
    gpyd6t->Draw("p same");
 
    cout << endl << "     pythia 7 TeV z2" << endl;
-   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,-1);
+   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,99);
    gpy7z2->SetMarkerSize(1.25);
    gpy7z2->SetMarkerStyle(kOpenCross);
    gpy7z2->SetMarkerColor(kBlue);
