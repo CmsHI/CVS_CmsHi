@@ -58,7 +58,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),15,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),16,0.001,1.999);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          if (dataSrcType==1) {
@@ -69,7 +69,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
             vana[ib]->subSShapeSideDPhiSide = false;
          }
          vana[ib]->SetPhotonIsolation(isolScheme);
-         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),15,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),16,0.001,1.999);
       }
       
       vana[ib]->Extrapolate(sigDPhi);
@@ -130,7 +130,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    getHistograms(vanahygj, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)==22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp;
-   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v23_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
    getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v2_v23_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -408,7 +408,7 @@ void plotHistograms(const SignalCorrector* ana,
       }
    }
    
-   ana->rSubtracted.hExtrapNorm->Draw(opt);
+   if (opt!="") ana->rSubtracted.hExtrapNorm->Draw(opt);
    float mean=ana->rSubtracted.hExtrapNorm->GetMean();
    
    // check subtraction
