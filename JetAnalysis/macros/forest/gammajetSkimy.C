@@ -303,6 +303,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.run = c->evt.run;
       evt.evt = c->evt.evt;
       evt.cBin = c->evt.hiBin;
+      //      cout << "evt.hiBin = " << c->evt.hiBin << endl;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
