@@ -1,18 +1,31 @@
-#for m in plotPtRatioSignal_AllCent4.C plotDeltaPhiSignal_AllCent4.C; do
-for m in plotDeltaPhiSignal_AllCent4.C; do
-#for m in plotPtRatioSignal_AllCent4.C; do
-  for log in 0 1; do
-    for doChk in 0 1; do
-      for phoMin in 60 50 70; do
-	for jetMin in 30 35; do
-	  root -b -q $m+'(0,1,1,1,'$phoMin','$jetMin','$log','$doChk')'
-	  root -b -q $m+'(2,1,1,1,'$phoMin','$jetMin','$log','$doChk')'
-	  if [ $m == "plotPtRatioSignal_AllCent4.C" ]; then
-	    root -b -q $m+'(0,2,1,1,'$phoMin','$jetMin','$log','$doChk')'
-	    root -b -q $m+'(2,2,1,1,'$phoMin','$jetMin','$log','$doChk')'
-	  fi
-	done
+#!/bin/bash -
+
+outdir="02.02_AN"
+mkdir -p $outdir
+
+doChk=0
+
+for m in plotPtRatioSignal_AllCent4_wSummary.C plotDeltaPhiSignal_AllCent4_wSummary.C; do
+  log=0
+  normMode=2
+  if [ $m=="plotDeltaPhiSignal_AllCent4_wSummary.C" ]; then
+    log=1
+    normMode=1
+  fi
+
+  # isolation schemes
+  for isolScheme in 0 2; do
+    
+    for ilog in 0 1; do
+      root -b -q $m+'('$isolScheme','$normMode',1,1,60,30,'$ilog','$doChk',"'$outdir'")'
+    done
+
+    # kinematic xchecks
+    for phoMin in 60 50 70; do
+      for jetMin in 30 35; do
+	root -b -q $m+'('$isolScheme','$normMode',1,1,'$phoMin','$jetMin','$log','$doChk',"'$outdir'")'
       done
     done
+
   done
 done
