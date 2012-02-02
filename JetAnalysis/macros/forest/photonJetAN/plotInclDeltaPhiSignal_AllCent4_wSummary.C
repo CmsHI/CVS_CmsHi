@@ -274,8 +274,8 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_deltaPhi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_deltaPhi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclDeltaPhi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclDeltaPhi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
    //
    // Summary Plot
@@ -390,8 +390,8 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    leg2->SetTextSize(17);
    leg2->Draw();
    
-   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
-   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_DeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
+   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclDeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));
+   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclDeltaPhiSubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
