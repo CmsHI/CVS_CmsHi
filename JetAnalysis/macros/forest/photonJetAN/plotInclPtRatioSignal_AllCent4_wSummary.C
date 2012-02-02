@@ -322,7 +322,8 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
-   gpp->SetMarkerColor(kBlue);
+   gpp->SetMarkerColor(kRed);
+   gpp->SetLineColor(kRed);
    gpp->Draw("p same");
    if (drawCheck) {
       getSummary(1,npart,vanapp,1,1,summaryMode,0);
@@ -333,7 +334,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    cout << endl << "     pp 7" << endl;
    TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,-1);
    gpp7->SetMarkerSize(1.25);
-   gpp7->SetMarkerStyle(kOpenStar);
+   gpp7->SetMarkerStyle(kOpenCross);
    gpp7->SetMarkerColor(kOrange+2);
    gpp7->SetLineColor(kOrange+2);
    gpp7->Draw("p same");
@@ -370,11 +371,11 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
    leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
+   leg->AddEntry(gpp,"pp 2.76 TeV","p");
+   leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
    leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
    leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
-   leg->AddEntry(gpp,"pp 2.76 TeV","p");
-   leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
    leg->SetFillStyle(0);
