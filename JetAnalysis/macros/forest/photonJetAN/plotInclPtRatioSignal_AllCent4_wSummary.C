@@ -58,7 +58,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi),15,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi),16,0.001,1.999);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          if (dataSrcType==1) {
@@ -69,7 +69,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
             vana[ib]->subSShapeSideDPhiSide = false;
          }
          vana[ib]->SetPhotonIsolation(isolScheme);
-         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),15,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),16,0.001,1.999);
       }
       
       vana[ib]->Extrapolate(sigDPhi);
