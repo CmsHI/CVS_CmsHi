@@ -107,7 +107,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.01_inclana"
+                                         TString outdir = "./fig/02.02_inclana"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -129,11 +129,17 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    vector<SignalCorrector*> vanahygj;
    getHistograms(vanahygj, vcutCent, "offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)==22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
-//   vector<SignalCorrector*> vanapp;
-//   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   vector<SignalCorrector*> vanapp;
+   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
    getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v3_v24_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+
+   vector<SignalCorrector*> vanapyz2;
+   getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+
+   vector<SignalCorrector*> vanapyd6t;
+   getHistograms(vanapyd6t, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760d6t_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
@@ -171,7 +177,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    int cbin=3;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
-//   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("50-100%",0.8,0.25);
@@ -194,7 +200,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=2;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
-//   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
    drawText("30-50%",0.8,0.25);
@@ -202,7 +208,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 
    TLegend *t3=new TLegend(0.43,0.63,0.91,0.94); 
    t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
-//   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
+   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
    t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
@@ -223,7 +229,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrame->DrawClone();
    cbin=1;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
-//   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("10-30%",0.8,0.4);
@@ -245,7 +251,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrameNoY->DrawClone();
    cbin=0;
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
-//   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
    drawText("0-10%",0.75,0.4);
@@ -288,17 +294,31 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    ghygj->SetMarkerStyle(kOpenCircle);
    ghygj->Draw("p same");
    
-//   cout << endl << "     pp 2.76" << endl;
-//   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
-//   gpp->SetMarkerSize(1.25);
-//   gpp->SetMarkerStyle(kOpenStar);
-//   gpp->SetMarkerColor(kBlue);
-//   gpp->Draw("p same");
-//   if (drawCheck) {
-//      getSummary(1,npart,vanapp,1,1,summaryMode,0);
-//      getSummary(1,npart,vanapp,1,1,summaryMode,1);
-//      getSummary(1,npart,vanapp,1,1,summaryMode,2);
-//   }
+   cout << endl << "     pythia z2" << endl;
+   TGraphAsymmErrors * gz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,-1);
+   gz2->SetMarkerSize(1.25);
+   gz2->SetMarkerStyle(kOpenSquare);
+   gz2->SetMarkerColor(kBlue);
+   gz2->Draw("p same");
+   
+   cout << endl << "     pythia d6t" << endl;
+   TGraphAsymmErrors * gd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,-1);
+   gd6t->SetMarkerSize(1.25);
+   gd6t->SetMarkerStyle(kOpenCircle);
+   gd6t->SetMarkerColor(kBlue);
+   gd6t->Draw("p same");
+
+   cout << endl << "     pp 2.76" << endl;
+   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
+   gpp->SetMarkerSize(1.25);
+   gpp->SetMarkerStyle(kOpenStar);
+   gpp->SetMarkerColor(kBlue);
+   gpp->Draw("p same");
+   if (drawCheck) {
+      getSummary(1,npart,vanapp,1,1,summaryMode,0);
+      getSummary(1,npart,vanapp,1,1,summaryMode,1);
+      getSummary(1,npart,vanapp,1,1,summaryMode,2);
+   }
    
    cout << endl << "     pp 7" << endl;
    TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,-1);
@@ -340,7 +360,9 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
    leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
-//   leg->AddEntry(gpp,"pp 2.76 TeV","p");
+   leg->AddEntry(gz2,"PYTHIA 2.76 TeV z2","p");
+   leg->AddEntry(gd6t,"PYTHIA 2.76 TeV d67","p");
+   leg->AddEntry(gpp,"pp 2.76 TeV","p");
    leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
