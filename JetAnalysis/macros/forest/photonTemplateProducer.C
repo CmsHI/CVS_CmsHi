@@ -13,7 +13,7 @@ const int kNoIso  = 4;
 const int kSumIso2= 5;
 const int kSumIso3= 6;
 
-void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true, float specialSbCut=10);
+void getTemplate(TH1D* h1=0, TString fname1="forest/barrelHiForestPhoton_MCphoton50_25k.root", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true, float specialSbCut=10, float theShift=0);
 
 TCut getIsoCut( int isoChoice=0, float isoCut = -100 ) {
    
@@ -35,7 +35,7 @@ TString getIsoLabel ( int isoChoice=0) {
 
    else   cout << "!!!!!!! No such isolation choice" << endl;
 }
-void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true, float specialSbCut=10) {
+void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onlygjEvents=true, float specialSbCut=10, float mcSigShift=0) {
    
   
   TCanvas* c1[5];
@@ -74,7 +74,7 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
 	 hBkgMCsr[icent][ipt] = (TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsr_cent%d_pt%d",icent,ipt));
 	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
 
-	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
+	 getTemplate(hSig[icent][ipt],"meaningless",isoChoice,isoCut, kSig,lowCent,highCent,ptCut,onlygjEvents,specialSbCut,mcSigShift);
 	 getTemplate(hData[icent][ipt],"barrelHiForestPhotonV7.root",isoChoice,isoCut, kData,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
 	 getTemplate(hBkg[icent][ipt], "barrelHiForestPhotonV7.root",isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
 	 
@@ -356,11 +356,11 @@ void photonTemplateProducer(int isoChoice = kSumIso, int isoCut = -100, bool onl
    
 }
 
-void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents, float specialSbCut) { 
+void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents, float specialSbCut, float theShift) { 
  
-   char* fnamePho50 = "barrelHiForestPhoton_MCphoton50_37k.root";
+   char* fnamePho50 = "barrelHiforestv2_qcdAllPhoton50_allCent.root";
    float nEvtPho50     = 37188;
-   char* fnamePho80 = "barrelHiForestPhoton_MCphoton80_25k.root";
+   char* fnamePho80 = "barrelHiforestv2_qcdAllPhoton80_allCent.root";
    float nEvtPho80     = 25308;
 
 
@@ -469,7 +469,7 @@ void getTemplate(TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTem
    htemp->Sumw2();
    cout << "cut = " << finalCut.GetTitle() <<  endl;
 
-   photon1->Draw2(htemp,  "sigmaIetaIeta",   finalCut,  weightBit);
+   photon1->Draw2(htemp,  Form("sigmaIetaIeta+%f",theShift),   finalCut,  weightBit);
    cout << " this is it" << endl;
    //  cout << " MC final Cut = " << finalCut.GetTitle() <<endl;
    TH1D* hcBins = new TH1D("hncoll","",40,-.5,39.5);
