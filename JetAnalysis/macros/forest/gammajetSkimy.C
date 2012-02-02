@@ -252,7 +252,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    tmixJet->Branch("phi",&phiMjet,"phi[njet]/F");
    
    //For the MB mixing
-   const int nMixing = 5;
+   const int nMixing = 20;
    TH1D* hrand;
    TChain *tjmb;
    Int_t           nimbj;
@@ -262,6 +262,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    Int_t           ipcoll;
    Int_t           iphcal;
    Int_t           imbcent;
+   float           imbEvtPl[40];
+
    TBranch        *b_nimbj;
    TBranch        *b_imbjpt;
    TBranch        *b_imbjphi;
@@ -269,7 +271,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    TBranch        *b_ipcoll;
    TBranch        *b_iphcal;
    TBranch        *b_imbcent;
-   
+   TBranch        *b_imbEvtP;
    if ( MinbiasFname !="") {
      tjmb = new TChain("yongsunJetakPu3PF");
      tjmb->Add(MinbiasFname);
@@ -282,6 +284,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
      tjmb->SetBranchAddress("yongsunSkimTree.pcollisionEventSelection", &ipcoll, &b_ipcoll);
      tjmb->SetBranchAddress("yongsunSkimTree.pHBHENoiseFilter",         &iphcal, &b_iphcal);
      tjmb->SetBranchAddress("yongsunHiEvt.hiBin",                  &imbcent,    &b_imbcent);
+     tjmb->SetBranchAddress("yongsunHiEvt.hiEvtPlanes", imbEvtPl, &b_imbEvtP);
+     
      hrand = new TH1D("hrand","",1, 1, tjmb->GetEntries()-1);
      hrand->Fill(2);
      cout << "mb Entries = " << tjmb->GetEntries();
@@ -303,7 +307,6 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       evt.run = c->evt.run;
       evt.evt = c->evt.evt;
       evt.cBin = c->evt.hiBin;
-      //      cout << "evt.hiBin = " << c->evt.hiBin << endl;
       evt.nG = c->photon.nPhotons;
       evt.nJ = c->icPu5.nref;
       evt.nT = c->track.nTrk;
@@ -420,18 +423,27 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       // Add MB jet 
       int iCounter=0;
       nmjet =0;
+      int theEvtPlNumber = 21;
+      float dPhiEvtPlMax = PI/4.;
+      float gjEvtPln = c->evt.hiEvtPlanes[theEvtPlNumber];
       while ( (MinbiasFname !="") && (iCounter<nMixing) ) {
 	int theEntry = hrand->GetRandom();
 	tjmb->GetEntry(theEntry);
+	float theMBEvtPlan = imbEvtPl[theEvtPlNumber];
 	if ( ipcoll == 0 )   
 	  continue;
 	if ( (!isMC) && ( iphcal == 0  )) 
 	  continue;  
-	//	cout << "theEntry= "<< theEntry << "    imbcent = " << imbcent  <<"   and evt.cBin = " << evt.cBin << endl;
 	if ( evt.cBin != imbcent ) 
 	  continue;
-	
-	// Now, this is clean minbias events with centrality matched
+
+	float dPhiEvtPlane  = acos( cos(gjEvtPln - theMBEvtPlan));
+	cout << " dPhiEvtPlane  = " << dPhiEvtPlane << endl;
+	if (dPhiEvtPlane >  dPhiEvtPlMax) 
+           continue;
+	cout << " ok" << endl;
+	//	cout << "the centrality = " << evt.cBin << " == " << imbcent << endl;
+	// Now, this is clean minbias events with centrality matched and event plane also matched
 	// nimbj    imbjpt, imbjeta, imbjphi
 	for (int ij = 0 ; ij<nimbj ; ij++) {
 	  ptMjet[nmjet] =  imbjpt[ij];
