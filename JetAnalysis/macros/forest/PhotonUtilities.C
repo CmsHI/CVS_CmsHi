@@ -113,9 +113,9 @@ float HiForest::getCorrEt(int j)
    if ( !photon.isEB[j]) return  -100; // photon correction valid only for barrel photons
    if ( photon.pt[j]<20 ) return -100; // photon correction valid only for photon pt > 40 GeV b/c we are using photon embedded sample
    
-   if ( evt.hiBin == -1 )  // for pp
-      return photon.pt[j];
-   
+   if ( evt.hiBin == -1 ) 
+     return photon.pt[j];
+
    int icent(0);
    int isConv(0);
    if ( photon.r9[j] > 0.94 ) 
