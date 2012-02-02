@@ -141,6 +141,9 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    vector<SignalCorrector*> vanapyd6t;
    getHistograms(vanapyd6t, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760d6t_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
+   vector<SignalCorrector*> vanapy7z2;
+   getHistograms(vanapy7z2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py7TeV-pho30-v1_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
 
@@ -295,19 +298,26 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    ghygj->Draw("p same");
    
    cout << endl << "     pythia z2" << endl;
-   TGraphAsymmErrors * gz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,-1);
-   gz2->SetMarkerSize(1.25);
-   gz2->SetMarkerStyle(kOpenSquare);
-   gz2->SetMarkerColor(kBlue);
-   gz2->Draw("p same");
+   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,-1);
+   gpyz2->SetMarkerSize(1.25);
+   gpyz2->SetMarkerStyle(kOpenSquare);
+   gpyz2->SetMarkerColor(kBlue);
+   gpyz2->Draw("p same");
    
    cout << endl << "     pythia d6t" << endl;
-   TGraphAsymmErrors * gd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,-1);
-   gd6t->SetMarkerSize(1.25);
-   gd6t->SetMarkerStyle(kOpenCircle);
-   gd6t->SetMarkerColor(kBlue);
-   gd6t->Draw("p same");
+   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,-1);
+   gpyd6t->SetMarkerSize(1.25);
+   gpyd6t->SetMarkerStyle(kOpenCircle);
+   gpyd6t->SetMarkerColor(kBlue);
+   gpyd6t->Draw("p same");
 
+   cout << endl << "     pythia 7 TeV z2" << endl;
+   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,-1);
+   gpy7z2->SetMarkerSize(1.25);
+   gpy7z2->SetMarkerStyle(kOpenCross);
+   gpy7z2->SetMarkerColor(kBlue);
+   gpy7z2->Draw("p same");
+   
    cout << endl << "     pp 2.76" << endl;
    TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
    gpp->SetMarkerSize(1.25);
@@ -352,7 +362,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    pline->SetLineStyle(4);
    pline->Draw();   
    
-   TLegend *leg=new TLegend(0.55,0.64,0.85,0.91);
+   TLegend *leg=new TLegend(0.55,0.6,0.85,0.91);
    leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
    leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
 //   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
@@ -360,8 +370,9 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
    leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
-   leg->AddEntry(gz2,"PYTHIA 2.76 TeV z2","p");
-   leg->AddEntry(gd6t,"PYTHIA 2.76 TeV d67","p");
+   leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
+   leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
+   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
    leg->AddEntry(gpp,"pp 2.76 TeV","p");
    leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->SetFillColor(0);
@@ -430,7 +441,7 @@ void plotHistograms(const SignalCorrector* ana,
       }
    }
    
-   ana->rSubtracted.hExtrapNorm->Draw(opt);
+   if (opt!="")  ana->rSubtracted.hExtrapNorm->Draw(opt);
    float mean=ana->rSubtracted.hExtrapNorm->GetMean();
    
    // check subtraction
