@@ -292,6 +292,8 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    }
    
    
+   int theItr=0;
+   int nMB = tjmb->GetEntries();
    /// LOOP!!
    int nentries = c->GetEntries();
    if (maxEvents > 0 ) 
@@ -427,16 +429,16 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       float dPhiEvtPlMax = PI/4.;
       float gjEvtPln = c->evt.hiEvtPlanes[theEvtPlNumber];
       while ( (MinbiasFname !="") && (iCounter<nMixing) ) {
-	int theEntry = hrand->GetRandom();
-	tjmb->GetEntry(theEntry);
-	float theMBEvtPlan = imbEvtPl[theEvtPlNumber];
-	if ( ipcoll == 0 )   
+	 theItr++;
+	 int theEntry = theItr%nMB;
+	 tjmb->GetEntry(theEntry);
+	 float theMBEvtPlan = imbEvtPl[theEvtPlNumber];
+	 if ( ipcoll == 0 )   
 	  continue;
 	if ( (!isMC) && ( iphcal == 0  )) 
 	  continue;  
 	if ( evt.cBin != imbcent ) 
 	  continue;
-
 	float dPhiEvtPlane  = acos( cos(gjEvtPln - theMBEvtPlan));
 	//	cout << " dPhiEvtPlane  = " << dPhiEvtPlane << endl;
 	if (dPhiEvtPlane >  dPhiEvtPlMax) 
