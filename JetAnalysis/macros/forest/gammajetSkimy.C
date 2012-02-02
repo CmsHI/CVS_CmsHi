@@ -252,7 +252,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    tmixJet->Branch("phi",&phiMjet,"phi[njet]/F");
    
    //For the MB mixing
-   const int nMixing = 20;
+   const int nMixing = 10;
    TH1D* hrand;
    TChain *tjmb;
    Int_t           nimbj;
@@ -300,7 +300,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    cout << "number of entries = " << nentries << endl;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      // for (Long64_t jentry=0; jentry<5000;jentry++) {
-     if (jentry% 10000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
+     if (jentry% 1000 == 0) cout <<jentry<<" / "<<nentries<<" "<<setprecision(2)<<(double)jentry/nentries*100<<endl;
      
       c->GetEntry(jentry);
       // Event Info                                                                                                                                                                                                 
@@ -438,10 +438,9 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
 	  continue;
 
 	float dPhiEvtPlane  = acos( cos(gjEvtPln - theMBEvtPlan));
-	cout << " dPhiEvtPlane  = " << dPhiEvtPlane << endl;
+	//	cout << " dPhiEvtPlane  = " << dPhiEvtPlane << endl;
 	if (dPhiEvtPlane >  dPhiEvtPlMax) 
            continue;
-	cout << " ok" << endl;
 	//	cout << "the centrality = " << evt.cBin << " == " << imbcent << endl;
 	// Now, this is clean minbias events with centrality matched and event plane also matched
 	// nimbj    imbjpt, imbjeta, imbjphi
