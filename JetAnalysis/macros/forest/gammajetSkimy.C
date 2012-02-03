@@ -252,7 +252,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
    tmixJet->Branch("phi",&phiMjet,"phi[njet]/F");
    
    //For the MB mixing
-   const int nMixing = 10;
+   const int nMixing = 20;
    TH1D* hrand;
    TChain *tjmb;
    Int_t           nimbj;
