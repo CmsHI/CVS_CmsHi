@@ -414,7 +414,7 @@ void gammajetSkimy(TString inputFile_="mc/photon50_25k.root", std::string outnam
       }
       gj.nTrk=0;
       for (int it=0; it<c->track.nTrk; ++it) {
-	if (c->track.trkPt[it] < 4) continue;
+	if (c->track.trkPt[it] < 2) continue;
 	if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
 	gj.trkPt[gj.nTrk] = c->track.trkPt[it];
 	gj.trkEta[gj.nTrk] = c->track.trkEta[it];
