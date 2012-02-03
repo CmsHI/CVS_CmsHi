@@ -107,7 +107,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/01.24_xchk"
+                                         TString outdir = "./fig/02.02_AN"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -121,7 +121,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    vcutCentPp.push_back("1==1");
    
    vector<SignalCorrector*> vanahi;
-   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v23_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v24_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahypho;
    getHistograms(vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -133,7 +133,7 @@ void plotPtRatioSignal_AllCent4_wSummary(
    getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
-   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v2_v23_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v3_v24_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
@@ -251,21 +251,21 @@ void plotPtRatioSignal_AllCent4_wSummary(
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
-   c1->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
-   c1->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
+   c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_ptratio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
    //
    // Summary Plot
    //
-   int summaryMode = 0; // 0 = average, 2 = area
+   int summaryMode = 2; // 0 = average, 2 = area
    float npart[nBin];// = {2,358.623,232.909,97.9521};
-   GetNPartBins("../output-data-Photon-v7_v23_akPu3PF.root", nBin, npart, m, minPhoton,1);
+   GetNPartBins("../output-data-Photon-v7_v24_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
 
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
    hNpartFrame->SetYTitle("<x_{JG}>");
-   if (summaryMode==2) hNpartFrame->SetYTitle("R(x_{#gamma,J}>0)");
+   if (summaryMode==2) hNpartFrame->SetYTitle("R_{J,#gamma}");
    hNpartFrame->GetXaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
@@ -360,8 +360,8 @@ void plotPtRatioSignal_AllCent4_wSummary(
    leg2->SetTextSize(17);
    leg2->Draw();
    
-   c2->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
-   c2->Print(Form("%s/Photonv7_v23_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
+   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
+   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_DeltaESubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
