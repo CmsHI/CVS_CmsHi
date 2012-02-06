@@ -117,9 +117,14 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 double nSig, nSigErr, chisq,purity10;
 	 c1[ipt]->cd(nCent - icent+1);
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==nCent_std),purity10);
+
+	 cout << " shift = " << mcSigShift << endl;
+         cout << " chisq  = " << fitr.chisq << endl;
+       	 cout << " hChisq->SetBinContent ( hChisq->FindBin(" << mcSigShift << " ), " <<  fitr.chisq << ")" << endl;
+	 cout << " hPurity->SetBinContent( hPurity->FindBin(" << mcSigShift << " ), " <<  fitr.purity010 << ")" << endl;
 	 cout << " purity = " << fitr.purity010 << endl;
 	 cout << " nSig   = " << fitr.nSig  << endl;
-	 cout << " chisq  = " << fitr.chisq << endl;
+	 
 	 if ( ptBin[ipt]> 200)
 	    drawText(Form(" E_{T}^{#gamma} > %d GeV", (int)ptBin[ipt-1]),0.5680963,0.529118);
 	 else
