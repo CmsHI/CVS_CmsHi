@@ -102,7 +102,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.07_pppurity"
+                                         TString outdir = "./fig/02.08_pppurity"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -139,8 +139,8 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    vector<SignalCorrector*> vanapy7z2;
    getHistograms(vanapy7z2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py7TeV-pho30-v1_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
    
-   TCanvas *c1 = new TCanvas("c1","",700,700);
-   makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
+   TCanvas *c1 = new TCanvas("c1","",1000,300);
+   makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.2,0.02);
 
    TH1D * hFrame = (TH1D*)vanahi[0]->rSubtracted.hExtrapNorm->Clone("hFrame");
    hFrame->Reset();
@@ -179,8 +179,8 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    plotHistograms(vanapy7z2[0],cbin,0,1,0,"");
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
-   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"samehistE");
-   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
+   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
+   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"");
    plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
    drawText("50-100%",0.8,0.25);
    drawText("(a)",0.25,0.885);
@@ -207,15 +207,15 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
-   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
+   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"");
    plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
-   drawText("30-50%",0.8,0.25);
+   drawText("30-50%",0.75,0.25);
    drawText("(b)",0.05,0.885);
 
    TLegend *t3=new TLegend(0.34,0.62,0.81,0.94); 
    t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
    t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
-   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
+//   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
    //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
    t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
 //   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
@@ -239,10 +239,10 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
-   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
+   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"");
    plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");
-   drawText("10-30%",0.8,0.4);
-   drawText("(c)",0.25,0.885);
+   drawText("10-30%",0.75,0.25);
+   drawText("(c)",0.05,0.885);
 
    TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
    t4->AddEntry(hFrame,Form("p_{T}^{#gamma} > %.0f GeV/c",minPhoton),"");
@@ -265,9 +265,9 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
-   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
+   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"");
    plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");
-   drawText("0-10%",0.75,0.4);
+   drawText("0-10%",0.75,0.25);
    drawText("(d)",0.05,0.885);
 
    c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclDeltaPhi_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
@@ -451,7 +451,7 @@ void plotHistograms(const SignalCorrector* ana,
       if (dataSrcType==1) fdphi->SetLineColor(kRed);
       else if (dataSrcType==3) fdphi->SetLineColor(kOrange+2);
    } else fdphi->SetLineColor(kBlue);
-   if (opt!="") fdphi->Draw("same");
+//   if (opt!="") fdphi->Draw("same");
    float dphiWidth = fdphi->GetParameter(1);
    
    // check subtraction
