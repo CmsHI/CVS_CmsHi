@@ -46,8 +46,9 @@ void getHistograms(vector<SignalCorrector*> & vana,
    // loop over centrality bins
    for (int ib=0; ib<vcutCent.size(); ++ib) {
       TString name = Form("dataSrc%d_reco%d_cent%d",dataSrcType,dataType,ib);
-      
-      vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-inclJetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,ib));
+      int cBin = ib;
+      if (dataSrcType>1) cBin==vcutCent.size()-1;
+      vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-inclJetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
       vana[ib]->cutBkgDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
       vana[ib]->cutSShape= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
       vana[ib]->cutSShapeDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
@@ -60,13 +61,8 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi),20,0.0001,3.1415926);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
-         if (dataSrcType==1) {
-            vana[ib]->subSShapeSide = subSShapeSide;
-            vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
-         } else {
-            vana[ib]->subSShapeSide = false;
-            vana[ib]->subSShapeSideDPhiSide = false;
-         }
+         vana[ib]->subSShapeSide = subSShapeSide;
+         vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
          vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),20,0.0001,3.1415926);
       }
@@ -106,7 +102,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.02_inclana"
+                                         TString outdir = "./fig/02.07_pppurity"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -129,10 +125,10 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    getHistograms(vanahygj, vcutCent, "offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)==22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp;
-   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
-   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v3_v24_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v4_v24_akPu3PF.root","1==1",3,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapyz2;
    getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -178,14 +174,14 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
    int cbin=3;
-   plotHistograms(vanapyz2[0],cbin,2,1,0,"");
-   plotHistograms(vanapyd6t[0],cbin,2,1,0,"");
-   plotHistograms(vanapy7z2[0],cbin,2,1,0,"");
+   plotHistograms(vanapyz2[0],cbin,0,1,0,"");
+   plotHistograms(vanapyd6t[0],cbin,0,1,0,"");
+   plotHistograms(vanapy7z2[0],cbin,0,1,0,"");
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"samehistE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
    drawText("50-100%",0.8,0.25);
    drawText("(a)",0.25,0.885);
 
@@ -205,14 +201,14 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
    cbin=2;
-   plotHistograms(vanapyz2[0],cbin,2,1,0,"");
-   plotHistograms(vanapyd6t[0],cbin,2,1,0,"");
-   plotHistograms(vanapy7z2[0],cbin,2,1,0,"");
+   plotHistograms(vanapyz2[0],cbin,0,1,0,"");
+   plotHistograms(vanapyd6t[0],cbin,0,1,0,"");
+   plotHistograms(vanapy7z2[0],cbin,0,1,0,"");
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
    drawText("30-50%",0.8,0.25);
    drawText("(b)",0.05,0.885);
 
@@ -237,14 +233,14 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
    cbin=1;
-   plotHistograms(vanapyz2[0],cbin,2,1,99,"");
-   plotHistograms(vanapyd6t[0],cbin,2,1,99,"");
-   plotHistograms(vanapy7z2[0],cbin,2,1,99,"");
+   plotHistograms(vanapyz2[0],cbin,0,1,0,"");
+   plotHistograms(vanapyd6t[0],cbin,0,1,0,"");
+   plotHistograms(vanapy7z2[0],cbin,0,1,0,"");
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");//   c1->cd(3);
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");
    drawText("10-30%",0.8,0.4);
    drawText("(c)",0.25,0.885);
 
@@ -263,14 +259,14 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
    cbin=0;
-   plotHistograms(vanapyz2[0],cbin,2,1,0,"");
-   plotHistograms(vanapyd6t[0],cbin,2,1,0,"");
-   plotHistograms(vanapy7z2[0],cbin,2,1,0,"");
+   plotHistograms(vanapyz2[0],cbin,0,1,0,"");
+   plotHistograms(vanapyd6t[0],cbin,0,1,0,"");
+   plotHistograms(vanapy7z2[0],cbin,0,1,0,"");
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanahygj[cbin],cbin,0,1,0,"");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
    plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");
    drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
@@ -476,7 +472,7 @@ void plotHistograms(const SignalCorrector* ana,
       }
    }
    
-   if (dataSrcType&&drawCheck<99) {
+   if (dataSrcType) {
       // Draw count
       float nPhotonJet = ana->rSubtracted.nExtrap;
       float dx = 0,dy = 0;

@@ -46,8 +46,9 @@ void getHistograms(vector<SignalCorrector*> & vana,
    // loop over centrality bins
    for (int ib=0; ib<vcutCent.size(); ++ib) {
       TString name = Form("dataSrc%d_reco%d_cent%d",dataSrcType,dataType,ib);
-      
-      vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-jetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,ib));
+      int cBin = ib;
+      if (dataSrcType>1) cBin==vcutCent.size()-1;
+      vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-jetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
       vana[ib]->cutBkgDPhi= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
       vana[ib]->cutSShape= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
       vana[ib]->cutSShapeDPhi= Form("jetEt>%.3f&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
@@ -60,13 +61,8 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f",minJet,sigDPhi),20,0,3.1415926);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
-         if (dataSrcType==1) {
-            vana[ib]->subSShapeSide = subSShapeSide;
-            vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
-         } else {
-            vana[ib]->subSShapeSide = false;
-            vana[ib]->subSShapeSideDPhiSide = false;
-         }
+         vana[ib]->subSShapeSide = subSShapeSide;
+         vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
          vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(Form("jetEt>%.03f && acos(cos(photonPhi-jetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),20,0,3.1415926);
       }
@@ -106,7 +102,7 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.02_leadana"
+                                         TString outdir = "./fig/02.07_pppurity"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -129,10 +125,10 @@ void plotDeltaPhiSignal_AllCent4_wSummary(
    getHistograms(vanahygj, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)==22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp;
-   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-data-pp2010-prod3-photon_v24_akPu3PF.root","1==1",2,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapp7;
-   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v3_v24_akPu3PF.root","1==1",3,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v3_v24_akPu3PF.root","1==1",3,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    TCanvas *c1 = new TCanvas("c1","",700,700);
    makeMultiPanelCanvas(c1,2,2,0.0,0.0,0.2,0.2,0.02);
