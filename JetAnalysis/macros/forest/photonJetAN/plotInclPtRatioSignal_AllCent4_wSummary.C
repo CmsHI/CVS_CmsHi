@@ -102,7 +102,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.08_pppurity"
+                                         TString outdir = "./fig/02.08_paper"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -157,14 +157,14 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);
    hFrame->GetXaxis()->SetTitleFont(43);
-   hFrame->GetXaxis()->SetTitleOffset(2);
+   hFrame->GetXaxis()->SetTitleOffset(1);
    hFrame->GetXaxis()->CenterTitle();
    hFrame->GetXaxis()->SetNdivisions(505,true);
    hFrame->GetYaxis()->SetLabelSize(22);
    hFrame->GetYaxis()->SetLabelFont(43);
    hFrame->GetYaxis()->SetTitleSize(22);
    hFrame->GetYaxis()->SetTitleFont(43);
-   hFrame->GetYaxis()->SetTitleOffset(2.6);
+   hFrame->GetYaxis()->SetTitleOffset(1.2);
    hFrame->GetYaxis()->CenterTitle();
    hFrame->GetYaxis()->SetNdivisions(505,true);   
    TH1D * hFrameNoY = (TH1D*)hFrame->Clone("hFrameNoY");
@@ -178,20 +178,11 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
-   drawText("50-100%",0.8,0.25);
+   drawText("50-100%",0.75,0.4);
    drawText("(a)",0.25,0.885);
 
-   TLegend *t2=new TLegend(0.44,0.66,0.91,0.94);
-   t2->AddEntry(hFrame,"CMS Preliminary","");
-   t2->AddEntry(hFrame,"#intL dt = 150 #mub^{-1}","");
-   t2->AddEntry(hFrame,"#sqrt{s}_{_{NN}}=2.76 TeV","");
-   t2->SetFillColor(0);
-   t2->SetBorderSize(0);
-   t2->SetFillStyle(0);
-   t2->SetTextFont(63);
-   t2->SetTextSize(17);
-   t2->Draw();
-   drawText("Ak PF, R=0.3",0.56,0.61,15);
+   drawText("CMS",0.7,0.885,17);
+   drawText("Ak PF, R=0.3",0.7,0.84,15);
 
    c1->cd(2);
    if (log==1) gPad->SetLogy();
@@ -201,27 +192,19 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
-   drawText("30-50%",0.8,0.25);
+   drawText("30-50%",0.75,0.4);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.43,0.63,0.91,0.94); 
-   t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
-   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
-//   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
-   //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
-   t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
-//   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-//   if (subSShapeSide&&drawCheck) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   t3->AddEntry(vanahypho[cbin]->rSubtracted.hExtrapNorm,"Isol. #gamma + HYDJET","lf");
-   //t3->AddEntry(hFrameGen,"MC: Frag. #gamma","lf");
-   //t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
-   t3->SetFillColor(0);
-   t3->SetBorderSize(0);
-   t3->SetFillStyle(0);
-   t3->SetTextFont(63);
-   t3->SetTextSize(15);
-   t3->Draw();
-
+   TLegend *t2=new TLegend(0.2,0.72,0.85,0.95);
+   t2->AddEntry(hFrame,"#intL dt = 150 #mub^{-1}","");
+   t2->AddEntry(hFrame,"#sqrt{s}_{_{NN}}=2.76 TeV","");
+   t2->SetFillColor(0);
+   t2->SetBorderSize(0);
+   t2->SetFillStyle(0);
+   t2->SetTextFont(63);
+   t2->SetTextSize(17);
+   t2->Draw();
+   
    c1->cd(3);
    if (log==1) gPad->SetLogy();
    hFrame->DrawClone();
@@ -230,7 +213,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
-   drawText("10-30%",0.75,0.25);
+   drawText("10-30%",0.75,0.4);
    drawText("(c)",0.05,0.885);
 
    TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
@@ -252,9 +235,27 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
-   drawText("0-10%",0.75,0.25);
+   drawText("0-10%",0.75,0.4);
    drawText("(d)",0.05,0.885);
 
+   TLegend *t3=new TLegend(0.35,0.67,0.91,0.95); 
+   t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
+   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
+   //   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
+   //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
+   t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
+   //   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   //   if (subSShapeSide&&drawCheck) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+   t3->AddEntry(vanahypho[cbin]->rSubtracted.hExtrapNorm,"Isol. #gamma + HYDJET","lf");
+   //t3->AddEntry(hFrameGen,"MC: Frag. #gamma","lf");
+   //t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
+   t3->SetFillColor(0);
+   t3->SetBorderSize(0);
+   t3->SetFillStyle(0);
+   t3->SetTextFont(63);
+   t3->SetTextSize(15);
+   t3->Draw();
+      
    c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclPtRatio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
    c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclPtRatio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
@@ -286,11 +287,11 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
    
-   cout << endl << "     MC Gamma-jet" << endl;
-   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,summaryMode,-1);
-   ghygj->SetMarkerSize(1.25);
-   ghygj->SetMarkerStyle(kOpenCircle);
-   ghygj->Draw("p same");
+//   cout << endl << "     MC Gamma-jet" << endl;
+//   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,summaryMode,-1);
+//   ghygj->SetMarkerSize(1.25);
+//   ghygj->SetMarkerStyle(kOpenCircle);
+//   ghygj->Draw("p same");
    
    cout << endl << "     pythia z2" << endl;
    TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,99);
@@ -306,12 +307,12 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    gpyd6t->SetMarkerColor(kBlue);
    gpyd6t->Draw("p same");
 
-   cout << endl << "     pythia 7 TeV z2" << endl;
-   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,99);
-   gpy7z2->SetMarkerSize(1.25);
-   gpy7z2->SetMarkerStyle(kOpenCross);
-   gpy7z2->SetMarkerColor(kBlue);
-   gpy7z2->Draw("p same");
+//   cout << endl << "     pythia 7 TeV z2" << endl;
+//   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,99);
+//   gpy7z2->SetMarkerSize(1.25);
+//   gpy7z2->SetMarkerStyle(kOpenCross);
+//   gpy7z2->SetMarkerColor(kBlue);
+//   gpy7z2->Draw("p same");
    
    cout << endl << "     pp 2.76" << endl;
    TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
@@ -326,13 +327,13 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       getSummary(1,npart,vanapp,1,1,summaryMode,2);
    }
    
-   cout << endl << "     pp 7" << endl;
-   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,-1);
-   gpp7->SetMarkerSize(1.25);
-   gpp7->SetMarkerStyle(kOpenCross);
-   gpp7->SetMarkerColor(kOrange+2);
-   gpp7->SetLineColor(kOrange+2);
-   gpp7->Draw("p same");
+//   cout << endl << "     pp 7" << endl;
+//   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,-1);
+//   gpp7->SetMarkerSize(1.25);
+//   gpp7->SetMarkerStyle(kOpenCross);
+//   gpp7->SetMarkerColor(kOrange+2);
+//   gpp7->SetLineColor(kOrange+2);
+//   gpp7->Draw("p same");
 //   if (drawCheck) {
 //      getSummary(1,npart,vanapp7,1,1,summaryMode,0);
 //      getSummary(1,npart,vanapp7,1,1,summaryMode,1);
@@ -352,7 +353,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    }
    
    // Annotation
-   drawText("CMS Preliminary",0.198,0.89,17);
+   drawText("CMS",0.198,0.89,17);
    TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
    pline->SetLineColor(4);
    pline->SetLineStyle(4);
@@ -365,12 +366,12 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
 //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
    leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
-   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
+//   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
    leg->AddEntry(gpp,"pp 2.76 TeV","p");
-   leg->AddEntry(gpp7,"pp 7 TeV","p");
+//   leg->AddEntry(gpp7,"pp 7 TeV","p");
    leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
    leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
-   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
+//   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
    leg->SetFillColor(0);
    leg->SetBorderSize(0);
    leg->SetFillStyle(0);
@@ -441,7 +442,7 @@ void plotHistograms(const SignalCorrector* ana,
    float mean=ana->rSubtracted.hExtrapNorm->GetMean();
    
    // check subtraction
-   if (drawCheck) {
+   if (drawCheck>=2) {
       if (ana->rBkgDPhi.hExtrapNorm) {
          ana->rBkgDPhi.hExtrapNorm->SetMarkerStyle(kOpenCircle);
          ana->rBkgDPhi.hExtrapNorm->SetMarkerColor(kGreen+2);
@@ -458,7 +459,7 @@ void plotHistograms(const SignalCorrector* ana,
       }
    }
    
-   if (dataSrcType) {
+   if (dataSrcType&&drawCheck>=1) {
       // Draw count
       float nPhotonJet = ana->rSubtracted.nExtrap;
       float dx = 0,dy = 0;
@@ -550,7 +551,7 @@ TGraphAsymmErrors * getSummary(
    // Draw count
    if (iCheck<0) {
       TLegend *t3=new TLegend(0.1,0.68,0.51,0.89);
-      if (dataSrcType==1) {
+      if (dataSrcType==1&&0) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,vana[0]->nameIsol,"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("PbPb: %.0f #gamma-j",nPhotonJet),"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
@@ -558,13 +559,13 @@ TGraphAsymmErrors * getSummary(
          //      for (int ib=nBin-1;ib>=0;--ib) {
          //         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("%.0f to %.0f \%: %.0f #gamma-j",m[ib]*2.5,m[ib+1]*2.5,vana[ib]->rSubtracted.nExtrap),"");
          //      }
-      } else if (dataSrcType==2) {
+      } else if (dataSrcType==2&&0) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76TeV: %.0f #gamma-j",nPhotonJet),"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
-      } else if (dataSrcType==3) {
+      } else if (dataSrcType==3&&0) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
