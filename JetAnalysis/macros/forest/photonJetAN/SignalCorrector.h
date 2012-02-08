@@ -43,7 +43,7 @@ public:
 class SignalCorrector
 {
 public:
-   SignalCorrector(TTree * tree, TString n, TString var, TCut s, TString w="(1==1)", int bin=-1) : 
+   SignalCorrector(TTree * tree, TString n, TString var, TCut s, TString w="(1==1)", int bin=-1, int srcType=1) : 
    name(n),
    observable(var),
    sel(s),
@@ -57,6 +57,7 @@ public:
    subSShapeSide(true),
    subSShapeSideDPhiSide(true),
    centBin(bin),
+   dataSrcType(srcType),
    nSelPhoton(0),fracDPhiBkg(0),fracPhotonBkg(0),fracPhotonDPhiBkg(0) {
       t = tree;
       cutBkgDPhi     = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
@@ -98,7 +99,15 @@ public:
       // Isolation Cut
       sel = sel&&cutIsol;
       // Photon Purity
-      if (subSShapeSide) fracPhotonBkg = 1-hPhotonPurity->GetBinContent(centBin+1);
+      if (subSShapeSide) {
+         if (dataSrcType==1) {
+            fracPhotonBkg = 1-hPhotonPurity->GetBinContent(centBin+1);
+         } else if (dataSrcType>=2) {
+            if (isolScheme==0) fracPhotonBkg = 1-0.79;
+            if (isolScheme==2) fracPhotonBkg = 1-0.75;
+         }
+      }
+      cout << nameIsol << " Purity: " << 1-fracPhotonBkg << endl;
    }
    
    void MakeHistograms(TCut sigSel, int nbin, float xmin, float xmax) {
@@ -250,6 +259,7 @@ public:
    float fracPhotonBkg;
    float fracPhotonDPhiBkg;
    int centBin;
+   int dataSrcType;
    TH1D * hPhotonPurity;
 };
 
