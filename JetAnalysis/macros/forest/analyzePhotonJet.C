@@ -52,7 +52,8 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v1_v6.root"
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
-                      TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
+                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
+                      TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
                       TString outname="output-data-Photon-v7_v24classes.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
@@ -74,12 +75,15 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=false,
                       TString mcfname="",
-                      TString datafname="output-data-Photon-v7_v23.root"
+                      TString datafname="output-data-Photon-v7_v24.root",
+                      int makeMixing=1,
+                      TString mixfname="output-data-Photon-v7_v24classes.root"
                       )
 {
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
+   mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 20;
    double cutphotonEta = 1.44;
@@ -135,14 +139,18 @@ void analyzePhotonJet(
    vector<TTree*> vtgj(nCentBin);
    vector<EvtSel> vevt(nCentBin);
    vector<GammaJet> vgj(nCentBin);
-   for (int ib=0; ib<nCentBin; ++ib) {
-      vtgj[ib] = new TTree(Form("tgj_%d",ib),"gamma jet tree");
-      vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
-      vtgj[ib]->Branch("jet",&vgj[ib].photonEt,vgj[ib].leaves);
-      vtgj[ib]->Branch("nJet",&vgj[ib].nJet,"nJet/I");
-      vtgj[ib]->Branch("inclJetPt",vgj[ib].inclJetPt,"inclJetPt[nJet]/F");
-      vtgj[ib]->Branch("inclJetEta",vgj[ib].inclJetEta,"inclJetEta[nJet]/F");
-      vtgj[ib]->Branch("inclJetPhi",vgj[ib].inclJetPhi,"inclJetPhi[nJet]/F");
+   vector<int> vmixEntry(nCentBin);
+   vector<int> vmixNEvt(nCentBin);
+   if (makeMixing==1) {
+      for (int ib=0; ib<nCentBin; ++ib) {
+         vtgj[ib] = new TTree(Form("tgj_%d",ib),"gamma jet tree");
+         vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
+         vtgj[ib]->Branch("jet",&vgj[ib].photonEt,vgj[ib].leaves);
+         vtgj[ib]->Branch("nJet",&vgj[ib].nJet,"nJet/I");
+         vtgj[ib]->Branch("inclJetPt",vgj[ib].inclJetPt,"inclJetPt[nJet]/F");
+         vtgj[ib]->Branch("inclJetEta",vgj[ib].inclJetEta,"inclJetEta[nJet]/F");
+         vtgj[ib]->Branch("inclJetPhi",vgj[ib].inclJetPhi,"inclJetPhi[nJet]/F");
+      }
    }
    
    // pp triggers
@@ -194,9 +202,6 @@ void analyzePhotonJet(
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight/c->GetEntries(); // for different mc sample, 1 for data
 
-      // mixing classes
-      vevt[evt.cBin] = evt;
-      
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
       if (dataSrcType==2&&!evt.trig) continue;
       
@@ -204,7 +209,11 @@ void analyzePhotonJet(
       int leadingIndex=-1;
       int awayIndex=-1;
       gj.clear();
-      for (int ib=0; ib<nCentBin; ++ib) vgj[ib].clear();
+      // mixing classes
+      if (makeMixing==1) {
+         vevt[evt.cBin] = evt;
+         for (int ib=0; ib<nCentBin; ++ib) vgj[ib].clear();
+      }
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
@@ -239,15 +248,17 @@ void analyzePhotonJet(
          gj.genCalIsoDR04 = c->photon.genCalIsoDR04[leadingIndex];
          
          // mixing classes
-         vgj[evt.cBin].photonEt = gj.photonEt;
-         vgj[evt.cBin].photonEta = gj.photonEta;
-         vgj[evt.cBin].photonPhi = gj.photonPhi;
-         vgj[evt.cBin].sigmaIetaIeta = gj.sigmaIetaIeta;
-         vgj[evt.cBin].sumIsol = gj.sumIsol;
+         if (makeMixing==1) {
+            vgj[evt.cBin].photonEt = gj.photonEt;
+            vgj[evt.cBin].photonEta = gj.photonEta;
+            vgj[evt.cBin].photonPhi = gj.photonPhi;
+            vgj[evt.cBin].sigmaIetaIeta = gj.sigmaIetaIeta;
+            vgj[evt.cBin].sumIsol = gj.sumIsol;
+         }
 
          // Loop over jet tree to find a away side leading jet
          gj.nJet=0;
-         vgj[evt.cBin].nJet = 0;
+         if (makeMixing==1) vgj[evt.cBin].nJet = 0;
          for (int j=0;j<anajet->nref;j++) {
             if (anajet->jtpt[j]<cutjetPt) continue;
             if (fabs(anajet->jteta[j])>cutjetEta) continue;
@@ -268,10 +279,12 @@ void analyzePhotonJet(
             }
             ++gj.nJet;
             // mixing classes
-            vgj[evt.cBin].inclJetPt[vgj[evt.cBin].nJet] = anajet->jtpt[j];
-            vgj[evt.cBin].inclJetEta[vgj[evt.cBin].nJet] = anajet->jteta[j];
-            vgj[evt.cBin].inclJetPhi[vgj[evt.cBin].nJet] = anajet->jtphi[j];
-            ++vgj[evt.cBin].nJet;
+            if (makeMixing==1)  {
+               vgj[evt.cBin].inclJetPt[vgj[evt.cBin].nJet] = anajet->jtpt[j];
+               vgj[evt.cBin].inclJetEta[vgj[evt.cBin].nJet] = anajet->jteta[j];
+               vgj[evt.cBin].inclJetPhi[vgj[evt.cBin].nJet] = anajet->jtphi[j];
+               ++vgj[evt.cBin].nJet;
+            }
          }	 
          
          // Found an away jet!
@@ -292,9 +305,11 @@ void analyzePhotonJet(
             gj.refPartonPt = anajet->refparton_pt[awayIndex];
             gj.refPartonFlavor = anajet->refparton_flavor[awayIndex];
             // mixing classes
-            vgj[evt.cBin].jetEt = gj.jetEt;
-            vgj[evt.cBin].jetEta = gj.jetEta;
-            vgj[evt.cBin].jetPhi = gj.jetPhi;
+            if (makeMixing==1) {
+               vgj[evt.cBin].jetEt = gj.jetEt;
+               vgj[evt.cBin].jetEta = gj.jetEta;
+               vgj[evt.cBin].jetPhi = gj.jetPhi;
+            }
          }
 
          // pfid
@@ -340,8 +355,10 @@ void analyzePhotonJet(
       
       // All done
       tgj->Fill();
-      // mixing classes
-      vtgj[evt.cBin]->Fill();
+      if (makeMixing==1) {
+         // mixing classes
+         vtgj[evt.cBin]->Fill();
+      }
    }
 
    // After Event Loop
