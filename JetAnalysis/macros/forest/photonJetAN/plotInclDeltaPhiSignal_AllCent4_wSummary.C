@@ -46,7 +46,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << endl;
 
    TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
-   bool doMixBkg=true;
+   bool doMixBkg=false;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
    
    // loop over centrality bins
@@ -116,7 +116,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.08_paper"
+                                         TString outdir = "./fig/02.09_paper"
                                          )
 {
    TH1::SetDefaultSumw2();
