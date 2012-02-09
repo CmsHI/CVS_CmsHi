@@ -104,7 +104,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.08_pppurity"
+                                         TString outdir = "./fig/02.08_paper"
                                          )
 {
    TH1::SetDefaultSumw2();
