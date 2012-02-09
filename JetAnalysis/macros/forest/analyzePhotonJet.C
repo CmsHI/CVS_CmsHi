@@ -137,7 +137,7 @@ void analyzePhotonJet(
 
    // mixing classes
    int nCentBin=40;
-   vector<TTree*> vtgj(nCentBin);
+   vector<TChain*> vtgj(nCentBin);
    vector<EvtSel> vevt(nCentBin);
    vector<GammaJet> vgj(nCentBin);
    vector<int> vmixNEvt(nCentBin);
@@ -145,7 +145,7 @@ void analyzePhotonJet(
    if (makeMixing==1) {
       cout << "Mixing step 1: " << endl;
       for (int ib=0; ib<nCentBin; ++ib) {
-         vtgj[ib] = new TTree(Form("tgj_%d",ib),"gamma jet tree");
+         vtgj[ib] = new TChain(Form("tgj_%d",ib),"gamma jet tree");
          vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
          vtgj[ib]->Branch("jet",&vgj[ib].photonEt,vgj[ib].leaves);
          vtgj[ib]->Branch("nJet",&vgj[ib].nJet,"nJet/I");
@@ -155,17 +155,18 @@ void analyzePhotonJet(
       }
    } else if (makeMixing==2) {
       cout << "Mixing step 2: " << endl;
-      TFile *mixf = TFile::Open(mixfname);
       for (int ib=0; ib<nCentBin; ++ib) {
-         vtgj[ib] =(TTree*)mixf->Get(Form("tgj_%d",ib));
-         vtgj[ib]->SetBranchAddress("evt",&evt.run);
-         vtgj[ib]->SetBranchAddress("jet",&gj.photonEt);
+         vtgj[ib] = new TChain(Form("tgj_%d",ib));
+         vtgj[ib]->Add(mixfname);         
+         vtgj[ib]->SetBranchAddress("evt",&vevt[ib].run);
+         vtgj[ib]->SetBranchAddress("jet",&vgj[ib].photonEt);
          vtgj[ib]->SetBranchAddress("nJet",&vgj[ib].nJet);
          vtgj[ib]->SetBranchAddress("inclJetPt",vgj[ib].inclJetPt);
          vtgj[ib]->SetBranchAddress("inclJetEta",vgj[ib].inclJetEta);
          vtgj[ib]->SetBranchAddress("inclJetPhi",vgj[ib].inclJetPhi);
          vmixNEvt[ib]=vtgj[ib]->GetEntries();
-         vmixEntry[ib]=0;
+         int offset=1;
+         vmixEntry[ib]=offset;
          cout << " ib" << ib << ": " << vmixNEvt[ib] << endl;
       }
    }
@@ -247,7 +248,7 @@ void analyzePhotonJet(
          }
       }
       
-      // Found a leading jet which passed basic quality cut!
+      // Found a leading photon which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading photon
          gj.isEle=c->photon.isEle[leadingIndex];
@@ -272,7 +273,7 @@ void analyzePhotonJet(
             vgj[evt.cBin].sigmaIetaIeta = gj.sigmaIetaIeta;
             vgj[evt.cBin].sumIsol = gj.sumIsol;
          }
-
+         
          // Loop over jet tree to find a away side leading jet
          gj.nJet=0;
          if (makeMixing==1) vgj[evt.cBin].nJet = 0;
@@ -302,12 +303,6 @@ void analyzePhotonJet(
                vgj[evt.cBin].inclJetPhi[vgj[evt.cBin].nJet] = anajet->jtphi[j];
                ++vgj[evt.cBin].nJet;
             }
-         }	 
-
-         // if mix, loop over mix events
-         if (makeMixing==2) {
-            for (int im=0; im<5; ++im) {
-            }
          }
 
          // Found an away jet!
@@ -335,6 +330,23 @@ void analyzePhotonJet(
             }
          }
 
+         // if mix, overwrite jets from mixed events
+         if (makeMixing==2) {
+            gj.nJet=0;
+            for (int im=0; im<10; ++im) {
+               int ient = (vmixEntry[evt.cBin]) % (vmixNEvt[evt.cBin]);
+               //cout << im << " get mix entry: " << ient << endl;
+               vtgj[evt.cBin]->GetEntry(ient);
+               for (int j=0; j<vgj[evt.cBin].nJet; ++j) {
+                  gj.inclJetPt[gj.nJet] = vgj[evt.cBin].inclJetPt[j];
+                  gj.inclJetEta[gj.nJet] = vgj[evt.cBin].inclJetEta[j];
+                  gj.inclJetPhi[gj.nJet] = vgj[evt.cBin].inclJetPhi[j];
+                  ++gj.nJet;
+               }
+               ++vmixEntry[evt.cBin];
+            }
+         }
+
          // pfid
          for (int it=0; it<pfs.nPFpart; ++it) {
             if (pfs.pfPt[it] < 4) continue;
@@ -348,7 +360,7 @@ void analyzePhotonJet(
                gj.jlpfId = pfs.pfId[it];
             }
          }
-      } // end of if jet
+      } // end of if leadingIndex
       
       // xcheck with tracks
       gj.nTrk=0;
