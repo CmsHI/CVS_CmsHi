@@ -456,13 +456,17 @@ void plotHistograms(const SignalCorrector* ana,
    float fitxmin=3.1415926*2./3;
    //float fitxmin=2.2;
    //TF1 *fdphi = new TF1("fdphi","[0]+[1]*exp(-(3.1415926-x)/[2])",2.0944,3.1415926);
-   TF1 *fdphi = new TF1("fdphi","[0]*exp(-(3.1415926-x)/[1])",fitxmin,3.1415926);
+   //TF1 *fdphi = new TF1("fdphi","[0]*exp(-(3.1415926-x)/[1])",fitxmin,3.1415926);
+   TF1 *fdphi = new TF1("fdphi","(TMath::Pi()/20.0)*exp(-(TMath::Pi()-x)/[0])/([0]*(1-exp(-TMath::Pi()/[0])))",2.0*TMath::Pi()/3.0,TMath::Pi());
    //TF1 *fdphi = new TF1("fdphi","[0]*exp(-(3.1415926-x)/[0])",fitxmin,3.1415926);
-   fdphi->SetParName(0,"norm");
-   fdphi->SetParName(1,"width");
-   fdphi->SetParameter("norm",1);
-   fdphi->SetParameter("width",0.2);
-   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
+   //fdphi->SetParName(0,"norm");
+   //fdphi->SetParName(1,"width");
+   //fdphi->SetParameter("norm",1);
+   //fdphi->SetParameter("width",0.2);
+   //ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
+   fdphi->SetParName(0,"width");
+   fdphi->SetParameter("width",0.3);
+   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0wl","",fitxmin,3.1415926);
    fdphi->SetLineWidth(1);
    fdphi->SetLineStyle(2);
    if (dataSrcType) {
