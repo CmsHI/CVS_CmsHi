@@ -46,7 +46,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << endl;
 
    TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
-   bool doMixBkg=true;
+   bool doMixBkg=false;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
    
    // loop over centrality bins

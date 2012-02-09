@@ -76,10 +76,10 @@ public:
       if (isolScheme==0) { //sum isol
          nameIsol="Sum(Isol.)<1GeV";
          cutIsol = "(cc4+cr4+ct4PtCut20)/0.9 <1";
-         hPhotonPurity->SetBinContent(1,0.73);
-         hPhotonPurity->SetBinContent(2,0.77);
-         hPhotonPurity->SetBinContent(3,0.79);
-         hPhotonPurity->SetBinContent(4,0.84);
+         hPhotonPurity->SetBinContent(1,0.74);
+         hPhotonPurity->SetBinContent(2,0.76);
+         hPhotonPurity->SetBinContent(3,0.82);
+         hPhotonPurity->SetBinContent(4,0.86);
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
@@ -92,9 +92,9 @@ public:
          t->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
          cutIsol = "fisherIsol>0.3";
          hPhotonPurity->SetBinContent(1,0.76);
-         hPhotonPurity->SetBinContent(2,0.77);
-         hPhotonPurity->SetBinContent(3,0.74);
-         hPhotonPurity->SetBinContent(4,0.78);         
+         hPhotonPurity->SetBinContent(2,0.76);
+         hPhotonPurity->SetBinContent(3,0.76);
+         hPhotonPurity->SetBinContent(4,0.81);
       }
       // Isolation Cut
       sel = sel&&cutIsol;
