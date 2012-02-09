@@ -52,7 +52,7 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v24.root",
+                      TString outname="output-data-Photon-v7_v24classes.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -93,7 +93,7 @@ void analyzePhotonJet(
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
-   c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v4.root");
+   c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v5.root");
    // intialize jet variables
    Jets * anajet = &(c->akPu3PF);   
    
@@ -128,6 +128,21 @@ void analyzePhotonJet(
    tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
+
+   // mixing groups
+   int nCentBin=40;
+   vector<TTree*> vtgj(nCentBin);
+   vector<EvtSel> vevt(nCentBin);
+   vector<GammaJet> vgj(nCentBin);
+   for (int ib=0; ib<nCentBin; ++ib) {
+      vtgj[ib] = new TTree("tgj","gamma jet tree");
+      vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
+      vtgj[ib]->Branch("jet",&vgj[ib].photonEt,vgj[ib].leaves);
+      vtgj[ib]->Branch("nJet",&vgj[ib].nJet,"nJet/I");
+      vtgj[ib]->Branch("inclJetPt",vgj[ib].inclJetPt,"inclJetPt[nJet]/F");
+      vtgj[ib]->Branch("inclJetEta",vgj[ib].inclJetEta,"inclJetEta[nJet]/F");
+      vtgj[ib]->Branch("inclJetPhi",vgj[ib].inclJetPhi,"inclJetPhi[nJet]/F");
+   }
    
    // pp triggers
    int HLT_Photon15_CaloIdVL_v1=0;
@@ -141,7 +156,8 @@ void analyzePhotonJet(
    }
    
    // Main loop
-   for (int i=0;i<c->GetEntries();i++)
+   //for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<1000;i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
