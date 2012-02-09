@@ -25,7 +25,8 @@ public:
       int run,evt;
       t->SetBranchAddress("Run",&run);
       t->SetBranchAddress("Event",&evt);
-      for (int i=0;i<t->GetEntries();i++) {
+      //for (int i=0;i<t->GetEntries();i++) {
+      for (int i=0;i<1000;i++) {
          t->GetEntry(i);
          if (i%100000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
          int occur = (int)FindOccurrences(run,evt);
@@ -129,13 +130,13 @@ void analyzePhotonJet(
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
 
-   // mixing groups
+   // mixing classes
    int nCentBin=40;
    vector<TTree*> vtgj(nCentBin);
    vector<EvtSel> vevt(nCentBin);
    vector<GammaJet> vgj(nCentBin);
    for (int ib=0; ib<nCentBin; ++ib) {
-      vtgj[ib] = new TTree("tgj","gamma jet tree");
+      vtgj[ib] = new TTree(Form("tgj_%d",ib),"gamma jet tree");
       vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
       vtgj[ib]->Branch("jet",&vgj[ib].photonEt,vgj[ib].leaves);
       vtgj[ib]->Branch("nJet",&vgj[ib].nJet,"nJet/I");
@@ -193,6 +194,8 @@ void analyzePhotonJet(
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight/c->GetEntries(); // for different mc sample, 1 for data
 
+      // mixing classes
+      vevt[evt.cBin] = evt;
       
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
       if (dataSrcType==2&&!evt.trig) continue;
@@ -201,6 +204,7 @@ void analyzePhotonJet(
       int leadingIndex=-1;
       int awayIndex=-1;
       gj.clear();
+      for (int ib=0; ib<nCentBin; ++ib) vgj[ib].clear();
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
@@ -234,8 +238,16 @@ void analyzePhotonJet(
          gj.refPhoFlavor = c->photon.genMomId[leadingIndex];
          gj.genCalIsoDR04 = c->photon.genCalIsoDR04[leadingIndex];
          
+         // mixing classes
+         vgj[evt.cBin].photonEt = gj.photonEt;
+         vgj[evt.cBin].photonEta = gj.photonEta;
+         vgj[evt.cBin].photonPhi = gj.photonPhi;
+         vgj[evt.cBin].sigmaIetaIeta = gj.sigmaIetaIeta;
+         vgj[evt.cBin].sumIsol = gj.sumIsol;
+
          // Loop over jet tree to find a away side leading jet
          gj.nJet=0;
+         vgj[evt.cBin].nJet = 0;
          for (int j=0;j<anajet->nref;j++) {
             if (anajet->jtpt[j]<cutjetPt) continue;
             if (fabs(anajet->jteta[j])>cutjetEta) continue;
@@ -255,6 +267,11 @@ void analyzePhotonJet(
                }
             }
             ++gj.nJet;
+            // mixing classes
+            vgj[evt.cBin].inclJetPt[vgj[evt.cBin].nJet] = anajet->jtpt[j];
+            vgj[evt.cBin].inclJetEta[vgj[evt.cBin].nJet] = anajet->jteta[j];
+            vgj[evt.cBin].inclJetPhi[vgj[evt.cBin].nJet] = anajet->jtphi[j];
+            ++vgj[evt.cBin].nJet;
          }	 
          
          // Found an away jet!
@@ -274,6 +291,10 @@ void analyzePhotonJet(
             gj.refJetPhi = anajet->refphi[awayIndex];
             gj.refPartonPt = anajet->refparton_pt[awayIndex];
             gj.refPartonFlavor = anajet->refparton_flavor[awayIndex];
+            // mixing classes
+            vgj[evt.cBin].jetEt = gj.jetEt;
+            vgj[evt.cBin].jetEta = gj.jetEta;
+            vgj[evt.cBin].jetPhi = gj.jetPhi;
          }
 
          // pfid
@@ -319,6 +340,8 @@ void analyzePhotonJet(
       
       // All done
       tgj->Fill();
+      // mixing classes
+      vtgj[evt.cBin]->Fill();
    }
 
    // After Event Loop
