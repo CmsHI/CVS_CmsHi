@@ -138,9 +138,9 @@ public:
       cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << rSigAll.n << " ** " << endl;
    }
    
-   void Extrapolate(float dphiSigCut=2.0944, bool doDPhiExtend=false) {
+   void Extrapolate(float dphiSigCut=2.0944, bool doDPhiExtend=false, float dphisidescale=-1) {
       // Scales
-      float dphisidescale = (3.14159-dphiSigCut)/(3.14159/2.-0.7);
+      if (dphisidescale<0) dphisidescale = (3.14159-dphiSigCut)/(3.14159/2.-0.7);
       float sssidescale = 0,ssdphisidescale=0;
       if (rBkgSShape.n>0) {
          sssidescale = rSigAll.n*fracPhotonBkg/rBkgSShape.n;
