@@ -24,7 +24,7 @@ public:
    deta(-99),dphi(-99), Aj(-99),
    sigmaIetaIeta(-99),
    isEle(false),
-   nTrk(0) {
+   nTrk(0),nJet(0) {
       leaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetRawEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
       ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
       ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
@@ -62,7 +62,7 @@ public:
       jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       isEle=false;
-      nTrk=0;
+      nTrk=0; nJet=0;
    }
 };
 
