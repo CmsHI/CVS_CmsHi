@@ -46,7 +46,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << endl;
 
    TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
-   bool doMixBkg=false;
+   bool doMixBkg=true;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
    
    // loop over centrality bins
@@ -56,9 +56,14 @@ void getHistograms(vector<SignalCorrector*> & vana,
       if (dataSrcType>1) cBin==vcutCent.size()-1;
       vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-inclJetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
       vana[ib]->cutBkgDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
-      if (doMixBkg) vana[ib]->cutBkgDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f",minJet,sigDPhi);
       vana[ib]->cutSShape= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
       vana[ib]->cutSShapeDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
+      if (doMixBkg) {
+         vana[ib]->cutBkgDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi);
+         vana[ib]->cutSShapeDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
+         vana[ib]->rBkgDPhi.var = "acos(cos(photonPhi-tmix.inclJetPhi))";
+         vana[ib]->rBkgSShapeDPhi.var = "acos(cos(photonPhi-tmix.inclJetPhi))";
+      }
 
       // analyze tree
       if (doMixBkg&&dataSrcType>1) {
