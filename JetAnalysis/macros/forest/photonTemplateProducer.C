@@ -26,7 +26,7 @@ TString fNamePPdata = "barrelHiForestPhotonPP7TeV-v3.root";
 void getTemplate(int ppHI = kHI, TH1D* h1=0, TString fname1="ss", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true, float specialSbCut=10, float theShift=0);
 
 TCut getIsoCut( int isoChoice=0, float isoCut = -100 ) {
-   
+  
    if ( (isoChoice== kSumIso2) && ( isoCut > -99))
       return Form("(cc4+cr4+ct4PtCut20)/0.9 < %f",isoCut);
    if         (isoChoice == kSumIso) return isoSumCut;
@@ -142,7 +142,7 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 if ( (icent == nCent_std) || (icent == 2)) 
 	   drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.5680963,0.3569118,1,15);
 	 else 
-	   drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4680963,0.3569118,1,15);
+	   drawText(Form("Purity(#sigma_{#eta#eta} < 0.01) : %.0f%%", (float)fitr.purity010*100),0.4980963,0.3569118,1,15);
 	 
 	 drawText(Form("#pm %.0f%% (stat)", float( 100. * fitr.purity010 * (float)fitr.nSigErr / (float)fitr.nSig ) ),0.6680963,0.2869118,1,15);
 	 
@@ -165,10 +165,17 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 
 	 if ( icent<= 2) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
 	 //	 drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
+	 if ( mcSigShift != 0 )
+           drawText(Form("Signal template shifted by %f",mcSigShift),0.1980963,0.7569118,1,15);
+	 
       }   
       
-      c1[ipt]->SaveAs(Form("fittingPurity_%s_pt%d.pdf",getIsoLabel(isoChoice).Data(),ipt));
-      
+      TString ppLabel ="";  
+      if ( ppHI == kPP) ppLabel = "_pp";
+      TString shiftLabel="";
+      if ( mcSigShift != 0 )  shiftLabel = Form("_%fSigShifted",(float)mcSigShift);
+      c1[ipt]->SaveAs(Form("fittingPurity%s_%s_pt%d%s.pdf",ppLabel.Data(), getIsoLabel(isoChoice).Data(),ipt,shiftLabel.Data()));
+
    }
    
    
@@ -258,7 +265,7 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 
    
    c2->SaveAs(Form("photonID_efficiency_%s.pdf",getIsoLabel(isoChoice).Data()));  
-   TCanvas* c3 = new TCanvas("cPurity","",500,500);
+   TCanvas* c3 = new TCanvas("cPurity","",400,400);
 
    TH1D* tempPurity = (TH1D*)hPurity[1]->Clone("tempPurity");
    tempPurity->Reset();
