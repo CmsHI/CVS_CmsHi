@@ -89,6 +89,7 @@ TGraphAsymmErrors * getSummary(
                                int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
                                int dataType, // 0=mc gen, 1=reco
                                int anaMode = 0, // 0=get mean, 1 = get fit, 2 = get area
+                               int drawCheck = 0,
                                int iCheck = 0
                                );
 
@@ -131,13 +132,13 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v4_v24_akPu3PF.root","1==1",3,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapyz2;
-   getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",10,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapyd6t;
-   getHistograms(vanapyd6t, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760d6t_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapyd6t, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760d6t_v24_akPu3PF.root","weight*sampleWeight",12,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapy7z2;
-   getHistograms(vanapy7z2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py7TeV-pho30-v1_v24_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapy7z2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py7TeV-pho30-v1_v24_akPu3PF.root","weight*sampleWeight",13,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    TCanvas *c1 = new TCanvas("c1","",1000,300);
    makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.2,0.02);
@@ -281,8 +282,11 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    TCanvas *c2 = new TCanvas("c","",500,500);
    hNpartFrame->Draw();
    
+   //
+   // Different inputs
+   //
    cout << endl << "     MC Isol Pho" << endl;
-   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,summaryMode,-1);
+   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,summaryMode,drawCheck);
    ghypho->SetMarkerSize(1.25);
    ghypho->SetMarkerStyle(kOpenSquare);
    ghypho->Draw("p same");
@@ -294,62 +298,62 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   ghygj->Draw("p same");
    
    cout << endl << "     pythia z2" << endl;
-   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,2,1,summaryMode,99);
+   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,10,1,summaryMode,drawCheck);
    gpyz2->SetMarkerSize(1.25);
    gpyz2->SetMarkerStyle(kOpenSquare);
    gpyz2->SetMarkerColor(kBlue);
    gpyz2->Draw("p same");
    
    cout << endl << "     pythia d6t" << endl;
-   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,2,1,summaryMode,99);
+   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,12,1,summaryMode,drawCheck);
    gpyd6t->SetMarkerSize(1.25);
    gpyd6t->SetMarkerStyle(kOpenCircle);
    gpyd6t->SetMarkerColor(kBlue);
    gpyd6t->Draw("p same");
 
 //   cout << endl << "     pythia 7 TeV z2" << endl;
-//   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,2,1,summaryMode,99);
+//   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,13,1,summaryMode,drawCheck);
 //   gpy7z2->SetMarkerSize(1.25);
 //   gpy7z2->SetMarkerStyle(kOpenCross);
 //   gpy7z2->SetMarkerColor(kBlue);
 //   gpy7z2->Draw("p same");
    
    cout << endl << "     pp 2.76" << endl;
-   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,-1);
+   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,drawCheck);
    gpp->SetMarkerSize(1.25);
    gpp->SetMarkerStyle(kOpenStar);
    gpp->SetMarkerColor(kRed);
    gpp->SetLineColor(kRed);
    gpp->Draw("p same");
    if (drawCheck) {
-      getSummary(1,npart,vanapp,1,1,summaryMode,0);
-      getSummary(1,npart,vanapp,1,1,summaryMode,1);
-      getSummary(1,npart,vanapp,1,1,summaryMode,2);
+      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,1);
+      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,2);
+      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,3);
    }
    
 //   cout << endl << "     pp 7" << endl;
-//   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,-1);
+//   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,drawCheck);
 //   gpp7->SetMarkerSize(1.25);
 //   gpp7->SetMarkerStyle(kOpenCross);
 //   gpp7->SetMarkerColor(kOrange+2);
 //   gpp7->SetLineColor(kOrange+2);
 //   gpp7->Draw("p same");
 //   if (drawCheck) {
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,0);
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,1);
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,2);
+//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,1);
+//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,2);
+//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,3);
 //   }
    
    cout << endl << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,summaryMode,-1);
+   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck);
    gdata->SetMarkerSize(1.25);
    gdata->SetMarkerColor(2);
    gdata->SetLineColor(2);
    gdata->Draw("p same");
    if (drawCheck) {
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,0);
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,1);
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,2);
+      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,0);
+      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,1);
+      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,2);
    }
    
    // Annotation
@@ -396,7 +400,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 
 void plotHistograms(const SignalCorrector* ana,
                     int cbin,
-                    int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
+                    int dataSrcType, // 0=hi mc, 1=pbpb data, 2= pp data, 10= pp mc
                     int dataType, // 0=mc gen, 1=reco
                     int drawCheck,
                     TString opt
@@ -440,6 +444,11 @@ void plotHistograms(const SignalCorrector* ana,
    
    if (opt!="")  ana->rSubtracted.hExtrapNorm->Draw(opt);
    float mean=ana->rSubtracted.hExtrapNorm->GetMean();
+   
+   // output histograms
+   TFile* hout = new TFile("outputHistv1.root","update");
+   ana->rSubtracted.hExtrapNorm->Write();
+   hout->Close();
    
    // check subtraction
    if (drawCheck>=2) {
@@ -506,9 +515,10 @@ TGraphAsymmErrors * getSummary(
                                int nBin,
                                float * npart,
                                const vector<SignalCorrector*> & vana,
-                               int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data
+                               int dataSrcType, // 0=mc, 1=pbpb data, 2= pp data, 10 = pp mc
                                int dataType, // 0=mc gen, 1=reco
                                int anaMode, // 0=get mean, 1 = get fit, 2 = get area
+                               int drawCheck,
                                int iCheck
                                )
 {
@@ -520,9 +530,9 @@ TGraphAsymmErrors * getSummary(
    {
       float y=0, errYL=0, errYH =0;
       TH1D * hana = vana[ib]->rSubtracted.hExtrapNorm;
-      if (iCheck==0) hana = vana[ib]->rSigAll.hExtrapNorm;
-      else if (iCheck==1) hana = vana[ib]->rBkgDPhi.hExtrapNorm;
-      else if (iCheck==2) hana = vana[ib]->rBkgSShape.hExtrapNorm;
+      if (iCheck==1) hana = vana[ib]->rSigAll.hExtrapNorm;
+      else if (iCheck==2) hana = vana[ib]->rBkgDPhi.hExtrapNorm;
+      else if (iCheck==3) hana = vana[ib]->rBkgSShape.hExtrapNorm;
       if (!hana) continue;
       
       if (anaMode ==0) {
@@ -549,9 +559,9 @@ TGraphAsymmErrors * getSummary(
    }
    
    // Draw count
-   if (iCheck<0) {
+   if (drawCheck>=1) {
       TLegend *t3=new TLegend(0.1,0.68,0.51,0.89);
-      if (dataSrcType==1&&0) {
+      if (dataSrcType==1) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,vana[0]->nameIsol,"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("PbPb: %.0f #gamma-j",nPhotonJet),"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
@@ -559,13 +569,13 @@ TGraphAsymmErrors * getSummary(
          //      for (int ib=nBin-1;ib>=0;--ib) {
          //         t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("%.0f to %.0f \%: %.0f #gamma-j",m[ib]*2.5,m[ib+1]*2.5,vana[ib]->rSubtracted.nExtrap),"");
          //      }
-      } else if (dataSrcType==2&&0) {
+      } else if (dataSrcType==2) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,Form("pp 2.76TeV: %.0f #gamma-j",nPhotonJet),"");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          //      for (int ib=nBin-1;ib>=0;--ib) { t3->AddEntry("","",""); }
-      } else if (dataSrcType==3&&0) {
+      } else if (dataSrcType==3) {
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
          t3->AddEntry(vana[0]->rSubtracted.hExtrapNorm,"","");
@@ -578,22 +588,22 @@ TGraphAsymmErrors * getSummary(
       t3->SetTextFont(63);
       t3->SetTextSize(15);
       t3->Draw();
-   } else {
-      if (iCheck==0) {
+   } else if (drawCheck>=2) {
+      if (iCheck==1) {
          gAve->SetMarkerSize(1.25);
          gAve->SetLineColor(kGray+2);
          gAve->SetLineStyle(2);
          gAve->SetMarkerColor(kGray+2);
          gAve->SetMarkerStyle(kOpenCircle);
          gAve->Draw("same p");
-      } else if (iCheck==1) {
+      } else if (iCheck==2) {
          gAve->SetMarkerSize(1.25);
          gAve->SetLineColor(kGreen+2);
          gAve->SetLineStyle(2);
          gAve->SetMarkerColor(kGreen+2);
          gAve->SetMarkerStyle(kOpenCircle);
          gAve->Draw("same p");
-      } else if (iCheck==2) {
+      } else if (iCheck==3) {
          gAve->SetMarkerSize(1.25);
          gAve->SetLineColor(kViolet);
          gAve->SetLineStyle(2);
