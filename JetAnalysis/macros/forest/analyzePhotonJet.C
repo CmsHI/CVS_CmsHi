@@ -54,7 +54,8 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v2_v14.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
                       TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v24classes.root",
+                      //TString outname="output-data-Photon-v7_v24classes.root",
+                      TString outname="output-data-Photon-v7_v24mix.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -76,7 +77,7 @@ void analyzePhotonJet(
                       bool doCentReWeight=false,
                       TString mcfname="",
                       TString datafname="output-data-Photon-v7_v24.root",
-                      int makeMixing=1,
+                      int makeMixing=2, // 0=default (no mix), 1=make mixing classes 2=mix
                       TString mixfname="output-data-Photon-v7_v24classes.root"
                       )
 {
@@ -139,9 +140,10 @@ void analyzePhotonJet(
    vector<TTree*> vtgj(nCentBin);
    vector<EvtSel> vevt(nCentBin);
    vector<GammaJet> vgj(nCentBin);
-   vector<int> vmixEntry(nCentBin);
    vector<int> vmixNEvt(nCentBin);
+   vector<int> vmixEntry(nCentBin);
    if (makeMixing==1) {
+      cout << "Mixing step 1: " << endl;
       for (int ib=0; ib<nCentBin; ++ib) {
          vtgj[ib] = new TTree(Form("tgj_%d",ib),"gamma jet tree");
          vtgj[ib]->Branch("evt",&vevt[ib].run,vevt[ib].leaves);
@@ -150,6 +152,21 @@ void analyzePhotonJet(
          vtgj[ib]->Branch("inclJetPt",vgj[ib].inclJetPt,"inclJetPt[nJet]/F");
          vtgj[ib]->Branch("inclJetEta",vgj[ib].inclJetEta,"inclJetEta[nJet]/F");
          vtgj[ib]->Branch("inclJetPhi",vgj[ib].inclJetPhi,"inclJetPhi[nJet]/F");
+      }
+   } else if (makeMixing==2) {
+      cout << "Mixing step 2: " << endl;
+      TFile *mixf = TFile::Open(mixfname);
+      for (int ib=0; ib<nCentBin; ++ib) {
+         vtgj[ib] =(TTree*)mixf->Get(Form("tgj_%d",ib));
+         vtgj[ib]->SetBranchAddress("evt",&evt.run);
+         vtgj[ib]->SetBranchAddress("jet",&gj.photonEt);
+         vtgj[ib]->SetBranchAddress("nJet",&vgj[ib].nJet);
+         vtgj[ib]->SetBranchAddress("inclJetPt",vgj[ib].inclJetPt);
+         vtgj[ib]->SetBranchAddress("inclJetEta",vgj[ib].inclJetEta);
+         vtgj[ib]->SetBranchAddress("inclJetPhi",vgj[ib].inclJetPhi);
+         vmixNEvt[ib]=vtgj[ib]->GetEntries();
+         vmixEntry[ib]=0;
+         cout << " ib" << ib << ": " << vmixNEvt[ib] << endl;
       }
    }
    
@@ -286,7 +303,13 @@ void analyzePhotonJet(
                ++vgj[evt.cBin].nJet;
             }
          }	 
-         
+
+         // if mix, loop over mix events
+         if (makeMixing==2) {
+            for (int im=0; im<5; ++im) {
+            }
+         }
+
          // Found an away jet!
          if (awayIndex !=-1) {
             double photonEt = c->photon.pt[leadingIndex];
