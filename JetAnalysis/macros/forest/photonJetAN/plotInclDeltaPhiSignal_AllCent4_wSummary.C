@@ -121,7 +121,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.09_paper"
+                                         TString outdir = "./fig/02.09_inclJetPhotonPurity"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -463,10 +463,11 @@ void plotHistograms(const SignalCorrector* ana,
    //fdphi->SetParName(1,"width");
    //fdphi->SetParameter("norm",1);
    //fdphi->SetParameter("width",0.2);
-   //ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
    fdphi->SetParName(0,"width");
    fdphi->SetParameter("width",0.3);
-   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0wl","",fitxmin,3.1415926);
+   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0ll","",fitxmin,3.1415926);
+   fdphi->SetParLimits(fdphi->GetParNumber("width"),fdphi->GetParameter("width")-0.05,fdphi->GetParameter("width")+0.05);
+   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
    fdphi->SetLineWidth(1);
    fdphi->SetLineStyle(2);
    if (dataSrcType) {
