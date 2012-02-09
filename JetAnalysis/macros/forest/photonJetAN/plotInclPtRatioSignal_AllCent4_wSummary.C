@@ -409,8 +409,8 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       leg2->SetTextSize(17);
       leg2->Draw();
       
-      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
-      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
+      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_Norm%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,normMode,summaryMode,drawCheck));
+      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_Norm%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,normMode,summaryMode,drawCheck));
    }
 }
 
