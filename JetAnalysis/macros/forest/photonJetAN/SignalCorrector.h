@@ -102,7 +102,9 @@ public:
       if (subSShapeSide) {
          if (dataSrcType==1) {
             fracPhotonBkg = 1-hPhotonPurity->GetBinContent(centBin+1);
-         } else if (dataSrcType>=2) {
+         } else if (dataSrcType==2) { // for now use peripheral purity for pp 2.76TeV
+            fracPhotonBkg = 1-hPhotonPurity->GetBinContent(4);
+         } else if (dataSrcType==3) {
             if (isolScheme==0) fracPhotonBkg = 1-0.79;
             if (isolScheme==2) fracPhotonBkg = 1-0.75;
          }
