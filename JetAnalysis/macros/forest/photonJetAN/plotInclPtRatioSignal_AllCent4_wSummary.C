@@ -22,6 +22,8 @@
 #include "npart.h"
 #endif
 
+TString outfname;
+
 //---------------------------------------------------------------------
 void getHistograms(vector<SignalCorrector*> & vana,
                    vector<TCut> vcutCent, TCut mycut, int isolScheme, int normMode,
@@ -109,6 +111,10 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    TH1::SetDefaultSumw2();
    float sigDPhi=3.1415926*7./8;
    
+   outfname=Form("%s/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma%.0fjet%.0fdphiSig%.0f_Isol%d_Norm%d.root",outdir.Data(),minPhoton,minJet,sigDPhi*1000,isolScheme,normMode);
+   TFile* hout = new TFile(outfname,"RECREATE");
+   hout->Close();
+
    const int nBin = 4;
    float m[nBin+1] = {0,4,12,20,40};
 
@@ -263,7 +269,6 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    //
    // Summary Plot
    //
-   int summaryMode = 0; // 0 = average, 2 = area
    float npart[nBin];// = {2,358.623,232.909,97.9521};
    GetNPartBins("../output-data-Photon-v7_v24_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
@@ -271,131 +276,139 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
    hNpartFrame->SetYTitle("<x_{JG}>");
-   if (summaryMode==2) hNpartFrame->SetYTitle("R(x_{#gamma,J}>0)");
    hNpartFrame->GetXaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
    hNpartFrame->GetYaxis()->SetTitleSize(0.05);
    float ymin=0.45,ymax=1.2; // 35, 2, 0.4
-   if (summaryMode==2) { ymin=0; ymax=1.5; }
-   hNpartFrame->SetAxisRange(ymin,ymax,"Y");
-   TCanvas *c2 = new TCanvas("c","",500,500);
-   hNpartFrame->Draw();
-   
-   //
-   // Different inputs
-   //
-   cout << endl << "     MC Isol Pho" << endl;
-   TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,summaryMode,drawCheck);
-   ghypho->SetMarkerSize(1.25);
-   ghypho->SetMarkerStyle(kOpenSquare);
-   ghypho->Draw("p same");
-   
-//   cout << endl << "     MC Gamma-jet" << endl;
-//   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,summaryMode,-1);
-//   ghygj->SetMarkerSize(1.25);
-//   ghygj->SetMarkerStyle(kOpenCircle);
-//   ghygj->Draw("p same");
-   
-   cout << endl << "     pythia z2" << endl;
-   TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,10,1,summaryMode,drawCheck);
-   gpyz2->SetMarkerSize(1.25);
-   gpyz2->SetMarkerStyle(kOpenSquare);
-   gpyz2->SetMarkerColor(kBlue);
-   gpyz2->Draw("p same");
-   
-   cout << endl << "     pythia d6t" << endl;
-   TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,12,1,summaryMode,drawCheck);
-   gpyd6t->SetMarkerSize(1.25);
-   gpyd6t->SetMarkerStyle(kOpenCircle);
-   gpyd6t->SetMarkerColor(kBlue);
-   gpyd6t->Draw("p same");
 
-//   cout << endl << "     pythia 7 TeV z2" << endl;
-//   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,13,1,summaryMode,drawCheck);
-//   gpy7z2->SetMarkerSize(1.25);
-//   gpy7z2->SetMarkerStyle(kOpenCross);
-//   gpy7z2->SetMarkerColor(kBlue);
-//   gpy7z2->Draw("p same");
-   
-   cout << endl << "     pp 2.76" << endl;
-   TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,drawCheck);
-   gpp->SetMarkerSize(1.25);
-   gpp->SetMarkerStyle(kOpenStar);
-   gpp->SetMarkerColor(kRed);
-   gpp->SetLineColor(kRed);
-   gpp->Draw("p same");
-   if (drawCheck) {
-      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,1);
-      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,2);
-      getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,3);
+   int summaryModes[2] = {0,2}; // 0 = average, 2 = area
+   for (int i=0; i<2; ++i) { 
+      int summaryMode = summaryModes[i]; 
+      
+      if (summaryMode==2) {
+         hNpartFrame->SetYTitle("R(x_{#gamma,J}>0)");
+         ymin=0; ymax=1.5;
+      }
+      hNpartFrame->SetAxisRange(ymin,ymax,"Y");
+      TCanvas *c2 = new TCanvas(Form("cSummary%d",summaryMode),"",500,500);
+      hNpartFrame->Draw();
+      
+      //
+      // Different inputs
+      //
+      cout << endl << "     MC Isol Pho" << endl;
+      TGraphAsymmErrors * ghypho = getSummary(nBin,npart,vanahypho,0,1,summaryMode,drawCheck);
+      ghypho->SetMarkerSize(1.25);
+      ghypho->SetMarkerStyle(kOpenSquare);
+      ghypho->Draw("p same");
+      
+      //   cout << endl << "     MC Gamma-jet" << endl;
+      //   TGraphAsymmErrors * ghygj = getSummary(nBin,npart,vanahygj,0,1,summaryMode,-1);
+      //   ghygj->SetMarkerSize(1.25);
+      //   ghygj->SetMarkerStyle(kOpenCircle);
+      //   ghygj->Draw("p same");
+      
+      cout << endl << "     pythia z2" << endl;
+      TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,10,1,summaryMode,drawCheck);
+      gpyz2->SetMarkerSize(1.25);
+      gpyz2->SetMarkerStyle(kOpenSquare);
+      gpyz2->SetMarkerColor(kBlue);
+      gpyz2->Draw("p same");
+      
+      cout << endl << "     pythia d6t" << endl;
+      TGraphAsymmErrors * gpyd6t = getSummary(1,npart,vanapyd6t,12,1,summaryMode,drawCheck);
+      gpyd6t->SetMarkerSize(1.25);
+      gpyd6t->SetMarkerStyle(kOpenCircle);
+      gpyd6t->SetMarkerColor(kBlue);
+      gpyd6t->Draw("p same");
+      
+      //   cout << endl << "     pythia 7 TeV z2" << endl;
+      //   TGraphAsymmErrors * gpy7z2 = getSummary(1,npart,vanapy7z2,13,1,summaryMode,drawCheck);
+      //   gpy7z2->SetMarkerSize(1.25);
+      //   gpy7z2->SetMarkerStyle(kOpenCross);
+      //   gpy7z2->SetMarkerColor(kBlue);
+      //   gpy7z2->Draw("p same");
+      
+      cout << endl << "     pp 2.76" << endl;
+      TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,drawCheck);
+      gpp->SetMarkerSize(1.25);
+      gpp->SetMarkerStyle(kOpenStar);
+      gpp->SetMarkerColor(kRed);
+      gpp->SetLineColor(kRed);
+      gpp->Draw("p same");
+      if (drawCheck) {
+         getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,1);
+         getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,2);
+         getSummary(1,npart,vanapp,1,1,summaryMode,drawCheck,3);
+      }
+      
+      //   cout << endl << "     pp 7" << endl;
+      //   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,drawCheck);
+      //   gpp7->SetMarkerSize(1.25);
+      //   gpp7->SetMarkerStyle(kOpenCross);
+      //   gpp7->SetMarkerColor(kOrange+2);
+      //   gpp7->SetLineColor(kOrange+2);
+      //   gpp7->Draw("p same");
+      //   if (drawCheck) {
+      //      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,1);
+      //      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,2);
+      //      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,3);
+      //   }
+      
+      cout << endl << "     Data" << endl;
+      TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck);
+      gdata->SetMarkerSize(1.25);
+      gdata->SetMarkerColor(2);
+      gdata->SetLineColor(2);
+      gdata->Draw("p same");
+      if (drawCheck) {
+         getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,1);
+         getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,2);
+         getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,3);
+      }
+      
+      // Annotation
+      drawText("CMS",0.198,0.89,17);
+      TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+      pline->SetLineColor(4);
+      pline->SetLineStyle(4);
+      pline->Draw();   
+      
+      TLegend *leg=new TLegend(0.55,0.6,0.85,0.91);
+      leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
+      leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
+      //   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
+      //   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+      //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+      leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
+      //   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
+      leg->AddEntry(gpp,"pp 2.76 TeV","p");
+      //   leg->AddEntry(gpp7,"pp 7 TeV","p");
+      leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
+      leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
+      //   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
+      leg->SetFillColor(0);
+      leg->SetBorderSize(0);
+      leg->SetFillStyle(0);
+      leg->SetTextFont(63);
+      leg->SetTextSize(17);
+      leg->Draw();
+      
+      TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
+      leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
+      leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
+      leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{7}{8}#pi","");
+      leg2->SetFillColor(0);
+      leg2->SetBorderSize(0);
+      leg2->SetFillStyle(0);
+      leg2->SetTextFont(63);
+      leg2->SetTextSize(17);
+      leg2->Draw();
+      
+      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
+      c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
    }
-   
-//   cout << endl << "     pp 7" << endl;
-//   TGraphAsymmErrors * gpp7 = getSummary(1,npart,vanapp7,3,1,summaryMode,drawCheck);
-//   gpp7->SetMarkerSize(1.25);
-//   gpp7->SetMarkerStyle(kOpenCross);
-//   gpp7->SetMarkerColor(kOrange+2);
-//   gpp7->SetLineColor(kOrange+2);
-//   gpp7->Draw("p same");
-//   if (drawCheck) {
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,1);
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,2);
-//      getSummary(1,npart,vanapp7,1,1,summaryMode,drawCheck,3);
-//   }
-   
-   cout << endl << "     Data" << endl;
-   TGraphAsymmErrors * gdata = getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck);
-   gdata->SetMarkerSize(1.25);
-   gdata->SetMarkerColor(2);
-   gdata->SetLineColor(2);
-   gdata->Draw("p same");
-   if (drawCheck) {
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,0);
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,1);
-      getSummary(nBin,npart,vanahi,1,1,summaryMode,drawCheck,2);
-   }
-   
-   // Annotation
-   drawText("CMS",0.198,0.89,17);
-   TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
-   pline->SetLineColor(4);
-   pline->SetLineStyle(4);
-   pline->Draw();   
-   
-   TLegend *leg=new TLegend(0.55,0.6,0.85,0.91);
-   leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
-   leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
-//   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
-//   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-//   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
-//   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
-   leg->AddEntry(gpp,"pp 2.76 TeV","p");
-//   leg->AddEntry(gpp7,"pp 7 TeV","p");
-   leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
-   leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
-//   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
-   leg->SetFillColor(0);
-   leg->SetBorderSize(0);
-   leg->SetFillStyle(0);
-   leg->SetTextFont(63);
-   leg->SetTextSize(17);
-   leg->Draw();
-   
-   TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
-   leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
-   leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
-   leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{7}{8}#pi","");
-   leg2->SetFillColor(0);
-   leg2->SetBorderSize(0);
-   leg2->SetFillStyle(0);
-   leg2->SetTextFont(63);
-   leg2->SetTextSize(17);
-   leg2->Draw();
-   
-   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.gif",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));
-   c2->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_InclPtRatio_SubDPhi%dSS%d_gamma%.0fjet%.0fdphiSig%.0f_vs_Npart_Isol%d_anaMode%d_drawChk%d.pdf",outdir.Data(),subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi*1000,isolScheme,summaryMode,drawCheck));   
 }
 
 void plotHistograms(const SignalCorrector* ana,
@@ -446,7 +459,7 @@ void plotHistograms(const SignalCorrector* ana,
    float mean=ana->rSubtracted.hExtrapNorm->GetMean();
    
    // output histograms
-   TFile* hout = new TFile("outputHistv1.root","update");
+   TFile* hout = new TFile(outfname,"update");
    ana->rSubtracted.hExtrapNorm->Write();
    hout->Close();
    
@@ -524,7 +537,11 @@ TGraphAsymmErrors * getSummary(
 {
    // make graph
    TGraphAsymmErrors * gAve = new TGraphAsymmErrors(nBin);
-   
+   TString name;
+   if (anaMode==0) name = Form("dataSrc%d_reco%d_x_Summary_%d",dataSrcType,dataType,iCheck);
+   if (anaMode==2) name = Form("dataSrc%d_reco%d_R_Summary_%d",dataSrcType,dataType,iCheck);
+   gAve->SetName(name);
+
    float nPhotonJet=0;
    for (int ib=0;ib<gAve->GetN();++ib)
    {
@@ -557,6 +574,10 @@ TGraphAsymmErrors * getSummary(
       cout <<"bin: " << ib <<" npart: "<<npart[ib]<< " y: " << y << " yerr: " << errYH << endl;
       nPhotonJet+=vana[ib]->rSubtracted.nExtrap;
    }
+
+   TFile* hout = new TFile(outfname,"update");
+   gAve->Write();
+   hout->Close();
    
    // Draw count
    if (drawCheck>=1) {
