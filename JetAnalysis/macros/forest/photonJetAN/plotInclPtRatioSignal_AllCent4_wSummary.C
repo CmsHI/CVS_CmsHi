@@ -105,7 +105,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.08_paper"
+                                         TString outdir = "./fig/02.08_paperGunther"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -157,7 +157,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
    hFrame->SetStats(0);
    hFrame->SetMarkerStyle(kOpenSquare);
-   hFrame->SetXTitle("x_{J,#gamma} = p_{T}^{J}/p_{T}^{#gamma}");
+   hFrame->SetXTitle("x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma}");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/dx");
    if (normMode==1) hFrame->SetYTitle("Event Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);
@@ -185,12 +185,28 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
-   drawText("50-100%",0.75,0.4);
+   drawText("50-100%",0.72,0.5);
    drawText("(a)",0.25,0.885);
 
-   drawText("CMS",0.7,0.885,17);
-   drawText("Ak PF, R=0.3",0.7,0.84,15);
-
+   TLegend *t3=new TLegend(0.42,0.72,0.91,0.95); 
+   t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
+   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
+   //   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
+   //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
+   if (drawCheck>=1) t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
+   //   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
+   //   if (subSShapeSide&&drawCheck) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
+   t3->AddEntry(vanahypho[cbin]->rSubtracted.hExtrapNorm,"PYTHIA + HYDJET","lf");
+   //t3->AddEntry(vanahypho[cbin]->rSubtracted.hExtrapNorm,"Isol. #gamma + HYDJET","lf");
+   //t3->AddEntry(hFrameGen,"MC: Frag. #gamma","lf");
+   //t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
+   t3->SetFillColor(0);
+   t3->SetBorderSize(0);
+   t3->SetFillStyle(0);
+   t3->SetTextFont(63);
+   t3->SetTextSize(15);
+   t3->Draw();
+   
    c1->cd(2);
    if (log==1) gPad->SetLogy();
    hFrameNoY->DrawClone();
@@ -199,10 +215,10 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
-   drawText("30-50%",0.75,0.4);
+   drawText("30-50%",0.72,0.5);
    drawText("(b)",0.05,0.885);
 
-   TLegend *t2=new TLegend(0.2,0.72,0.85,0.95);
+   TLegend *t2=new TLegend(0.2,0.72,0.85,0.9);
    t2->AddEntry(hFrame,"#intL dt = 150 #mub^{-1}","");
    t2->AddEntry(hFrame,"#sqrt{s}_{_{NN}}=2.76 TeV","");
    t2->SetFillColor(0);
@@ -220,7 +236,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
-   drawText("10-30%",0.75,0.4);
+   drawText("10-30%",0.72,0.5);
    drawText("(c)",0.05,0.885);
 
    TLegend *t4=new TLegend(0.43,0.7,0.91,0.94);
@@ -242,52 +258,38 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
    plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
-   drawText("0-10%",0.75,0.4);
+   drawText("0-10%",0.72,0.5);
    drawText("(d)",0.05,0.885);
 
-   TLegend *t3=new TLegend(0.35,0.67,0.91,0.95); 
-   t3->AddEntry(vanahi[cbin]->rSubtracted.hExtrapNorm,"PbPb","p");
-   t3->AddEntry(vanapp[0]->rSubtracted.hExtrapNorm,"pp 2.76 TeV","p");
-   //   t3->AddEntry(vanapp7[0]->rSubtracted.hExtrapNorm,"pp 7 TeV","p");
-   //t3->AddEntry(hFrameData,"PYQUEN_Quen+HYDJET","p");
-   t3->AddEntry(vanahi[cbin]->rSigAll.hExtrapNorm,"No Subtraction","l");
-   //   if (subDPhiSide&&drawCheck) t3->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
-   //   if (subSShapeSide&&drawCheck) t3->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-   t3->AddEntry(vanahypho[cbin]->rSubtracted.hExtrapNorm,"Isol. #gamma + HYDJET","lf");
-   //t3->AddEntry(hFrameGen,"MC: Frag. #gamma","lf");
-   //t3->AddEntry(hFrameGen,"PYTHIA+HYDJET1.8","lf");
-   t3->SetFillColor(0);
-   t3->SetBorderSize(0);
-   t3->SetFillStyle(0);
-   t3->SetTextFont(63);
-   t3->SetTextSize(15);
-   t3->Draw();
-      
+   drawText("CMS",0.6,0.885,16);
+   drawText("Ak PF, R=0.3",0.6,0.82,15);
+   
    c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclPtRatio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.gif",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
    c1->Print(Form("%s/Photonv7_v24_akPu3PF_isolPho_gamma%.0fjet%.0fdphiSig%.0f_InclPtRatio_all_cent4_subDPhi%dSS%d_Isol%d_Norm%d_drawChk%d_log%d.pdf",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode,drawCheck,log));
 
-   //
+   ////////////////////////////////////////////////////////////////////////////////////////////////
    // Summary Plot
-   //
+   ////////////////////////////////////////////////////////////////////////////////////////////////
    float npart[nBin];// = {2,358.623,232.909,97.9521};
    GetNPartBins("../output-data-Photon-v7_v24_akPu3PF.root", nBin, npart, m, minPhoton,1);
    cout << "got npart" << endl;
 
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
-   hNpartFrame->SetYTitle("<x_{JG}>");
+   hNpartFrame->SetYTitle("<x_{J#gamma}>");
+   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
+   hNpartFrame->GetXaxis()->SetNdivisions(505);
    hNpartFrame->GetXaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->CenterTitle();
    hNpartFrame->GetYaxis()->SetTitleOffset(1.4);
    hNpartFrame->GetYaxis()->SetTitleSize(0.05);
-   float ymin=0.45,ymax=1.2; // 35, 2, 0.4
 
    int summaryModes[2] = {0,2}; // 0 = average, 2 = area
    for (int i=0; i<2; ++i) { 
-      int summaryMode = summaryModes[i]; 
-      
+
+      int summaryMode = summaryModes[i];
       if (summaryMode==2) {
-         hNpartFrame->SetYTitle("R(x_{#gamma,J}>0)");
+         hNpartFrame->SetYTitle("R_{J#gamma}");
          ymin=0; ymax=1.5;
       }
       hNpartFrame->SetAxisRange(ymin,ymax,"Y");
@@ -312,7 +314,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       cout << endl << "     pythia z2" << endl;
       TGraphAsymmErrors * gpyz2 = getSummary(1,npart,vanapyz2,10,1,summaryMode,drawCheck);
       gpyz2->SetMarkerSize(1.25);
-      gpyz2->SetMarkerStyle(kOpenSquare);
+      gpyz2->SetMarkerStyle(kOpenCross);
       gpyz2->SetMarkerColor(kBlue);
       gpyz2->Draw("p same");
       
@@ -333,7 +335,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       cout << endl << "     pp 2.76" << endl;
       TGraphAsymmErrors * gpp = getSummary(1,npart,vanapp,2,1,summaryMode,drawCheck);
       gpp->SetMarkerSize(1.25);
-      gpp->SetMarkerStyle(kOpenStar);
+      gpp->SetMarkerStyle(kFullStar);
       gpp->SetMarkerColor(kRed);
       gpp->SetLineColor(kRed);
       gpp->Draw("p same");
@@ -369,24 +371,25 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       }
       
       // Annotation
-      drawText("CMS",0.198,0.89,17);
-      TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
-      pline->SetLineColor(4);
-      pline->SetLineStyle(4);
-      pline->Draw();   
+      drawText("CMS",0.813,0.89,17);
+      drawText("#intL dt = 150 #mub^{-1}",0.68,0.82,17);
+//      TLine* pline = new TLine(0,ghypho->GetY()[4],400,ghypho->GetY()[4]);
+//      pline->SetLineColor(4);
+//      pline->SetLineStyle(4);
+//      pline->Draw();   
       
-      TLegend *leg=new TLegend(0.55,0.6,0.85,0.91);
-      leg->AddEntry(gdata,"#intL dt = 150 #mub^{-1}","");
+      TLegend *leg=new TLegend(0.17,0.7,0.7,0.91);
       leg->AddEntry(gdata,"PbPb  #sqrt{s}_{_{NN}}=2.76 TeV","p");
       //   leg->AddEntry(hFrameDataSigAll,"No Subtraction","p");
       //   if (drawCheck&&subDPhiSide) leg->AddEntry(hFrameDataBkg1,"|#Delta#phi| sideband","p");
       //   if (drawCheck&&subSShapeSide) leg->AddEntry(hFrameDataBkg2,"#sigma_{#eta#eta} sideband","p");
-      leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
+      leg->AddEntry(ghypho,"PYTHIA + HYDJET1.8","p");
+      //leg->AddEntry(ghypho,"Isol. #gamma + HYDJET1.8","p");
       //   leg->AddEntry(ghygj,"LO #gamma + HYDJET1.8","p");
       leg->AddEntry(gpp,"pp 2.76 TeV","p");
       //   leg->AddEntry(gpp7,"pp 7 TeV","p");
-      leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV z2","p");
-      leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV d67","p");
+      leg->AddEntry(gpyz2,"PYTHIA 2.76 TeV Z2","p");
+      leg->AddEntry(gpyd6t,"PYTHIA 2.76 TeV D6T","p");
       //   leg->AddEntry(gpy7z2,"PYTHIA 7 TeV z2","p");
       leg->SetFillColor(0);
       leg->SetBorderSize(0);
@@ -395,7 +398,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
       leg->SetTextSize(17);
       leg->Draw();
       
-      TLegend *leg2=new TLegend(0.54,0.17,0.86,0.35);
+      TLegend *leg2=new TLegend(0.16,0.216,0.526,0.38);
       leg2->AddEntry(hNpartFrame,Form("p_{T,#gamma} > %.0f GeV/c",minPhoton),"");
       leg2->AddEntry(hNpartFrame,Form("p_{T,jet} > %.0f GeV/c",minJet),"");
       leg2->AddEntry(hNpartFrame,"#Delta#phi_{12} > #frac{7}{8}#pi","");
