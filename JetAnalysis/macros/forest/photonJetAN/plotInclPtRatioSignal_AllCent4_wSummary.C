@@ -105,7 +105,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.08_paperGunther"
+                                         TString outdir = "./fig/02.09_inclJetPhotonPurity"
                                          )
 {
    TH1::SetDefaultSumw2();
