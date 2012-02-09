@@ -81,7 +81,7 @@ void analyzePhotonJet(
                       TString mixfname="output-data-Photon-v7_v24classes.root"
                       )
 {
-   bool checkDup=false;
+   bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0);
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -96,7 +96,7 @@ void analyzePhotonJet(
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
-   if (checkDup&&(dataSrcType==1||dataSrcType==3)) dupEvt.MakeList();
+   if (checkDup) dupEvt.MakeList();
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
@@ -185,13 +185,12 @@ void analyzePhotonJet(
    }
    
    // Main loop
-   //for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<10000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
       // check if event is duplicate
-      if (checkDup&&(dataSrcType==1||dataSrcType==3)) evt.nOccur = dupEvt.occurrence[i];
+      if (checkDup) evt.nOccur = dupEvt.occurrence[i];
       else evt.nOccur = 1;
       // Event Info
       evt.run = c->hlt.Run;
@@ -212,7 +211,7 @@ void analyzePhotonJet(
             evt.trig = (HLT_Photon50_CaloIdVL_v3>0)||(HLT_Photon50_CaloIdVL_IsoL_v6>0);
          }
          evt.offlSel = (c->skim.phfCoincFilter && c->skim.ppurityFractionFilter);
-         evt.anaEvtSel = evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
+         evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
       }
       if (makeMixing==1) {
          evt.anaEvtSel = evt.offlSel && evt.nOccur==1;
