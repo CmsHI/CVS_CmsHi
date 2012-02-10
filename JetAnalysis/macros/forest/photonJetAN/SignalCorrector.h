@@ -112,6 +112,31 @@ public:
       cout << nameIsol << " Purity: " << 1-fracPhotonBkg << endl;
    }
    
+   void SetJetWeights(TString jetvar="inclJetPt")
+   {
+      //
+      // Centrality bins: 0=0-4, 1=4-12, 2=12-20, 3=20-40
+      //
+      TString jetweight;
+      if (dataSrcType<=1) {
+         if (centBin==0) {
+            jetweight = Form("0.992966*0.5*(TMath::Erf(-0.627825+0.054612*%s)+1)",jetvar.Data());
+         } else if (centBin==1) {
+            jetweight = Form("1.000029*0.5*(TMath::Erf(-0.571441+0.049538*%s)+1)",jetvar.Data());
+         } else if (centBin==2) {
+            jetweight = Form("0.997227*0.5*(TMath::Erf(-0.695991+0.051474*%s)+1)",jetvar.Data());
+         } else if (centBin==3) {
+            jetweight = Form("0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1)",jetvar.Data());
+         }
+      } else { // for now use peripheral for pp 2.76TeV
+         jetweight = Form("0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1)",jetvar.Data());
+      }
+      cout << "Jet weight: " << jetweight << endl;
+      
+      rSigAll.weight += "*"+jetweight;
+      rBkgSShape.weight += "*"+jetweight;
+   }
+
    void MakeHistograms(TCut sigSel, int nbin, float xmin, float xmax) {
       float * bins = new float[nbin+1];
       float dx = (xmax-xmin)/nbin;
@@ -171,16 +196,20 @@ public:
 
    // special case for dphi
    void ExtrapolateDPhiHist(float dphiSigCut=0.7) {
-      TF1 *p0 = new TF1("p0","pol0",dphiSigCut,3.14/2);
+      float binw = 3.1415926/20;
+      float fitmin=dphiSigCut+binw;
+      float fitmax=3.1415926/2;
+      TF1 *p0 = new TF1("p0","pol0",fitmin,fitmax);
       if (subDPhiSide&&rBkgDPhi.n>=10) {
-         rBkgDPhi.hExtrap->Fit("p0","0");
+         p0->SetParameter(0,rBkgDPhi.hExtrap->GetBinContent(rBkgDPhi.hExtrap->FindBin(3.14/2)));
+         rBkgDPhi.hExtrap->Fit("p0","","",fitmin,fitmax);
          for (int i=rBkgDPhi.hExtrap->FindBin(dphiSigCut); i<=rBkgDPhi.hExtrap->GetNbinsX(); ++i) {
             rBkgDPhi.hExtrap->SetBinContent(i,p0->GetParameter(0));
             rBkgDPhi.hExtrap->SetBinError(i,p0->GetParError(0));
          }
       }
       if (subSShapeSideDPhiSide&&rBkgSShapeDPhi.n>=10) {
-         rBkgSShapeDPhi.hExtrap->Fit("p0","0");
+         rBkgSShapeDPhi.hExtrap->Fit("p0","","",fitmin,fitmax);
          for (int i=rBkgSShapeDPhi.hExtrap->FindBin(dphiSigCut); i<=rBkgSShapeDPhi.hExtrap->GetNbinsX(); ++i) {
             rBkgSShapeDPhi.hExtrap->SetBinContent(i,p0->GetParameter(0));
             rBkgSShapeDPhi.hExtrap->SetBinError(i,p0->GetParError(0));
