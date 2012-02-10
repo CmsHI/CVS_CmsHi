@@ -81,7 +81,7 @@ void analyzePhotonJet(
                       TString mixfname="output-data-Photon-v7_v24classes.root"
                       )
 {
-   bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0);
+   bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -200,7 +200,7 @@ void analyzePhotonJet(
       evt.nG = c->photon.nPhotons;
       evt.nJ = anajet->nref;
       evt.nT = c->track.nTrk;
-      evt.trig = (c->hlt.HLT_HISinglePhoton30_v2 > 0);
+      evt.trig = (c->hlt.HLT_HISinglePhoton40_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.nOccur==1;
@@ -309,17 +309,20 @@ void analyzePhotonJet(
          // if mix, overwrite jets from mixed events
          if (makeMixing==2) {
             gj.nJet=0;
-            for (int im=0; im<5; ++im) {
+            int im=0;
+            while (im<10) {
                int ient = (vmixEntry[evt.cBin]) % (vmixNEvt[evt.cBin]);
                //cout << im << " get mix entry: " << ient << endl;
                vtgj[evt.cBin]->GetEntry(ient);
+               ++vmixEntry[evt.cBin];
+               if (!vevt[evt.cBin].anaEvtSel) continue;
                for (int j=0; j<vgj[evt.cBin].nJet; ++j) {
                   gj.inclJetPt[gj.nJet] = vgj[evt.cBin].inclJetPt[j];
                   gj.inclJetEta[gj.nJet] = vgj[evt.cBin].inclJetEta[j];
                   gj.inclJetPhi[gj.nJet] = vgj[evt.cBin].inclJetPhi[j];
                   ++gj.nJet;
                }
-               ++vmixEntry[evt.cBin];
+               ++im;
             }
          }
 
