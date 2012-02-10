@@ -198,7 +198,7 @@ public:
    void ExtrapolateDPhiHist(float dphiSigCut=0.7) {
       float binw = 3.1415926/20;
       float fitmin=dphiSigCut+binw;
-      float fitmax=3.1415926/2;
+      float fitmax=3.1415926/2+binw;
       TF1 *p0 = new TF1("p0","pol0",fitmin,fitmax);
       if (subDPhiSide&&rBkgDPhi.n>=10) {
          p0->SetParameter(0,rBkgDPhi.hExtrap->GetBinContent(rBkgDPhi.hExtrap->FindBin(3.14/2)));

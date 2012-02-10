@@ -121,7 +121,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.09_inclJetPhotonPurity"
+                                         TString outdir = "./fig/02.10_dphiFix"
                                          )
 {
    TH1::SetDefaultSumw2();
