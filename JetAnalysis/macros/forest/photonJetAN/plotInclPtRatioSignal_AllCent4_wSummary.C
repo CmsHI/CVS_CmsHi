@@ -45,6 +45,11 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << infname << ": useWeight: " << weight << " dataSrcType: " << dataSrcType << " photon: " << minPhoton << " jet: " << minJet << endl;
    cout << "# " << endl;
    
+   TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
+   bool doMixBkg=false;
+   if (dataSrcType==1) doMixBkg=true;
+   if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
+      
    // loop over centrality bins
    for (int ib=0; ib<vcutCent.size(); ++ib) {
       TString name = Form("dataSrc%d_reco%d_cent%d",dataSrcType,dataType,ib);
@@ -54,7 +59,13 @@ void getHistograms(vector<SignalCorrector*> & vana,
       vana[ib]->cutBkgDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
       vana[ib]->cutSShape= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
       vana[ib]->cutSShapeDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
-
+      if (doMixBkg) {
+         vana[ib]->cutBkgDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi);
+         vana[ib]->cutSShapeDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
+         vana[ib]->rBkgDPhi.var = "(tmix.inclJetPt/photonEt)";
+         vana[ib]->rBkgSShapeDPhi.var = "(tmix.inclJetPt/photonEt)";
+      }
+      
       // analyze tree
       if (dataType==0) {
          vana[ib]->subDPhiSide = false;
@@ -69,7 +80,11 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),16,0.001,1.999);
       }
       
-      vana[ib]->Extrapolate(sigDPhi);
+      if (doMixBkg) {
+         vana[ib]->Extrapolate(sigDPhi,false,0.1);
+      } else {
+         vana[ib]->Extrapolate(sigDPhi);
+      }
       vana[ib]->SubtractBkg();
       vana[ib]->Normalize(normMode);
    }
@@ -105,7 +120,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.09_inclJetPhotonPurity"
+                                         TString outdir = "./fig/02.11_mix"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -184,7 +199,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
    plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
    drawText("50-100%",0.72,0.5);
    drawText("(a)",0.25,0.885);
 
@@ -214,7 +229,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");   
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");   
    drawText("30-50%",0.72,0.5);
    drawText("(b)",0.05,0.885);
 
@@ -235,7 +250,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");//   c1->cd(3);
    drawText("10-30%",0.72,0.5);
    drawText("(c)",0.05,0.885);
 
@@ -257,7 +272,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    plotHistograms(vanahypho[cbin],cbin,0,1,0,"samehistE");
 //   plotHistograms(vanapp[0],cbin,2,1,drawCheck,"sameE");
 //   plotHistograms(vanapp7[0],cbin,3,1,drawCheck,"sameE");
-   plotHistograms(vanahi[cbin],cbin,1,1,0,"sameE");//   c1->cd(3);
+   plotHistograms(vanahi[cbin],cbin,1,1,drawCheck,"sameE");//   c1->cd(3);
    drawText("0-10%",0.72,0.5);
    drawText("(d)",0.05,0.885);
 
