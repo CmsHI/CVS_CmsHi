@@ -1,6 +1,6 @@
 #!/bin/bash -
 
-outdir="fig/02.09_inclJetPhotonPurity"
+outdir="fig/02.09_inclJetPhotonPurity_jgranges"
 mkdir -p $outdir
 
 doChk=0
@@ -14,8 +14,8 @@ for isolScheme in 0 2; do
 #  done
 
   # kinematic xchecks
-  for phoMin in 60 70; do
-    for jetMin in 30 35; do
+  for phoMin in 70; do
+    for jetMin in 35; do
       #root -b -q plotPtRatioSignal_AllCent4_wSummary.C+'('$isolScheme',2,1,1,'$phoMin','$jetMin',0,'$doChk',"'$outdir'")'
       root -b -q plotDeltaPhiSignal_AllCent4_wSummary.C+'('$isolScheme',1,1,1,'$phoMin','$jetMin',0,'$doChk',"'$outdir'")'
     done
