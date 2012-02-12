@@ -310,7 +310,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   }
 
   if (hasMetTree) {
-    evtTree->SetName("met");
+    metTree->SetName("met");
     if (tree == 0) tree = metTree; else tree->AddFriend(metTree);
     setupMetTree(metTree,met);
   }
@@ -514,7 +514,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasEvtTree)      AddCloneTree(evtTree,      "hiEvtAnalyzer",            "HiTree");
-  if (hasMetTree)      AddCloneTree(evtTree,      "anaMET",            "metTree");
+  if (hasMetTree)      AddCloneTree(metTree,      "anaMET",            "metTree");
   if (hasTowerTree)    AddCloneTree(towerTree,    "rechitanalyzer",              "tower");
   if (hasHbheTree)     AddCloneTree(hbheTree,     "rechitanalyzer",               "hbhe");
   if (hasEbTree)       AddCloneTree(ebTree,       "rechitanalyzer",               "eb");
