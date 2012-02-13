@@ -119,7 +119,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.11_mix"
+                                         TString outdir = "./fig/02.13_dphiVal_mix"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -447,6 +447,9 @@ void plotHistograms(const SignalCorrector* ana,
    
    // output histograms
    TFile* hout = new TFile(outfname,"update");
+   if (ana->rSigAll.hExtrapNorm) ana->rSigAll.hExtrapNorm->Write();
+   if (ana->rBkgDPhi.hExtrapNorm) ana->rBkgDPhi.hExtrapNorm->Write();
+   if (ana->rBkgSShape.hExtrapNorm) ana->rBkgSShape.hExtrapNorm->Write();
    ana->rSubtracted.hExtrapNorm->Write();
    hout->Close();
    
