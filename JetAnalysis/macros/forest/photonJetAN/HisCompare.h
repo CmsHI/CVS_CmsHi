@@ -14,7 +14,7 @@ using namespace std;
 class HisCompare
 {
 public:
-   HisCompare(TString myname, TString mytitle, float myxmin, float myxmax, int nm=1) :
+   HisCompare(TString myname, TString mytitle, float myxmin, float myxmax, int nm=0) :
    name(myname), title(mytitle),
    xmin(myxmin), xmax(myxmax),
    normMode(nm)
@@ -92,6 +92,10 @@ public:
       leg->SetY1NDC(ly1);
       leg->SetX2NDC(lx2);
       leg->SetY2NDC(ly2);
+      leg->SetX1(lx1);
+      leg->SetY1(ly1);
+      leg->SetX2(lx2);
+      leg->SetY2(ly2);
       leg->Draw();
    }
    
