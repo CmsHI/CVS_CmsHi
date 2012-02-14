@@ -120,7 +120,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.13_phobkg"
+                                         TString outdir = "./fig/02.13_allbkg"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -482,6 +482,7 @@ void plotHistograms(const SignalCorrector* ana,
    if (ana->rSigAll.hExtrapNorm) ana->rSigAll.hExtrapNorm->Write();
    if (ana->rBkgDPhi.hExtrapNorm) ana->rBkgDPhi.hExtrapNorm->Write();
    if (ana->rBkgSShape.hExtrapNorm) ana->rBkgSShape.hExtrapNorm->Write();
+   if (ana->rBkgSShapeDPhi.hExtrapNorm) ana->rBkgSShapeDPhi.hExtrapNorm->Write();
    hout->Close();
    
    // check subtraction
