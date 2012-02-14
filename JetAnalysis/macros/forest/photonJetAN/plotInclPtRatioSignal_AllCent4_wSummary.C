@@ -47,7 +47,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    
    TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
    bool doMixBkg=false;
-   if (dataSrcType==1) doMixBkg=true;
+//   if (dataSrcType==1) doMixBkg=true;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
       
    // loop over centrality bins
@@ -56,12 +56,14 @@ void getHistograms(vector<SignalCorrector*> & vana,
       int cBin = ib;
       if (dataSrcType>1) cBin==vcutCent.size()-1;
       vana.push_back(new SignalCorrector(nt,name,"(inclJetPt/photonEt)",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
-      vana[ib]->cutBkgDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
-      vana[ib]->cutSShape= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
-      vana[ib]->cutSShapeDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
+      vana[ib]->cutSigAllPho     = "sigmaIetaIeta<0.01";
+      vana[ib]->cutSShapeAllPho  = "sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+      vana[ib]->cutBkgDPhi       = vana[ib]->cutSigAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2.",minJet);
+      vana[ib]->cutSShape        = vana[ib]->cutSShapeAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi);
+      vana[ib]->cutSShapeDPhi    = vana[ib]->cutSShapeAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2.",minJet);
       if (doMixBkg) {
-         vana[ib]->cutBkgDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi);
-         vana[ib]->cutSShapeDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
+         vana[ib]->cutBkgDPhi    = vana[ib]->cutSigAllPho&&Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f",minJet,sigDPhi);
+         vana[ib]->cutSShapeDPhi = vana[ib]->cutSShapeAllPho&&Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f",minJet,sigDPhi);
          vana[ib]->rBkgDPhi.var = "(tmix.inclJetPt/photonEt)";
          vana[ib]->rBkgSShapeDPhi.var = "(tmix.inclJetPt/photonEt)";
       }
@@ -82,9 +84,9 @@ void getHistograms(vector<SignalCorrector*> & vana,
       }
       
       if (!doMixBkg) {
-         vana[ib]->Extrapolate(0.1);
+         vana[ib]->Extrapolate((3.14159-sigDPhi)/(3.14159/2.-0.7));
       } else {
-         vana[ib]->Extrapolate((3.14159-dphiSigCut)/(3.14159/2.-0.7));
+         vana[ib]->Extrapolate(0.1);
       }
       vana[ib]->SubtractBkg();
       vana[ib]->Normalize(normMode);

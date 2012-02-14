@@ -47,6 +47,8 @@ public:
    name(n),
    observable(var),
    sel(s),
+   rSigAllPho(n+"SignalAllPho","photonEt",s,w),
+   rBkgSShapeAllPho(n+"BkgSShapeAllPho","photonEt",s,w),
    rSigAll(n+"SignalAll",var,s,w),
    rBkgDPhi(n+"BkgDPhi",var,s,w),
    rBkgSShape(n+"BkgSShape",var,s,w),
@@ -60,9 +62,6 @@ public:
    dataSrcType(srcType),
    nSelPhoton(0),fracDPhiBkg(0),fracPhotonBkg(0),fracPhotonDPhiBkg(0) {
       t = tree;
-      cutBkgDPhi     = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta<0.01";
-      cutSShape      = "jetEt>30&&acos(cos(photonPhi-jetPhi))>2.0944 && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
-      cutSShapeDPhi  = "jetEt>30&&acos(cos(photonPhi-jetPhi))>0.7 && acos(cos(photonPhi-jetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
       // photon purity values
       hPhotonPurity = (TH1D*)gDirectory->FindObjectAny("hPhotonPurity");
       if (!hPhotonPurity) hPhotonPurity = new TH1D("hPhotonPurity","",4,0,4);
@@ -154,27 +153,31 @@ public:
    void MakeHistograms(TCut sigSel, int nbin, float * bins) {
       // setup cuts
       cout << "Base Selection: " << sel << endl;
-      rSigAll.cut = sel&&sigSel;
-      rBkgDPhi.cut = sel&&cutBkgDPhi;
-      rBkgSShape.cut = sel&&cutSShape;
-      rBkgSShapeDPhi.cut = sel&&cutSShapeDPhi;
+      rSigAllPho.cut         = sel&&cutSigAllPho;
+      rBkgSShapeAllPho.cut   = sel&&cutSShapeAllPho;
+      rSigAll.cut            = sel&&sigSel;
+      rBkgDPhi.cut           = sel&&cutBkgDPhi;
+      rBkgSShape.cut         = sel&&cutSShape;
+      rBkgSShapeDPhi.cut     = sel&&cutSShapeDPhi;
       
+      rSigAllPho.Init(t,nbin,bins);
+      rBkgSShapeAllPho.Init(t,nbin,bins);
       rSigAll.Init(t,nbin,bins);
       rBkgDPhi.Init(t,nbin,bins);
       rBkgSShape.Init(t,nbin,bins);
       rBkgSShapeDPhi.Init(t,nbin,bins);
       
       // photon normalization
-      nSelPhoton = t->GetEntries(sel&&"sigmaIetaIeta<0.01");
+      nSelPhoton = t->GetEntries(rSigAllPho.cut);
       // number of events in signal region
-      cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << rSigAll.n << " ** " << endl;
+      cout << " ** Number of selection photons: " << rSigAllPho.n << " gamma-jets: " << rSigAll.n << " ** " << endl;
    }
    
    void Extrapolate(float dphisidescale=1) {
       // Scales
       float sssidescale = 0,ssdphisidescale=0;
       if (rBkgSShape.n>0) {
-         sssidescale = rSigAll.n*fracPhotonBkg/rBkgSShape.n;
+         sssidescale = rSigAllPho.n*fracPhotonBkg/rBkgSShapeAllPho.n;
          ssdphisidescale = dphisidescale*sssidescale;
       }
       cout << " Bkg scale dphi: " << dphisidescale << endl;
@@ -183,7 +186,6 @@ public:
 
       rSigAll.Extrapolate(1.);
       rBkgSShape.Extrapolate(sssidescale);
-
       rBkgDPhi.Extrapolate(dphisidescale);
       rBkgSShapeDPhi.Extrapolate(ssdphisidescale);
 
@@ -273,6 +275,8 @@ public:
    TTree * t;
    TString name,nameIsol,observable;
    TCut sel,cutIsol;
+   Region rSigAllPho;
+   Region rBkgSShapeAllPho;
    Region rSigAll;
    Region rBkgDPhi;
    Region rBkgSShape;
@@ -282,6 +286,8 @@ public:
    bool subDPhiSide;
    bool subSShapeSide;
    bool subSShapeSideDPhiSide;
+   TCut cutSigAllPho;
+   TCut cutSShapeAllPho;
    TCut cutBkgDPhi;
    TCut cutSShape;
    TCut cutSShapeDPhi;   
