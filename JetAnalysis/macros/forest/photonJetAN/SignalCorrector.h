@@ -70,6 +70,7 @@ public:
    
    void SetPhotonIsolation(int isolScheme)
    {
+      bool doSys = true;
       //
       // Centrality bins: 0=0-4, 1=4-12, 2=12-20, 3=20-40
       // 
@@ -96,6 +97,10 @@ public:
          hPhotonPurity->SetBinContent(3,0.76);
          hPhotonPurity->SetBinContent(4,0.81);
       }
+      if (doSys) {
+         for (int i=1; i<=hPhotonPurity->GetNbinsX(); ++i) hPhotonPurity->SetBinContent(i,hPhotonPurity->GetBinContent(i)*1.2);
+      }
+      
       // Isolation Cut
       sel = sel&&cutIsol;
       // Photon Purity
@@ -120,16 +125,16 @@ public:
       TString jetweight;
       if (dataSrcType<=1) {
          if (centBin==0) {
-            jetweight = Form("0.992966*0.5*(TMath::Erf(-0.627825+0.054612*%s)+1)",jetvar.Data());
+            jetweight = Form("1./(0.992966*0.5*(TMath::Erf(-0.627825+0.054612*%s)+1))",jetvar.Data());
          } else if (centBin==1) {
-            jetweight = Form("1.000029*0.5*(TMath::Erf(-0.571441+0.049538*%s)+1)",jetvar.Data());
+            jetweight = Form("1./(1.000029*0.5*(TMath::Erf(-0.571441+0.049538*%s)+1))",jetvar.Data());
          } else if (centBin==2) {
-            jetweight = Form("0.997227*0.5*(TMath::Erf(-0.695991+0.051474*%s)+1)",jetvar.Data());
+            jetweight = Form("1./(0.997227*0.5*(TMath::Erf(-0.695991+0.051474*%s)+1))",jetvar.Data());
          } else if (centBin==3) {
-            jetweight = Form("0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1)",jetvar.Data());
+            jetweight = Form("1./(0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1))",jetvar.Data());
          }
       } else { // for now use peripheral for pp 2.76TeV
-         jetweight = Form("0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1)",jetvar.Data());
+         jetweight = Form("1./(0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1))",jetvar.Data());
       }
       cout << "Jet weight: " << jetweight << endl;
       
