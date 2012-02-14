@@ -7,11 +7,12 @@
 void compareHisDPhi()
 {
    TFile * infside = new TFile("fig/02.13_dphiVal_side/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma60jet30dphiSig628_Isol0_Norm0.root");
-   TFile * infmix = new TFile("fig/02.13_dphiVal_mix/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma60jet30dphiSig628_Isol0_Norm0.root");
+   TFile * infmix = new TFile("fig/02.13_phobkg/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma60jet30dphiSig628_Isol0_Norm0.root");
    
    HisCompare hcRawBkg("RawBkg",";|#Delta#phi|;",0,3.1415926,0);
    hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0SignalAllExtrapExtrapNorm"),"Raw","hist",kBlack,kFullCircle,"l",2);
    hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0BkgDPhiExtrapExtrapNorm"),"#Delta#phi Bkg","E",kGreen+2,kOpenCircle,"p");
+   hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0BkgSShapeExtrapExtrapNorm"),"#Delta#phi Bkg","E",kViolet,kOpenCircle,"p");
    hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Subtracted","E",kRed,kFullCircle,"p");
 
    TCanvas * c2 = new TCanvas("c2","c2",500,500);
@@ -23,6 +24,7 @@ void compareHisDPhi()
    HisCompare hcRawBkgMix("RawBkgMix",";|#Delta#phi|;",0,3.1415926,0);
    hcRawBkgMix.AddHist((TH1D*)infmix->Get("dataSrc1_reco1_cent0SignalAllExtrapExtrapNorm"),"Raw","hist",kBlack,kFullCircle,"l",2);
    hcRawBkgMix.AddHist((TH1D*)infmix->Get("dataSrc1_reco1_cent0BkgDPhiExtrapExtrapNorm"),"#Delta#phi Bkg","E",kGreen+2,kOpenCircle,"p");
+   hcRawBkgMix.AddHist((TH1D*)infmix->Get("dataSrc1_reco1_cent0BkgSShapeExtrapExtrapNorm"),"#Delta#phi Bkg","E",kViolet,kOpenCircle,"p");
    hcRawBkgMix.AddHist((TH1D*)infmix->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Subtracted","E",kRed,kFullCircle,"p");
    
    TCanvas * c3 = new TCanvas("c3","c3",500,500);

@@ -227,14 +227,14 @@ public:
          cout << " - " << rBkgDPhi.nExtrap;
       }
       if (subSShapeSide) {
+         if (subSShapeSideDPhiSide) {
+            rBkgSShape.hExtrap->Add(rBkgSShapeDPhi.hExtrap,-1);
+            rBkgSShape.nExtrap -= rBkgSShapeDPhi.nExtrap;
+            cout << " + " << rBkgSShapeDPhi.nExtrap;
+         }
          rSubtracted.hExtrap->Add(rBkgSShape.hExtrap,-1);
          rSubtracted.nExtrap -= rBkgSShape.nExtrap;
          cout << " - " << rBkgSShape.nExtrap;
-      }
-      if (subSShapeSideDPhiSide) {
-         rSubtracted.hExtrap->Add(rBkgSShapeDPhi.hExtrap,1);
-         rSubtracted.nExtrap += rBkgSShapeDPhi.nExtrap;
-         cout << " + " << rBkgSShapeDPhi.nExtrap;
       }
       cout << " =? " << rSubtracted.nExtrap << endl;
       cout << "Check Integ:  " << rSigAll.hExtrap->Integral() << " - " << 
