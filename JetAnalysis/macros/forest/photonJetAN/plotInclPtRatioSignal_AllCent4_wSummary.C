@@ -81,10 +81,10 @@ void getHistograms(vector<SignalCorrector*> & vana,
          vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),16,0.001,1.999);
       }
       
-      if (doMixBkg) {
-         vana[ib]->Extrapolate(sigDPhi,false,0.1);
+      if (!doMixBkg) {
+         vana[ib]->Extrapolate(0.1);
       } else {
-         vana[ib]->Extrapolate(sigDPhi);
+         vana[ib]->Extrapolate((3.14159-dphiSigCut)/(3.14159/2.-0.7));
       }
       vana[ib]->SubtractBkg();
       vana[ib]->Normalize(normMode);

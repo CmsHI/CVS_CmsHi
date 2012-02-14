@@ -70,7 +70,7 @@ public:
    
    void SetPhotonIsolation(int isolScheme)
    {
-      bool doSys = true;
+//      bool doSys = false;
       //
       // Centrality bins: 0=0-4, 1=4-12, 2=12-20, 3=20-40
       // 
@@ -97,9 +97,9 @@ public:
          hPhotonPurity->SetBinContent(3,0.76);
          hPhotonPurity->SetBinContent(4,0.81);
       }
-      if (doSys) {
-         for (int i=1; i<=hPhotonPurity->GetNbinsX(); ++i) hPhotonPurity->SetBinContent(i,hPhotonPurity->GetBinContent(i)*1.2);
-      }
+//      if (doSys) {
+//         for (int i=1; i<=hPhotonPurity->GetNbinsX(); ++i) hPhotonPurity->SetBinContent(i,hPhotonPurity->GetBinContent(i)*1.2);
+//      }
       
       // Isolation Cut
       sel = sel&&cutIsol;
@@ -170,9 +170,8 @@ public:
       cout << " ** Number of selection photons: " << nSelPhoton << " gamma-jets: " << rSigAll.n << " ** " << endl;
    }
    
-   void Extrapolate(float dphiSigCut=2.0944, bool doDPhiExtend=false, float dphisidescale=-1) {
+   void Extrapolate(float dphisidescale=1) {
       // Scales
-      if (dphisidescale<0) dphisidescale = (3.14159-dphiSigCut)/(3.14159/2.-0.7);
       float sssidescale = 0,ssdphisidescale=0;
       if (rBkgSShape.n>0) {
          sssidescale = rSigAll.n*fracPhotonBkg/rBkgSShape.n;
@@ -184,13 +183,9 @@ public:
 
       rSigAll.Extrapolate(1.);
       rBkgSShape.Extrapolate(sssidescale);
-      if (!doDPhiExtend) {
-         rBkgDPhi.Extrapolate(dphisidescale);
-         rBkgSShapeDPhi.Extrapolate(ssdphisidescale);
-      } else {
-         rBkgDPhi.Extrapolate(1.);
-         rBkgSShapeDPhi.Extrapolate(1.);
-      }
+
+      rBkgDPhi.Extrapolate(dphisidescale);
+      rBkgSShapeDPhi.Extrapolate(ssdphisidescale);
 
       // Fractions
       if (rSigAll.n>0) {
