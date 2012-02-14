@@ -120,7 +120,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.13_paperAllHists"
+                                         TString outdir = "./fig/02.13_phobkg"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -174,7 +174,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    hFrame->SetMarkerStyle(kOpenSquare);
    hFrame->SetXTitle("x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma}");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/dx");
-   if (normMode==1) hFrame->SetYTitle("Event Fraction");
+   if (normMode==1) hFrame->SetYTitle("#gamma-Jet Pair Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);

@@ -119,7 +119,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.13_dphiVal_mix"
+                                         TString outdir = "./fig/02.13_phobkg"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -173,7 +173,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    hFrame->SetMarkerStyle(kOpenSquare);
    hFrame->SetXTitle("|#Delta#phi|");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/d|#Delta#phi|");
-   if (normMode==1) hFrame->SetYTitle("Event Fraction");
+   if (normMode==1) hFrame->SetYTitle("\gamma-Jet Pair Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);
