@@ -53,9 +53,9 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v2_v14.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
                       TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
-                      //TString outname="output-data-Photon-v7_v25.root",
-                      TString outname="output-data-Photon-v7_v25classes.root",
-                      //TString outname="output-data-Photon-v7_v24mix.root",
+                      TString outname="output-data-Photon-v7_v25.root",
+                      //TString outname="output-data-Photon-v7_v25classes.root",
+                      //TString outname="output-data-Photon-v7_v25mix.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -77,7 +77,7 @@ void analyzePhotonJet(
                       bool doCentReWeight=false,
                       TString mcfname="",
                       TString datafname="output-data-Photon-v7_v25.root",
-                      int makeMixing=1, // 0=default (no mix), 1=make mixing classes 2=mix
+                      int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
                       TString mixfname="output-data-Photon-v7_v25classes.root"
                       )
 {
@@ -233,7 +233,7 @@ void analyzePhotonJet(
          evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
       }
       if (makeMixing==1) {
-         evt.anaEvtSel = evt.offlSel && evt.nOccur==1;
+         evt.anaEvtSel = evt.offlSel;
       }
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
@@ -245,7 +245,8 @@ void analyzePhotonJet(
 
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
       if (dataSrcType==2&&!evt.trig) continue;
-      
+      if (makeMixing==1&&!evt.offlSel) continue;
+
       // initialize
       int leadingIndex=-1;
       int awayIndex=-1;
@@ -334,7 +335,6 @@ void analyzePhotonJet(
                //cout << im << " get mix entry: " << ient << endl;
                vtgj[evt.cBin][evtPlaneBin]->GetEntry(ient);
                ++vmixEntry[evt.cBin][evtPlaneBin];
-               if (!vevt[evt.cBin][evtPlaneBin].anaEvtSel) continue;
                for (int j=0; j<vgj[evt.cBin][evtPlaneBin].nJet; ++j) {
                   gj.inclJetPt[gj.nJet] = vgj[evt.cBin][evtPlaneBin].inclJetPt[j];
                   gj.inclJetEta[gj.nJet] = vgj[evt.cBin][evtPlaneBin].inclJetEta[j];
