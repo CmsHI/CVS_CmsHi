@@ -139,7 +139,7 @@ void analyzePhotonJet(
 
    // mixing classes
    int nCentBin=40;
-   int nEPBin=11, epBin=0;
+   int nEPBin=11;
    vector<vector<TTree*> > vtgj(nCentBin,vector<TTree*>(nEPBin));
    vector<vector<EvtSel> > vevt(nCentBin,vector<EvtSel>(nEPBin));
    vector<vector<GammaJet> > vgj(nCentBin,vector<GammaJet>(nEPBin));
@@ -207,7 +207,15 @@ void analyzePhotonJet(
       evt.cBin = c->evt.hiBin;
       if (dataSrcType>1) evt.cBin = 39;
       evt.evtPlane = c->evt.hiEvtPlanes[21];
-      int evtPlaneBin=0;
+      int evtPlaneBin=nEPBin-1;
+      if (evt.evtPlane>=-TMath::PiOver2()&&evt.evtPlane<=TMath::PiOver2()) {
+         float dEvtPlaneBin=TMath::Pi()/(nEPBin-1);
+         for (int e=0; e<(nEPBin-1); ++e) {
+            if (evt.evtPlane>(-TMath::PiOver2()+e*dEvtPlaneBin) && evt.evtPlane<(-TMath::PiOver2()+(e+1)*dEvtPlaneBin)){
+               evtPlaneBin=e;
+            }
+         }
+      }
       evt.nG = c->photon.nPhotons;
       evt.nJ = anajet->nref;
       evt.nT = c->track.nTrk;
