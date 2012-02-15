@@ -45,7 +45,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << infname << ": useWeight: " << weight << " dataSrcType: " << dataSrcType << " photon: " << minPhoton << " jet: " << minJet << endl;
    cout << "# " << endl;
 
-   TString mixfname="../output-data-Photon-v7_v24mixmb_akPu3PF.root";
+   TString mixfname="../output-data-Photon-v7_v25mixmb_akPu3PF.root";
    bool doMixBkg=false;
    if (dataSrcType==1) doMixBkg=true;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
@@ -56,12 +56,14 @@ void getHistograms(vector<SignalCorrector*> & vana,
       int cBin = ib;
       if (dataSrcType>1) cBin==vcutCent.size()-1;
       vana.push_back(new SignalCorrector(nt,name,"acos(cos(photonPhi-inclJetPhi))",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
-      vana[ib]->cutBkgDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.6284 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta<0.01",minJet);
-      vana[ib]->cutSShape= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
-      vana[ib]->cutSShapeDPhi= Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.6284 && acos(cos(photonPhi-inclJetPhi))<3.14159/2. && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet);
+      vana[ib]->cutSigAllPho     = "sigmaIetaIeta<0.01";
+      vana[ib]->cutSShapeAllPho  = "sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
+      vana[ib]->cutBkgDPhi       = vana[ib]->cutSigAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.6284 && acos(cos(photonPhi-inclJetPhi))<3.14159/2.",minJet);
+      vana[ib]->cutSShape        = vana[ib]->cutSShapeAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi);
+      vana[ib]->cutSShapeDPhi    = vana[ib]->cutSShapeAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.6284 && acos(cos(photonPhi-inclJetPhi))<3.14159/2.",minJet);
       if (doMixBkg) {
-         vana[ib]->cutBkgDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi);
-         vana[ib]->cutSShapeDPhi= Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f && sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017",minJet,sigDPhi);
+         vana[ib]->cutBkgDPhi    = vana[ib]->cutSigAllPho&&Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f",minJet,sigDPhi);
+         vana[ib]->cutSShapeDPhi = vana[ib]->cutSShapeAllPho&&Form("tmix.inclJetPt>%.03f && acos(cos(photonPhi-tmix.inclJetPhi))>%f",minJet,sigDPhi);
          vana[ib]->rBkgDPhi.var = "acos(cos(photonPhi-tmix.inclJetPhi))";
          vana[ib]->rBkgSShapeDPhi.var = "acos(cos(photonPhi-tmix.inclJetPhi))";
       }
@@ -87,7 +89,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
             vana[ib]->ExtrapolateDPhiHist(sigDPhi);
          }
          else {
-            vana[ib]->Extrapolate((3.14159-dphiSigCut)/(3.14159/2.-0.6284));
+            vana[ib]->Extrapolate((3.14159-sigDPhi)/(3.14159/2.-0.6284));
          }
       } else {
          vana[ib]->Extrapolate(0.1);
@@ -125,13 +127,14 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.13_phobkg"
+                                         TString outdir = "./fig/02.15_mixbkg"
                                          )
 {
    TH1::SetDefaultSumw2();
-   float sigDPhi=0.6284;
+   //float sigDPhi=0.6284;
+   float sigDPhi=0;
    
-   outfname=Form("%s/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma%.0fjet%.0fdphiSig%.0f_Isol%d_Norm%d.root",outdir.Data(),minPhoton,minJet,sigDPhi*1000,isolScheme,normMode);
+   outfname=Form("%s/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma%.0fjet%.0fdphiSig%.0f_subJ%dSS%d_Isol%d_Norm%d.root",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode);
    TFile* hout = new TFile(outfname,"RECREATE");
    hout->Close();
 
@@ -143,7 +146,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    vcutCentPp.push_back("1==1");
    
    vector<SignalCorrector*> vanahi;
-   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v24_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v25_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahypho;
    getHistograms(vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -179,7 +182,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    hFrame->SetMarkerStyle(kOpenSquare);
    hFrame->SetXTitle("|#Delta#phi|");
    hFrame->SetYTitle("N_{#gamma}^{-1} dN/d|#Delta#phi|");
-   if (normMode==1) hFrame->SetYTitle("\gamma-Jet Pair Fraction");
+   if (normMode==1) hFrame->SetYTitle("#gamma-Jet Pair Fraction");
    hFrame->GetXaxis()->SetLabelSize(22);
    hFrame->GetXaxis()->SetLabelFont(43);
    hFrame->GetXaxis()->SetTitleSize(24);
@@ -453,6 +456,8 @@ void plotHistograms(const SignalCorrector* ana,
    
    // output histograms
    TFile* hout = new TFile(outfname,"update");
+   if (ana->rSigAllPho.h) ana->rSigAllPho.h->Write();
+   if (ana->rBkgSShapeAllPho.h) ana->rBkgSShapeAllPho.h->Write();
    if (ana->rSigAll.hExtrapNorm) ana->rSigAll.hExtrapNorm->Write();
    if (ana->rBkgDPhi.hExtrapNorm) ana->rBkgDPhi.hExtrapNorm->Write();
    if (ana->rBkgSShape.hExtrapNorm) ana->rBkgSShape.hExtrapNorm->Write();
