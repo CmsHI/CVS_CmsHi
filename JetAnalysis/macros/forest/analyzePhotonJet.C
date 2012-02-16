@@ -136,6 +136,7 @@ void analyzePhotonJet(
    tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
+   tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
 
    // mixing classes
    int nCentBin=40;
@@ -165,14 +166,14 @@ void analyzePhotonJet(
       TFile * mixf = TFile::Open(mixfname);
       for (int ib=0; ib<nCentBin; ++ib) {
          for (int e=0; e<nEPBin; ++e) {
-         vtgj[ib][e] = (TTree*)mixf->Get(Form("tgj_%d_%d",ib,e));
-         vtgj[ib][e]->SetBranchAddress("evt",&vevt[ib][e].run);
-         vtgj[ib][e]->SetBranchAddress("jet",&vgj[ib][e].photonEt);
-         vtgj[ib][e]->SetBranchAddress("nJet",&vgj[ib][e].nJet);
-         vtgj[ib][e]->SetBranchAddress("inclJetPt",vgj[ib][e].inclJetPt);
-         vtgj[ib][e]->SetBranchAddress("inclJetEta",vgj[ib][e].inclJetEta);
-         vtgj[ib][e]->SetBranchAddress("inclJetPhi",vgj[ib][e].inclJetPhi);
-         vmixNEvt[ib][e]=vtgj[ib][e]->GetEntries();
+            vtgj[ib][e] = (TTree*)mixf->Get(Form("tgj_%d_%d",ib,e));
+            vtgj[ib][e]->SetBranchAddress("evt",&vevt[ib][e].run);
+            vtgj[ib][e]->SetBranchAddress("jet",&vgj[ib][e].photonEt);
+            vtgj[ib][e]->SetBranchAddress("nJet",&vgj[ib][e].nJet);
+            vtgj[ib][e]->SetBranchAddress("inclJetPt",vgj[ib][e].inclJetPt);
+            vtgj[ib][e]->SetBranchAddress("inclJetEta",vgj[ib][e].inclJetEta);
+            vtgj[ib][e]->SetBranchAddress("inclJetPhi",vgj[ib][e].inclJetPhi);
+            vmixNEvt[ib][e]=vtgj[ib][e]->GetEntries();
          int offset=1;
          vmixEntry[ib][e]=offset;
          cout << " ib" << ib << ", ep" << e << ": " << vmixNEvt[ib][e] << endl;
@@ -242,9 +243,10 @@ void analyzePhotonJet(
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight/c->GetEntries(); // for different mc sample, 1 for data
 
-      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " epbin: " << evtPlaneBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
       if (dataSrcType==2&&!evt.trig) continue;
       if (makeMixing==1&&!evt.offlSel) continue;
+//      if (dataSrcType==0&&makeMixing==2&&evt.evtPlane<-2) continue;
 
       // initialize
       int leadingIndex=-1;
@@ -291,6 +293,7 @@ void analyzePhotonJet(
             gj.inclJetPt[gj.nJet] = anajet->jtpt[j];
             gj.inclJetEta[gj.nJet] = anajet->jteta[j];
             gj.inclJetPhi[gj.nJet] = anajet->jtphi[j];
+            gj.inclJetRefPt[gj.nJet] = anajet->refpt[j];
             if (fabs(deltaPhi(anajet->jtphi[j],c->photon.phi[leadingIndex]))>0.5) {
                if (anajet->jtpt[j]>gj.jetEt) {
                   gj.jetEt = anajet->jtpt[j];

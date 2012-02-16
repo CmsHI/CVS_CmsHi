@@ -50,6 +50,7 @@ public:
    float inclJetPt[MAXTRK];
    float inclJetEta[MAXTRK];
    float inclJetPhi[MAXTRK];   
+   float inclJetRefPt[MAXTRK];
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
