@@ -46,7 +46,7 @@ public :
    Int_t           hiNtracksEtaCut;
    Int_t           hiNtracksEtaPtCut;
    Int_t           hiNevtPlane;
-   Float_t         hiEvtPlanes[76];   //[hiNevtPlane]
+   Float_t         hiEvtPlanes[100];   //[hiNevtPlane]
 
    // List of branches
    TBranch        *b_run;   //!

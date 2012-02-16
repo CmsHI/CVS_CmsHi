@@ -22,13 +22,13 @@ public :
    Float_t         hf;
    Int_t           nPar;
    Float_t         recoVtxZ;
-   Float_t         et[64];   //[nPar]
-   Float_t         eta[64];   //[nPar]
-   Float_t         phi[64];   //[nPar]
-   Int_t           id[64];   //[nPar]
-   Int_t           momId[64];   //[nPar]
-   Int_t           status[64];   //[nPar]
-   Int_t           collId[64];   //[nPar]
+   Float_t         et[maxEntry];   //[nPar]
+   Float_t         eta[maxEntry];   //[nPar]
+   Float_t         phi[maxEntry];   //[nPar]
+   Int_t           id[maxEntry];   //[nPar]
+   Int_t           momId[maxEntry];   //[nPar]
+   Int_t           status[maxEntry];   //[nPar]
+   Int_t           collId[maxEntry];   //[nPar]
 
    // List of branches
    TBranch        *b_cBin;   //!
@@ -61,7 +61,7 @@ void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 0)
    t->SetBranchAddress("status", tGenps.status, &tGenps.b_status);
    t->SetBranchAddress("collId", tGenps.collId, &tGenps.b_collId);
    if (doCheck) {
-      if (t->GetMaximum("nPar")>64) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
+     if (t->GetMaximum("nPar")>maxEntry) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
    }
 }
 

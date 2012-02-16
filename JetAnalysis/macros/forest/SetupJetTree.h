@@ -21,33 +21,33 @@ public :
    Int_t           evt;
    Float_t         b;
    Int_t           nref;
-   Float_t         rawpt[174];   //[nref]
-   Float_t         jtpt[174];   //[nref]
-   Float_t         jteta[174];   //[nref]
-   Float_t         jty[174];   //[nref]
-   Float_t         jtphi[174];   //[nref]
-   Float_t         jtpu[174];   //[nref]
+   Float_t         rawpt[maxEntry];   //[nref]
+   Float_t         jtpt[maxEntry];   //[nref]
+   Float_t         jteta[maxEntry];   //[nref]
+   Float_t         jty[maxEntry];   //[nref]
+   Float_t         jtphi[maxEntry];   //[nref]
+   Float_t         jtpu[maxEntry];   //[nref]
    Float_t         pthat;
-   Float_t         refpt[174];   //[nref]
-   Float_t         refeta[174];   //[nref]
-   Float_t         refy[174];   //[nref]
-   Float_t         refphi[174];   //[nref]
-   Float_t         refdphijt[174];   //[nref]
-   Float_t         refdrjt[174];   //[nref]
-   Float_t         refparton_pt[174];   //[nref]
-   Float_t         refparton_flavor[174];   //[nref]
+   Float_t         refpt[maxEntry];   //[nref]
+   Float_t         refeta[maxEntry];   //[nref]
+   Float_t         refy[maxEntry];   //[nref]
+   Float_t         refphi[maxEntry];   //[nref]
+   Float_t         refdphijt[maxEntry];   //[nref]
+   Float_t         refdrjt[maxEntry];   //[nref]
+   Float_t         refparton_pt[maxEntry];   //[nref]
+   Float_t         refparton_flavor[maxEntry];   //[nref]
    Int_t           ngen;
-   Int_t           genmatchindex[10];   //[ngen]
-   Float_t         genpt[10];   //[ngen]
-   Float_t         geneta[10];   //[ngen]
-   Float_t         geny[10];   //[ngen]
-   Float_t         genphi[10];   //[ngen]
-   Float_t         gendphijt[10];   //[ngen]
-   Float_t         gendrjt[10];   //[ngen]
-   Float_t         smpt[174];   //[nref]
-   Float_t         fr01Chg[174];   //[nref]
-   Float_t         fr01EM[174];   //[nref]
-   Float_t         fr01[174];   //[nref]
+   Int_t           genmatchindex[maxEntry];   //[ngen]
+   Float_t         genpt[maxEntry];   //[ngen]
+   Float_t         geneta[maxEntry];   //[ngen]
+   Float_t         geny[maxEntry];   //[ngen]
+   Float_t         genphi[maxEntry];   //[ngen]
+   Float_t         gendphijt[maxEntry];   //[ngen]
+   Float_t         gendrjt[maxEntry];   //[ngen]
+   Float_t         smpt[maxEntry];   //[nref]
+   Float_t         fr01Chg[maxEntry];   //[nref]
+   Float_t         fr01EM[maxEntry];   //[nref]
+   Float_t         fr01[maxEntry];   //[nref]
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -118,8 +118,8 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
    t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
    t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-      if (t->GetMaximum("nref")>174) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
-      if (t->GetMaximum("ngen")>10) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;
+      if (t->GetMaximum("nref")>maxEntry) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
+      if (t->GetMaximum("ngen")>maxEntry) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;
    }
 }
 
