@@ -175,7 +175,7 @@ void analyzePhotonJet(
          vmixNEvt[ib][e]=vtgj[ib][e]->GetEntries();
          int offset=1;
          vmixEntry[ib][e]=offset;
-         cout << " ib,ep" << ib << "," << e << ": " << vmixNEvt[ib][e] << endl;
+         cout << " ib" << ib << ", ep" << e << ": " << vmixNEvt[ib][e] << endl;
          }
       }
    }
@@ -194,8 +194,7 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   //for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<10000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -223,7 +222,6 @@ void analyzePhotonJet(
       evt.trig = (c->hlt.HLT_HISinglePhoton40_v2 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
-      evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel;
       if (dataSrcType>1) {
          if (dataSrcType==2) {
             evt.trig = (HLT_Photon15_CaloIdVL_v1>0);
@@ -231,8 +229,8 @@ void analyzePhotonJet(
             evt.trig = (HLT_Photon50_CaloIdVL_v3>0)||(HLT_Photon50_CaloIdVL_IsoL_v6>0);
          }
          evt.offlSel = (c->skim.phfCoincFilter && c->skim.ppurityFractionFilter);
-         evt.anaEvtSel = c->selectEvent() && evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
       }
+      evt.anaEvtSel = evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
       if (makeMixing==1) {
          evt.anaEvtSel = evt.offlSel;
       }
