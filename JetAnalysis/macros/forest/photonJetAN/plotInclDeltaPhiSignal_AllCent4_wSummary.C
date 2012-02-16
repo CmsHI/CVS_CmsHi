@@ -45,7 +45,7 @@ void getHistograms(vector<SignalCorrector*> & vana,
    cout << "# " << infname << ": useWeight: " << weight << " dataSrcType: " << dataSrcType << " photon: " << minPhoton << " jet: " << minJet << endl;
    cout << "# " << endl;
 
-   TString mixfname="../output-data-Photon-v7_v25mixmb_akPu3PF.root";
+   TString mixfname="../output-data-Photon-v7-noDuplicate_v25mixmb_akPu3PF.root";
    bool doMixBkg=false;
    if (dataSrcType==1) doMixBkg=true;
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
@@ -127,12 +127,11 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=1,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.15_mixbkg"
+                                         TString outdir = "./fig/02.15_preapproval"
                                          )
 {
    TH1::SetDefaultSumw2();
-   //float sigDPhi=0.6284;
-   float sigDPhi=0;
+   float sigDPhi=3.1415926/5;
    
    outfname=Form("%s/HisOutput_Photonv7_v24_akPu3PF_InclDeltaPhi_gamma%.0fjet%.0fdphiSig%.0f_subJ%dSS%d_Isol%d_Norm%d.root",outdir.Data(),minPhoton,minJet,sigDPhi*1000,subDPhiSide,subSShapeSide,isolScheme,normMode);
    TFile* hout = new TFile(outfname,"RECREATE");
@@ -146,7 +145,7 @@ void plotInclDeltaPhiSignal_AllCent4_wSummary(
    vcutCentPp.push_back("1==1");
    
    vector<SignalCorrector*> vanahi;
-   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7_v25_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+   getHistograms(vanahi, vcutCent,"anaEvtSel",isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v25_akPu3PF.root","1==1",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanahypho;
    getHistograms(vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-hy18qcdpho30and50merge_v24_xsec_akPu3PF.root","weight*sampleWeight",0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
@@ -477,9 +476,9 @@ void plotHistograms(const SignalCorrector* ana,
    //fdphi->SetParameter("width",0.2);
    fdphi->SetParName(0,"width");
    fdphi->SetParameter("width",0.3);
-   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0ll","",fitxmin,3.1415926);
-   fdphi->SetParLimits(fdphi->GetParNumber("width"),fdphi->GetParameter("width")-0.02,fdphi->GetParameter("width")+0.02);
-   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
+   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0llm","",fitxmin,3.1415926);
+//   fdphi->SetParLimits(fdphi->GetParNumber("width"),fdphi->GetParameter("width")-0.02,fdphi->GetParameter("width")+0.02);
+//   ana->rSubtracted.hExtrapNorm->Fit("fdphi","0em","",fitxmin,3.1415926);
    fdphi->SetLineWidth(1);
    fdphi->SetLineStyle(2);
    if (dataSrcType) {
@@ -576,8 +575,8 @@ TGraphAsymmErrors * getSummary(
       TF1 * fdphi = vana[ib]->rSubtracted.hExtrapNorm->GetFunction("fdphi");
       if (fdphi) {
          y=fdphi->GetParameter("width");
-         errYL = fdphi->GetParError(fdphi->GetParNumber("width"));
-         errYH = fdphi->GetParError(fdphi->GetParNumber("width"));
+//         errYL = fdphi->GetParError(fdphi->GetParNumber("width"));
+//         errYH = fdphi->GetParError(fdphi->GetParNumber("width"));
       }
       
       gAve->SetPointError(ib,0,0,errYL,errYH);
