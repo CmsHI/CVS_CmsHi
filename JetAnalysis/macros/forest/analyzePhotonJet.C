@@ -100,7 +100,7 @@ void analyzePhotonJet(
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
-   c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v5.root");
+   c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v6.root");
    // intialize jet variables
    Jets * anajet = &(c->akPu3PF);   
    
