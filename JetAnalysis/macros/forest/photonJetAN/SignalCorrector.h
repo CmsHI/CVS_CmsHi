@@ -10,6 +10,14 @@ public:
    name(regName),var(v),cut(c),weight(w),
    n(0),nExtrap(0)
    {}
+   
+   void Init(TTree * t, int nbins, float xmin, float xmax) {
+      float * bins = new float[nbins+1];
+      float dx = (xmax-xmin)/nbins;
+      for (int i=0; i<nbins+1; ++i) bins[i] = xmin+i*dx;
+      Init(t,nbins,bins);
+   }
+   
    void Init(TTree * t, int nbins, float *bins) {
       cut*=weight;
       h = new TH1D(name,"",nbins,bins);
@@ -160,8 +168,8 @@ public:
       rBkgSShape.cut         = sel&&cutSShape;
       rBkgSShapeDPhi.cut     = sel&&cutSShapeDPhi;
       
-      rSigAllPho.Init(t,nbin,bins);
-      rBkgSShapeAllPho.Init(t,nbin,bins);
+      rSigAllPho.Init(t,80,0,400);
+      rBkgSShapeAllPho.Init(t,80,0,400);
       rSigAll.Init(t,nbin,bins);
       rBkgDPhi.Init(t,nbin,bins);
       rBkgSShape.Init(t,nbin,bins);
@@ -254,8 +262,8 @@ public:
       } else {
          float rawarea=1,area=1;
          if (normMode%10==2) {
-            rawarea*=(rSigAll.n)/nSelPhoton;
-            area*=(rSigAll.n - rBkgDPhi.nExtrap - rBkgSShape.nExtrap + rBkgSShapeDPhi.nExtrap) / (nSelPhoton*(1-fracPhotonBkg));
+            rawarea*=(rSigAll.h->Integral())/rSigAllPho.h->Integral();
+            area*=(rSubtracted.hExtrap->Integral()) / (rSigAllPho.h->Integral()*(1-fracPhotonBkg));
          }
          rSigAll.Normalize(rawarea);
          rSubtracted.Normalize(area);
