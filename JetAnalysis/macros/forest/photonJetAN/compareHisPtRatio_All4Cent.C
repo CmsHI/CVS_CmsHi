@@ -18,7 +18,7 @@ void compareHisPtRatio_All4Cent()
    cout << "got npart" << endl;
 
    //TString infname="fig/02.13_paperAllHists/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm1.root";
-   TString infname="fig/02.13_phobkg/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm1.root";
+   TString infname="fig/02.13_allbkg/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root";
    TFile * infside = new TFile(infname);
    
    TString outfname(infname);
@@ -29,20 +29,28 @@ void compareHisPtRatio_All4Cent()
    outtag.ReplaceAll(".root","");
    
    
-   vector<TH1D*> vhsub;
-   vector<TH1D*> vhbkg;
    vector<HisCompare*> vc;
+   vector<TString> steps;
+   steps.push_back("SignalAll");
+   steps.push_back("BkgDPhi");
+   steps.push_back("BkgSShape");
+   steps.push_back("BkgSShapeDPhi");
+   steps.push_back("Subtracted");
+   vector<vector<TH1D*> >vh(steps.size());
+   for (int s=0; s<steps.size(); ++s) {
+      cout << steps[s] << endl;
+      for (int ib=0; ib<nBin; ++ib) {
+         TString hname=Form("dataSrc1_reco1_cent%d%sExtrapExtrapNorm",ib,steps[s].Data());
+         cout << hname;
+         vh[s].push_back((TH1D*)infside->Get(hname));
+         cout << " mean: " << vh[s][ib]->GetMean() << endl;
+      }
+   }
+
    for (int ib=0; ib<nBin; ++ib) {
-      cout << "cBin: " << ib << endl;
-      vhsub.push_back((TH1D*)infside->Get(Form("dataSrc1_reco1_cent%dSubtractedExtrapExtrapNorm",ib)));
-      cout << "subtracted mean: " << vhsub[ib]->GetMean() << endl;
-      //vh.push_back((TH1D*)infside->Get(Form("dataSrc1_reco1_cent%dSignalAllExtrapExtrapNorm",ib)));
-      //vh.push_back((TH1D*)infside->Get(Form("dataSrc1_reco1_cent%dBkgDPhiExtrapExtrapNorm",ib)));
-      vhbkg.push_back((TH1D*)infside->Get(Form("dataSrc1_reco1_cent%dBkgSShapeExtrapExtrapNorm",ib)));
-      cout << "bkg mean: " << vhbkg[ib]->GetMean() << endl;
       vc.push_back(new HisCompare(Form("ptratio_%d",ib),";x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma};#gamma-Jet Pair Fraction",0,2,1));
-      vc[ib]->AddHist(vhsub[ib],"Subtracted","E",kRed,kFullCircle,"p");
-      vc[ib]->AddHist(vhbkg[ib],"#gamma bkg","E",kGreen+2,kOpenCircle,"p");
+      vc[ib]->AddHist(vh[1][ib],"#gamma bkg","E",kGreen+2,kOpenCircle,"p");
+      vc[ib]->AddHist(vh[steps.size()-1][ib],"Subtracted","E",kRed,kFullCircle,"p");
    }
    
    
