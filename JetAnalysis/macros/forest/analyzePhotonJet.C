@@ -81,7 +81,8 @@ void analyzePhotonJet(
                       TString mixfname="output-data-Photon-v7_v25classes.root"
                       )
 {
-   bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
+   //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
+   bool checkDup=false;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -138,7 +139,8 @@ void analyzePhotonJet(
 
    // mixing classes
    int nCentBin=40;
-   int nEPBin=11;
+   //int nEPBin=11;
+   int nEPBin=1;
    vector<vector<TTree*> > vtgj(nCentBin,vector<TTree*>(nEPBin));
    vector<vector<EvtSel> > vevt(nCentBin,vector<EvtSel>(nEPBin));
    vector<vector<GammaJet> > vgj(nCentBin,vector<GammaJet>(nEPBin));
@@ -192,7 +194,8 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   for (int i=0;i<c->GetEntries();i++)
+   //for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<10000;i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -206,14 +209,14 @@ void analyzePhotonJet(
       if (dataSrcType>1) evt.cBin = 39;
       evt.evtPlane = c->evt.hiEvtPlanes[21];
       int evtPlaneBin=nEPBin-1;
-      if (evt.evtPlane>=-TMath::PiOver2()&&evt.evtPlane<=TMath::PiOver2()) {
-         float dEvtPlaneBin=TMath::Pi()/(nEPBin-1);
-         for (int e=0; e<(nEPBin-1); ++e) {
-            if (evt.evtPlane>(-TMath::PiOver2()+e*dEvtPlaneBin) && evt.evtPlane<(-TMath::PiOver2()+(e+1)*dEvtPlaneBin)){
-               evtPlaneBin=e;
-            }
-         }
-      }
+//      if (evt.evtPlane>=-TMath::PiOver2()&&evt.evtPlane<=TMath::PiOver2()) {
+//         float dEvtPlaneBin=TMath::Pi()/(nEPBin-1);
+//         for (int e=0; e<(nEPBin-1); ++e) {
+//            if (evt.evtPlane>(-TMath::PiOver2()+e*dEvtPlaneBin) && evt.evtPlane<(-TMath::PiOver2()+(e+1)*dEvtPlaneBin)){
+//               evtPlaneBin=e;
+//            }
+//         }
+//      }
       evt.nG = c->photon.nPhotons;
       evt.nJ = anajet->nref;
       evt.nT = c->track.nTrk;
@@ -328,7 +331,7 @@ void analyzePhotonJet(
          if (makeMixing==2) {
             gj.nJet=0;
             int im=0;
-            while (im<10) {
+            while (im<40) {
                int ient = (vmixEntry[evt.cBin][evtPlaneBin]) % (vmixNEvt[evt.cBin][evtPlaneBin]);
                //cout << im << " get mix entry: " << ient << endl;
                vtgj[evt.cBin][evtPlaneBin]->GetEntry(ient);
