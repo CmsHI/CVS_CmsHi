@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuonOnia2DPlots.cc,v 1.15 2010/12/05 17:43:18 pshukla Exp $
+// $Id: DiMuonOnia2DPlots.cc,v 1.4 2011/11/01 08:22:57 kumarv Exp $
 //
 //
 // system include files
@@ -156,10 +156,23 @@ private:
   double muPos_nchi2In, muPos_dxy, muPos_dz, muPos_nchi2Gl;
   int muPos_found, muPos_pixeLayers, muPos_nValidMuHits,muPos_arbitrated;
   bool muPos_matches, muPos_tracker, muPos_global;  
+  
+  //Posative muon triggers
+  int muPos_Trigger1,muPos_Trigger2,muPos_Trigger3,muPos_Trigger4,muPos_Trigger5;
+  int muPos_Trigger6,muPos_Trigger7,muPos_Trigger8,muPos_Trigger9,muPos_Trigger10;
+
+
   //(ii).Negative Muon                                                                                                             
   double muNeg_nchi2In, muNeg_dxy, muNeg_dz, muNeg_nchi2Gl;
   int muNeg_found, muNeg_pixeLayers, muNeg_nValidMuHits,muNeg_arbitrated;
   bool muNeg_matches, muNeg_tracker,muNeg_global;  
+
+  //Negative muon triggers
+  int muNeg_Trigger1,muNeg_Trigger2,muNeg_Trigger3,muNeg_Trigger4,muNeg_Trigger5;
+  int muNeg_Trigger6,muNeg_Trigger7,muNeg_Trigger8,muNeg_Trigger9,muNeg_Trigger10;
+
+
+
 
   int GeventNb,GrunNb,GlumiBlock;
   //Gen JPsi Variables
@@ -228,7 +241,6 @@ void DiMuonOnia2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup&
   using namespace edm;
   using namespace std;
   nPV = 0 ;
-  
   centrality_ = new CentralityProvider(iSetup);
   centrality_->newEvent(iEvent,iSetup);
   bin = centrality_->getBin();
@@ -333,6 +345,19 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("muPos_global", &muPos_global, "muPos_global/O");
   
 
+  SingleMuonTree->Branch("muPos_Trigger1", &muPos_Trigger1, "muPos_Trigger1/I");
+  SingleMuonTree->Branch("muPos_Trigger2", &muPos_Trigger2, "muPos_Trigger2/I");
+  SingleMuonTree->Branch("muPos_Trigger3", &muPos_Trigger3, "muPos_Trigger3/I");
+  SingleMuonTree->Branch("muPos_Trigger4", &muPos_Trigger4, "muPos_Trigger4/I");
+  SingleMuonTree->Branch("muPos_Trigger5", &muPos_Trigger5, "muPos_Trigger5/I");
+  SingleMuonTree->Branch("muPos_Trigger6", &muPos_Trigger6, "muPos_Trigger6/I");
+  SingleMuonTree->Branch("muPos_Trigger7", &muPos_Trigger7, "muPos_Trigger7/I");
+  SingleMuonTree->Branch("muPos_Trigger8", &muPos_Trigger8, "muPos_Trigger8/I");
+  SingleMuonTree->Branch("muPos_Trigger9", &muPos_Trigger9, "muPos_Trigger9/I");
+  SingleMuonTree->Branch("muPos_Trigger10", &muPos_Trigger10, "muPos_Trigger10/I");
+
+
+
 
 
   //2). Negative Muon                                                                                                                                                                          
@@ -348,7 +373,16 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("muNeg_tracker", &muNeg_tracker, "muNeg_tracker/O");
   SingleMuonTree->Branch("muNeg_global", &muNeg_global, "muNeg_global/O");
 
-
+  SingleMuonTree->Branch("muNeg_Trigger1", &muNeg_Trigger1, "muNeg_Trigger1/I");
+  SingleMuonTree->Branch("muNeg_Trigger2", &muNeg_Trigger2, "muNeg_Trigger2/I");
+  SingleMuonTree->Branch("muNeg_Trigger3", &muNeg_Trigger3, "muNeg_Trigger3/I");
+  SingleMuonTree->Branch("muNeg_Trigger4", &muNeg_Trigger4, "muNeg_Trigger4/I");
+  SingleMuonTree->Branch("muNeg_Trigger5", &muNeg_Trigger5, "muNeg_Trigger5/I");
+  SingleMuonTree->Branch("muNeg_Trigger6", &muNeg_Trigger6, "muNeg_Trigger6/I");
+  SingleMuonTree->Branch("muNeg_Trigger7", &muNeg_Trigger7, "muNeg_Trigger7/I");
+  SingleMuonTree->Branch("muNeg_Trigger8", &muNeg_Trigger8, "muNeg_Trigger8/I");
+  SingleMuonTree->Branch("muNeg_Trigger9", &muNeg_Trigger9, "muNeg_Trigger9/I");
+  SingleMuonTree->Branch("muNeg_Trigger10", &muNeg_Trigger10, "muNeg_Trigger10/I");
 
 
 
@@ -420,12 +454,22 @@ bool DiMuonOnia2DPlots::matchPATMuon(const pat::Muon *pMuon)
 	 //to match with trigger name
 	 //!pMuon->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()
 	 !pMuon->triggerObjectMatchesByPath(fHLTFilterName).empty()
+	 
+
+
+
+
 	 );
+
+
+
+
 }
 
 void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   
+  //float massMu=0.105658;
   //init events
   //RecJPsiSize=0;
   //reset J/psi RECO variables
@@ -455,9 +499,9 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muNegPz=-9999.;
   muNegEta=-9999.;
   muNegPhi=-9999.;
-
   
-//1).Positive Muon                                                                                                                                                                                                                         
+  
+  //1).Positive Muon                                                                                                                                                                                                                         
   muPos_nchi2In=-9999.;
   muPos_dxy=-9999.;
   muPos_dz=-9999.;
@@ -469,7 +513,25 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muPos_matches=0;
   muPos_tracker=0;
   muPos_global=0;
+  
+  
+  muPos_Trigger1=-9999;
+  muPos_Trigger2=-9999;
+  muPos_Trigger3=-9999;
+  muPos_Trigger4=-9999;
+  muPos_Trigger5=-9999;
+  muPos_Trigger6=-9999;
+  muPos_Trigger7=-9999;
+  muPos_Trigger8=-9999;
+  muPos_Trigger9=-9999;
+  muPos_Trigger10=-9999;
+  
 
+  
+  
+  
+
+  
   //2).Negtive Muon                                                                                                                                                                                                                          
   muNeg_nchi2In=-9999.;
   muNeg_dxy=-9999.;
@@ -483,11 +545,26 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   muNeg_tracker=0;
   muNeg_global=0;
 
+
+  muNeg_Trigger1=-9999;
+  muNeg_Trigger2=-9999;
+  muNeg_Trigger3=-9999;
+  muNeg_Trigger4=-9999;
+  muNeg_Trigger5=-9999;
+  muNeg_Trigger6=-9999;
+  muNeg_Trigger7=-9999;
+  muNeg_Trigger8=-9999;
+  muNeg_Trigger9=-9999;
+  muNeg_Trigger10=-9999;
+
+
+
   //reset EVENT information                                                                                                                                                                                                                    
   eventNb= 0 ;
   runNb= 0 ;
   lumiBlock= 0 ;
-  rbin=0;
+  
+  //rbin=0;
 
  // Event related infos
   eventNb= iEvent.id().event();
@@ -498,7 +575,7 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   centrality_->newEvent(iEvent,iSetup);
   rbin = centrality_->getBin();
   
-  cout<<" rbin "<<rbin<<endl;
+  //cout<<" rbin "<<rbin<<endl;
 
   //--------------------------------------Reco DimuonGlobal ---------------------------------------------------------------------
 
@@ -506,74 +583,175 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   using namespace std;
   using namespace pat;
 
+  //muonPos = mu1; muonNeg =
+  //------------------------------------------------------------------------------------------------------------------------------
+  //===============================  Muons  =====================================================//                                                                      
+  // get muon collection               
+  
+
+
+  //  edm::Handle<edm::View<pat::Muon> >Muons;
+  //iEvent.getByLabel("patMuonsWithTrigger",Muons);
+  //edm::View<pat::Muon>MuonColl=*Muons;
+  //int MuonSize =MuonColl.size();
+  //cout<<" no of pat muons : "<<MuonSize<<endl;
+  //int GlobalMuNb=0;
+  //for ( int i=0 ; i < MuonSize ; ++i ){
+  //const pat::Muon &muonP = (*Muons)[i];
+
+  //const pat::Muon *muonPos = &muonP;
+
+
+  //if(muonPos->isGlobalMuon())GlobalMuNb++;
+    
+  //if(!muonPos->isGlobalMuon()) continue;
+  // TVector3 vmuon1(muonPos->px(),muonPos->py(),muonPos->pz());
+  //float muon1_e =sqrt((vmuon1.Mag()*vmuon1.Mag())+(massMu*massMu));
+  //TLorentzVector lmuon1(vmuon1,muon1_e);
+
+  //for ( int j=i+1 ; j < MuonSize ; ++j){
+
+  //  const pat::Muon &muonN = (*Muons)[j];
+  //  const pat::Muon *muonNeg = &muonN;
+
+  //  if(!muonNeg->isGlobalMuon()) continue;
+  //  TVector3 vmuon2(muonNeg->px(),muonNeg->py(),muonNeg->pz());
+  //  float muon2_e =sqrt((vmuon2.Mag()*vmuon2.Mag())+(massMu*massMu));
+  //  TLorentzVector lmuon2(vmuon2,muon2_e);
+  //  TLorentzVector p = lmuon1+lmuon2;
+  //  int Charge=muonPos->charge()+muonNeg->charge();
+    
+
+      //DiMuMass[DiMuSize]= dimuon.M();
+      //DiMuPt[DiMuSize]=dimuon.Pt();
+      //DiMuRap[DiMuSize]=dimuon.Rapidity();
+
+  //-------------------------------------------------------------------------------------------------------------------------------
+  
   edm::Handle<edm::View<pat::CompositeCandidate> > diMuonsPATCand;
   iEvent.getByLabel("onia2MuMuPatGlbGlb", diMuonsPATCand);
   if(!(diMuonsPATCand.isValid())) return;
   edm::View<pat::CompositeCandidate>dimuonsPATColl= *diMuonsPATCand;
   JpsiNo=dimuonsPATColl.size();
-  cout<<" reco Jpsi size : "<<dimuonsPATColl.size()<<endl;
+  
+  //cout<<" reco Jpsi size : "<<dimuonsPATColl.size()<<endl;
                                                                                                                                            
   
   for(size_t ii = 0; ii <dimuonsPATColl.size(); ++ ii) 
     {
-    const pat::CompositeCandidate &p = (dimuonsPATColl)[ii];
-    const reco::Candidate *dau0 = p.daughter(0);
-    const pat::Muon *mu0 = dynamic_cast<const pat::Muon *>(dau0);
-    const reco::Candidate *dau1 = p.daughter(1); 
-    const pat::Muon *mu1 = dynamic_cast<const pat::Muon *>(dau1);
-    const pat::Muon *muonPos = 0, *muonNeg = 0;
-    
-    if(mu0->charge() > 0){ muonPos = mu0; muonNeg = mu1;}
-    else if(mu0->charge() < 0){ muonPos = mu1; muonNeg = mu0;}
-    
-    //---------------------------------------- Trigger Matches -----------------------------------------//
-    
-    //to match with filter name                                                                                                                                              
-    //(!pMuon->triggerObjectMatchesByFilter(fHLTFilterName).empty())                                                                                                         
-    //to match with trigger name                                                                                                                                             
-    //!pMuon->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()                                                                                                     
-    //!pMuon->triggerObjectMatchesByPath(fHLTFilterName).empty()
-    
-    //TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT")
-    
-    cout<< !muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()  <<" matches "<<!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()<<endl;                                                                                                                                                                                                                  
-    
+      const pat::CompositeCandidate &p = (dimuonsPATColl)[ii];
+      const reco::Candidate *dau0 = p.daughter(0);
+      const pat::Muon *mu0 = dynamic_cast<const pat::Muon *>(dau0);
+      const reco::Candidate *dau1 = p.daughter(1); 
+      const pat::Muon *mu1 = dynamic_cast<const pat::Muon *>(dau1);
+      const pat::Muon *muonPos = 0, *muonNeg = 0;
       
-    //Trigger matches        
-    //cout<<matchPATMuon(muonPos)<<" matches "<<matchPATMuon(muonNeg)<<endl;                                                                                                                                                                                                                  
-    if(!muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()) {muPos_matches=1;}
-    if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()) {muNeg_matches=1;}
-
+      if(mu0->charge() > 0){ muonPos = mu0; muonNeg = mu1;}
+      else if(mu0->charge() < 0){ muonPos = mu1; muonNeg = mu0;}
+      
+      
+      //---------------------------------------- Trigger Matches -----------------------------------------//
     
-    if(muonPos->isTrackerMuon()){muPos_tracker=1;}
-    if(muonNeg->isTrackerMuon()){muNeg_tracker=1;}
+      //to match with filter name                                                                                                                                              
+      //(!pMuon->triggerObjectMatchesByFilter(fHLTFilterName).empty())                                                                                                         
+      //to match with trigger name                                                                                                                                             
+      //!pMuon->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()                                                                                                     
+      //!pMuon->triggerObjectMatchesByPath(fHLTFilterName).empty()
+      
+      //TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT")
+      
+      //cout<< !muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()  <<" matches "<<!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen").empty()<<endl;                                                                                                                                                                                                                  
+      
+      //Trigger matches        
+      //cout<<matchPATMuon(muonPos)<<" matches "<<matchPATMuon(muonNeg)<<endl;                                                                                                                                                                                                                  
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()) {muPos_matches=1;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()) {muNeg_matches=1;}
+      
+      
+      
 
-    if(muonPos->isGlobalMuon()){muPos_global=1;}
-    if(muonNeg->isGlobalMuon()){muNeg_global=1;}
+      /*HLT_HIL1DoubleMuOpen_v1   
+	HLT_HIL1DoubleMu0_HighQ_v1   
+	HLT_HIL2Mu3_v1   
+	HLT_HIL2Mu3_NHitQ_v1   
+	HLT_HIL2Mu7_v1   
+	HLT_HIL2Mu15_v1   
+	HLT_HIL2DoubleMu0_v1   
+	HLT_HIL2DoubleMu0_NHitQ_v1   
+	HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1   
+	HLT_HIL2DoubleMu3_v1*/
+      
+      
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen_v1").empty()){muPos_Trigger1=1;}else{muPos_Trigger1=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){muPos_Trigger2=1;}else{muPos_Trigger2=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2Mu3_v1").empty()){muPos_Trigger3=1;}else{muPos_Trigger3=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2Mu3_NHitQ_v1").empty()){muPos_Trigger4=1;}else{muPos_Trigger4=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2Mu7_v1").empty()){muPos_Trigger5=1;}else{muPos_Trigger5=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2Mu15_v1").empty()){muPos_Trigger6=1;}else{muPos_Trigger6=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_v1").empty()){muPos_Trigger7=1;}else{muPos_Trigger7=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_NHitQ_v1").empty()){muPos_Trigger8=1;}else{muPos_Trigger8=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1").empty()){muPos_Trigger9=1;}else{muPos_Trigger9=0;}
+      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()){muPos_Trigger10=1;}else{muPos_Trigger10=0;}
+      
+      
 
+      
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMuOpen_v1").empty()){muNeg_Trigger1=1;}else{muNeg_Trigger1=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){muNeg_Trigger2=1;}else{muNeg_Trigger2=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2Mu3_v1").empty()){muNeg_Trigger3=1;}else{muNeg_Trigger3=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2Mu3_NHitQ_v1").empty()){muNeg_Trigger4=1;}else{muNeg_Trigger4=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2Mu7_v1").empty()){muNeg_Trigger5=1;}else{muNeg_Trigger5=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2Mu15_v1").empty()){muNeg_Trigger6=1;}else{muNeg_Trigger6=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_v1").empty()){muNeg_Trigger7=1;}else{muNeg_Trigger7=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_NHitQ_v1").empty()){muNeg_Trigger8=1;}else{muNeg_Trigger8=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1").empty()){muNeg_Trigger9=1;}else{muNeg_Trigger9=0;}
+      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL2DoubleMu3_v1").empty()){muNeg_Trigger10=1;}else{muNeg_Trigger10=0;}
+      
+      
 
-    cout<<muPos_tracker<<"    "<<muNeg_tracker<<endl;
-    cout<<"muPos_matches "<<muPos_matches<<" muNeg_matches "<<muNeg_matches<<endl; 
-    cout<<"JpsiCharge " <<p.charge()<<" JpsiMass  "<<p.mass()<<endl;
-    
+      
+      if(muonPos->isTrackerMuon()){muPos_tracker=1;}
+      if(muonNeg->isTrackerMuon()){muNeg_tracker=1;}
+      
+      if(muonPos->isGlobalMuon()){muPos_global=1;}
+      if(muonNeg->isGlobalMuon()){muNeg_global=1;}
+      
 
+      //cout<<muPos_tracker<<"    "<<muNeg_tracker<<endl;
+      
+      //cout<<"muPos_matches "<<muPos_matches<<" muNeg_matches "<<muNeg_matches<<endl; 
+      //cout<<"JpsiCharge " <<Charge<<" JpsiMass  "<<p.M()<<endl;
+      
+      
     // write out JPsi RECO information
     //cout<<" inside loop RecJPsiSize "<<RecJPsiSize<<endl;
-   
-    JpsiCharge  = p.charge();
+      
+    JpsiCharge  = p.charge(); //will changed for onia dimuon loop
+    //JpsiCharge  = Charge;
     JpsiMass =p.mass();
     JpsiPt =p.pt();
     JpsiRap =p.rapidity();
     JpsiPx =p.px();
     JpsiPy =p.py();
     JpsiPz =p.pz();
+    
 
+    
+    
+
+    
     JpsiVprob =p.userFloat("vProb");
-
     RecoCtau=10.0*p.userFloat("ppdlPV");
     RecoCtauErr=10.0*p.userFloat("ppdlErrPV");
     RecoCtauTrue=10.*p.userFloat("ppdlTrue");
 
+    
+    //JpsiVprob=-9999;
+    //RecoCtau=-9999;
+    //RecoCtauErr=-9999;
+    //RecoCtauTrue=-9999;
+    
+    
     
     // write out Muon RECO information                                                                                                                                                                                                     
     float f_muPosPx, f_muPosPy, f_muPosPz, f_muPosEta, f_muPosPhi;
@@ -590,7 +768,7 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
     f_muNegPz = muonNeg->pz();
     f_muNegEta = muonNeg->eta();
     f_muNegPhi = muonNeg->phi();
-
+    
     muPosPx= f_muPosPx ;
     muPosPy= f_muPosPy ;
     muPosPz= f_muPosPz ;
@@ -602,15 +780,15 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
     muNegPz= f_muNegPz ;
     muNegEta= f_muNegEta;
     muNegPhi= f_muNegPhi;
-
+    
     //-----------------------------------------------------                                                                                                                                                                                
     //-----------additional Reco Muon Variables------------                                                                                                                                                                                
     //----------------------------------------------------- 
+    
 
-
-
+    
     //1.Positive Muon                                                                                                                                                                                                                      
-    if(muonPos->isTrackerMuon())
+    if(muonPos->isTrackerMuon() && muonPos->isGlobalMuon())
       {
 	TrackRef iTrack =muonPos->innerTrack();
 	const reco::HitPattern& p1=iTrack->hitPattern();
@@ -628,11 +806,11 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 	    muPos_nchi2Gl=gTrack->chi2()/gTrack->ndof();
 	  }
       }
+    
 
-
-
+    
     //2.Negative Muobn                                                                                                                                                                                                                     
-    if(muonNeg->isTrackerMuon())
+    if(muonNeg->isTrackerMuon() && muonNeg->isGlobalMuon())
       {
 	TrackRef iTrack =muonNeg->innerTrack();
 	const reco::HitPattern& p2=iTrack->hitPattern();
@@ -652,12 +830,19 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 	  }
       }     
     
+    
     SingleMuonTree->Fill();
     //RecJPsiSize++;
     //cout<<"RecJPsiSiZe " <<RecJPsiSize<<endl;
-    }
+    
+
+    //loop should be changed when we put oniaDiMuon loop one loop will remain for onia
+    //}//muon j loop
   
-   cout<<" fill tree called "<<endl;
+    }//Onia loop //muon i loop for PAT muons
+   
+
+  //cout<<" fill tree called "<<endl;
 
 }
 
@@ -688,7 +873,7 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     GeventNb= 0 ;
     GrunNb= 0 ;
     GlumiBlock= 0 ;
-    gbin=0;
+    gbin=-999;
 
     // Event related infos 
                                                                                                                     
@@ -700,7 +885,8 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     centrality_ = new CentralityProvider(iSetup);
     centrality_->newEvent(iEvent,iSetup);
     gbin = centrality_->getBin();
-    cout<<" gbin "<<gbin<<endl;
+    
+    //cout<<" gbin "<<gbin<<endl;
 
 
   //-----------------------------------------------------hiGenParticle----------------------------------------------------------------------
@@ -738,6 +924,7 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     if(momId == 443) MID=(char *)"JPsi";
     if(momId == 553) MID=(char *)"Upsilon1s";
     if(momId == 100553)MID=(char *)"Upsilon2s";
+    if(momId == 23)MID=(char *)"Z0";
 
 
     //cout<<"momId "<<momId<<endl;
@@ -765,7 +952,7 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
 	GenmuNegEta=part.eta();
 	GenmuNegPhi=part.phi();
       
-	cout<<"motherID "<<MID<<endl;
+	//cout<<"motherID "<<MID<<endl;
 
 
       }
@@ -785,7 +972,8 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
       }
     }
   }
-  cout<<" nplus : "<<nplus<<"  "<<nminus<<endl;
+  
+  //cout<<" nplus : "<<nplus<<"  "<<nminus<<endl;
   
   for(size_t i = 0; i < nplus; i++) {
     double en1 = sqrt(px1[i]*px1[i] + py1[i]*py1[i] + pz1[i]*pz1[i] + mumass*mumass);
@@ -806,7 +994,7 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
       double GenDiMuonPy=genvector3.Py();
       double GenDiMuonPz=genvector3.Pz();
 
-      cout<<" gen mass "<< GenDiMuonMinv   <<" pT "<< GenDiMuonPt<<endl; 
+      //cout<<" gen mass "<< GenDiMuonMinv   <<" pT "<< GenDiMuonPt<<endl; 
       GenJpsiMass=GenDiMuonMinv;
       GenJpsiPt=GenDiMuonPt;
       GenJpsiRap=GenDiMuonY;
