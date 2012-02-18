@@ -117,12 +117,12 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 double nSig, nSigErr,purity10;
 	 c1[ipt]->cd(nCent - icent+1);
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==nCent_std),purity10);
-
+	 
 	 cout << " shift = " << mcSigShift << endl;
-         cout << " chisq  = " << fitr.chisq << endl;
-       	 cout << " hChisq->SetBinContent ( hChisq->FindBin(" << mcSigShift << " ), " <<  fitr.chisq << ")" << endl;
-	 cout << " hPurity->SetBinContent( hPurity->FindBin(" << mcSigShift << " ), " <<  fitr.purity010 << ")" << endl;
+       	 cout << " hChisq[icent]->SetBinContent ( hChisq->FindBin(" << mcSigShift << " ), " <<  fitr.chisq << ")" << endl;
+	 cout << " hPurity[icent]->SetBinContent( hPurity->FindBin(" << mcSigShift << " ), " <<  fitr.purity010 << ")" << endl;
 	 cout << " purity = " << fitr.purity010 << endl;
+	 cout << " chisq  = " << fitr.chisq << endl;
 	 cout << " nSig   = " << fitr.nSig  << endl;
 	 
 	 if ( ptBin[ipt]> 200)
