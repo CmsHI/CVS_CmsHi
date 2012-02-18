@@ -119,8 +119,8 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==nCent_std),purity10);
 	 
 	 cout << " shift = " << mcSigShift << endl;
-       	 cout << " hChisq[icent]->SetBinContent ( hChisq->FindBin(" << mcSigShift << " ), " <<  fitr.chisq << ")" << endl;
-	 cout << " hPurity[icent]->SetBinContent( hPurity->FindBin(" << mcSigShift << " ), " <<  fitr.purity010 << ")" << endl;
+       	 cout << Form(" hChisq[%d]->SetBinContent ( hChisq[%d]->FindBin(",icent,icent) << mcSigShift << " ), " <<  fitr.chisq << ");" << endl;
+	 cout << Form(" hPurity[%d]->SetBinContent( hPurity[%d]->FindBin(",icent,icent) << mcSigShift << " ), " <<  fitr.purity010 << ");" << endl;
 	 cout << " purity = " << fitr.purity010 << endl;
 	 cout << " chisq  = " << fitr.chisq << endl;
 	 cout << " nSig   = " << fitr.nSig  << endl;
@@ -165,9 +165,12 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 
 	 if ( icent<= 2) drawPatch(0,0,0.05,0.14,0,1001,"NDC");
 	 //	 drawPatch(0.9,0.05,1.01,0.14,0,1001,"NDC");
-	 if ( mcSigShift != 0 )
+	 if  ( (ppHI == kPP) && ( mcSigShift != 0 )) 
            drawText(Form("Signal template shifted by %f",mcSigShift),0.1980963,0.7569118,1,15);
-	 
+	 if  ( (ppHI == kHI) && ( mcSigShift != 0 ) && (icent==3))
+	   drawText(Form("Signal template shifted by %f",mcSigShift),0.1980963,0.7569118,1,15);
+
+
       }   
       
       TString ppLabel ="";  
