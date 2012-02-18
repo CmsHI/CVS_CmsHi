@@ -33,6 +33,7 @@ class fitResult {
    double nSig; 
    double nSigErr;
    double purity010;
+   double chisq;
 };
 
 TCut FisherCut = "((4.6774452168946995e-01 +(cc5-cc1) *9.6796013515455164e-04 +(cc4-cc1) *-1.2788583705647016e-02 +(cc3-cc1) *1.3674667235554151e-02 +(cc2-cc1) *-7.4576842527504350e-02 +(cr5) *-1.2105656031270820e-02 +(cr4) *-1.8158418924831903e-03 +(cr3) *-1.4267772594659891e-02 +(cr2) *-3.0555858981100050e-02 +(ct5PtCut20) *6.4351309460660500e-03 +(ct4PtCut20) *-7.3308097775112357e-03 +(ct3PtCut20) *-2.2250052480332189e-03 +(ct2PtCut20) *-2.4645948244900417e-02 +(ct1PtCut20) *2.1959860851889978e-03 > 0.3))";
@@ -43,6 +44,7 @@ TCut iso3dCut  = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5"; //cc4 <2 && cr4 < 2.
 TCut isoSumCut  = "(cc4+cr4+ct4PtCut20)/0.9 <1";
 
 TCut sbIsoCut =" (cc4+cr4+ct4PtCut20)/0.9>10 && (cc4+cr4+ct4PtCut20)/0.9 < 20 ";
+TCut sbIsoPPCut = sbIsoCut;
 
 int nBinsExt = 2500;
 const double lumiPP = 231.;
@@ -858,7 +860,7 @@ ncoll[38] = 2.11898 ;
 
 
 
-fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, double &nSigErr=a2, float varLow=0.001, float varHigh=0.028, bool drawLeg=true, bool drawHist=false,double &chisq=a5,double &purity011=a6) {
+fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, double &nSigErr=a2, float varLow=0.001, float varHigh=0.028, bool drawLeg=true, bool drawHist=false, double &purity011=a6) {
    
    TH1D* hDatatmp = (TH1D*)hData1->Clone(Form("%s_datatmp",hData1->GetName()));
    double realNev = hDatatmp->GetEntries();
@@ -869,9 +871,8 @@ fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, dou
    f->SetParLimits(1,0,1);
    hDatatmp->Fit("f","LL M O Q","",varLow,varHigh);
    hDatatmp->Fit("f","LL M O Q","",varLow,varHigh);
-   chisq = (double)f->GetChisquare()/ f->GetNDF()  ;
    
-   //   cout <<" cs = " << chisq << endl;                                                                                                                                                                           
+
    fitResult res;
    res.nSig =0;
    double nev = f->GetParameter(0);
@@ -879,7 +880,8 @@ fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, dou
    double ratioErr = f->GetParError(1);
    res.nSig    = nev * ratio;
    res.nSigErr = nev * ratioErr;
-
+   res.chisq = (double)f->GetChisquare()/ f->GetNDF()  ;
+   
    TH1F *hSigPdf = (TH1F*)hSig->Clone(Form("%s_tmp",hSig->GetName()));
    hSigPdf->Scale(res.nSig/hSigPdf->Integral(1,nBins+1));
 

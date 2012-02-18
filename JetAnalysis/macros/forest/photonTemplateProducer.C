@@ -20,10 +20,10 @@ const int kSumIso3= 6;
 const int kHI = 1;
 const int kPP = 2;
 
-TString fNameHIdata = "barrelHiForestPhotonV7_mixedJetsWihtquarterPI_reactionPln.root";
+TString fNameHIdata = "barrelHiForestPhotonV7-noDupl.root"; //"barrelHiForestPhotonV7_mixedJetsWihtquarterPI_reactionPln.root";
 TString fNamePPdata = "barrelHiForestPhotonPP7TeV-v3.root";
 
-void getTemplate(int ppHI = kHI, TH1D* h1=0, TString fname1="ss", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=true, float specialSbCut=10, float theShift=0);
+void getTemplate(int ppHI = kHI, TH1D* h1=0, TString fname1="ss", int isoChoice =kSumIso, float isoCut=-100, int iTemp=kData, int lowCent=0, int highCent =3, TCut addCut="",bool onlygjEvents=false, float specialSbCut=10, float theShift=0);
 
 TCut getIsoCut( int isoChoice=0, float isoCut = -100 ) {
   
@@ -114,7 +114,7 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 int lowerCent = centBin_std[icent-1];
 	 int upperCent = centBin_std[icent]-1;
 	 
-	 double nSig, nSigErr, chisq,purity10;
+	 double nSig, nSigErr,purity10;
 	 c1[ipt]->cd(nCent - icent+1);
 	 fitResult fitr = doFit ( hSig[icent][ipt], hBkg[icent][ipt], hData[icent][ipt], nSig, nSigErr, 0.005,0.025, (icent==nCent_std),purity10);
 
@@ -400,13 +400,14 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
    for ( int icent=1 ; icent<=nCent_std ; icent++) {
       heff[icent][3]->Write();
       heff[icent][4]->Write();
-   }
-   for ( int icent =1 ; icent<=nCent_std ; icent++) {
-     finSpectra[icent]->Write();
-     hPurity[icent]->Write();
+      finSpectra[icent]->Write();
+      hPurity[icent]->Write();
+      for (int ipt = 1; ipt <= nPtBin ; ipt++) {
+	hData[icent][ipt]->Write();
+      }
    }
    outf.Close();
-
+   
    
    
    
