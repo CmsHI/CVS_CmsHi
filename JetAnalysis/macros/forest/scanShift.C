@@ -1,0 +1,202 @@
+#include "CutAndBinCollection2011.h"
+#include "photonIDEfficiency.C"
+
+
+void scanShift() {
+  TH1D* hPurity[10];
+  TH1D* hChisq[10];
+  for ( int icent=1; icent<=4 ; icent++)   {
+    hPurity[icent] = new TH1D(Form("hShift_icent%d",icent),";Shifted amount of #sigma_{#eta#eta};Purity",19,-0.00019999,0.00018001);
+    hChisq[icent] = (TH1D*)hPurity[icent]->Clone(Form("hChi_icent%d",icent));
+    hChisq[icent]->SetTitle(";Shifted amount of #sigma_{#eta#eta};#Chi^{2}/n_{dof}");
+    hPurity[icent]->Sumw2();
+    hChisq[icent]->Sumw2();
+  }
+
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0 ), 3.63738);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0 ), 0.742419);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0 ), 1.90177);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0 ), 0.778225);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0 ), 2.78129);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0 ), 0.789103);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0 ), 0.483296);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0 ), 0.836987);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-2e-05 ), 3.55145);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-2e-05 ), 0.743132);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-2e-05 ), 1.71012);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-2e-05 ), 0.777893);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-2e-05 ), 2.66658);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-2e-05 ), 0.790714);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-2e-05 ), 0.489611);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-2e-05 ), 0.836362);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-4e-05 ), 3.56558);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-4e-05 ), 0.742031);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-4e-05 ), 1.58232);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-4e-05 ), 0.777013);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-4e-05 ), 2.63003);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-4e-05 ), 0.790406);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-4e-05 ), 0.490264);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-4e-05 ), 0.836691);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-6e-05 ), 3.55812);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-6e-05 ), 0.741804);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-6e-05 ), 1.48702);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-6e-05 ), 0.776379);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-6e-05 ), 2.53779);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-6e-05 ), 0.791653);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-6e-05 ), 0.506679);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-6e-05 ), 0.835097);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-8e-05 ), 3.55531);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-8e-05 ), 0.741556);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-8e-05 ), 1.41376);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-8e-05 ), 0.775149);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-8e-05 ), 2.46855);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-8e-05 ), 0.792155);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-8e-05 ), 0.516407);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-8e-05 ), 0.834909);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-0.0001 ), 3.52676);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-0.0001 ), 0.741703);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-0.0001 ), 1.36032);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-0.0001 ), 0.773741);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-0.0001 ), 2.43471);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-0.0001 ), 0.792098);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-0.0001 ), 0.542524);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-0.0001 ), 0.83446);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-0.00012 ), 3.54103);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-0.00012 ), 0.741086);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-0.00012 ), 1.34125);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-0.00012 ), 0.772118);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-0.00012 ), 2.3795);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-0.00012 ), 0.792435);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-0.00012 ), 0.571932);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-0.00012 ), 0.832892);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-0.00014 ), 3.5998);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-0.00014 ), 0.739225);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-0.00014 ), 1.32057);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-0.00014 ), 0.770722);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-0.00014 ), 2.34272);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-0.00014 ), 0.792478);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-0.00014 ), 0.600277);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-0.00014 ), 0.832072);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-0.00016 ), 3.6418);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-0.00016 ), 0.737564);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-0.00016 ), 1.29366);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-0.00016 ), 0.769124);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-0.00016 ), 2.35287);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-0.00016 ), 0.790954);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-0.00016 ), 0.636585);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-0.00016 ), 0.830425);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(-0.00018 ), 3.76018);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(-0.00018 ), 0.736028);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(-0.00018 ), 1.31011);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(-0.00018 ), 0.767062);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(-0.00018 ), 2.34635);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(-0.00018 ), 0.790618);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(-0.00018 ), 0.679786);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(-0.00018 ), 0.829125);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(2e-05 ), 3.72707);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(2e-05 ), 0.741211);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(2e-05 ), 2.00803);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(2e-05 ), 0.779338);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(2e-05 ), 2.85952);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(2e-05 ), 0.78832);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(2e-05 ), 0.481126);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(2e-05 ), 0.837649);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(4e-05 ), 3.8501);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(4e-05 ), 0.739659);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(4e-05 ), 2.23074);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(4e-05 ), 0.778617);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(4e-05 ), 2.96999);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(4e-05 ), 0.786796);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(4e-05 ), 0.484315);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(4e-05 ), 0.837683);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(6e-05 ), 3.95443);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(6e-05 ), 0.738095);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(6e-05 ), 2.35785);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(6e-05 ), 0.778923);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(6e-05 ), 3.05881);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(6e-05 ), 0.785775);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(6e-05 ), 0.505431);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(6e-05 ), 0.836269);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(8e-05 ), 4.11363);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(8e-05 ), 0.735527);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(8e-05 ), 2.61729);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(8e-05 ), 0.777675);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(8e-05 ), 3.22089);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(8e-05 ), 0.782392);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(8e-05 ), 0.530976);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(8e-05 ), 0.834733);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0.0001 ), 4.29181);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0.0001 ), 0.731991);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0.0001 ), 2.83824);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0.0001 ), 0.77655);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0.0001 ), 3.35424);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0.0001 ), 0.780141);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0.0001 ), 0.553466);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0.0001 ), 0.834076);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0.00012 ), 4.48794);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0.00012 ), 0.727562);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0.00012 ), 3.22102);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0.00012 ), 0.773926);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0.00012 ), 3.57635);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0.00012 ), 0.775094);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0.00012 ), 0.585216);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0.00012 ), 0.832253);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0.00014 ), 4.63575);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0.00014 ), 0.723946);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0.00014 ), 3.58744);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0.00014 ), 0.770286);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0.00014 ), 3.7844);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0.00014 ), 0.769222);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0.00014 ), 0.617256);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0.00014 ), 0.830734);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0.00016 ), 4.86183);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0.00016 ), 0.718498);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0.00016 ), 3.80698);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0.00016 ), 0.768418);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0.00016 ), 3.98553);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0.00016 ), 0.763043);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0.00016 ), 0.670928);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0.00016 ), 0.827598);
+  hChisq[1]->SetBinContent ( hChisq[1]->FindBin(0.00018 ), 5.07569);
+  hPurity[1]->SetBinContent( hPurity[1]->FindBin(0.00018 ), 0.71369);
+  hChisq[2]->SetBinContent ( hChisq[2]->FindBin(0.00018 ), 4.14765);
+  hPurity[2]->SetBinContent( hPurity[2]->FindBin(0.00018 ), 0.764091);
+  hChisq[3]->SetBinContent ( hChisq[3]->FindBin(0.00018 ), 4.1808);
+  hPurity[3]->SetBinContent( hPurity[3]->FindBin(0.00018 ), 0.756618);
+  hChisq[4]->SetBinContent ( hChisq[4]->FindBin(0.00018 ), 0.740535);
+  hPurity[4]->SetBinContent( hPurity[4]->FindBin(0.00018 ), 0.823066);
+
+  
+  TCanvas* c1 = new TCanvas("c1","",1200,400);
+  c1->Divide(4,1);
+  for ( int icent=1 ; icent<=4 ; icent++) {
+    int lowerCent = centBin_std[icent-1];
+    int upperCent = centBin_std[icent]-1;
+    c1->cd(5-  icent);
+    hChisq[icent]->SetAxisRange(0,10,"Y");
+    handsomeTH1(hChisq[icent]);
+    hChisq[icent]->Draw();
+    ///  jumSun(-.000138,0,-0.000138,10,2);
+    gPad->SetRightMargin(0.12);
+    drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.4680963,0.6369118);
+  }
+  c1->SaveAs("scanShiftSigTemplate1HI.pdf");
+
+  TCanvas* c2 = new TCanvas("c2","",1200,400);
+  c2->Divide(4,1);
+  for (int icent=1 ; icent<=4 ; icent++) {
+    int lowerCent = centBin_std[icent-1];
+    int upperCent = centBin_std[icent]-1;
+    c2->cd(5 - icent);
+    
+    hPurity[icent]->SetAxisRange(0,1,"Y");
+    handsomeTH1(hPurity[icent]);
+    hPurity[icent]->Draw();
+    //  jumSun(-.000138,0,-.000138,1,2);
+    gPad->SetRightMargin(0.12);
+    drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.4680963,0.6369118);
+    
+  }
+  c2->SaveAs("scanShiftSigTemplate2HI.pdf");
+
+}
