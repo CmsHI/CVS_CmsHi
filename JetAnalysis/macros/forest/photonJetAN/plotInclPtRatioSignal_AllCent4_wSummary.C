@@ -59,7 +59,9 @@ void getHistograms(vector<SignalCorrector*> & vana,
       TString name = Form("dataSrc%d_reco%d_cent%d",dataSrcType,dataType,ib);
       int cBin = ib;
       if (dataSrcType>1) cBin==vcutCent.size()-1;
+      // initialize ana
       vana.push_back(new SignalCorrector(nt,name,"(inclJetPt/photonEt)",Form("photonEt>%.3f",minPhoton)&&mycut&&vcutCent[ib],weight,cBin,dataSrcType));
+      // setup cuts
       vana[ib]->cutSigAllPho     = "sigmaIetaIeta<0.01";
       vana[ib]->cutSShapeAllPho  = "sigmaIetaIeta>0.011 && sigmaIetaIeta<0.017";
       vana[ib]->cutBkgDPhi       = vana[ib]->cutSigAllPho&&Form("inclJetPt>%.3f&&acos(cos(photonPhi-inclJetPhi))>0.7 && acos(cos(photonPhi-inclJetPhi))<3.14159/2.",minJet);
@@ -73,18 +75,25 @@ void getHistograms(vector<SignalCorrector*> & vana,
       }
       
       // analyze tree
+      vana[ib]->rSigAll.normBinWidth = true;
+      vana[ib]->rBkgDPhi.normBinWidth = true;
+      vana[ib]->rBkgSShape.normBinWidth = true;
+      vana[ib]->rBkgSShapeDPhi.normBinWidth = true;
+      vana[ib]->rSubtracted.normBinWidth = true;
+      float nxbins=16, xmin=0.001, xmax=1.999;
+      if (ib==(vcutCent.size()-1)||dataSrcType>1) nxbins=10;
       if (dataType==0) {
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi),16,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f",minJet,sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          vana[ib]->subSShapeSide = subSShapeSide;
          vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
          vana[ib]->SetPhotonIsolation(isolScheme);
 //         vana[ib]->SetJetWeights("inclJetPt");
-         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),16,0.001,1.999);
+         vana[ib]->MakeHistograms(Form("inclJetPt>%.03f && acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",minJet,sigDPhi),nxbins,xmin,xmax);
       }
       
       if (!doMixBkg) {
@@ -127,7 +136,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.15_preapproval"
+                                         TString outdir = "./fig/02.20_periph10xbin"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -140,6 +149,9 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
    const int nBin = 4;
    float m[nBin+1] = {0,4,12,20,40};
 
+   ////////////////////////////////////////////////////////////////////////////////////////////////
+   // Analysis
+   ////////////////////////////////////////////////////////////////////////////////////////////////
    vector<TCut> vcutCent,vcutCentPp;
    for (int ib=0; ib<nBin; ++ib) vcutCent.push_back(Form("cBin>=%.1f&&cBin<%.1f",m[ib],m[ib+1]));
    vcutCentPp.push_back("1==1");
@@ -168,15 +180,21 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   vector<SignalCorrector*> vanapy7z2;
 //   getHistograms(vanapy7z2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py7TeV-pho30-v1_v24_akPu3PF.root","weight*sampleWeight",13,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
+   ////////////////////////////////////////////////////////////////////////////////////////////////
+   // Draw Individual Centrality Plots
+   ////////////////////////////////////////////////////////////////////////////////////////////////
    TCanvas *c1 = new TCanvas("c1","",1000,300);
    makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.2,0.02);
 
    TH1D * hFrame = (TH1D*)vanahi[0]->rSubtracted.hExtrapNorm->Clone("hFrame");
    hFrame->Reset();
    hFrame->SetAxisRange(0.001,1.999,"X");
-   hFrame->SetAxisRange(-0.02,0.2999,"Y");
-   if (normMode==1) hFrame->SetAxisRange(-0.02,0.3499,"Y");
-   if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
+//   hFrame->SetAxisRange(-0.02,0.2999,"Y");
+//   if (normMode==1) hFrame->SetAxisRange(-0.02,0.3499,"Y");
+//   if (log==1) hFrame->SetAxisRange(1e-3,5,"Y");
+   hFrame->SetAxisRange(-0.2,2,"Y");
+   if (normMode==1) hFrame->SetAxisRange(-0.2,2.4,"Y");
+   if (log==1) hFrame->SetAxisRange(1e-3,10,"Y");
    hFrame->SetStats(0);
    hFrame->SetMarkerStyle(kOpenSquare);
    hFrame->SetXTitle("x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma}");
@@ -591,6 +609,7 @@ TGraphAsymmErrors * getSummary(
          int imin = hana->FindBin(0);
          int imax = hana->FindBin(10);
          y=hana->Integral(imin,imax);
+         if (vana[ib]->rSubtracted.normBinWidth) y*=hana->GetBinWidth(1);
          errYL = y/sqrt(vana[ib]->rSubtracted.nExtrap);
          errYH = y/sqrt(vana[ib]->rSubtracted.nExtrap);
       }

@@ -8,7 +8,7 @@ class Region
 public:
    Region(TString regName, TString v, TCut c, TString w) :
    name(regName),var(v),cut(c),weight(w),
-   n(0),nExtrap(0)
+   n(0),nExtrap(0),normBinWidth(false)
    {}
    
    void Init(TTree * t, int nbins, float xmin, float xmax) {
@@ -34,6 +34,7 @@ public:
    void Normalize(float norm) {
       hExtrapNorm = (TH1D*)hExtrap->Clone(Form("%sExtrapNorm",hExtrap->GetName()));
       hExtrapNorm->Scale(norm/hExtrapNorm->Integral());
+      if (normBinWidth) hExtrapNorm->Scale(1./hExtrapNorm->GetBinWidth(1));
    }
    
    TH1D * h;
@@ -45,6 +46,7 @@ public:
    TString weight;
    float n;
    float nExtrap;
+   bool normBinWidth;
 };
 
 //---------------------------------------------------------------------
