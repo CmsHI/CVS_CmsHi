@@ -3,28 +3,22 @@
 #include "TCanvas.h"
 
 #include "HisCompare.h"
-#include "HisPhotonJet.h"
 
 void compareHisPtRatio()
 {
-   //TString infname="fig/02.13_paperAllHists/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm1.root";
-   TString infname="fig/02.13_paperAllHists/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root";
-   TFile * infside = new TFile(infname);
+   TFile * infpaper = new TFile("fig/02.08_paper/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm1.root");
+   TFile * infmix0213 = new TFile("fig/02.13_phobkg/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+   TFile * infmixfin = new TFile("fig/02.15_preapproval/HisOutput_Photonv7_v24_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm1.root");
    
-   TString outfname(infname);
-   outfname.ReplaceAll("HisOutput_","HisPaper_");
-   cout << outfname << endl;
-   //TFile* hout = new TFile(outfname,"RECREATE");
-   
-   HisCompare hcRawBkg("RawBkg",";x;",0,2);
-   hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0SignalAllExtrapExtrapNorm"),"Raw","hist",kBlack,kFullCircle,"l",2);
-   hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0BkgDPhiExtrapExtrapNorm"),"#Delta#phi Bkg","E",kGreen+2,kOpenCircle,"p");
-   hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0BkgSShapeExtrapExtrapNorm"),"#gamma Bkg","E",kViolet,kOpenCircle,"p");
-   hcRawBkg.AddHist((TH1D*)infside->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Subtracted","E",kRed,kFullCircle,"p");
-
-   TCanvas * c2 = new TCanvas("c2","c2",500,500);
-   //hcRawBkg.Draw(-0.02,0.5);
-   hcRawBkg.Draw();
-   hcRawBkg.DrawLeg("0-10\%",0.64,0.72,0.94,0.91);
-   //c2->Print("fig/his/dphi_Isol0_cent0_side.gif");
+   HisCompare hcRawBkgYS("RawBkgYS",";x_{J#gamma} = p_{T}^{J}/p_{T}^{#gamma}; #gamma-Jet Pair Fraction",0,2,0);
+   hcRawBkgYS.AddHist((TH1D*)infpaper->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Paper 02/10","E",kBlack,kOpenSquare,"p");
+   hcRawBkgYS.AddHist((TH1D*)infmix0213->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Mixed Evt. Bkg","E",kBlue,kOpenCircle,"p");
+   hcRawBkgYS.AddHist((TH1D*)infmixfin->Get("dataSrc1_reco1_cent0SubtractedExtrapExtrapNorm"),"Updated #gamma Energy Scale","E",kRed,kFullCircle,"p");
+   hcRawBkgYS.vh[0]->Scale(1./hcRawBkgYS.vh[0]->Integral());
+   hcRawBkgYS.vh[1]->Scale(1./hcRawBkgYS.vh[1]->Integral());
+   hcRawBkgYS.vh[2]->Scale(1./hcRawBkgYS.vh[2]->Integral());
+   TCanvas * c5 = new TCanvas("c5","c5",500,500);
+   hcRawBkgYS.Draw(-0.02,0.37);
+   hcRawBkgYS.DrawLeg("0-10%",0.45,0.76,0.83,0.92);
+   c5->Print("fig/his/ptratio_cent0_mix_SubAll_Changes_since_Paper.gif");
 }
