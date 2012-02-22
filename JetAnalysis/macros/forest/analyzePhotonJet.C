@@ -52,10 +52,11 @@ void analyzePhotonJet(
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
                       //TString outname="output-data-Photon-v2_v14.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
-                      TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
-                      TString outname="output-data-Photon-v7_v25.root",
-                      //TString outname="output-data-Photon-v7_v25classes.root",
-                      //TString outname="output-data-Photon-v7_v25mix.root",
+                      //TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
+                      TString inname="/mnt/hadoop/cms/store/user/velicanu/forest/HiForestPhoton-v7-noDuplicate.root",
+                      TString outname="output-data-Photon-v7-noDuplicate_v28.root",
+                      //TString outname="output-data-Photon-v7_v28classes.root",
+                      //TString outname="output-data-Photon-v7_v28mix.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
@@ -76,13 +77,14 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=false,
                       TString mcfname="",
-                      TString datafname="output-data-Photon-v7_v25.root",
+                      TString datafname="output-data-Photon-v7_v28.root",
                       int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
-                      TString mixfname="output-data-Photon-v7_v25classes.root"
+                      TString mixfname="output-data-Photon-v7_v28classes.root"
                       )
 {
    //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
    bool checkDup=false;
+   bool doMPT=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -91,7 +93,7 @@ void analyzePhotonJet(
    double cutjetPt = 20;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
-   double cutEtaTrk = 2.4;	
+   double cutPtTrk=0, cutEtaTrk = 2.4;	
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
@@ -101,6 +103,8 @@ void analyzePhotonJet(
    
    // Define the input file and HiForest
    HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
+   c->doTrackCorrections = 1;
+   c->InitTree();
    c->GetEnergyScaleTable("photonEnergyScaleTable_lowPt_v6.root");
    // intialize jet variables
    Jets * anajet = &(c->akPu3PF);   
@@ -137,7 +141,20 @@ void analyzePhotonJet(
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
    tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
-
+   vector<MPT> vmpt;
+   if (doMPT) {
+      vmpt.push_back(MPT("AllAcc",0,0,-1,cutPtTrk,cutEtaTrk));
+      vmpt.push_back(MPT("InCone",1,0,0.8,cutPtTrk,cutEtaTrk));
+      vmpt.push_back(MPT("OutCone",2,0,0.8,cutPtTrk,cutEtaTrk));
+      vmpt.push_back(MPT("AllAccCorr",0,1,-1,cutPtTrk,cutEtaTrk));
+      vmpt.push_back(MPT("InConeCorr",1,1,0.8,cutPtTrk,cutEtaTrk));
+      vmpt.push_back(MPT("OutConeCorr",2,1,0.8,cutPtTrk,cutEtaTrk));
+      for (unsigned m=0; m<vmpt.size(); ++m) { 
+         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
+         SetMPTBranches(tgj,vmpt[m]);
+      }
+   }
+   
    // mixing classes
    int nCentBin=40;
    //int nEPBin=11;
@@ -252,6 +269,9 @@ void analyzePhotonJet(
       int leadingIndex=-1;
       int awayIndex=-1;
       gj.clear();
+      if (doMPT) {
+         for (unsigned m=0; m<vmpt.size(); ++m) vmpt[m].clear();
+      }
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
@@ -386,6 +406,12 @@ void analyzePhotonJet(
          }
       }
       
+      // MPT
+      if (doMPT) {
+         for (unsigned m=0; m<vmpt.size(); ++m) {
+            CalcMPT(c,gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi,vmpt[m]);
+         }
+      }
       
       // xcheck with tracks
       gj.nTrk=0;
