@@ -28,12 +28,19 @@ double a1, a2, a3, a4, a5, a6;
 
 // DON'T FORGET TO APPLY HOE CUT SEPARATELY    
 // Convinient Output Classes                                                                                                                 
+
+struct valPair {
+  double val;
+  double err;
+};
+
+
+
 class fitResult {
  public:
    double nSig; 
    double nSigErr;
    double purity010;
-   double chisq;
 };
 
 TCut FisherCut = "((4.6774452168946995e-01 +(cc5-cc1) *9.6796013515455164e-04 +(cc4-cc1) *-1.2788583705647016e-02 +(cc3-cc1) *1.3674667235554151e-02 +(cc2-cc1) *-7.4576842527504350e-02 +(cr5) *-1.2105656031270820e-02 +(cr4) *-1.8158418924831903e-03 +(cr3) *-1.4267772594659891e-02 +(cr2) *-3.0555858981100050e-02 +(ct5PtCut20) *6.4351309460660500e-03 +(ct4PtCut20) *-7.3308097775112357e-03 +(ct3PtCut20) *-2.2250052480332189e-03 +(ct2PtCut20) *-2.4645948244900417e-02 +(ct1PtCut20) *2.1959860851889978e-03 > 0.3))";
@@ -44,7 +51,6 @@ TCut iso3dCut  = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5"; //cc4 <2 && cr4 < 2.
 TCut isoSumCut  = "(cc4+cr4+ct4PtCut20)/0.9 <1";
 
 TCut sbIsoCut =" (cc4+cr4+ct4PtCut20)/0.9>10 && (cc4+cr4+ct4PtCut20)/0.9 < 20 ";
-TCut sbIsoPPCut = sbIsoCut;
 
 int nBinsExt = 2500;
 const double lumiPP = 231.;
@@ -58,11 +64,14 @@ TString fnameDATA_2010   = "/d100/yjlee/hiForest/merged_HI2010_SD_Photon40_prod0
 TString fnameDATA_2011   = "/d100/velicanu/forest/HiForestPhoton35_Skim.root";
 
 
-const int nPtBin = 4;
-double ptBin[nPtBin+1] = {50,60,80,120,200};
+//const int nPtBin = 4;
+//double ptBin[nPtBin+1] = {50,60,80,120,200};
 
 //const int nPtBin = 1;
 //double ptBin[nPtBin+1] = {60,300};
+
+const int nPtBin = 2;    
+double ptBin[nPtBin+1] = {50,60,80};
 
 
 const int nCent_std = 4;
@@ -76,7 +85,7 @@ float isolationCut = 5.0;
 TCut isFragment = "abs(genMomId)<22";
 TCut isPrompt = "abs(genMomId)==22";
 
-TCut genMatchCut0      = "isGenMatched";
+TCut genMatchCut0      = "isGenMatched && abs(genMomId)<=22";
 TCut genMatchCut1      = Form("isGenMatched && genMomId==22 && genCalIsoDR04 < %.1f",isolationCut);
 TCut genMatchCut      = Form("(isGenMatched && abs(genMatchedEta)<1.44 && abs(etCorrected/genMatchedPt-1)<.3 && abs(genMomId) <= 22 && genCalIsoDR04 < %.1f)",isolationCut);
 TCut genMatchCutBkg      = "(isGenMatched && abs(genMatchedEta)<1.44 && abs(etCorrected/genMatchedPt-1)<.6)  &&  ( (abs(genMomId) > 22) || (genCalIsoDR04 > 5.0) ) ";
@@ -221,6 +230,52 @@ double getNoEmc (TString theFname="", TCut theCut="") {
    TTree *ana = (TTree*) fd->FindObjectAny("Analysis");
    cout << "number of events of " << theCut.GetTitle() << "    : " << ana->GetEntries( theCut ) << endl;
    return ana->GetEntries( theCut ) ;
+}
+
+
+
+float  getHnaprt(int ibin) {
+  if (ibin ==0) return  393.633;
+  if (ibin ==1) return  368.819;
+  if (ibin ==2) return  343.073;
+  if (ibin ==3) return  317.625;
+  if (ibin ==4) return  292.932;
+  if (ibin ==5) return  271.917;
+  if (ibin ==6) return  249.851;
+  if (ibin ==7) return  230.72;
+  if (ibin ==8) return  212.465;
+  if (ibin ==9) return  194.752;
+  if (ibin ==10) return  178.571;
+  if (ibin ==11) return  163.23;
+  if (ibin ==12) return  149.187;
+  if (ibin ==13) return  136.011;
+  if (ibin ==14) return  123.414;
+  if (ibin ==15) return  111.7;
+  if (ibin ==16) return  100.831;
+  if (ibin ==17) return  90.7831;
+  if (ibin ==18) return  80.9823;
+  if (ibin ==19) return  72.6236;
+  if (ibin ==20) return  64.1508;
+  if (ibin ==21) return  56.6284;
+  if (ibin ==22) return  49.9984;
+  if (ibin ==23) return  43.3034;
+  if (ibin ==24) return  37.8437;
+  if (ibin ==25) return  32.6659;
+  if (ibin ==26) return  27.83;
+  if (ibin ==27) return  23.7892;
+  if (ibin ==28) return  20.1745;
+  if (ibin ==29) return  16.8453;
+  if (ibin ==30) return  14.0322;
+  if (ibin ==31) return  11.602;
+  if (ibin ==32) return  9.52528;
+  if (ibin ==33) return  7.6984;
+  if (ibin ==34) return  6.446;
+  if (ibin ==35) return  4.96683;
+  if (ibin ==36) return  4.23649;
+  if (ibin ==37) return  3.50147;
+  if (ibin ==38) return  3.16107;
+  if (ibin ==39) return  2.7877;
+  return -100000;
 }
 
 
@@ -780,7 +835,6 @@ return thehoe;
 */
 
 
-
 void addCentralityFriend(TTree *tSig, TTree *tData,TCut selectionCut)
 {
    //copied from /d101/yjlee/HIPhoton/ana/photonAna2011/common.h
@@ -860,7 +914,7 @@ ncoll[38] = 2.11898 ;
 
 
 
-fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, double &nSigErr=a2, float varLow=0.001, float varHigh=0.028, bool drawLeg=true, bool drawHist=false, double &purity011=a6) {
+fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, double &nSigErr=a2, float varLow=0.001, float varHigh=0.028, bool drawLeg=true, bool drawHist=false,double &chisq=a5,double &purity011=a6) {
    
    TH1D* hDatatmp = (TH1D*)hData1->Clone(Form("%s_datatmp",hData1->GetName()));
    double realNev = hDatatmp->GetEntries();
@@ -871,8 +925,9 @@ fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, dou
    f->SetParLimits(1,0,1);
    hDatatmp->Fit("f","LL M O Q","",varLow,varHigh);
    hDatatmp->Fit("f","LL M O Q","",varLow,varHigh);
+   chisq = (double)f->GetChisquare()/ f->GetNDF()  ;
    
-
+   //   cout <<" cs = " << chisq << endl;                                                                                                                                                                           
    fitResult res;
    res.nSig =0;
    double nev = f->GetParameter(0);
@@ -880,8 +935,7 @@ fitResult doFit(TH1D* hSig=0, TH1D* hBkg=0, TH1D* hData1=0, double &nSig=a1, dou
    double ratioErr = f->GetParError(1);
    res.nSig    = nev * ratio;
    res.nSigErr = nev * ratioErr;
-   res.chisq = (double)f->GetChisquare()/ f->GetNDF()  ;
-   
+
    TH1F *hSigPdf = (TH1F*)hSig->Clone(Form("%s_tmp",hSig->GetName()));
    hSigPdf->Scale(res.nSig/hSigPdf->Integral(1,nBins+1));
 
