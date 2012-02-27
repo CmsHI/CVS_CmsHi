@@ -24,7 +24,7 @@
 
 int runByRunMode = 3;
 int ptMode   = 1;
-void getEff(TH1D* heff=0,TGraphAsymmErrors* geff=0, TCut moreGeneralCut="", TCut addCut="");
+void getEff(TString var="genMatchedPt", TH1D* heff=0,TGraphAsymmErrors* geff=0, TCut moreGeneralCut="", TCut addCut="");
 
 TGraphAsymmErrors* drawEffBay(TH1* num=0, TH1* den=0) {
    TGraphAsymmErrors* gEff = new  TGraphAsymmErrors();
@@ -59,13 +59,13 @@ void photonIDEfficiency(){
       TCut centCut      = Form("yEvt.hiBin >= %d && yEvt.hiBin<= %d",lowCent,highCent);
       
       nId=1;
-      getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4");
+      getEff("genMatchedPt",heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4");
       nId++;
-      getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1");
+      getEff("genMatchedPt",heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1");
       nId++;
-      getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && iso3dCut);
+      getEff("genMatchedPt",heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1" && iso3dCut);
       nId++;
-      getEff(heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1 && sigmaIetaIeta<0.010" && iso3dCut);
+      getEff("genMatchedPt",heff[icent][nId],geff[icent][nId],centCut, "swissCrx<0.90 && seedTime<4 && hadronicOverEm<0.1 && sigmaIetaIeta<0.010" && iso3dCut);
       
       
    }
@@ -94,7 +94,7 @@ void photonIDEfficiency(){
 	    TLegend* leg1 =  new TLegend(0.25,0.20,0.95,0.55,NULL,"brNDC");
 	    easyLeg(leg1,"Photon ID efficiency");
 	    leg1->AddEntry(heff[icent][1],"spike rejection","lp");
-	    leg1->AddEntry(heff[icent][2],"+ H/E < 0.2","lp");
+	    leg1->AddEntry(heff[icent][2],"+ H/E < 0.1","lp");
 	    leg1->AddEntry(heff[icent][3],"+ Fisher Disc","lp");
 	    leg1->AddEntry(heff[icent][4],"+ #sigma_{#eta#eta} <0.010","lp");
 	    leg1->Draw();
@@ -108,13 +108,15 @@ void photonIDEfficiency(){
 }
 
 
-void getEff(TH1D* heff, TGraphAsymmErrors* geff, TCut moreGeneralCut, TCut addCut){
+void getEff(TString var, TH1D* heff, TGraphAsymmErrors* geff, TCut moreGeneralCut, TCut addCut){
    
-   TString fname1 = "barrelHiForestPhoton_MCphoton_all.root";
+  //   TString fname1 = "barrelHiForestPhoton_MCphoton_all.root";
+  TString fname1 = "barrelHiforestv2_qcdAllPhotonAllPt_allCent.root";
    TFile *f1=new TFile(fname1.Data());
    TTree *photon1 = (TTree*)f1->Get("yongsunPhotonTree");
    photon1->AddFriend("yEvt=yongsunHiEvt"       ,fname1.Data());
    photon1->AddFriend("ySkim=yongsunSkimTree"   ,fname1.Data());
+   photon1->AddFriend("yJet=yongsunJetakPu3PF");                                                                                        
    photon1->AddFriend("yHlt=yongsunHltTree"     ,fname1.Data());
    
    TCut generalCut  = etaCut && genMatchCut1 ; 
@@ -125,8 +127,8 @@ void getEff(TH1D* heff, TGraphAsymmErrors* geff, TCut moreGeneralCut, TCut addCu
    num->Reset();
    den->Sumw2();
    num->Sumw2();
-   photon1->Draw("genMatchedPt>>den321",generalCut && moreGeneralCut   );
-   photon1->Draw("genMatchedPt>>num321",generalCut && moreGeneralCut && addCut);
+   photon1->Draw(Form("genMatchedPt>>den321",var.Data()),generalCut && moreGeneralCut   );
+   photon1->Draw(Form("genMatchedPt>>num321",var.Data()),generalCut && moreGeneralCut && addCut);
    
    geff->BayesDivide(num,den);
    num->Divide(den);
