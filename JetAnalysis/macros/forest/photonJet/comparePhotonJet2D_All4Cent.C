@@ -87,11 +87,17 @@ void comparePhotonJet2D_All4Cent(
 //   float nxbins=40, xmin=0, xmax=3.14159, nybins=40, ymin=0, ymax=0.02;
 //   TCut mycut = selPre&&"photonEt>60&&inclJetPt>30&&acos(cos(inclJetPhi-photonPhi))>0.7"&&isolCut;;
    
-   TString tag = "ss_isol";
-   TString var = "sigmaIetaIeta:sumIsol/0.9";
-   TString title = ";sumIsol;#sigma_{#eta#eta}";
-   float nxbins=40, xmin=-40, xmax=50, nybins=40, ymin=0, ymax=0.02;
-   TCut mycut = selPre&&"photonEt>60";
+   TString tag = "ss_x";
+   TString var = "sigmaIetaIeta:(inclJetPt/photonEt)";
+   TString title = ";x_{J#gamma};#sigma_{#eta#eta}";
+   float nxbins=40, xmin=0, xmax=2, nybins=40, ymin=0, ymax=0.02;
+   TCut mycut = selPre&&"photonEt>60&&inclJetPt>30&&acos(cos(inclJetPhi-photonPhi))>7./8*3.1415926"&&isolCut;;
+
+//   TString tag = "ss_isol";
+//   TString var = "sigmaIetaIeta:sumIsol/0.9";
+//   TString title = ";sumIsol;#sigma_{#eta#eta}";
+//   float nxbins=40, xmin=-40, xmax=50, nybins=40, ymin=0, ymax=0.02;
+//   TCut mycut = selPre&&"photonEt>60";
 
    TCanvas * c4 = new TCanvas("c4","",1000,250);
    c4->Divide(4,1);
@@ -119,7 +125,7 @@ void comparePhotonJet2D_All4Cent(
       l0->SetLineColor(kRed);
       l0->SetLineStyle(2);
       l0->SetLineWidth(3);
-      l0->Draw();      
+//      l0->Draw();      
    }
    c4->Print(Form("fig/draw/%s_src%d_Isol%d.gif",tag.Data(),dataSrcType,isolScheme));
    c4->Print(Form("fig/draw/%s_src%d_Isol%d.pdf",tag.Data(),dataSrcType,isolScheme));
