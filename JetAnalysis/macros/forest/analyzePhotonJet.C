@@ -279,6 +279,7 @@ void analyzePhotonJet(
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
          if (c->isSpike(j)) continue;               // spike removal
          if (!c->isLoosePhoton(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut
+         if (c->photon.seedTime[j]==0) continue;
          //if (!c->isLooseEGamma(j)) continue;         // final cuts in final plot macro execpt photon isol and showershape cut, include electrons
          // sort using corrected photon pt
          float corrPt=c->getCorrEt(j);
