@@ -172,7 +172,8 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
 //   getHistograms(vanapp7, vcutCentPp,"anaEvtSel",isolScheme,normMode,"../output-pp-photon-7TeV-v4_v24_akPu3PF.root","(1==1)",3,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
 
    vector<SignalCorrector*> vanapyz2;
-   getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",10,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+//   getHistograms(vanapyz2, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760z2_v24_akPu3PF.root","weight*sampleWeight",10,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   getHistograms(vanapyz2, vcutCentPp,"offlSel",isolScheme,normMode,"../output-qcdpho30and50hiSignal_v28_xsec_akPu3PF.root","weight*sampleWeight",10,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
 //   vector<SignalCorrector*> vanapyd6t;
 //   getHistograms(vanapyd6t, vcutCentPp,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",isolScheme,normMode,"../output-py2760d6t_v24_akPu3PF.root","weight*sampleWeight",12,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
