@@ -310,4 +310,16 @@ public:
    TH1D * hPhotonPurity;
 };
 
+double calcMean(TH1* h){
+   double tot = 0;
+   double integral=  0;
+   for(int i = 1; i <= h->GetNbinsX(); ++i){
+      double x = h->GetBinCenter(i);
+      double y = h->GetBinContent(i);
+      tot += y*x;
+      integral += y;
+   }
+   return tot/integral;
+}
+
 #endif

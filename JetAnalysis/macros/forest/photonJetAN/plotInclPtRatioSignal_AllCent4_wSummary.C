@@ -136,7 +136,7 @@ void plotInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/02.20_periph10xbin"
+                                         TString outdir = "./fig/03.01_updateMeanx"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -499,7 +499,7 @@ void plotHistograms(const SignalCorrector* ana,
    }
    
    if (opt!="")  ana->rSubtracted.hExtrapNorm->Draw(opt);
-   float mean=ana->rSubtracted.hExtrapNorm->GetMean();
+   float mean=calcMean(ana->rSubtracted.hExtrapNorm);
    
    // output histograms
    TFile* hout = new TFile(outfname,"update");
@@ -602,7 +602,7 @@ TGraphAsymmErrors * getSummary(
       if (!hana) continue;
       
       if (anaMode ==0) {
-         y=hana->GetMean();
+         y=calcMean(hana);
          errYL = hana->GetMeanError();
          errYH = hana->GetMeanError();
       } else if (anaMode ==2 ) {
