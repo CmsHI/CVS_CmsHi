@@ -7,10 +7,10 @@ public:
    int run,evt,nOccur,cBin;
    int nG,nJ,nT;
    bool trig,offlSel,noiseFilt,anaEvtSel;
-   float vz,weight,npart,ncoll,sampleWeight,evtPlane;
+   float vz,weight,npart,ncoll,sampleWeight,evtPlane,pthat,samplePtHat;
    TString leaves;
    EvtSel(){
-      leaves="run/I:evt:nOccur:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight:evtPlane";
+      leaves="run/I:evt:nOccur:cBin:nG:nJ:nT:trig/O:offlSel:noiseFilt:anaEvtSel:vz/F:weight:npart:ncoll:sampleWeight:evtPlane:pthat:samplePtHat";
    }
 };
 

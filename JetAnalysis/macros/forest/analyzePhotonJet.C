@@ -45,19 +45,27 @@ public:
 };
 
 void analyzePhotonJet(
+                      // mc
                       TString jetAlgo = "akPu3PF",
-                      //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/photon50/HiForest_Tree/photon50_25k.root"
-                      //TString inname="/d100/velicanu/forest/merged/HiForestPhoton_v1.root",
-                      //TString outname="output-data-Photon-v1_v6.root"
-                      //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v2.root",
-                      //TString outname="output-data-Photon-v2_v14.root",
+                      //TString inname="/net/hisrv0001/home/y_alive/scratch1/gammajet/temp/set1Merge/allQCDPhoton50_cent10_merged_highstat.root",
+                      //TString outname="output-hy18qcdpho50v2_v30_xsec.root",
+                      //int dataSrcType = 0, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
+                      //double samplePtHat=50,
+                      //double sampleWeight = 0.767, // data: 1, mc: s = 0.62, b = 0.38
+                      //bool doCentReWeight=false,
+                      //TString mcfname="",
+                      //TString datafname="",
+                      //int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
+                      //TString mixfname=""
+                      // data
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v7.root",
                       //TString inname="/mnt/hadoop/cms/store/user/frankmalocal/forest/Hi2011ForestPhoton_v7.root",
                       TString inname="/mnt/hadoop/cms/store/user/velicanu/forest/HiForestPhoton-v7-noDuplicate.root",
-                      TString outname="output-data-Photon-v7-noDuplicate_v28.root",
+                      TString outname="output-data-Photon-v7-noDuplicate_v30.root",
                       //TString outname="output-data-Photon-v7_v28classes.root",
                       //TString outname="output-data-Photon-v7_v28mix.root",
                       int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
+                      double samplePtHat=0,
                       double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
                       //TString inname="/mnt/hadoop/cms/store/user/yinglu/MC_Production/Photon50/HiForest_Tree2/photon50_25k_v2.root",
                       //TString inname="/d102/velicanu/forest/merged/HiForestPhoton_v3.root",
@@ -77,20 +85,20 @@ void analyzePhotonJet(
                       //TString outname="output-data-Photon-v4_v11.root",
                       bool doCentReWeight=false,
                       TString mcfname="",
-                      TString datafname="output-data-Photon-v7_v28.root",
+                      TString datafname="output-data-Photon-v7_v30.root",
                       int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
-                      TString mixfname="output-data-Photon-v7_v28classes.root"
+                      TString mixfname="output-data-Photon-v7_v30classes.root"
                       )
 {
    //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
    bool checkDup=false;
-   bool doMPT=true;
+   bool doMPT=false;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   double cutphotonPt = 40; // highest photon trigger is 20, also photon correction valid for photon pt > 40
-   double cutjetPt = 20;
+   double cutphotonPt = 20; // highest photon trigger is 20, also photon correction valid for photon pt > 40
+   double cutjetPt = 0;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    double cutPtTrk=0, cutEtaTrk = 2.4;	
@@ -259,6 +267,8 @@ void analyzePhotonJet(
       evt.npart = getNpart(evt.cBin);
       evt.ncoll = getNcoll(evt.cBin);
       evt.sampleWeight = sampleWeight/c->GetEntries(); // for different mc sample, 1 for data
+      evt.pthat = anajet->pthat;
+      evt.samplePtHat = samplePtHat;
 
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " epbin: " << evtPlaneBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
       if (dataSrcType==2&&!evt.trig) continue;
