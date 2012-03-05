@@ -104,11 +104,9 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	   getTemplate(ppHI, hBkg[icent][ipt], fNamedata ,isoChoice,isoCut, kSBB,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
 	 if ( ppHI == kPP)
            getTemplate(ppHI, hBkg[icent][ipt], fNamedata ,isoChoice,isoCut, kSBBpp,lowCent,highCent,ptCut,onlygjEvents,specialSbCut);
-
+	 
       }
-      
-      
-      
+            
       
       for ( int icent = 1 ; icent<=nCent ; icent++) {
 	 int lowerCent = centBin_std[icent-1];
@@ -243,10 +241,6 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
    }
    
 
-
-
-
-
    
    
    
@@ -304,11 +298,34 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
    if (isoChoice == kFisher)  easyLeg(legCent,"Fisher Method");
    for (int icent = 1; icent <=nCent_std; icent++) {
      handsomeTH1(heffGj[icent],color[icent]);
+     heffGj[icent]->Fit("pol1");
+     heffGj[icent]->GetFunction("pol1")->SetLineColor(color[icent]);
+     heffGj[icent]->GetFunction("pol1")->SetLineStyle(7);
+     
      heffGj[icent]->Draw("same");
      int lowerCent = centBin_std[icent-1];     int upperCent = centBin_std[icent]-1;
      legCent->AddEntry(heffGj[icent],Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),"pl");
    }
    legCent->Draw();
+
+   c2b->cd(2);
+   TH1D* htmpDp = (TH1D*)heffDphi[1]->Clone("htmpDp");
+   htmpDp->Reset();
+   htmpDp->SetAxisRange(0,1.3,"Y");
+   htmpDp->SetYTitle("Efficiency");
+   handsomeTH1(htmpDp);
+   for (int icent = 1; icent <=nCent_std; icent++) {
+     handsomeTH1(heffDphi[icent],color[icent]);
+     heffDphi[icent]->Fit("pol1");
+     heffDphi[icent]->GetFunction("pol1")->SetLineColor(color[icent]);
+     heffDphi[icent]->GetFunction("pol1")->SetLineStyle(7);
+   }
+   htmpDp->DrawCopy();
+   for (int icent = 1; icent <=nCent_std; icent++) {
+     heffDphi[icent]->Draw("same");
+   }
+   legCent->Draw();
+   
    c2b->SaveAs(Form("photonID_efficiency_%s_2.pdf",getIsoLabel(isoChoice).Data()));
    
    
@@ -469,12 +486,13 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 
 void getTemplate(int ppHI, TH1D* h1, TString fname1, int isoChoice, float isoCut, int iTemp, int lowCent, int highCent, TCut addCut,bool onlygjEvents, float specialSbCut, float theShift) { 
  
-   char* fnamePho50 = "barrelHiforestv2_qcdAllPhoton50_allCent.root";
-   float nEvtPho50     = 45188;
-   char* fnamePho80 = "barrelHiforestv2_qcdAllPhoton80_allCent.root";
-   float nEvtPho80     = 45308;
-   float nEvtPho30    =  45000;
-
+  char* fnamePho30 = "barrelHiforestv2_qcdAllPhoton30_allCent.root";
+  float nEvtPho30    =  45000;
+  char* fnamePho50 = "barrelHiforestv2_qcdAllPhoton50_allCent.root";
+  float nEvtPho50     = 45188;
+  char* fnamePho80 = "barrelHiforestv2_qcdAllPhoton80_allCent.root";
+  float nEvtPho80     = 45308;
+    
    char* fnameEmj80 = "barrelHiForestPhoton_MCemJet80_41007events.root";
    char* fnameEmj120 = "barrelHiForestPhoton_MCemJet120_25308events.root";
    char* fnameEmj80_cent10 = "barrelHiForestPhoton_emJet80_cent10_10016evnts.root";
@@ -512,7 +530,8 @@ void getTemplate(int ppHI, TH1D* h1, TString fname1, int isoChoice, float isoCut
    TCut dphiCut= "acos(cos(tgj.photonPhi-tgj.jetPhi))>2.748893";
    TCut lPhotCut= "leading==1";
    TCut hoeCut ="hadronicOverEm<0.1";
-   TCut generalCutMC   = lPhotCut && centCut && noEleCut && hoeCut && addCut ;
+   TCut islandButCut = " seedTime != 0";
+   TCut generalCutMC   = lPhotCut && centCut && noEleCut && hoeCut && addCut &&islandButCut;
    if (onlygjEvents)
       generalCutMC = generalCutMC && photonJetCut && dphiCut;
     
@@ -555,6 +574,7 @@ void getTemplate(int ppHI, TH1D* h1, TString fname1, int isoChoice, float isoCut
    TString weightBit = "";
    if ( ppHI == kHI) {
      if ( iTemp  == kSig) {
+       //       photon1->addFile( fnamePho30,  "yongsunPhotonTree", "" , weightPho30);
        photon1->addFile( fnamePho50,  "yongsunPhotonTree", "" , weightPho50);
        photon1->addFile( fnamePho80,  "yongsunPhotonTree", "" , weightPho80);
        weightBit = "tgj.reweight";
