@@ -10,11 +10,8 @@
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
-
 
 #include "TFile.h"
 #include "TTree.h"
@@ -24,6 +21,8 @@
 
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 //
 
 /**\class HiInclusiveJetAnalyzer 
@@ -62,9 +61,11 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
  private:
   
+  int getPFJetMuon(const pat::Jet& pfJet, const reco::PFCandidateCollection *pfCandidateColl);
 
+  double getPtRel(const reco::PFCandidate lep, const pat::Jet& jet );
 
-  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_; 
+  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_; 
 
 
   /// verbose ?
@@ -76,6 +77,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool usePat_;
   bool isMC_;
 
+  bool doLifeTimeTagging_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
@@ -117,6 +119,33 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float jty[MAXJETS];
     float jtpu[MAXJETS];
 
+    float discr_csvMva[MAXJETS];
+    float discr_csvSimple[MAXJETS];
+    float discr_muByIp3[MAXJETS];
+    float discr_muByPt[MAXJETS];
+    float discr_prob[MAXJETS];
+    float discr_probb[MAXJETS];
+    float discr_tcHighEff[MAXJETS];    
+    float discr_tcHighPur[MAXJETS];
+
+    unsigned nsvtx[MAXJETS];    
+    unsigned svtxntrk[MAXJETS]; 
+    float svtxdl[MAXJETS];   
+    float svtxdls[MAXJETS];  
+    float svtxm[MAXJETS];    
+    float svtxpt[MAXJETS];   
+
+    unsigned nIPtracks[MAXJETS];
+    unsigned nselIPtracks[MAXJETS];
+
+    float mue[MAXJETS];     
+    float mupt[MAXJETS];    
+    float mueta[MAXJETS];   
+    float muphi[MAXJETS];   
+    float mudr[MAXJETS];    
+    float muptrel[MAXJETS]; 
+    int muchg[MAXJETS];   
+    
     float refpt[MAXJETS];
     float refeta[MAXJETS];
     float refphi[MAXJETS];
@@ -124,7 +153,8 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float refdphijt[MAXJETS];
     float refdrjt[MAXJETS];
     float refparton_pt[MAXJETS];
-    float refparton_flavor[MAXJETS];
+    int refparton_flavor[MAXJETS];
+    int refparton_flavorForB[MAXJETS];
 
     float pthat;
     int ngen;
@@ -145,6 +175,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     bool l1TBit[MAXHLTBITS];
     int nL1ABit;
     bool l1ABit[MAXHLTBITS];
+
 
   };
 
