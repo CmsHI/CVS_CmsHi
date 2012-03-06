@@ -62,7 +62,9 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
    
    TH1D* hBkgMCsr[5][5];
    TH1D* hBkgMCsb[5][5];
-
+   TH1D* hBkgMCRatio[5][5];
+   TH1D* hBkgMCRatioFit[5][5];
+   
    TH1D* rawSpectra[5];
    TH1D* finSpectra[5];
    TH1D* hPurity[5];
@@ -94,7 +96,7 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 hBkg[icent][ipt]   = (TH1D*)hData[icent][ipt]->Clone(Form("hBkg_cent%d_pt%d",icent,ipt));
 	 hBkgMCsr[icent][ipt] = (TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsr_cent%d_pt%d",icent,ipt));
 	 hBkgMCsb[icent][ipt] =(TH1D*)hData[icent][ipt]->Clone(Form("hBkgMCsb_cent%d_pt%d",icent,ipt));
-	 
+	
 	 TString fNamedata = fNameHIdata;
 	 if ( ppHI == kPP ) fNamedata = fNamePPdata;
 	 
@@ -443,6 +445,12 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
       handsomeTH1(hBkgMCsr[icent][1],1);
       scaleInt(hBkgMCsb[icent][1]);
       scaleInt(hBkgMCsr[icent][1]);
+      //      hBkgMCsb[icent][1]->Rebin(2);
+      //  hBkgMCsr[icent][1]->Rebin(2);
+
+      hBkgMCRatio[icent][1] = (TH1D*)hBkgMCsr[icent][1]->Clone(Form("hBkgMCRatio_cent%d_pt1",icent));
+      hBkgMCRatio[icent][1]->Divide(hBkgMCsb[icent][1]);
+            
    }
    for (int icent = 1; icent <=nCent_std; icent++) {
      if ( ppHI == kPP )  break;
@@ -462,8 +470,28 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
 	 leg1->Draw();
       }
    }
-   
    c5->SaveAs(Form("backgroundTemplateInMC_%s.pdf",getIsoLabel(isoChoice).Data()));   
+
+   TCanvas* c6 = new TCanvas("c6","",700,700);
+   makeMultiPanelCanvas(c6,nCent_std/2,2,0.0,0.0,0.2,0.15,0.02);
+   for (int icent = 1; icent <=nCent_std; icent++) {
+     if ( ppHI == kPP )  break;
+     int lowerCent = centBin_std[icent-1];
+     int upperCent = centBin_std[icent]-1;
+     c6->cd(nCent_std - icent+1);
+     hBkgMCRatio[icent][1]->SetAxisRange(0,2,"Y");
+     hBkgMCRatio[icent][1]->Fit("pol1","W","",0.008,0.025);
+     hBkgMCRatio[icent][1]->GetFunction("pol1")->SetLineColor(1);
+     hBkgMCRatio[icent][1]->GetFunction("pol1")->SetLineStyle(7);
+     hBkgMCRatioFit[icent][1] = (TH1D*)hBkgMCRatio[icent][1]->Clone(Form("hBkgMCRatioFit_cent%d_pt1",icent));
+     hBkgMCRatioFit[icent][1]->Reset();
+     for ( int ii=1 ; ii<=hBkgMCRatioFit[icent][1]->GetNbinsX() ; ii++) {
+       hBkgMCRatioFit[icent][1]->SetBinContent( ii, hBkgMCRatio[icent][1]->GetFunction("pol1")->Eval( hBkgMCRatioFit[icent][1]->GetBinCenter(ii)) );
+     }
+     hBkgMCRatio[icent][1]->Draw();
+     drawText(Form("%.0f%% - %.0f%%", float((float)lowerCent*2.5), float((float)(upperCent+1)*2.5)),0.3680963,0.8369118);
+   }
+
 
    c3->SaveAs(Form("crossSection_%s.gif",getIsoLabel(isoChoice).Data()));
    TFile outf = TFile("photonPurityCollection.root","update");
@@ -475,6 +503,7 @@ void photonTemplateProducer(int ppHI = kHI, int isoChoice = kSumIso, int isoCut 
       for (int ipt = 1; ipt <= nPtBin ; ipt++) {
 	hData[icent][ipt]->Write();
       }
+      hBkgMCRatioFit[icent][1]->Write();
    }
    outf.Close();
    
@@ -574,7 +603,7 @@ void getTemplate(int ppHI, TH1D* h1, TString fname1, int isoChoice, float isoCut
    TString weightBit = "";
    if ( ppHI == kHI) {
      if ( iTemp  == kSig) {
-       //       photon1->addFile( fnamePho30,  "yongsunPhotonTree", "" , weightPho30);
+       photon1->addFile( fnamePho30,  "yongsunPhotonTree", "" , weightPho30);
        photon1->addFile( fnamePho50,  "yongsunPhotonTree", "" , weightPho50);
        photon1->addFile( fnamePho80,  "yongsunPhotonTree", "" , weightPho80);
        weightBit = "tgj.reweight";
