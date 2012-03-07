@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuonOnia2DPlots.cc,v 1.4 2011/11/01 08:22:57 kumarv Exp $
+// $Id: DiMuonOnia2DPlots.cc,v 1.5 2012/02/17 10:20:55 kumarv Exp $
 //
 //
 // system include files
@@ -176,8 +176,16 @@ private:
 
   int GeventNb,GrunNb,GlumiBlock;
   //Gen JPsi Variables
+  double GenJpsiMassP, GenJpsiPtP, GenJpsiRapP;
+  double GenJpsiPxP, GenJpsiPyP, GenJpsiPzP;
+
+
+
+  //Gen JPsi Variables                                                                                                                                                                                           
   double GenJpsiMass, GenJpsiPt, GenJpsiRap;
   double GenJpsiPx, GenJpsiPy, GenJpsiPz;
+
+
 
   //2.) muon variables Gen                                         
                                                                                                                  
@@ -394,6 +402,19 @@ DiMuonOnia2DPlots::beginJob()
   SingleGenMuonTree->Branch("GeventNb",   &GeventNb,       "GeventNb/I");
   SingleGenMuonTree->Branch("GrunNb",     &GrunNb,         "GrunNb/I");
   SingleGenMuonTree->Branch("GlumiBlock", &GlumiBlock,     "GlumiBlock/I");
+
+  //Gen Jpsi Variables Parent                                                                                                                                                                                           
+  SingleGenMuonTree->Branch("GenJpsiMassP",   &GenJpsiMassP,  "GenJpsiMassP/D");
+  SingleGenMuonTree->Branch("GenJpsiPtP",     &GenJpsiPtP,    "GenJpsiPtP/D");
+  SingleGenMuonTree->Branch("GenJpsiRapP",    &GenJpsiRapP,   "GenJpsiRapP/D");
+  SingleGenMuonTree->Branch("GenJpsiPxP",     &GenJpsiPxP,    "GenJpsiPxP/D");
+  SingleGenMuonTree->Branch("GenJpsiPyP",     &GenJpsiPyP,    "GenJpsiPyP/D");
+  SingleGenMuonTree->Branch("GenJpsiPzP",     &GenJpsiPzP,    "GenJpsiPzP/D");
+
+
+
+
+
 
   //Gen Jpsi Variables                                                                                                                                                        
   SingleGenMuonTree->Branch("GenJpsiMass",   &GenJpsiMass,  "GenJpsiMass/D");
@@ -849,6 +870,15 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
 void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   
+
+  GenJpsiMassP=-9999.;
+  GenJpsiPtP=-9999.;
+  GenJpsiRapP=-9999.;
+  GenJpsiPxP=-9999.;
+  GenJpsiPyP=-9999.;
+  GenJpsiPzP=-9999.;
+
+
   GenJpsiMass=-9999.;
   GenJpsiPt=-9999.;
   GenJpsiRap=-9999.;
@@ -926,11 +956,11 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     if(momId == 100553)MID=(char *)"Upsilon2s";
     if(momId == 23)MID=(char *)"Z0";
 
-
+    
     //cout<<"momId "<<momId<<endl;
     //JPsi
     
-    if ((abs(part.pdgId()) == 13) && ( !strcmp(fMotherID.c_str(),MID)) ){
+    if ((abs(part.pdgId()) == 13) && (!strcmp(fMotherID.c_str(),MID)) ){
         
     //if (abs(part.pdgId()) == 13 &&  momId == 443){
    //Upsilon 1s
@@ -939,6 +969,30 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     //if (abs(part.pdgId()) == 13 &&  momId == 100553){
 
       
+
+
+      double GenDiMuonYP=mom->rapidity();
+      double GenDiMuonMinvP=mom->mass();
+      double GenDiMuonPtP =mom->pt();
+      double GenDiMuonPxP=mom->px();
+      double GenDiMuonPyP=mom->py();
+      double GenDiMuonPzP=mom->pz();
+
+
+
+
+      GenJpsiMassP=GenDiMuonMinvP;
+      GenJpsiPtP=GenDiMuonPtP;
+      GenJpsiRapP=GenDiMuonYP;
+      GenJpsiPxP=GenDiMuonPxP;
+      GenJpsiPyP=GenDiMuonPyP;
+      GenJpsiPzP=GenDiMuonPzP;
+      
+      //cout<<" mass P "<<GenDiMuonMinvP<<" pT P : "<<GenDiMuonPtP<<endl;
+
+
+
+
 
       if(part.pdgId() == 13 ){
         px1[nplus] = part.px();
@@ -1003,6 +1057,10 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
       GenJpsiPz=GenDiMuonPz;
       
       SingleGenMuonTree->Fill();
+
+
+      //cout<<" mass  "<<GenDiMuonMinv<<" pT  : "<<GenDiMuonPt<<endl;
+
       //cout<<"gen Tree Filled "<<endl;
 
     }
