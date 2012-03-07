@@ -87,9 +87,9 @@ public:
          nameIsol="Sum(Isol.)<1GeV";
          cutIsol = "(cc4+cr4+ct4PtCut20)/0.9 <1";
          hPhotonPurity->SetBinContent(1,0.74);
-         hPhotonPurity->SetBinContent(2,0.76);
-         hPhotonPurity->SetBinContent(3,0.82);
-         hPhotonPurity->SetBinContent(4,0.86);
+         hPhotonPurity->SetBinContent(2,0.77);
+         hPhotonPurity->SetBinContent(3,0.79);
+         hPhotonPurity->SetBinContent(4,0.83);
       } else if (isolScheme==1) { // cut isol
          nameIsol="3DCutIsol.";
          cutIsol = "cc4 < 6.9 && ct4PtCut20 < 3.00 && cr4<5";
