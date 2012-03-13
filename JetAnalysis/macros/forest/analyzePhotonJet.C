@@ -87,7 +87,8 @@ void analyzePhotonJet(
                       TString mcfname="",
                       TString datafname="output-data-Photon-v7_v30.root",
                       int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
-                      TString mixfname="output-data-Photon-v7_v30classes.root"
+                      TString mixfname="output-data-Photon-v7_v30classes.root",
+                      int srcType=1 // 0=gen, 1 = reco
                       )
 {
    //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
@@ -357,6 +358,19 @@ void analyzePhotonJet(
             gj.refJetPhi = anajet->refphi[awayIndex];
             gj.refPartonPt = anajet->refparton_pt[awayIndex];
             gj.refPartonFlavor = anajet->refparton_flavor[awayIndex];
+         }
+
+         // if mix, overwrite jets from gen
+         if (srcType==0) {
+            gj.nJet=0;
+            for (int j=0;j<anajet->ngen;j++) {
+               if (anajet->genpt[j]<cutjetPt) continue;
+               if (fabs(anajet->geneta[j])>cutjetEta) continue;
+               gj.inclJetPt[gj.nJet] = anajet->genpt[j];
+               gj.inclJetEta[gj.nJet] = anajet->geneta[j];
+               gj.inclJetPhi[gj.nJet] = anajet->genphi[j];
+               ++gj.nJet;
+            }
          }
 
          // if mix, overwrite jets from mixed events
