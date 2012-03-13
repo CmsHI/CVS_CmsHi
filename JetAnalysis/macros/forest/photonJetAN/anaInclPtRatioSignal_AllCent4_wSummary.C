@@ -48,11 +48,13 @@ void getHistograms(TString myname,
    cout << "# " << endl;
    
    // mixing trees
-   TString mixfname="../output-data-Photon-v7-noDuplicate_v29mixmb_akPu3PF.root";
+   TString mixfname=infname;
    bool doMixBkg=false;
    if (dataSrcType<=1) {
       doMixBkg=true;
-      if (dataSrcType==0) mixfname="../output-hy18pyquenlopho50v2_v30_xsec_mbmix_akPu3PF.root";
+      if (dataSrcType==0) mixfname.ReplaceAll("xsec","xsec_mbmix");
+      if (dataSrcType==1) mixfname.ReplaceAll("_akPu3PF","mixmb_akPu3PF");
+      cout << "Mix file: " << mixfname << endl;
    }
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
    
@@ -83,7 +85,7 @@ void getHistograms(TString myname,
       vana[ib]->rBkgSShapeDPhi.normBinWidth = true;
       vana[ib]->rSubtracted.normBinWidth = true;
       float nxbins=16, xmin=0.001, xmax=1.999;
-//      if (ib==(vcutCent.size()-1)||dataSrcType>1) nxbins=10;
+      if (ib==(vcutCent.size()-1)||dataSrcType>1) nxbins=10;
       if (dataType==0) {
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
@@ -123,14 +125,14 @@ void getHistograms(TString myname,
 //---------------------------------------------------------------------
 void anaInclPtRatioSignal_AllCent4_wSummary(
                                          int isolScheme=0, // 0=sumIsol, 1=cutIsol, 2=fisherIsol
-                                         int normMode=2, // 1=unity, 2=per photon
+                                         int normMode=1, // 1=unity, 2=per photon
                                          int subDPhiSide = 1,
                                          int subSShapeSide = 1,
                                          float minPhoton=60,
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.12_pyquen_and_mat"
+                                         TString outdir = "./fig/03.12_pyquen_and_data"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -151,11 +153,21 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
    vcutCentPp.push_back("1==1");
 
 
-   // Closure Test
-   TString mcweight = "(1==1)";
+   
+   // Data
+   TCut jet20Sel = Form("inclJetPt>%.3f",minJet);
+   TCut jet20BkgSel = Form("tmix.inclJetPt>%.03f",minJet);
+   vector<SignalCorrector*> vanahi20;
+   getHistograms("hi20",vanahi20, vcutCent,"anaEvtSel",jet20Sel,jet20BkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+
    TCut jetSel = Form("abs(inclJetEta)<1.6&&inclJetPt>%.3f",minJet);
    TCut jetBkgSel = Form("abs(tmix.inclJetEta)<1.6&&tmix.inclJetPt>%.03f",minJet);
 
+   vector<SignalCorrector*> vanahi;
+   getHistograms("hi",vanahi, vcutCent,"anaEvtSel",jetSel,jetBkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+
+   // Pyquen Closure Test
+   TString mcweight = "(1==1)";
    vector<SignalCorrector*> vanahypho;
    getHistograms("hypho",vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
    
