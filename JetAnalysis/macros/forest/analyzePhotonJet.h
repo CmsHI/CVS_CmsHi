@@ -51,6 +51,7 @@ public:
    float inclJetEta[MAXTRK];
    float inclJetPhi[MAXTRK];   
    float inclJetRefPt[MAXTRK];
+   float inclJetResp[MAXTRK];
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
@@ -223,4 +224,33 @@ float getNcoll(int cBin) {
    return -1;
 }
 
+class Response {
+public:
+   // jet energy studies
+   // Default and user constructor.
+   TF1 * fGaus;
+   TF1 * vfReso[4];
+   Response() {
+      fGaus = new TF1("fGaus","gaus",-1,3);
+      fGaus->SetParameter(0,1); // normalization
+      fGaus->SetParameter(1,1); // mean
+      vfReso[0] = new TF1("fres0","sqrt(pow(0.0246,2)+pow(1.213/sqrt(x),2)+pow(5.23/x,2))",0,300);
+      vfReso[1] = new TF1("fres1","sqrt(pow(0.0246,2)+pow(1.213/sqrt(x),2)+pow(5.10/x,2))",0,300);
+      vfReso[2] = new TF1("fres2","sqrt(pow(0.0246,2)+pow(1.213/sqrt(x),2)+pow(3.88/x,2))",0,300);
+      vfReso[3] = new TF1("fres3","sqrt(pow(0.0246,2)+pow(1.213/sqrt(x),2)+pow(0.001/x,2))",0,300);
+   }
+   float GetSmear(int cBin, float pt) {
+      int mybin;
+      if (cBin<4) mybin=0;
+      else if (cBin<12) mybin=1;
+      else if (cBin<20) mybin=2;
+      else mybin=3;
+
+      float reso = vfReso[mybin]->Eval(pt);
+      fGaus->SetParameter(2,reso);
+      float sm = fGaus->GetRandom();
+//      cout << "GetSmear for: " << mybin << " " << pt << " reso: " << reso << " gaus: " << smpt/pt << " smeared: " << smpt << endl;
+      return sm;
+   }
+};
 #endif

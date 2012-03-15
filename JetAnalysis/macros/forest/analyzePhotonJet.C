@@ -150,6 +150,7 @@ void analyzePhotonJet(
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
    tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
+   tgj->Branch("inclJetResp",gj.inclJetResp,"inclJetResp[nJet]/F");
    vector<MPT> vmpt;
    if (doMPT) {
       vmpt.push_back(MPT("AllAcc",0,0,-1,cutPtTrk,cutEtaTrk));
@@ -217,6 +218,9 @@ void analyzePhotonJet(
       c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_v3",&HLT_Photon50_CaloIdVL_v3);
       c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_IsoL_v6",&HLT_Photon50_CaloIdVL_IsoL_v6);
    }
+
+   // jet energy studies
+   Response jetRes;
    
    ///////////////////////////////////////////////////
    // Main loop
@@ -369,6 +373,7 @@ void analyzePhotonJet(
                gj.inclJetPt[gj.nJet] = anajet->genpt[j];
                gj.inclJetEta[gj.nJet] = anajet->geneta[j];
                gj.inclJetPhi[gj.nJet] = anajet->genphi[j];
+               gj.inclJetResp[gj.nJet] = jetRes.GetSmear(evt.cBin,gj.inclJetPt[gj.nJet]);
                ++gj.nJet;
             }
          }
