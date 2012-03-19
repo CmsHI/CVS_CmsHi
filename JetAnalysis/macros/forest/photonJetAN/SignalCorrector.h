@@ -101,10 +101,10 @@ public:
          nameIsol="Fisher Isol. > 0.3";
          t->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
          cutIsol = "fisherIsol>0.3";
-         hPhotonPurity->SetBinContent(1,0.76);
-         hPhotonPurity->SetBinContent(2,0.76);
-         hPhotonPurity->SetBinContent(3,0.76);
-         hPhotonPurity->SetBinContent(4,0.81);
+         hPhotonPurity->SetBinContent(1,0.77);
+         hPhotonPurity->SetBinContent(2,0.75);
+         hPhotonPurity->SetBinContent(3,0.72);
+         hPhotonPurity->SetBinContent(4,0.76);
       }
 //      if (doSys) {
 //         for (int i=1; i<=hPhotonPurity->GetNbinsX(); ++i) hPhotonPurity->SetBinContent(i,hPhotonPurity->GetBinContent(i)*1.2);
