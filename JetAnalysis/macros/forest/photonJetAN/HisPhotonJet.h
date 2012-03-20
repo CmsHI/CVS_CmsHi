@@ -2,6 +2,20 @@
 #define HisPhotonJet_h
 
 #include "TGraphAsymmErrors.h"
+#include "TMath.h"
+#include "TF1.h"
+
+double calcMean(TH1* h){
+   double tot = 0;
+   double integral=  0;
+   for(int i = 1; i <= h->GetNbinsX(); ++i){
+      double x = h->GetBinCenter(i);
+      double y = h->GetBinContent(i);
+      tot += y*x;
+      integral += y;
+   }
+   return tot/integral;
+}
 
 TGraphAsymmErrors * getSummary(//TString outfname,
                                //TString name,
@@ -34,7 +48,7 @@ TGraphAsymmErrors * getSummary(//TString outfname,
       if (!hana) continue;
       
       if (anaMode ==0) {
-         y=hana->GetMean();
+         y=calcMean(hana);
          errYL = hana->GetMeanError();
          errYH = hana->GetMeanError();
       } else if (anaMode ==1 ) {
@@ -45,7 +59,7 @@ TGraphAsymmErrors * getSummary(//TString outfname,
       } else if (anaMode ==2 ) {
          int imin = hana->FindBin(0);
          int imax = hana->FindBin(10);
-         y=hana->Integral(imin,imax);
+         y=hana->Integral(imin,imax)*hana->GetBinWidth(1);
          errYL = y/sqrt(hana->GetEntries());
          errYH = y/sqrt(hana->GetEntries());
       }

@@ -9,18 +9,24 @@
 #include "HisPhotonJet.h"
 using namespace std;
 
-void plotHisDPhi_All4Cent()
+void plotHisPtRatio_All4Cent(
+                             int normMode=0 // 0=mean, 2=area
+                             )
 {
    const int nBin = 4;
    float m[nBin+1] = {0,4,12,20,40};
 //   const int nBin = 1;
 //   float m[nBin+1] = {0,40};
-
+   
    vector<HisCompare*> vc;
    vector<TString> names;
    vector<TFile*> infiles;
-   TString infname_x0320="fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclDeltaPhi_gamma60jet30dphiSig628_Isol0_Norm0.root";
-   TString infname_x0320_fisher="fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclDeltaPhi_gamma60jet30dphiSig628_Isol2_Norm0.root";
+//   names.push_back("hyphoquen_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+//   names.push_back("hyphoquenmatjet_dataSrc0_reco1");
+//   names.push_back("hyphoquengenjetsmear_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+//   names.push_back("hyphoquengenjet_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+   TString infname_x0320=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm%d.root",normMode);
+   TString infname_x0320_fisher=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol2_Norm%d.root",normMode);
 
    names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320));
    names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320_fisher));
@@ -36,7 +42,8 @@ void plotHisDPhi_All4Cent()
    }
 
    for (int ib=0; ib<nBin; ++ib) {
-      vc.push_back(new HisCompare(Form("x_c%d",ib),";#Delta#phi_{J#gamma};Pair Fraction",0,3.1415926,1));
+      if (normMode==0) vc.push_back(new HisCompare(Form("x_c%d",ib),";x_{J#gamma} = p^{Jet}_{T}/p^{#gamma-jet}_{T}; #frac{1}{N^{#gamma-jet}} #frac{dN^{#gamma-jet}}{dx_{J#gamma}}",0,2,2));
+      if (normMode==2) vc.push_back(new HisCompare(Form("x_c%d",ib),";x_{J#gamma} = p^{Jet}_{T}/p^{#gamma-jet}_{T}; #frac{1}{N^{#gamma-jet}} #frac{dN^{#gamma-jet}}{dx_{J#gamma}}",0,2,0));
       for (int s=0; s<names.size(); ++s) {
          if (s==0) vc[ib]->AddHist(vh[s][ib],"Paper v9","E",kRed,kFullCircle,"p");
          if (s==1) vc[ib]->AddHist(vh[s][ib],"Fisher Isol.","E",kBlack,kOpenCircle,"p");
@@ -47,13 +54,12 @@ void plotHisDPhi_All4Cent()
 
    TCanvas *c1 = new TCanvas("c1","",1000,300);
    makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.2,0.02);
-   float ymin=1.e-3, ymax=1;
+   float ymin=0, ymax=2.5;
    //c1->Divide(4,1);
 
    // first draw
    for (int ib=0; ib<nBin; ++ib) {
       c1->cd(nBin-ib);
-      gPad->SetLogy();
       vc[ib]->Draw(ymin,ymax);
    }
    // labels
@@ -61,10 +67,10 @@ void plotHisDPhi_All4Cent()
    vc[0]->DrawLeg("PbPb Data",0.45,0.71,0.92,0.93);
    for (int ib=0; ib<nBin; ++ib) {
       c1->cd(nBin-ib);
-      if ( ib == 3) drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.25,0.6,1,16);
-      else drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.1,0.6,1,16);
+      if ( ib == 3) drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.72,0.5,1,16);
+      else drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.67,0.5,1,16);
    }
-   c1->Print("fig/his/HisDeltaPhi_All4Cent_data_sumIsol_vs_fisherIsol.gif");
+   c1->Print(Form("fig/his/HisPtRatio_All4Cent_data_sumIsol_vs_fisherIsol_Norm%d.gif",normMode));
    
    //
    // Summary
@@ -81,12 +87,18 @@ void plotHisDPhi_All4Cent()
    TCanvas * c3 = new TCanvas("c3","c3",500,500);
    TH1D *hNpartFrame = new TH1D("hNpartFrame","",100,-10,400);
    hNpartFrame->SetXTitle("N_{part}");
-   hNpartFrame->SetYTitle("#sigma(#Delta#phi_{J#gamma})");
-   hNpartFrame->SetAxisRange(0,0.5,"Y");
+   if (normMode==0) {
+      hNpartFrame->SetYTitle("<x_{J#gamma}>");
+      hNpartFrame->SetAxisRange(0.6,1.1,"Y");
+   }
+   if (normMode==2) {
+      hNpartFrame->SetYTitle("R_{J#gamma}");
+      hNpartFrame->SetAxisRange(0.4,1,"Y");
+   }
    handsomeTH1(hNpartFrame);
    hNpartFrame->Draw();
    for (int s=0; s<names.size(); ++s) {
-      TGraphAsymmErrors * gSummary = getSummary(nBin,npart,vh[s],1,1,1);
+      TGraphAsymmErrors * gSummary = getSummary(nBin,npart,vh[s],1,1,normMode);
       gSummary->SetMarkerColor(vc[0]->vh[s]->GetMarkerColor());
       gSummary->SetMarkerStyle(vc[0]->vh[s]->GetMarkerStyle());
       gSummary->Draw("psame");
@@ -95,5 +107,5 @@ void plotHisDPhi_All4Cent()
    vc[0]->DrawLeg("PbPb Data",0.45,0.71,0.92,0.93);
    fout->Write();
    
-   c3->Print("fig/his/HisDeltaPhi_Summary_data_sumIsol_vs_fisherIsol.gif");
+   c3->Print(Form("fig/his/HisPtRatio_Summary_data_sumIsol_vs_fisherIsol_Norm%d.gif",normMode));
 }
