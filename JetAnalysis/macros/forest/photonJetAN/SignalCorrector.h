@@ -21,8 +21,10 @@ public:
    void Init(TTree * t, int nbins, float *bins) {
       cut*=weight;
       h = new TH1D(name,"",nbins,bins);
-      n = t->Project(h->GetName(),var,cut);
-      cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
+      if (var!="") {
+	n = t->Project(h->GetName(),var,cut);
+	cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
+      }
    }
    
    void Extrapolate(float scale) {
