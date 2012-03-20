@@ -44,16 +44,16 @@ void getHistograms(TString myname, TString var, TString bkgvar,
    TFile *inf = TFile::Open(infname);
    TTree *nt =(TTree*)inf->FindObjectAny("tgj");
    cout << endl << "# " << endl;
-   cout << "# " << infname << ": useWeight: " << weight << " dataSrcType: " << dataSrcType << " photon: " << minPhoton << " jet: " << minJet << endl;
+   cout << "# " << infname << endl;
+   cout << myname << ": useWeight: " << weight << " dataSrcType: " << dataSrcType << " photon: " << minPhoton << " jet: " << minJet << endl;
    cout << "# " << endl;
    
    // mixing trees
    TString mixfname=infname;
    bool doMixBkg=false;
-   if (dataSrcType<=1) {
+   if (dataSrcType<=1&&dataType==1) {
       doMixBkg=true;
-      if (dataSrcType==0) mixfname.ReplaceAll("xsec","xsec_mbmix");
-      if (dataSrcType==1) mixfname.ReplaceAll("_akPu3PF","mixmb_akPu3PF");
+      mixfname.ReplaceAll("_akPu3PF","_mixmb_akPu3PF");
       cout << "Mix file: " << mixfname << endl;
    }
    if (doMixBkg) nt->AddFriend("tmix=tgj",mixfname);
@@ -132,7 +132,7 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.16_genjet_smear"
+                                         TString outdir = "./fig/03.20_approval"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -151,29 +151,32 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
    vector<TCut> vcutCent,vcutCentPp;
    for (int ib=0; ib<nBin; ++ib) vcutCent.push_back(Form("cBin>=%.1f&&cBin<%.1f",m[ib],m[ib+1]));
    vcutCentPp.push_back("1==1");
-
-
    
    // Data
-   TCut jet20Sel = Form("inclJetPt>%.3f",minJet);
-   TCut jet20BkgSel = Form("tmix.inclJetPt>%.03f",minJet);
-   vector<SignalCorrector*> vanahi20;
-   getHistograms("hi20","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahi20, vcutCent,"anaEvtSel",jet20Sel,jet20BkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
-
    TCut jetSel = Form("abs(inclJetEta)<1.6&&inclJetPt>%.3f",minJet);
    TCut jetBkgSel = Form("abs(tmix.inclJetEta)<1.6&&tmix.inclJetPt>%.03f",minJet);
 
-   vector<SignalCorrector*> vanahi;
-   getHistograms("hi","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahi, vcutCent,"anaEvtSel",jetSel,jetBkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+  vector<SignalCorrector*> vanahi;
+  getHistograms("hi","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahi, vcutCent,"anaEvtSel",jetSel,jetBkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+
+  // MC Reference
+   TString mcweight = "((samplePtHat==30&&pthat<50)||(samplePtHat==50&&pthat<80)||(samplePtHat==80))*weight*sampleWeight";
+
+   vector<SignalCorrector*> vanahypho;
+   getHistograms("hypho","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18qcdpho30and50and80v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    // Pyquen Closure Test
-   TString mcweight = "(1==1)";
-   vector<SignalCorrector*> vanahypho;
-   getHistograms("hypho","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+   mcweight = "(1==1)";
+   vector<SignalCorrector*> vanahyphoquen;
+   getHistograms("hyphoquen","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahyphoquen, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
    
-   vector<SignalCorrector*> vanahyphomatjet;
-   getHistograms("hyphomatjet","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahyphomatjet, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel&&"inclJetRefPt>0",jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_akPu3PF.root",mcweight,0,1,0,0,minPhoton,minJet,sigDPhi);
+   vector<SignalCorrector*> vanahyphoquenmatjet;
+   getHistograms("hyphoquenmatjet","(inclJetPt/photonEt)","",vanahyphoquenmatjet, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel&&"inclJetRefPt>0",jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_akPu3PF.root",mcweight,0,1,0,0,minPhoton,minJet,sigDPhi);
 
-   vector<SignalCorrector*> vanahyphogenjet;
-   getHistograms("hyphogenjet","(inclJetPt/photonEt)","(tmix.inclJetPt/photonEt)",vanahyphogenjet, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_genjet_akPu3PF.root",mcweight,0,1,0,0,minPhoton,minJet,sigDPhi);
+   vector<SignalCorrector*> vanahyphoquengenjet;
+   getHistograms("hyphoquengenjet","(inclJetPt/photonEt)","",vanahyphoquengenjet, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_genjet_akPu3PF.root",mcweight,0,0,0,0,minPhoton,minJet,sigDPhi);
+
+   TCut jetSmearSel = Form("abs(inclJetEta)<1.6&&(inclJetPt*inclJetResp)>%.3f",minJet);
+   vector<SignalCorrector*> vanahyphoquengenjetsmear;
+   getHistograms("hyphoquengenjetsmear","(inclJetPt*inclJetResp/photonEt)","",vanahyphoquengenjetsmear, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSmearSel,"",isolScheme,normMode,"../output-hy18pyquenlopho50v2_v30_xsec_genjet_smear_akPu3PF.root",mcweight,0,0,0,0,minPhoton,minJet,sigDPhi);
 }
