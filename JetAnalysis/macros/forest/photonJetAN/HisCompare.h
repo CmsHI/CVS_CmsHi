@@ -51,7 +51,7 @@ public:
    vector<TString> vhstyle;
    TLegend * leg;
    
-   void AddHist(TH1D *h, TString htitle, TString hdrawstyle, int color, int mkstyle, TString legstyle="p", int lstyle=-1) {
+   void AddHist(TH1D *h, TString htitle, TString hdrawstyle, int color, int mkstyle, TString legstyle="", int lstyle=-1) {
       if (!h) {
          cout << "bad histogram" << endl;
          return;
@@ -59,16 +59,19 @@ public:
 
       if (normMode==1) {
          h->Scale(1./h->Integral());
+      } else if (normMode==2) {
+         h->Scale(1./(h->Integral()*h->GetBinWidth(1)));
       }
       h->SetMarkerColor(color);
       h->SetMarkerStyle(mkstyle);
       h->SetLineColor(color);
       if (lstyle>0) h->SetLineStyle(lstyle);
 
-      vh.push_back(h);
+      TH1D * hnew = (TH1D*)h->Clone(Form("%s_%d",name.Data(),vh.size()));
+      vh.push_back(hnew);
       vhstyle.push_back(hdrawstyle);
       
-      leg->AddEntry(h,htitle,legstyle);
+      if (legstyle!="") leg->AddEntry(hnew,htitle,legstyle);
    }
    
    void Draw(float ymin=0, float ymax=0) {
