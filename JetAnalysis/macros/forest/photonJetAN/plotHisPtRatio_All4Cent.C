@@ -2,7 +2,7 @@
 #include <vector>
 #include "TFile.h"
 #include "TCanvas.h"
-
+#include "TCut.h"
 #include "commonUtility.h"
 #include "npart.h"
 #include "HisCompare.h"
@@ -25,19 +25,32 @@ void plotHisPtRatio_All4Cent(
 //   names.push_back("hyphoquenmatjet_dataSrc0_reco1");
 //   names.push_back("hyphoquengenjetsmear_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
 //   names.push_back("hyphoquengenjet_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-   TString infname_x0320=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm%d.root",normMode);
-   TString infname_x0320_fisher=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol2_Norm%d.root",normMode);
-
-   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320));
-   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320_fisher));
+   TString infname_x0320=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+   TString infname_x0320_fisher=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol2_Norm0.root");
+   // Photon purity
+   float PhotonPurity_sumIsol[4] = {0.74,0.77,0.79,0.83};
+   float PhotonPurity_fisherIsol[4] = {0.77,0.75,0.72,0.76};
+   vector<float*> PhotonPurities;
+   
+   
+   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320)); PhotonPurities.push_back(PhotonPurity_sumIsol);
+   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320_fisher)); PhotonPurities.push_back(PhotonPurity_fisherIsol);
    vector<vector<TH1D*> >vh(names.size());
-
+   vector<vector<TH1D*> >vhnorm(names.size());
+      
    for (int s=0; s<names.size(); ++s) {
       cout << "name: " << names[s] << endl;
       for (int ib=0; ib<nBin; ++ib) {
-         TString hname=Form("%s_cent%dSubtractedExtrapExtrapNorm",names[s].Data(),ib);
-         vh[s].push_back((TH1D*)infiles[s]->Get(hname));
-         cout << vh[s][ib]->GetName() << endl;
+         vh[s].push_back((TH1D*)infiles[s]->Get(Form("%s_cent%dSubtractedExtrapExtrapNorm",names[s].Data(),ib)));
+         if (normMode==2) {
+            vhnorm[s].push_back((TH1D*)infiles[s]->Get(Form("%s_cent%dSignalAllPho",names[s].Data(),ib)));
+            vhnorm[s][ib]->Scale(PhotonPurities[s][ib]);
+            float nJets = vh[s][ib]->Integral();
+            float nPho = vhnorm[s][ib]->Integral();
+            cout << vh[s][ib]->GetName() << " # jet: " << nJets << ", " << vhnorm[s][ib]->GetName() << " # photon: " << nPho << " Purity: " << PhotonPurities[s][ib] << endl;
+            vh[s][ib]->Scale(1./vhnorm[s][ib]->Integral()/vh[s][ib]->GetBinWidth(1));
+            vh[s][ib]->SetEntries(nJets);
+         }
       }
    }
 

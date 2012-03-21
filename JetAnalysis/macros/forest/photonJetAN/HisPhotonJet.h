@@ -5,6 +5,7 @@
 #include "TMath.h"
 #include "TF1.h"
 
+//-----------------------------------------------------------------
 double calcMean(TH1* h){
    double tot = 0;
    double integral=  0;
@@ -17,6 +18,7 @@ double calcMean(TH1* h){
    return tot/integral;
 }
 
+//-----------------------------------------------------------------
 TGraphAsymmErrors * getSummary(//TString outfname,
                                //TString name,
                                int nBin,
