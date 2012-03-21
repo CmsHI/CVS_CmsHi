@@ -9,6 +9,7 @@
 #include "TString.h"
 #include "TLegend.h"
 #include "TLine.h"
+#include "commonUtility.h"
 using namespace std;
 
 class HisCompare
@@ -24,7 +25,7 @@ public:
       hFrame->GetXaxis()->SetLabelFont(43);
       hFrame->GetXaxis()->SetTitleSize(24);
       hFrame->GetXaxis()->SetTitleFont(43);
-      hFrame->GetXaxis()->SetTitleOffset(1);
+      hFrame->GetXaxis()->SetTitleOffset(1.1);
       hFrame->GetXaxis()->CenterTitle();
       hFrame->GetXaxis()->SetNdivisions(505,true);
       hFrame->GetYaxis()->SetLabelSize(22);
@@ -90,7 +91,6 @@ public:
    
    void DrawLeg(TString header, float lx1=0.4, float ly1=0.18, float lx2=0.87, float ly2=0.28)
    {
-      leg->SetHeader(header);
       leg->SetX1NDC(lx1);
       leg->SetY1NDC(ly1);
       leg->SetX2NDC(lx2);
@@ -100,6 +100,7 @@ public:
       leg->SetX2(lx2);
       leg->SetY2(ly2);
       leg->Draw();
+      easyLeg(leg,header);
    }
    
 //   TH1D * Ratio(TString ytitle="ratio") {
