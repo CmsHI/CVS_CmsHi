@@ -39,14 +39,14 @@ void plotHisDPhi_All4Cent()
       vc.push_back(new HisCompare(Form("x_c%d",ib),";#Delta#phi_{J#gamma};Pair Fraction",0,3.1415926,1));
       for (int s=0; s<names.size(); ++s) {
          if (s==0) vc[ib]->AddHist(vh[s][ib],"Paper v9","E",kRed,kFullCircle,"p");
-         if (s==1) vc[ib]->AddHist(vh[s][ib],"Fisher Isol.","E",kBlack,kOpenCircle,"p");
+         if (s==1) vc[ib]->AddHist(vh[s][ib],"Fisher Isol.","E",kBlack,kOpenCircle,"p"),2;
       }
    }
    
    
 
-   TCanvas *c1 = new TCanvas("c1","",1000,300);
-   makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.2,0.02);
+   TCanvas *c1 = new TCanvas("c1dphi","",1100,330);
+   makeMultiPanelCanvas(c1,4,1,0.0,0.0,0.2,0.18,0.02);
    float ymin=1.e-3, ymax=1;
    //c1->Divide(4,1);
 
@@ -58,11 +58,23 @@ void plotHisDPhi_All4Cent()
    }
    // labels
    c1->cd(4);
-   vc[0]->DrawLeg("PbPb Data",0.45,0.71,0.92,0.93);
    for (int ib=0; ib<nBin; ++ib) {
       c1->cd(nBin-ib);
-      if ( ib == 3) drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.25,0.6,1,16);
-      else drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.1,0.6,1,16);
+      if ( ib == 3) {
+         drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.25,0.6,1,16);
+         vc[0]->DrawLeg("PbPb Data",0.21,0.76,0.68,0.98);
+      } else drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.1,0.6,1,16);
+      if ( ib == 2) {
+         drawText("#sqrt{s_{NN}}=2.76TeV ",0.4,0.88,0,15);
+         drawText("#int L dt = 150 #mub^{-1}",0.4,0.75,0,15);
+      }
+      if ( ib == 1) {
+         drawText(Form("p^{#gamma}_{T} > %dGeV/c     |#eta^{#gamma}| < 1.44",60),0.15,0.9,0,15);
+         drawText(Form("p^{Jet}_{T} > %dGeV/c    |#eta^{Jet}| < 1.6",30),0.15,0.8,0,15);
+      }
+      if ( ib == 0 ) {
+         drawText("CMS",0.8,0.9,1);
+      }
    }
    c1->Print("fig/his/HisDeltaPhi_All4Cent_data_sumIsol_vs_fisherIsol.gif");
    
@@ -89,6 +101,8 @@ void plotHisDPhi_All4Cent()
       TGraphAsymmErrors * gSummary = getSummary(nBin,npart,vh[s],1,1,1);
       gSummary->SetMarkerColor(vc[0]->vh[s]->GetMarkerColor());
       gSummary->SetMarkerStyle(vc[0]->vh[s]->GetMarkerStyle());
+      gSummary->SetLineColor(vc[0]->vh[s]->GetMarkerColor());
+      gSummary->SetLineStyle(vc[0]->vh[s]->GetLineStyle());
       gSummary->Draw("psame");
       gSummary->Write();
    }
