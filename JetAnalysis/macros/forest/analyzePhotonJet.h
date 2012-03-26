@@ -52,7 +52,11 @@ public:
    float inclJetPhi[MAXTRK];   
    float inclJetRefPt[MAXTRK];
    float inclJetRefPartonPt[MAXTRK];
-   float inclJetResp[MAXTRK];
+   int nGenJet;
+   float inclGenJetPt[MAXTRK];
+   float inclGenJetEta[MAXTRK];
+   float inclGenJetPhi[MAXTRK];   
+   float inclGenJetResp[MAXTRK];
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
@@ -65,7 +69,7 @@ public:
       jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       isEle=false;
-      nTrk=0; nJet=0;
+      nTrk=0; nJet=0; nGenJet=0;
    }
 };
 
@@ -96,6 +100,29 @@ public:
       ct5PtCut20=c->photon.ct5PtCut20[j];
    }
 };
+
+
+void BookGJBranches(TTree * tgj, EvtSel & evt, GammaJet & gj, Isolation & isol) {
+   tgj->Branch("evt",&evt.run,evt.leaves);
+   tgj->Branch("jet",&gj.photonEt,gj.leaves);
+   tgj->Branch("isolation",&isol.cc1,isol.leaves);
+   tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
+   tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
+   tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
+   tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
+   tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
+   tgj->Branch("nJet",&gj.nJet,"nJet/I");
+   tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
+   tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
+   tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
+   tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
+   tgj->Branch("inclJetRefPartonPt",gj.inclJetRefPartonPt,"inclJetRefPartonPt[nJet]/F");
+   tgj->Branch("nGenJet",&gj.nGenJet,"nGenJet/I");
+   tgj->Branch("inclGenJetPt",gj.inclGenJetPt,"inclGenJetPt[nGenJet]/F");
+   tgj->Branch("inclGenJetEta",gj.inclGenJetEta,"inclGenJetEta[nGenJet]/F");
+   tgj->Branch("inclGenJetPhi",gj.inclGenJetPhi,"inclGenJetPhi[nGenJet]/F");
+   tgj->Branch("inclGenJetResp",gj.inclGenJetResp,"inclGenJetResp[nGenJet]/F");
+}
 
 class CentralityReWeight {
 public:

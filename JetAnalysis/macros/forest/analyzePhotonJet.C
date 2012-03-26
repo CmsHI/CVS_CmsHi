@@ -87,8 +87,7 @@ void analyzePhotonJet(
                       TString mcfname="",
                       TString datafname="output-data-Photon-v7_v30.root",
                       int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
-                      TString mixfname="output-data-Photon-v7_v30classes.root",
-                      int srcType=1 // 0=gen, 1 = reco
+                      TString mixfname="output-data-Photon-v7_v30classes.root"
                       )
 {
    //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
@@ -129,7 +128,6 @@ void analyzePhotonJet(
    // Output file
    cout << "Output: " << outname << endl;
    TFile *output = new TFile(outname,"recreate");
-   TTree * tgj = new TTree("tgj","gamma jet tree");
    if (doCentReWeight&&mcfname!="") {
       cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
    }
@@ -137,21 +135,8 @@ void analyzePhotonJet(
    EvtSel evt;
    GammaJet gj;
    Isolation isol;
-   tgj->Branch("evt",&evt.run,evt.leaves);
-   tgj->Branch("jet",&gj.photonEt,gj.leaves);
-   tgj->Branch("isolation",&isol.cc1,isol.leaves);
-   tgj->Branch("nTrk",&gj.nTrk,"nTrk/I");
-   tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
-   tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
-   tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
-   tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
-   tgj->Branch("nJet",&gj.nJet,"nJet/I");
-   tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
-   tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
-   tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
-   tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
-   tgj->Branch("inclJetRefPartonPt",gj.inclJetRefPartonPt,"inclJetRefPartonPt[nJet]/F");
-   tgj->Branch("inclJetResp",gj.inclJetResp,"inclJetResp[nJet]/F");
+   TTree * tgj = new TTree("tgj","gamma jet tree");
+   BookGJBranches(tgj,evt,gj,isol);
    vector<MPT> vmpt;
    if (doMPT) {
       vmpt.push_back(MPT("AllAcc",0,0,-1,cutPtTrk,cutEtaTrk));
@@ -347,8 +332,7 @@ void analyzePhotonJet(
             ++gj.nJet;
          }
 
-         // Found an away jet!
-         if (awayIndex !=-1) {
+         if (awayIndex !=-1) { // Found an away jet!
             double photonEt = c->photon.pt[leadingIndex];
             double jetEt = anajet->jtpt[awayIndex];
             double Agj = (photonEt-jetEt)/(photonEt+jetEt);
@@ -366,18 +350,16 @@ void analyzePhotonJet(
             gj.refPartonFlavor = anajet->refparton_flavor[awayIndex];
          }
 
-         // if mix, overwrite jets from gen
-         if (srcType==0) {
-            gj.nJet=0;
-            for (int j=0;j<anajet->ngen;j++) {
-               if (anajet->genpt[j]<cutjetPt) continue;
-               if (fabs(anajet->geneta[j])>cutjetEta) continue;
-               gj.inclJetPt[gj.nJet] = anajet->genpt[j];
-               gj.inclJetEta[gj.nJet] = anajet->geneta[j];
-               gj.inclJetPhi[gj.nJet] = anajet->genphi[j];
-               gj.inclJetResp[gj.nJet] = jetRes.GetSmear(evt.cBin,gj.inclJetPt[gj.nJet]);
-               ++gj.nJet;
-            }
+         // if mc, write genjets
+         gj.nGenJet=0;
+         for (int j=0;j<anajet->ngen;j++) {
+            if (anajet->genpt[j]<cutjetPt) continue;
+            if (fabs(anajet->geneta[j])>cutjetEta) continue;
+            gj.inclGenJetPt[gj.nGenJet] = anajet->genpt[j];
+            gj.inclGenJetEta[gj.nGenJet] = anajet->geneta[j];
+            gj.inclGenJetPhi[gj.nGenJet] = anajet->genphi[j];
+            gj.inclGenJetResp[gj.nGenJet] = jetRes.GetSmear(evt.cBin,gj.inclGenJetPt[gj.nGenJet]);
+            ++gj.nGenJet;
          }
 
          // if mix, overwrite jets from mixed events
@@ -479,10 +461,6 @@ void analyzePhotonJet(
       }
    }
 
-   // After Event Loop
-   tgj->SetAlias("fisherIsol","(4.5536204845644690e-01 +cc5*-1.1621087258504197e-03 +cc4*-1.3139962130657250e-02 +cc3*9.8272534188056666e-03 +cc2*-7.9659880964355362e-02 +cc1*5.6661268034678275e-02 +cr5*-1.2763802967154852e-02 +cr4*-1.2594575465310987e-03 +cr3*-1.3333157740152167e-02 +cr2*-2.5518237583408113e-02 +cr1*-1.3706749407235775e-02 +ct4PtCut20*-7.9844325658248016e-03 +ct3PtCut20*-2.5276510400767658e-03 +ct2PtCut20*-2.0741636383420897e-02 +ct1PtCut20*7.1545293456054884e-04 +ct5PtCut20*7.8080659557798627e-03)");
-   tgj->SetAlias("xgj","(jetEt/photonEt)");
-   // * cut at 0.3 from Yongsun's studies
    output->Write();
    output->Close();
    delete c;
