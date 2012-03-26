@@ -51,6 +51,7 @@ public:
    float inclJetEta[MAXTRK];
    float inclJetPhi[MAXTRK];   
    float inclJetRefPt[MAXTRK];
+   float inclJetRefPartonPt[MAXTRK];
    float inclJetResp[MAXTRK];
    TString leaves;
    void clear() {
