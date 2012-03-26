@@ -150,6 +150,7 @@ void analyzePhotonJet(
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
    tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
+   tgj->Branch("inclJetRefPartonPt",gj.inclJetRefPartonPt,"inclJetRefPartonPt[nJet]/F");
    tgj->Branch("inclJetResp",gj.inclJetResp,"inclJetResp[nJet]/F");
    vector<MPT> vmpt;
    if (doMPT) {
@@ -330,6 +331,7 @@ void analyzePhotonJet(
             gj.inclJetEta[gj.nJet] = anajet->jteta[j];
             gj.inclJetPhi[gj.nJet] = anajet->jtphi[j];
             gj.inclJetRefPt[gj.nJet] = anajet->refpt[j];
+            gj.inclJetRefPartonPt[gj.nJet] = anajet->refparton_pt[j];
             if (fabs(deltaPhi(anajet->jtphi[j],c->photon.phi[leadingIndex]))>0.5) {
                if (anajet->jtpt[j]>gj.jetEt) {
                   gj.jetEt = anajet->jtpt[j];
