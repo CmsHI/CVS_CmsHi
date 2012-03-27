@@ -84,6 +84,7 @@ void getHistograms(TString myname, TString var, TString bkgvar,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
+         vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f && sigmaIetaIeta<0.01",sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
