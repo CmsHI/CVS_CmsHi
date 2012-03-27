@@ -84,17 +84,17 @@ for algo in akPu3PF; do
     if [ $pthat -eq 50 ]; then sampleWt=0.6683; fi
     inputLOPhoFile="/net/hisrv0001/home/icali/hadoop/Hydjet1.8/Z2/LOPhotons_merged/LOPhotons${pthat}_merged.root"
     outputLOPhoFile="output-hy18lopho${pthat}v2_v31_gensmear_xsec.root"
-    #root -b -q analyzePhotonJet.C+'("'$algo'","'$inputLOPhoFile'","'$outputLOPhoFile'",0,'$pthat,$sampleWt',0,"","",0)'
+    root -b -q analyzePhotonJet.C+'("'$algo'","'$inputLOPhoFile'","'$outputLOPhoFile'",0,'$pthat,$sampleWt',0,"","",0)'
 
     mixmbFile="output-hy18mbv2_v30classes.root"
-    outputMixFile="output-hy18qcdpho${pthat}v2_v31_gensmear_xsec_mixmb.root"
-    root -b -q analyzePhotonJet.C+'("'$algo'","'$inputLOPhoFile'","'$outputMixFile'",0,'$pthat,$sampleWt',0,"","",2,"'$mixmbFile'")'
+    outputMixFile="output-hy18lopho${pthat}v2_v31_gensmear_xsec_mixmb.root"
+    #root -b -q analyzePhotonJet.C+'("'$algo'","'$inputLOPhoFile'","'$outputMixFile'",0,'$pthat,$sampleWt',0,"","",2,"'$mixmbFile'")'
 
     inputPyqFile="/net/hisrv0001/home/icali/hadoop/Pyquen/D6T/merged/Pyquen_LOPhotons${pthat}_merged.root"
     outputPyqFile="output-hy18pyquenlopho${pthat}v2_v31_gensmear_xsec.root"
-    #root -b -q analyzePhotonJet.C+'("'$algo'","'$inputPyqFile'","'$outputPyqFile'",0,'$pthat,$sampleWt',0,"","",0,"")'
+    root -b -q analyzePhotonJet.C+'("'$algo'","'$inputPyqFile'","'$outputPyqFile'",0,'$pthat,$sampleWt',0,"","",0,"")'
 
     outputPyqMixFile="output-hy18pyquenlopho${pthat}v2_v31_gensmear_xsec_mixmb.root"
-    root -b -q analyzePhotonJet.C+'("'$algo'","'$inputPyqFile'","'$outputPyqMixFile'",0,'$pthat,$sampleWt',0,"","",2,"'$mixmbFile'")'
+    #root -b -q analyzePhotonJet.C+'("'$algo'","'$inputPyqFile'","'$outputPyqMixFile'",0,'$pthat,$sampleWt',0,"","",2,"'$mixmbFile'")'
   done
 done

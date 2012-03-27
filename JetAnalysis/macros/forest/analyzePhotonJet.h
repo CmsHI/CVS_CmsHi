@@ -52,6 +52,7 @@ public:
    float inclJetPhi[MAXTRK];   
    float inclJetRefPt[MAXTRK];
    float inclJetRefPartonPt[MAXTRK];
+   float inclJetRefResp[MAXTRK];
    int nGenJet;
    float inclGenJetPt[MAXTRK];
    float inclGenJetEta[MAXTRK];
@@ -117,6 +118,7 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, GammaJet & gj, Isolation & isol) 
    tgj->Branch("inclJetPhi",gj.inclJetPhi,"inclJetPhi[nJet]/F");
    tgj->Branch("inclJetRefPt",gj.inclJetRefPt,"inclJetRefPt[nJet]/F");
    tgj->Branch("inclJetRefPartonPt",gj.inclJetRefPartonPt,"inclJetRefPartonPt[nJet]/F");
+   tgj->Branch("inclJetRefResp",gj.inclJetRefResp,"inclJetRefResp[nJet]/F");
    tgj->Branch("nGenJet",&gj.nGenJet,"nGenJet/I");
    tgj->Branch("inclGenJetPt",gj.inclGenJetPt,"inclGenJetPt[nGenJet]/F");
    tgj->Branch("inclGenJetEta",gj.inclGenJetEta,"inclGenJetEta[nGenJet]/F");

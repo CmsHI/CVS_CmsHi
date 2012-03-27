@@ -317,6 +317,7 @@ void analyzePhotonJet(
             gj.inclJetPhi[gj.nJet] = anajet->jtphi[j];
             gj.inclJetRefPt[gj.nJet] = anajet->refpt[j];
             gj.inclJetRefPartonPt[gj.nJet] = anajet->refparton_pt[j];
+            gj.inclJetRefResp[gj.nJet] = jetRes.GetSmear(evt.cBin,gj.inclJetRefPt[gj.nJet]);
             if (fabs(deltaPhi(anajet->jtphi[j],c->photon.phi[leadingIndex]))>0.5) {
                if (anajet->jtpt[j]>gj.jetEt) {
                   gj.jetEt = anajet->jtpt[j];
