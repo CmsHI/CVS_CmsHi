@@ -134,7 +134,7 @@ void anaInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.27_closure_pythia_genPhoIsol"
+                                         TString outdir = "./fig/03.27_closure_pythia_and_data"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -160,19 +160,19 @@ void anaInclDeltaPhiSignal_AllCent4_wSummary(
    TCut jetSel = Form("abs(inclJetEta)<1.6&&inclJetPt>%.3f",minJet);
    TCut jetBkgSel = Form("abs(tmix.inclJetEta)<1.6&&tmix.inclJetPt>%.03f",minJet);
 
-//  vector<SignalCorrector*> vanahi;
-//  getHistograms("hi",var,varbkg,vanahi, vcutCent,"anaEvtSel",jetSel,jetBkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
-//
-//  // MC Reference
-//   TString mcweight = "((samplePtHat==30&&pthat<50)||(samplePtHat==50&&pthat<80)||(samplePtHat==80))*weight*sampleWeight";
-//
-//   vector<SignalCorrector*> vanahypho;
-//   getHistograms("hypho",var,varbkg,vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18qcdpho30and50and80v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
+  vector<SignalCorrector*> vanahi;
+  getHistograms("hi",var,varbkg,vanahi, vcutCent,"anaEvtSel",jetSel,jetBkgSel,isolScheme,normMode,"../output-data-Photon-v7-noDuplicate_v29_akPu3PF.root","(1==1)",1,1,subDPhiSide,subSShapeSide,minPhoton,minJet,sigDPhi);
+
+  // MC Reference
+   TString mcweight = "((samplePtHat==30&&pthat<50)||(samplePtHat==50&&pthat<80)||(samplePtHat==80))*weight*sampleWeight";
+
+   vector<SignalCorrector*> vanahypho;
+   getHistograms("hypho",var,varbkg,vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18qcdpho30and50and80v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    // Closure Test
    TString inputTree="../output-hy18lopho50v2_v31_gensmear_xsec_akPu3PF.root";
 //   TString inputTree="../output-hy18pyquenlopho50v2_v31_gensmear_xsec_akPu3PF.root";
-   TString mcweight = "(1==1)";
+   mcweight = "(1==1)";
    vector<SignalCorrector*> vanahyphoclos;
    getHistograms("hyphoclos",var,varbkg,vanahyphoclos, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,inputTree,mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
    
