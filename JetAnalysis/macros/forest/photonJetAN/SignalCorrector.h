@@ -22,8 +22,8 @@ public:
       cut*=weight;
       h = new TH1D(name,"",nbins,bins);
       if (var!="") {
-	n = t->Project(h->GetName(),var,cut);
-	cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
+         n = t->Project(h->GetName(),var,cut);
+         if (TString(cut).Contains("cBin>=0.0")&&TString(cut).Contains("Jet")) cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
       }
    }
    
@@ -77,6 +77,11 @@ public:
       // photon purity values
       hPhotonPurity = (TH1D*)gDirectory->FindObjectAny("hPhotonPurity");
       if (!hPhotonPurity) hPhotonPurity = new TH1D("hPhotonPurity","",4,0,4);
+      
+      verbosity=0;
+      if (TString(s).Contains("cBin>=0.0")) {
+         verbosity=1;
+      }
    }
    
    void SetPhotonIsolation(int isolScheme)
@@ -125,7 +130,7 @@ public:
             if (isolScheme==2) fracPhotonBkg = 1-0.75;
          }
       }
-      cout << nameIsol << " Purity: " << 1-fracPhotonBkg << endl;
+      if (verbosity>0) cout << nameIsol << " Purity: " << 1-fracPhotonBkg << endl;
    }
    
    void SetJetWeights(TString jetvar="inclJetPt")
@@ -147,7 +152,7 @@ public:
       } else { // for now use peripheral for pp 2.76TeV
          jetweight = Form("1./(0.998959*0.5*(TMath::Erf(-0.898526+0.059567*%s)+1))",jetvar.Data());
       }
-      cout << "Jet weight: " << jetweight << endl;
+      if (verbosity>0) cout << "Jet weight: " << jetweight << endl;
       
       rSigAll.weight += "*"+jetweight;
       rBkgSShape.weight += "*"+jetweight;
@@ -164,7 +169,7 @@ public:
    
    void MakeHistograms(TCut sigSel, int nbin, float * bins) {
       // setup cuts
-      cout << "Base Selection: " << sel << endl;
+      if (verbosity>1) cout << "Base Selection: " << sel << endl;
       rSigAllPho.cut         = sel&&cutSigAllPho;
       rBkgSShapeAllPho.cut   = sel&&cutSShapeAllPho;
       rSigAll.cut            = sel&&sigSel;
@@ -182,7 +187,7 @@ public:
       // photon normalization
       nSelPhoton = t->GetEntries(rSigAllPho.cut);
       // number of events in signal region
-      cout << " ** Number of selection photons: " << rSigAllPho.n << " gamma-jets: " << rSigAll.n << " ** " << endl;
+      if (verbosity>0) cout << " ** Number of selection photons: " << rSigAllPho.n << " gamma-jets: " << rSigAll.n << " ** " << endl;
    }
    
    void Extrapolate(float dphisidescale=1) {
@@ -192,9 +197,11 @@ public:
          sssidescale = rSigAllPho.n*fracPhotonBkg/rBkgSShapeAllPho.n;
          ssdphisidescale = dphisidescale*sssidescale;
       }
-      cout << " Bkg scale dphi: " << dphisidescale << endl;
-      cout << " Bkg scale ss: " << sssidescale << endl;
-      cout << " Bkg scale ssdphi: " << ssdphisidescale << endl;
+      if (verbosity>0) {
+         cout << " Bkg scale dphi: " << dphisidescale << endl;
+         cout << " Bkg scale ss: " << sssidescale << endl;
+         cout << " Bkg scale ssdphi: " << ssdphisidescale << endl;
+      }
 
       rSigAll.Extrapolate(1.);
       rBkgSShape.Extrapolate(sssidescale);
@@ -234,26 +241,28 @@ public:
    void SubtractBkg() {
       rSubtracted.hExtrap = (TH1D*)rSigAll.h->Clone(rSubtracted.name+"Extrap");
       rSubtracted.nExtrap = rSigAll.nExtrap;
-      cout << "Raw Sig: " << rSigAll.nExtrap;
+      if (verbosity>1) cout << "Raw Sig: " << rSigAll.nExtrap;
       if (subDPhiSide) {
          rSubtracted.hExtrap->Add(rBkgDPhi.hExtrap,-1);
          rSubtracted.nExtrap -= rBkgDPhi.nExtrap;
-         cout << " - " << rBkgDPhi.nExtrap;
+         if (verbosity>1) cout << " - " << rBkgDPhi.nExtrap;
       }
       if (subSShapeSide) {
          if (subSShapeSideDPhiSide) {
             rBkgSShape.hExtrap->Add(rBkgSShapeDPhi.hExtrap,-1);
             rBkgSShape.nExtrap -= rBkgSShapeDPhi.nExtrap;
-            cout << " + " << rBkgSShapeDPhi.nExtrap;
+            if (verbosity>1) cout << " + " << rBkgSShapeDPhi.nExtrap;
          }
          rSubtracted.hExtrap->Add(rBkgSShape.hExtrap,-1);
          rSubtracted.nExtrap -= rBkgSShape.nExtrap;
-         cout << " - " << rBkgSShape.nExtrap;
+         if (verbosity>1) cout << " - " << rBkgSShape.nExtrap;
       }
-      cout << " =? " << rSubtracted.nExtrap << endl;
-      cout << "Check Integ:  " << rSigAll.hExtrap->Integral() << " - " << 
-      rBkgDPhi.hExtrap->Integral() << " - " << rBkgSShape.hExtrap->Integral() << " + " << rBkgSShapeDPhi.hExtrap->Integral()
-      << " = " << rSubtracted.hExtrap->Integral() << endl;
+      if (verbosity>1) {
+         cout << " =? " << rSubtracted.nExtrap << endl;
+         cout << "Check Integ:  " << rSigAll.hExtrap->Integral() << " - " << 
+         rBkgDPhi.hExtrap->Integral() << " - " << rBkgSShape.hExtrap->Integral() << " + " << rBkgSShapeDPhi.hExtrap->Integral()
+         << " = " << rSubtracted.hExtrap->Integral() << endl;
+      }
    }
    
    void Normalize(int normMode=1) { // 0=area is signal region count, 1=unit normalization, 2=per photon normalization
@@ -280,7 +289,7 @@ public:
             rBkgSShape.Normalize(rawarea);
             rBkgSShapeDPhi.Normalize(rawarea*fracPhotonDPhiBkg);
          }
-         cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
+         if (verbosity>0) cout << "Norlamize to: " << area << " chk integ: " << rSubtracted.hExtrapNorm->Integral() << endl;
       }
    }
    
@@ -310,6 +319,7 @@ public:
    int centBin;
    int dataSrcType;
    TH1D * hPhotonPurity;
+   int verbosity;
 };
 
 double calcMean(TH1* h){
