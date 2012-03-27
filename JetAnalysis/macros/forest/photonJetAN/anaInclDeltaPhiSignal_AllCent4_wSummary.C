@@ -84,15 +84,17 @@ void getHistograms(TString myname, TString var, TString bkgvar,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->SetPhotonIsolation(isolScheme);
-         vana[ib]->MakeHistograms(jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f && sigmaIetaIeta<0.01",sigDPhi),nxbins,xmin,xmax);
+         //         vana[ib]->SetPhotonIsolation(isolScheme);
+         //         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
+         vana[ib]->cutSigAllPho="";
+         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          vana[ib]->subSShapeSide = subSShapeSide;
          vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
          vana[ib]->SetPhotonIsolation(isolScheme);
 //         vana[ib]->SetJetWeights("inclJetPt");
-         vana[ib]->MakeHistograms(jetSel&&Form("acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",sigDPhi),nxbins,xmin,xmax);
+         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       }
       
       if (!doMixBkg) {
@@ -134,7 +136,7 @@ void anaInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.26_xcheck_closure_3"
+                                         TString outdir = "./fig/03.27_closure_pythia_genPhoNoIsol"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -171,6 +173,7 @@ void anaInclDeltaPhiSignal_AllCent4_wSummary(
 
    // Closure Test
    TString inputTree="../output-hy18lopho50v2_v31_gensmear_xsec_akPu3PF.root";
+//   TString inputTree="../output-hy18pyquenlopho50v2_v31_gensmear_xsec_akPu3PF.root";
    TString mcweight = "(1==1)";
    vector<SignalCorrector*> vanahyphoclos;
    getHistograms("hyphoclos",var,varbkg,vanahyphoclos, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,inputTree,mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);

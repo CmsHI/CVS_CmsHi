@@ -90,15 +90,17 @@ void getHistograms(TString myname, TString var, TString bkgvar,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         vana[ib]->SetPhotonIsolation(isolScheme);
-         vana[ib]->MakeHistograms(jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f && sigmaIetaIeta<0.01",sigDPhi),nxbins,xmin,xmax);
+//         vana[ib]->SetPhotonIsolation(isolScheme);
+//         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
+         vana[ib]->cutSigAllPho="";
+         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
          vana[ib]->subSShapeSide = subSShapeSide;
          vana[ib]->subSShapeSideDPhiSide = subDPhiSide&&subSShapeSide;
          vana[ib]->SetPhotonIsolation(isolScheme);
 //         vana[ib]->SetJetWeights("inclJetPt");
-         vana[ib]->MakeHistograms(jetSel&&Form("acos(cos(photonPhi-inclJetPhi))>%f && sigmaIetaIeta<0.01",sigDPhi),nxbins,xmin,xmax);
+         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       }
       
       if (!doMixBkg) {
@@ -113,6 +115,7 @@ void getHistograms(TString myname, TString var, TString bkgvar,
       TFile* hout = new TFile(outfname,"update");
       vana[ib]->rSubtracted.hExtrapNorm->Write();
       if (vana[ib]->rSigAllPho.h) vana[ib]->rSigAllPho.h->Write();
+      if (vana[ib]->rSigAllPho.hExtrap) vana[ib]->rSigAllPho.hExtrap->Write();
       if (vana[ib]->rBkgSShapeAllPho.h) vana[ib]->rBkgSShapeAllPho.h->Write();
       if (vana[ib]->rSigAll.hExtrapNorm) vana[ib]->rSigAll.hExtrapNorm->Write();
       if (vana[ib]->rBkgDPhi.hExtrapNorm) vana[ib]->rBkgDPhi.hExtrapNorm->Write();
@@ -133,7 +136,7 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.27_closure_pyquen_2"
+                                         TString outdir = "./fig/03.27_closure_pyquen_genPhoNoIsol"
                                          )
 {
    TH1::SetDefaultSumw2();
