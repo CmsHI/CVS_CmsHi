@@ -203,6 +203,7 @@ public:
          cout << " Bkg scale ssdphi: " << ssdphisidescale << endl;
       }
 
+      rSigAllPho.Extrapolate(1-fracPhotonBkg);
       rSigAll.Extrapolate(1.);
       rBkgSShape.Extrapolate(sssidescale);
       rBkgDPhi.Extrapolate(dphisidescale);
@@ -276,7 +277,7 @@ public:
          float rawarea=1,area=1;
          if (normMode%10==2) {
             rawarea*=(rSigAll.h->Integral())/rSigAllPho.h->Integral();
-            area*=(rSubtracted.hExtrap->Integral()) / (rSigAllPho.h->Integral()*(1-fracPhotonBkg));
+            area*=(rSubtracted.hExtrap->Integral()) / (rSigAllPho.hExtrap->Integral());
          }
          rSigAll.Normalize(rawarea);
          rSubtracted.Normalize(area);

@@ -84,9 +84,7 @@ void getHistograms(TString myname, TString var, TString bkgvar,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-         //         vana[ib]->SetPhotonIsolation(isolScheme);
-         //         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
-         vana[ib]->cutSigAllPho="";
+         vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
@@ -136,7 +134,7 @@ void anaInclDeltaPhiSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.27_closure_pythia_genPhoNoIsol"
+                                         TString outdir = "./fig/03.27_closure_pythia_genPhoIsol"
                                          )
 {
    TH1::SetDefaultSumw2();

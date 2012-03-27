@@ -90,9 +90,7 @@ void getHistograms(TString myname, TString var, TString bkgvar,
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
          vana[ib]->subSShapeSideDPhiSide = false;
-//         vana[ib]->SetPhotonIsolation(isolScheme);
-//         vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
-         vana[ib]->cutSigAllPho="";
+         vana[ib]->SetPhotonIsolation(isolScheme);
          vana[ib]->MakeHistograms(vana[ib]->cutSigAllPho&&jetSel&&Form("acos(cos(photonPhi-inclGenJetPhi))>%f",sigDPhi),nxbins,xmin,xmax);
       } else {
          vana[ib]->subDPhiSide = subDPhiSide;
@@ -136,7 +134,7 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
                                          float minJet=30,
                                          int log=0,
                                          int drawCheck = 0,
-                                         TString outdir = "./fig/03.27_closure_pyquen_genPhoNoIsol"
+                                         TString outdir = "./fig/03.27_closure_pythia_genPhoIsol"
                                          )
 {
    TH1::SetDefaultSumw2();
@@ -172,8 +170,8 @@ void anaInclPtRatioSignal_AllCent4_wSummary(
 //   getHistograms("hypho",var,varbkg,vanahypho, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,"../output-hy18qcdpho30and50and80v2_v30_xsec_akPu3PF.root",mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
 
    // Closure Test
-//   TString inputTree="../output-hy18lopho50v2_v31_gensmear_xsec_akPu3PF.root";
-   TString inputTree="../output-hy18pyquenlopho50v2_v31_gensmear_xsec_akPu3PF.root";
+   TString inputTree="../output-hy18lopho50v2_v31_gensmear_xsec_akPu3PF.root";
+//   TString inputTree="../output-hy18pyquenlopho50v2_v31_gensmear_xsec_akPu3PF.root";
    TString mcweight = "(1==1)";
    vector<SignalCorrector*> vanahyphoclos;
    getHistograms("hyphoclos",var,varbkg,vanahyphoclos, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,jetBkgSel,isolScheme,normMode,inputTree,mcweight,0,1,subDPhiSide,0,minPhoton,minJet,sigDPhi);
