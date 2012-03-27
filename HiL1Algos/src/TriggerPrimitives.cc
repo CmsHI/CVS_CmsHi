@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id$
+// $Id: TriggerPrimitives.cc,v 1.1 2012/03/27 13:16:58 richard Exp $
 //
 //
 
@@ -111,20 +111,20 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       static const int nEcalPhiStrips = 72;
       int ecalDetectorMapSize;// = nEcalEtaStrips*nEcalPhiStrips;
 
-      int *EcompressedEt;
-      int *EiEta;
-      int *EiPhi;
-      int *EeFineGrain;
+      int *ecalCompressedEt;
+      int *ecalEtaIndex;
+      int *ecalPhiIndex;
+      int *ecalFineGrain;
 
   static const int nHcalEtaStrips = 64; // but +-29 to +-32 are weird, only have every fourth phi
   static const int nHcalPhiStrips = 72; // but weirdness for certain eta
 
   int hcalDetectorMapSize;// = nHcalEtaStrips*nHcalPhiStrips - 2*4*72*3/4;
 
-      int *HcompressedEt;
-      int *HiEta;
-      int *HiPhi;
-      int *HeFineGrain;
+      int *hcalCompressedEt;
+      int *hcalEtaIndex;
+      int *hcalPhiIndex;
+      int *hcalFineGrain;
 };
 
 //
@@ -181,10 +181,10 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {      
       //cout << lEcalTPItr->compressedEt(  ) << " " << lEcalTPItr->id(  ).ieta(  ) << " " << lEcalTPItr->id(  ).iphi(  ) << " " << lEcalTPItr->fineGrain(  )  << endl;
 
-      EcompressedEt[i] = lEcalTPItr->compressedEt(  );
-      EiEta[i] = lEcalTPItr->id(  ).ieta(  );
-      EiPhi[i] = lEcalTPItr->id(  ).iphi(  );
-      EeFineGrain[i] = lEcalTPItr->fineGrain(  );
+      ecalCompressedEt[i] = lEcalTPItr->compressedEt(  );
+      ecalEtaIndex[i] = lEcalTPItr->id(  ).ieta(  );
+      ecalPhiIndex[i] = lEcalTPItr->id(  ).iphi(  );
+      ecalFineGrain[i] = lEcalTPItr->fineGrain(  );
       
       i++;
     }
@@ -201,10 +201,10 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     {
       //cout << lHcalTPItr->SOI_compressedEt(  ) << " " << lHcalTPItr->id(  ).ieta(  ) << " " << lHcalTPItr->id(  ).iphi(  ) << " " << lHcalTPItr->SOI_fineGrain(  )  << endl;
 
-      HcompressedEt[i] = lHcalTPItr->SOI_compressedEt(  );
-      HiEta[i] = lHcalTPItr->id(  ).ieta(  );
-      HiPhi[i] = lHcalTPItr->id(  ).iphi(  );
-      HeFineGrain[i] = lHcalTPItr->SOI_fineGrain(  );
+      hcalCompressedEt[i] = lHcalTPItr->SOI_compressedEt(  );
+      hcalEtaIndex[i] = lHcalTPItr->id(  ).ieta(  );
+      hcalPhiIndex[i] = lHcalTPItr->id(  ).iphi(  );
+      hcalFineGrain[i] = lHcalTPItr->SOI_fineGrain(  );
  
       i++;
     }
@@ -227,29 +227,29 @@ TriggerPrimitives::beginJob()
   //detectorMapSize = 0;
   int ecalSize = nEcalEtaStrips*nEcalPhiStrips;
 
-  EcompressedEt = new int[ecalSize];
-  EiEta = new int[ecalSize];
-  EiPhi = new int[ecalSize];
-  EeFineGrain = new int[ecalSize];
+  ecalCompressedEt = new int[ecalSize];
+  ecalEtaIndex = new int[ecalSize];
+  ecalPhiIndex = new int[ecalSize];
+  ecalFineGrain = new int[ecalSize];
 
   RRTree->Branch("ecalDetectorMapSize",&ecalDetectorMapSize,"ecalDetectorMapSize/I");
-  RRTree->Branch("EcompressedEt",EcompressedEt,"EcompressedEt[ecalDetectorMapSize]/I");
-  RRTree->Branch("EiEta",EiEta,"EiEta[ecalDetectorMapSize]/I");
-  RRTree->Branch("EiPhi",EiPhi,"EiPhi[ecalDetectorMapSize]/I");
-  RRTree->Branch("EeFineGrain",EeFineGrain,"EeFineGrain[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalCompressedEt",ecalCompressedEt,"ecalCompressedEt[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalEtaIndex",ecalEtaIndex,"ecalEtaIndex[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalPhiIndex",ecalPhiIndex,"ecalPhiIndex[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalFineGrain",ecalFineGrain,"ecalFineGrain[ecalDetectorMapSize]/I");
 
   int hcalSize = nHcalEtaStrips*nHcalPhiStrips;
 
-  HcompressedEt = new int[hcalSize];
-  HiEta = new int[hcalSize];
-  HiPhi = new int[hcalSize];
-  HeFineGrain = new int[hcalSize];
+  hcalCompressedEt = new int[hcalSize];
+  hcalEtaIndex = new int[hcalSize];
+  hcalPhiIndex = new int[hcalSize];
+  hcalFineGrain = new int[hcalSize];
 
   RRTree->Branch("hcalDetectorMapSize",&hcalDetectorMapSize,"hcalDetectorMapSize/I");
-  RRTree->Branch("HcompressedEt",HcompressedEt,"HcompressedEt[hcalDetectorMapSize]/I");
-  RRTree->Branch("HiEta",HiEta,"HiEta[hcalDetectorMapSize]/I");
-  RRTree->Branch("HiPhi",HiPhi,"HiPhi[hcalDetectorMapSize]/I");
-  RRTree->Branch("HeFineGrain",HeFineGrain,"HeFineGrain[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalCompressedEt",hcalCompressedEt,"hcalCompressedEt[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalEtaIndex",hcalEtaIndex,"hcalEtaIndex[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalPhiIndex",hcalPhiIndex,"hcalPhiIndex[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalFineGrain",hcalFineGrain,"hcalFineGrain[hcalDetectorMapSize]/I");
   
 }
 
