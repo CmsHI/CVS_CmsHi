@@ -61,7 +61,7 @@ public:
    AnaMPT(TString myname) :
    name(myname),
    excludeTrigCand(true),chargedOnly(false),
-   ptmin(0),etamax(2.4),
+   ptmin(0.5),etamax(2.4),
    selPFId(0),
    doTrackingCorr(false),
    anaDiJet(false)
@@ -132,7 +132,8 @@ public:
             if (drG>m.dRCone&&drJ>m.dRCone) accept=true;
          }
          if (accept) {
-            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
+//            cout << "accepted mpt cand pt|eta|phi: " << candPt << "|" << candEta << "|" << candPhi << endl;
+//            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
