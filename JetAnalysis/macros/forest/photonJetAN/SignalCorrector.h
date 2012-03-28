@@ -258,6 +258,8 @@ public:
          rSubtracted.nExtrap -= rBkgSShape.nExtrap;
          if (verbosity>1) cout << " - " << rBkgSShape.nExtrap;
       }
+      // store rSubtracted.nExtrap in histogram
+      rSubtracted.hExtrap->SetEntries(rSubtracted.nExtrap);
       if (verbosity>1) {
          cout << " =? " << rSubtracted.nExtrap << endl;
          cout << "Check Integ:  " << rSigAll.hExtrap->Integral() << " - " << 

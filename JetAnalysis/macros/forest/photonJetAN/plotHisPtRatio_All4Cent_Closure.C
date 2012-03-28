@@ -41,7 +41,6 @@ void plotHisPtRatio_All4Cent_Closure(
             float nPho = vhnorm[s][ib]->Integral();
             cout << vh[s][ib]->GetName() << " # jet: " << nJets << ", " << vhnorm[s][ib]->GetName() << " # photon: " << nPho << endl;
             vh[s][ib]->Scale(1./vhnorm[s][ib]->Integral()/vh[s][ib]->GetBinWidth(1));
-            vh[s][ib]->SetEntries(nJets);
          }
       }
    }
