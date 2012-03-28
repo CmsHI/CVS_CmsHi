@@ -49,7 +49,7 @@ class AnaMPT
 public:
    // parameters
    TString name;
-   bool chargedOnly;
+   bool excludeTrigCand,chargedOnly;
    float ptmin, etamax;
    int selPFId;
    bool doTrackingCorr,anaDiJet;
@@ -60,7 +60,7 @@ public:
    
    AnaMPT(TString myname) :
    name(myname),
-   chargedOnly(false),
+   excludeTrigCand(true),chargedOnly(false),
    ptmin(0),etamax(2.4),
    selPFId(0),
    doTrackingCorr(false),
@@ -77,6 +77,8 @@ public:
          vmpt.push_back(MPT(name+"InConeCorr",1,0.8,1));
          vmpt.push_back(MPT(name+"OutConeCorr",2,0.8,1));
       }
+      cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
+      cout << " excludeTrigCand=" << excludeTrigCand << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
       for (unsigned m=0; m<vmpt.size(); ++m) { 
          cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
          SetBranches(t,vmpt[m]);
@@ -130,7 +132,7 @@ public:
             if (drG>m.dRCone&&drJ>m.dRCone) accept=true;
          }
          if (accept) {
-//            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
+            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
@@ -151,8 +153,15 @@ public:
          }
       }
       // finished looping through the candidates, but if included trigger particle in the sum, need to subtract
-      if (!chargedOnly) {
-         if (gpt>0&&m.selType<2) m.mptx-=gpt;
+      if (excludeTrigCand) {
+         if (gpt>0&&m.selType<2) {
+            m.mptx-=gpt;
+            for (int k=0; k<nptrange; ++k) {
+               if (gpt> ptranges[k] && gpt<ptranges[k+1]) {
+                  m.mptx_pt[k]-=gpt;
+               }
+            }
+         }
       }
 //      cout << m.name << " mptx = " << m.mptx << " mpty = " << m.mpty << endl;
    }
