@@ -18,8 +18,8 @@ public:
    float mptx_pt[nptrange];
    float mpty_pt[nptrange];
    
-   MPT(TString s, int t=0, int c=0, float dr=0.8, float ptmin=0.5, float etamax=2.4) :
-   name(s), dRCone(dr),ptMin(ptmin), etaMax(etamax), selType(t), corrType(c) {
+   MPT(TString s, int t=0, float dr=0.8, int c=0) :
+   name(s), selType(t), dRCone(dr), corrType(c) {
       clear();
    }
    void clear() {
@@ -37,7 +37,7 @@ public:
    float eta[maxEntryTrack];
    float phi[maxEntryTrack];
    MPTCands() : n(0) {}
-   Set(int i, float currpt, float curreta, float currphi) {
+   void Set(int i, float currpt, float curreta, float currphi) {
       pt[i]   = currpt;
       eta[i]  = curreta;
       phi[i]  = currphi;
@@ -52,6 +52,7 @@ public:
    bool chargedOnly;
    float ptmin, etamax;
    int selPFId;
+   bool doTrackingCorr,anaDiJet;
    
    // data members
    MPTCands cands; // input
@@ -66,15 +67,15 @@ public:
    anaDiJet(false)
    {}
    
-   Init(TTree * t) {
+   void Init(TTree * t) {
       // default mpt analyses
-      vmpt.push_back(MPT(name+"AllAcc",0,0,-1));
-      vmpt.push_back(MPT(name+"InCone",1,0,0.8));
-      vmpt.push_back(MPT(name+"OutCone",2,0,0.8));
+      vmpt.push_back(MPT(name+"AllAcc",0,-1));
+      vmpt.push_back(MPT(name+"InCone",1,0.8));
+      vmpt.push_back(MPT(name+"OutCone",2,0.8));
       if (doTrackingCorr) {
-         vmpt.push_back(MPT(name+"AllAccCorr",0,1,-1));
-         vmpt.push_back(MPT(name+"InConeCorr",1,1,0.8));
-         vmpt.push_back(MPT(name+"OutConeCorr",2,1,0.8));
+         vmpt.push_back(MPT(name+"AllAccCorr",0,-1,1));
+         vmpt.push_back(MPT(name+"InConeCorr",1,0.8,1));
+         vmpt.push_back(MPT(name+"OutConeCorr",2,0.8,1));
       }
       for (unsigned m=0; m<vmpt.size(); ++m) { 
          cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
@@ -82,7 +83,7 @@ public:
       }      
    }
    
-   InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0) {
+   void InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0) {
       cands.n = 0;
       for (int i=0; i<n; ++i) {
          // candidate selection
@@ -129,15 +130,15 @@ public:
             if (drG>m.dRCone&&drJ>m.dRCone) accept=true;
          }
          if (accept) {
-            cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << endl;
+//            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
-               if (anaDiJet&&drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,gpt,c->evt.hiBin,correctionFactors);
-               else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(candPt,candEta,jpt,c->evt.hiBin,correctionFactors);
-               else trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,0,c->evt.hiBin,correctionFactors);
-               ptx*=trkweight;
-               pty*=trkweight;
+//               if (anaDiJet&&drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,gpt,c->evt.hiBin,correctionFactors);
+//               else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(candPt,candEta,jpt,c->evt.hiBin,correctionFactors);
+//               else trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,0,c->evt.hiBin,correctionFactors);
+//               ptx*=trkweight;
+//               pty*=trkweight;
             }
             m.mptx += ptx;
             m.mpty += pty;
@@ -151,9 +152,9 @@ public:
       }
       // finished looping through the candidates, but if included trigger particle in the sum, need to subtract
       if (!chargedOnly) {
-         m.mptx-=gpt;
+         if (gpt>0&&m.selType<2) m.mptx-=gpt;
       }
-      cout << m.name << " mptx = " << m.mptx << " mpty = " << m.mpty << endl;
+//      cout << m.name << " mptx = " << m.mptx << " mpty = " << m.mpty << endl;
    }
    
    void SetBranches(TTree * t, MPT & m) {
