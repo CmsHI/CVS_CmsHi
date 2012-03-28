@@ -8,7 +8,7 @@
 #include "HisPhotonJet.h"
 using namespace std;
 
-void plotHisPtRatio_All4Cent(
+void plotHisPtRatio_All4Cent_Closure(
                              int normMode=0 // 0=mean, 2=area
                              )
 {
@@ -20,17 +20,14 @@ void plotHisPtRatio_All4Cent(
    vector<HisCompare*> vc;
    vector<TString> names;
    vector<TFile*> infiles;
-//   names.push_back("hyphoquen_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-//   names.push_back("hyphoquenmatjet_dataSrc0_reco1");
-//   names.push_back("hyphoquengenjetsmear_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-//   names.push_back("hyphoquengenjet_dataSrc0_reco1"); infiles.push_back(new TFile("fig/03.16_genjet_smear/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-//   TString infname_x0320=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-//   TString infname_x0320_fisher=Form("fig/03.20_approval/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol2_Norm0.root");
-   TString infname_x0327=Form("fig/03.27_closure_pythia_and_data/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
-   
-   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0327));
-   names.push_back("hypho_dataSrc0_reco1"); infiles.push_back(new TFile(infname_x0327));
-//   names.push_back("hi_dataSrc1_reco1"); infiles.push_back(new TFile(infname_x0320_fisher));
+//   TString infname_x0320=Form("fig/03.20_approval_pyquen/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+//   TString infname_x0320=Form("fig/03.20_approval_pyquen_jeta20/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root");
+//   TString infclos0327pyquen = "fig/03.27_closure_pythia/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root";
+   TString infclos0327 = "fig/03.27_closure_pyquen_genPhoIsol/HisOutput_Photonv7_v29_akPu3PF_InclPtRatio_gamma60jet30dphiSig2749_Isol0_Norm0.root";
+
+   names.push_back("hyphoclos_dataSrc0_reco1"); infiles.push_back(new TFile(infclos0327));
+   names.push_back("hyphoclosrefjet_dataSrc0_reco1"); infiles.push_back(new TFile(infclos0327));
+   names.push_back("hyphoclosrefjetsmear_dataSrc0_reco1"); infiles.push_back(new TFile(infclos0327));
    vector<vector<TH1D*> >vh(names.size());
    vector<vector<TH1D*> >vhnorm(names.size());
       
@@ -53,9 +50,9 @@ void plotHisPtRatio_All4Cent(
       if (normMode==0) vc.push_back(new HisCompare(Form("x_c%d",ib),";x_{J#gamma} = p^{Jet}_{T}/p^{#gamma-jet}_{T}; #frac{1}{N^{#gamma-jet}} #frac{dN^{#gamma-jet}}{dx_{J#gamma}}",0,2,2));
       if (normMode==2) vc.push_back(new HisCompare(Form("x_c%d",ib),";x_{J#gamma} = p^{Jet}_{T}/p^{#gamma-jet}_{T}; #frac{1}{N^{#gamma-jet}} #frac{dN^{#gamma-jet}}{dx_{J#gamma}}",0,2,0));
       for (int s=0; s<names.size(); ++s) {
-         if (s==0) vc[ib]->AddHist(vh[s][ib],"Paper v9","E",kRed,kFullCircle,"p");
-         if (s==1) vc[ib]->AddHist(vh[s][ib],"PYTHIA+HYDJET","hist",kBlue,kOpenCircle,"l",3);
-//         if (s==1) vc[ib]->AddHist(vh[s][ib],"Fisher Isol.","E",kBlack,kOpenCircle,"p",2);
+         if (s==0) vc[ib]->AddHist(vh[s][ib],"RecoJet (Subtracted)","E",kBlack,kFullCircle,"p");
+         if (s==1) vc[ib]->AddHist(vh[s][ib],"Matched GenJet","E",kRed,kOpenCircle,"p");
+         if (s==2) vc[ib]->AddHist(vh[s][ib],"Matched GenJet Smeared","E",kBlue,kOpenSquare,"p");
       }
    }
    
@@ -77,12 +74,13 @@ void plotHisPtRatio_All4Cent(
       c1->cd(nBin-ib);
       if ( ib == 3) {
          drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.72,0.5,1,16);
-         vc[0]->DrawLeg("",0.61,0.76,0.95,0.98);
+         vc[0]->DrawLeg("",0.24,0.73,0.58,0.95);
       } else drawText(Form("%.0f%% - %.0f%%",m[ib]*2.5,m[ib+1]*2.5),0.67,0.5,1,16);
+      if ( ib == 2) {
+         drawText("PYQUEN+HYDJET",0.35,0.88,0,15);
+      }
       if ( ib == 0) {
          drawText("CMS",0.8,0.9,1);
-         drawText("#sqrt{s_{NN}}=2.76TeV ",0.35,0.88,0,15);
-         drawText("#int L dt = 150 #mub^{-1}",0.35,0.75,0,15);
       }
       if ( ib == 1) {
          drawText(Form("p^{#gamma}_{T} > %dGeV/c     |#eta^{#gamma}| < 1.44",60),0.2,0.9,0,15);
@@ -91,7 +89,7 @@ void plotHisPtRatio_All4Cent(
       }
    }
    
-//   c1->Print(Form("fig/his/HisPtRatio_All4Cent_data_sumIsol_vs_fisherIsol_Norm%d.gif",normMode));
+   c1->Print(Form("fig/his/HisPtRatio_All4Cent_pyquen_Closure_Norm%d_RefJet_PhoIsol.gif",normMode));
    
    //
    // Summary
@@ -127,8 +125,8 @@ void plotHisPtRatio_All4Cent(
       gSummary->Draw("psame");
       gSummary->Write();
    }
-   vc[0]->DrawLeg("",0.61,0.76,0.95,0.98);
+   vc[0]->DrawLeg("",0.24,0.73,0.58,0.95);
    fout->Write();
    
-//   c3->Print(Form("fig/his/HisPtRatio_Summary_data_sumIsol_vs_fisherIsol_Norm%d.gif",normMode));
+   c3->Print(Form("fig/his/HisPtRatio_Summary_pyquen_Closure_Norm%d_RefJet_PhoIsol.gif",normMode));
 }
