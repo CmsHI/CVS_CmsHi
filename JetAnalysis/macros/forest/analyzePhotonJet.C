@@ -1,4 +1,5 @@
 #include "hiForest.h"
+#include "MPTUtilities.C"
 #include <TFile.h>
 #include <TH1D.h>
 #include <TNtuple.h>
@@ -92,7 +93,7 @@ void analyzePhotonJet(
 {
    //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
    bool checkDup=false;
-   bool doMPT=false;
+   bool doMPT=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -137,18 +138,12 @@ void analyzePhotonJet(
    Isolation isol;
    TTree * tgj = new TTree("tgj","gamma jet tree");
    BookGJBranches(tgj,evt,gj,isol);
-   vector<MPT> vmpt;
+
+   AnaMPT pfmpt("pf");
+   AnaMPT genp0mpt("genp0");
    if (doMPT) {
-      vmpt.push_back(MPT("AllAcc",0,0,-1,cutPtTrk,cutEtaTrk));
-      vmpt.push_back(MPT("InCone",1,0,0.8,cutPtTrk,cutEtaTrk));
-      vmpt.push_back(MPT("OutCone",2,0,0.8,cutPtTrk,cutEtaTrk));
-      vmpt.push_back(MPT("AllAccCorr",0,1,-1,cutPtTrk,cutEtaTrk));
-      vmpt.push_back(MPT("InConeCorr",1,1,0.8,cutPtTrk,cutEtaTrk));
-      vmpt.push_back(MPT("OutConeCorr",2,1,0.8,cutPtTrk,cutEtaTrk));
-      for (unsigned m=0; m<vmpt.size(); ++m) { 
-         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
-         SetMPTBranches(tgj,vmpt[m]);
-      }
+      pfmpt.Init(tgj);  
+      genp0mpt.Init(tgj);  
    }
    
    // mixing classes
@@ -211,7 +206,8 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   for (int i=0;i<c->GetEntries();i++)
+//   for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<5000;i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -270,9 +266,6 @@ void analyzePhotonJet(
       int leadingIndex=-1;
       int awayIndex=-1;
       gj.clear();
-      if (doMPT) {
-         for (unsigned m=0; m<vmpt.size(); ++m) vmpt[m].clear();
-      }
       
       // Loop over jets to look for leading jet candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
@@ -360,6 +353,11 @@ void analyzePhotonJet(
             gj.inclGenJetEta[gj.nGenJet] = anajet->geneta[j];
             gj.inclGenJetPhi[gj.nGenJet] = anajet->genphi[j];
             gj.inclGenJetResp[gj.nGenJet] = jetRes.GetSmear(evt.cBin,gj.inclGenJetPt[gj.nGenJet]);
+            if (anajet->genpt[j]>gj.genJetPt) {
+               gj.genJetPt=anajet->genpt[j];
+               gj.genJetEta=anajet->geneta[j];
+               gj.genJetPhi=anajet->genphi[j];
+            }
             ++gj.nGenJet;
          }
 
@@ -423,9 +421,10 @@ void analyzePhotonJet(
       
       // MPT
       if (doMPT) {
-         for (unsigned m=0; m<vmpt.size(); ++m) {
-            CalcMPT(c,gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi,vmpt[m]);
-         }
+         pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+         pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+         genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
+         genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.genJetPt,gj.genJetEta,gj.genJetPhi);
       }
       
       // xcheck with tracks
