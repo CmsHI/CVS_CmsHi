@@ -206,8 +206,7 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-//   for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<5000;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -424,7 +423,7 @@ void analyzePhotonJet(
          pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
          pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
          genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
-         genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.genJetPt,gj.genJetEta,gj.genJetPhi);
+         genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
       }
       
       // xcheck with tracks
