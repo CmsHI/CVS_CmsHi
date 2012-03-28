@@ -49,7 +49,8 @@ class AnaMPT
 public:
    // parameters
    TString name;
-   bool excludeTrigCand,chargedOnly;
+   int excludeTrigCandMode;
+   bool chargedOnly;
    float ptmin, etamax;
    int selPFId;
    bool doTrackingCorr,anaDiJet;
@@ -58,9 +59,10 @@ public:
    MPTCands cands; // input
    vector<MPT> vmpt; // ouput
    
-   AnaMPT(TString myname) :
+   AnaMPT(TString myname, int mode=1) :
    name(myname),
-   excludeTrigCand(true),chargedOnly(false),
+   excludeTrigCandMode(mode),
+   chargedOnly(false),
    ptmin(0.5),etamax(2.4),
    selPFId(0),
    doTrackingCorr(false),
@@ -78,7 +80,7 @@ public:
          vmpt.push_back(MPT(name+"OutConeCorr",2,0.8,1));
       }
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
-      cout << " excludeTrigCand=" << excludeTrigCand << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
+      cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
       for (unsigned m=0; m<vmpt.size(); ++m) { 
          cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
          SetBranches(t,vmpt[m]);
@@ -123,6 +125,7 @@ public:
          float candPhi = cands.phi[it];
          float drG = deltaR(candEta,candPhi,geta,gphi);
          float drJ = deltaR(candEta,candPhi,jeta,jphi);
+         if (excludeTrigCandMode==2&&drG<0.05) continue;
          bool accept=false;
          if (m.selType==0) accept = true;
          else if (m.selType==1) {
@@ -154,7 +157,7 @@ public:
          }
       }
       // finished looping through the candidates, but if included trigger particle in the sum, need to subtract
-      if (excludeTrigCand) {
+      if (excludeTrigCandMode==1) {
          if (gpt>0&&m.selType<2) {
             m.mptx-=gpt;
             for (int k=0; k<nptrange; ++k) {

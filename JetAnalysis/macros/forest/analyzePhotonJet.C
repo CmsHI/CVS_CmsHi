@@ -91,8 +91,8 @@ void analyzePhotonJet(
                       TString mixfname="output-data-Photon-v7_v30classes.root"
                       )
 {
-   //bool checkDup=(dataSrcType==1||dataSrcType==3)&&(makeMixing==0||makeMixing==2);
-   bool checkDup=false;
+   bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
+   //bool checkDup=false;
    bool doMPT=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -139,10 +139,14 @@ void analyzePhotonJet(
    TTree * tgj = new TTree("tgj","gamma jet tree");
    BookGJBranches(tgj,evt,gj,isol);
 
-   AnaMPT pfmpt("pf");
-   AnaMPT genp0mpt("genp0");
+   AnaMPT pfmpt("pf",1);
+   AnaMPT pfex2mpt("pfex2",2);
+   AnaMPT trkmpt("trk",0);
+   AnaMPT genp0mpt("genp0",1);
    if (doMPT) {
       pfmpt.Init(tgj);  
+      pfex2mpt.Init(tgj);  
+      trkmpt.Init(tgj);  
       genp0mpt.Init(tgj);  
    }
    
@@ -422,6 +426,13 @@ void analyzePhotonJet(
       if (doMPT) {
          pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
          pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+         
+         pfex2mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+         pfex2mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+
+         trkmpt.InputEvent(c->track.nTrk,c->track.trkPt,c->track.trkEta,c->track.trkPhi);
+         trkmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+         
          genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
          genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
       }
