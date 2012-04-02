@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.1 2012/03/27 13:16:58 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.2 2012/03/27 14:05:31 richard Exp $
 //
 //
 
@@ -60,6 +60,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/EcalDigi/interface/EcalTriggerPrimitiveDigi.h"
 #include "DataFormats/HcalDigi/interface/HcalTriggerPrimitiveDigi.h"
+#include "DataFormats/L1CaloTrigger/interface/L1CaloRegion.h"
 
 // #include "SimDataFormats/SLHC/interface/L1CaloTower.h"
 // #include "SimDataFormats/SLHC/interface/L1CaloTowerFwd.h"
@@ -100,7 +101,7 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       // Calorimeter Digis
       edm::InputTag mEcalDigiInputTag;
       edm::InputTag mHcalDigiInputTag;
-
+      edm::InputTag mGCTDigiInputTag;
       edm::Service<TFileService> fs;
 
       TTree * RRTree;
@@ -140,7 +141,8 @@ class TriggerPrimitives : public edm::EDAnalyzer {
 //
 TriggerPrimitives::TriggerPrimitives(const edm::ParameterSet& iConfig):
   mEcalDigiInputTag( iConfig.getParameter < edm::InputTag > ( "ECALDigis" ) ),
-  mHcalDigiInputTag( iConfig.getParameter < edm::InputTag > ( "HCALDigis" ) )
+  mHcalDigiInputTag( iConfig.getParameter < edm::InputTag > ( "HCALDigis" ) ),
+  mGCTDigiInputTag( iConfig.getParameter < edm::InputTag > ( "GCTDigis") )
 {
    //now do what ever initialization is needed
 }
@@ -212,6 +214,11 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   RRTree->Fill();
   
+  edm::Handle < vector<L1CaloRegion>  > lGCTDigiHandle;
+  iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
+   for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
+   cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->et() << endl;
+   }
 }
 
 

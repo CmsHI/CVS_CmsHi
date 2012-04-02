@@ -21,7 +21,7 @@ process.load('Configuration.EventContent.EventContentHeavyIons_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(1)
 )
 
 # Input source
@@ -40,7 +40,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.341.2.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('step2 nevts:2'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -68,7 +68,8 @@ process.TFileService = cms.Service("TFileService",
 		)
 process.demo = cms.EDAnalyzer('TriggerPrimitives',
                               ECALDigis = cms.InputTag("ecalDigis:EcalTriggerPrimitives"),
-                              HCALDigis = cms.InputTag("hcalDigis")
+                              HCALDigis = cms.InputTag("hcalDigis"),
+                              GCTDigis = cms.InputTag("gctDigis")
 )
 
 #process.p = cms.Path(process.demo)
