@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.7 2012/04/03 17:35:58 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.8 2012/04/03 17:42:27 richard Exp $
 //
 //
 
@@ -208,7 +208,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       if (ecalEtaIndex[i]*signEta<=17) {ecalTag[i]=1;} else {ecalTag[i]=2;}
 
       ecalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]])/2.;
-      ecalPhi[i]=0.0436332310*(ecalPhiIndex[i]-1);
+      ecalPhi[i]=0.0872664626*(ecalPhiIndex[i]-1);
       //std::cout<<"ecal :"<<ecalEtaIndex[i]<<" "<<ecalPhiIndex[i]<<" "<<ecalEta[i]<<" "<<ecalPhi[i]<<" "<<ecalTag[i]<<std::endl;
       i++;
     }
@@ -238,7 +238,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         hcalTag[i]=3;    }
 
       hcalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]])/2.;
-      hcalPhi[i]=0.0436332310*(hcalPhiIndex[i]-1);
+      hcalPhi[i]=0.0872664626*(hcalPhiIndex[i]-1);
       //std::cout<<"hcal :"<<hcalEtaIndex[i]<<" "<<hcalPhiIndex[i]<<" "<<hcalEta[i]<<" "<<hcalPhi[i]<<" "<<hcalTag[i]<<"    "<<lHcalTPItr->SOI_compressedEt()<<std::endl;
       i++;
     }
