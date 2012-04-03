@@ -3,7 +3,7 @@
 // Package:    TriggerPrimitives
 // Class:      TriggerPrimitives
 // 
-/**\class TriggerPrimitives TriggerPrimitives.cc maria/TriggerPrimitives/src/TriggerPrimitives.cc
+/**\class TriggerPrimitives TriggerPrimitives.cc UserCode/CmsHi/HiL1Algos/src/TriggerPrimitives.cc
 
  Description: [one line class summary]
 
@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.5 2012/04/03 15:30:14 grobicho Exp $
+// $Id: TriggerPrimitives.cc,v 1.6 2012/04/03 17:22:49 grobicho Exp $
 //
 //
 
@@ -246,6 +246,11 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   RRTree->Fill();
 
+  edm::Handle < vector<L1CaloRegion>  > lGCTDigiHandle;
+  iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
+   for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
+     cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->()isHf() << " " << lGCTRegionPItr->et() << endl;
+   }
 }
 
 
