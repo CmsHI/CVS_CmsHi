@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.8 2012/04/03 17:42:27 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.9 2012/04/03 17:49:50 grobicho Exp $
 //
 //
 
@@ -134,6 +134,12 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       double *hcalPhi;
       int *hcalFineGrain;
       int *hcalTag;
+
+     int caloRegionEt[396];
+     int caloRegionTau[396];
+     int caloRegionEtaIndex[396];
+     int caloRegionPhiIndex[396];
+
 };
 
 //
@@ -181,7 +187,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                                            1.74, 1.83, 1.93, 2.043, 2.172,
                                            2.332, 2.5, 2.65, 3.00, 3.50, 4.00, 4.50, 5.00};
  //This array has to be checked : this version dates from 2000, and the numbers do not agree with some other data I found from the web .....
-
+  
   using namespace edm;
   using namespace std;
 
@@ -196,7 +202,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   int i = 0;
 
   for ( EcalTrigPrimDigiCollection::const_iterator lEcalTPItr = lEcalDigiHandle->begin(  ); lEcalTPItr != lEcalDigiHandle->end(  ); ++lEcalTPItr )
-    {      
+  {      
       //cout << lEcalTPItr->compressedEt(  ) << " " << lEcalTPItr->id(  ).ieta(  ) << " " << lEcalTPItr->id(  ).iphi(  ) << " " << lEcalTPItr->fineGrain(  )  << endl;
 
       ecalCompressedEt[i] = lEcalTPItr->compressedEt(  );
@@ -211,7 +217,10 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       ecalPhi[i]=0.0872664626*(ecalPhiIndex[i]-1);
       //std::cout<<"ecal :"<<ecalEtaIndex[i]<<" "<<ecalPhiIndex[i]<<" "<<ecalEta[i]<<" "<<ecalPhi[i]<<" "<<ecalTag[i]<<std::endl;
       i++;
-    }
+  }
+
+  
+
   ecalDetectorMapSize = i;
 
   i = 0;
@@ -244,13 +253,24 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     }
   hcalDetectorMapSize = i;
 
-  RRTree->Fill();
+
 
   edm::Handle < vector<L1CaloRegion>  > lGCTDigiHandle;
   iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
-   for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
-     cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
-   }
+  i=0;
+  for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
+      cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
+      caloRegionEt[i] = lGCTRegionPItr->et();
+      caloRegionTau[i] = lGCTRegionPItr->tauVeto();
+      caloRegionEtaIndex[i]=lGCTRegionPItr->gctEta();
+      caloRegionPhiIndex[i]=lGCTRegionPItr->gctPhi();
+
+
+      i++;
+  }
+
+  RRTree->Fill();
+
 }
 
 
@@ -302,7 +322,11 @@ TriggerPrimitives::beginJob()
   RRTree->Branch("hcalFineGrain",hcalFineGrain,"hcalFineGrain[hcalDetectorMapSize]/I");
   RRTree->Branch("hcalTag",hcalTag,"hcalTag[hcalDetectorMapSize]/I");
 
-  
+  RRTree->Branch("caloRegionEt",caloRegionEt,"caloRegionEt[396]/I");
+  RRTree->Branch("caloRegionTau",caloRegionTau,"caloRegionTau[396]/I");
+  RRTree->Branch("caloRegionEtaIndex",caloRegionEtaIndex,"caloRegionEtaIndex[396]/I");
+  RRTree->Branch("caloRegionPhiIndex",caloRegionPhiIndex,"caloRegionPhiIndex[396]/I");
+
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
