@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.2 2012/03/27 14:05:31 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.3 2012/04/02 22:06:45 dgulhan Exp $
 //
 //
 
@@ -48,6 +48,7 @@
 #include "CondFormats/DataRecord/interface/L1CaloHcalScaleRcd.h"
 #include "CondFormats/L1TObjects/interface/L1CaloHcalScale.h"
 #include "FWCore/Framework/interface/EventSetup.h"
+
 // system include files
 #include <memory>
 
@@ -74,6 +75,7 @@
 // class declaration
 //
 
+
 class TriggerPrimitives : public edm::EDAnalyzer {
    public:
       explicit TriggerPrimitives(const edm::ParameterSet&);
@@ -94,7 +96,7 @@ class TriggerPrimitives : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
 
-      
+
 //       const L1CaloEcalScale *mEcalScale;
 //       const L1CaloHcalScale *mHcalScale;
 
@@ -115,7 +117,10 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       int *ecalCompressedEt;
       int *ecalEtaIndex;
       int *ecalPhiIndex;
+      double *ecalEta;
+      double *ecalPhi;
       int *ecalFineGrain;
+      int *ecalTag;
 
   static const int nHcalEtaStrips = 64; // but +-29 to +-32 are weird, only have every fourth phi
   static const int nHcalPhiStrips = 72; // but weirdness for certain eta
@@ -125,7 +130,10 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       int *hcalCompressedEt;
       int *hcalEtaIndex;
       int *hcalPhiIndex;
+      double *hcalEta;
+      double *hcalPhi;
       int *hcalFineGrain;
+      int *hcalTag;
 };
 
 //
@@ -166,6 +174,14 @@ TriggerPrimitives::~TriggerPrimitives()
 void
 TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  double theHBHEHFEtaBounds[] = { 0.000, 0.087, 0.087*2, 0.087*3, 0.087*4,
+                                           0.087*5, 0.087*6, 0.087*7, 0.087*8, 0.087*9,
+                                           0.087*10, 0.087*11, 0.087*12, 0.087*13, 0.087*14,
+                                           0.087*15, 0.087*16, 0.087*17, 0.087*18, 0.087*19,
+                                           1.74, 1.83, 1.93, 2.043, 2.172,
+                                           2.332, 2.5, 2.65, 3.00, 3.50, 4.00, 4.50, 5.00};
+ //This array has to be checked : this version dates from 2000, and the numbers do not agree with some other data I found from the web .....
+
   using namespace edm;
   using namespace std;
 
@@ -187,7 +203,13 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       ecalEtaIndex[i] = lEcalTPItr->id(  ).ieta(  );
       ecalPhiIndex[i] = lEcalTPItr->id(  ).iphi(  );
       ecalFineGrain[i] = lEcalTPItr->fineGrain(  );
-      
+      int signEta;
+      if (ecalEtaIndex[i]>0) {signEta=1;} else {signEta=-1;}
+      if (ecalEtaIndex[i]*signEta<=17) {ecalTag[i]=1;} else {ecalTag[i]=2;}
+
+      ecalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]])/2.;
+      ecalPhi[i]=0.0436332310*(ecalPhiIndex[i]-1);
+      //std::cout<<"ecal :"<<ecalEtaIndex[i]<<" "<<ecalPhiIndex[i]<<" "<<ecalEta[i]<<" "<<ecalPhi[i]<<" "<<ecalTag[i]<<std::endl;
       i++;
     }
   ecalDetectorMapSize = i;
@@ -198,7 +220,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   edm::Handle < HcalTrigPrimDigiCollection > lHcalDigiHandle;
   iEvent.getByLabel( mHcalDigiInputTag, lHcalDigiHandle );
-      
+
   for ( HcalTrigPrimDigiCollection::const_iterator lHcalTPItr = lHcalDigiHandle->begin(  ); lHcalTPItr != lHcalDigiHandle->end(  ); ++lHcalTPItr )
     {
       //cout << lHcalTPItr->SOI_compressedEt(  ) << " " << lHcalTPItr->id(  ).ieta(  ) << " " << lHcalTPItr->id(  ).iphi(  ) << " " << lHcalTPItr->SOI_fineGrain(  )  << endl;
@@ -207,18 +229,32 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       hcalEtaIndex[i] = lHcalTPItr->id(  ).ieta(  );
       hcalPhiIndex[i] = lHcalTPItr->id(  ).iphi(  );
       hcalFineGrain[i] = lHcalTPItr->SOI_fineGrain(  );
- 
+      int signEta;
+      if (hcalEtaIndex[i]>0) {signEta=1;} else {signEta=-1;}
+      if (hcalEtaIndex[i]*signEta<=28)  {
+         if (hcalEtaIndex[i]*signEta<=17) { hcalTag[i]=1;} else {hcalTag[i]=2;}
+      }
+      else { 
+        hcalTag[i]=3;    }
+
+      hcalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]])/2.;
+      hcalPhi[i]=0.0436332310*(hcalPhiIndex[i]-1);
+      //std::cout<<"hcal :"<<hcalEtaIndex[i]<<" "<<hcalPhiIndex[i]<<" "<<hcalEta[i]<<" "<<hcalPhi[i]<<" "<<hcalTag[i]<<"    "<<lHcalTPItr->SOI_compressedEt()<<std::endl;
       i++;
     }
   hcalDetectorMapSize = i;
 
   RRTree->Fill();
+<<<<<<< TriggerPrimitives.cc
+ 
+=======
   
   edm::Handle < vector<L1CaloRegion>  > lGCTDigiHandle;
   iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
    for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
    cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->et() << endl;
    }
+>>>>>>> 1.3
 }
 
 
@@ -237,38 +273,49 @@ TriggerPrimitives::beginJob()
   ecalCompressedEt = new int[ecalSize];
   ecalEtaIndex = new int[ecalSize];
   ecalPhiIndex = new int[ecalSize];
+  ecalEta = new double[ecalSize];
+  ecalPhi = new double[ecalSize];
   ecalFineGrain = new int[ecalSize];
+  ecalTag = new int[ecalSize];
 
   RRTree->Branch("ecalDetectorMapSize",&ecalDetectorMapSize,"ecalDetectorMapSize/I");
   RRTree->Branch("ecalCompressedEt",ecalCompressedEt,"ecalCompressedEt[ecalDetectorMapSize]/I");
   RRTree->Branch("ecalEtaIndex",ecalEtaIndex,"ecalEtaIndex[ecalDetectorMapSize]/I");
   RRTree->Branch("ecalPhiIndex",ecalPhiIndex,"ecalPhiIndex[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalEta",ecalEta,"ecalEta[ecalDetectorMapSize]/D");
+  RRTree->Branch("ecalPhi",ecalPhi,"ecalPhi[ecalDetectorMapSize]/D");
   RRTree->Branch("ecalFineGrain",ecalFineGrain,"ecalFineGrain[ecalDetectorMapSize]/I");
+  RRTree->Branch("ecalTag",ecalTag,"ecalTag[ecalDetectorMapSize]/I");
 
   int hcalSize = nHcalEtaStrips*nHcalPhiStrips;
 
   hcalCompressedEt = new int[hcalSize];
   hcalEtaIndex = new int[hcalSize];
   hcalPhiIndex = new int[hcalSize];
+  hcalEta = new double[hcalSize];
+  hcalPhi = new double[hcalSize];
   hcalFineGrain = new int[hcalSize];
+  hcalTag = new int[hcalSize];
 
   RRTree->Branch("hcalDetectorMapSize",&hcalDetectorMapSize,"hcalDetectorMapSize/I");
   RRTree->Branch("hcalCompressedEt",hcalCompressedEt,"hcalCompressedEt[hcalDetectorMapSize]/I");
   RRTree->Branch("hcalEtaIndex",hcalEtaIndex,"hcalEtaIndex[hcalDetectorMapSize]/I");
   RRTree->Branch("hcalPhiIndex",hcalPhiIndex,"hcalPhiIndex[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalEta",hcalEta,"hcalEta[hcalDetectorMapSize]/D");
+  RRTree->Branch("hcalPhi",hcalPhi,"hcalPhi[hcalDetectorMapSize]/D");
   RRTree->Branch("hcalFineGrain",hcalFineGrain,"hcalFineGrain[hcalDetectorMapSize]/I");
+  RRTree->Branch("hcalTag",hcalTag,"hcalTag[hcalDetectorMapSize]/I");
+
   
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
-TriggerPrimitives::endJob() 
+void TriggerPrimitives::endJob() 
 {
 }
 
 // ------------ method called when starting to processes a run  ------------
-void 
-TriggerPrimitives::beginRun(edm::Run const&, edm::EventSetup const&)
+void TriggerPrimitives::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
