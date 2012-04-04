@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.10 2012/04/03 22:56:26 grobicho Exp $
+// $Id: TriggerPrimitives.cc,v 1.9 2012/04/03 17:49:50 grobicho Exp $
 //
 //
 
@@ -139,7 +139,8 @@ class TriggerPrimitives : public edm::EDAnalyzer {
      int caloRegionTau[396];
      int caloRegionEtaIndex[396];
      int caloRegionPhiIndex[396];
-
+     double caloRegionEta[396];
+     double caloRegionPhi[396];
 };
 
 //
@@ -186,8 +187,8 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                                            0.087*15, 0.087*16, 0.087*17, 0.087*18, 0.087*19,
                                            1.74, 1.83, 1.93, 2.043, 2.172,
                                            2.332, 2.5, 2.65, 3.00, 3.50, 4.00, 4.50, 5.00};
- //This array has to be checked : this version dates from 2000, and the numbers do not agree with some other data I found from the web .....
-  
+  //This array has to be checked : this version dates from 2000, and the numbers do not agree with some other data I found from the web .....
+
   using namespace edm;
   using namespace std;
 
@@ -259,13 +260,19 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
   i=0;
   for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
-    //cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
+      //cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
       caloRegionEt[i] = lGCTRegionPItr->et();
       caloRegionTau[i] = lGCTRegionPItr->tauVeto();
       caloRegionEtaIndex[i]=lGCTRegionPItr->gctEta();
       caloRegionPhiIndex[i]=lGCTRegionPItr->gctPhi();
-
-
+      caloRegionPhi[i]=0.34906585*caloRegionPhiIndex[i];
+      int ieta=caloRegionEtaIndex[i];
+      if (ieta<=3) caloRegionEta[i]= -1*(theHBHEHFEtaBounds[32-ieta] + theHBHEHFEtaBounds[31-ieta])/2.;
+      else if (ieta>=18) caloRegionEta[i]= 1*(theHBHEHFEtaBounds[10+ieta] + theHBHEHFEtaBounds[11+ieta])/2.;
+      else { 
+        if (ieta<=10) caloRegionEta[i]=-theHBHEHFEtaBounds[42-4*ieta];
+        else caloRegionEta[i]=theHBHEHFEtaBounds[4*ieta-42];
+      }
       i++;
   }
 
@@ -326,6 +333,8 @@ TriggerPrimitives::beginJob()
   RRTree->Branch("caloRegionTau",caloRegionTau,"caloRegionTau[396]/I");
   RRTree->Branch("caloRegionEtaIndex",caloRegionEtaIndex,"caloRegionEtaIndex[396]/I");
   RRTree->Branch("caloRegionPhiIndex",caloRegionPhiIndex,"caloRegionPhiIndex[396]/I");
+  RRTree->Branch("caloRegionEta",caloRegionEta,"caloRegionEta[396]/D");
+  RRTree->Branch("caloRegionPhi",caloRegionPhi,"caloRegionPhi[396]/D");
 
 }
 
@@ -343,6 +352,9 @@ void TriggerPrimitives::beginRun(edm::Run const&, edm::EventSetup const&)
 void 
 TriggerPrimitives::endRun(edm::Run const&, edm::EventSetup const&)
 {
+  using namespace std;
+  cout<<" it worked :D"<<endl;
+
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
