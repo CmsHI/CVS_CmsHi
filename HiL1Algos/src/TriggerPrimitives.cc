@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.9 2012/04/03 17:49:50 grobicho Exp $
+// $Id: TriggerPrimitives.cc,v 1.10 2012/04/03 22:56:26 grobicho Exp $
 //
 //
 
@@ -259,7 +259,7 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
   i=0;
   for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
-      cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
+    //cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
       caloRegionEt[i] = lGCTRegionPItr->et();
       caloRegionTau[i] = lGCTRegionPItr->tauVeto();
       caloRegionEtaIndex[i]=lGCTRegionPItr->gctEta();
