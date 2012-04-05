@@ -29,7 +29,7 @@ public:
       ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
       ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
       ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:genCalIsoDR04:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
-      ":genJetPt:genJetEta:genJetPhi"
+      ":genPhoPt:genPhoEta:genPhoPhi:genJetPt:genJetEta:genJetPhi"
       ":isEle/O";
    }
    float photonEt,photonRawEt,photonEta,photonPhi;
@@ -41,7 +41,7 @@ public:
    float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
    float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
    float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,genCalIsoDR04,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
-   float genJetPt,genJetEta,genJetPhi;
+   float genPhoPt,genPhoEta,genPhoPhi,genJetPt,genJetEta,genJetPhi;
    bool isEle;
    int nTrk;
    float trkPt[MAXTRK];
@@ -71,7 +71,7 @@ public:
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
       jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
-      genJetPt=-99; genJetEta=-99; genJetPhi=-99;
+      genPhoPt=-99; genPhoEta=-99; genPhoPhi=-99; genJetPt=-99; genJetEta=-99; genJetPhi=-99;
       isEle=false;
       nTrk=0; nJet=0; nGenJet=0;
    }

@@ -210,7 +210,8 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   for (int i=0;i<c->GetEntries();i++)
+//   for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<100;i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -270,7 +271,7 @@ void analyzePhotonJet(
       int awayIndex=-1;
       gj.clear();
       
-      // Loop over jets to look for leading jet candidate in the event
+      // Loop over jets to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
          if (c->photon.pt[j]<cutphotonPt||c->photon.pt[j]>1000) continue;          // photon pT cut
          if (fabs(c->photon.eta[j])>cutphotonEta) continue; // |eta|<1.44
@@ -286,6 +287,18 @@ void analyzePhotonJet(
          }
       }
       
+      // If MC, Loop over gen photons to look for leading gen photon candidate in the event
+      for(int j = 0; j < c->genp.nPar; ++j){
+         if(c->genp.status[j]!=3||c->genp.id[j]!=22) continue; // parton photon selection
+         if(c->genp.et[j] < cutphotonPt) continue;
+         if(fabs(c->genp.eta[j]) > cutphotonEta) continue;
+         if (c->genp.et[j] > gj.genPhoPt ) {
+            gj.genPhoPt = c->genp.et[j];
+            gj.genPhoEta = c->genp.eta[j];
+            gj.genPhoPhi = c->genp.phi[j];
+         }
+      }
+
       // Found a leading photon which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading photon
