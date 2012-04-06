@@ -59,12 +59,12 @@ public:
    MPTCands cands; // input
    vector<MPT> vmpt; // ouput
    
-   AnaMPT(TString myname, int mode=1) :
+   AnaMPT(TString myname, int mode=1, int pfid=0) :
    name(myname),
    excludeTrigCandMode(mode),
    chargedOnly(false),
    ptmin(0.5),etamax(2.4),
-   selPFId(0),
+   selPFId(pfid),
    doTrackingCorr(false),
    anaDiJet(false)
    {}

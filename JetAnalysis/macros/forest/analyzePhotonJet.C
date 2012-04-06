@@ -140,11 +140,19 @@ void analyzePhotonJet(
    BookGJBranches(tgj,evt,gj,isol);
 
    AnaMPT pfmpt("pf",1);
+   AnaMPT pfgenphompt("pfgenpho",1);
+   AnaMPT pf1mpt("pf1",0,1);
+   AnaMPT pf4mpt("pf4",1,4);
+   AnaMPT pf5mpt("pf5",0,5);
    AnaMPT pfex2mpt("pfex2",2);
    AnaMPT trkmpt("trk",0);
    AnaMPT genp0mpt("genp0",1);
    if (doMPT) {
       pfmpt.Init(tgj);  
+      pfgenphompt.Init(tgj);  
+      pf1mpt.Init(tgj);  
+      pf4mpt.Init(tgj);  
+      pf5mpt.Init(tgj);  
       pfex2mpt.Init(tgj);  
       trkmpt.Init(tgj);  
       genp0mpt.Init(tgj);  
@@ -440,6 +448,18 @@ void analyzePhotonJet(
          pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
          pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
          
+         pfgenphompt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+         pfgenphompt.AnalyzeEvent(gj.genPhoPt,gj.genPhoEta,gj.genPhoPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+
+         pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         pf1mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+
+         pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         pf4mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+
+         pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         pf5mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+
          pfex2mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
          pfex2mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
 
