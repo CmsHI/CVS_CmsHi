@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.9 2012/04/03 17:49:50 grobicho Exp $
+// $Id: TriggerPrimitives.cc,v 1.12 2012/04/04 17:57:48 grobicho Exp $
 //
 //
 
@@ -70,6 +70,7 @@
 
 #include <map>
 #include <deque>
+#include "math.h"
 
 //
 // class declaration
@@ -122,10 +123,9 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       int *ecalFineGrain;
       int *ecalTag;
 
-  static const int nHcalEtaStrips = 64; // but +-29 to +-32 are weird, only have every fourth phi
-  static const int nHcalPhiStrips = 72; // but weirdness for certain eta
-
-  int hcalDetectorMapSize;// = nHcalEtaStrips*nHcalPhiStrips - 2*4*72*3/4;
+      static const int nHcalEtaStrips = 64; // but +-29 to +-32 are weird, only have every fourth phi
+      static const int nHcalPhiStrips = 72; // but weirdness for certain eta
+      int hcalDetectorMapSize;// = nHcalEtaStrips*nHcalPhiStrips - 2*4*72*3/4;
 
       int *hcalCompressedEt;
       int *hcalEtaIndex;
@@ -135,17 +135,34 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       int *hcalFineGrain;
       int *hcalTag;
 
-     int caloRegionEt[396];
-     int caloRegionTau[396];
-     int caloRegionEtaIndex[396];
-     int caloRegionPhiIndex[396];
-     double caloRegionEta[396];
-     double caloRegionPhi[396];
+      static const int nEtaRegions = 22;
+      static const int nPhiRegions = 18;
+      int numRegions;// = nEtaRegions*nPhiRetions;
+
+      int *caloRegionEt;
+      int *caloRegionTau;
+      int *caloRegionEtaIndex;
+      int *caloRegionPhiIndex;
+      double *caloRegionEta;
+      double *caloRegionPhi;
+      int *caloRegionTag;
+      int *caloRCTRegionEtaIndex;
+      int *caloRCTRegionPhiIndex;
 };
 
 //
 // constants, enums and typedefs
 //
+  //This array has to be checked : this version dates from 2000, 
+  //and the numbers do not agree with some other data I found from the web .....
+double theHBHEHFEtaBounds[] = { 0.000, 0.087, 0.087*2, 0.087*3, 0.087*4,
+				0.087*5, 0.087*6, 0.087*7, 0.087*8, 0.087*9,
+				0.087*10, 0.087*11, 0.087*12, 0.087*13, 0.087*14,
+				0.087*15, 0.087*16, 0.087*17, 0.087*18, 0.087*19,
+				1.74, 1.83, 1.93, 2.043, 2.172,
+				2.332, 2.5, 2.65, 3.00, 3.50, 4.00, 4.50, 5.00};
+
+
 
 //
 // static data member definitions
@@ -175,19 +192,17 @@ TriggerPrimitives::~TriggerPrimitives()
 //
 // member functions
 //
+double getRealTowerEta(int etaIndex);
+//double getRealTowerPhi(int phiIndex);
+double getRealRegionEta(int etaIndex);
+//double getRealRegionPhi(int etaIndex);
+int getDetectorTag(int etaIndex);
 
 
 // ------------ method called for each event  ------------
 void
 TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  double theHBHEHFEtaBounds[] = { 0.000, 0.087, 0.087*2, 0.087*3, 0.087*4,
-                                           0.087*5, 0.087*6, 0.087*7, 0.087*8, 0.087*9,
-                                           0.087*10, 0.087*11, 0.087*12, 0.087*13, 0.087*14,
-                                           0.087*15, 0.087*16, 0.087*17, 0.087*18, 0.087*19,
-                                           1.74, 1.83, 1.93, 2.043, 2.172,
-                                           2.332, 2.5, 2.65, 3.00, 3.50, 4.00, 4.50, 5.00};
-  //This array has to be checked : this version dates from 2000, and the numbers do not agree with some other data I found from the web .....
 
   using namespace edm;
   using namespace std;
@@ -202,25 +217,20 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
   int i = 0;
 
-  for ( EcalTrigPrimDigiCollection::const_iterator lEcalTPItr = lEcalDigiHandle->begin(  ); lEcalTPItr != lEcalDigiHandle->end(  ); ++lEcalTPItr )
+  for ( EcalTrigPrimDigiCollection::const_iterator lEcalTPItr = lEcalDigiHandle->begin(  ); 
+	lEcalTPItr != lEcalDigiHandle->end(  ); ++lEcalTPItr )
   {      
-      //cout << lEcalTPItr->compressedEt(  ) << " " << lEcalTPItr->id(  ).ieta(  ) << " " << lEcalTPItr->id(  ).iphi(  ) << " " << lEcalTPItr->fineGrain(  )  << endl;
-
       ecalCompressedEt[i] = lEcalTPItr->compressedEt(  );
       ecalEtaIndex[i] = lEcalTPItr->id(  ).ieta(  );
       ecalPhiIndex[i] = lEcalTPItr->id(  ).iphi(  );
       ecalFineGrain[i] = lEcalTPItr->fineGrain(  );
-      int signEta;
-      if (ecalEtaIndex[i]>0) {signEta=1;} else {signEta=-1;}
-      if (ecalEtaIndex[i]*signEta<=17) {ecalTag[i]=1;} else {ecalTag[i]=2;}
 
-      ecalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * ecalEtaIndex[i]])/2.;
-      ecalPhi[i]=0.0872664626*(ecalPhiIndex[i]-1);
-      //std::cout<<"ecal :"<<ecalEtaIndex[i]<<" "<<ecalPhiIndex[i]<<" "<<ecalEta[i]<<" "<<ecalPhi[i]<<" "<<ecalTag[i]<<std::endl;
+      ecalEta[i] = getRealTowerEta(ecalEtaIndex[i]);
+      ecalTag[i] = getDetectorTag(ecalEtaIndex[i]);
+      ecalPhi[i] = 0.0872664626*(ecalPhiIndex[i]-1);
+
       i++;
   }
-
-  
 
   ecalDetectorMapSize = i;
 
@@ -231,54 +241,108 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   edm::Handle < HcalTrigPrimDigiCollection > lHcalDigiHandle;
   iEvent.getByLabel( mHcalDigiInputTag, lHcalDigiHandle );
 
-  for ( HcalTrigPrimDigiCollection::const_iterator lHcalTPItr = lHcalDigiHandle->begin(  ); lHcalTPItr != lHcalDigiHandle->end(  ); ++lHcalTPItr )
+  for ( HcalTrigPrimDigiCollection::const_iterator lHcalTPItr = lHcalDigiHandle->begin(  ); 
+	lHcalTPItr != lHcalDigiHandle->end(  ); ++lHcalTPItr )
     {
-      //cout << lHcalTPItr->SOI_compressedEt(  ) << " " << lHcalTPItr->id(  ).ieta(  ) << " " << lHcalTPItr->id(  ).iphi(  ) << " " << lHcalTPItr->SOI_fineGrain(  )  << endl;
-
       hcalCompressedEt[i] = lHcalTPItr->SOI_compressedEt(  );
       hcalEtaIndex[i] = lHcalTPItr->id(  ).ieta(  );
       hcalPhiIndex[i] = lHcalTPItr->id(  ).iphi(  );
       hcalFineGrain[i] = lHcalTPItr->SOI_fineGrain(  );
-      int signEta;
-      if (hcalEtaIndex[i]>0) {signEta=1;} else {signEta=-1;}
-      if (hcalEtaIndex[i]*signEta<=28)  {
-         if (hcalEtaIndex[i]*signEta<=17) { hcalTag[i]=1;} else {hcalTag[i]=2;}
-      }
-      else { 
-        hcalTag[i]=3;    }
 
-      hcalEta[i]=signEta * (theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]-1] + theHBHEHFEtaBounds[signEta * hcalEtaIndex[i]])/2.;
+      hcalEta[i] = getRealTowerEta(hcalEtaIndex[i]);
+      hcalTag[i] = getDetectorTag(hcalEtaIndex[i]);
       hcalPhi[i]=0.0872664626*(hcalPhiIndex[i]-1);
-      //std::cout<<"hcal :"<<hcalEtaIndex[i]<<" "<<hcalPhiIndex[i]<<" "<<hcalEta[i]<<" "<<hcalPhi[i]<<" "<<hcalTag[i]<<"    "<<lHcalTPItr->SOI_compressedEt()<<std::endl;
+
       i++;
     }
+
   hcalDetectorMapSize = i;
 
+  i = 0;
 
+  numRegions = 0;
 
   edm::Handle < vector<L1CaloRegion>  > lGCTDigiHandle;
   iEvent.getByLabel ( mGCTDigiInputTag, lGCTDigiHandle );
-  i=0;
-  for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr ){
-      //cout <<  lGCTRegionPItr->rctEta() << " " << lGCTRegionPItr->rctPhi() << " " << lGCTRegionPItr->gctEta() << " " << lGCTRegionPItr->gctPhi() << " " << lGCTRegionPItr->isHf() << " " << lGCTRegionPItr->et() << endl;
+
+  for ( vector<L1CaloRegion>::const_iterator lGCTRegionPItr = lGCTDigiHandle->begin(  ); 
+	lGCTRegionPItr != lGCTDigiHandle->end(  ); ++lGCTRegionPItr )
+    {
       caloRegionEt[i] = lGCTRegionPItr->et();
       caloRegionTau[i] = lGCTRegionPItr->tauVeto();
-      caloRegionEtaIndex[i]=lGCTRegionPItr->gctEta();
-      caloRegionPhiIndex[i]=lGCTRegionPItr->gctPhi();
-      caloRegionPhi[i]=0.34906585*caloRegionPhiIndex[i];
-      int ieta=caloRegionEtaIndex[i];
-      if (ieta<=3) caloRegionEta[i]= -1*(theHBHEHFEtaBounds[32-ieta] + theHBHEHFEtaBounds[31-ieta])/2.;
-      else if (ieta>=18) caloRegionEta[i]= 1*(theHBHEHFEtaBounds[10+ieta] + theHBHEHFEtaBounds[11+ieta])/2.;
-      else { 
-        if (ieta<=10) caloRegionEta[i]=-theHBHEHFEtaBounds[42-4*ieta];
-        else caloRegionEta[i]=theHBHEHFEtaBounds[4*ieta-42];
-      }
+      caloRegionEtaIndex[i] = lGCTRegionPItr->gctEta();
+      caloRegionPhiIndex[i] = lGCTRegionPItr->gctPhi();
+      caloRegionPhi[i] = 0.34906585*caloRegionPhiIndex[i];
+      caloRegionEta[i] = getRealRegionEta(caloRegionEtaIndex[i]);
+      caloRegionTag[i] = lGCTRegionPItr->isHf();
+
+      caloRCTRegionEtaIndex[i] = lGCTRegionPItr->rctEta();
+      caloRCTRegionPhiIndex[i] = lGCTRegionPItr->rctPhi();
+
       i++;
-  }
+    }
+
+  numRegions = i;
 
   RRTree->Fill();
 
 }
+
+double getRealTowerEta(int etaIndex)
+{  
+  int signEta;
+  double realEta;
+  
+  (etaIndex > 0) ? (signEta = 1) : (signEta = -1); 
+  
+  realEta = signEta * 
+    (theHBHEHFEtaBounds[signEta * etaIndex - 1] + theHBHEHFEtaBounds[signEta * etaIndex]) / 2.;  
+  
+  return(realEta);
+} 
+
+int getDetectorTag(int etaIndex)
+{
+  int signEta;
+
+  (etaIndex > 0) ? (signEta = 1) : (signEta = -1); 
+
+  if (etaIndex * signEta <= 28)  
+    {
+      if (etaIndex * signEta <= 17) 
+	{ 
+	  return(1);
+	}
+      else 
+	{
+	  return(2);
+	}
+    }
+  else 
+    { 
+      return(3);
+    }
+}
+
+double getRealRegionEta(int etaIndex)
+{
+  if (etaIndex <= 3) 
+    {
+      return(-1 * (theHBHEHFEtaBounds[32 - etaIndex] + theHBHEHFEtaBounds[31 - etaIndex]) / 2.);
+    }
+  else if (etaIndex >= 18) 
+    {
+      return(1 * (theHBHEHFEtaBounds[10 + etaIndex] + theHBHEHFEtaBounds[11 + etaIndex]) / 2.);
+    }
+  else { 
+    if (etaIndex <= 10) {
+      return(-theHBHEHFEtaBounds[42 - 4 * etaIndex]);
+    }
+    else return(theHBHEHFEtaBounds[4 * etaIndex - 42]);
+  }
+}
+
+
 
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -286,7 +350,7 @@ void
 TriggerPrimitives::beginJob()
 {
 
-  RRTree = fs->make<TTree>("RRTree","Tree containing ecal and hcal info");
+  RRTree = fs->make<TTree>("TriggerPrimitivesTree","Tree containing tower and region primitives.");
   RRTree->Branch("event",&event,"event/I");
   RRTree->Branch("run", &run, "run/I");
 
@@ -329,13 +393,28 @@ TriggerPrimitives::beginJob()
   RRTree->Branch("hcalFineGrain",hcalFineGrain,"hcalFineGrain[hcalDetectorMapSize]/I");
   RRTree->Branch("hcalTag",hcalTag,"hcalTag[hcalDetectorMapSize]/I");
 
-  RRTree->Branch("caloRegionEt",caloRegionEt,"caloRegionEt[396]/I");
-  RRTree->Branch("caloRegionTau",caloRegionTau,"caloRegionTau[396]/I");
-  RRTree->Branch("caloRegionEtaIndex",caloRegionEtaIndex,"caloRegionEtaIndex[396]/I");
-  RRTree->Branch("caloRegionPhiIndex",caloRegionPhiIndex,"caloRegionPhiIndex[396]/I");
-  RRTree->Branch("caloRegionEta",caloRegionEta,"caloRegionEta[396]/D");
-  RRTree->Branch("caloRegionPhi",caloRegionPhi,"caloRegionPhi[396]/D");
+  int regionSize = nEtaRegions*nPhiRegions;
 
+  caloRegionEt = new int[regionSize];
+  caloRegionTau = new int[regionSize];
+  caloRegionEtaIndex = new int[regionSize];
+  caloRegionPhiIndex = new int[regionSize];
+  caloRegionEta = new double[regionSize];
+  caloRegionPhi = new double[regionSize];
+  caloRegionTag = new int[regionSize];
+  caloRCTRegionEtaIndex = new int[regionSize];
+  caloRCTRegionPhiIndex = new int[regionSize];
+  
+  RRTree->Branch("numRegions",&numRegions,"numRegions/I");
+  RRTree->Branch("caloRegionEt",caloRegionEt,"caloRegionEt[numRegions]/I");
+  RRTree->Branch("caloRegionTau",caloRegionTau,"caloRegionTau[numRegions]/I");
+  RRTree->Branch("caloRegionEtaIndex",caloRegionEtaIndex,"caloRegionEtaIndex[numRegions]/I");
+  RRTree->Branch("caloRegionPhiIndex",caloRegionPhiIndex,"caloRegionPhiIndex[numRegions]/I");
+  RRTree->Branch("caloRegionEta",caloRegionEta,"caloRegionEta[numRegions]/D");
+  RRTree->Branch("caloRegionPhi",caloRegionPhi,"caloRegionPhi[numRegions]/D");
+  RRTree->Branch("caloRegionTag",caloRegionTag,"caloRegionTag[numRegions]/I");
+  RRTree->Branch("caloRCTRegionEtaIndex",caloRCTRegionEtaIndex,"caloRCTRegionEtaIndex[numRegions]/I");
+  RRTree->Branch("caloRCTRegionPhiIndex",caloRCTRegionPhiIndex,"caloRCTRegionPhiIndex[numRegions]/I");
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
