@@ -83,7 +83,7 @@ for algo in akPu3PF; do
   for pthat in 50; do
     if [ $pthat -eq 50 ]; then sampleWt=0.6683; fi
     inputLOPhoFile="/net/hisrv0001/home/icali/hadoop/Hydjet1.8/Z2/LOPhotons_merged/LOPhotons${pthat}_merged.root"
-    outputLOPhoFile="output-hy18lopho${pthat}v2_v32_mpt_xsec.root"
+    outputLOPhoFile="output-hy18lopho${pthat}v2_v34_mpt_xsec.root"
     root -b -q analyzePhotonJet.C+'("'$algo'","'$inputLOPhoFile'","'$outputLOPhoFile'",0,'$pthat,$sampleWt',0,"","",0)'
 
     mixmbFile="output-hy18mbv2_v30classes.root"

@@ -1,6 +1,7 @@
 #ifndef MPTUtilities_C
 #define MPTUtilities_C
 #include "commonSetup.h"
+#include "hiForest.h"
 
 // MPT Ranges
 const int nptrange = 6;
@@ -54,6 +55,7 @@ public:
    float ptmin, etamax;
    int selPFId;
    bool doTrackingCorr,anaDiJet;
+   HiForest * c;
    
    // data members
    MPTCands cands; // input
@@ -82,7 +84,7 @@ public:
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
       cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
       for (unsigned m=0; m<vmpt.size(); ++m) { 
-         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
+//         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
          SetBranches(t,vmpt[m]);
       }      
    }
@@ -140,11 +142,11 @@ public:
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
-//               if (anaDiJet&&drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,gpt,c->evt.hiBin,correctionFactors);
-//               else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(candPt,candEta,jpt,c->evt.hiBin,correctionFactors);
-//               else trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,0,c->evt.hiBin,correctionFactors);
-//               ptx*=trkweight;
-//               pty*=trkweight;
+               if (anaDiJet&&drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,gpt,c->evt.hiBin,correctionFactors);
+               else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(candPt,candEta,jpt,c->evt.hiBin,correctionFactors);
+               else trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,0,c->evt.hiBin,correctionFactors);
+               ptx*=trkweight;
+               pty*=trkweight;
             }
             m.mptx += ptx;
             m.mpty += pty;

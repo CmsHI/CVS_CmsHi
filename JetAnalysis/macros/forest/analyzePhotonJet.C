@@ -146,6 +146,7 @@ void analyzePhotonJet(
    AnaMPT pf5mpt("pf5",0,5);
    AnaMPT pfex2mpt("pfex2",2);
    AnaMPT trkmpt("trk",0);
+   AnaMPT trkcorrmpt("trkcorr",0);
    AnaMPT genp0mpt("genp0",1);
    if (doMPT) {
       pfmpt.Init(tgj);  
@@ -154,7 +155,10 @@ void analyzePhotonJet(
       pf4mpt.Init(tgj);  
       pf5mpt.Init(tgj);  
       pfex2mpt.Init(tgj);  
-      trkmpt.Init(tgj);  
+      trkmpt.Init(tgj);
+      trkcorrmpt.doTrackingCorr = true;
+      trkcorrmpt.c = c;
+      trkcorrmpt.Init(tgj);
       genp0mpt.Init(tgj);  
    }
    
@@ -218,8 +222,7 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-//   for (int i=0;i<c->GetEntries();i++)
-   for (int i=0;i<100;i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
