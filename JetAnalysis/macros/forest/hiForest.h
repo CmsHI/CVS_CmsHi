@@ -1,3 +1,6 @@
+#ifndef hiForest_h
+#define hiForest_h
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -602,3 +605,4 @@ void HiForest::GetEnergyScaleTable(char *fileNameTable) {
 #include "PhotonUtilities.C"
 
 
+#endif
