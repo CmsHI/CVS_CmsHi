@@ -146,19 +146,17 @@ void analyzePhotonJet(
    AnaMPT pf5mpt("pf5",0,5);
    AnaMPT pfex2mpt("pfex2",2);
    AnaMPT trkmpt("trk",0);
-   AnaMPT trkcorrmpt("trkcorr",0);
    AnaMPT genp0mpt("genp0",1);
    if (doMPT) {
       pfmpt.Init(tgj);  
       pfgenphompt.Init(tgj);  
       pf1mpt.Init(tgj);  
       pf4mpt.Init(tgj);  
-      pf5mpt.Init(tgj);  
+      pf5mpt.Init(tgj);
       pfex2mpt.Init(tgj);  
+      trkmpt.doTrackingCorr = true;
+      trkmpt.c = c;
       trkmpt.Init(tgj);
-      trkcorrmpt.doTrackingCorr = true;
-      trkcorrmpt.c = c;
-      trkcorrmpt.Init(tgj);
       genp0mpt.Init(tgj);  
    }
    
