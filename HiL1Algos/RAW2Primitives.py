@@ -27,7 +27,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:/d102/velicanu/raw/181985/00026B4D-DD11-E111-B567-00237DDC5CB0.root')
+    fileNames = cms.untracked.vstring('file:/mnt/hadoop/cms/store/user/velicanu/raw/181985/00026B4D-DD11-E111-B567-00237DDC5CB0.root')
 )
 
 process.options = cms.untracked.PSet(
@@ -36,7 +36,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.3 $'),
+    version = cms.untracked.string('$Revision: 1.4 $'),
     annotation = cms.untracked.string('step2 nevts:2'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -62,7 +62,7 @@ process.GlobalTag.globaltag = 'GR_R_44_V7::All'
 process.TFileService = cms.Service("TFileService",
 		fileName = cms.string("dump_prims.root") 
 		)
-process.demo = cms.EDAnalyzer('TriggerPrimitives',
+process.TriggerPrimitives = cms.EDAnalyzer('TriggerPrimitives',
                               ECALDigis = cms.InputTag("ecalDigis:EcalTriggerPrimitives"),
                               HCALDigis = cms.InputTag("hcalDigis"),
                               GCTDigis = cms.InputTag("gctDigis")
@@ -74,7 +74,7 @@ process.demo = cms.EDAnalyzer('TriggerPrimitives',
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
 #process.reconstruction_step = cms.Path(process.reconstructionHeavyIons)
-process.p = cms.Path(process.demo)
+process.p = cms.Path(process.TriggerPrimitives)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RECODEBUGoutput_step = cms.EndPath(process.RECODEBUGoutput)
 
