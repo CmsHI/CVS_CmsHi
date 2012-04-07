@@ -93,7 +93,7 @@ void analyzePhotonJet(
 {
    bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
    //bool checkDup=false;
-   bool doMPT=true;
+   bool doMPT=true, saveAllCands=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -102,7 +102,8 @@ void analyzePhotonJet(
    double cutjetPt = 0;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
-   double cutPtTrk=0.5, cutEtaTrk = 2.4;	
+   double cutPtTrk=4, cutEtaTrk = 2.4;
+   if (saveAllCands) cutPtTrk=1;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
@@ -139,14 +140,14 @@ void analyzePhotonJet(
    TTree * tgj = new TTree("tgj","gamma jet tree");
    BookGJBranches(tgj,evt,gj,isol);
 
-   AnaMPT pfmpt("pf",1);
-   AnaMPT pfgenphompt("pfgenpho",1);
+   AnaMPT pfmpt("pf",0);
+   AnaMPT pfgenphompt("pfgenpho",0);
    AnaMPT pf1mpt("pf1",0,1);
-   AnaMPT pf4mpt("pf4",1,4);
+   AnaMPT pf4mpt("pf4",0,4);
    AnaMPT pf5mpt("pf5",0,5);
    AnaMPT pfex2mpt("pfex2",2);
    AnaMPT trkmpt("trk",0);
-   AnaMPT genp0mpt("genp0",1);
+   AnaMPT genp0mpt("genp0",0);
    if (doMPT) {
       pfmpt.Init(tgj);  
       pfgenphompt.Init(tgj);  
@@ -220,8 +221,7 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   for (int i=0;i<2000;i++)
-//   for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -448,6 +448,9 @@ void analyzePhotonJet(
                gj.jlpfEta = pfs.pfEta[it];
                gj.jlpfPhi = pfs.pfPhi[it];
                gj.jlpfId = pfs.pfId[it];
+            }
+            if (gj.pfId[gj.nPf]==4&&gj.pfPt[gj.nPf]>6&&fabs(gj.pfEta[gj.nPf])<1.6&&deltaPhi(gj.pfPhi[gj.nPf],gj.photonPhi)<0.4&&fabs(gj.pfEta[gj.nPf]-gj.photonEta)<0.1) {
+               gj.pfPhoPt+=gj.pfPt[gj.nPf]*cos(gj.pfPhi[gj.nPf]-gj.photonPhi);
             }
             ++gj.nPf;
          }

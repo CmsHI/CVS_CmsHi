@@ -27,7 +27,8 @@ public:
    nTrk(0),nJet(0) {
       leaves = "photonEt/F:photonRawEt:photonEta:photonPhi:jetEt:jetRawEt:jetEta:jetPhi:deta:dphi:Agj:hovere:sigmaIetaIeta:sumIsol"
       ":phoMatJetEt:phoMatJetEta:phoMatJetPhi"
-      ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr:jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId"
+      ":ltrkPt:ltrkEta:ltrkPhi:ltrkJetDr:jltrkPt:jltrkEta:jltrkPhi:jltrkJetDr"
+      ":jlpfPt:jlpfEta:jlpfPhi:jlpfJetDr:jlpfId:pfPhoPt"
       ":refPhoPt:refPhoEta:refPhoPhi:refPhoFlavor:genCalIsoDR04:refJetEt:refJetEta:refJetPhi:refPartonPt:refPartonFlavor"
       ":genPhoPt:genPhoEta:genPhoPhi:genJetPt:genJetEta:genJetPhi"
       ":isEle/O";
@@ -37,9 +38,8 @@ public:
    float deta,dphi,Aj;
    float hovere,sigmaIetaIeta,sumIsol;
    float phoMatJetEt,phoMatJetEta,phoMatJetPhi;
-   float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr;
-   float jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
-   float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId;
+   float ltrkPt,ltrkEta,ltrkPhi,ltrkJetDr,jltrkPt,jltrkEta,jltrkPhi,jltrkJetDr;
+   float jlpfPt,jlpfEta,jlpfPhi,jlpfJetDr,jlpfId,pfPhoPt;
    float refPhoPt,refPhoEta,refPhoPhi,refPhoFlavor,genCalIsoDR04,refJetEt,refJetEta,refJetPhi,refPartonPt,refPartonFlavor;
    float genPhoPt,genPhoEta,genPhoPhi,genJetPt,genJetEta,genJetPhi;
    bool isEle;
@@ -79,7 +79,7 @@ public:
       phoMatJetEt=-99; phoMatJetEta=-99; phoMatJetPhi=-99;
       ltrkPt=-99; ltrkEta=-99; ltrkPhi=-99; ltrkJetDr=-99;
       jltrkPt=-99; jltrkEta=-99; jltrkPhi=-99; jltrkJetDr=-99;
-      jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99;
+      jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99; pfPhoPt=0;
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       genPhoPt=-99; genPhoEta=-99; genPhoPhi=-99; genJetPt=-99; genJetEta=-99; genJetPhi=-99;
       isEle=false;
