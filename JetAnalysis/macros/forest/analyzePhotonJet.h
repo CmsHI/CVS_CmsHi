@@ -60,6 +60,16 @@ public:
    float inclGenJetEta[MAXTRK];
    float inclGenJetPhi[MAXTRK];   
    float inclGenJetResp[MAXTRK];
+   int nPf;
+   float pfPt[MAXTRK];
+   float pfEta[MAXTRK];
+   float pfPhi[MAXTRK];
+   int pfId[MAXTRK];
+   int nGenp;
+   float genpPt[MAXTRK];
+   float genpEta[MAXTRK];
+   float genpPhi[MAXTRK];
+   int genpCh[MAXTRK];
    TString leaves;
    void clear() {
       photonEt=-99; photonEta=-99; photonPhi=-99;
@@ -73,7 +83,7 @@ public:
       refPhoPt=-99; refPhoFlavor=-99; refJetEt=-99; refJetEta=-99; refJetPhi=-99; refPartonPt=-99; refPartonFlavor=-99;
       genPhoPt=-99; genPhoEta=-99; genPhoPhi=-99; genJetPt=-99; genJetEta=-99; genJetPhi=-99;
       isEle=false;
-      nTrk=0; nJet=0; nGenJet=0;
+      nTrk=0; nJet=0; nGenJet=0; nPf=0; nGenp=0;
    }
 };
 
@@ -127,6 +137,16 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, GammaJet & gj, Isolation & isol) 
    tgj->Branch("inclGenJetEta",gj.inclGenJetEta,"inclGenJetEta[nGenJet]/F");
    tgj->Branch("inclGenJetPhi",gj.inclGenJetPhi,"inclGenJetPhi[nGenJet]/F");
    tgj->Branch("inclGenJetResp",gj.inclGenJetResp,"inclGenJetResp[nGenJet]/F");
+   tgj->Branch("nPf",&gj.nPf,"nPf/I");
+   tgj->Branch("pfPt",gj.pfPt,"pfPt[nPf]/F");
+   tgj->Branch("pfEta",gj.pfEta,"pfEta[nPf]/F");
+   tgj->Branch("pfPhi",gj.pfPhi,"pfPhi[nPf]/F");
+   tgj->Branch("pfId",gj.pfId,"pfId[nPf]/I");
+   tgj->Branch("nGenp",&gj.nGenp,"nGenp/I");
+   tgj->Branch("genpPt",gj.genpPt,"genpPt[nGenp]/F");
+   tgj->Branch("genpEta",gj.genpEta,"genpEta[nGenp]/F");
+   tgj->Branch("genpPhi",gj.genpPhi,"genpPhi[nGenp]/F");
+   tgj->Branch("genpCh",gj.genpCh,"genpCh[nGenp]/I");
 }
 
 class CentralityReWeight {

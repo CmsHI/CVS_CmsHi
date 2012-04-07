@@ -102,7 +102,7 @@ void analyzePhotonJet(
    double cutjetPt = 0;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
-   double cutPtTrk=0, cutEtaTrk = 2.4;	
+   double cutPtTrk=0.5, cutEtaTrk = 2.4;	
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
@@ -220,7 +220,8 @@ void analyzePhotonJet(
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
-   for (int i=0;i<c->GetEntries();i++)
+   for (int i=0;i<2000;i++)
+//   for (int i=0;i<c->GetEntries();i++)
    {
       c->GetEntry(i);
       if (pfTree) pfTree->GetEntry(i);
@@ -404,11 +405,42 @@ void analyzePhotonJet(
                ++im;
             }
          }
-
-         // pfid
+         
+         // xcheck with tracks
+         gj.nTrk=0;
+         for (int it=0; it<c->track.nTrk; ++it) {
+            if (c->track.trkPt[it] < cutPtTrk) continue;
+            if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
+            gj.trkPt[gj.nTrk] = c->track.trkPt[it];
+            gj.trkEta[gj.nTrk] = c->track.trkEta[it];
+            gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
+            gj.trkJetDr[gj.nTrk] = deltaR(gj.trkEta[gj.nTrk],gj.trkPhi[gj.nTrk],gj.jetEta,gj.jetPhi);
+            // find leading track
+            if (gj.trkPt[gj.nTrk]>gj.ltrkPt) {
+               gj.ltrkPt = gj.trkPt[gj.nTrk];
+               gj.ltrkEta = gj.trkEta[gj.nTrk];
+               gj.ltrkPhi = gj.trkPhi[gj.nTrk];
+               gj.ltrkJetDr = gj.trkJetDr[gj.nTrk];
+            }
+            // find leading track in jet
+            if (gj.trkJetDr[gj.nTrk]<0.3 && gj.trkPt[gj.nTrk]>gj.jltrkPt) {
+               gj.jltrkPt = gj.trkPt[gj.nTrk];
+               gj.jltrkEta = gj.trkEta[gj.nTrk];
+               gj.jltrkPhi = gj.trkPhi[gj.nTrk];
+               gj.jltrkJetDr = gj.trkJetDr[gj.nTrk];
+            }
+            ++gj.nTrk;
+         }
+         
+         // xcheck with pfcands
+         gj.nPf=0;
          for (int it=0; it<pfs.nPFpart; ++it) {
-            if (pfs.pfPt[it] < 4) continue;
-            if (fabs(pfs.pfEta[it]) > 3) continue;
+            if (pfs.pfPt[it] < cutPtTrk) continue;
+            if (fabs(pfs.pfEta[it]) > cutEtaTrk) continue;
+            gj.pfPt[gj.nPf]=pfs.pfPt[it];
+            gj.pfEta[gj.nPf]=pfs.pfEta[it];
+            gj.pfPhi[gj.nPf]=pfs.pfPhi[it];
+            gj.pfId[gj.nPf]=pfs.pfId[it];
             // find leading pfcand in jet
             float dr = deltaR(pfs.pfEta[it],pfs.pfPhi[it],gj.jetEta,gj.jetPhi);
             if (dr<0.3 && pfs.pfPt[it]>gj.jlpfPt) {
@@ -417,6 +449,7 @@ void analyzePhotonJet(
                gj.jlpfPhi = pfs.pfPhi[it];
                gj.jlpfId = pfs.pfId[it];
             }
+            ++gj.nPf;
          }
       } // end of if leadingIndex
       
@@ -469,32 +502,6 @@ void analyzePhotonJet(
          
          genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
          genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-      }
-      
-      // xcheck with tracks
-      gj.nTrk=0;
-      for (int it=0; it<c->track.nTrk; ++it) {
-         if (c->track.trkPt[it] < 4) continue;
-         if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
-         gj.trkPt[gj.nTrk] = c->track.trkPt[it];
-         gj.trkEta[gj.nTrk] = c->track.trkEta[it];
-         gj.trkPhi[gj.nTrk] = c->track.trkPhi[it];
-         gj.trkJetDr[gj.nTrk] = deltaR(gj.trkEta[gj.nTrk],gj.trkPhi[gj.nTrk],gj.jetEta,gj.jetPhi);
-         // find leading track
-         if (gj.trkPt[gj.nTrk]>gj.ltrkPt) {
-            gj.ltrkPt = gj.trkPt[gj.nTrk];
-            gj.ltrkEta = gj.trkEta[gj.nTrk];
-            gj.ltrkPhi = gj.trkPhi[gj.nTrk];
-            gj.ltrkJetDr = gj.trkJetDr[gj.nTrk];
-         }
-         // find leading track in jet
-         if (gj.trkJetDr[gj.nTrk]<0.3 && gj.trkPt[gj.nTrk]>gj.jltrkPt) {
-            gj.jltrkPt = gj.trkPt[gj.nTrk];
-            gj.jltrkEta = gj.trkEta[gj.nTrk];
-            gj.jltrkPhi = gj.trkPhi[gj.nTrk];
-            gj.jltrkJetDr = gj.trkJetDr[gj.nTrk];
-         }
-         ++gj.nTrk;
       }
       
       // All done
