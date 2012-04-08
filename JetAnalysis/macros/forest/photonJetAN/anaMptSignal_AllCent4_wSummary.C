@@ -84,8 +84,8 @@ void getHistograms(TString myname, TString var, TString bkgvar,
       vana[ib]->rBkgSShape.normBinWidth = true;
       vana[ib]->rBkgSShapeDPhi.normBinWidth = true;
       vana[ib]->rSubtracted.normBinWidth = true;
-      float nxbins=16, xmin=-1, xmax=3;
-      if (ib==(vcutCent.size()-1)||dataSrcType>1) nxbins=10;
+      float nxbins=32, xmin=-2, xmax=4;
+//      if (ib==(vcutCent.size()-1)||dataSrcType>1) nxbins=10;
       if (dataType==0) {
          vana[ib]->subDPhiSide = false;
          vana[ib]->subSShapeSide = false;
