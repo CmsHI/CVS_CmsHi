@@ -23,7 +23,7 @@ public:
       h = new TH1D(name,"",nbins,bins);
       if (var!="") {
          n = t->Project(h->GetName(),var,cut);
-         if (TString(cut).Contains("cBin>=0.0")&&TString(cut).Contains("Jet")) cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
+         if (TString(cut).Contains("cBin>=0.0")&&!TString(h->GetName()).Contains("AllPho")) cout << "  " << h->GetName() << "  draw: " << var << " cut: " << TString(cut) << ": " << n << endl;
       }
    }
    
