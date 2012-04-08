@@ -183,9 +183,9 @@ void anaMptSignal_AllCent4_wSummary(
    
    // MPT
    vector<TString> mptCand;
-   mptCand.push_back("pf");
-   mptCand.push_back("trk");
-//   mptCand.push_back("trkcorr");
+   vector<TString> xmptObs;
+   mptCand.push_back("pf"); xmptObs.push_back("(-(mptxSrcType-pfPhoPt)/photonEt)");
+   mptCand.push_back("trk"); xmptObs.push_back("(-(mptxSrcType)/photonEt)");
 
    vector<TString> mptType;
    mptType.push_back("AllAcc");
@@ -194,13 +194,15 @@ void anaMptSignal_AllCent4_wSummary(
 
    for (int c=0; c<mptCand.size(); ++c) {
       for (int m=0; m<mptType.size(); ++m) {
-         TString mptvar=Form("mptx%s%s",mptCand[c].Data(), mptType[m].Data());
-         TString xmptobs=Form("(-(%s-pfPhoPt)/photonEt)",mptvar.Data());
+         TString xmptobs=xmptObs[c];
+         xmptobs.ReplaceAll("Src",mptCand[c]);
+         xmptobs.ReplaceAll("Type",mptType[m]);
+
          vector<SignalCorrector*> vanahyphompt;
-         getHistograms("hypho"+mptvar,xmptobs,"",vanahyphompt, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,"",isolScheme,normMode,inputTree_mc,mcweight,0,1,0,0,minPhoton,minJet,sigDPhi);
+         getHistograms("hyphomptx"+mptCand[c]+mptType[m],xmptobs,"",vanahyphompt, vcutCent,"offlSel&&genCalIsoDR04<5&&abs(refPhoFlavor)<=22",jetSel,"",isolScheme,normMode,inputTree_mc,mcweight,0,1,0,0,minPhoton,minJet,sigDPhi);
          
          vector<SignalCorrector*> vanahimpt;
-         getHistograms("hi"+mptvar,xmptobs,"",vanahimpt, vcutCent,"anaEvtSel",jetSel,"",isolScheme,normMode,inputTree_data,"(1==1)",1,1,0,subSShapeSide,minPhoton,minJet,sigDPhi);         
+         getHistograms("himptx"+mptCand[c]+mptType[m],xmptobs,"",vanahimpt, vcutCent,"anaEvtSel",jetSel,"",isolScheme,normMode,inputTree_data,"(1==1)",1,1,0,subSShapeSide,minPhoton,minJet,sigDPhi);         
       }
    }
 }
