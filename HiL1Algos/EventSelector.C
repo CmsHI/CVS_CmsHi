@@ -53,6 +53,7 @@ public :
    TH2D *histoEt2D;
    TH1D *histoEtvsEta;
    TH1D *histoEtvsPhi;
+
    TBranch *currentEtaBranch;
    TBranch *currentPhiBranch;
    TBranch *currentEtaIndexBranch;
@@ -65,20 +66,15 @@ public :
    TBranch* fJetPhiIndexBranch;
    TBranch* fJetNumberBranch;
 
-   TBranch* fTauEtBranch;
-   TBranch* fTauEtaIndexBranch;
-   TBranch* fTauPhiIndexBranch;
-   TBranch* fTauNumberBranch;
-
    TBranch* cJetEtBranch;
    TBranch* cJetEtaIndexBranch;
    TBranch* cJetPhiIndexBranch;
    TBranch* cJetNumberBranch;
 
-   TBranch* cTauEtBranch;
-   TBranch* cTauEtaIndexBranch;
-   TBranch* cTauPhiIndexBranch;
-   TBranch* cTauNumberBranch;
+   TBranch* TauEtBranch;
+   TBranch* TauEtaIndexBranch;
+   TBranch* TauPhiIndexBranch;
+   TBranch* TauNumberBranch;
 
    double currentEta[396];
    int currentEt[396];
@@ -92,20 +88,15 @@ public :
    int fJetPhiIndex[4];
    int fJetNumber;
 
-   int fTauEt[4];
-   int fTauEtaIndex[4];
-   int fTauPhiIndex[4];
-   int fTauNumber;
-
    int cJetEt[4];
    int cJetEtaIndex[4];
    int cJetPhiIndex[4];
    int cJetNumber;
 
-   int cTauEt[4];
-   int cTauEtaIndex[4];
-   int cTauPhiIndex[4];
-   int cTauNumber;
+   int TauEt[4];
+   int TauEtaIndex[4];
+   int TauPhiIndex[4];
+   int TauNumber;
 };
 
 void EventSelector::Init(TTree *tree)
@@ -126,21 +117,15 @@ void EventSelector::Init(TTree *tree)
    fJetPhiIndexBranch=tree->Branch("fJetPhi",fJetPhiIndex,"fJetPhi[4]/I");
    fJetNumberBranch=  tree->Branch("fJetNumber",&fJetNumber,"fJetNumber/I");
 
-   fTauEtBranch=      tree->Branch("fTauEt",fTauEt,"fTauEt[4]/I");
-   fTauEtaIndexBranch=tree->Branch("fTauEta",fTauEtaIndex,"fTauEta[4]/I");
-   fTauPhiIndexBranch=tree->Branch("fTauPhi",fTauPhiIndex,"fTauPhi[4]/I");
-   fTauNumberBranch=  tree->Branch("fTauNumber",&fTauNumber,"fTauNumber/I");
-
    cJetEtBranch=      tree->Branch("cJetEt",cJetEt,"cJetEt[4]/I");
    cJetEtaIndexBranch=tree->Branch("cJetEta",cJetEtaIndex,"cJetEta[4]/I");
    cJetPhiIndexBranch=tree->Branch("cJetPhi",cJetPhiIndex,"cJetPhi[4]/I");
    cJetNumberBranch=  tree->Branch("cJetNumber",&cJetNumber,"cJetNumber/I");
 
-   cTauEtBranch=      tree->Branch("cTauEt",cTauEt,"cTauEt[4]/I");
-   cTauEtaIndexBranch=tree->Branch("cTauEta",cTauEtaIndex,"cTauEta[4]/I");
-   cTauPhiIndexBranch=tree->Branch("cTauPhi",cTauPhiIndex,"cTauPhi[4]/I");
-   cTauNumberBranch=  tree->Branch("cTauNumber",&cTauNumber,"cTauNumber/I");
-
+   TauEtBranch=      tree->Branch("TauEt",TauEt,"TauEt[4]/I");
+   TauEtaIndexBranch=tree->Branch("TauEta",TauEtaIndex,"TauEta[4]/I");
+   TauPhiIndexBranch=tree->Branch("TauPhi",TauPhiIndex,"TauPhi[4]/I");
+   TauNumberBranch=  tree->Branch("TauNumber",&TauNumber,"TauNumber/I");
 }
 
 void EventSelector::SlaveBegin(TTree *tree)
@@ -152,7 +137,6 @@ void EventSelector::SlaveBegin(TTree *tree)
   histoEt2D=new TH2D("hCaloRegion","histo EtCaloRegion vs Eta,Phi",18,0,6.283,22,ybins);
   histoEtvsEta=new TH1D("hCaloRegion2","histo EtCaloRegion vs Eta",22,ybins);
   histoEtvsPhi=new TH1D("hCaloRegion3","histo EtCaloRegion vs Phi",18,0,6.283);
-
 }
 
 Bool_t EventSelector::Process(Long64_t entry)
@@ -175,200 +159,236 @@ Bool_t EventSelector::Process(Long64_t entry)
    int mapEt[22][18];
    int mapTau[22][18];
 
-   int tempEt[3][3];
-   int tempTau[3][3];
+   int mapCluster[22][18];
+   int mapClusterTau[22][18];
 
-   int tfJetEt[72];
-   int tfJetEtaIndex[72];
-   int tfJetPhiIndex[72];
-   int tfJetTau[252];
+   int tfJetEt[40];
+   int tfJetEtaIndex[40];
+   int tfJetPhiIndex[40];
    fJetNumber=0;
-   fTauNumber=0;
 
-   int tcJetEt[252];
-   int tcJetEtaIndex[252];
-   int tcJetPhiIndex[252];
-   int tcJetTau[252];
+   int tcJetEt[80];
+   int tcJetEtaIndex[80];
+   int tcJetPhiIndex[80];
    cJetNumber=0;
-   cTauNumber=0;
+
+   int tTauEt[120];
+   int tTauEtaIndex[120];
+   int tTauPhiIndex[120];
+   TauNumber=0;
 
    for(int i=0;i<396;i++){
      histoEt2D->Fill(currentPhi[i],currentEta[i],currentEt[i]);
      histoEtvsEta->Fill(currentEta[i],currentEt[i]);
      histoEtvsPhi->Fill(currentPhi[i],currentEt[i]);
      mapEt[currentEtaIndex[i]][currentPhiIndex[i]]=currentEt[i];
-     //std::cout<<currentEtaIndex[i]<<" "<<currentPhiIndex[i]<<" "<<mapEt[currentEtaIndex[i]][currentPhiIndex[i]]<<std::endl;
      mapTau[currentEtaIndex[i]][currentPhiIndex[i]]=currentTau[i];
-     // std::cout<<currentPhi[i]<<" "<<currentEta[i]<<" "<<currentEt[i]<<std::endl;
    }
-   int isItJet,isItTau,tmpEt;
 
-   for(int ieta=0;ieta<20;ieta++){
-     if (ieta==3) ieta=17;
-     for(int iphi=0;iphi<18;iphi++){
-       for(int itphi=0;itphi<3;itphi++)
-         for(int iteta=0;iteta<3;iteta++){
-           tempEt[iteta][itphi]=mapEt[ieta+iteta][iphi+itphi>17?iphi+itphi-18:iphi+itphi];
-           tempTau[iteta][itphi]=mapTau[ieta+iteta][iphi+itphi>17?iphi+itphi-18:iphi+itphi];
-         }
-       isItJet=1;isItTau=0;tmpEt=0;
-       for(int itphi=0;itphi<3;itphi++)
-         for(int iteta=0;iteta<3;iteta++){
-           if ((iteta!=1) || (itphi!=1))
-             if (tempEt[iteta][itphi]>tempEt[1][1])  isItJet=0;
-           isItTau+=tempTau[iteta][itphi];
-           tmpEt+=tempEt[iteta][itphi];
-         }
-       if (tempEt[1][1]==0) isItJet=0;
-       if (isItJet==1){
-         tfJetEt[fJetNumber]=tmpEt;
-         tfJetEtaIndex[fJetNumber]=ieta+1;
-         tfJetPhiIndex[fJetNumber]=(iphi+1==18?0:iphi+1);
-         tfJetTau[fJetNumber]=(isItTau?0:1);
-         fTauNumber+=tfJetTau[fJetNumber];
-         fJetNumber++;
-       }
-     }
-   }
-  
-   for(int ieta=3;ieta<17;ieta++){
-     for(int iphi=0;iphi<18;iphi++){
-       for(int itphi=0;itphi<3;itphi++)
-         for(int iteta=0;iteta<3;iteta++){
-           tempEt[iteta][itphi]=mapEt[ieta+iteta][iphi+itphi>17?iphi+itphi-18:iphi+itphi];
-           tempTau[iteta][itphi]=mapTau[ieta+iteta][iphi+itphi>17?iphi+itphi-18:iphi+itphi];
-         }
-       isItJet=1;isItTau=0;tmpEt=0;
-       for(int itphi=0;itphi<3;itphi++)
-         for(int iteta=0;iteta<3;iteta++){
-           if ((iteta!=1) || (itphi!=1))
-             if (tempEt[iteta][itphi]>tempEt[1][1]) isItJet=0;
-           isItTau+=tempTau[iteta][itphi];
-           tmpEt+=tempEt[iteta][itphi];
-         }
-       if (tempEt[1][1]==0) isItJet=0;
-       if (isItJet==1){
-         tcJetEt[cJetNumber]=tmpEt;
-         tcJetEtaIndex[cJetNumber]=ieta+1;
-         tcJetPhiIndex[cJetNumber]=(iphi+1==18?0:iphi+1);
-         tcJetTau[cJetNumber]=(isItTau?0:1);
-         cTauNumber+=tcJetTau[cJetNumber];
-         cout<<tcJetTau[cJetNumber]<<" "<<ieta+1<<" "<<iphi+1<<endl;
-         cJetNumber++;
-       }
-     }
-   }
-  
-   cJetNumber-=cTauNumber;
-   fJetNumber-=fTauNumber;
+   for(int strip=0;strip<9;strip++){
+      for(int i=0;i<2;i++){
+         for(int j=0;j<22;j++){
+            cout<<mapEt[j][2*strip+i]<<"  ";
+            if ((j>0)&&(j<21)){
+               if((mapEt[j][2*strip+i]>mapEt[j+1][2*strip+i])&&
+                  (mapEt[j][2*strip+i]>=mapEt[j-1][2*strip+i])&&
+                  ((mapEt[j][2*strip+i]>mapEt[j][2*strip+(i?0:1)])||((i==0)&&(mapEt[j][2*strip+0]==mapEt[j][2*strip+1])))&&
+                  (mapEt[j][2*strip+i]>mapEt[j+1][2*strip+(i?0:1)])&&
+                  (mapEt[j][2*strip+i]>=mapEt[j-1][2*strip+(i?0:1)])){
+                     mapCluster[j][2*strip+i]=mapEt[j][2*strip+i]+mapEt[j+1][2*strip+i]+mapEt[j-1][2*strip+i]+
+                                                      mapEt[j][2*strip+(i?0:1)]+mapEt[j+1][2*strip+(i?0:1)]+mapEt[j-1][2*strip+(i?0:1)];
+                     //cout<<mapCluster[j][2*strip+i]<<"[]";
+                    mapClusterTau[j][2*strip+i]=mapTau[j][2*strip+i]+mapTau[j+1][2*strip+i]+
+mapTau[j-1][2*strip+i]+mapTau[j][2*strip+(i?0:1)]+mapTau[j+1][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)]; }
+               else {
+                  mapCluster[j][2*strip+i]=0;
+                  //cout<<mapCluster[j][2*strip+i]<<"[0]";
+               }
+            }
 
-   std::cout<<cJetNumber<<" "<<fJetNumber<<" "<<cTauNumber<<" "<<fTauNumber<<std::endl;
+            if (j==0){
+               if((mapEt[j][2*strip+i]>mapEt[j+1][2*strip+i])&&
+                  ((mapEt[j][2*strip+i]>mapEt[j][2*strip+(i?0:1)])||((i==0)&&(mapEt[j][2*strip+0]==mapEt[j][2*strip+1])))&&
+                  (mapEt[j][2*strip+i]>mapEt[j+1][2*strip+(i?0:1)])){
+                     mapCluster[j][2*strip+i]=mapEt[j][2*strip+i]+mapEt[j+1][2*strip+i]+
+mapEt[j][2*strip+(i?0:1)]+mapEt[j+1][2*strip+(i?0:1)];
+                     //cout<<mapCluster[j][2*strip+i]<<"[]";
+                     mapClusterTau[j][2*strip+i]=mapTau[j][2*strip+i]+mapTau[j+1][2*strip+i]+
+mapTau[j][2*strip+(i?0:1)]+mapTau[j+1][2*strip+(i?0:1)];}
+               else{
+                  mapCluster[j][2*strip+i]=0;
+                  //cout<<mapCluster[j][2*strip+i]<<"[0]";
+               }
+            }
+            if(j==21){
+               if ((mapEt[j][2*strip+i]>=mapEt[j-1][2*strip+i])&&
+                  ((mapEt[j][2*strip+i]>mapEt[j][2*strip+(i?0:1)])||((i==0)&&(mapEt[j][2*strip+0]==mapEt[j][2*strip+1])))&&
+                  (mapEt[j][2*strip+i]>=mapEt[j-1][2*strip+(i?0:1)])){
+                     mapCluster[j][2*strip+i]=mapEt[j][2*strip+i]+mapEt[j-1][2*strip+i]+
+mapEt[j][2*strip+(i?0:1)]+mapEt[j-1][2*strip+(i?0:1)];
+                     //cout<<mapCluster[j][2*strip+i]<<"[]";
+                     mapClusterTau[j][2*strip+i]=mapTau[j][2*strip+i]+mapTau[j-1][2*strip+i]+
+mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
+               else{
+                  mapCluster[j][2*strip+i]=0;
+                  //cout<<mapCluster[j][2*strip+i]<<"[0]";
+               }
+            }
+         }
+      }
+   }
 
-   for(int i=0;i<4;i++){
-     if(i==cJetNumber) {
-       for(int j=i;j<4;j++){
-         cJetEt[j]=-1;
-         cJetEtaIndex[j]=-1;
-         cJetPhiIndex[j]=-1;
-       }
-       break;
-     }
-     else{
-       int max=0,jindex=0;
-       for(int j=0;j<cJetNumber+cTauNumber;j++)
-         if(tcJetEt[j]>max) if (tcJetTau[j]==0) {max=tcJetEt[j]; jindex=j;}
-       cJetEt[i]=tcJetEt[jindex];
-       tcJetEt[jindex]=0;
-       cJetEtaIndex[i]=tcJetEtaIndex[jindex];
-       cJetPhiIndex[i]=tcJetPhiIndex[jindex];
-     }
-   }
-   //cout<<"1 : OK"<<endl;
-   for(int i=0;i<4;i++){
-     if(i==cTauNumber) {
-       for(int j=i;j<4;j++){
-         cTauEt[j]=-1;
-         cTauEtaIndex[j]=-1;
-         cTauPhiIndex[j]=-1;
-       }
-       break;
-     }
-     else{
-       int max=0,jindex=0;
-       for(int j=0;j<cTauNumber+cJetNumber;j++)
-         if(tcJetEt[j]>max) if (tcJetTau[j]==1) {max=tcJetEt[j];jindex=j;}
-       cTauEt[i]=tcJetEt[jindex];
-       tcJetEt[jindex]=0;
-       cTauEtaIndex[i]=tcJetEtaIndex[jindex];
-       cTauPhiIndex[i]=tcJetPhiIndex[jindex];
-     }
-   }
-   //cout<<"2 : OK"<<endl;
-   for(int i=0;i<4;i++){
-     if(i==fJetNumber) {       
-       for(int j=i;j<4;j++){
-         fJetEt[j]=-1;
-         fJetEtaIndex[j]=-1;
-         fJetPhiIndex[j]=-1;
-       }
-       break;
-     }
-     else{
-       int max=0,jindex=0;
-       for(int j=0;j<fJetNumber+fTauNumber;j++)
-         if(tfJetEt[j]>max) if(tfJetTau[j]==0) {max=tfJetEt[j];jindex=j;}
-       fJetEt[i]=tfJetEt[jindex];
-       tfJetEt[jindex]=0;
-       fJetEtaIndex[i]=tfJetEtaIndex[jindex];
-       fJetPhiIndex[i]=tfJetPhiIndex[jindex];
-     }
-   }
-   //cout<<"3 : OK"<<endl;
-   for(int i=0;i<4;i++){
-     if(i==fTauNumber) {       
-       for(int j=i;j<4;j++){
-         fTauEt[j]=-1;
-         fTauEtaIndex[j]=-1;
-         fTauPhiIndex[j]=-1;
-       }
-       break;
-     }
-     else{
-       if (i==fTauNumber) break;
-       int max=0,jindex=0;
-       for(int j=0;j<fTauNumber+fJetNumber;j++)
-         if(tfJetEt[j]>max) if(tfJetTau[j]==1) {max=tfJetEt[j];jindex=j;}
-       fTauEt[i]=tfJetEt[jindex];
-       tfJetEt[jindex]=0;
-       fTauEtaIndex[i]=tfJetEtaIndex[jindex];
-       fTauPhiIndex[i]=tfJetPhiIndex[jindex];
-     }
-   }
-   //cout<<"4 : OK"<<endl;
 
+   for(int i=0;i<18;i++) for(int j=0;j<22;j++){
+      cout<<mapCluster[j][i]<<" ";
+      if (mapCluster[j][i]){
+         int tempi=i+(i%2?1:-1);
+         if (tempi>17) tempi=tempi-18;
+         if (tempi<0)  tempi=tempi+18;
+         if((j>0)&&(j<21)){
+            if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j+1][tempi])||((i%2==0)&&(mapCluster[j+1][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j-1][tempi])||((i%2==0)&&(mapCluster[j-1][tempi]==mapCluster[j][i])))){
+               mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j+1][tempi]+mapEt[j-1][tempi];
+               mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j+1][tempi]+mapTau[j-1][tempi];
+               if (mapClusterTau[j][i]) {
+                  if((j<=3)||(j>=18)){
+                     tfJetEt[fJetNumber]=mapCluster[j][i];
+                     tfJetEtaIndex[fJetNumber]=j;
+                     tfJetPhiIndex[fJetNumber]=i;
+                     fJetNumber++;
+                  }
+                  else{
+                    tcJetEt[cJetNumber]=mapCluster[j][i];
+                    tcJetEtaIndex[cJetNumber]=j;
+                    tcJetPhiIndex[cJetNumber]=i;
+                    cJetNumber++;
+                  }
+               }
+               else{
+                  tTauEt[TauNumber]=mapCluster[j][i];
+                  tTauEtaIndex[TauNumber]=j;
+                  tTauPhiIndex[TauNumber]=i;
+                  TauNumber++;
+               }
+            }
+         }
+         if (j==0){
+            if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j+1][tempi])||((i%2==0)&&(mapCluster[j+1][tempi]==mapCluster[j][i])))){
+               mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j+1][tempi];
+               mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j+1][tempi];
+               if (mapClusterTau[j][i]) {
+                  tfJetEt[fJetNumber]=mapCluster[j][i];
+                  tfJetEtaIndex[fJetNumber]=j;
+                  tfJetPhiIndex[fJetNumber]=i;
+                  fJetNumber++;
+               }
+               else{
+                  tTauEt[TauNumber]=mapCluster[j][i];
+                  tTauEtaIndex[TauNumber]=j;
+                  tTauPhiIndex[TauNumber]=i;
+                  TauNumber++;
+               }
+            }
+         }
+         if (j==21){
+            if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j-1][tempi])||((i%2==0)&&(mapCluster[j-1][tempi]==mapCluster[j][i])))){
+               mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j-1][tempi];
+               mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j-1][tempi];
+               if (mapClusterTau[j][i]) {
+                  tfJetEt[cJetNumber]=mapCluster[j][i];
+                  tfJetEtaIndex[cJetNumber]=j;
+                  tfJetPhiIndex[cJetNumber]=i;
+                  fJetNumber++;
+               }
+               else{
+                  tTauEt[TauNumber]=mapCluster[j][i];
+                  tTauEtaIndex[TauNumber]=j;
+                  tTauPhiIndex[TauNumber]=i;
+                  TauNumber++;
+               }
+            }
+         }
+      }
+   }
+   cout<<endl;
+   int i;
+   int avoid=0;
+   for(i=0;i<4;i++){
+      if(i==fJetNumber) break;
+      int max=0,maxj=0;
+      for(int j=0;j<fJetNumber;j++) if (tfJetEt[j]>max){
+         max=tfJetEt[j];
+         maxj=j;
+      }
+      tfJetEt[maxj]=0;
+      fJetEt[i]=max;
+      fJetEtaIndex[i]=tfJetEtaIndex[maxj];
+      fJetPhiIndex[i]=tfJetPhiIndex[maxj];
+      //cout<<max<<"  ";
+   }
+   for(int j=i;j<4;j++){
+      fJetEt[j]=-1;
+      fJetEtaIndex[j]=-1;
+      fJetPhiIndex[j]=-1;
+      avoid++;
+   }
+
+   for(i=0;i<4;i++){
+      if(i==cJetNumber) break;
+      int max=0,maxj=0;
+      for(int j=0;j<cJetNumber;j++) if (tcJetEt[j]>max){
+         max=tcJetEt[j];
+         maxj=j;
+      }
+      tcJetEt[maxj]=0;
+      cJetEt[i]=max;
+      cJetEtaIndex[i]=tcJetEtaIndex[maxj];
+      cJetPhiIndex[i]=tcJetPhiIndex[maxj];
+      //cout<<max<<"  ";
+   }
+   for(int j=i;j<4;j++){
+      cJetEt[j]=-1;
+      cJetEtaIndex[j]=-1;
+      cJetPhiIndex[j]=-1;
+      avoid++;
+   }
+ 
+   for(i=0;i<4;i++){
+      if(i==TauNumber) break;
+      int max=0,maxj=0;
+      for(int j=0;j<TauNumber;j++) if (tTauEt[j]>max){
+         max=tTauEt[j];
+         maxj=j;
+      }
+      tTauEt[maxj]=0;
+      TauEt[i]=max;
+      TauEtaIndex[i]=tTauEtaIndex[maxj];
+      TauPhiIndex[i]=tTauPhiIndex[maxj];
+      //cout<<max<<"  ";
+   }
+   for(int j=i;j<4;j++){
+      TauEt[j]=-1;
+      TauEtaIndex[j]=-1;
+      TauPhiIndex[j]=-1;
+      avoid++;
+   }
+   cout<<avoid<<" ";
+//   cout<<endl<<endl;
    fJetEtBranch->Fill();
    fJetEtaIndexBranch->Fill();
    fJetPhiIndexBranch->Fill();
    fJetNumberBranch->Fill();
-
-   fTauEtBranch->Fill();
-   fTauEtaIndexBranch->Fill();
-   fTauPhiIndexBranch->Fill();
-   fTauNumberBranch->Fill();
-
-   //cout<<"Fill f : OK"<<endl;
 
    cJetEtBranch->Fill();
    cJetEtaIndexBranch->Fill();
    cJetPhiIndexBranch->Fill();
    cJetNumberBranch->Fill();
 
-   cTauEtBranch->Fill();
-   cTauEtaIndexBranch->Fill();
-   cTauPhiIndexBranch->Fill();
-   cTauNumberBranch->Fill();
+   TauEtBranch->Fill();
+   TauEtaIndexBranch->Fill();
+   TauPhiIndexBranch->Fill();
+   TauNumberBranch->Fill();
 
-   cout<<"Fill : OK"<<endl;
+//   cout<<"Fill : OK"<<endl;
 
    return kTRUE;
 }
