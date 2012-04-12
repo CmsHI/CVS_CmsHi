@@ -21,6 +21,7 @@ public:
    
    MPT(TString s, int t=0, float dr=0.8, int c=0) :
    name(s), selType(t), dRCone(dr), corrType(c) {
+      name+=Form("%.0f",dRCone*10);
       clear();
    }
    void clear() {
@@ -84,11 +85,11 @@ public:
       vmpt.push_back(MPT(name+"AllAcc",0,-1));
       if (doTrackingCorr) vmpt.push_back(MPT(name+"CorrAllAcc",0,-1,1));
       for (int ir=0; ir<drbins.size(); ++ir) {
-	 vmpt.push_back(MPT(name+Form("InCone%.0f",drbins[ir]*10),1,drbins[ir]));
-	 vmpt.push_back(MPT(name+Form("OutCone%.0f",drbins[ir]*10),2,drbins[ir]));
+	 vmpt.push_back(MPT(name+Form("InCone"),1,drbins[ir]));
+	 vmpt.push_back(MPT(name+Form("OutCone"),2,drbins[ir]));
 	 if (doTrackingCorr) {
-	    vmpt.push_back(MPT(name+Form("CorrInCone%0.f",drbins[ir]*10),1,drbins[ir],1));
-	    vmpt.push_back(MPT(name+Form("CorrOutCone%0.f",drbins[ir]*10),2,drbins[ir],1));
+	    vmpt.push_back(MPT(name+Form("CorrInCone"),1,drbins[ir],1));
+	    vmpt.push_back(MPT(name+Form("CorrOutCone"),2,drbins[ir],1));
 	 }
       }
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;

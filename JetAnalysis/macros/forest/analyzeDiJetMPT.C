@@ -112,13 +112,13 @@ void analyzeDiJetMPT(
    AnaMPT genp0mpt("genp0",0);
    if (doMPT) {
       pfmpt.Init(tgj);  
-      pf1mpt.Init(tgj);  
-      pf4mpt.Init(tgj);  
-      pf5mpt.Init(tgj);
+      //pf1mpt.Init(tgj);  
+      //pf4mpt.Init(tgj);  
+      //pf5mpt.Init(tgj);
       trkmpt.doTrackingCorr = true;
       trkmpt.c = c;
       trkmpt.Init(tgj);
-      genp0mpt.Init(tgj);  
+      //genp0mpt.Init(tgj);  
    }
    
    // mixing classes
@@ -412,23 +412,23 @@ void analyzeDiJetMPT(
       
       // MPT
       if (doMPT) {
-         pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
-         pfmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         //pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+         //pfmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf1mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         //pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf1mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
-         pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf4mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         //pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf4mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
-         pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf5mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         //pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf5mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
          trkmpt.InputEvent(c->track.nTrk,c->track.trkPt,c->track.trkEta,c->track.trkPhi);
          trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
-         genp0mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         //genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
+         //genp0mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
       }
       
       // All done
