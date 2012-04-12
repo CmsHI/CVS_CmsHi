@@ -56,6 +56,7 @@ public:
    int selPFId;
    bool doTrackingCorr,anaDiJet;
    HiForest * c;
+   vector<float> drbins;
    
    // data members
    MPTCands cands; // input
@@ -69,17 +70,26 @@ public:
    selPFId(pfid),
    doTrackingCorr(false),
    anaDiJet(false)
-   {}
+   {
+      cout << "dr bins: ";
+      for (int i=0; i<7; ++i) {
+	 drbins.push_back((i+1)*0.2);
+	 cout << drbins[i] << " ";
+      }
+      cout << endl;
+   }
    
    void Init(TTree * t) {
       // default mpt analyses
       vmpt.push_back(MPT(name+"AllAcc",0,-1));
-      vmpt.push_back(MPT(name+"InCone",1,0.8));
-      vmpt.push_back(MPT(name+"OutCone",2,0.8));
-      if (doTrackingCorr) {
-         vmpt.push_back(MPT(name+"AllAccCorr",0,-1,1));
-         vmpt.push_back(MPT(name+"InConeCorr",1,0.8,1));
-         vmpt.push_back(MPT(name+"OutConeCorr",2,0.8,1));
+      if (doTrackingCorr) vmpt.push_back(MPT(name+"CorrAllAcc",0,-1,1));
+      for (int ir=0; ir<drbins.size(); ++ir) {
+	 vmpt.push_back(MPT(name+Form("InCone%.0f",drbins[ir]*10),1,drbins[ir]));
+	 vmpt.push_back(MPT(name+Form("OutCone%.0f",drbins[ir]*10),2,drbins[ir]));
+	 if (doTrackingCorr) {
+	    vmpt.push_back(MPT(name+Form("CorrInCone%0.f",drbins[ir]*10),1,drbins[ir],1));
+	    vmpt.push_back(MPT(name+Form("CorrOutCone%0.f",drbins[ir]*10),2,drbins[ir],1));
+	 }
       }
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
       cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
