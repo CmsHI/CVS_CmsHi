@@ -114,9 +114,9 @@ TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TTree *tree)
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
   if (tree == 0) {
-    TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/minbiasL1/HiForestL1_merged_v2.root");
+    //TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/minbiasL1/HiForestL1_merged_v2.root");
     //TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/L1jet/HiForestL1-jet_merged_v1.root");
-    //TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
+    TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
 
     tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
 

@@ -50,14 +50,10 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 
   Long64_t nbytes = 0, nb = 0;
 
-//   const int total_events = 3000;
-//   const int threshhold = 30;
-//   const bool SUBTRACT_RCT_MINIMUM = true;
-//   const bool SUBTRACT_RCT_AVERAGE = false;
   int event_should_trigger = 0;
 
-//   TH2I *original_map = new TH2I("original_map","Detector Map before subtraction",22,0,1,18,0,1);
-//   TH2I *subtracted_map = new TH2I("subtracted_map","Detector Map after subtraction",22,0,1,18,0,1);
+  // TH2I *original_map, *subtracted_map;
+  TH1I *max_jet_energy = new TH1I("max_jet_energy","Maximum jet energy for each event",60,0,300);
 
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
@@ -75,20 +71,11 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
     //fmu->GetEntry(jentry);
     // if (Cut(ientry) < 0) continue;
     
-//     cout<<"ecalDetectorMapSize from trigger primitives tree: "<<ecalDetectorMapSize<<endl;
-//     cout<<"nref from jet tree: "<<fjet->nref<<endl;
-//     cout<<"L1EtTot from hlt tree: "<<fhlt->L1EtTot<<endl;
-//     cout<<"centrality bin from hieventanalyzer: "<<fhiinfo->hiBin<<endl;
-//     cout<<"Glb_nptl from muon tree: "<<fmu->Glb_nptl<<endl;
-
-//     int totalEt = 0;
-//     for(int i = 0; i < numRegions; i++)
-//       {
-// 	totalEt += caloRegionEt[i];
-//       }
-
-//     cout << "Total calorimeter energy for event: " << totalEt << endl;
-
+//     if(jentry == total_events - 1){
+//       original_map = new TH2I("original_map","Detector Map before subtraction",22,0,22,18,0,18);
+//       subtracted_map = new TH2I("subtracted_map","Detector Map after subtraction",22,0,22,18,0,18);
+//     }
+    
     int fulldetector[22][18]; //[eta][phi]
     int RCTs[18][11][2]; //[region #][eta][phi]
     for(int i = 0; i < numRegions; i++)
@@ -97,14 +84,13 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 	int rctnum = (9*(caloRegionEtaIndex[i]/11))+(caloRegionPhiIndex[i]/2);
 	RCTs[rctnum][caloRCTRegionEtaIndex[i]][caloRCTRegionPhiIndex[i]] = caloRegionEt[i];
       }
-
-   //  for(int ieta = 0; ieta < 22; ieta++)
-//       for(int iphi = 0; iphi < 18; iphi++){
-// 	original_map->Fill(ieta,iphi,fulldetector[ieta][iphi]);
-//       }
-//     original_map->Draw();
-
-
+    
+//     if(jentry == total_events - 1)
+//       for(int ieta = 0; ieta < 22; ieta++)
+// 	for(int iphi = 0; iphi < 18; iphi++){
+// 	  original_map->Fill(ieta,iphi,fulldetector[ieta][iphi]);
+// 	}
+    
     int rct_minimums[18];
     double rct_averages[18];
     for(int i = 0; i < 18; i++)
@@ -156,12 +142,13 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 	    fulldetector[ieta][iphi] -= eta_average[ieta];
 	  }
       }
-
-    // for(int ieta = 0; ieta < 22; ieta++)
-// 	  for(int iphi = 0; iphi < 18; iphi++){
-// 	    subtracted_map->Fill(ieta,iphi,fulldetector[ieta][iphi]);
-// 	  }
-//      subtracted_map->Draw();
+    
+//     if(jentry == total_events - 1)
+//       for(int ieta = 0; ieta < 22; ieta++)
+// 	for(int iphi = 0; iphi < 18; iphi++){
+// 	  subtracted_map->Fill(ieta,iphi,fulldetector[ieta][iphi]);
+// 	}
+    
     
     jet jets[18][2][3];
 
@@ -254,17 +241,24 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 
     qsort(head, 18*2*3, sizeof(jet), sort_func_jet);
 
-    if(jentry == total_events - 1)
-      print_jets(head, 18*2*3);
+//     if(jentry == total_events - 1){
+//       //      print_jets(head, 18*2*3);
+//       TCanvas *c1 = new TCanvas();
+//       original_map->Draw("Lego2");
+//       TCanvas *c2 = new TCanvas();
+//       subtracted_map->Draw("Lego2");
+//     }
     
     //cout << "Biggest jet for event: " << head[0].et << endl;
-
+    max_jet_energy->Fill(head[0].et);
     if(head[0].et > threshhold)
       event_should_trigger++;
 
     if(jentry > total_events - 2) break;
   }
   cout << "Percentage of passing events: " << ((double)event_should_trigger)/total_events << endl;
+  TCanvas *c3 = new TCanvas();
+  max_jet_energy->Draw();
 }
 
 int sort_func_jet(const void *a, const void *b) 
