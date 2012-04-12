@@ -70,11 +70,11 @@ public:
    ptmin(0.5),etamax(2.4),
    selPFId(pfid),
    doTrackingCorr(false),
-   anaDiJet(false)
+   anaDiJet(true)
    {
       cout << "dr bins: ";
-      for (int i=0; i<7; ++i) {
-	 drbins.push_back((i+1)*0.2);
+      for (int i=0; i<2; ++i) {
+	 drbins.push_back((i+1)*0.4);
 	 cout << drbins[i] << " ";
       }
       cout << endl;
