@@ -21,7 +21,7 @@ public:
    
    MPT(TString s, int t=0, float dr=0.8, int c=0) :
    name(s), selType(t), dRCone(dr), corrType(c) {
-      name+=Form("%.0f",dRCone*10);
+      if (dRCone>0) name+=Form("%.0f",dRCone*10);
       clear();
    }
    void clear() {

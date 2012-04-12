@@ -59,8 +59,8 @@ void analyzeDiJetMPT(
                       TString mixfname="output-data-Photon-v7_v30classes.root"
                       )
 {
-   bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
-   //bool checkDup=false;
+   //bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
+   bool checkDup=false;
    bool doMPT=true, saveAllCands=false;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
