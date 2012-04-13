@@ -319,7 +319,7 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
    int ncJetEt[80];
    int ncJetEtaIndex[80];
    int ncJetPhiIndex[80];
-
+ //sort the jets
  for(i=0;i<fJetNumber;i++){
       int max=0,maxj=0;
       for(int j=0;j<fJetNumber;j++) if (tfJetEt[j]>max){
@@ -332,25 +332,27 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
       nfJetPhiIndex[i]=tfJetPhiIndex[maxj];
       //cout<<max<<"  ";
    }
+   //put the empty jets to -400
    for(int j=i;j<40;j++){
       nfJetEt[j]=-400;
       nfJetEtaIndex[j]=-10;
       nfJetPhiIndex[j]=-10;
    }
+   //select the 4 highest jets
    for(i=0;i<4;i++){
       fJetEt[i]=nfJetEt[i];
       fJetEtaIndex[i]=nfJetEtaIndex[i];
       fJetPhiIndex[i]=nfJetPhiIndex[i];
    }
 
-//select only the highest jet
+   //select only the highest jet
    for(i=1;i<4;i++){
      fJetEt[i]=-400;
      fJetEtaIndex[i]=-10;
      fJetPhiIndex[i]=-10;
    }
 
-
+   //idem for central jets
    for(i=0;i<cJetNumber;i++){
       int max=0,maxj=0;
       for(int j=0;j<cJetNumber;j++) if (tcJetEt[j]>max){
@@ -374,7 +376,7 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
       cJetPhiIndex[i]=ncJetPhiIndex[i];
    }
 
-//select only the highest jet
+   //select only the highest jet
    for(i=1;i<4;i++){
      cJetEt[i]=-400;
      cJetEtaIndex[i]=-10;
@@ -407,7 +409,6 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
    //cout<<endl<<endl;
 
    //subtract median :
-
    for(i=0;i<4;i++) if(cJetEt[i]>0)
       cJetEt[i]-=ncJetEt[cJetNumber/2];
 
