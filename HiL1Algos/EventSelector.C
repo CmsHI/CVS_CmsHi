@@ -97,17 +97,24 @@ public :
    int TauEtaIndex[4];
    int TauPhiIndex[4];
    int TauNumber;
+
+   int eventnumber;
+   int acceptednumber;
+   int taunumber;
 };
 
 void EventSelector::Init(TTree *tree)
 {
+   eventnumber=0;
+   acceptednumber=0;
+   taunumber=0;
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
    // pointers of the tree will be set.
    tree->SetMakeClass(1);
-   tree->SetBranchAddress("caloRegionEta",currentEta, &currentEtaBranch);
+   //tree->SetBranchAddress("caloRegionEta",currentEta, &currentEtaBranch);
    tree->SetBranchAddress("caloRegionEt",currentEt, &currentEtBranch);
-   tree->SetBranchAddress("caloRegionPhi",currentPhi, &currentPhiBranch);
+   //tree->SetBranchAddress("caloRegionPhi",currentPhi, &currentPhiBranch);
    tree->SetBranchAddress("caloRegionEtaIndex",currentEtaIndex, &currentEtaIndexBranch);
    tree->SetBranchAddress("caloRegionPhiIndex",currentPhiIndex, &currentPhiIndexBranch);
    tree->SetBranchAddress("caloRegionTau",currentTau, &currentTauBranch);
@@ -130,13 +137,13 @@ void EventSelector::Init(TTree *tree)
 
 void EventSelector::SlaveBegin(TTree *tree)
 {
-   // SlaveBegin() is a good place to create histograms. 
-   // For PROOF, this is called for each worker.
-   // The TTree* is there for backward compatibility; e.g. PROOF passes 0.
-  Double_t ybins[23] = {-5.,-4.5,-4.,-3.5,-3.,-2.172,-1.74,-0.087*16,-0.087*12,-0.087*8,-0.087*4,0,0.087*4,0.087*8,0.087*12,0.087*16,1.74,2.172,3.,3.5,4.,4.5,5.};
-  histoEt2D=new TH2D("hCaloRegion","histo EtCaloRegion vs Eta,Phi",18,0,6.283,22,ybins);
-  histoEtvsEta=new TH1D("hCaloRegion2","histo EtCaloRegion vs Eta",22,ybins);
-  histoEtvsPhi=new TH1D("hCaloRegion3","histo EtCaloRegion vs Phi",18,0,6.283);
+  // SlaveBegin() is a good place to create histograms. 
+  // For PROOF, this is called for each worker.
+  // The TTree* is there for backward compatibility; e.g. PROOF passes 0.
+  //Double_t ybins[23] = {-5.,-4.5,-4.,-3.5,-3.,-2.172,-1.74,-0.087*16,-0.087*12,-0.087*8,-0.087*4,0,0.087*4,0.087*8,0.087*12,0.087*16,1.74,2.172,3.,3.5,4.,4.5,5.};
+  //histoEt2D=new TH2D("hCaloRegion","histo EtCaloRegion vs Eta,Phi",18,0,6.283,22,ybins);
+  //histoEtvsEta=new TH1D("hCaloRegion2","histo EtCaloRegion vs Eta",22,ybins);
+  //histoEtvsPhi=new TH1D("hCaloRegion3","histo EtCaloRegion vs Phi",18,0,6.283);
 }
 
 Bool_t EventSelector::Process(Long64_t entry)
@@ -149,12 +156,15 @@ Bool_t EventSelector::Process(Long64_t entry)
    //
    // This function should contain the "body" of the analysis: select relevant
    // tree entries, run algorithms on the tree entry and typically fill histograms.
-   currentEtaBranch->GetEntry(entry);
+   //currentEtaBranch->GetEntry(entry);
    currentEtBranch->GetEntry(entry);
-   currentPhiBranch->GetEntry(entry);
+   //currentPhiBranch->GetEntry(entry);
    currentEtaIndexBranch->GetEntry(entry);
    currentPhiIndexBranch->GetEntry(entry);
    currentTauBranch->GetEntry(entry);
+
+   if (eventnumber%1000==0) cout<<eventnumber<<endl;
+   eventnumber++;
 
    int mapEt[22][18];
    int mapTau[22][18];
@@ -177,20 +187,25 @@ Bool_t EventSelector::Process(Long64_t entry)
    int tTauPhiIndex[120];
    TauNumber=0;
 
+   int istheretau=0;
    for(int i=0;i<396;i++){
-     histoEt2D->Fill(currentPhi[i],currentEta[i],currentEt[i]);
-     histoEtvsEta->Fill(currentEta[i],currentEt[i]);
-     histoEtvsPhi->Fill(currentPhi[i],currentEt[i]);
+     //histoEt2D->Fill(currentPhi[i],currentEta[i],currentEt[i]);
+     //histoEtvsEta->Fill(currentEta[i],currentEt[i]);
+     //histoEtvsPhi->Fill(currentPhi[i],currentEt[i]);
      mapEt[currentEtaIndex[i]][currentPhiIndex[i]]=currentEt[i];
      mapTau[currentEtaIndex[i]][currentPhiIndex[i]]=currentTau[i];
+     //cout<<currentTau[i]<<" ";
+     if (currentTau[i]) istheretau=1;
    }
+   //cout<<endl;
+   taunumber+=istheretau;
 
    for(int strip=0;strip<9;strip++){
       for(int i=0;i<2;i++){
          for(int j=0;j<22;j++){
-            cout<<mapEt[j][2*strip+i]<<"  ";
+            //cout<<mapEt[j][2*strip+i]<<"  ";
             if ((j>0)&&(j<21)){
-               if((mapEt[j][2*strip+i]>mapEt[j+1][2*strip+i])&&
+	      if((mapEt[j][2*strip+i]>mapEt[j+1][2*strip+i])&&
                   (mapEt[j][2*strip+i]>=mapEt[j-1][2*strip+i])&&
                   ((mapEt[j][2*strip+i]>mapEt[j][2*strip+(i?0:1)])||((i==0)&&(mapEt[j][2*strip+0]==mapEt[j][2*strip+1])))&&
                   (mapEt[j][2*strip+i]>mapEt[j+1][2*strip+(i?0:1)])&&
@@ -234,13 +249,15 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
                   //cout<<mapCluster[j][2*strip+i]<<"[0]";
                }
             }
+	    //keep only the HB/HE jets
+            if ((j<=4)||(j>=17)) mapCluster[j][2*strip+i]=0;
          }
       }
    }
 
 
    for(int i=0;i<18;i++) for(int j=0;j<22;j++){
-      cout<<mapCluster[j][i]<<" ";
+      //cout<<mapCluster[j][i]<<" ";
       if (mapCluster[j][i]){
          int tempi=i+(i%2?1:-1);
          if (tempi>17) tempi=tempi-18;
@@ -249,7 +266,7 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
             if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j+1][tempi])||((i%2==0)&&(mapCluster[j+1][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j-1][tempi])||((i%2==0)&&(mapCluster[j-1][tempi]==mapCluster[j][i])))){
                mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j+1][tempi]+mapEt[j-1][tempi];
                mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j+1][tempi]+mapTau[j-1][tempi];
-               if (mapClusterTau[j][i]) {
+//               if(mapClusterTau[j][i]){
                   if((j<=3)||(j>=18)){
                      tfJetEt[fJetNumber]=mapCluster[j][i];
                      tfJetEtaIndex[fJetNumber]=j;
@@ -262,97 +279,111 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
                     tcJetPhiIndex[cJetNumber]=i;
                     cJetNumber++;
                   }
-               }
-               else{
-                  tTauEt[TauNumber]=mapCluster[j][i];
-                  tTauEtaIndex[TauNumber]=j;
-                  tTauPhiIndex[TauNumber]=i;
-                  TauNumber++;
-               }
+//               }
             }
          }
          if (j==0){
             if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j+1][tempi])||((i%2==0)&&(mapCluster[j+1][tempi]==mapCluster[j][i])))){
                mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j+1][tempi];
                mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j+1][tempi];
-               if (mapClusterTau[j][i]) {
+//               if(mapClusterTau[j][i]){
                   tfJetEt[fJetNumber]=mapCluster[j][i];
                   tfJetEtaIndex[fJetNumber]=j;
                   tfJetPhiIndex[fJetNumber]=i;
                   fJetNumber++;
-               }
-               else{
-                  tTauEt[TauNumber]=mapCluster[j][i];
-                  tTauEtaIndex[TauNumber]=j;
-                  tTauPhiIndex[TauNumber]=i;
-                  TauNumber++;
-               }
+//               }
             }
          }
          if (j==21){
             if(((mapCluster[j][i]>mapCluster[j][tempi])||((i%2==0)&&(mapCluster[j][tempi]==mapCluster[j][i])))&&((mapCluster[j][i]>mapCluster[j-1][tempi])||((i%2==0)&&(mapCluster[j-1][tempi]==mapCluster[j][i])))){
                mapCluster[j][i]+=mapEt[j][tempi]+mapEt[j-1][tempi];
                mapClusterTau[j][i]+=mapTau[j][tempi]+mapTau[j-1][tempi];
-               if (mapClusterTau[j][i]) {
-                  tfJetEt[cJetNumber]=mapCluster[j][i];
-                  tfJetEtaIndex[cJetNumber]=j;
-                  tfJetPhiIndex[cJetNumber]=i;
+//               if(mapClusterTau[j][i]){
+                  tfJetEt[fJetNumber]=mapCluster[j][i];
+                  tfJetEtaIndex[fJetNumber]=j;
+                  tfJetPhiIndex[fJetNumber]=i;
                   fJetNumber++;
-               }
-               else{
-                  tTauEt[TauNumber]=mapCluster[j][i];
-                  tTauEtaIndex[TauNumber]=j;
-                  tTauPhiIndex[TauNumber]=i;
-                  TauNumber++;
-               }
+//               }
             }
          }
       }
    }
-   cout<<endl;
+
+   //cout<<endl;
+
    int i;
-   int avoid=0;
-   for(i=0;i<4;i++){
-      if(i==fJetNumber) break;
+   int nfJetEt[40];
+   int nfJetEtaIndex[40];
+   int nfJetPhiIndex[40];
+
+   int ncJetEt[80];
+   int ncJetEtaIndex[80];
+   int ncJetPhiIndex[80];
+
+ for(i=0;i<fJetNumber;i++){
       int max=0,maxj=0;
       for(int j=0;j<fJetNumber;j++) if (tfJetEt[j]>max){
          max=tfJetEt[j];
          maxj=j;
       }
       tfJetEt[maxj]=0;
-      fJetEt[i]=max;
-      fJetEtaIndex[i]=tfJetEtaIndex[maxj];
-      fJetPhiIndex[i]=tfJetPhiIndex[maxj];
+      nfJetEt[i]=max;
+      nfJetEtaIndex[i]=tfJetEtaIndex[maxj];
+      nfJetPhiIndex[i]=tfJetPhiIndex[maxj];
       //cout<<max<<"  ";
    }
-   for(int j=i;j<4;j++){
-      fJetEt[j]=-1;
-      fJetEtaIndex[j]=-1;
-      fJetPhiIndex[j]=-1;
-      avoid++;
+   for(int j=i;j<40;j++){
+      nfJetEt[j]=-400;
+      nfJetEtaIndex[j]=-10;
+      nfJetPhiIndex[j]=-10;
+   }
+   for(i=0;i<4;i++){
+      fJetEt[i]=nfJetEt[i];
+      fJetEtaIndex[i]=nfJetEtaIndex[i];
+      fJetPhiIndex[i]=nfJetPhiIndex[i];
    }
 
-   for(i=0;i<4;i++){
-      if(i==cJetNumber) break;
+//select only the highest jet
+   for(i=1;i<4;i++){
+     fJetEt[i]=-400;
+     fJetEtaIndex[i]=-10;
+     fJetPhiIndex[i]=-10;
+   }
+
+
+   for(i=0;i<cJetNumber;i++){
       int max=0,maxj=0;
       for(int j=0;j<cJetNumber;j++) if (tcJetEt[j]>max){
          max=tcJetEt[j];
          maxj=j;
       }
       tcJetEt[maxj]=0;
-      cJetEt[i]=max;
-      cJetEtaIndex[i]=tcJetEtaIndex[maxj];
-      cJetPhiIndex[i]=tcJetPhiIndex[maxj];
+      ncJetEt[i]=max;
+      ncJetEtaIndex[i]=tcJetEtaIndex[maxj];
+      ncJetPhiIndex[i]=tcJetPhiIndex[maxj];
       //cout<<max<<"  ";
    }
-   for(int j=i;j<4;j++){
-      cJetEt[j]=-1;
-      cJetEtaIndex[j]=-1;
-      cJetPhiIndex[j]=-1;
-      avoid++;
+   for(int j=i;j<80;j++){
+      ncJetEt[j]=-400;
+      ncJetEtaIndex[j]=-10;
+      ncJetPhiIndex[j]=-10;
    }
- 
    for(i=0;i<4;i++){
+      cJetEt[i]=ncJetEt[i];
+      cJetEtaIndex[i]=ncJetEtaIndex[i];
+      cJetPhiIndex[i]=ncJetPhiIndex[i];
+   }
+
+//select only the highest jet
+   for(i=1;i<4;i++){
+     cJetEt[i]=-400;
+     cJetEtaIndex[i]=-10;
+     cJetPhiIndex[i]=-10;
+   }
+
+
+
+/*   for(i=0;i<4;i++){
       if(i==TauNumber) break;
       int max=0,maxj=0;
       for(int j=0;j<TauNumber;j++) if (tTauEt[j]>max){
@@ -366,13 +397,25 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
       //cout<<max<<"  ";
    }
    for(int j=i;j<4;j++){
-      TauEt[j]=-1;
-      TauEtaIndex[j]=-1;
-      TauPhiIndex[j]=-1;
+      TauEt[j]=-1000;
+      TauEtaIndex[j]=-1000;
+      TauPhiIndex[j]=-1000;
       avoid++;
    }
-   cout<<avoid<<" ";
-//   cout<<endl<<endl;
+*/
+   //cout<<avoid<<" ";
+   //cout<<endl<<endl;
+
+   //subtract median :
+
+   for(i=0;i<4;i++) if(cJetEt[i]>0)
+      cJetEt[i]-=ncJetEt[cJetNumber/2];
+
+   for(i=0;i<4;i++) if(fJetEt[i]>0)
+      fJetEt[i]-=nfJetEt[fJetNumber/2];
+
+   if((fJetEt[0]>40)||(cJetEt[0]>40)) acceptednumber++;
+
    fJetEtBranch->Fill();
    fJetEtaIndexBranch->Fill();
    fJetPhiIndexBranch->Fill();
@@ -395,15 +438,15 @@ mapTau[j][2*strip+(i?0:1)]+mapTau[j-1][2*strip+(i?0:1)];}
 
 void EventSelector::Terminate()
 {
-   // The Terminate() function is the last function to be called during the
-   // analysis of a tree with a selector. It always runs on the client, it can
-   // be used to present the results graphically or save the results to file.
+  // The Terminate() function is the last function to be called during the
+  // analysis of a tree with a selector. It always runs on the client, it can
+  // be used to present the results graphically or save the results to file.
    
-   //histoEt2D->Draw("lego2");
-   //new TCanvas;
-   //histoEtvsEta->Draw();
-   //new TCanvas;
-   //histoEtvsPhi->Draw();
+  //histoEt2D->Draw("lego2");
+  //new TCanvas;
+  //histoEtvsEta->Draw();
+  //new TCanvas;
+  //histoEtvsPhi->Draw();
+
+  std::cout<<((float) acceptednumber)/(eventnumber)<<" "<<eventnumber<<" "<<acceptednumber<<" "<<taunumber<<std::endl;
 }
-
-
