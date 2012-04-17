@@ -58,6 +58,7 @@ public:
    bool doTrackingCorr,anaDiJet;
    HiForest * c;
    vector<float> drbins;
+   vector<float> dphibins;
    
    // data members
    MPTCands cands; // input
@@ -73,9 +74,16 @@ public:
    anaDiJet(true)
    {
       cout << "dr bins: ";
-      for (int i=0; i<2; ++i) {
-	 drbins.push_back((i+1)*0.4);
-	 cout << drbins[i] << " ";
+      for (int i=0; i<3; ++i) {
+         drbins.push_back((i+1)*0.4);
+         cout << drbins[i] << " ";
+      }
+      cout << endl;
+
+      cout << "dphi bins: ";
+      for (int i=0; i<3; ++i) {
+         dphibins.push_back((i+1)*TMath::PiOver2()/4.);
+         cout << dphibins[i] << " ";
       }
       cout << endl;
    }
@@ -84,18 +92,28 @@ public:
       // default mpt analyses
       vmpt.push_back(MPT(name+"AllAcc",0,-1));
       if (doTrackingCorr) vmpt.push_back(MPT(name+"CorrAllAcc",0,-1,1));
+      // dR cones
       for (int ir=0; ir<drbins.size(); ++ir) {
-	 vmpt.push_back(MPT(name+Form("InCone"),1,drbins[ir]));
-	 vmpt.push_back(MPT(name+Form("OutCone"),2,drbins[ir]));
-	 if (doTrackingCorr) {
-	    vmpt.push_back(MPT(name+Form("CorrInCone"),1,drbins[ir],1));
-	    vmpt.push_back(MPT(name+Form("CorrOutCone"),2,drbins[ir],1));
-	 }
+         vmpt.push_back(MPT(name+Form("InCone"),1,drbins[ir]));
+         vmpt.push_back(MPT(name+Form("OutCone"),2,drbins[ir]));
+         if (doTrackingCorr) {
+            vmpt.push_back(MPT(name+Form("CorrInCone"),1,drbins[ir],1));
+            vmpt.push_back(MPT(name+Form("CorrOutCone"),2,drbins[ir],1));
+         }
+      }
+      // dphi regions
+      for (int ir=0; ir<dphibins.size(); ++ir) {
+         vmpt.push_back(MPT(name+Form("InDPhi"),3,dphibins[ir]));
+         vmpt.push_back(MPT(name+Form("OutDPhi"),4,dphibins[ir]));
+         if (doTrackingCorr) {
+            vmpt.push_back(MPT(name+Form("CorrInDPhi"),3,dphibins[ir],1));
+            vmpt.push_back(MPT(name+Form("CorrOutDPhi"),4,dphibins[ir],1));
+         }
       }
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
       cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
       for (unsigned m=0; m<vmpt.size(); ++m) { 
-//         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
+         //         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
          SetBranches(t,vmpt[m]);
       }      
    }
@@ -138,18 +156,24 @@ public:
          float candPhi = cands.phi[it];
          float drG = deltaR(candEta,candPhi,geta,gphi);
          float drJ = deltaR(candEta,candPhi,jeta,jphi);
+         float dphi1 = fabs(deltaPhi(candPhi,gphi));
+         float dphipi1 = TMath::Pi()-dphi1;
          if (excludeTrigCandMode==2&&drG<0.05) continue;
          bool accept=false;
          if (m.selType==0) accept = true;
          else if (m.selType==1) {
             if (drG<m.dRCone||drJ<m.dRCone) accept=true;
-         }
-         else if (m.selType==2) {
+         } else if (m.selType==2) {
             if (drG>m.dRCone&&drJ>m.dRCone) accept=true;
+         } else if (m.selType==3) {
+            if (dphi1<m.dRCone||dphipi1<m.dRCone) accept=true;
+         } else if (m.selType==4) {
+            if (dphi1>m.dRCone&&dphipi1>m.dRCone) accept=true;
          }
          if (accept) {
 //            cout << "accepted mpt cand pt|eta|phi: " << candPt << "|" << candEta << "|" << candPhi << endl;
 //            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
+//            cout << m.name << " pt: " << candPt << " pt1: " << gpt << " dr1: " << drG << " dr2: " << drJ << " dphi1: " << dphi1 << " dphipi1: " << dphipi1 << endl;
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
