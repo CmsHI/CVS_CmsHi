@@ -71,7 +71,7 @@ void analyzeDiJetMPT(
    double cutPtTrk=4, cutEtaTrk = 2.4;
    if (saveAllCands) cutPtTrk=1;
    // Centrality reweiting
-   CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>60");
+   CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
 
    // Check for duplicate events
    DuplicateEvents dupEvt(inname);
