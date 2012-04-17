@@ -250,6 +250,13 @@ void analyzeDiJetMPT(
          }
       }
       
+      //
+      // Skim
+      //
+      if (dataSrcType==1&&!evt.anaEvtSel) continue;
+      if (dataSrcType==0&&!evt.offlSel) continue;
+      if (gj.pt1<120) continue;
+      
       // If MC, Loop over gen jets to look for leading genjet candidate in the event
       for (int j=0;j<anajet->ngen;j++) {
          if (anajet->genpt[j]<cutjetPt) continue;
