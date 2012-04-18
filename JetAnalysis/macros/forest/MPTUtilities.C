@@ -119,6 +119,7 @@ public:
    }
    
    void InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0) {
+//      cout << "mpt input size: " << n << endl;
       cands.n = 0;
       for (int i=0; i<n; ++i) {
          // candidate selection
@@ -128,9 +129,13 @@ public:
             if (pfid[i]!=selPFId) continue;
          }
          if (pstat) {
+//            cout << "stat: " << pstat[i] << endl;
             if (pstat[i]!=1) continue;
          }
-         if (chargedOnly&&pch[i]==0) continue;
+         if (chargedOnly&&pch) {
+//            cout << "charge: " << pch[i] << endl;
+            if (pch[i]==0) continue;
+         }
          // now write selected cands
          cands.Set(cands.n,pt[i],eta[i],phi[i]);
          ++cands.n;
