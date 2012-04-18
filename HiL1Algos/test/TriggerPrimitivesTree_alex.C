@@ -53,7 +53,10 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
   int event_should_trigger = 0;
 
   // TH2I *original_map, *subtracted_map;
-  TH1I *max_jet_energy = new TH1I("max_jet_energy","Maximum jet energy for each event",60,0,300);
+  TH1I *max_jet_energy = new TH1I("max_jet_energy","Maximum jet energy for each event",180,0,900);
+
+  TH2I *max_jet_location = new TH2I("max_jet_location","Location of max jet for each event",
+				    22,0,22,18,0,18);
 
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
@@ -180,17 +183,17 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 	  {
 	    
 	    
-	    // 	    int cluster = fulldetector[ieta-1][minusPhi] +
-	    // 	      fulldetector[ieta-1][iphi] +		
-	    // 	      fulldetector[ieta-1][plusPhi] +		
-	    // 	      fulldetector[ieta][minusPhi] +		
-	    // 	      fulldetector[ieta][iphi] +		
-	    // 	      fulldetector[ieta][plusPhi] +		
-	    // 	      fulldetector[ieta+1][minusPhi] +		
-	    // 	      fulldetector[ieta+1][iphi] +		
-	    // 	      fulldetector[ieta+1][plusPhi];
+	    int cluster = fulldetector[ieta-1][minusPhi] +
+	      fulldetector[ieta-1][iphi] +		
+	      fulldetector[ieta-1][plusPhi] +		
+	      fulldetector[ieta][minusPhi] +		
+	      fulldetector[ieta][iphi] +		
+	      fulldetector[ieta][plusPhi] +		
+	      fulldetector[ieta+1][minusPhi] +		
+	      fulldetector[ieta+1][iphi] +		
+	      fulldetector[ieta+1][plusPhi];
 	    
-	    int cluster = fulldetector[ieta][iphi];
+	    //int cluster = fulldetector[ieta][iphi];
 	    
 	    if(cluster >= jets[rctnum][rctphi][0].et){
 	      jets[rctnum][rctphi][2] = jets[rctnum][rctphi][1];
@@ -211,29 +214,6 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 	  }
 	
       }
-    
-
-
-//     if(SUBTRACT_RCT_MINIMUM)
-//       {
-// 	for(int i = 0; i < 18; i++) 
-// 	  for(int j = 0; j < 2; j++) 
-// 	    for(int k = 0; k < 3; k++)
-// 	      {
-// 		jets[i][j][k].et -= rct_minimums[i];
-// 	      }
-//       }
-
-//     if(SUBTRACT_RCT_AVERAGE)
-//       {
-// 	for(int i = 0; i < 18; i++) 
-// 	  for(int j = 0; j < 2; j++) 
-// 	    for(int k = 0; k < 3; k++)
-// 	      {
-// 		jets[i][j][k].et -= rct_averages[i];
-// 	      }
-//       }
-
 
     jet *head = &jets[0][0][0];
 
@@ -251,6 +231,7 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
     
     //cout << "Biggest jet for event: " << head[0].et << endl;
     max_jet_energy->Fill(head[0].et);
+    max_jet_location->Fill(head[0].eta, head[0].phi);
     if(head[0].et > threshhold)
       event_should_trigger++;
 
@@ -259,6 +240,8 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
   cout << "Percentage of passing events: " << ((double)event_should_trigger)/total_events << endl;
   TCanvas *c3 = new TCanvas();
   max_jet_energy->Draw();
+  TCanvas *c4 = new TCanvas();
+  max_jet_location->Draw("Lego2");
 }
 
 int sort_func_jet(const void *a, const void *b) 
