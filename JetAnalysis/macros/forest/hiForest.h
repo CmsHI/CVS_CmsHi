@@ -16,6 +16,7 @@
 #include "SetupMetTree.h"
 #include "SetupGenpTree.h"
 #include "SetupPFTree.h"
+#include "SetupGenParticleTree.h"
 #include "TrackingCorrections.h"
 
 #include <TTree.h>
@@ -123,7 +124,8 @@ class HiForest : public TNamed
   TTree *ebTree;                                // ECAL eb Tree
   TTree *evtTree;                               // Event Tree
   TTree *metTree;                               // MET Tree
-  TTree *genpTree;                               // Gen particles of the signal event Tree
+  TTree *genpTree;                               // Gen photon of the signal event Tree
+  TTree *genParticleTree;                        // Stable Gen particles
 
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
@@ -149,6 +151,7 @@ class HiForest : public TNamed
   Evts evt;
   Mets met;
   Genps genp;
+  GenParticles genparticle;
     
   // Booleans
   bool hasPhotonTree;
@@ -163,6 +166,7 @@ class HiForest : public TNamed
   bool hasHbheTree;
   bool hasEbTree;
   bool hasGenpTree;
+  bool hasGenParticleTree;
 
   bool setupOutput;
   bool verbose;
@@ -270,6 +274,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
   genpTree     = (TTree*) inf->Get("genpana/photon");
+  genParticleTree     = (TTree*) inf->Get("HiGenParticleAna/hi");
 /*
   if(pp){
     icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
@@ -297,6 +302,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasHbheTree      = (hbheTree     != 0);
   hasEbTree        = (ebTree     != 0);
   hasGenpTree	   = (genpTree   !=0);
+  hasGenParticleTree = (genParticleTree   !=0);
   setupOutput = false;
   
   // Setup branches. See also Setup*.h
@@ -372,6 +378,12 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     setupGenpTree(genpTree,genp);
   }
 
+  if (hasGenParticleTree) {
+    genParticleTree->SetName("genParticle");
+    if (tree == 0) tree = genParticleTree; else tree->AddFriend(genParticleTree);
+    setupGenParticleTree(genParticleTree,genparticle);
+  }
+
   tree->SetMarkerStyle(20);
 
   // Print the status of thre forest
@@ -410,6 +422,7 @@ void HiForest::GetEntry(int i)
   if (hasHbheTree)     hbheTree     ->GetEntry(i);
   if (hasEbTree)       ebTree     ->GetEntry(i);
   if (hasGenpTree)     genpTree   ->GetEntry(i);
+  if (hasGenParticleTree) genParticleTree   ->GetEntry(i);
 }
 
 int HiForest::GetEntries()
@@ -497,6 +510,7 @@ void HiForest::PrintStatus()
   if (hasHbheTree)     CheckTree(hbheTree,     "HbheTree");
   if (hasEbTree)       CheckTree(ebTree,     "EbTree");
   if (hasGenpTree)      CheckTree(genpTree,   "GenpTree");
+  if (hasGenParticleTree)      CheckTree(genParticleTree,   "GenParticleTree");
 
 }
 

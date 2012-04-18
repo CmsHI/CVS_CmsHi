@@ -104,21 +104,22 @@ void analyzeDiJetMPT(
    TTree * tgj = new TTree("tgj","dijet jet tree");
    BookGJBranches(tgj,evt,gj);
 
-   AnaMPT pfmpt("pf",0);
-   AnaMPT pf1mpt("pf1",0,1);
-   AnaMPT pf4mpt("pf4",0,4);
-   AnaMPT pf5mpt("pf5",0,5);
+//   AnaMPT pfmpt("pf",0);
+//   AnaMPT pf1mpt("pf1",0,1);
+//   AnaMPT pf4mpt("pf4",0,4);
+//   AnaMPT pf5mpt("pf5",0,5);
    AnaMPT trkmpt("trk",0);
-   AnaMPT genp0mpt("genp0",0);
+   AnaMPT genpSigmpt("genpSig",0);
    if (doMPT) {
-      pfmpt.Init(tgj);  
+      //pfmpt.Init(tgj);  
       //pf1mpt.Init(tgj);  
       //pf4mpt.Init(tgj);  
       //pf5mpt.Init(tgj);
       trkmpt.doTrackingCorr = true;
       trkmpt.c = c;
       trkmpt.Init(tgj);
-      //genp0mpt.Init(tgj);  
+      genpSigmpt.chargedOnly = true;
+      genpSigmpt.Init(tgj);
    }
    
    // mixing classes
@@ -434,8 +435,8 @@ void analyzeDiJetMPT(
          trkmpt.InputEvent(c->track.nTrk,c->track.trkPt,c->track.trkEta,c->track.trkPhi);
          trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         //genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
-         //genp0mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg);
+         genpSigmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
       }
       
       // All done
