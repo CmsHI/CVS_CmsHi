@@ -80,8 +80,10 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   }
 
   cout<<" jet collection : "<<jetTag_<<endl;
-  if(isMC_)cout<<" genjet collection : "<<genjetTag_<<endl;
-
+  if(isMC_){
+     cout<<" genjet collection : "<<genjetTag_<<endl;
+     genPtMin_ = iConfig.getUntrackedParameter<double>("genPtMin",0);
+  }
 
    
 }
@@ -454,7 +456,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
        float genjet_pt = genjet.pt();
        
        // threshold to reduce size of output in minbias PbPb
-       if(genjet_pt>20.){
+       if(genjet_pt>genPtMin_){
 
 	 jets_.genpt[jets_.ngen] = genjet_pt;                            
 	 jets_.geneta[jets_.ngen] = genjet.eta();

@@ -77,6 +77,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool usePat_;
   bool isMC_;
 
+  double genPtMin_;
   bool doLifeTimeTagging_;
 
   TTree *t;

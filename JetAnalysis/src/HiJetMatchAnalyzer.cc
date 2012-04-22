@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz
 //         Created:  Thu Sep  9 10:38:59 EDT 2010
-// $Id: HiJetMatchAnalyzer.cc,v 1.11 2011/04/01 12:09:17 yilmaz Exp $
+// $Id: HiJetMatchAnalyzer.cc,v 1.1 2011/09/20 19:48:45 yilmaz Exp $
 //
 //
 
@@ -208,21 +208,6 @@ HiJetMatchAnalyzer::HiJetMatchAnalyzer(const edm::ParameterSet& iConfig)
 
 {
 
-   levels_ = iConfig.getUntrackedParameter<string>("corrLevels","L2Relative:L3Absolute");
-
-   algo_ = iConfig.getUntrackedParameter<string>("algo","IC5Calo");
-   tags_ = "";
-
-   string l[2] = {"L2Relative","L3Absolute"};
-
-   for(int i = 0; i <2; ++i){
-      edm::FileInPath fip("CondFormats/JetMETObjects/data/Spring10_"+l[i]+"_"+algo_+".txt");
-      tags_ += fip.fullPath();
-      if(i < 2 - 1)tags_ +=":";
-   }
-
-   jetCorrector_ = new FactorizedJetCorrector(levels_, tags_);
-
    //now do what ever initialization is needed
   matchR_ = iConfig.getUntrackedParameter<double>("matchR",0.25);
 
@@ -261,6 +246,27 @@ HiJetMatchAnalyzer::HiJetMatchAnalyzer(const edm::ParameterSet& iConfig)
    for(unsigned int i = 0; i < doMatchedFastJets_.size(); ++i){
       getFastJets_ = getFastJets_ || (bool)doMatchedFastJets_[i];
    }
+
+
+   if(correctJets_){
+
+      levels_ = iConfig.getUntrackedParameter<string>("corrLevels","L2Relative:L3Absolute");
+
+      algo_ = iConfig.getUntrackedParameter<string>("algo","IC5Calo");
+      tags_ = "";
+
+      string l[2] = {"L2Relative","L3Absolute"};
+
+      for(int i = 0; i <2; ++i){
+	 edm::FileInPath fip("CondFormats/JetMETObjects/data/Spring10_"+l[i]+"_"+algo_+".txt");
+	 tags_ += fip.fullPath();
+	 if(i < 2 - 1)tags_ +=":";
+      }
+
+      jetCorrector_ = new FactorizedJetCorrector(levels_, tags_);
+   }
+
+
 
 
 }
