@@ -92,18 +92,18 @@ void analyzePhotonJet(
                       )
 {
    bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
-   //bool checkDup=false;
-   bool doMPT=true, saveAllCands=true;
+//   bool checkDup=false;
+   bool doMPT=false, saveAllCands=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   double cutphotonPt = 20; // highest photon trigger is 20, also photon correction valid for photon pt > 40
+   double cutphotonPt = 50; // highest photon trigger is 20, also photon correction valid for photon pt > 40
    double cutjetPt = 0;
    double cutphotonEta = 1.44;
    double cutjetEta = 2;
    double cutPtTrk=4, cutEtaTrk = 2.4;
-   if (saveAllCands) cutPtTrk=1;
+   if (saveAllCands) cutPtTrk=3;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&photonEt>60");
 
@@ -140,25 +140,26 @@ void analyzePhotonJet(
    TTree * tgj = new TTree("tgj","gamma jet tree");
    BookGJBranches(tgj,evt,gj,isol);
 
-   AnaMPT pfmpt("pf",0);
-   AnaMPT pfgenphompt("pfgenpho",0);
-   AnaMPT pf1mpt("pf1",0,1);
-   AnaMPT pf4mpt("pf4",0,4);
-   AnaMPT pf5mpt("pf5",0,5);
-   AnaMPT pfex2mpt("pfex2",2);
+//   AnaMPT pfmpt("pf",0);
+//   AnaMPT pfgenphompt("pfgenpho",0);
+//   AnaMPT pf1mpt("pf1",0,1);
+//   AnaMPT pf4mpt("pf4",0,4);
+//   AnaMPT pf5mpt("pf5",0,5);
+//   AnaMPT pfex2mpt("pfex2",2);
    AnaMPT trkmpt("trk",0);
-   AnaMPT genp0mpt("genp0",0);
+//   AnaMPT genp0mpt("genp0",0);
    if (doMPT) {
-      pfmpt.Init(tgj);  
-      pfgenphompt.Init(tgj);  
-      pf1mpt.Init(tgj);  
-      pf4mpt.Init(tgj);  
-      pf5mpt.Init(tgj);
-      pfex2mpt.Init(tgj);  
+//      pfmpt.Init(tgj);  
+//      pfgenphompt.Init(tgj);  
+//      pf1mpt.Init(tgj);  
+//      pf4mpt.Init(tgj);  
+//      pf5mpt.Init(tgj);
+//      pfex2mpt.Init(tgj);  
+      trkmpt.anaDiJet = false;
       trkmpt.doTrackingCorr = true;
       trkmpt.c = c;
       trkmpt.Init(tgj);
-      genp0mpt.Init(tgj);  
+//      genp0mpt.Init(tgj);  
    }
    
    // mixing classes
@@ -280,7 +281,7 @@ void analyzePhotonJet(
       int leadingIndex=-1;
       int awayIndex=-1;
       gj.clear();
-      
+
       // Loop over jets to look for leading photon candidate in the event
       for (int j=0;j<c->photon.nPhotons;j++) {
          if (c->photon.pt[j]<cutphotonPt||c->photon.pt[j]>1000) continue;          // photon pT cut
@@ -296,6 +297,14 @@ void analyzePhotonJet(
             leadingIndex = j;
          }
       }
+      
+      //
+      // Skim
+      //
+      if (evt.nOccur!=1) continue;
+      if (dataSrcType==1&&!evt.anaEvtSel) continue;
+      if (dataSrcType==0&&!evt.offlSel) continue;
+      if (gj.photonEt<55) continue;
       
       // If MC, Loop over gen photons to look for leading gen photon candidate in the event
       for(int j = 0; j < c->genp.nPar; ++j){
@@ -482,29 +491,29 @@ void analyzePhotonJet(
       
       // MPT
       if (doMPT) {
-         pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
-         pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-         
-         pfgenphompt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
-         pfgenphompt.AnalyzeEvent(gj.genPhoPt,gj.genPhoEta,gj.genPhoPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-
-         pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf1mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-
-         pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf4mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-
-         pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
-         pf5mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
-
-         pfex2mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
-         pfex2mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//         pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+//         pfmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//         
+//         pfgenphompt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+//         pfgenphompt.AnalyzeEvent(gj.genPhoPt,gj.genPhoEta,gj.genPhoPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//
+//         pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+//         pf1mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//
+//         pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+//         pf4mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//
+//         pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+//         pf5mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//
+//         pfex2mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+//         pfex2mpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
 
          trkmpt.InputEvent(c->track.nTrk,c->track.trkPt,c->track.trkEta,c->track.trkPhi);
          trkmpt.AnalyzeEvent(gj.photonEt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
          
-         genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
-         genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
+//         genp0mpt.InputEvent(c->genp.nPar,c->genp.et,c->genp.eta,c->genp.phi,0,c->genp.status);
+//         genp0mpt.AnalyzeEvent(gj.refPhoPt,gj.photonEta,gj.photonPhi,gj.jetEt,gj.jetEta,gj.jetPhi);
       }
       
       // All done
