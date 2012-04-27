@@ -1,11 +1,11 @@
 indir=$1
 outfile=$2
 
-N=`ls $indir/*.root | head -n 14 | wc -l`
+N=`ls $indir/*.root | wc -l`
 
 echo $N input files in $indir
 
-npermerge=5
+npermerge=40
 ngroups=$(($N/$npermerge+1))
 echo npermerge: $npermerge, ngroups: $ngroups
 
