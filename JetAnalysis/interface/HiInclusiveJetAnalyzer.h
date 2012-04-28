@@ -79,6 +79,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
   double genPtMin_;
   bool doLifeTimeTagging_;
+  bool doLifeTimeTaggingExtras_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
@@ -98,8 +99,9 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
 
 
-  static const int MAXJETS = 50000;
-  static const int MAXHLTBITS = 500000;
+  static const int MAXJETS = 500;
+  static const int MAXTRACKS = 5000;
+  static const int MAXHLTBITS = 5000;
 
 
   struct JRA{
@@ -129,15 +131,27 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float discr_tcHighEff[MAXJETS];    
     float discr_tcHighPur[MAXJETS];
 
-    unsigned nsvtx[MAXJETS];    
-    unsigned svtxntrk[MAXJETS]; 
+    int nsvtx[MAXJETS];    
+    int svtxntrk[MAXJETS]; 
     float svtxdl[MAXJETS];   
     float svtxdls[MAXJETS];  
     float svtxm[MAXJETS];    
     float svtxpt[MAXJETS];   
 
-    unsigned nIPtracks[MAXJETS];
-    unsigned nselIPtracks[MAXJETS];
+    int nIPtrk[MAXJETS];
+    int nselIPtrk[MAXJETS];
+    
+    int ipJetIndex[MAXTRACKS];
+    float ipPt[MAXTRACKS];
+    float ipProb0[MAXTRACKS];
+    float ipProb1[MAXTRACKS];
+    float ip2d[MAXTRACKS];
+    float ip2dSig[MAXTRACKS];
+    float ip3d[MAXTRACKS];
+    float ip3dSig[MAXTRACKS];
+    float ipDist2Jet[MAXTRACKS];
+    float ipDist2JetSig[MAXTRACKS];
+    float ipClosest2Jet[MAXTRACKS];
 
     float mue[MAXJETS];     
     float mupt[MAXJETS];    
@@ -158,6 +172,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     int refparton_flavorForB[MAXJETS];
 
     float pthat;
+    int beamId1, beamId2;
     int ngen;
     int genmatchindex[MAXJETS];
     float genpt[MAXJETS];

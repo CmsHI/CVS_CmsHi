@@ -24,6 +24,7 @@
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
@@ -61,6 +62,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   usePat_ = iConfig.getUntrackedParameter<bool>("usePAT",true);
 
   doLifeTimeTagging_ = iConfig.getUntrackedParameter<bool>("doLifeTimeTagging",false);
+  doLifeTimeTaggingExtras_ = iConfig.getUntrackedParameter<bool>("doLifeTimeTaggingExtras",true);
   pfCandidateLabel_ = iConfig.getUntrackedParameter<edm::InputTag>("pfCandidateLabel",edm::InputTag("particleFlowTmp"));
 
   if(!isMC_){
@@ -142,15 +144,29 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("discr_tcHighEff",jets_.discr_tcHighEff,"discr_tcHighEff[nref]/F");
     t->Branch("discr_tcHighPur",jets_.discr_tcHighPur,"discr_tcHighPur[nref]/F");
     
-    t->Branch("nsvtx",    jets_.nsvtx,    "nsvtx[nref]/b");
-    t->Branch("svtxntrk", jets_.svtxntrk, "svtxntrk[nref]/b");
+    t->Branch("nsvtx",    jets_.nsvtx,    "nsvtx[nref]/I");
+    t->Branch("svtxntrk", jets_.svtxntrk, "svtxntrk[nref]/I");
     t->Branch("svtxdl",   jets_.svtxdl,   "svtxdl[nref]/F");
     t->Branch("svtxdls",  jets_.svtxdls,  "svtxdls[nref]/F");
     t->Branch("svtxm",    jets_.svtxm,    "svtxm[nref]/F");
     t->Branch("svtxpt",   jets_.svtxpt,   "svtxpt[nref]/F");
     
-    t->Branch("nIPtracks",jets_.nIPtracks,"nIPTracks[nref]/b");
-    t->Branch("nselIPtracks",jets_.nselIPtracks,"nselIPTracks[nref]/b");
+    t->Branch("nIPtrk",jets_.nIPtrk,"nIPtrk[nref]/I");
+    t->Branch("nselIPtrk",jets_.nselIPtrk,"nselIPtrk[nref]/I");
+    
+    if (doLifeTimeTaggingExtras_) {
+      t->Branch("ipJetIndex",jets_.ipJetIndex,"ipJetIndex[nselIPtrk]/I");
+      t->Branch("ipPt",jets_.ipPt,"ipPt[nselIPtrk]/F");
+      t->Branch("ipProb0",jets_.ipProb0,"ipProb0[nselIPtrk]/F");
+      t->Branch("ipProb1",jets_.ipProb1,"ipProb1[nselIPtrk]/F");
+      t->Branch("ip2d",jets_.ip2d,"ip2d[nselIPtrk]/F");
+      t->Branch("ip2dSig",jets_.ip2dSig,"ip2dSig[nselIPtrk]/F");
+      t->Branch("ip3d",jets_.ip3d,"ip3d[nselIPtrk]/F");
+      t->Branch("ip3dSig",jets_.ip3dSig,"ip3dSig[nselIPtrk]/F");
+      t->Branch("ipDist2Jet",jets_.ipDist2Jet,"ipDist2Jet[nselIPtrk]/F");
+      t->Branch("ipDist2JetSig",jets_.ipDist2JetSig,"ipDist2JetSig[nselIPtrk]/F");
+      t->Branch("ipClosest2Jet",jets_.ipClosest2Jet,"ipClosest2Jet[nselIPtrk]/F");
+    }      
 
     t->Branch("mue",     jets_.mue,     "mue[nref]/F");
     t->Branch("mupt",    jets_.mupt,    "mupt[nref]/F");
@@ -162,6 +178,9 @@ HiInclusiveJetAnalyzer::beginJob() {
   }
   
   if(isMC_){
+    t->Branch("beamId1",&jets_.beamId1,"beamId1/I");    
+    t->Branch("beamId2",&jets_.beamId2,"beamId2/I");    
+
     t->Branch("pthat",&jets_.pthat,"pthat/F");    
 
     // Only matched gen jets
@@ -310,67 +329,53 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.discr_tcHighPur[jets_.nref] = (*patjets)[j].bDiscriminator("akPu3PFTrackCountingHighPurBJetTags");
        }
        else{
-	 cout<<" you fail at btagging "<<endl;
+	 cout<<" b-tagging variables not filled for this collection, turn of doLifeTimeTagging "<<endl;
        }
-       
+
        const reco::SecondaryVertexTagInfo& tagInfoSV=*(*patjets)[j].tagInfoSecondaryVertex();
+       
+       jets_.nsvtx[jets_.nref]     = tagInfoSV.nVertices();	 
+       
        if (tagInfoSV.nVertices()>0) {
-	 Measurement1D m1D = tagInfoSV.flightDistance(0);
-	 jets_.nsvtx[jets_.nref]     = tagInfoSV.nVertices();	 
 	 jets_.svtxntrk[jets_.nref]  = tagInfoSV.nVertexTracks(0);
+	 // this is the 3d flight distance, for 2-D use (0,true)
+	 Measurement1D m1D = tagInfoSV.flightDistance(0);	 
 	 jets_.svtxdl[jets_.nref]    = m1D.value();
 	 jets_.svtxdls[jets_.nref]   = m1D.significance();
 	 
-	 const reco::Vertex& svtx = tagInfoSV.secondaryVertex(0);
-	 
+	 const reco::Vertex& svtx = tagInfoSV.secondaryVertex(0);	 
 	 jets_.svtxm[jets_.nref]    = svtx.p4().mass();
-	 jets_.svtxpt[jets_.nref]   = svtx.p4().pt();
-
+	 jets_.svtxpt[jets_.nref]   = svtx.p4().pt();	 
        }
-       else {	 
-	 jets_.nsvtx[jets_.nref]    =   0;
-	 jets_.svtxntrk[jets_.nref] =   0;
-	 jets_.svtxdl[jets_.nref]   = 0.0;
-	 jets_.svtxdls[jets_.nref]  = 0.0;
-	 jets_.svtxm[jets_.nref]    = 0.0;
-	 jets_.svtxpt[jets_.nref]   = 0.0;
-       }
+       
        const reco::TrackIPTagInfo& tagInfoIP=*(*patjets)[j].tagInfoTrackIP();
+       
+       jets_.nIPtrk[jets_.nref] = tagInfoIP.tracks().size();
+       jets_.nselIPtrk[jets_.nref] = tagInfoIP.selectedTracks().size();
 
-       jets_.nIPtracks[jets_.nref] = tagInfoIP.tracks().size();
-       jets_.nselIPtracks[jets_.nref] = tagInfoIP.selectedTracks().size();
+       if (doLifeTimeTaggingExtras_) {
 
-       // would be nice to save the info for the tracks, but requires a more sophisticated tree
-       /*
-       //cout << "Jet pt: " << tagInfoIP.jet()->pt() << endl;
-       cout << "Tot tracks: " << tagInfoIP.tracks().size() << endl;    
-       TrackRefVector selTracks=tagInfoIP.selectedTracks();
-       int n=selTracks.size();
-       cout << "Sel tracks: " << n << endl; 
-       // false      cout << " Pt  \t d len \t jet dist \t p3d \t p2d\t ip3d \t ip2d " << endl; 
-       GlobalPoint pv(tagInfoIP.primaryVertex()->position().x(),tagInfoIP.primaryVertex()->position().y(),tagInfoIP.primaryVertex()->position().z());
-       cout << pv << " vs " << tagInfoIP.primaryVertex()->position()   << endl;
-       for(int j=0;j< n;j++)
-	 {
-	   TrackIPTagInfo::TrackIPData data = tagInfoIP.impactParameterData()[j];  
-	   cout << selTracks[j]->pt() << "\t";
-	   cout << tagInfoIP.probabilities(0)[j] << "\t";
-	   cout << tagInfoIP.probabilities(1)[j] << "\t";
-	   cout << data.ip3d.value() << "\t";
-	   cout << data.ip3d.significance() << "\t";
-	   cout << data.distanceToJetAxis.value() << "\t";
-	   cout << data.distanceToJetAxis.significance() << "\t";
-	   cout << data.distanceToGhostTrack.value() << "\t";
-	   cout << data.distanceToGhostTrack.significance() << "\t";
-	   cout << data.closestToJetAxis << "\t";
-	   cout << (data.closestToJetAxis - pv).mag() << "\t";
-	   cout << data.closestToGhostTrack << "\t";
-	   cout << (data.closestToGhostTrack - pv).mag() << "\t";
-	   cout << data.ip2d.value() << "\t";
-	   cout << data.ip2d.significance() <<  endl;     
-	 }
-       */
-
+	 TrackRefVector selTracks=tagInfoIP.selectedTracks();
+	 
+	 GlobalPoint pv(tagInfoIP.primaryVertex()->position().x(),tagInfoIP.primaryVertex()->position().y(),tagInfoIP.primaryVertex()->position().z());
+	 
+	 for(int it=0;it<jets_.nselIPtrk[jets_.nref] ;it++)
+	   {
+	     jets_.ipJetIndex[it]= jets_.nref;
+	     TrackIPTagInfo::TrackIPData data = tagInfoIP.impactParameterData()[it];  
+	     jets_.ipPt[it] = selTracks[it]->pt();
+	     jets_.ipProb0[it] = tagInfoIP.probabilities(0)[it];
+	     jets_.ipProb1[it] = tagInfoIP.probabilities(1)[it];
+	     jets_.ip2d[it] = data.ip2d.value();
+	     jets_.ip2dSig[it] = data.ip2d.significance();
+	     jets_.ip3d[it] = data.ip3d.value();
+	     jets_.ip3dSig[it] = data.ip3d.significance();
+	     jets_.ipDist2Jet[it] = data.distanceToJetAxis.value();
+	     jets_.ipDist2JetSig[it] = data.distanceToJetAxis.significance();
+	     jets_.ipClosest2Jet[it] = (data.closestToJetAxis - pv).mag();	//decay length   
+	   }
+       }
+       
        const reco::PFCandidateCollection *pfCandidateColl = &(*pfCandidates);
        int pfMuonIndex = getPFJetMuon(jet, pfCandidateColl);
        if(pfMuonIndex >=0){
@@ -382,15 +387,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.mudr[jets_.nref]    =  reco::deltaR(jet,muon);
 	 jets_.muptrel[jets_.nref] =  getPtRel(muon, jet);
 	 jets_.muchg[jets_.nref]   =  muon.charge();
-       }
-       else{
-	 jets_.mupt[jets_.nref]    =  0.0;
-	 jets_.mueta[jets_.nref]   =  0.0;
-	 jets_.muphi[jets_.nref]   =  0.0;
-	 jets_.mue[jets_.nref]     =  0.0;
-	 jets_.mudr[jets_.nref]    =  9.9;
-	 jets_.muptrel[jets_.nref] =  0.0;
-	 jets_.muchg[jets_.nref]   = 0;
        }
      }
 
@@ -438,6 +434,13 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
 
    if(isMC_){
+
+     edm::Handle<HepMCProduct> hepMCProduct;
+     iEvent.getByLabel(eventInfoTag_,hepMCProduct);
+     const HepMC::GenEvent* MCEvt = hepMCProduct->GetEvent();
+     std::pair<HepMC::GenParticle*,HepMC::GenParticle*> beamParticles = MCEvt->beam_particles();
+     jets_.beamId1 = beamParticles.first->pdg_id();
+     jets_.beamId2 = beamParticles.second->pdg_id();
 
      edm::Handle<GenEventInfoProduct> hEventInfo;
      iEvent.getByLabel(eventInfoTag_,hEventInfo);
@@ -493,6 +496,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      
    }
    t->Fill();
+   memset(&jets_,0,sizeof jets_);
 }
 
 
