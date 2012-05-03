@@ -66,6 +66,7 @@ isLeadingJet_(true)
    centBin_.push_back("4to11");
    centBin_.push_back("12to19");
    centBin_.push_back("20to35");
+//    centBin_.push_back("20to39");
    numCentBins_ = centBin_.size();
    
    levelName_.push_back("Eff");
@@ -106,7 +107,7 @@ void TrackingCorrections::Init()
    // =============================
    TH3F* h3tmp = (TH3F*)sample_[0]->Get(trkCorrModule_+"/heff3D_cbin"+centBin_[0]);
    if (!h3tmp) {
-      cout << "bad input: " << sample_[0]->GetName() << endl;
+      cout << "bad input: " << trkCorrModule_+"/heff3D_cbin"+centBin_[0] << " in " << sample_[0]->GetName() << endl;
       exit(1);
    }
    
@@ -196,7 +197,7 @@ void TrackingCorrections::Init()
                                  if (abs(ieta_neighbor-ieta)>=3) break;
                               }
                            }
-                           for (Int_t ijet_neighbor=ijet-1; ijet_neighbor>=1&&ijet_neighbor<=numJEtBins_; ++ijet_neighbor) { // merge neighbor jet bins
+                           for (Int_t ijet_neighbor=ijet; ijet_neighbor>=1&&ijet_neighbor<=numJEtBins_; ++ijet_neighbor) { // merge neighbor jet bins
                               if (ijet_neighbor!=ijet) {
                                  if (smoothLevel_==0||jetBin_->GetBinLowEdge(ijet_neighbor)<40) break;
                                  else if (abs(ijet_neighbor-ijet)>=3) break;
@@ -238,6 +239,7 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    Int_t ptBin = ptBin_->FindBin(pt);
    Int_t etaBin = etaBin_->FindBin(eta);
    Int_t jetBin = jetBin_->FindBin(jet);
+   if (jet<40) jetBin = 1; // jet pt < 40 cases are all gathered in jet=0 bin
    
    Int_t bin = -1;   
    // Get the corresponding centrality bin
@@ -256,6 +258,9 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    Double_t corr[4]={1,1,1,1};
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       corr[lv] = correctionHists_[lv][bin]->GetBinContent(etaBin,ptBin,jetBin);
+      if (lv==0&&corr[lv]<0.001) { // if eff==0, give some average default value
+         corr[lv] = (fabs(eta)<2 ? 0.78 : 0.69);
+      }
       if (outCorr) outCorr[lv] = corr[lv];
    }
    
