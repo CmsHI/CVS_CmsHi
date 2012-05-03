@@ -84,6 +84,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   double genPtMin_;
   bool doLifeTimeTagging_;
   bool doLifeTimeTaggingExtras_;
+  bool saveBfragments_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
