@@ -152,7 +152,6 @@ public:
    void CalcMPT(float gpt, float geta, float gphi, float jpt, float jeta, float jphi, MPT & m) {
       // initial setup
       m.clear();
-      double correctionFactors[4] = {0,0,0,0};
       float trkweight = 1.;
       
       for (int it=0; it<cands.n; ++it) {
@@ -182,9 +181,11 @@ public:
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType==1) {
-               if (anaDiJet&&drG<0.8) trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,gpt,c->evt.hiBin,correctionFactors);
-               else if (drJ<0.8) trkweight = c->trackCorrections[1]->GetCorr(candPt,candEta,jpt,c->evt.hiBin,correctionFactors);
-               else trkweight = c->trackCorrections[0]->GetCorr(candPt,candEta,0,c->evt.hiBin,correctionFactors);
+               int corrSet=0;
+               if (candPt<1) corrSet=1;
+               if (anaDiJet&&gpt>40&&drG<0.8) trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,gpt,c->evt.hiBin);
+               else if (jpt>40&&drJ<0.8) trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,jpt,c->evt.hiBin);
+               else trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,0,c->evt.hiBin);
                ptx*=trkweight;
                pty*=trkweight;
             }
