@@ -17,7 +17,7 @@
 #include "SetupGenpTree.h"
 #include "SetupPFTree.h"
 #include "SetupGenParticleTree.h"
-#include "TrackingCorrections.h"
+#include "TrackingCorrections2012.h"
 
 #include <TTree.h>
 #include <TFile.h>
@@ -118,6 +118,7 @@ class HiForest : public TNamed
   TTree *akPu3jetTree;				// Jet Tree with akPu3PF algorithm, see branches in SetupJetTree.h
   TTree *hltTree;				// OpenHLT Tree, see branches in SetupHltTree.h
   TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
+  TTree *pixtrackTree;				// Track Tree, see branches in SetupTrackTree.h
   TTree *skimTree;				// Skim Tree, contains event selection info, see branches in SetupSkimTree.h
   TTree *towerTree;                             // Tower Tree
   TTree *hbheTree;                              // HCAL HBHE Tree
@@ -145,6 +146,7 @@ class HiForest : public TNamed
 
   Photons photon;
   Tracks track;
+  Tracks pixtrack;
   Hits tower;
   Hits hbhe;
   Hits eb;
@@ -161,6 +163,7 @@ class HiForest : public TNamed
   bool hasAkPu3JetTree;
   bool hasHltTree;
   bool hasTrackTree;
+  bool hasPixTrackTree;
   bool hasSkimTree;
   bool hasTowerTree;
   bool hasHbheTree;
@@ -266,6 +269,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
   if (photonTree==0)  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
   trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
+  pixtrackTree = (TTree*) inf->Get("pixelTrack/trackTree");
+  //pixtrackTree = (TTree*) inf->Get("anaPixTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get(jetAlgo+"JetAnalyzer/t");
@@ -296,6 +301,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasIcPu5JetTree  = (icPu5jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
   hasTrackTree     = (trackTree    != 0);
+  hasPixTrackTree  = (pixtrackTree    != 0);
   hasHltTree       = (hltTree      != 0);
   hasSkimTree      = (skimTree     != 0);
   hasTowerTree     = (towerTree    != 0);
@@ -347,7 +353,13 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     if (tree == 0) tree = trackTree; else tree->AddFriend(trackTree);
     setupTrackTree(trackTree,track);
   }
-
+   
+  if (hasPixTrackTree) {
+    pixtrackTree->SetName("pixtrack");
+    if (tree == 0) tree = pixtrackTree; else tree->AddFriend(pixtrackTree);
+    setupTrackTree(pixtrackTree,pixtrack);
+  }
+   
   if (hasSkimTree) {
     skimTree->SetName("skim");
     if (tree == 0) tree = skimTree; else tree->AddFriend(skimTree);
@@ -418,6 +430,7 @@ void HiForest::GetEntry(int i)
   if (hasIcPu5JetTree) icPu5jetTree ->GetEntry(i);
   if (hasAkPu3JetTree) akPu3jetTree ->GetEntry(i);
   if (hasTrackTree)    trackTree    ->GetEntry(i);
+  if (hasPixTrackTree) pixtrackTree ->GetEntry(i);
   if (hasTowerTree)    towerTree    ->GetEntry(i);
   if (hasHbheTree)     hbheTree     ->GetEntry(i);
   if (hasEbTree)       ebTree     ->GetEntry(i);
@@ -434,21 +447,24 @@ int HiForest::GetEntries()
 void HiForest::InitTree()
 {
    // Setup Track Corrections 	 
-   if(doTrackCorrections){ 	 
-      if(pp){ 	 
-         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf")); 	 
-         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_ppcorrpthgtv4","hitrkEffAnalyzer_akpu3pf")); 	 
-      }else{ 	 
-         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf")); 	 
-         trackCorrections.push_back(new TrackingCorrections("trkCorrHisAna_djuq","_tev9hgtv4_3","hitrkEffAnalyzer_akpu3pf")); 	 
-      } 	 
-      
-      trackCorrections[0]->isLeadingJet_ = 1; 	 
-      trackCorrections[1]->isLeadingJet_ = 0; 	 
-      
-      for(int i = 0; i < trackCorrections.size(); ++i){ 	 
-         trackCorrections[i]->sampleMode_ = 1; 	 
-         trackCorrections[i]->smoothLevel_ = 4; 	 
+   if(doTrackCorrections){
+      trackCorrections.push_back(new TrackingCorrections("QM2011","hitrkEffAnalyzer_akpu3pf")); 	 
+
+      for(int i = 0; i < trackCorrections.size(); ++i){
+         if (pp) {
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq30_ppcorrpthgtv4.root",30);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq50_ppcorrpthgtv4.root",50);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq80_ppcorrpthgtv4.root",80);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq110_ppcorrpthgtv4.root",110);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq170_ppcorrpthgtv4.root",170);
+         } else {
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq30_tev9hgtv4_3.root",30);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq50_tev9hgtv4_3.root",50);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq80_tev9hgtv4_3.root",80);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq110_tev9hgtv4_3.root",110);
+            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq170_tev9hgtv4_3.root",170);
+         }
+         trackCorrections[i]->smoothLevel_ = 1; 	 
          trackCorrections[i]->Init(); 	 
       }
    }
@@ -504,6 +520,7 @@ void HiForest::PrintStatus()
   if (hasIcPu5JetTree) CheckTree(icPu5jetTree, "IcPu5jetTree");
   if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
   if (hasTrackTree)    CheckTree(trackTree,    "TrackTree");
+  if (hasPixTrackTree) CheckTree(pixtrackTree, "PixTrackTree");
   if (hasPhotonTree)   CheckTree(photonTree,   "PhotonTree");
   if (hasMetTree)      CheckTree(metTree,   "MetTree");
   if (hasTowerTree)    CheckTree(towerTree,    "TowerTree");
@@ -529,6 +546,7 @@ void HiForest::SetOutputFile(const char *name)
      }
 
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
+  if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasEvtTree)      AddCloneTree(evtTree,      "hiEvtAnalyzer",            "HiTree");
   if (hasMetTree)      AddCloneTree(metTree,      "anaMET",            "metTree");
