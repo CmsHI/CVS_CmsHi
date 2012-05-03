@@ -65,8 +65,12 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
   double getPtRel(const reco::PFCandidate lep, const pat::Jet& jet );
 
+  void saveDaughters( const reco::GenParticle & gen);
+  void saveDaughters( const reco::Candidate & gen);
+
   edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_; 
 
+  std::vector<float> usedStringPts;
 
   /// verbose ?
   bool   verbose_;
@@ -102,7 +106,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   static const int MAXJETS = 500;
   static const int MAXTRACKS = 5000;
   static const int MAXHLTBITS = 5000;
-
+  static const int MAXBFRAG = 500;
 
   struct JRA{
     
@@ -141,6 +145,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     int nIPtrk[MAXJETS];
     int nselIPtrk[MAXJETS];
     
+    int nIP;
     int ipJetIndex[MAXTRACKS];
     float ipPt[MAXTRACKS];
     float ipProb0[MAXTRACKS];
@@ -191,6 +196,18 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     bool l1TBit[MAXHLTBITS];
     int nL1ABit;
     bool l1ABit[MAXHLTBITS];
+
+    int bMult;
+    int bJetIndex[MAXBFRAG];
+    int bStatus[MAXBFRAG];
+    int bPdg[MAXBFRAG];
+    int bChg[MAXBFRAG];
+    float bVx[MAXBFRAG];
+    float bVy[MAXBFRAG];
+    float bVz[MAXBFRAG];
+    float bPt[MAXBFRAG];
+    float bEta[MAXBFRAG];
+    float bPhi[MAXBFRAG];
 
 
   };
