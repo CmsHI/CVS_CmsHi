@@ -20,10 +20,10 @@
 
 
 class TriggerPrimitivesTree_alex {
-  public :
+public :
   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
   Int_t           fCurrent; //!current Tree number in a TChain
-
+  
   // Declaration of leaf types
   Int_t           event;
   Int_t           run;
@@ -84,17 +84,32 @@ class TriggerPrimitivesTree_alex {
   TBranch        *b_caloRCTRegionEtaIndex;   //!
   TBranch        *b_caloRCTRegionPhiIndex;   //!
 
-  TriggerPrimitivesTree_alex(TTree *tree=0);
+  enum SUBTRACT_ALGORITHM{
+    NONE = 0,
+    RCT_MINIMUM = 1,
+    RCT_AVERAGE = 2,
+    ETA_AVERAGE = 3,
+    MIN_3X3 = 4
+  };
+
+  enum CALIBRATION_TYPE{
+    NO = 0,
+    IDEAL = 1,
+    DIGITAL = 2
+  };
+  
+  TriggerPrimitivesTree_alex(TFile *f=0);
   virtual ~TriggerPrimitivesTree_alex();
   virtual Int_t    Cut(Long64_t entry);
   virtual Int_t    GetEntry(Long64_t entry);
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
   virtual void     Loop(int total_events = 0, 
-			int threshhold = 25,  
-			bool SUBTRACT_RCT_MINIMUM = false,
-			bool SUBTRACT_RCT_AVERAGE = false,
-			bool SUBTRACT_ETA_AVG = false);
+			int threshhold = 0,
+			enum CALIBRATION_TYPE = NO,
+			enum SUBTRACT_ALGORITHM algorithm = NONE,
+			bool histo = true,
+			TString filename = "dump.root");
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);
   
@@ -104,24 +119,26 @@ class TriggerPrimitivesTree_alex {
   //HiTree         *fhiinfo;
   //JetTree        *fjet;
   //HLTMuTree      *fmu;
+
+
 };
 
 #endif
 
 #ifdef TriggerPrimitivesTree_alex_cxx
-TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TTree *tree)
+TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
-  if (tree == 0) {
-    //TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/minbiasL1/HiForestL1_merged_v2.root");
-    //TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/L1jet/HiForestL1-jet_merged_v1.root");
-    TFile *f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
-
-    tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
-
-  }
-  
+  if (f == 0) {
+    f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/minbiasL1/HiForestL1_merged_v2.root");
+    //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/L1jet/HiForestL1-jet_merged_v1.root");
+    //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
+    
+    //tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
+    
+    }
+  TTree *tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
   //fhlt = new HltTree::HltTree();
   //fhiinfo = new HiTree::HiTree();
   //fjet = new JetTree::JetTree();
