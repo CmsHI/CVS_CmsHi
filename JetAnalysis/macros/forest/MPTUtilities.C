@@ -55,7 +55,9 @@ public:
    bool chargedOnly;
    float ptmin, etamax;
    int selPFId;
-   bool doTrackingCorr,anaDiJet;
+   vector<int> trackingCorrectionTypes;
+   vector<TString> trackingCorrectionNames;
+   bool anaDiJet;
    HiForest * c;
    vector<float> drbins;
    vector<float> dphibins;
@@ -70,7 +72,6 @@ public:
    chargedOnly(false),
    ptmin(0.5),etamax(2.4),
    selPFId(pfid),
-   doTrackingCorr(false),
    anaDiJet(true)
    {
       cout << "dr bins: ";
@@ -86,32 +87,28 @@ public:
          cout << dphibins[i] << " ";
       }
       cout << endl;
+      
+      trackingCorrectionTypes.push_back(-1); trackingCorrectionNames.push_back("");
    }
    
    void Init(TTree * t) {
       // default mpt analyses
-      vmpt.push_back(MPT(name+"AllAcc",0,-1));
-      if (doTrackingCorr) vmpt.push_back(MPT(name+"CorrAllAcc",0,-1,1));
-      // dR cones
-      for (int ir=0; ir<drbins.size(); ++ir) {
-         vmpt.push_back(MPT(name+Form("InCone"),1,drbins[ir]));
-         vmpt.push_back(MPT(name+Form("OutCone"),2,drbins[ir]));
-         if (doTrackingCorr) {
-            vmpt.push_back(MPT(name+Form("CorrInCone"),1,drbins[ir],1));
-            vmpt.push_back(MPT(name+Form("CorrOutCone"),2,drbins[ir],1));
+      for (int ct=0; ct<trackingCorrectionTypes.size(); ++ct) {
+         vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+"AllAcc",0,-1,trackingCorrectionTypes[ct]));
+         // dR cones
+         for (int ir=0; ir<drbins.size(); ++ir) {
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrInCone"),1,drbins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrOutCone"),2,drbins[ir],trackingCorrectionTypes[ct]));
+         }
+         // dphi regions
+         for (int ir=0; ir<dphibins.size(); ++ir) {
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrInDPhi"),3,dphibins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrOutDPhi"),4,dphibins[ir],trackingCorrectionTypes[ct]));
          }
       }
-      // dphi regions
-      for (int ir=0; ir<dphibins.size(); ++ir) {
-         vmpt.push_back(MPT(name+Form("InDPhi"),3,dphibins[ir]));
-         vmpt.push_back(MPT(name+Form("OutDPhi"),4,dphibins[ir]));
-         if (doTrackingCorr) {
-            vmpt.push_back(MPT(name+Form("CorrInDPhi"),3,dphibins[ir],1));
-            vmpt.push_back(MPT(name+Form("CorrOutDPhi"),4,dphibins[ir],1));
-         }
-      }
-      cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax;
-      cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " doTrackingCorr=" << doTrackingCorr << " anaDiJet=" << anaDiJet << endl;
+      cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax << " trkCorrs= ";
+      for (int ct=0; ct<trackingCorrectionTypes.size(); ++ct) cout << trackingCorrectionTypes[ct] << ",";
+      cout << " excludeTrigCandMode=" << excludeTrigCandMode << " chargedOnly=" << chargedOnly << " selPFId=" << selPFId << " anaDiJet=" << anaDiJet << endl;
       for (unsigned m=0; m<vmpt.size(); ++m) { 
          //         cout << "CalcMPT for " << vmpt[m].name << " dRCone: " << vmpt[m].dRCone << endl;
          SetBranches(t,vmpt[m]);
@@ -180,12 +177,10 @@ public:
 //            cout << m.name << " pt: " << candPt << " pt1: " << gpt << " dr1: " << drG << " dr2: " << drJ << " dphi1: " << dphi1 << " dphipi1: " << dphipi1 << endl;
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
-            if (m.corrType==1) {
-               int corrSet=0;
-               if (candPt<1) corrSet=1;
-               if (anaDiJet&&gpt>40&&drG<0.8) trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,gpt,c->evt.hiBin);
-               else if (jpt>40&&drJ<0.8) trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,jpt,c->evt.hiBin);
-               else trkweight = c->trackCorrections[corrSet]->GetCorr(candPt,candEta,0,c->evt.hiBin);
+            if (m.corrType>=0) {
+               if (anaDiJet&&gpt>40&&drG<0.8) trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,gpt,c->evt.hiBin);
+               else if (jpt>40&&drJ<0.8) trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,jpt,c->evt.hiBin);
+               else trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,0,c->evt.hiBin);
                ptx*=trkweight;
                pty*=trkweight;
             }

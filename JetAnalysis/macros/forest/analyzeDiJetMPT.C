@@ -68,7 +68,7 @@ void analyzeDiJetMPT(
    mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    double cutjetPt = 30;
    double cutjetEta = 2;
-   double cutPtTrk=0.5, cutEtaTrk = 2.4, cutPtPfCand=4;
+   double cutPtTrk=4, cutEtaTrk = 2.4, cutPtPfCand=4;
    if (saveAllCands) cutPtPfCand=1;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
@@ -117,10 +117,10 @@ void analyzeDiJetMPT(
       //pf4mpt.Init(tgj);  
       //pf5mpt.Init(tgj);
 
-      trkmpt.doTrackingCorr = true;
+      trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
       trkmpt.c = c;
       trkmpt.Init(tgj);
-      pixtrkmpt.doTrackingCorr = true;
+      pixtrkmpt.trackingCorrectionTypes.push_back(1); pixtrkmpt.trackingCorrectionNames.push_back("Corr");
       pixtrkmpt.c = c;
       pixtrkmpt.Init(tgj);
 
