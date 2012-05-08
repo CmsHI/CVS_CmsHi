@@ -192,9 +192,9 @@ void TrackingCorrections::Init()
                         Int_t eta_direction = (ieta>numEtaBins_/2 ? -1 : 1);
                         for (Int_t ieta_neighbor=ieta; ieta_neighbor>=1&&ieta_neighbor<=numEtaBins_; ieta_neighbor+=eta_direction) { // merge neighbor eta bins
                            if (ieta_neighbor!=ieta) {
-                              if (smoothLevel_==0) break;
+                              if (smoothLevel_>=0) break;
                               else if ((ieta_neighbor>=1&&ieta_neighbor<=4) || (ieta_neighbor>=10&&ieta_neighbor<=13)) {
-                                 if (abs(ieta_neighbor-ieta)>=3) break;
+                                 if (abs(ieta_neighbor-ieta)>=1) break;
                               }
                            }
                            for (Int_t ijet_neighbor=ijet; ijet_neighbor>=1&&ijet_neighbor<=numJEtBins_; ++ijet_neighbor) { // merge neighbor jet bins
@@ -259,7 +259,9 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       corr[lv] = correctionHists_[lv][bin]->GetBinContent(etaBin,ptBin,jetBin);
       if (lv==0&&corr[lv]<0.001) { // if eff==0, give some average default value
-         corr[lv] = (fabs(eta)<2 ? 0.78 : 0.69);
+         if (pt>7.5) corr[lv] = (fabs(eta)<1 ? 0.78 : 0.65);
+         else if (pt>2) corr[lv] = (fabs(eta)<1 ? 0.65 : 0.55);
+         else corr[lv] = 1;
       }
       if (outCorr) outCorr[lv] = corr[lv];
    }
