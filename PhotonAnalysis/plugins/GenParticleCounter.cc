@@ -13,7 +13,7 @@ Implementation:
 //
 // Original Author:  Yong Kim,32 4-A08,+41227673039,
 //         Created:  Fri Oct 29 12:18:14 CEST 2010
-// $Id: GenParticleCounter.cc,v 1.1 2011/04/14 15:44:27 kimy Exp $
+// $Id: GenParticleCounter.cc,v 1.2 2011/07/18 15:49:01 kimy Exp $
 //
 //
 
@@ -168,12 +168,12 @@ GenParticleCounter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
  
    // Get the primary event vertex                                                                                                                                                                           
    recoVtxZ = -100;
-   edm::Handle<reco::VertexCollection> vertexHandle;
-   iEvent.getByLabel(InputTag(vertexProducer_), vertexHandle);
-   reco::VertexCollection vertexCollection = *(vertexHandle.product());
-   if (vertexCollection.size()>0) {
-     recoVtxZ = vertexCollection.begin()->position().Z();
-   }
+   //  edm::Handle<reco::VertexCollection> vertexHandle;
+   //  iEvent.getByLabel(InputTag(vertexProducer_), vertexHandle);
+   //  reco::VertexCollection vertexCollection = *(vertexHandle.product());
+   //  if (vertexCollection.size()>0) {
+   //   recoVtxZ = vertexCollection.begin()->position().Z();
+   //   }
    
    
    edm::Handle<reco::GenParticleCollection> inputHandle;
