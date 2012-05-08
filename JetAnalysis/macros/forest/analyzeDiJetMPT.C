@@ -111,6 +111,7 @@ void analyzeDiJetMPT(
    AnaMPT trkmpt("trk",0);
    AnaMPT pixtrkmpt("pixtrk",0);
    AnaMPT genpSigmpt("genpSig",0);
+   AnaMPT genpAllmpt("genpAll",0);
    if (doMPT) {
       //pfmpt.Init(tgj);  
       //pf1mpt.Init(tgj);  
@@ -126,6 +127,8 @@ void analyzeDiJetMPT(
 
       genpSigmpt.chargedOnly = true;
       genpSigmpt.Init(tgj);
+      genpAllmpt.chargedOnly = true;
+      genpAllmpt.Init(tgj);
    }
    
    // mixing classes
@@ -475,9 +478,11 @@ void analyzeDiJetMPT(
          pixtrkmpt.InputEvent(c->pixtrack.nTrk,c->pixtrack.trkPt,c->pixtrack.trkEta,c->pixtrack.trkPhi);
          pixtrkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg);
+         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg,c->genparticle.sube);
          genpSigmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-      }
+         genpAllmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg);
+         genpAllmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+        }
       
       // All done
       tgj->Fill();

@@ -97,13 +97,13 @@ public:
          vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+"AllAcc",0,-1,trackingCorrectionTypes[ct]));
          // dR cones
          for (int ir=0; ir<drbins.size(); ++ir) {
-            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrInCone"),1,drbins[ir],trackingCorrectionTypes[ct]));
-            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrOutCone"),2,drbins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("InCone"),1,drbins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("OutCone"),2,drbins[ir],trackingCorrectionTypes[ct]));
          }
          // dphi regions
          for (int ir=0; ir<dphibins.size(); ++ir) {
-            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrInDPhi"),3,dphibins[ir],trackingCorrectionTypes[ct]));
-            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("CorrOutDPhi"),4,dphibins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("InDPhi"),3,dphibins[ir],trackingCorrectionTypes[ct]));
+            vmpt.push_back(MPT(name+trackingCorrectionNames[ct]+Form("OutDPhi"),4,dphibins[ir],trackingCorrectionTypes[ct]));
          }
       }
       cout << "Setup mpt study " << name << ": ptmin=" << ptmin << " etamax=" << etamax << " trkCorrs= ";
@@ -115,7 +115,7 @@ public:
       }      
    }
    
-   void InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0) {
+   void InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
 //      cout << "mpt input size: " << n << endl;
       cands.n = 0;
       for (int i=0; i<n; ++i) {
@@ -132,6 +132,9 @@ public:
          if (chargedOnly&&pch) {
 //            cout << "charge: " << pch[i] << endl;
             if (pch[i]==0) continue;
+         }
+         if (psube) {
+            if (psube[i]!=0) continue;
          }
          // now write selected cands
          cands.Set(cands.n,pt[i],eta[i],phi[i]);
