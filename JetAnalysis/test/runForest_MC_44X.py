@@ -250,7 +250,7 @@ process.reco_extra_jet    = cms.Path(process.iterativeConePu5CaloJets *
                                      process.iterativeCone5CaloJets *
                                      process.recoAk1to6 *
                                      process.photon_extra_reco)
-process.gen_step          = cms.Path( process.hiGenParticles * process.hiGenParticlesForJets * process.genPartons * process.hiPartons * process.hiRecoGenJets)
+process.gen_step          = cms.Path( process.hiGen )
 
 ###########################################
 # Do regit and b-tagging
