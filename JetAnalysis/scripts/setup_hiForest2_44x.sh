@@ -71,7 +71,7 @@ this should be cleaned up
 #---
 #>    track = cms.InputTag("hiSelectedTrackHighPurity"),
 
-cvs co -r hi44X_03                 RecoHI/HiEgammaAlgos
+cvs co -r hi44X_04                 RecoHI/HiEgammaAlgos
 
 # Yen-Jie: checking with Matt to see if we need to update to HEAD
 cvs co -r hi44X_02_01              RecoHI/Configuration
