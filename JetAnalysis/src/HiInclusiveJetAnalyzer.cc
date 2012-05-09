@@ -84,9 +84,12 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   }
 
   cout<<" jet collection : "<<jetTag_<<endl;
+  doSubEvent_ = 0;
+
   if(isMC_){
      cout<<" genjet collection : "<<genjetTag_<<endl;
      genPtMin_ = iConfig.getUntrackedParameter<double>("genPtMin",0);
+     doSubEvent_ = iConfig.getUntrackedParameter<bool>("doSubEvent",1);
   }
 
    
@@ -208,6 +211,12 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("genphi",jets_.genphi,"genphi[ngen]/F");
     t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
     t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
+<<<<<<< HiInclusiveJetAnalyzer.cc
+
+    if(doSubEvent_){
+       t->Branch("gensubid",jets_.gensubid,"gensubid[ngen]/I");
+    }
+=======
 
     if(saveBfragments_  ) {
       t->Branch("bMult",&jets_.bMult,"bMult/I");
@@ -222,6 +231,7 @@ HiInclusiveJetAnalyzer::beginJob() {
       t->Branch("bPdg",jets_.bPdg,"bPdg[bMult]/I");
       t->Branch("bChg",jets_.bChg,"bChg[bMult]/I");
     }
+>>>>>>> 1.11
   }
   /*
   if(!isMC_){
@@ -516,6 +526,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.genphi[jets_.ngen] = genjet.phi();
 	 jets_.geny[jets_.ngen] = genjet.eta();
 	 
+	 if(doSubEvent_){
+	    const GenParticle* gencon = genjet.getGenConstituent(0);
+	    jets_.gensubid[jets_.ngen] = gencon->collisionId();
+	 }
 	 
 	 // find matching patJet if there is one
 	 

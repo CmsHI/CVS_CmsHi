@@ -81,6 +81,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool usePat_;
   bool isMC_;
 
+  bool doSubEvent_;
   double genPtMin_;
   bool doLifeTimeTagging_;
   bool doLifeTimeTaggingExtras_;
@@ -187,6 +188,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float geny[MAXJETS];
     float gendphijt[MAXJETS];
     float gendrjt[MAXJETS];
+    int gensubid[MAXJETS];
 
     // hlt
     int nHLTBit;
