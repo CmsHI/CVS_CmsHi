@@ -84,24 +84,3 @@ icPu5JPTJetAnalyzer = inclusiveJetAnalyzer.clone()
 icPu5JPTJetAnalyzer.jetTag = 'jpticPu5patJets'
 icPu5JPTJetAnalyzer.genjetTag = 'iterativeCone5HiGenJets'
 
-allJetAnalyzers = cms.Sequence(                         inclusiveJetAnalyzer
-                                                        *ic3JetAnalyzer
-                                                        *ic4JetAnalyzer
-                                                        *ic5JetAnalyzer
-                                                        *ak3JetAnalyzer
-                                                        *ak4JetAnalyzer
-                                                        *ak5JetAnalyzer
-                                                        *kt4JetAnalyzer
-                                                        *ak7JetAnalyzer
-                                                        *ic3PFJetAnalyzer
-                                                        *ic4PFJetAnalyzer
-                                                        *ic5PFJetAnalyzer
-                                                        *ak3PFJetAnalyzer
-                                                        *ak4PFJetAnalyzer
-                                                        *ak5PFJetAnalyzer
-                                                        *ak7PFJetAnalyzer
-                                                        *icPu5JPTJetAnalyzer
-                                                        )
-
-
-

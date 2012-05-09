@@ -365,32 +365,9 @@ akPu3PFpatJets = patJets.clone(jetSource            = cms.InputTag("akPu3PFJets"
                                                                                     ),
                                                )
 
-# end batagging
-
-
-# === mc sequences ===
-icPu5patSequence = cms.Sequence(icPu5corr * icPu5clean * icPu5match * icPu5parton  *  icPu5patJets)
-akPu5PFpatSequence = cms.Sequence(akPu5PFcorr * akPu5PFclean * akPu5PFmatch * akPu5PFparton * akPu5PFpatJets)
-akPu3PFpatSequence = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFpatJets)
-akPu5patSequence = cms.Sequence(akPu5corr * akPu5PFclean * akPu5match * akPu5parton * akPu5patJets)
-akPu3patSequence = cms.Sequence(akPu3corr * akPu3PFclean * akPu3match * akPu3parton * akPu3patJets)
-
-icPu5patSequence_withBtagging = cms.Sequence(icPu5corr * icPu5clean * icPu5match * icPu5parton  * icPu5PatJetFlavourId * icPu5JetTracksAssociator * icPu5JetBtagging * icPu5patJets)
-akPu3PFpatSequence_withBtagging = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFPatJetFlavourId * akPu3PFJetTracksAssociator *akPu3PFJetBtagging * akPu3PFpatJets)
-
 
 # === data sequences ===
 # Note still need to use enableData function in cfg to remove mc dep of patjet
-icPu5patSequence_data = cms.Sequence( icPu5corr * icPu5patJets )
-akPu5PFpatSequence_data = cms.Sequence(akPu5PFcorr * akPu5PFpatJets )
-akPu3PFpatSequence_data = cms.Sequence( akPu3PFcorr * akPu3PFpatJets )
-akPu5patSequence_data = cms.Sequence( akPu5corr * akPu5patJets )
-akPu3patSequence_data = cms.Sequence( akPu3corr * akPu3patJets )
-
-icPu5patSequence_withBtagging_data = cms.Sequence( icPu5corr * icPu5JetTracksAssociator * icPu5JetBtagging * icPu5JetTracksAssociator * icPu5JetBtagging * icPu5patJets )
-akPu3PFpatSequence_withBtagging_data = cms.Sequence( akPu3PFcorr * akPu3PFJetTracksAssociator *akPu3PFJetBtagging * akPu3PFJetTracksAssociator *akPu3PFJetBtagging * akPu3PFpatJets )
-
-
 
 # All corrections
 
@@ -511,6 +488,9 @@ ak5CalopatJets = akPu3PFpatJets.clone(jetSource = cms.InputTag("ak5CaloJets"), j
 ak6CalopatJets = akPu3PFpatJets.clone(jetSource = cms.InputTag("ak6CaloJets"), jetCorrFactorsSource = cms.VInputTag(cms.InputTag("ak6Calocorr")), genJetMatch = cms.InputTag("ak6Calomatch"), genPartonMatch = cms.InputTag("ak6Caloparton"))
 
 
+
+icPu5patSequence = cms.Sequence(icPu5corr * icPu5clean * icPu5match * icPu5parton  *  icPu5patJets)
+
 akPu1PFpatSequence = cms.Sequence(akPu1PFcorr+ak1clean+akPu1PFmatch+akPu1PFparton+akPu1PFpatJets)
 akPu2PFpatSequence = cms.Sequence(akPu2PFcorr+ak2clean+akPu2PFmatch+akPu2PFparton+akPu2PFpatJets)
 akPu3PFpatSequence = cms.Sequence(akPu3PFcorr+ak3clean+akPu3PFmatch+akPu3PFparton+akPu3PFpatJets)
@@ -572,7 +552,7 @@ makeHeavyIonJets = cms.Sequence(icPu5patSequence +
 
                                 )
                                
-
+akPu3PFpatSequence_withBtagging = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFPatJetFlavourId * akPu3PFJetTracksAssociator *akPu3PFJetBtagging * akPu3PFpatJets)
 
 
 

@@ -61,36 +61,35 @@ ak4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4Calopa
 ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"))
 ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"))
 
-jetAnalyzers = cms.Sequence(
-        akPu1PFJetAnalyzer +
-            akPu2PFJetAnalyzer +
-            akPu3PFJetAnalyzer +
-            akPu4PFJetAnalyzer +
-            akPu5PFJetAnalyzer +
-            akPu6PFJetAnalyzer +
-
-            akPu1CaloJetAnalyzer +
-            akPu2CaloJetAnalyzer +
-            akPu3CaloJetAnalyzer +
-            akPu4CaloJetAnalyzer +
-            akPu5CaloJetAnalyzer +
-            akPu6CaloJetAnalyzer +
-
-            ak1PFJetAnalyzer +
-            ak2PFJetAnalyzer +
-            ak3PFJetAnalyzer +
-            ak4PFJetAnalyzer +
-            ak5PFJetAnalyzer +
-            ak6PFJetAnalyzer +
-
-            ak1CaloJetAnalyzer +
-            ak2CaloJetAnalyzer +
-            ak3CaloJetAnalyzer +
-            ak4CaloJetAnalyzer +
-            ak5CaloJetAnalyzer +
-            ak6CaloJetAnalyzer
-
-            )
+jetAnalyzers = cms.Sequence(akPu1PFJetAnalyzer +
+                            akPu2PFJetAnalyzer +
+                            akPu3PFJetAnalyzer +
+                            akPu4PFJetAnalyzer +
+                            akPu5PFJetAnalyzer +
+                            akPu6PFJetAnalyzer +
+                            
+                            akPu1CaloJetAnalyzer +
+                            akPu2CaloJetAnalyzer +
+                            akPu3CaloJetAnalyzer +
+                            akPu4CaloJetAnalyzer +
+                            akPu5CaloJetAnalyzer +
+                            akPu6CaloJetAnalyzer +
+                            
+                            ak1PFJetAnalyzer +
+                            ak2PFJetAnalyzer +
+                            ak3PFJetAnalyzer +
+                            ak4PFJetAnalyzer +
+                            ak5PFJetAnalyzer +
+                            ak6PFJetAnalyzer +
+                            
+                            ak1CaloJetAnalyzer +
+                            ak2CaloJetAnalyzer +
+                            ak3CaloJetAnalyzer +
+                            ak4CaloJetAnalyzer +
+                            ak5CaloJetAnalyzer +
+                            ak6CaloJetAnalyzer
+                            
+                            )
 
 
 
