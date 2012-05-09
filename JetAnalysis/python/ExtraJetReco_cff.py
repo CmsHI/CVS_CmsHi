@@ -72,6 +72,22 @@ ak2CaloJets = akPu2CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
 ak1PFJets = akPu1PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
 ak1CaloJets = akPu1CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
 
+
+akPu1PFJets.puPtMin = cms.double(5.0)
+akPu2PFJets.puPtMin = cms.double(10.0)
+akPu3PFJets.puPtMin = cms.double(15.0)
+akPu4PFJets.puPtMin = cms.double(20.0)
+akPu5PFJets.puPtMin = cms.double(25.0)
+akPu6PFJets.puPtMin = cms.double(30.0)
+
+akPu1CaloJets.puPtMin = cms.double(2.0)
+akPu2CaloJets.puPtMin = cms.double(4.0)
+akPu3CaloJets.puPtMin = cms.double(6.0)
+akPu4CaloJets.puPtMin = cms.double(8.0)
+akPu5CaloJets.puPtMin = cms.double(10.0)
+akPu6CaloJets.puPtMin = cms.double(12.0)
+
+
 recoAk1to6 = cms.Sequence( akPu1PFJets * akPu2PFJets *akPu3PFJets * akPu4PFJets * akPu5PFJets * akPu6PFJets *
                            ak1PFJets * ak2PFJets *ak3PFJets * ak4PFJets * ak5PFJets * ak6PFJets *
                            akPu1CaloJets * akPu2CaloJets *akPu3CaloJets * akPu4CaloJets * akPu5CaloJets * akPu6CaloJets *
