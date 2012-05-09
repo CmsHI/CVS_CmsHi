@@ -418,7 +418,7 @@ ak1PFJets = akPu1PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
 ak1CaloJets = akPu1CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
 
 
-recoAllJets = cms.Sequence(akPu1PFJets * akPu2PFJets *akPu3PFJets * akPu4PFJets * akPu5PFJets * akPu6PFJets *
+recoAk1to6 = cms.Sequence( akPu1PFJets * akPu2PFJets *akPu3PFJets * akPu4PFJets * akPu5PFJets * akPu6PFJets *
                            ak1PFJets * ak2PFJets *ak3PFJets * ak4PFJets * ak5PFJets * ak6PFJets *
                            akPu1CaloJets * akPu2CaloJets *akPu3CaloJets * akPu4CaloJets * akPu5CaloJets * akPu6CaloJets *
                            ak1CaloJets * ak2CaloJets *ak3CaloJets * ak4CaloJets * ak5CaloJets * ak6CaloJets *
@@ -546,15 +546,12 @@ ak5CalopatJets = akPu3PFpatJets.clone(jetSource = cms.InputTag("ak5CaloJets"), j
 ak6CalopatJets = akPu3PFpatJets.clone(jetSource = cms.InputTag("ak6CaloJets"), jetCorrFactorsSource = cms.VInputTag(cms.InputTag("ak6Calocorr")), genJetMatch = cms.InputTag("ak6Calomatch"), genPartonMatch = cms.InputTag("ak6Caloparton"))
 
 
-
-
 akPu1PFpatSequence = cms.Sequence(akPu1PFcorr+ak1clean+akPu1PFmatch+akPu1PFparton+akPu1PFpatJets)
 akPu2PFpatSequence = cms.Sequence(akPu2PFcorr+ak2clean+akPu2PFmatch+akPu2PFparton+akPu2PFpatJets)
 akPu3PFpatSequence = cms.Sequence(akPu3PFcorr+ak3clean+akPu3PFmatch+akPu3PFparton+akPu3PFpatJets)
 akPu4PFpatSequence = cms.Sequence(akPu4PFcorr+ak4clean+akPu4PFmatch+akPu4PFparton+akPu4PFpatJets)
 akPu5PFpatSequence = cms.Sequence(akPu5PFcorr+ak5clean+akPu5PFmatch+akPu5PFparton+akPu5PFpatJets)
 akPu6PFpatSequence = cms.Sequence(akPu6PFcorr+ak6clean+akPu6PFmatch+akPu6PFparton+akPu6PFpatJets)
-
 
 akPu1CalopatSequence = cms.Sequence(akPu1Calocorr+ak1clean+akPu1Calomatch+akPu1Caloparton+akPu1CalopatJets)
 akPu2CalopatSequence = cms.Sequence(akPu2Calocorr+ak2clean+akPu2Calomatch+akPu2Caloparton+akPu2CalopatJets)
@@ -611,26 +608,6 @@ makeHeavyIonJets = cms.Sequence(icPu5patSequence +
                                 )
                                 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ic5JetAnalyzer = icPu5JetAnalyzer.clone(jetTag = cms.InputTag("iterativeCone5CaloJets"))
 
 akPu1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak1PFpatJets"))
@@ -666,35 +643,35 @@ ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5Calopa
 ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"))
 
 jetAnalyzers = cms.Sequence(
-        akPu1PFJetAnalyzer +
-            akPu2PFJetAnalyzer +
-                akPu3PFJetAnalyzer +
-                akPu4PFJetAnalyzer +
-                akPu5PFJetAnalyzer +
-                akPu6PFJetAnalyzer +
-
-            akPu1CaloJetAnalyzer +
-            akPu2CaloJetAnalyzer +
-                akPu3CaloJetAnalyzer +
-                akPu4CaloJetAnalyzer +
-                akPu5CaloJetAnalyzer +
-                akPu6CaloJetAnalyzer +
-
-            ak1PFJetAnalyzer +
-            ak2PFJetAnalyzer +
-                ak3PFJetAnalyzer +
-                ak4PFJetAnalyzer +
-                ak5PFJetAnalyzer +
-                ak6PFJetAnalyzer +
-
-            ak1CaloJetAnalyzer +
-            ak2CaloJetAnalyzer +
-                ak3CaloJetAnalyzer +
-                ak4CaloJetAnalyzer +
-                ak5CaloJetAnalyzer +
-                ak6CaloJetAnalyzer
-
-            )
+    akPu1PFJetAnalyzer +
+    akPu2PFJetAnalyzer +
+    akPu3PFJetAnalyzer +
+    akPu4PFJetAnalyzer +
+    akPu5PFJetAnalyzer +
+    akPu6PFJetAnalyzer +
+    
+    akPu1CaloJetAnalyzer +
+    akPu2CaloJetAnalyzer +
+    akPu3CaloJetAnalyzer +
+    akPu4CaloJetAnalyzer +
+    akPu5CaloJetAnalyzer +
+    akPu6CaloJetAnalyzer +
+    
+    ak1PFJetAnalyzer +
+    ak2PFJetAnalyzer +
+    ak3PFJetAnalyzer +
+    ak4PFJetAnalyzer +
+    ak5PFJetAnalyzer +
+    ak6PFJetAnalyzer +
+    
+    ak1CaloJetAnalyzer +
+    ak2CaloJetAnalyzer +
+    ak3CaloJetAnalyzer +
+    ak4CaloJetAnalyzer +
+    ak5CaloJetAnalyzer +
+    ak6CaloJetAnalyzer
+    
+    )
 
 
 
