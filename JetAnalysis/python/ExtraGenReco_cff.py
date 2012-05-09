@@ -9,7 +9,19 @@ from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonProducer_cfi import heavyI
 
 hiGenParticles.srcVector = cms.vstring('hiSignal')
 
-hiAnaGenJets = cms.Sequence(iterativeCone5HiGenJets + ak5HiGenJets + ak4HiGenJets + ak3HiGenJets )
+ak1HiGenJets = ak3HiGenJets.clone(rParam = 0.1)
+ak2HiGenJets = ak3HiGenJets.clone(rParam = 0.2)
+ak6HiGenJets = ak3HiGenJets.clone(rParam = 0.6)
+
+hiAnaGenJets = cms.Sequence(iterativeCone5HiGenJets +
+                            ak1HiGenJets +
+                            ak2HiGenJets +
+                            ak3HiGenJets +
+                            ak4HiGenJets +
+                            ak5HiGenJets +
+                            ak6HiGenJets
+                            )
+                            
 
 hiGen = cms.Sequence(
   heavyIon * # GenHIEventProducer

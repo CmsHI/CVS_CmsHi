@@ -402,12 +402,12 @@ ak6Calocorr = akPu3PFcorr.clone(src = cms.InputTag("ak6CaloJets"),payload = cms.
 
 # Gen stuff
 
-ak1clean = akPu3PFclean.clone()
-ak2clean = akPu3PFclean.clone()
-ak3clean = akPu3PFclean.clone()
-ak4clean = akPu3PFclean.clone()
-ak5clean = akPu3PFclean.clone()
-ak6clean = akPu3PFclean.clone()
+ak1clean = akPu3PFclean.clone(src = cms.InputTag("akPu1PFJets"))
+ak2clean = akPu3PFclean.clone(src = cms.InputTag("akPu2PFJets"))
+ak3clean = akPu3PFclean.clone(src = cms.InputTag("akPu3PFJets"))
+ak4clean = akPu3PFclean.clone(src = cms.InputTag("akPu4PFJets"))
+ak5clean = akPu3PFclean.clone(src = cms.InputTag("akPu5PFJets"))
+ak6clean = akPu3PFclean.clone(src = cms.InputTag("akPu6PFJets"))
 
 
 akPu1PFmatch = akPu3PFmatch.clone(src = cms.InputTag("akPu1PFJets"), matched = cms.InputTag("ak1clean"))
