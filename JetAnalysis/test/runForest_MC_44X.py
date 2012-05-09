@@ -14,7 +14,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test4.root"
-ivars.outputFile = './forest_test1.root'
+ivars.outputFile = './forest_test2.root'
 
 ivars.parseArguments()
 
@@ -127,7 +127,7 @@ process.anaTrack.trackPtMin = 0.5
 process.anaTrack.useQuality = True
 #print "Temporarily commented out sim tracks "
 process.anaTrack.doSimTrack = True
-process.anaTrack.simTrackPtMin = 2
+process.anaTrack.simTrackPtMin = 4
 process.anaTrack.doPFMatching = True
 process.anaTrack.pfCandSrc = cms.InputTag("particleFlowTmp")
 process.anaTrack.trackSrc = cms.InputTag("hiSelectedTracks")
