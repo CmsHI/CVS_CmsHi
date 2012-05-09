@@ -11,17 +11,16 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'GR10_P_V12::All'
-
-from CmsHi.Analysis2010.CommonFunctions_cff import *
-overrideCentrality(process)
+process.GlobalTag.globaltag = 'GR_R_44_V12::All'
 
 process.HeavyIonGlobalParameters = cms.PSet(
-    centralityVariable = cms.string("HFhits"),
+    centralityVariable = cms.string("HFtowers"),
     nonDefaultGlauberModel = cms.string(""),
     centralitySrc = cms.InputTag("hiCentrality")
     )
 
+# Common offline event selection
+process.load("HeavyIonsAnalysis.Configuration.collisionEventSelection_cff")
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
@@ -36,11 +35,19 @@ process.source = cms.Source("PoolSource",
     )
 )
 
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+process.hltMinBiasHFOrBSC = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.hltMinBiasHFOrBSC.HLTPaths = ["HLT_HIMinBiasHfOrBSC_v1"]
+process.hltMinBiasHFOrBSC.throw = False
+
 process.mbcounter = cms.EDAnalyzer('MinBiasCounter',
-                              triggerName = cms.string("HLT_HIMinBiasHfOrBSC"),
-                              histFileName = cms.string("MinBiasCentrality_Histo.root")
-                              #hltPreHIMinBiasBSCCore ||hltPreHIMinBiasHF_Core
+                                   TriggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
+                                   triggerName = cms.vstring("HLT_HIMinBiasHfOrBSC_v1"),
+                                   histFileName = cms.string("MinBiasCentrality_Histo.root")
+                                   #hltPreHIMinBiasBSCCore ||hltPreHIMinBiasHF_Core
 )
 
 
-process.p = cms.Path(process.mbcounter)
+process.p = cms.Path(process.hltMinBiasHFOrBSC *
+                     process.collisionEventSelection *
+                     process.mbcounter)
