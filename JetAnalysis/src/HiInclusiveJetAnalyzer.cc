@@ -211,12 +211,10 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("genphi",jets_.genphi,"genphi[ngen]/F");
     t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
     t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
-<<<<<<< HiInclusiveJetAnalyzer.cc
 
     if(doSubEvent_){
        t->Branch("gensubid",jets_.gensubid,"gensubid[ngen]/I");
     }
-=======
 
     if(saveBfragments_  ) {
       t->Branch("bMult",&jets_.bMult,"bMult/I");
@@ -231,7 +229,7 @@ HiInclusiveJetAnalyzer::beginJob() {
       t->Branch("bPdg",jets_.bPdg,"bPdg[bMult]/I");
       t->Branch("bChg",jets_.bChg,"bChg[bMult]/I");
     }
->>>>>>> 1.11
+
   }
   /*
   if(!isMC_){
