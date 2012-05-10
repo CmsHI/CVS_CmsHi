@@ -49,6 +49,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   vtxTag_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("hiSelectedVertex"));  
 
   isMC_ = iConfig.getUntrackedParameter<bool>("isMC",false);
+  doTrigger_ = iConfig.getUntrackedParameter<bool>("doTrigger",false);
   
   if(isMC_){
     genjetTag_ = iConfig.getParameter<InputTag>("genjetTag");
@@ -67,7 +68,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
 
   pfCandidateLabel_ = iConfig.getUntrackedParameter<edm::InputTag>("pfCandidateLabel",edm::InputTag("particleFlowTmp"));
 
-  if(!isMC_){
+  if(doTrigger_){
     L1gtReadout_ = iConfig.getParameter<edm::InputTag>("L1gtReadout");
     hltResName_ = iConfig.getUntrackedParameter<string>("hltTrgResults","TriggerResults::HLT");
     

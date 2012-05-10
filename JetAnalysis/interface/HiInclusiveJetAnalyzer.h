@@ -80,6 +80,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool useJEC_;
   bool usePat_;
   bool isMC_;
+  bool doTrigger_;
 
   bool doSubEvent_;
   double genPtMin_;
