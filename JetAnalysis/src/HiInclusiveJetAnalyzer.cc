@@ -317,7 +317,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    jets_.b = b;
    jets_.nref = 0;
    
-   if(!isMC_){
+   if(doTrigger_){
      fillL1Bits(iEvent);
      fillHLTBits(iEvent);
    }
