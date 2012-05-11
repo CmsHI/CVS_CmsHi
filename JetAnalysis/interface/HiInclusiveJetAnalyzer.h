@@ -68,7 +68,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   void saveDaughters( const reco::GenParticle & gen);
   void saveDaughters( const reco::Candidate & gen);
 
-  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_; 
+  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_, trackTag_; 
 
   std::vector<float> usedStringPts;
 
@@ -81,12 +81,16 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool usePat_;
   bool isMC_;
   bool doTrigger_;
+  bool useQuality_;
+  std::string trackQuality_;
 
   bool doSubEvent_;
   double genPtMin_;
   bool doLifeTimeTagging_;
   bool doLifeTimeTaggingExtras_;
   bool saveBfragments_;
+
+  double rParam;
 
   TTree *t;
   edm::Service<TFileService> fs1;
@@ -128,6 +132,30 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float jtphi[MAXJETS];
     float jty[MAXJETS];
     float jtpu[MAXJETS];
+
+     float trackMax[MAXJETS];
+     float trackSum[MAXJETS];
+     int trackN[MAXJETS];
+
+     float chargedMax[MAXJETS];
+     float chargedSum[MAXJETS];
+     int chargedN[MAXJETS];
+
+     float photonMax[MAXJETS];
+     float photonSum[MAXJETS];
+     int photonN[MAXJETS];
+
+     float neutralMax[MAXJETS];
+     float neutralSum[MAXJETS];
+     int neutralN[MAXJETS];
+
+     float eMax[MAXJETS];
+     float eSum[MAXJETS];
+     int eN[MAXJETS];
+
+     float muMax[MAXJETS];
+     float muSum[MAXJETS];
+     int muN[MAXJETS];
 
     float discr_csvMva[MAXJETS];
     float discr_csvSimple[MAXJETS];

@@ -43,13 +43,17 @@ using namespace edm;
 using namespace reco;
 
 HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig) {
-  
 
   jetTag_ = iConfig.getParameter<InputTag>("jetTag");
   vtxTag_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("hiSelectedVertex"));  
+  trackTag_ = iConfig.getParameter<InputTag>("trackTag");
+  useQuality_ = iConfig.getUntrackedParameter<bool>("useQuality",0);
+  string trackQuality_ = iConfig.getUntrackedParameter<string>("trackQuality","highPurity");
 
   isMC_ = iConfig.getUntrackedParameter<bool>("isMC",false);
   doTrigger_ = iConfig.getUntrackedParameter<bool>("doTrigger",false);
+
+  rParam = iConfig.getParameter<double>("rParam");
   
   if(isMC_){
     genjetTag_ = iConfig.getParameter<InputTag>("genjetTag");
@@ -138,6 +142,34 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
   t->Branch("jtpu",jets_.jtpu,"jtpu[nref]/F");
 
+  // jet ID information, jet composition
+  t->Branch("discr_fr01", jets_.discr_fr01,"discr_fr01[nref]/F");
+
+  t->Branch("trackMax", jets_.trackMax,"trackMax[nref]/F");
+  t->Branch("trackSum", jets_.trackSum,"trackSum[nref]/F");
+  t->Branch("trackN", jets_.trackN,"trackN[nref]/I");
+
+  t->Branch("chargedMax", jets_.chargedMax,"chargedMax[nref]/F");
+  t->Branch("chargedSum", jets_.chargedSum,"chargedSum[nref]/F");
+  t->Branch("chargedN", jets_.chargedN,"chargedN[nref]/I");
+
+  t->Branch("photonMax", jets_.photonMax,"photonMax[nref]/F");
+  t->Branch("photonSum", jets_.photonSum,"photonSum[nref]/F");
+  t->Branch("photonN", jets_.photonN,"photonN[nref]/I");
+
+  t->Branch("neutralMax", jets_.neutralMax,"neutralMax[nref]/F");
+  t->Branch("neutralSum", jets_.neutralSum,"neutralSum[nref]/F");
+  t->Branch("neutralN", jets_.neutralN,"neutralN[nref]/I");
+
+  t->Branch("eMax", jets_.eMax,"eMax[nref]/F");
+  t->Branch("eSum", jets_.eSum,"eSum[nref]/F");
+  t->Branch("eN", jets_.eN,"eN[nref]/I");
+
+  t->Branch("muMax", jets_.muMax,"muMax[nref]/F");
+  t->Branch("muSum", jets_.muSum,"muSum[nref]/F");
+  t->Branch("muN", jets_.muN,"muN[nref]/I");
+
+
   // b-jet discriminators
   if (doLifeTimeTagging_) {
 
@@ -185,7 +217,6 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("muchg",   jets_.muchg,   "muchg[nref]/I");
   }
 
-  t->Branch("discr_fr01", jets_.discr_fr01,"discr_fr01[nref]/F");
   
   if(isMC_){
     t->Branch("beamId1",&jets_.beamId1,"beamId1/I");    
@@ -311,9 +342,11 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    iEvent.getByLabel(jetTag_, jets);
 
    edm::Handle<reco::PFCandidateCollection> pfCandidates;
-   if(doLifeTimeTagging_){
-     iEvent.getByLabel(pfCandidateLabel_,pfCandidates);  
-   }
+   iEvent.getByLabel(pfCandidateLabel_,pfCandidates);  
+ 
+   edm::Handle<reco::TrackCollection> tracks;
+   iEvent.getByLabel(trackTag_,tracks);
+
    // FILL JRA TREE
 
    jets_.b = b;
@@ -419,9 +452,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.mudr[jets_.nref]    =  reco::deltaR(jet,muon);
 	 jets_.muptrel[jets_.nref] =  getPtRel(muon, jet);
 	 jets_.muchg[jets_.nref]   =  muon.charge();
-       }
-<<<<<<< HiInclusiveJetAnalyzer.cc
-       else{
+       }else{
 	 jets_.mupt[jets_.nref]    =  0.0;
 	 jets_.mueta[jets_.nref]   =  0.0;
 	 jets_.muphi[jets_.nref]   =  0.0;
@@ -431,9 +462,98 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.muchg[jets_.nref]   = 0;
        }
 
-=======
->>>>>>> 1.15
      }
+
+
+
+     // Jet ID variables
+
+     jets_.muMax[jets_.nref] = 0;
+     jets_.muSum[jets_.nref] = 0;
+     jets_.muN[jets_.nref] = 0;
+
+     jets_.eMax[jets_.nref] = 0;
+     jets_.eSum[jets_.nref] = 0;
+     jets_.eN[jets_.nref] = 0;
+
+     jets_.neutralMax[jets_.nref] = 0;
+     jets_.neutralSum[jets_.nref] = 0;
+     jets_.neutralN[jets_.nref] = 0;
+
+     jets_.photonMax[jets_.nref] = 0;
+     jets_.photonSum[jets_.nref] = 0;
+     jets_.photonN[jets_.nref] = 0;
+
+     jets_.chargedMax[jets_.nref] = 0;
+     jets_.chargedSum[jets_.nref] = 0;
+     jets_.chargedN[jets_.nref] = 0;
+
+     jets_.trackMax[jets_.nref] = 0;
+     jets_.trackSum[jets_.nref] = 0;
+     jets_.trackN[jets_.nref] = 0;
+
+
+     for(unsigned int icand = 0; icand < tracks->size(); ++icand){
+	const reco::Track& track = (*tracks)[icand];
+	double dr = deltaR(jet,track);
+	if(dr < rParam){
+	   double ptcand = track.pt();
+	   jets_.trackSum[jets_.nref] += ptcand;
+	   jets_.trackN[jets_.nref] += 1;
+	   if(ptcand > jets_.trackMax[jets_.nref]) jets_.trackMax[jets_.nref] = ptcand;
+
+	}
+     }
+
+     for(unsigned int icand = 0; icand < pfCandidates->size(); ++icand){
+        const reco::PFCandidate& track = (*pfCandidates)[icand];
+        double dr = deltaR(jet,track);
+        if(dr < rParam){
+           double ptcand = track.pt();
+	   int pfid = track.particleId();
+
+	   switch(pfid){
+
+	   case 1:
+              jets_.chargedSum[jets_.nref] += ptcand;
+              jets_.chargedN[jets_.nref] += 1;
+              if(ptcand > jets_.chargedMax[jets_.nref]) jets_.chargedMax[jets_.nref] = ptcand;
+	      break;
+
+	   case 2:
+              jets_.eSum[jets_.nref] += ptcand;
+              jets_.eN[jets_.nref] += 1;
+              if(ptcand > jets_.eMax[jets_.nref]) jets_.eMax[jets_.nref] = ptcand;
+              break;
+
+	   case 3:
+              jets_.muSum[jets_.nref] += ptcand;
+              jets_.muN[jets_.nref] += 1;
+              if(ptcand > jets_.muMax[jets_.nref]) jets_.muMax[jets_.nref] = ptcand;
+              break;
+
+	   case 4:
+              jets_.photonSum[jets_.nref] += ptcand;
+              jets_.photonN[jets_.nref] += 1;
+              if(ptcand > jets_.photonMax[jets_.nref]) jets_.photonMax[jets_.nref] = ptcand;
+              break;
+
+	   case 5:
+              jets_.neutralSum[jets_.nref] += ptcand;
+              jets_.neutralN[jets_.nref] += 1;
+              if(ptcand > jets_.neutralMax[jets_.nref]) jets_.neutralMax[jets_.nref] = ptcand;
+              break;
+
+	   }
+	}
+     }
+
+   
+
+
+
+
+     //     if(etrk.quality(reco::TrackBase::qualityByName(qualityString_))) pev_.trkQual[pev_.nTrk]=1;
 
 	/////////////////////////////////////////////////////////////////
 	// Jet core pt^2 discriminant for fake jets
