@@ -169,6 +169,8 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float muptrel[MAXJETS]; 
     int muchg[MAXJETS];   
     
+    float discr_fr01[MAXJETS];
+
     float refpt[MAXJETS];
     float refeta[MAXJETS];
     float refphi[MAXJETS];

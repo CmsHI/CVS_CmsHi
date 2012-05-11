@@ -184,6 +184,8 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("muptrel", jets_.muptrel, "muptrel[nref]/F");
     t->Branch("muchg",   jets_.muchg,   "muchg[nref]/I");
   }
+
+  t->Branch("discr_fr01", jets_.discr_fr01,"discr_fr01[nref]/F");
   
   if(isMC_){
     t->Branch("beamId1",&jets_.beamId1,"beamId1/I");    
@@ -418,7 +420,81 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.muptrel[jets_.nref] =  getPtRel(muon, jet);
 	 jets_.muchg[jets_.nref]   =  muon.charge();
        }
+<<<<<<< HiInclusiveJetAnalyzer.cc
+       else{
+	 jets_.mupt[jets_.nref]    =  0.0;
+	 jets_.mueta[jets_.nref]   =  0.0;
+	 jets_.muphi[jets_.nref]   =  0.0;
+	 jets_.mue[jets_.nref]     =  0.0;
+	 jets_.mudr[jets_.nref]    =  9.9;
+	 jets_.muptrel[jets_.nref] =  0.0;
+	 jets_.muchg[jets_.nref]   = 0;
+       }
+
+=======
+>>>>>>> 1.15
      }
+
+	/////////////////////////////////////////////////////////////////
+	// Jet core pt^2 discriminant for fake jets
+	// Edited by Yue Shi Lai <ylai@mit.edu>
+
+	// Initial value is 0
+	jets_.discr_fr01[jets_.nref] = 0;
+	// Start with no directional adaption, i.e. the fake rejection
+	// axis is the jet axis
+	float pseudorapidity_adapt = jets_.jteta[jets_.nref];
+	float azimuth_adapt = jets_.jtphi[jets_.nref];
+
+	// Unadapted discriminant with adaption search
+	for (size_t iteration = 0; iteration < 2; iteration++) {
+		float pseudorapidity_adapt_new = pseudorapidity_adapt;
+		float azimuth_adapt_new = azimuth_adapt;
+		float max_weighted_perp = 0;
+		float perp_square_sum = 0;
+
+		for (size_t index_pf_candidate = 0;
+			 index_pf_candidate < pfCandidates->size();
+			 index_pf_candidate++) {
+			const reco::PFCandidate &p =
+				(*pfCandidates)[index_pf_candidate];
+
+			switch (p.particleId()) {
+			case 1:	// Charged hadron
+			case 3:	// Muon
+			case 4:	// Photon
+				{
+					const float dpseudorapidity =
+						p.eta() - pseudorapidity_adapt;
+					const float dazimuth =
+						reco::deltaPhi(p.phi(), azimuth_adapt);
+					// The Gaussian scale factor is 0.5 / (0.1 * 0.1)
+					// = 50
+					const float angular_weight =
+						exp(-50.0F * (dpseudorapidity * dpseudorapidity +
+									  dazimuth * dazimuth));
+					const float weighted_perp =
+						angular_weight * p.pt() * p.pt();
+					const float weighted_perp_square =
+						weighted_perp * p.pt();
+
+					perp_square_sum += weighted_perp_square;
+					if (weighted_perp >= max_weighted_perp) {
+						pseudorapidity_adapt_new = p.eta();
+						azimuth_adapt_new = p.phi();
+						max_weighted_perp = weighted_perp;
+					}
+				}
+			}
+		}
+		// Update the fake rejection value
+		jets_.discr_fr01[jets_.nref] = std::max(
+			jets_.discr_fr01[jets_.nref], perp_square_sum);
+		// Update the directional adaption
+		pseudorapidity_adapt = pseudorapidity_adapt_new;
+		azimuth_adapt = azimuth_adapt_new;
+	}
+
 
      jets_.jtpt[jets_.nref] = jet.pt();                            
      jets_.jteta[jets_.nref] = jet.eta();
