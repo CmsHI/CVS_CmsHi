@@ -14,7 +14,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_test7.root'
+ivars.outputFile = './forest_v16_test9.root'
 
 ivars.parseArguments()
 
@@ -432,7 +432,7 @@ process.patPhotons.addPhotonID = cms.bool(False)
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
-process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(0)
+process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.ana_step          = cms.Path( process.genpana +
                                       process.hcalNoise +
                                       process.jetAnalyzers +                                      

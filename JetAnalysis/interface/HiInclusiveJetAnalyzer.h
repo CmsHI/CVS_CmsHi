@@ -91,6 +91,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool saveBfragments_;
 
   double rParam;
+  double hardPtMin_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
@@ -144,6 +145,14 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
      float photonMax[MAXJETS];
      float photonSum[MAXJETS];
      int photonN[MAXJETS];
+
+     float trackHardSum[MAXJETS];
+     float chargedHardSum[MAXJETS];
+     float photonHardSum[MAXJETS];
+
+     int trackHardN[MAXJETS];
+     int chargedHardN[MAXJETS];
+     int photonHardN[MAXJETS];
 
      float neutralMax[MAXJETS];
      float neutralSum[MAXJETS];

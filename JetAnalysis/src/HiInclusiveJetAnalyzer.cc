@@ -56,7 +56,8 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   doTrigger_ = iConfig.getUntrackedParameter<bool>("doTrigger",false);
 
   rParam = iConfig.getParameter<double>("rParam");
-  
+  hardPtMin_ = iConfig.getUntrackedParameter<double>("hardPtMin",4);  
+
   if(isMC_){
     genjetTag_ = iConfig.getParameter<InputTag>("genjetTag");
     eventInfoTag_ = iConfig.getParameter<InputTag>("eventInfoTag");
@@ -150,14 +151,20 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("trackMax", jets_.trackMax,"trackMax[nref]/F");
   t->Branch("trackSum", jets_.trackSum,"trackSum[nref]/F");
   t->Branch("trackN", jets_.trackN,"trackN[nref]/I");
+  t->Branch("trackHardSum", jets_.trackHardSum,"trackHardSum[nref]/F");
+  t->Branch("trackHardN", jets_.trackHardN,"trackHardN[nref]/I");
 
   t->Branch("chargedMax", jets_.chargedMax,"chargedMax[nref]/F");
   t->Branch("chargedSum", jets_.chargedSum,"chargedSum[nref]/F");
   t->Branch("chargedN", jets_.chargedN,"chargedN[nref]/I");
+  t->Branch("chargedHardSum", jets_.chargedHardSum,"chargedHardSum[nref]/F");
+  t->Branch("chargedHardN", jets_.chargedHardN,"chargedHardN[nref]/I");
 
   t->Branch("photonMax", jets_.photonMax,"photonMax[nref]/F");
   t->Branch("photonSum", jets_.photonSum,"photonSum[nref]/F");
   t->Branch("photonN", jets_.photonN,"photonN[nref]/I");
+  t->Branch("photonHardSum", jets_.photonHardSum,"photonHardSum[nref]/F");
+  t->Branch("photonHardN", jets_.photonHardN,"photonHardN[nref]/I");
 
   t->Branch("neutralMax", jets_.neutralMax,"neutralMax[nref]/F");
   t->Branch("neutralSum", jets_.neutralSum,"neutralSum[nref]/F");
@@ -490,14 +497,20 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.photonMax[jets_.nref] = 0;
      jets_.photonSum[jets_.nref] = 0;
      jets_.photonN[jets_.nref] = 0;
+     jets_.photonHardSum[jets_.nref] = 0;
+     jets_.photonHardN[jets_.nref] = 0;
 
      jets_.chargedMax[jets_.nref] = 0;
      jets_.chargedSum[jets_.nref] = 0;
      jets_.chargedN[jets_.nref] = 0;
+     jets_.chargedHardSum[jets_.nref] = 0;
+     jets_.chargedHardN[jets_.nref] = 0;
 
      jets_.trackMax[jets_.nref] = 0;
      jets_.trackSum[jets_.nref] = 0;
      jets_.trackN[jets_.nref] = 0;
+     jets_.trackHardSum[jets_.nref] = 0;
+     jets_.trackHardN[jets_.nref] = 0;
 
 
      for(unsigned int icand = 0; icand < tracks->size(); ++icand){
@@ -509,6 +522,12 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	   double ptcand = track.pt();
 	   jets_.trackSum[jets_.nref] += ptcand;
 	   jets_.trackN[jets_.nref] += 1;
+
+	   if(ptcand > hardPtMin_){
+	      jets_.trackHardSum[jets_.nref] += ptcand;
+	      jets_.trackHardN[jets_.nref] += 1;
+
+	   }
 	   if(ptcand > jets_.trackMax[jets_.nref]) jets_.trackMax[jets_.nref] = ptcand;
 
 	}
@@ -526,6 +545,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	   case 1:
               jets_.chargedSum[jets_.nref] += ptcand;
               jets_.chargedN[jets_.nref] += 1;
+              if(ptcand > hardPtMin_){
+                 jets_.chargedHardSum[jets_.nref] += ptcand;
+                 jets_.chargedHardN[jets_.nref] += 1;
+              }
               if(ptcand > jets_.chargedMax[jets_.nref]) jets_.chargedMax[jets_.nref] = ptcand;
 	      break;
 
@@ -544,6 +567,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	   case 4:
               jets_.photonSum[jets_.nref] += ptcand;
               jets_.photonN[jets_.nref] += 1;
+	      if(ptcand > hardPtMin_){
+		 jets_.photonHardSum[jets_.nref] += ptcand;
+		 jets_.photonHardN[jets_.nref] += 1;
+	      }
               if(ptcand > jets_.photonMax[jets_.nref]) jets_.photonMax[jets_.nref] = ptcand;
               break;
 
