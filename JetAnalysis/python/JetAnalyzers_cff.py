@@ -10,54 +10,64 @@ icPu5JetAnalyzer = inclusiveJetAnalyzer.clone()
 
 akPu5PFJetAnalyzer = icPu5JetAnalyzer.clone(
     jetTag = 'akPu5PFpatJets',
-    genjetTag = 'ak5HiGenJets'
+    genjetTag = 'ak5HiGenJets',
+    matchTag = 'akPu5CalopatJets',
+    rParam = 0.5
     )
 
 akPu3PFJetAnalyzer = icPu5JetAnalyzer.clone(
     jetTag = 'akPu3PFpatJets',
-    genjetTag = 'ak3HiGenJets'
+    genjetTag = 'ak3HiGenJets',
+    matchTag = 'akPu3CalopatJets',    
+    rParam = 0.3    
     )
 
 akPu5CaloJetAnalyzer = icPu5JetAnalyzer.clone(
     jetTag = 'akPu5patJets',
-    genjetTag = 'ak5HiGenJets'
+    genjetTag = 'ak5HiGenJets',
+    matchTag = 'akPu5PFpatJets',    
+    rParam = 0.5
+    
     )
 
 akPu3CaloJetAnalyzer = icPu5JetAnalyzer.clone(
     jetTag = 'akPu3patJets',
-    genjetTag = 'ak3HiGenJets'
+    genjetTag = 'ak3HiGenJets',
+    matchTag = 'akPu3PFpatJets',    
+    rParam = 0.3
+    
     )
 
-ic5JetAnalyzer = icPu5JetAnalyzer.clone(jetTag = cms.InputTag("iterativeCone5CaloJets"))
+ic5JetAnalyzer = icPu5JetAnalyzer.clone(jetTag = cms.InputTag("iterativeCone5CaloJets"),genjetTag = 'ak3HiGenJets',rParam = 0.5)
 
-akPu1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak1PFpatJets"))
-akPu2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJets"))
-akPu3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJets"))
-akPu4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJets"))
-akPu5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJets"))
-akPu6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"))
+akPu1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak1PFpatJets"),genjetTag = 'ak1HiGenJets',rParam = 0.1,matchTag = 'akPu1CalopatJets')
+akPu2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJets"),genjetTag = 'ak2HiGenJets',rParam = 0.2,matchTag = 'akPu2CalopatJets')
+akPu3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJets"),genjetTag = 'ak3HiGenJets',rParam = 0.3,matchTag = 'akPu3CalopatJets')
+akPu4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJets"),genjetTag = 'ak4HiGenJets',rParam = 0.4,matchTag = 'akPu4CalopatJets')
+akPu5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'akPu5CalopatJets')
+akPu6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"),genjetTag = 'ak6HiGenJets',rParam = 0.6,matchTag = 'akPu6CalopatJets')
 
-akPu1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak1CalopatJets"))
-akPu2CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak2CalopatJets"))
-akPu3CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak3CalopatJets"))
-akPu4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4CalopatJets"))
-akPu5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"))
-akPu6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"))
+akPu1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak1CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.1,matchTag = 'akPu1PFpatJets')
+akPu2CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak2CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.2,matchTag = 'akPu2PFpatJets')
+akPu3CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak3CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.3,matchTag = 'akPu3PFpatJets')
+akPu4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.4,matchTag = 'akPu4PFpatJets')
+akPu5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'akPu5PFpatJets')
+akPu6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'akPu6PFpatJets')
 
-ak1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak1PFpatJets"))
-ak2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJets"))
-ak3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJets"))
-ak4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJets"))
-ak5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJets"))
-ak6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"))
+ak1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak1PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.1,matchTag = 'ak1CalopatJets')
+ak2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.2,matchTag = 'ak2CalopatJets')
+ak3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.3,matchTag = 'ak3CalopatJets')
+ak4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.4,matchTag = 'ak4CalopatJets')
+ak5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'ak5CalopatJets')
+ak6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak6CalopatJets')
 ak3CaloJetAnalyzer = akPu3PFJetAnalyzer.clone()
 
-ak1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak1CalopatJets"))
-ak2CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak2CalopatJets"))
-ak3CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak3CalopatJets"))
-ak4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4CalopatJets"))
-ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"))
-ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"))
+ak1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak1CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.1,matchTag = 'ak1PFpatJets')
+ak2CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak2CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.2,matchTag = 'ak2PFpatJets')
+ak3CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak3CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.3,matchTag = 'ak3PFpatJets')
+ak4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.4,matchTag = 'ak4PFpatJets')
+ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'ak5PFpatJets')
+ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak6PFpatJets')
 
 jetAnalyzers = cms.Sequence(akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +

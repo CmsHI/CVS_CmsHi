@@ -68,7 +68,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   void saveDaughters( const reco::GenParticle & gen);
   void saveDaughters( const reco::Candidate & gen);
 
-  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_, trackTag_; 
+  edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_, trackTag_, matchTag_; 
 
   std::vector<float> usedStringPts;
 
@@ -156,6 +156,9 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
      float muMax[MAXJETS];
      float muSum[MAXJETS];
      int muN[MAXJETS];
+
+     float matchedPt[MAXJETS];
+     float matchedR[MAXJETS];
 
     float discr_csvMva[MAXJETS];
     float discr_csvSimple[MAXJETS];

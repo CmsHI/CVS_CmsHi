@@ -45,6 +45,8 @@ using namespace reco;
 HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig) {
 
   jetTag_ = iConfig.getParameter<InputTag>("jetTag");
+  matchTag_ = iConfig.getUntrackedParameter<InputTag>("matchTag",jetTag_);
+
   vtxTag_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("hiSelectedVertex"));  
   trackTag_ = iConfig.getParameter<InputTag>("trackTag");
   useQuality_ = iConfig.getUntrackedParameter<bool>("useQuality",0);
@@ -169,6 +171,8 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("muSum", jets_.muSum,"muSum[nref]/F");
   t->Branch("muN", jets_.muN,"muN[nref]/I");
 
+  t->Branch("matchedPt", jets_.matchedPt,"matchedPt[nref]/F");
+  t->Branch("matchedR", jets_.matchedR,"matchedR[nref]/F");
 
   // b-jet discriminators
   if (doLifeTimeTagging_) {
@@ -337,6 +341,9 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    
    edm::Handle<pat::JetCollection> patjets;
    if(usePat_)iEvent.getByLabel(jetTag_, patjets);
+
+   edm::Handle<pat::JetCollection> matchedjets;
+   iEvent.getByLabel(matchTag_, matchedjets);
    
    edm::Handle<reco::JetView> jets;
    iEvent.getByLabel(jetTag_, jets);
@@ -495,6 +502,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
      for(unsigned int icand = 0; icand < tracks->size(); ++icand){
 	const reco::Track& track = (*tracks)[icand];
+	if(useQuality_ && !(track.quality(reco::TrackBase::qualityByName(trackQuality_)))) continue;
+
 	double dr = deltaR(jet,track);
 	if(dr < rParam){
 	   double ptcand = track.pt();
@@ -548,7 +557,17 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	}
      }
 
-   
+     double drMin = 100;
+     for(unsigned int j = 0 ; j < matchedjets->size(); ++j){
+	const reco::Jet& mjet = (*matchedjets)[j];
+
+	double dr = deltaR(jet,mjet);
+	if(dr < drMin){
+	   jets_.matchedPt[jets_.nref] = mjet.pt();
+           jets_.matchedR[jets_.nref] = dr;
+
+	}
+     }
 
 
 
