@@ -580,13 +580,16 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
               if(ptcand > jets_.neutralMax[jets_.nref]) jets_.neutralMax[jets_.nref] = ptcand;
               break;
 
+	   default:
+	     break;
+
 	   }
 	}
      }
 
      double drMin = 100;
-     for(unsigned int j = 0 ; j < matchedjets->size(); ++j){
-	const reco::Jet& mjet = (*matchedjets)[j];
+     for(unsigned int imatch = 0 ; imatch < matchedjets->size(); ++imatch){
+	const reco::Jet& mjet = (*matchedjets)[imatch];
 
 	double dr = deltaR(jet,mjet);
 	if(dr < drMin){
@@ -595,7 +598,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
 	}
      }
-
+   
 
 
 
@@ -626,8 +629,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 				(*pfCandidates)[index_pf_candidate];
 
 			switch (p.particleId()) {
-			case 1:	// Charged hadron
-			case 3:	// Muon
+			  //case 1:	// Charged hadron
+			  //case 3:	// Muon
 			case 4:	// Photon
 				{
 					const float dpseudorapidity =
@@ -651,6 +654,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 						max_weighted_perp = weighted_perp;
 					}
 				}
+			default:						  
+			  break;
 			}
 		}
 		// Update the fake rejection value
