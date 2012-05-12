@@ -39,6 +39,8 @@ public:
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];   
    float trkJetDr[MAXTRK];
+   float trkWt[MAXTRK];
+   float trkEff[MAXTRK];
    int nJet;
    float inclJetPt[MAXTRK];
    float inclJetEta[MAXTRK];
@@ -80,7 +82,9 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
-   tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
+//    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
+   tgj->Branch("trkWt",gj.trkWt,"trkWt[nTrk]/F");
+   tgj->Branch("trkEff",gj.trkEff,"trkEff[nTrk]/F");
    tgj->Branch("nJet",&gj.nJet,"nJet/I");
    tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
