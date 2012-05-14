@@ -63,6 +63,7 @@ public:
    float genpEta[MAXTRK];
    float genpPhi[MAXTRK];
    int genpCh[MAXTRK];
+   int genpSube[MAXTRK];
    TString leaves;
    void clear() {
       pt1=-99; pt1raw=-99; eta1=-99; phi1=-99; pt2=-99; pt2raw=-99; eta2=-99; phi2=-99; deta=-99; dphi=-99; Aj=-99;
@@ -107,6 +108,7 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {
    tgj->Branch("genpEta",gj.genpEta,"genpEta[nGenp]/F");
    tgj->Branch("genpPhi",gj.genpPhi,"genpPhi[nGenp]/F");
    tgj->Branch("genpCh",gj.genpCh,"genpCh[nGenp]/I");
+   tgj->Branch("genpSube",gj.genpSube,"genpSube[nGenp]/I");
 }
 
 class CentralityReWeight {

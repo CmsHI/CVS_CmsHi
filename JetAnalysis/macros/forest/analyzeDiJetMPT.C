@@ -119,7 +119,6 @@ void analyzeDiJetMPT(
       //pf5mpt.Init(tgj);
 
       trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
-      trkmpt.c = c;
       trkmpt.Init(tgj);
       
       genpSigmpt.chargedOnly = true;
@@ -376,16 +375,6 @@ void analyzeDiJetMPT(
             ++gj.nPf;
          }
          
-         // gen particles
-         gj.nGenp =0;
-         for (int ip=0; ip<c->genparticle.mult; ++ip) {
-            if (c->genparticle.pt[ip] < cutPtTrk) continue;
-            if (fabs(c->genparticle.eta[ip]) > cutEtaTrk) continue;
-            gj.genpPt[gj.nGenp] = c->genparticle.pt[ip];
-            gj.genpEta[gj.nGenp] = c->genparticle.eta[ip];
-            gj.genpPhi[gj.nGenp] = c->genparticle.phi[ip];
-            ++gj.nGenp;
-         }
       } // end of if leadingIndex
       
       // mixing classes
@@ -472,7 +461,22 @@ void analyzeDiJetMPT(
             ++gj.nTrk;
          }
       }
-      
+
+      ////////////////////////      
+      // Gen Particles
+      ////////////////////////      
+      gj.nGenp =0;
+      for (int ip=0; ip<c->genparticle.mult; ++ip) {
+         if (c->genparticle.pt[ip] < cutPtTrk) continue;
+         if (fabs(c->genparticle.eta[ip]) > cutEtaTrk) continue;
+         gj.genpPt[gj.nGenp] = c->genparticle.pt[ip];
+         gj.genpEta[gj.nGenp] = c->genparticle.eta[ip];
+         gj.genpPhi[gj.nGenp] = c->genparticle.phi[ip];
+         gj.genpCh[gj.nGenp] = c->genparticle.chg[ip];
+         gj.genpSube[gj.nGenp] = c->genparticle.sube[ip];
+         ++gj.nGenp;
+      }
+
       // MPT
       if (doMPT) {
          //pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0);
