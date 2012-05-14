@@ -68,8 +68,9 @@ void analyzeDiJetMPT(
    mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    double cutjetPt = 30;
    double cutjetEta = 2;
-   double cutPtTrk=4, cutEtaTrk = 2.4, cutPtPfCand=4;
+   double cutPtTrk=0.5, cutEtaTrk = 2.4, cutPtPfCand=4;
    if (saveAllCands) cutPtPfCand=1;
+   float maxPixTrkPt =2.;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
 
@@ -103,13 +104,12 @@ void analyzeDiJetMPT(
    DiJet gj;
    TTree * tgj = new TTree("tgj","dijet jet tree");
    BookGJBranches(tgj,evt,gj);
-
+   
 //   AnaMPT pfmpt("pf",0);
 //   AnaMPT pf1mpt("pf1",0,1);
 //   AnaMPT pf4mpt("pf4",0,4);
 //   AnaMPT pf5mpt("pf5",0,5);
    AnaMPT trkmpt("trk",0);
-   AnaMPT pixtrkmpt("pixtrk",0);
    AnaMPT genpSigmpt("genpSig",0);
    AnaMPT genpAllmpt("genpAll",0);
    if (doMPT) {
@@ -121,10 +121,7 @@ void analyzeDiJetMPT(
       trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
       trkmpt.c = c;
       trkmpt.Init(tgj);
-      pixtrkmpt.trackingCorrectionTypes.push_back(1); pixtrkmpt.trackingCorrectionNames.push_back("Corr");
-      pixtrkmpt.c = c;
-      pixtrkmpt.Init(tgj);
-
+      
       genpSigmpt.chargedOnly = true;
       genpSigmpt.Init(tgj);
       genpAllmpt.chargedOnly = true;
@@ -217,6 +214,7 @@ void analyzeDiJetMPT(
       evt.nT = c->track.nTrk;
       evt.trig = (c->hlt.HLT_HIJet80_v1 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
+      if (!c->hasSkimTree) evt.offlSel = (c->evt.hiNtracks>0 && c->evt.hiHFplus>=4 && c->evt.hiHFminus>=4);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
       if (dataSrcType>1) {
          if (dataSrcType==2) {
@@ -265,7 +263,7 @@ void analyzeDiJetMPT(
       //
       if (dataSrcType==1&&!evt.anaEvtSel) continue;
       if (dataSrcType==0&&!evt.offlSel) continue;
-      if (gj.pt1<120) continue;
+      if (gj.pt1<100) continue;
       
       // If MC, Loop over gen jets to look for leading genjet candidate in the event
       for (int j=0;j<anajet->ngen;j++) {
@@ -276,7 +274,7 @@ void analyzeDiJetMPT(
             genLeadingIndex=j;
          }
       }
-
+      
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading jet
@@ -358,52 +356,6 @@ void analyzeDiJetMPT(
             }
          }
          
-         // xcheck with tracks
-         double trkcorr[4];
-         gj.nTrk=0;
-         for (int it=0; it<c->track.nTrk; ++it) {
-            if (c->track.trkPt[it] < cutPtTrk) continue;
-            if (fabs(c->track.trkEta[it]) > cutEtaTrk) continue;
-            float trkPt = c->track.trkPt[it];
-            float trkEta = c->track.trkEta[it];
-            float trkPhi = c->track.trkPhi[it];
-            gj.trkPt[gj.nTrk] = trkPt;
-            gj.trkEta[gj.nTrk] = trkEta;
-            gj.trkPhi[gj.nTrk] = trkPhi;
-            float dr1 = deltaR(trkEta,trkPhi,gj.eta1,gj.phi1);
-            float dr2 = deltaR(trkEta,trkPhi,gj.eta2,gj.phi2);
-            //gj.trkJetDr[gj.nTrk] = dr2;
-            // **trk efficiency/fake correction**
-            int corrSet = 0;
-            if (trkPt<1) corrSet=1;
-            if (gj.pt1>40&&dr1<0.8) {
-               gj.trkWt[gj.nTrk] = c->trackCorrections[corrSet]->GetCorr(trkPt,trkEta,gj.pt1,c->evt.hiBin,trkcorr);
-//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt1 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-            } else if (gj.pt2>40&&dr2<0.8) {
-               gj.trkWt[gj.nTrk] = c->trackCorrections[corrSet]->GetCorr(trkPt,trkEta,gj.pt2,c->evt.hiBin,trkcorr);
-//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt2 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-            } else {
-               gj.trkWt[gj.nTrk] = c->trackCorrections[corrSet]->GetCorr(trkPt,trkEta,0,c->evt.hiBin,trkcorr);
-//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << 0 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-            }
-            gj.trkEff[gj.nTrk] = trkcorr[0];
-            // find leading track
-            if (trkPt>gj.ltrkPt) {
-               gj.ltrkPt = trkPt;
-               gj.ltrkEta = trkEta;
-               gj.ltrkPhi = trkPhi;
-               gj.ltrkJetDr = dr2;
-            }
-            // find leading track in jet
-            if (dr2<0.3 && trkPt>gj.jltrkPt) {
-               gj.jltrkPt = trkPt;
-               gj.jltrkEta = trkEta;
-               gj.jltrkPhi = trkPhi;
-               gj.jltrkJetDr = dr2;
-            }
-            ++gj.nTrk;
-         }
-         
          // xcheck with pfcands
          gj.nPf=0;
          for (int it=0; it<pfs.nPFpart; ++it) {
@@ -458,29 +410,89 @@ void analyzeDiJetMPT(
          }
       }
       
+      ///////////////////////////////////////////////////////
+      // Tracks
+      ///////////////////////////////////////////////////////
+      double trkcorr[4];
+      gj.nTrk=0;
+      Tracks * anaTrks[2] = {&(c->track),&(c->pixtrack)};
+      // Full Tracks, Pixel Tracks
+      for (int iset=0; iset<2; ++iset) {
+         for (int it=0; it<anaTrks[iset]->nTrk; ++it) {
+            // Kinematic Selection
+            if (anaTrks[iset]->trkPt[it] < cutPtTrk) continue;
+            if (fabs(anaTrks[iset]->trkEta[it]) > cutEtaTrk) continue;
+            // Full Track Selection
+            if (iset==0) {
+               if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
+               if (!anaTrks[iset]->trkQual[it]) continue;
+               if ( fabs(anaTrks[iset]->trkEta[it])>=1.6 ) {
+                 if ( (anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it]) > 0.12 ) continue;
+               }
+            }
+            // Pixel Track Selection
+            if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
+            float trkPt = anaTrks[iset]->trkPt[it];
+            float trkEta = anaTrks[iset]->trkEta[it];
+            float trkPhi = anaTrks[iset]->trkPhi[it];
+            gj.trkPt[gj.nTrk] = trkPt;
+            gj.trkEta[gj.nTrk] = trkEta;
+            gj.trkPhi[gj.nTrk] = trkPhi;
+            float dr1 = deltaR(trkEta,trkPhi,gj.eta1,gj.phi1);
+            float dr2 = deltaR(trkEta,trkPhi,gj.eta2,gj.phi2);
+            //gj.trkJetDr[gj.nTrk] = dr2;
+            ////////////////////////////////////
+            // Track efficiency/fake correction
+            ////////////////////////////////////
+            if (gj.pt1>40&&dr1<0.8) {
+               gj.trkWt[gj.nTrk] = c->trackCorrections[iset]->GetCorr(trkPt,trkEta,gj.pt1,c->evt.hiBin,trkcorr);
+//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt1 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
+            } else if (gj.pt2>40&&dr2<0.8) {
+               gj.trkWt[gj.nTrk] = c->trackCorrections[iset]->GetCorr(trkPt,trkEta,gj.pt2,c->evt.hiBin,trkcorr);
+//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt2 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
+            } else {
+               gj.trkWt[gj.nTrk] = c->trackCorrections[iset]->GetCorr(trkPt,trkEta,0,c->evt.hiBin,trkcorr);
+//                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << 0 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
+            }
+            gj.trkEff[gj.nTrk] = trkcorr[0];
+            // find leading track
+            if (trkPt>gj.ltrkPt) {
+               gj.ltrkPt = trkPt;
+               gj.ltrkEta = trkEta;
+               gj.ltrkPhi = trkPhi;
+               gj.ltrkJetDr = dr2;
+            }
+            // find leading track in jet
+            if (dr2<0.3 && trkPt>gj.jltrkPt) {
+               gj.jltrkPt = trkPt;
+               gj.jltrkEta = trkEta;
+               gj.jltrkPhi = trkPhi;
+               gj.jltrkJetDr = dr2;
+            }
+            ++gj.nTrk;
+         }
+      }
+      
       // MPT
       if (doMPT) {
-         //pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+         //pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0);
          //pfmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         //pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
          //pf1mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
-         //pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
          //pf4mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
-         //pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,pfs.pfId);
+         //pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
          //pf5mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
-         trkmpt.InputEvent(c->track.nTrk,c->track.trkPt,c->track.trkEta,c->track.trkPhi);
+         trkmpt.InputEvent(gj.nTrk,gj.trkPt,gj.trkEta,gj.trkPhi,gj.trkWt);
          trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         pixtrkmpt.InputEvent(c->pixtrack.nTrk,c->pixtrack.trkPt,c->pixtrack.trkEta,c->pixtrack.trkPhi);
-         pixtrkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-         
-         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg,c->genparticle.sube);
+         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,0,c->genparticle.chg,c->genparticle.sube);
          genpSigmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-         genpAllmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,c->genparticle.chg);
+         genpAllmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,0,c->genparticle.chg);
          genpAllmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
         }
       

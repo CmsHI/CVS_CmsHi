@@ -1,7 +1,6 @@
 #ifndef MPTUtilities_C
 #define MPTUtilities_C
 #include "commonSetup.h"
-#include "hiForest.h"
 
 // MPT Ranges
 const int nptrange = 6;
@@ -38,11 +37,13 @@ public:
    float pt[maxEntryTrack];
    float eta[maxEntryTrack];
    float phi[maxEntryTrack];
+   float weight[maxEntryTrack];
    MPTCands() : n(0) {}
-   void Set(int i, float currpt, float curreta, float currphi) {
+   void Set(int i, float currpt, float curreta, float currphi,float currwt=1.) {
       pt[i]   = currpt;
       eta[i]  = curreta;
       phi[i]  = currphi;
+      weight[i] = currwt;
    }
 };
 
@@ -58,7 +59,6 @@ public:
    vector<int> trackingCorrectionTypes;
    vector<TString> trackingCorrectionNames;
    bool anaDiJet;
-   HiForest * c;
    vector<float> drbins;
    vector<float> dphibins;
    
@@ -115,7 +115,7 @@ public:
       }      
    }
    
-   void InputEvent(int n, float * pt, float * eta, float * phi, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
+   void InputEvent(int n, float * pt, float * eta, float * phi, float * wt, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
 //      cout << "mpt input size: " << n << endl;
       cands.n = 0;
       for (int i=0; i<n; ++i) {
@@ -137,7 +137,8 @@ public:
             if (psube[i]!=0) continue;
          }
          // now write selected cands
-         cands.Set(cands.n,pt[i],eta[i],phi[i]);
+         if (wt) cands.Set(cands.n,pt[i],eta[i],phi[i],wt[i]);
+         else cands.Set(cands.n,pt[i],eta[i],phi[i]);
          ++cands.n;
       }
    }
@@ -152,7 +153,6 @@ public:
    void CalcMPT(float gpt, float geta, float gphi, float jpt, float jeta, float jphi, MPT & m) {
       // initial setup
       m.clear();
-      float trkweight = 1.;
       
       for (int it=0; it<cands.n; ++it) {
          float candPt  = cands.pt[it];
@@ -181,11 +181,8 @@ public:
             float ptx = candPt * cos(deltaPhi(candPhi,gphi));
             float pty = candPt * sin(deltaPhi(candPhi,gphi));
             if (m.corrType>=0) {
-               if (anaDiJet&&gpt>40&&drG<0.8) trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,gpt,c->evt.hiBin);
-               else if (jpt>40&&drJ<0.8) trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,jpt,c->evt.hiBin);
-               else trkweight = c->trackCorrections[m.corrType]->GetCorr(candPt,candEta,0,c->evt.hiBin);
-               ptx*=trkweight;
-               pty*=trkweight;
+               ptx*=cands.weight[it];
+               pty*=cands.weight[it];
             }
             m.mptx += ptx;
             m.mpty += pty;
