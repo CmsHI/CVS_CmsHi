@@ -34,6 +34,7 @@ cvs co -r hi44X_03                 RecoHI/HiJetAlgos
 cvs co -r hi44X_03                 RecoHI/HiCentralityAlgos
 cvs co -r hi44X_03                 RecoHI/HiEvtPlaneAlgos
 cvs co -r hi44X_03                 CondFormats/HIObjects
+cvs co -r hi44X_02                 DataFormats/HeavyIonEvent
 
 # Track validation histograms
 cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/HiTrackValidator UserCode/ASYoon/PbPbTrackingTools/HiTrackValidator
@@ -42,7 +43,6 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/HiTrackValidator UserCode/A
 cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer 
 
 UserCode/ASYoon/PbPbTrackingTools/VertexConstraintProducer
-
 
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
