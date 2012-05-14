@@ -125,9 +125,10 @@ class HiForest : public TNamed
   TTree *ebTree;                                // ECAL eb Tree
   TTree *evtTree;                               // Event Tree
   TTree *metTree;                               // MET Tree
+  TTree *pfTree;                                // PF candidate Tree, see branches in SetupPFTree.h
   TTree *genpTree;                               // Gen photon of the signal event Tree
   TTree *genParticleTree;                        // Stable Gen particles
-
+  
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
   vector<TTree*> jetTrees;
@@ -152,6 +153,7 @@ class HiForest : public TNamed
   Hits eb;
   Evts evt;
   Mets met;
+  PFs pf;
   Genps genp;
   GenParticles genparticle;
     
@@ -159,6 +161,7 @@ class HiForest : public TNamed
   bool hasPhotonTree;
   bool hasEvtTree;
   bool hasMetTree;
+  bool hasPFTree;
   bool hasIcPu5JetTree;
   bool hasAkPu3JetTree;
   bool hasHltTree;
@@ -278,6 +281,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
   evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
   metTree      = (TTree*) inf->Get("anaMET/metTree");
+  pfTree      = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
   genpTree     = (TTree*) inf->Get("genpana/photon");
   genParticleTree     = (TTree*) inf->Get("HiGenParticleAna/hi");
 /*
@@ -296,6 +300,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
 */
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
+  hasPFTree        = (pfTree   != 0);
   hasEvtTree       = (evtTree   != 0);
   hasMetTree       = (metTree   != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
@@ -317,6 +322,13 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     if (tree == 0) tree = photonTree; else tree->AddFriend(photonTree);
     setupPhotonTree(photonTree,photon);
   }
+
+  if (hasPFTree) {
+    pfTree->SetName("pf");
+    if (tree == 0) tree = pfTree; else tree->AddFriend(pfTree);
+    setupPFTree(pfTree,pf);
+  }
+
 
   if (hasEvtTree) {
     evtTree->SetName("evtTree");
@@ -423,6 +435,7 @@ void HiForest::GetEntry(int i)
    currentEvent = i;
   // get the entry of the available trees
   if (hasPhotonTree)   photonTree   ->GetEntry(i);
+  if (hasPFTree)       pfTree   ->GetEntry(i);
   if (hasEvtTree)      evtTree   ->GetEntry(i);
   if (hasMetTree)      metTree   ->GetEntry(i);
   if (hasHltTree)      hltTree      ->GetEntry(i);
@@ -522,6 +535,7 @@ void HiForest::PrintStatus()
   if (hasTrackTree)    CheckTree(trackTree,    "TrackTree");
   if (hasPixTrackTree) CheckTree(pixtrackTree, "PixTrackTree");
   if (hasPhotonTree)   CheckTree(photonTree,   "PhotonTree");
+  if (hasPFTree)       CheckTree(pfTree,   "PFTree");
   if (hasMetTree)      CheckTree(metTree,   "MetTree");
   if (hasTowerTree)    CheckTree(towerTree,    "TowerTree");
   if (hasHbheTree)     CheckTree(hbheTree,     "HbheTree");
@@ -548,6 +562,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
+  if (hasPFTree)   AddCloneTree(pfTree,   "pfcandAnalyzer",            "pfTree");
   if (hasEvtTree)      AddCloneTree(evtTree,      "hiEvtAnalyzer",            "HiTree");
   if (hasMetTree)      AddCloneTree(metTree,      "anaMET",            "metTree");
   if (hasTowerTree)    AddCloneTree(towerTree,    "rechitanalyzer",              "tower");
