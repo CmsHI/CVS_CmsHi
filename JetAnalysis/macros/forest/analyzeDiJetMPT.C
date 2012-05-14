@@ -449,6 +449,8 @@ void analyzeDiJetMPT(
 //                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << 0 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
             }
             gj.trkEff[gj.nTrk] = trkcorr[0];
+            gj.trkFak[gj.nTrk] = trkcorr[1];
+            gj.trkChi2Norm[gj.nTrk] = anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it];
             // find leading track
             if (trkPt>gj.ltrkPt) {
                gj.ltrkPt = trkPt;
