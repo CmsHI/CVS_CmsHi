@@ -279,7 +279,6 @@ void analyzeDiJetMPT(
          // Loop over jet tree to find a away side leading jet
          gj.nJet=0;
          for (int j=0;j<anajet->nref;j++) {
-            if (j==leadingIndex) continue;
             if (anajet->jtpt[j]<cutjetPt) continue;
             if (fabs(anajet->jteta[j])>cutjetEta) continue;
             gj.inclJetPt[gj.nJet] = anajet->jtpt[j];
@@ -288,7 +287,7 @@ void analyzeDiJetMPT(
             gj.inclJetRefPt[gj.nJet] = anajet->refpt[j];
             gj.inclJetRefPartonPt[gj.nJet] = anajet->refparton_pt[j];
             gj.inclJetRefResp[gj.nJet] = jetRes.GetSmear(evt.cBin,gj.inclJetRefPt[gj.nJet]);
-            if (anajet->jtpt[j] > gj.pt2) {
+            if (j!=leadingIndex&&anajet->jtpt[j] > gj.pt2) {
                gj.pt2 = anajet->jtpt[j];
                awayIndex = j;
             }
@@ -421,9 +420,9 @@ void analyzeDiJetMPT(
             if (iset==0) {
                if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
                if (!anaTrks[iset]->trkQual[it]) continue;
-               if ( fabs(anaTrks[iset]->trkEta[it])>=1.6 ) {
-                 if ( (anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it]) > 0.12 ) continue;
-               }
+//                if ( fabs(anaTrks[iset]->trkEta[it])>=1.6 ) {
+//                  if ( (anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it]) > 0.12 ) continue;
+//                }
             }
             // Pixel Track Selection
             if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
