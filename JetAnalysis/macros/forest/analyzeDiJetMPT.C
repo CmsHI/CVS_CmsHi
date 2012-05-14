@@ -264,16 +264,6 @@ void analyzeDiJetMPT(
       if (dataSrcType==0&&!evt.offlSel) continue;
       if (gj.pt1<100) continue;
       
-      // If MC, Loop over gen jets to look for leading genjet candidate in the event
-      for (int j=0;j<anajet->ngen;j++) {
-         if (anajet->genpt[j]<cutjetPt) continue;
-         if (fabs(anajet->geneta[j])>cutjetEta) continue;
-         if (anajet->genpt[j] > gj.genjetpt1) {
-            gj.genjetpt1=anajet->genpt[j];
-            genLeadingIndex=j;
-         }
-      }
-      
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading jet
@@ -317,23 +307,6 @@ void analyzeDiJetMPT(
             gj.ref2phi = anajet->refphi[awayIndex];
             gj.ref2partonpt = anajet->refparton_pt[awayIndex];
             gj.ref2partonflavor = anajet->refparton_flavor[awayIndex];
-         }
-
-         // if mc, write genjets
-         gj.nGenJet=0;
-         for (int j=0;j<anajet->ngen;j++) {
-            if (anajet->genpt[j]<cutjetPt) continue;
-            if (fabs(anajet->geneta[j])>cutjetEta) continue;
-            gj.inclGenJetPt[gj.nGenJet] = anajet->genpt[j];
-            gj.inclGenJetEta[gj.nGenJet] = anajet->geneta[j];
-            gj.inclGenJetPhi[gj.nGenJet] = anajet->genphi[j];
-            gj.inclGenJetResp[gj.nGenJet] = jetRes.GetSmear(evt.cBin,gj.inclGenJetPt[gj.nGenJet]);
-            if (j!=genLeadingIndex && anajet->genpt[j]>gj.genjetpt2) {
-               gj.genjetpt2=anajet->genpt[j];
-               gj.genjeteta2=anajet->geneta[j];
-               gj.genjetphi2=anajet->genphi[j];
-            }
-            ++gj.nGenJet;
          }
 
          // if mix, overwrite jets from mixed events
@@ -399,6 +372,39 @@ void analyzeDiJetMPT(
          }
       }
       
+      ////////////////////////////////////////
+      // If mc, write genjets
+      ////////////////////////////////////////
+      // leading
+      for (int j=0;j<anajet->ngen;j++) {
+         if (anajet->genpt[j]<cutjetPt) continue;
+         if (fabs(anajet->geneta[j])>cutjetEta) continue;
+         if (anajet->genpt[j] > gj.genjetpt1) {
+            gj.genjetpt1=anajet->genpt[j];
+            genLeadingIndex=j;
+         }
+      }
+      if (genLeadingIndex!=-1) {
+         gj.genjeteta1=anajet->geneta[genLeadingIndex];
+         gj.genjetphi1=anajet->genphi[genLeadingIndex];
+      }
+      // subleading
+      gj.nGenJet=0;
+      for (int j=0;j<anajet->ngen;j++) {
+         if (anajet->genpt[j]<cutjetPt) continue;
+         if (fabs(anajet->geneta[j])>cutjetEta) continue;
+         gj.inclGenJetPt[gj.nGenJet] = anajet->genpt[j];
+         gj.inclGenJetEta[gj.nGenJet] = anajet->geneta[j];
+         gj.inclGenJetPhi[gj.nGenJet] = anajet->genphi[j];
+         gj.inclGenJetResp[gj.nGenJet] = jetRes.GetSmear(evt.cBin,gj.inclGenJetPt[gj.nGenJet]);
+         if (j!=genLeadingIndex && anajet->genpt[j]>gj.genjetpt2) {
+            gj.genjetpt2=anajet->genpt[j];
+            gj.genjeteta2=anajet->geneta[j];
+            gj.genjetphi2=anajet->genphi[j];
+         }
+         ++gj.nGenJet;
+      }
+
       ///////////////////////////////////////////////////////
       // Tracks
       ///////////////////////////////////////////////////////
