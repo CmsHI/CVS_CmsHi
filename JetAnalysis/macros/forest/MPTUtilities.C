@@ -66,7 +66,7 @@ public:
    MPTCands cands; // input
    vector<MPT> vmpt; // ouput
    
-   AnaMPT(TString myname, int mode=1, int pfid=0) :
+   AnaMPT(TString myname, int mode=0, int pfid=0) :
    name(myname),
    excludeTrigCandMode(mode),
    chargedOnly(false),
@@ -115,7 +115,7 @@ public:
       }      
    }
    
-   void InputEvent(int n, float * pt, float * eta, float * phi, float * wt, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
+   void InputEvent(int n, float * pt, float * eta, float * phi, float * wt=0, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
 //      cout << "mpt input size: " << n << endl;
       cands.n = 0;
       for (int i=0; i<n; ++i) {
