@@ -450,7 +450,7 @@ void analyzeDiJetMPT(
             gj.trkFak[gj.nTrk] = trkcorr[1];
             gj.trkChi2Norm[gj.nTrk] = trkChi2Norm;
             gj.trkHP[gj.nTrk] = (trkPt>=maxPixTrkPt ? (trkPtErrorNorm<0.06&&trkNHit>=13&&trkChi2Norm<0.15&&trkDzNorm<3&&trkDxyNorm<3) : true);
-            gj.trkHGT[gj.nTrk] = (trkPt>=maxPixTrkPt ? (gj.trkHP[gj.nTrk]&&anaTrks[iset]->trkAlgo[it]==4) : true);
+            gj.trkAlgo[gj.nTrk] = anaTrks[iset]->trkAlgo[it];
             // find leading track
             if (trkPt>gj.ltrkPt) {
                gj.ltrkPt = trkPt;
