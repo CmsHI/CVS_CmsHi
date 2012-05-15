@@ -14,7 +14,7 @@ public:
    }
 };
 
-static const int MAXTRK = 10000;
+static const int MAXTRK = 50000;
 
 class DiJet{
 public:
@@ -43,6 +43,8 @@ public:
    float trkEff[MAXTRK];
    float trkFak[MAXTRK];
    float trkChi2Norm[MAXTRK];
+   bool trkHP[MAXTRK];
+   bool trkHGT[MAXTRK];
    int nJet;
    float inclJetPt[MAXTRK];
    float inclJetEta[MAXTRK];
@@ -90,6 +92,8 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {
    tgj->Branch("trkEff",gj.trkEff,"trkEff[nTrk]/F");
    tgj->Branch("trkFak",gj.trkFak,"trkFak[nTrk]/F");
    tgj->Branch("trkChi2Norm",gj.trkChi2Norm,"trkChi2Norm[nTrk]/F");
+   tgj->Branch("trkHP",gj.trkHP,"trkHP[nTrk]/O");
+   tgj->Branch("trkHGT",gj.trkHGT,"trkHGT[nTrk]/O");
    tgj->Branch("nJet",&gj.nJet,"nJet/I");
    tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");

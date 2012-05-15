@@ -106,17 +106,13 @@ void analyzeDiJetMPT(
    BookGJBranches(tgj,evt,gj);
    
 //   AnaMPT pfmpt("pf",0);
-//   AnaMPT pf1mpt("pf1",0,1);
 //   AnaMPT pf4mpt("pf4",0,4);
-//   AnaMPT pf5mpt("pf5",0,5);
    AnaMPT trkmpt("trk",0);
    AnaMPT genpSigmpt("genpSig",0);
    AnaMPT genpAllmpt("genpAll",0);
    if (doMPT) {
-      //pfmpt.Init(tgj);  
-      //pf1mpt.Init(tgj);  
+//       pfmpt.Init(tgj);  
       //pf4mpt.Init(tgj);  
-      //pf5mpt.Init(tgj);
 
       trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
       trkmpt.Init(tgj);
@@ -420,15 +416,17 @@ void analyzeDiJetMPT(
             if (iset==0) {
                if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
                if (!anaTrks[iset]->trkQual[it]) continue;
-//                if ( fabs(anaTrks[iset]->trkEta[it])>=1.6 ) {
-//                  if ( (anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it]) > 0.12 ) continue;
-//                }
             }
             // Pixel Track Selection
             if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
             float trkPt = anaTrks[iset]->trkPt[it];
             float trkEta = anaTrks[iset]->trkEta[it];
             float trkPhi = anaTrks[iset]->trkPhi[it];
+            float trkPtErrorNorm = anaTrks[iset]->trkPtError[it]/anaTrks[iset]->trkPt[it];
+            float trkNHit = anaTrks[iset]->trkNHit[it];
+            float trkChi2Norm = anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it];
+            float trkDzNorm = anaTrks[iset]->trkDz1[it]/anaTrks[iset]->trkDzError1[it];
+            float trkDxyNorm = anaTrks[iset]->trkDxy1[it]/anaTrks[iset]->trkDxyError1[it];
             gj.trkPt[gj.nTrk] = trkPt;
             gj.trkEta[gj.nTrk] = trkEta;
             gj.trkPhi[gj.nTrk] = trkPhi;
@@ -450,7 +448,9 @@ void analyzeDiJetMPT(
             }
             gj.trkEff[gj.nTrk] = trkcorr[0];
             gj.trkFak[gj.nTrk] = trkcorr[1];
-            gj.trkChi2Norm[gj.nTrk] = anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it];
+            gj.trkChi2Norm[gj.nTrk] = trkChi2Norm;
+            gj.trkHP[gj.nTrk] = (trkPt>=maxPixTrkPt ? (trkPtErrorNorm<0.06&&trkNHit>=13&&trkChi2Norm<0.15&&trkDzNorm<3&&trkDxyNorm<3) : true);
+            gj.trkHGT[gj.nTrk] = (trkPt>=maxPixTrkPt ? (gj.trkHP[gj.nTrk]&&anaTrks[iset]->trkAlgo[it]==4) : true);
             // find leading track
             if (trkPt>gj.ltrkPt) {
                gj.ltrkPt = trkPt;
@@ -486,17 +486,11 @@ void analyzeDiJetMPT(
 
       // MPT
       if (doMPT) {
-         //pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0);
-         //pfmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
+//          pfmpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi);
+//          pfmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         //pf1mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
-         //pf1mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-
          //pf4mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
          //pf4mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-
-         //pf5mpt.InputEvent(pfs.nPFpart,pfs.pfPt,pfs.pfEta,pfs.pfPhi,0,pfs.pfId);
-         //pf5mpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
 
          trkmpt.InputEvent(gj.nTrk,gj.trkPt,gj.trkEta,gj.trkPhi,gj.trkWt);
          trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
