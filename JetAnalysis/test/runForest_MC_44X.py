@@ -14,7 +14,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_test9.root'
+ivars.outputFile = './forest_v16_test10.root'
 
 ivars.parseArguments()
 
@@ -121,26 +121,9 @@ process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
 process.load('CmsHi.JetAnalysis.PatAna_cff')
-process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
-process.load('CmsHi.JetAnalysis.TrkAnalyzers_cff')
+process.load('CmsHi.JetAnalysis.JetAnalyzers_MC_cff')
+process.load('CmsHi.JetAnalysis.TrkAnalyzers_MC_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
-process.load("MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff")
-
-process.anaTrack.trackPtMin = 0.5
-process.anaTrack.useQuality = True
-#print "Temporarily commented out sim tracks "
-process.anaTrack.doSimTrack = True
-process.anaTrack.fillSimTrack = cms.untracked.bool(True)
-process.anaTrack.simTrackPtMin = 1
-process.anaTrack.doPFMatching = True
-
-process.anaTrack.pfCandSrc = cms.InputTag("particleFlowTmp")
-process.anaTrack.trackSrc = cms.InputTag("hiGeneralCaloMatchedTracks")
-
-process.pixelTrack = process.anaTrack.clone(trackSrc = cms.InputTag("hiConformalPixelTracks"))
-process.pixelTrack.useQuality = False
-process.pixelTrack.fillSimTrack = False
-process.pixelTrack.trackPtMin = 0.5
 
 process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
@@ -183,21 +166,6 @@ process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag("hiSignal")
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 
-process.icPu5JetAnalyzer.isMC   = cms.untracked.bool(True)
-process.akPu1PFJetAnalyzer.isMC = cms.untracked.bool(True)
-process.akPu2PFJetAnalyzer.isMC = cms.untracked.bool(True)
-process.akPu3PFJetAnalyzer.isMC = cms.untracked.bool(True)
-process.akPu4PFJetAnalyzer.isMC = cms.untracked.bool(True)
-process.akPu5PFJetAnalyzer.isMC = cms.untracked.bool(True)
-process.akPu6PFJetAnalyzer.isMC = cms.untracked.bool(True)
-
-process.icPu5JetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu1PFJetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu2PFJetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu3PFJetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu4PFJetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu5PFJetAnalyzer.genPtMin = cms.untracked.double(15)
-process.akPu6PFJetAnalyzer.genPtMin = cms.untracked.double(15)
 
 
 #Commented by Yen-Jie
@@ -445,7 +413,7 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
-                                      process.randomCones +
+#                                      process.randomCones +
                                       process.hltMuTree
                                       )
 
