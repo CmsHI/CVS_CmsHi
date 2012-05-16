@@ -62,6 +62,7 @@ void analyzeDiJetMPT(
    //bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
    bool checkDup=false;
    bool doMPT=true, saveAllCands=false;
+   bool onlyTrkAlgo4=true, onlyTrkHP=true;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -413,12 +414,6 @@ void analyzeDiJetMPT(
             if (anaTrks[iset]->trkPt[it] < cutPtTrk) continue;
             if (fabs(anaTrks[iset]->trkEta[it]) > cutEtaTrk) continue;
             // Full Track Selection
-            if (iset==0) {
-               if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
-               if (!anaTrks[iset]->trkQual[it]) continue;
-            }
-            // Pixel Track Selection
-            if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
             float trkPt = anaTrks[iset]->trkPt[it];
             float trkEta = anaTrks[iset]->trkEta[it];
             float trkPhi = anaTrks[iset]->trkPhi[it];
@@ -427,6 +422,16 @@ void analyzeDiJetMPT(
             float trkChi2Norm = anaTrks[iset]->trkChi2[it]/anaTrks[iset]->trkNlayer[it]/anaTrks[iset]->trkNdof[it];
             float trkDzNorm = anaTrks[iset]->trkDz1[it]/anaTrks[iset]->trkDzError1[it];
             float trkDxyNorm = anaTrks[iset]->trkDxy1[it]/anaTrks[iset]->trkDxyError1[it];
+            int trkAlgo = (trkPt>=maxPixTrkPt ? anaTrks[iset]->trkAlgo[it] : 4);
+            bool trkHP  = (trkPt>=maxPixTrkPt ? (trkPtErrorNorm<0.06&&trkNHit>=13&&trkChi2Norm<0.15&&trkDzNorm<3&&trkDxyNorm<3) : true);
+            if (iset==0) {
+               if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
+               if (!anaTrks[iset]->trkQual[it]) continue;
+               if (onlyTrkAlgo4&&trkAlgo!=4) continue;
+               if (onlyTrkHP&&!trkHP) continue;
+            }
+            // Pixel Track Selection
+            if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
             gj.trkPt[gj.nTrk] = trkPt;
             gj.trkEta[gj.nTrk] = trkEta;
             gj.trkPhi[gj.nTrk] = trkPhi;
@@ -449,8 +454,8 @@ void analyzeDiJetMPT(
             gj.trkEff[gj.nTrk] = trkcorr[0];
             gj.trkFak[gj.nTrk] = trkcorr[1];
             gj.trkChi2Norm[gj.nTrk] = trkChi2Norm;
-            gj.trkHP[gj.nTrk] = (trkPt>=maxPixTrkPt ? (trkPtErrorNorm<0.06&&trkNHit>=13&&trkChi2Norm<0.15&&trkDzNorm<3&&trkDxyNorm<3) : true);
-            gj.trkAlgo[gj.nTrk] = anaTrks[iset]->trkAlgo[it];
+            gj.trkAlgo[gj.nTrk] = trkAlgo;
+            gj.trkHP[gj.nTrk] = trkHP;
             // find leading track
             if (trkPt>gj.ltrkPt) {
                gj.ltrkPt = trkPt;
