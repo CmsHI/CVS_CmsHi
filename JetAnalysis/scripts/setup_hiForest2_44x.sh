@@ -48,7 +48,7 @@ UserCode/ASYoon/PbPbTrackingTools/VertexConstraintProducer
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_00 -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 cvs co -r HiForest_V02_00 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_07 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_08 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 #PixelTrack
