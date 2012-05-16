@@ -132,6 +132,7 @@ process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiGeneralCaloMatchedTracks")
 
 process.anaTrack.doSimTrack = False
+process.pixelTrack.doSimTrack = False
 
 #process.load("HiMuonAlgos.HLTMuTree.hltMuTree_cfi")
 
