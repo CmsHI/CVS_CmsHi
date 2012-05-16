@@ -53,6 +53,8 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   string trackQuality_ = iConfig.getUntrackedParameter<string>("trackQuality","highPurity");
 
   isMC_ = iConfig.getUntrackedParameter<bool>("isMC",false);
+  fillGenJets_ = iConfig.getUntrackedParameter<bool>("fillGenJets",false);
+
   doTrigger_ = iConfig.getUntrackedParameter<bool>("doTrigger",false);
 
   rParam = iConfig.getParameter<double>("rParam");
@@ -247,20 +249,22 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("refparton_flavor",jets_.refparton_flavor,"refparton_flavor[nref]/I");
     t->Branch("refparton_flavorForB",jets_.refparton_flavorForB,"refparton_flavorForB[nref]/I");
 
-    // For all gen jets, matched or unmatched
-    t->Branch("ngen",&jets_.ngen,"ngen/I");
-    t->Branch("genmatchindex",jets_.genmatchindex,"genmatchindex[ngen]/I");
-    t->Branch("genpt",jets_.genpt,"genpt[ngen]/F");
-    t->Branch("geneta",jets_.geneta,"geneta[ngen]/F");
-    t->Branch("geny",jets_.geny,"geny[ngen]/F");
-    t->Branch("genphi",jets_.genphi,"genphi[ngen]/F");
-    t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
-    t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
-
-    if(doSubEvent_){
-       t->Branch("gensubid",jets_.gensubid,"gensubid[ngen]/I");
+    if(fillGenJets_){
+       // For all gen jets, matched or unmatched
+       t->Branch("ngen",&jets_.ngen,"ngen/I");
+       t->Branch("genmatchindex",jets_.genmatchindex,"genmatchindex[ngen]/I");
+       t->Branch("genpt",jets_.genpt,"genpt[ngen]/F");
+       t->Branch("geneta",jets_.geneta,"geneta[ngen]/F");
+       t->Branch("geny",jets_.geny,"geny[ngen]/F");
+       t->Branch("genphi",jets_.genphi,"genphi[ngen]/F");
+       t->Branch("gendphijt",jets_.gendphijt,"gendphijt[ngen]/F");
+       t->Branch("gendrjt",jets_.gendrjt,"gendrjt[ngen]/F");
+       
+       if(doSubEvent_){
+	  t->Branch("gensubid",jets_.gensubid,"gensubid[ngen]/I");
+       }
     }
-
+    
     if(saveBfragments_  ) {
       t->Branch("bMult",&jets_.bMult,"bMult/I");
       t->Branch("bJetIndex",jets_.bJetIndex,"bJetIndex[bMult]/I");

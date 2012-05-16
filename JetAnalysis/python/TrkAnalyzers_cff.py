@@ -19,3 +19,15 @@ hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer.clone(
   )
 
 hitrkEffAna_akpu3pf = cms.Sequence(cutsTPForFak*cutsTPForEff*hitrkEffAnalyzer_akpu3pf)
+
+anaTrack.trackPtMin = 0.5
+anaTrack.useQuality = True
+anaTrack.doPFMatching = True
+anaTrack.pfCandSrc = cms.InputTag("particleFlowTmp")
+anaTrack.trackSrc = cms.InputTag("hiGeneralCaloMatchedTracks")
+
+pixelTrack = process.anaTrack.clone(trackSrc = cms.InputTag("hiConformalPixelTracks"))
+pixelTrack.useQuality = False
+pixelTrack.trackPtMin = 0.5
+
+

@@ -69,7 +69,9 @@ ak4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4Calopa
 ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'ak5PFpatJets')
 ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak6PFpatJets')
 
-jetAnalyzers = cms.Sequence(akPu1PFJetAnalyzer +
+jetAnalyzers = cms.Sequence(icPu5CaloJetAnalyzer+
+
+                            akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +
                             akPu3PFJetAnalyzer +
                             akPu4PFJetAnalyzer +
