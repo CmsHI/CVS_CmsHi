@@ -89,7 +89,7 @@ akPu6PFJetAnalyzer.genPtMin = cms.untracked.double(15)
 
 
 
-jetAnalyzers = cms.Sequence(icPu5CaloJetAnalyzer +
+jetAnalyzers = cms.Sequence(icPu5JetAnalyzer +
 
                             akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +
