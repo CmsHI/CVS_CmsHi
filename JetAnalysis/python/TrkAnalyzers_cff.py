@@ -27,7 +27,7 @@ anaTrack.doPFMatching = True
 anaTrack.pfCandSrc = cms.InputTag("particleFlowTmp")
 anaTrack.trackSrc = cms.InputTag("hiGeneralCaloMatchedTracks")
 
-pixelTrack = process.anaTrack.clone(trackSrc = cms.InputTag("hiConformalPixelTracks"))
+pixelTrack = anaTrack.clone(trackSrc = cms.InputTag("hiConformalPixelTracks"))
 pixelTrack.useQuality = False
 pixelTrack.trackPtMin = 0.5
 
