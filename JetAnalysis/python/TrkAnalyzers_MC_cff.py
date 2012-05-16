@@ -8,4 +8,4 @@ anaTrack.simTrackPtMin = 1
 
 pixelTrack.doSimTrack = True
 pixelTrack.simTrackPtMin = 1
-pixelTrack.fillSimTrack = False
+pixelTrack.fillSimTrack = cms.untracked.bool(False)
