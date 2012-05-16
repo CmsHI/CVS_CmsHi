@@ -65,8 +65,8 @@ isLeadingJet_(true)
    centBin_.push_back("2to3");
    centBin_.push_back("4to11");
    centBin_.push_back("12to19");
-   centBin_.push_back("20to35");
-//    centBin_.push_back("20to39");
+   if (name=="QM2011") centBin_.push_back("20to35");
+   else centBin_.push_back("20to39");
    numCentBins_ = centBin_.size();
    
    levelName_.push_back("Eff");
