@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from edwenger.HiTrkEffAnalyzer.hitrkEffAnalyzer_cff import *
+from MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff import *
 
 hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer.clone(
   # evt
