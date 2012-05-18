@@ -14,7 +14,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_test10.root'
+ivars.outputFile = './forest_v16_test13.root'
 
 ivars.parseArguments()
 
@@ -167,6 +167,8 @@ process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::R
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 
 
+process.mergedTrack = process.pixelTrack.clone(trackSrc = cms.InputTag("hiMergedTracks"), fillSimTrack = cms.untracked.bool(True))
+process.anaTrack.fillSimTrack = False
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
@@ -185,6 +187,12 @@ process.hiTracks = cms.EDFilter("TrackSelector",
     'quality("' + hiTrackQuality+  '")')
                                                  )
 
+process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
+process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
+process.hiMergedTracks = process.hiGoodMergedTracks.clone(
+    TrackProducer1  = "hiTracks",
+    TrackProducer2  = "hiConformalPixelTracks")
+
 process.particleFlowTmp.postMuonCleaning = False
 process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
 
@@ -200,7 +208,7 @@ process.cutsTPForFak.tracks = cms.untracked.InputTag('TrackingParticles')
 # Here it is after including b-tagging -Matt
 
 process.rechits = cms.Sequence(process.siPixelRecHits * process.siStripMatchedRecHits)
-process.hiTrackReco = cms.Sequence(process.hiTracks)
+process.hiTrackReco = cms.Sequence(process.hiTracks*process.hiMergedTracks)
 
 # fixed necessary for muons in HI -Matt
 process.particleFlowBlock.RecMuons = 'muons'
@@ -408,7 +416,7 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.HiGenParticleAna +
 #                                      process.cutsTPForFak +
 #                                      process.cutsTPForEff +
-                                      process.anaTrack + process.pixelTrack +
+                                      process.anaTrack + process.pixelTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.met * process.anaMET +
 				      process.muonTree +

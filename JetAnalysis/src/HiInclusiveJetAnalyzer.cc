@@ -49,8 +49,8 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
 
   vtxTag_ = iConfig.getUntrackedParameter<edm::InputTag>("vtxTag",edm::InputTag("hiSelectedVertex"));  
   trackTag_ = iConfig.getParameter<InputTag>("trackTag");
-  useQuality_ = iConfig.getUntrackedParameter<bool>("useQuality",0);
-  string trackQuality_ = iConfig.getUntrackedParameter<string>("trackQuality","highPurity");
+  useQuality_ = iConfig.getUntrackedParameter<bool>("useQuality",1);
+  trackQuality_ = iConfig.getUntrackedParameter<string>("trackQuality","highPurity");
 
   isMC_ = iConfig.getUntrackedParameter<bool>("isMC",false);
   fillGenJets_ = iConfig.getUntrackedParameter<bool>("fillGenJets",false);
@@ -519,7 +519,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
      for(unsigned int icand = 0; icand < tracks->size(); ++icand){
 	const reco::Track& track = (*tracks)[icand];
-	if(useQuality_ && !(track.quality(reco::TrackBase::qualityByName(trackQuality_)))) continue;
+	if(useQuality_ ){
+	   bool goodtrack = track.quality(reco::TrackBase::qualityByName(trackQuality_));
+	   if(!goodtrack) continue;
+	}
 
 	double dr = deltaR(jet,track);
 	if(dr < rParam){
@@ -599,7 +602,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	if(dr < drMin){
 	   jets_.matchedPt[jets_.nref] = mjet.pt();
            jets_.matchedR[jets_.nref] = dr;
-
+	   drMin = dr;
 	}
      }
    
