@@ -485,3 +485,29 @@ process.rechitAna = cms.Path(process.rechitanalyzer+process.pfTowers)
 #                               fileName = cms.untracked.string("output.root")
 #                               )
 #process.save = cms.EndPath(process.out)
+
+
+process.ak1PFJets.jetPtMin = 1.0
+process.ak2PFJets.jetPtMin = 1.0
+process.ak3PFJets.jetPtMin = 1.0
+process.ak4PFJets.jetPtMin = 1.0
+process.ak5PFJets.jetPtMin = 1.0
+process.ak6PFJets.jetPtMin = 1.0
+process.ak1CaloJets.jetPtMin = 1.0
+process.ak2CaloJets.jetPtMin = 1.0
+process.ak3CaloJets.jetPtMin = 1.0
+process.ak4CaloJets.jetPtMin = 1.0
+process.ak5CaloJets.jetPtMin = 1.0
+process.ak6CaloJets.jetPtMin = 1.0
+
+
+process.icPu5clean.ptCut = 0
+process.ak1clean.ptCut = 0
+process.ak2clean.ptCut = 0
+process.ak3clean.ptCut = 0
+process.ak4clean.ptCut = 0
+process.ak5clean.ptCut = 0
+process.ak6clean.ptCut = 0
+
+
+

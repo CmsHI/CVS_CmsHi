@@ -17,6 +17,9 @@ akPu5CaloJets.radiusPU = 0.5
 iterativeConePu5CaloJets.doPVCorrection = cms.bool(True)
 iterativeConePu5CaloJets.srcPVs = 'hiSelectedVertex'
 
+iterativeConePu5CaloJets.jetPtMin = 1.0
+akPu5PFJets.jetPtMin = 1.0
+
 akPu5PFJets = ak5PFJets.clone()
 akPu5PFJets.src = 'PFTowers'
 akPu5PFJets.jetType = 'BasicJet'
