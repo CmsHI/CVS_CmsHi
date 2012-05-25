@@ -1,6 +1,88 @@
 
 from CmsHi.JetAnalysis.PatAna_MC_cff import *
 
+icPu5patJets.addGenJetMatch = False
+icPu5patJets.addGenPartonMatch = False
+
+akPu1PFpatJets.addGenJetMatch = False
+akPu1PFpatJets.addGenPartonMatch = False
+
+akPu2PFpatJets.addGenJetMatch = False
+akPu2PFpatJets.addGenPartonMatch = False
+
+akPu3PFpatJets.addGenJetMatch = False
+akPu3PFpatJets.addGenPartonMatch = False
+
+akPu4PFpatJets.addGenJetMatch = False
+akPu4PFpatJets.addGenPartonMatch = False
+
+akPu5PFpatJets.addGenJetMatch = False
+akPu5PFpatJets.addGenPartonMatch = False
+
+akPu6PFpatJets.addGenJetMatch = False
+akPu6PFpatJets.addGenPartonMatch = False
+
+
+akPu1CalopatJets.addGenJetMatch = False
+akPu1CalopatJets.addGenPartonMatch = False
+
+akPu2CalopatJets.addGenJetMatch = False
+akPu2CalopatJets.addGenPartonMatch = False
+
+akPu3CalopatJets.addGenJetMatch = False
+akPu3CalopatJets.addGenPartonMatch = False
+
+akPu4CalopatJets.addGenJetMatch = False
+akPu4CalopatJets.addGenPartonMatch = False
+
+akPu5CalopatJets.addGenJetMatch = False
+akPu5CalopatJets.addGenPartonMatch = False
+
+akPu6CalopatJets.addGenJetMatch = False
+akPu6CalopatJets.addGenPartonMatch = False
+
+ak1CalopatJets.addGenJetMatch = False
+ak1CalopatJets.addGenPartonMatch = False
+
+ak2CalopatJets.addGenJetMatch = False
+ak2CalopatJets.addGenPartonMatch = False
+
+ak3CalopatJets.addGenJetMatch = False
+ak3CalopatJets.addGenPartonMatch = False
+
+ak4CalopatJets.addGenJetMatch = False
+ak4CalopatJets.addGenPartonMatch = False
+
+ak5CalopatJets.addGenJetMatch = False
+ak5CalopatJets.addGenPartonMatch = False
+
+ak6CalopatJets.addGenJetMatch = False
+ak6CalopatJets.addGenPartonMatch = False
+
+ak1PFpatJets.addGenJetMatch = False
+ak1PFpatJets.addGenPartonMatch = False
+
+ak2PFpatJets.addGenJetMatch = False
+ak2PFpatJets.addGenPartonMatch = False
+
+ak3PFpatJets.addGenJetMatch = False
+ak3PFpatJets.addGenPartonMatch = False
+
+ak4PFpatJets.addGenJetMatch = False
+ak4PFpatJets.addGenPartonMatch = False
+
+ak5PFpatJets.addGenJetMatch = False
+ak5PFpatJets.addGenPartonMatch = False
+
+ak6PFpatJets.addGenJetMatch = False
+ak6PFpatJets.addGenPartonMatch = False
+
+
+
+
+
+
+
 icPu5patSequence.remove(icPu5clean)
 icPu5patSequence.remove(icPu5match)
 icPu5patSequence.remove(icPu5parton)

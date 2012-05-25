@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from CmsHi.JetAnalysis.TrkAnalyzers_cff import *
+from CmsHi.JetAnalysis.TrkEfficiency_cff import *
 
 anaTrack.doSimTrack = True
 anaTrack.fillSimTrack = cms.untracked.bool(False)

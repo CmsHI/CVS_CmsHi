@@ -204,6 +204,8 @@ process.pfTrack.TrackQuality = cms.string(hiTrackQuality)
 
 process.reco_extra =  cms.Path(
     process.hiTrackReco
+    +process.hiTrackDebug
+    
     #        *process.muonRecoPbPb
     *process.HiParticleFlowLocalReco
     *process.HiParticleFlowReco
@@ -393,6 +395,7 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.HiGenParticleAna +
 #                                      process.cutsTPForFak +
 #                                      process.cutsTPForEff +
+                                      process.trackeff_seq+
                                       process.anaTrack + process.pixelTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.met * process.anaMET +

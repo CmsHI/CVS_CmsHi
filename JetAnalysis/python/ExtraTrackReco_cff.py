@@ -9,12 +9,24 @@ rechits = cms.Sequence(siPixelRecHits * siStripMatchedRecHits)
 hiTrackReReco = cms.Sequence(rechits * heavyIonTracking)
 
 # good track selection
-from edwenger.HiTrkEffAnalyzer.TrackSelections_cff import *
+hiCaloCompatibleGeneralTracksQuality = cms.EDFilter("TrackSelector",
+                                                       src = cms.InputTag("hiGeneralCaloMatchedTracks"),
+                                                       cut = cms.string(
+       'quality("highPuritySetWithPV")')
+                                                    )
 
-hiextraTrackReco = cms.Sequence(
-		hiPostGlobalPrimTracks *
-    hiGoodTightTracksSelection
-    )
+hiGeneralTracksQuality = cms.EDFilter("TrackSelector",
+                                         src = cms.InputTag("hiGeneralCaloMatchedTracks"),
+                                         cut = cms.string(
+       'quality("highPurity")')
+                                      )
+
+hiSelectedTrackQuality = cms.EDFilter("TrackSelector",
+                                         src = cms.InputTag("hiGeneralCaloMatchedTracks"),
+                                         cut = cms.string(
+       'quality("highPurity")&&algo()==4')
+                                      )
+
 
 
 
@@ -32,5 +44,28 @@ hiTracks = cms.EDFilter("TrackSelector",
     'quality("highPurity")')
                                 )
 
+##################################################
+
+
+
+hiMergedTracksSelcted = hiGoodMergedTracks.clone(
+        TrackProducer1  = "hiSelectedTrackQuality",
+            TrackProducer2  = "hiConformalPixelTracks")
+
+hiMergedTracksGeneral = hiGoodMergedTracks.clone(
+        TrackProducer1  = "hiGeneralTracksQuality",
+            TrackProducer2  = "hiConformalPixelTracks")
+
+hiMergedTracksGeneralCalo = hiGoodMergedTracks.clone(
+        TrackProducer1  = "hiCaloCompatibleGeneralTracksQuality",
+            TrackProducer2  = "hiConformalPixelTracks")
+
+##################################################
+
 rechits = cms.Sequence(siPixelRecHits * siStripMatchedRecHits)
 hiTrackReco = cms.Sequence(hiTracks * hiMergedTracks)
+hiTrackDebug = cms.Sequence( hiCaloCompatibleGeneralTracksQuality * hiMergedTracksGeneralCalo *
+                                  hiSelectedTrackQuality * hiMergedTracksSelcted *
+                                  hiGeneralTracksQuality * hiMergedTracksGeneral
+                                  )
+
