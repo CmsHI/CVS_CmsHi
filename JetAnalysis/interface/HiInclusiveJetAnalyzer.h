@@ -134,6 +134,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float jtphi[MAXJETS];
     float jty[MAXJETS];
     float jtpu[MAXJETS];
+     float jtm[MAXJETS];
 
      float trackMax[MAXJETS];
      float trackSum[MAXJETS];

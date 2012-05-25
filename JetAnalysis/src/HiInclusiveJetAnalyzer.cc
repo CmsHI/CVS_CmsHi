@@ -146,6 +146,7 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("jty",jets_.jty,"jty[nref]/F");
   t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
   t->Branch("jtpu",jets_.jtpu,"jtpu[nref]/F");
+  t->Branch("jtm",jets_.jtm,"jtm[nref]/F");
 
   // jet ID information, jet composition
   t->Branch("discr_fr01", jets_.discr_fr01,"discr_fr01[nref]/F");
@@ -679,6 +680,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.jtphi[jets_.nref] = jet.phi();
      jets_.jty[jets_.nref] = jet.eta();
      jets_.jtpu[jets_.nref] = jet.pileup();
+     jets_.jtm[jets_.nref] = jet.mass();
 	 
      if(isMC_ && usePat_){
 
