@@ -4,7 +4,7 @@ from MitHig.PixelTrackletAnalyzer.trackAnalyzer_cff import *
 
 
 anaTrack.trackPtMin = 0.5
-anaTrack.useQuality = True
+anaTrack.useQuality = False
 anaTrack.doPFMatching = True
 anaTrack.pfCandSrc = cms.InputTag("particleFlowTmp")
 anaTrack.trackSrc = cms.InputTag("hiGeneralCaloMatchedTracks")

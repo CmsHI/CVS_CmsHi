@@ -330,10 +330,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
       b = centrality_->bMean();
   }
    
-
-
-
-
    // loop the events
    
    jets_.bin = bin;
@@ -367,19 +363,17 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    iEvent.getByLabel(trackTag_,tracks);
 
    // FILL JRA TREE
-
    jets_.b = b;
    jets_.nref = 0;
+
    
    if(doTrigger_){
      fillL1Bits(iEvent);
      fillHLTBits(iEvent);
    }
 
-   for(unsigned int j = 0 ; j < jets->size(); ++j){
-     const reco::Jet& jet = (*jets)[j];
-     
-
+   for(unsigned int j = 0; j < jets->size(); ++j){
+     const reco::Jet& jet = (*jets)[j];     
      if (useJEC_ && usePat_){
        jets_.rawpt[jets_.nref]=(*patjets)[j].correctedJet("Uncorrected").pt();
      }
@@ -483,8 +477,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
      }
 
-
-
      // Jet ID variables
 
      jets_.muMax[jets_.nref] = 0;
@@ -516,7 +508,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.trackN[jets_.nref] = 0;
      jets_.trackHardSum[jets_.nref] = 0;
      jets_.trackHardN[jets_.nref] = 0;
-
 
      for(unsigned int icand = 0; icand < tracks->size(); ++icand){
 	const reco::Track& track = (*tracks)[icand];
@@ -607,9 +598,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	}
      }
    
-
-
-
      //     if(etrk.quality(reco::TrackBase::qualityByName(qualityString_))) pev_.trkQual[pev_.nTrk]=1;
 
 	/////////////////////////////////////////////////////////////////
@@ -673,7 +661,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 		pseudorapidity_adapt = pseudorapidity_adapt_new;
 		azimuth_adapt = azimuth_adapt_new;
 	}
-
 
      jets_.jtpt[jets_.nref] = jet.pt();                            
      jets_.jteta[jets_.nref] = jet.eta();
@@ -753,9 +740,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      edm::Handle<HepMCProduct> hepMCProduct;
      iEvent.getByLabel(eventInfoTag_,hepMCProduct);
      const HepMC::GenEvent* MCEvt = hepMCProduct->GetEvent();
-     std::pair<HepMC::GenParticle*,HepMC::GenParticle*> beamParticles = MCEvt->beam_particles();
-     jets_.beamId1 = beamParticles.first->pdg_id();
-     jets_.beamId2 = beamParticles.second->pdg_id();
+
+	std::pair<HepMC::GenParticle*,HepMC::GenParticle*> beamParticles = MCEvt->beam_particles();
+	if(beamParticles.first != 0)jets_.beamId1 = beamParticles.first->pdg_id();
+	if(beamParticles.second != 0)jets_.beamId2 = beamParticles.second->pdg_id();
 
      edm::Handle<GenEventInfoProduct> hEventInfo;
      iEvent.getByLabel(eventInfoTag_,hEventInfo);
@@ -814,8 +802,10 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      }
      
    }
+
    t->Fill();
    memset(&jets_,0,sizeof jets_);
+
 }
 
 

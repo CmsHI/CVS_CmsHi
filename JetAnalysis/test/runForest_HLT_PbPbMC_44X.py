@@ -13,8 +13,8 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
-ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_test15.root'
+ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Hydjet1.8/Z2/HydjetMB_corrVertexDistr/tracking/hydjetDefault_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_1157.root"
+ivars.outputFile = './forest_v16_hydjet15.root'
 
 ivars.parseArguments()
 
@@ -74,6 +74,12 @@ process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.ReconstructionHeavyIons_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
+process.load('HLTrigger.Configuration.HLT_HIon_cff')
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+
+
+process.L1simulation_step = cms.Path(process.SimL1Emulator)
+
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
@@ -139,7 +145,6 @@ process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
 
-
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
 process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
@@ -167,8 +172,8 @@ process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 #process.hiEvtAnalyzer.doMC = cms.bool(True)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 
-genTag="hiSignal"
-process.hiGenParticles.srcVector = cms.vstring('hiSignal','generator')
+genTag="generator"
+process.hiGenParticles.srcVector = cms.vstring('generator')
 process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu2PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
@@ -431,9 +436,15 @@ process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
 process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
-process.hltAna = cms.Path(process.hltanalysis)
-process.pAna = cms.EndPath(process.skimanalysis)
+process.hltAna = cms.EndPath(process.hltanalysis)
 process.reco_extra*=process.L1Extra
+
+process.pAna = cms.EndPath(process.skimanalysis)
+process.endjob_step = cms.EndPath(process.endOfProcess)
+process.schedule = cms.Schedule(process.L1simulation_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step, process.extrapatstep,process.ana_step, process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
+
+process.HLTSchedule.extend(process.schedule)
+
 
 
 ########### random number seed
