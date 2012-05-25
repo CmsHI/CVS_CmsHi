@@ -15,3 +15,22 @@ hiextraTrackReco = cms.Sequence(
 		hiPostGlobalPrimTracks *
     hiGoodTightTracksSelection
     )
+
+
+
+from Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff import *
+from Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff import *
+
+hiMergedTracks = hiGoodMergedTracks.clone(
+    TrackProducer1  = "hiTracks",
+    TrackProducer2  = "hiConformalPixelTracks")
+
+
+hiTracks = cms.EDFilter("TrackSelector",
+                                src = cms.InputTag("hiGeneralCaloMatchedTracks"),
+                                cut = cms.string(
+    'quality("highPurity")')
+                                )
+
+rechits = cms.Sequence(siPixelRecHits * siStripMatchedRecHits)
+hiTrackReco = cms.Sequence(hiTracks * hiMergedTracks)

@@ -10,6 +10,21 @@ from RecoHI.HiJetAlgos.ParticleTowerProducer_cff import *
 from RecoLocalCalo.Configuration.hcalLocalReco_cff import *
 PFTowers = particleTowerProducer.clone()
 
+particleFlowTmp.postMuonCleaning = False
+particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
+
+
+particleFlowBlock.RecMuons = 'muons'
+particleFlowTmp.postMuonCleaning = False
+pfTrack.UseQuality = True
+pfTrack.GsfTracksInEvents = cms.bool(False)
+HiParticleFlowReco.remove(electronsWithPresel)
+HiParticleFlowReco.remove(electronsCiCLoose)
+particleFlowTmp.usePFElectrons = cms.bool(False)
+particleFlowTmp.useEGammaElectrons = cms.bool(False)
+
+
+
 HiParticleFlowRecoNoJets = cms.Sequence(
 	particleFlowCluster
 	* pfTrack

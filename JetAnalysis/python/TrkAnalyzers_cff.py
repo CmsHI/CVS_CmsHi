@@ -31,4 +31,6 @@ pixelTrack = anaTrack.clone(trackSrc = cms.InputTag("hiConformalPixelTracks"))
 pixelTrack.useQuality = False
 pixelTrack.trackPtMin = 0.5
 
+mergedTrack = pixelTrack.clone(trackSrc = cms.InputTag("hiMergedTracks"))
+
 
