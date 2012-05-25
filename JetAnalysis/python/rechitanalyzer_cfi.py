@@ -21,3 +21,20 @@ rechitanalyzer = cms.EDAnalyzer("RecHitTreeProducer",
   HFlongMin = cms.untracked.double(0.5),
   HFshortMin = cms.untracked.double(0.85)
 )
+
+pfTowers = rechitanalyzer.clone(
+        doEcal  = cms.untracked.bool(False),
+            doHcal  = cms.untracked.bool(False),
+            hasVtx  = cms.untracked.bool(False),
+            doFastJet = cms.untracked.bool(False),
+            towersSrc = cms.untracked.InputTag("PFTowers"),
+            TowerTreePtMin = cms.untracked.double(-99)
+            )
+
+
+rechitanalyzer.HBHETreePtMin = cms.untracked.double(15)
+rechitanalyzer.HFTreePtMin = cms.untracked.double(15)
+rechitanalyzer.EBTreePtMin = cms.untracked.double(15)
+rechitanalyzer.EETreePtMin = cms.untracked.double(15)
+rechitanalyzer.TowerTreePtMin = cms.untracked.double(15)
+rechitanalyzer.doHF = cms.untracked.bool(True)

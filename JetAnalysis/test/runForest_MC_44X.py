@@ -14,7 +14,11 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test16.root"
+<<<<<<< runForest_MC_44X.py
+ivars.outputFile = './forest_v16_test10.root'
+=======
 ivars.outputFile = './forest_v16_test13.root'
+>>>>>>> 1.17
 
 ivars.parseArguments()
 
