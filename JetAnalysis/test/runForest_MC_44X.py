@@ -31,7 +31,7 @@ process.options = cms.untracked.PSet(
 hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
-doElectrons = True
+doElectrons = False
 doRegitForBjets = False
 
 

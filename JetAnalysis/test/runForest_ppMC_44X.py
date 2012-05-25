@@ -13,9 +13,8 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
-ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet30/reco_v6//set1_random10000_HydjetDrum_126.root"
-ivars.outputFile = './forest_pp0_test2.root'
-
+ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet30/reco_v8_v0_v8/set1_random10000_HydjetDrum_126.root"
+ivars.outputFile = './forest_pp0_test3.root'
 
 ivars.parseArguments()
 
@@ -32,8 +31,19 @@ process.options = cms.untracked.PSet(
 hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
-doElectrons = True
+doElectrons = False
 doRegitForBjets = False
+
+
+#####################################################################################
+
+process.load("CmsHi.JetAnalysis.HiForest_cff")
+process.HiForest.inputLines = cms.vstring("HiForest V2",
+                                          "PF : iterative tracks",
+                                          "EP Flattening OFF",
+                                          "Electrons OFF",
+                                          "Preshower OFF"
+                                          )
 
 #####################################################################################
 # Input source
@@ -117,11 +127,11 @@ process.load("CmsHi.JetAnalysis.hcalNoise_cff")
 # Define Analysis sequencues
 process.load('CmsHi.JetAnalysis.EventSelection_cff')
 process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
-#process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
+process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
-process.load('CmsHi.JetAnalysis.PatAna_cff')
+process.load('CmsHi.JetAnalysis.PatAna_MC_cff')
 process.load('CmsHi.JetAnalysis.JetAnalyzers_MC_cff')
 process.load('CmsHi.JetAnalysis.TrkAnalyzers_MC_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
@@ -152,29 +162,27 @@ process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 #process.hiEvtAnalyzer.doMC = cms.bool(True)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 
-process.heavyIon.generators =  cms.vstring('hiSignal')
+process.anaTrack.doSimTrack = False
+process.pixelTrack.doSimTrack = False
+process.mergedTrack.doSimTrack = False
+ 
+genTag="hiSignal"
+process.heavyIon.generators =  cms.vstring(genTag)
 process.hiGenParticles.srcVector = cms.vstring('hiSignal')
-process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu2PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu3PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu4PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu5PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
-process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
+process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu2PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu3PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu4PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu5PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 
-process.multiPhotonAnalyzer.GenEventScale = cms.InputTag("hiSignal")
-process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag("hiSignal")
+process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
+process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 
-
-process.mergedTrack = process.pixelTrack.clone(trackSrc = cms.InputTag("hiMergedTracks"), fillSimTrack = cms.untracked.bool(True))
-process.anaTrack.fillSimTrack = False
-
-process.anaTrack.doSimTrack = False
-process.pixelTrack.doSimTrack = False
-process.mergedTrack.doSimTrack = False
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
@@ -186,25 +194,9 @@ process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
 
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
-
-process.hiTracks = cms.EDFilter("TrackSelector",
-                                                 src = cms.InputTag("hiGeneralCaloMatchedTracks"),
-                                                 cut = cms.string(
-    'quality("' + hiTrackQuality+  '")')
-                                                 )
-
-process.load('Appeltel.PixelTracksRun2010.HiLowPtPixelTracksFromReco_cff')
-process.load('Appeltel.PixelTracksRun2010.HiMultipleMergedTracks_cff')
-process.hiMergedTracks = process.hiGoodMergedTracks.clone(
-    TrackProducer1  = "hiTracks",
-    TrackProducer2  = "hiConformalPixelTracks")
-
-process.particleFlowTmp.postMuonCleaning = False
-process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
+process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
 
 #process.load("edwenger.HiTrkEffAnalyzer.hitrkEffAnalyzer_cff")
-
-
 
 process.cutsTPForFak.tracks = cms.untracked.InputTag('TrackingParticles')
 
@@ -213,23 +205,7 @@ process.cutsTPForFak.tracks = cms.untracked.InputTag('TrackingParticles')
 ###########################################
 # Here it is after including b-tagging -Matt
 
-process.rechits = cms.Sequence(process.siPixelRecHits * process.siStripMatchedRecHits)
-process.hiTrackReco = cms.Sequence(process.hiTracks*process.hiMergedTracks)
-
-# fixed necessary for muons in HI -Matt
-process.particleFlowBlock.RecMuons = 'muons'
-process.particleFlowTmp.postMuonCleaning = False
-# should be set elsewhere, but just to make double sure...
-process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
-# seed PF with high purity tracks only
-process.pfTrack.UseQuality = True 
 process.pfTrack.TrackQuality = cms.string(hiTrackQuality)
-
-process.pfTrack.GsfTracksInEvents = cms.bool(False)
-process.HiParticleFlowReco.remove(process.electronsWithPresel)
-process.HiParticleFlowReco.remove(process.electronsCiCLoose)
-process.particleFlowTmp.usePFElectrons = cms.bool(False)
-process.particleFlowTmp.useEGammaElectrons = cms.bool(False)         
 
 process.reco_extra =  cms.Path(
     process.hiTrackReco
@@ -428,7 +404,8 @@ process.ana_step          = cms.Path( process.genpana +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
 #                                      process.randomCones +
-                                      process.hltMuTree
+                                      process.hltMuTree +
+                                      process.HiForest
                                       )
 
 
@@ -455,24 +432,7 @@ process.pAna = cms.EndPath(process.skimanalysis)
 process.reco_extra*=process.L1Extra
 
 
-process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
-  
-process.rechitanalyzer.HBHETreePtMin = cms.untracked.double(15)
-process.rechitanalyzer.HFTreePtMin = cms.untracked.double(15)
-process.rechitanalyzer.EBTreePtMin = cms.untracked.double(15)
-process.rechitanalyzer.EETreePtMin = cms.untracked.double(15)
-process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(15)
-process.rechitanalyzer.doHF = cms.untracked.bool(True)
-
-process.pfTowers = process.rechitanalyzer.clone(
-    doEcal  = cms.untracked.bool(False),
-    doHcal  = cms.untracked.bool(False),
-    hasVtx  = cms.untracked.bool(False),
-    doFastJet = cms.untracked.bool(False),
-    towersSrc = cms.untracked.InputTag("PFTowers"),
-    TowerTreePtMin = cms.untracked.double(-99)
-    )
-
+process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi') 
 process.rechitAna = cms.Path(process.rechitanalyzer+process.pfTowers)
 
 ########### random number seed
@@ -485,29 +445,3 @@ process.rechitAna = cms.Path(process.rechitanalyzer+process.pfTowers)
 #                               fileName = cms.untracked.string("output.root")
 #                               )
 #process.save = cms.EndPath(process.out)
-
-
-process.ak1PFJets.jetPtMin = 1.0
-process.ak2PFJets.jetPtMin = 1.0
-process.ak3PFJets.jetPtMin = 1.0
-process.ak4PFJets.jetPtMin = 1.0
-process.ak5PFJets.jetPtMin = 1.0
-process.ak6PFJets.jetPtMin = 1.0
-process.ak1CaloJets.jetPtMin = 1.0
-process.ak2CaloJets.jetPtMin = 1.0
-process.ak3CaloJets.jetPtMin = 1.0
-process.ak4CaloJets.jetPtMin = 1.0
-process.ak5CaloJets.jetPtMin = 1.0
-process.ak6CaloJets.jetPtMin = 1.0
-
-
-process.icPu5clean.ptCut = 0
-process.ak1clean.ptCut = 0
-process.ak2clean.ptCut = 0
-process.ak3clean.ptCut = 0
-process.ak4clean.ptCut = 0
-process.ak5clean.ptCut = 0
-process.ak6clean.ptCut = 0
-
-
-

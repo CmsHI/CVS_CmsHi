@@ -14,7 +14,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
 ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_data15.root'
+ivars.outputFile = './forest_v16_data16.root'
 
 ivars.parseArguments()
 
@@ -31,7 +31,7 @@ process.options = cms.untracked.PSet(
 hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
-doElectrons = True
+doElectrons = False
 doRegitForBjets = False
 
 
@@ -57,7 +57,8 @@ process.source = cms.Source("PoolSource",
 # DATA EMULATION
 process.source.inputCommands = cms.untracked.vstring("keep *",
                                                      "drop *_hiSignal*_*_*",
-                                                     "drop *_*Gen*_*_*",
+                                                     "drop *_*GenJet*_*_*",
+                                                     "drop *_*GenPar*_*_*",
                                                      "drop *_gen*_*_*"
                                                      )
 process.source.dropDescendantsOfDroppedBranches=cms.untracked.bool(False)
@@ -179,11 +180,6 @@ process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults:
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
-
-process.HiGenParticleAna = cms.EDAnalyzer("HiGenAnalyzer")
-process.HiGenParticleAna.src= cms.untracked.InputTag("hiGenParticles")
-process.HiGenParticleAna.chargedOnly = cms.untracked.bool(False)
-process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
 
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
