@@ -13,7 +13,7 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
-ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Hydjet1.8/Z2/HydjetMB_corrVertexDistr/tracking/hydjetDefault_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_1157.root"
+ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Hydjet1.8/Z2/HydjetMB_corrVertexDistr/tracking/hydjetDefault_cfi_py_GEN_SIM_DIGI_L1_DIGI2RAW_HLT_1153.root"
 ivars.outputFile = './forest_v16_hydjet15.root'
 
 ivars.parseArguments()
@@ -148,6 +148,10 @@ process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
 process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
+process.anaTrack.doSimTrack = False
+process.pixelTrack.doSimTrack = False
+process.mergedTrack.doSimTrack = False
+
 process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("hiGeneralCaloMatchedTracks")
@@ -181,6 +185,27 @@ process.akPu3PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu4PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu5PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+
+process.akPu1CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu2CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu3CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu4CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu5CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.akPu6CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+
+process.ak1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak2PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak3PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak4PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak5PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+
+process.ak1CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak2CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak3CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak4CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak5CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
+process.ak6CaloJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
@@ -403,9 +428,7 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
-#                                      process.cutsTPForFak +
-#                                      process.cutsTPForEff +
-                                      process.trackeff_seq+
+#                                      process.trackeff_seq+
                                       process.anaTrack + process.pixelTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.rechitAna +
