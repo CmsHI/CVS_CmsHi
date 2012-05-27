@@ -125,32 +125,32 @@ def overrideGlobalTag(process):
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_AK1PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                              label = cms.untracked.string("AK1PF")
+                              label = cms.untracked.string("AK1PF_hiIterativeTracks")
                  ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_AK2PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("AK2PF")
+                 label = cms.untracked.string("AK2PF_hiIterativeTracks")
                  ),
           cms.PSet(record = cms.string("JetCorrectionsRecord"),
                    tag = cms.string("JetCorrectorParametersCollection_AK3PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                    connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                   label = cms.untracked.string("AK3PF")
+                   label = cms.untracked.string("AK3PF_hiIterativeTracks")
                    ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_AK4PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("AK4PF")
+                 label = cms.untracked.string("AK4PF_hiIterativeTracks")
                  ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_AK5PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("AK5PF")
+                 label = cms.untracked.string("AK5PF_hiIterativeTracks")
                  ),
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_AK6PFTowers_hiIterativeTracks_HI_2760GeV_11_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("AK6PF")
+                 label = cms.untracked.string("AK6PF_hiIterativeTracks")
                  ),
 
           cms.PSet(record = cms.string("JetCorrectionsRecord"),
