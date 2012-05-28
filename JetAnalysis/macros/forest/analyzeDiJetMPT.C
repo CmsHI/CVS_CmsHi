@@ -59,6 +59,7 @@ void analyzeDiJetMPT(
                       TString mixfname="output-data-Photon-v7_v30classes.root"
                       )
 {
+   bool doSkim=true;
    //bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
    bool checkDup=false;
    bool doMPT=true, saveAllCands=false;
@@ -71,7 +72,6 @@ void analyzeDiJetMPT(
    double cutjetEta = 2;
    double cutPtTrk=0.5, cutEtaTrk = 2.4, cutPtPfCand=4;
    if (saveAllCands) cutPtPfCand=1;
-   float maxPixTrkPt =2.;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
 
@@ -116,6 +116,7 @@ void analyzeDiJetMPT(
       //pf4mpt.Init(tgj);  
 
       trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
+      trkmpt.etamax = 2.2;
       trkmpt.Init(tgj);
       
       genpSigmpt.chargedOnly = true;
@@ -208,7 +209,8 @@ void analyzeDiJetMPT(
 //      }
       evt.nJ = anajet->nref;
       evt.nT = c->track.nTrk;
-      evt.trig = (c->hlt.HLT_HIJet80_v1 > 0);
+      if (c->hasHltTree) evt.trig = (c->hlt.HLT_HIJet80_v1 > 0);
+      else evt.trig = true;
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       if (!c->hasSkimTree) evt.offlSel = (c->evt.hiNtracks>0 && c->evt.hiHFplus>=4 && c->evt.hiHFminus>=4);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
@@ -235,9 +237,6 @@ void analyzeDiJetMPT(
       evt.samplePtHat = samplePtHat;
 
       if (i%1000==0) cout <<i<<" / "<<c->GetEntries() << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " epbin: " << evtPlaneBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
-      if (dataSrcType==2&&!evt.trig) continue;
-      if (makeMixing==1&&!evt.offlSel) continue;
-//      if (dataSrcType==0&&makeMixing==2&&evt.evtPlane<-2) continue;
 
       // initialize
       int leadingIndex=-1,genLeadingIndex=-1;
@@ -257,9 +256,14 @@ void analyzeDiJetMPT(
       //
       // Skim
       //
-      if (dataSrcType==1&&!evt.anaEvtSel) continue;
-      if (dataSrcType==0&&!evt.offlSel) continue;
-      if (gj.pt1<100) continue;
+//      if (dataSrcType==0&&makeMixing==2&&evt.evtPlane<-2) continue;
+      if (dataSrcType==2&&!evt.trig) continue;
+      if (makeMixing==1&&!evt.offlSel) continue;
+      if (doSkim) {
+         if (dataSrcType==1&&!evt.anaEvtSel) continue;
+         if (dataSrcType==0&&!evt.offlSel) continue;
+         if (gj.pt1<120) continue;
+      }
       
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
@@ -407,6 +411,7 @@ void analyzeDiJetMPT(
       double trkcorr[4];
       gj.nTrk=0;
       Tracks * anaTrks[2] = {&(c->track),&(c->pixtrack)};
+      float maxPixTrkPt =2.;
       // Full Tracks, Pixel Tracks
       for (int iset=0; iset<2; ++iset) {
          for (int it=0; it<anaTrks[iset]->nTrk; ++it) {
@@ -428,7 +433,7 @@ void analyzeDiJetMPT(
                if (anaTrks[iset]->trkPt[it] < maxPixTrkPt) continue;
                if (!anaTrks[iset]->trkQual[it]) continue;
                if (onlyTrkAlgo4&&trkAlgo!=4) continue;
-               if (onlyTrkHP&&!trkHP) continue;
+//                if (onlyTrkHP&&!trkHP) continue;
             }
             // Pixel Track Selection
             if (iset==1 && anaTrks[iset]->trkPt[it] >= maxPixTrkPt) continue;
