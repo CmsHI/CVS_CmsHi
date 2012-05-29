@@ -58,8 +58,10 @@ cvs co -r HiForest_V02_00 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel
 
 #ecal requires some code from the photon analyzer, 'rm' commands are to truncate the endless chain of packages obviously, 
 
-this should be cleaned up
+# Top Level Forest cfg
+cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 
+#this should be cleaned up
 # need to fix this
 #Index: python/HiIsolationCommonParameters_cff.py
 #===================================================================
