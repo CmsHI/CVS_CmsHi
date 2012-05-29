@@ -365,14 +365,6 @@ if doRegitForBjets:
     process.pat_step.replace(process.akPu3PFpatSequence,process.akPu3PFpatSequence_withBtagging)
 # Note that for data you need: akPu3PFpatSequence_withBtagging_data
     
-process.pat_step.remove(process.interestingTrackEcalDetIds)
-process.photonMatch.matched = cms.InputTag("hiGenParticles")
-#process.pat_step.remove(process.photonMatch)
-#+ process.patPhotons)
-
-process.patPhotons.addPhotonID = cms.bool(False)
-#process.makeHeavyIonPhotons)
-process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)

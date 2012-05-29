@@ -1,7 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
-# Pat Jets
+# Pat 
 from PhysicsTools.PatAlgos.patHeavyIonSequences_cff import *
+
+
+
+# Photons
+
+makeHeavyIonPhotons.remove(interestingTrackEcalDetIds)
+photonMatch.matched = cms.InputTag("hiGenParticles")
+
+patPhotons.addPhotonID = cms.bool(False)
+makeHeavyIonPhotons *= selectedPatPhotons
+
+
+# Jets
+
+
 patJets.jetSource  = cms.InputTag("iterativeConePu5CaloJets")
 patJets.addBTagInfo         = False
 patJets.addTagInfos         = False
@@ -19,11 +34,6 @@ patJets.embedCaloTowers	    = False
 
 patJetCorrFactors.useNPV = False
 # full reco
-icPu5corr = patJetCorrFactors.clone(
-  src = cms.InputTag("iterativeConePu5CaloJets"),
-  levels = cms.vstring('L2Relative','L3Absolute'),
-  payload = cms.string('IC5Calo_HI')
-  )
 
 #icPu5patJets = patJets.clone(
 #  jetSource = cms.InputTag("iterativeConePu5CaloJets"),
@@ -31,6 +41,9 @@ icPu5corr = patJetCorrFactors.clone(
 #  genPartonMatch = cms.InputTag("icPu5parton"),
 #  jetCorrFactorsSource = cms.VInputTag(cms.InputTag("icPu5corr"))
 #  )
+icPu5corr    = patJetCorrFactors.clone(src      = cms.InputTag("iterativeConePu5CaloJets"),
+                                       levels   = cms.vstring('L2Relative','L3Absolute'),
+                                       payload  = cms.string('IC5Calo_2760GeV'))
 
 akPu5PFcorr = icPu5corr.clone(
   src = cms.InputTag("akPu5PFJets"),
@@ -216,9 +229,7 @@ icPu5JetBtagging = cms.Sequence(icPu5JetBtaggingIP
 
 
 #----------------------
-icPu5corr    = patJetCorrFactors.clone(src      = cms.InputTag("iterativeConePu5CaloJets"),
-                                                       levels   = cms.vstring('L2Relative','L3Absolute'),
-                                                       payload  = cms.string('IC5Calo_HI'))
+
 icPu5clean   = heavyIonCleanedGenJets.clone(src = cms.InputTag('iterativeCone5HiGenJets')) # cleans the jets, but NOT the partons
 icPu5match   = patJetGenJetMatch.clone(src      = cms.InputTag("iterativeConePu5CaloJets"),
                                                        matched  = cms.InputTag("icPu5clean"))

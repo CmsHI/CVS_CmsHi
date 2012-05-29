@@ -1,6 +1,11 @@
 
 from CmsHi.JetAnalysis.PatAna_MC_cff import *
 
+makeHeavyIonPhotons.remove(photonMatch)
+
+patPhotons.addGenMatch = False
+
+
 icPu5patJets.addGenJetMatch = False
 icPu5patJets.addGenPartonMatch = False
 
@@ -116,27 +121,27 @@ icPu5patSequence.remove(icPu5match)
 icPu5patSequence.remove(icPu5parton)
 
 akPu1PFpatSequence.remove(ak1clean)
-akPu1PFpatSequence.remove(akPu1Calomatch)
+akPu1PFpatSequence.remove(akPu1PFmatch)
 akPu1PFpatSequence.remove(akPu1PFparton)
 
 akPu2PFpatSequence.remove(ak2clean)
-akPu2PFpatSequence.remove(akPu2Calomatch)
+akPu2PFpatSequence.remove(akPu2PFmatch)
 akPu2PFpatSequence.remove(akPu2PFparton)
 
 akPu3PFpatSequence.remove(ak3clean)
-akPu3PFpatSequence.remove(akPu3Calomatch)
+akPu3PFpatSequence.remove(akPu3PFmatch)
 akPu3PFpatSequence.remove(akPu3PFparton)
 
 akPu4PFpatSequence.remove(ak4clean)
-akPu4PFpatSequence.remove(akPu4Calomatch)
+akPu4PFpatSequence.remove(akPu4PFmatch)
 akPu4PFpatSequence.remove(akPu4PFparton)
 
 akPu5PFpatSequence.remove(ak5clean)
-akPu5PFpatSequence.remove(akPu5Calomatch)
+akPu5PFpatSequence.remove(akPu5PFmatch)
 akPu5PFpatSequence.remove(akPu5PFparton)
 
 akPu6PFpatSequence.remove(ak6clean)
-akPu6PFpatSequence.remove(akPu6Calomatch)
+akPu6PFpatSequence.remove(akPu6PFmatch)
 akPu6PFpatSequence.remove(akPu6PFparton)
 
 ak1CalopatSequence.remove(ak1clean)
@@ -165,25 +170,25 @@ ak6CalopatSequence.remove(ak6Caloparton)
 
 
 ak1PFpatSequence.remove(ak1clean)
-ak1PFpatSequence.remove(ak1Calomatch)
+ak1PFpatSequence.remove(ak1PFmatch)
 ak1PFpatSequence.remove(ak1PFparton)
 
 ak2PFpatSequence.remove(ak2clean)
-ak2PFpatSequence.remove(ak2Calomatch)
+ak2PFpatSequence.remove(ak2PFmatch)
 ak2PFpatSequence.remove(ak2PFparton)
 
 ak3PFpatSequence.remove(ak3clean)
-ak3PFpatSequence.remove(ak3Calomatch)
+ak3PFpatSequence.remove(ak3PFmatch)
 ak3PFpatSequence.remove(ak3PFparton)
 
 ak4PFpatSequence.remove(ak4clean)
-ak4PFpatSequence.remove(ak4Calomatch)
+ak4PFpatSequence.remove(ak4PFmatch)
 ak4PFpatSequence.remove(ak4PFparton)
 
 ak5PFpatSequence.remove(ak5clean)
-ak5PFpatSequence.remove(ak5Calomatch)
+ak5PFpatSequence.remove(ak5PFmatch)
 ak5PFpatSequence.remove(ak5PFparton)
 
 ak6PFpatSequence.remove(ak6clean)
-ak6PFpatSequence.remove(ak6Calomatch)
+ak6PFpatSequence.remove(ak6PFmatch)
 ak6PFpatSequence.remove(ak6PFparton)
