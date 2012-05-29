@@ -119,8 +119,83 @@ def overrideGlobalTag(process):
                                           connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
                                           label = cms.untracked.string("HFtowersHydjet_Drum")
                                           ),
-        
 
+        #==================== JET CORRECTIONS
+
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+#                 tag = cms.string("JetCorrectorParametersCollection_HI_PFTowers_hiGoodTightTracks_PythiaZ2_442p5_AK1PF"),
+#                 connect = cms.untracked.string("sqlite_file:JEC_HI2760_CMSSW442pa9_2012.db"),
+#                 connect = cms.untracked.string("sqlite_file:JEC_HI2760_CMSSW501_2012.db"),
+                 
+                 tag = cms.string("JetCorrectorParametersCollection_AK1PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"), 
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+
+
+                              label = cms.untracked.string("AK1PF_hiIterativeTracks")
+                 ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_AK2PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                 label = cms.untracked.string("AK2PF_hiIterativeTracks")
+                 ),
+          cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                   tag = cms.string("JetCorrectorParametersCollection_AK3PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"),
+                   connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                   label = cms.untracked.string("AK3PF_hiIterativeTracks")
+                   ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_AK4PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                 label = cms.untracked.string("AK4PF_hiIterativeTracks")
+                 ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_AK5PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                 label = cms.untracked.string("AK5PF_hiIterativeTracks")
+                 ),
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_AK6PFTowers_hiIterativeTracks_HI_2760GeV_v3_offline"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                 label = cms.untracked.string("AK6PF_hiIterativeTracks")
+                 ),
+
+          cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                    tag = cms.string("JetCorrectorParametersCollection_AK1Calo_HI_2760GeV_v3_offline"),
+                                    connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                                 label = cms.untracked.string("AK1Calo_HI")
+                                    ),
+                cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                          tag = cms.string("JetCorrectorParametersCollection_AK2Calo_HI_2760GeV_v3_offline"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("AK2Calo_HI")
+                                          ),
+                  cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                              tag = cms.string("JetCorrectorParametersCollection_AK3Calo_HI_2760GeV_v3_offline"),
+                                              connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                              label = cms.untracked.string("AK3Calo_HI")
+                                              ),
+                cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                          tag = cms.string("JetCorrectorParametersCollection_AK4Calo_HI_2760GeV_v3_offline"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("AK4Calo_HI")
+                                          ),
+                cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                          tag = cms.string("JetCorrectorParametersCollection_AK5Calo_HI_2760GeV_v3_offline"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("AK5Calo_HI")
+                                          ),
+                cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                                          tag = cms.string("JetCorrectorParametersCollection_AK6Calo_HI_2760GeV_v3_offline"),
+                                          connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                                          label = cms.untracked.string("AK6Calo_HI")
+                                          ),
+        
+        cms.PSet(record = cms.string("JetCorrectionsRecord"),
+                 tag = cms.string("JetCorrectorParametersCollection_IC5Calo_2760GeV_v0_offline"),
+                 connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
+                 label = cms.untracked.string("IC5Calo_HI")
+                 ),
+        
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
 # NOTHING
         ])
