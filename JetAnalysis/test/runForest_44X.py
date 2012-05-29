@@ -12,10 +12,12 @@ ivars.register ('randomNumber',
 ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v0//cd475ecb0c871a17cabcfbdd64b9e8dc/reco_1_1_Ls9.root"
-ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v0//cd475ecb0c871a17cabcfbdd64b9e8dc/reco_2_1_xux.root"
+#ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v0//cd475ecb0c871a17cabcfbdd64b9e8dc/reco_2_1_xux.root"
+ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v1/d358bdc6c19493517e3e245a7413a024/reco_100_1_YqR.root"
 
 #ivars.inputFiles = "file:./reco_test16.root"
 ivars.outputFile = './forest_data_00.root'
+ivars.maxEvents = -1
 
 ivars.parseArguments()
 
@@ -25,7 +27,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process('hiForestAna2011')
 
 process.options = cms.untracked.PSet(
-   # wantSummary = cms.untracked.bool(True)
+   wantSummary = cms.untracked.bool(True)
 )
 
 
@@ -90,9 +92,9 @@ process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
-process.GlobalTag.globaltag = 'GR_P_V27::All'
+process.GlobalTag.globaltag = 'GR_P_V27A::All'
 
-process.Timing = cms.Service("Timing")
+# process.Timing = cms.Service("Timing")
 
 # MC Global Tag 44x 
 #process.GlobalTag.globaltag = 'STARTHI44_V7::All'
@@ -102,10 +104,8 @@ from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 process.HeavyIonGlobalParameters = cms.PSet(
 	centralityVariable = cms.string("HFtowers"),
-	nonDefaultGlauberModel = cms.string("Hydjet_Drum"),
 	centralitySrc = cms.InputTag("hiCentrality")
 	)
-
 process.hiCentrality.pixelBarrelOnly = False
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
@@ -383,10 +383,8 @@ process.ana_step          = cms.Path(
                                       )
 
 
-process.phltJetHI = cms.Path( process.hltJetHI )
 process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
 process.pHBHENoiseFilter = cms.Path( process.HBHENoiseFilter )
-process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 #process.ppreTrgTest = cms.Path(process.preTrgTest )
 #process.pminBiasBscFilter = cms.Path(process.minBiasBscFilter )
 #process.ppostTrgTest = cms.Path(process.postTrgTest )
