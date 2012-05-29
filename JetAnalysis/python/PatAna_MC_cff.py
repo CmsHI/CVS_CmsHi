@@ -218,7 +218,7 @@ icPu5JetBtagging = cms.Sequence(icPu5JetBtaggingIP
 #----------------------
 icPu5corr    = patJetCorrFactors.clone(src      = cms.InputTag("iterativeConePu5CaloJets"),
                                                        levels   = cms.vstring('L2Relative','L3Absolute'),
-                                                       payload  = cms.string('IC5Calo_2760GeV'))
+                                                       payload  = cms.string('IC5Calo_HI'))
 icPu5clean   = heavyIonCleanedGenJets.clone(src = cms.InputTag('iterativeCone5HiGenJets')) # cleans the jets, but NOT the partons
 icPu5match   = patJetGenJetMatch.clone(src      = cms.InputTag("iterativeConePu5CaloJets"),
                                                        matched  = cms.InputTag("icPu5clean"))

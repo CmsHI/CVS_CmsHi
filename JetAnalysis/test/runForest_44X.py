@@ -11,10 +11,11 @@ ivars.register ('randomNumber',
 
 ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
-#ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
+#ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v0//cd475ecb0c871a17cabcfbdd64b9e8dc/reco_1_1_Ls9.root"
+ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankma/HIHighPt/promptskim-hihighpt-hltjet80-pt90-v0//cd475ecb0c871a17cabcfbdd64b9e8dc/reco_2_1_xux.root"
 
-ivars.inputFiles = "file:./reco_test16.root"
-ivars.outputFile = './forest_v16_data16.root'
+#ivars.inputFiles = "file:./reco_test16.root"
+ivars.outputFile = './forest_data_00.root'
 
 ivars.parseArguments()
 
@@ -89,12 +90,12 @@ process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
-#process.GlobalTag.globaltag = 'GR_P_V27::All'
+process.GlobalTag.globaltag = 'GR_P_V27::All'
 
 process.Timing = cms.Service("Timing")
 
 # MC Global Tag 44x 
-process.GlobalTag.globaltag = 'STARTHI44_V7::All'
+#process.GlobalTag.globaltag = 'STARTHI44_V7::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
