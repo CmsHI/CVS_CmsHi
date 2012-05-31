@@ -398,7 +398,7 @@ setPhotonObject(process,"cleanPhotons")
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
-process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","HLT")
 process.hltAna = cms.Path(process.hltanalysis)
 process.pAna = cms.EndPath(process.skimanalysis)
 process.reco_extra*=process.L1Extra
