@@ -115,7 +115,7 @@ public:
       }      
    }
    
-   void InputEvent(int n, float * pt, float * eta, float * phi, float * wt=0, int * pfid=0, int * pstat=0, int * pch=0, int * psube=0) {
+   void InputEvent(int n, float * pt, float * eta, float * phi, float * wt=0, int * pfid=0, int * psube=0) {
 //      cout << "mpt input size: " << n << endl;
       cands.n = 0;
       for (int i=0; i<n; ++i) {
@@ -124,14 +124,6 @@ public:
          if (fabs(eta[i])>etamax) continue;
          if (selPFId&&pfid) {
             if (pfid[i]!=selPFId) continue;
-         }
-         if (pstat) {
-//            cout << "stat: " << pstat[i] << endl;
-            if (pstat[i]!=1) continue;
-         }
-         if (chargedOnly&&pch) {
-//            cout << "charge: " << pch[i] << endl;
-            if (pch[i]==0) continue;
          }
          if (psube) {
             if (psube[i]!=0) continue;
@@ -175,11 +167,15 @@ public:
             if (dphi1>m.dRCone&&dphipi1>m.dRCone) accept=true;
          }
          if (accept) {
-//            cout << "accepted mpt cand pt|eta|phi: " << candPt << "|" << candEta << "|" << candPhi << endl;
-//            if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
-//            cout << m.name << " pt: " << candPt << " pt1: " << gpt << " dr1: " << drG << " dr2: " << drJ << " dphi1: " << dphi1 << " dphipi1: " << dphipi1 << endl;
-            float ptx = candPt * cos(deltaPhi(candPhi,gphi));
-            float pty = candPt * sin(deltaPhi(candPhi,gphi));
+            float ptx = candPt * cos(candPhi-gphi);
+            float pty = candPt * sin(candPhi-gphi);
+
+//          if (m.selType==0) {
+//             cout << "accepted mpt cand pt|eta|phi: " << candPt << "|" << candEta << "|" << candPhi << ", ptx: " << ptx << endl;
+//             if (drG<0.01) cout << m.name << " pt: " << candPt << " drG: " << drG << " drJ: " << drJ << " photonPt: " << gpt << endl;
+//             cout << m.name << " pt: " << candPt << " pt1: " << gpt << " dr1: " << drG << " dr2: " << drJ << " dphi1: " << dphi1 << " dphipi1: " << dphipi1 << endl;
+//             }
+
             if (m.corrType>=0) {
                ptx*=cands.weight[it];
                pty*=cands.weight[it];

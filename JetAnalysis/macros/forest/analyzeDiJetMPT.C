@@ -70,7 +70,9 @@ void analyzeDiJetMPT(
    mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    double cutjetPt = 30;
    double cutjetEta = 2;
-   double cutPtTrk=0.5, cutEtaTrk = 2.4, cutPtPfCand=4;
+   double cutPtTrk=0.5;
+   double cutEtaTrk = 2.2; // 2.4
+   double cutPtPfCand=4;
    if (saveAllCands) cutPtPfCand=1;
    // Centrality reweiting
    CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
@@ -116,12 +118,9 @@ void analyzeDiJetMPT(
       //pf4mpt.Init(tgj);  
 
       trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
-      trkmpt.etamax = 2.2;
       trkmpt.Init(tgj);
       
-      genpSigmpt.chargedOnly = true;
       genpSigmpt.Init(tgj);
-      genpAllmpt.chargedOnly = true;
       genpAllmpt.Init(tgj);
    }
    
@@ -486,6 +485,7 @@ void analyzeDiJetMPT(
       for (int ip=0; ip<c->genparticle.mult; ++ip) {
          if (c->genparticle.pt[ip] < cutPtTrk) continue;
          if (fabs(c->genparticle.eta[ip]) > cutEtaTrk) continue;
+         if (abs(int(c->genparticle.chg[ip])) ==0 ) continue;
          gj.genpPt[gj.nGenp] = c->genparticle.pt[ip];
          gj.genpEta[gj.nGenp] = c->genparticle.eta[ip];
          gj.genpPhi[gj.nGenp] = c->genparticle.phi[ip];
@@ -505,9 +505,9 @@ void analyzeDiJetMPT(
          trkmpt.InputEvent(gj.nTrk,gj.trkPt,gj.trkEta,gj.trkPhi,gj.trkWt);
          trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
          
-         genpSigmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,0,c->genparticle.chg,c->genparticle.sube);
+         genpSigmpt.InputEvent(gj.nGenp,gj.genpPt,gj.genpEta,gj.genpPhi,0,0, gj.genpSube);
          genpSigmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-         genpAllmpt.InputEvent(c->genparticle.mult,c->genparticle.pt,c->genparticle.eta,c->genparticle.phi,0,0,0,c->genparticle.chg);
+         genpAllmpt.InputEvent(gj.nGenp,gj.genpPt,gj.genpEta,gj.genpPhi);
          genpAllmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
         }
       
