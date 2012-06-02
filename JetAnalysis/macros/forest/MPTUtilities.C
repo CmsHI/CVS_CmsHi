@@ -17,6 +17,16 @@ public:
    float mpty;
    float mptx_pt[nptrange];
    float mpty_pt[nptrange];
+
+   float mptx1;
+   float mpty1;
+   float mptx1_pt[nptrange];
+   float mpty1_pt[nptrange];
+
+   float mptx2;
+   float mpty2;
+   float mptx2_pt[nptrange];
+   float mpty2_pt[nptrange];
    
    MPT(TString s, int t=0, float dr=0.8, int c=0) :
    name(s), selType(t), dRCone(dr), corrType(c) {
@@ -25,8 +35,12 @@ public:
    }
    void clear() {
       mptx = 0; mpty = 0;
+      mptx1 = 0; mpty1 = 0;
+      mptx2 = 0; mpty2 = 0;
       for (int i=0; i<nptrange; ++i) {
          mptx_pt[i] =0; mpty_pt[i] = 0;
+         mptx1_pt[i] =0; mpty1_pt[i] = 0;
+         mptx2_pt[i] =0; mpty2_pt[i] = 0;
       }      
    }
 };
@@ -182,10 +196,19 @@ public:
             }
             m.mptx += ptx;
             m.mpty += pty;
+            if (ptx>=0) m.mptx1 += ptx;
+            else m.mptx2 += -ptx;
+            if (pty>=0) m.mpty1 += ptx;
+            else m.mpty2 += -pty;
+            
             for (int k=0; k<nptrange; ++k) {
                if (candPt> ptranges[k] && candPt<ptranges[k+1]) {
                   m.mptx_pt[k]+= ptx;
                   m.mpty_pt[k]+= pty;
+                  if (ptx>=0) m.mptx1_pt[k] += ptx;
+                  else m.mptx2_pt[k] += -ptx;
+                  if (pty>=0) m.mpty1_pt[k] += ptx;
+                  else m.mpty2_pt[k] += -pty;
                }
             }
          }
@@ -205,13 +228,24 @@ public:
    }
    
    void SetBranches(TTree * t, MPT & m) {
-      t->Branch("mptx"+m.name,&m.mptx,"mptx"+m.name+"/F");
-      t->Branch("mpty"+m.name,&m.mpty,"mpty"+m.name+"/F");
       TString sbrxpt = Form("mptx%s[%d]_pt/F",m.name.Data(),nptrange);
       TString sbrypt = Form("mpty%s[%d]_pt/F",m.name.Data(),nptrange);
       //cout << sbrxpt << ", " << sbrypt << endl;
+
+      t->Branch("mptx"+m.name,&m.mptx,"mptx"+m.name+"/F");
+      t->Branch("mpty"+m.name,&m.mpty,"mpty"+m.name+"/F");
       t->Branch("mptx"+m.name+"_pt",m.mptx_pt,sbrxpt);
       t->Branch("mpty"+m.name+"_pt",m.mpty_pt,sbrypt);
+
+      t->Branch("mptx1"+m.name,&m.mptx1,"mptx1"+m.name+"/F");
+      t->Branch("mpty1"+m.name,&m.mpty1,"mpty1"+m.name+"/F");
+      t->Branch("mptx1"+m.name+"_pt",m.mptx1_pt,sbrxpt);
+      t->Branch("mpty1"+m.name+"_pt",m.mpty1_pt,sbrypt);
+
+      t->Branch("mptx2"+m.name,&m.mptx2,"mptx2"+m.name+"/F");
+      t->Branch("mpty2"+m.name,&m.mpty2,"mpty2"+m.name+"/F");
+      t->Branch("mptx2"+m.name+"_pt",m.mptx2_pt,sbrxpt);
+      t->Branch("mpty2"+m.name+"_pt",m.mpty2_pt,sbrypt);
    }
 };
 #endif

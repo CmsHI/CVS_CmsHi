@@ -78,6 +78,9 @@ public:
       genjetpt1=-99; genjeteta1=-99; genjetphi1=-99; genjetpt2=-99; genjeteta2=-99; genjetphi2;
       nTrk=0; nJet=0; nGenJet=0; nPf=0; nGenp=0;
    }
+   void clearParticles() {
+      nTrk=0; nPf=0; nGenp=0;
+   }
 };
 
 void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {

@@ -64,6 +64,7 @@ void analyzeDiJetMPT(
    bool checkDup=false;
    bool doMPT=true, saveAllCands=false;
    bool onlyTrkAlgo4=true, onlyTrkHP=true;
+   bool saveParticles=false;
    outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
    datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
@@ -512,6 +513,7 @@ void analyzeDiJetMPT(
         }
       
       // All done
+      if (!saveParticles) gj.clearParticles();
       tgj->Fill();
       if (makeMixing==1) {
          // mixing classes
