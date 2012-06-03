@@ -280,6 +280,8 @@ process.isoDR41.track = trackTag
 process.isoDR42.track = trackTag
 process.isoDR43.track = trackTag
 process.isoDR44.track = trackTag
+process.gamIsoDepositTk.inputTrackCollection = trackTag
+
 
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
