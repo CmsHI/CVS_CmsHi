@@ -52,8 +52,9 @@ process.HiForest.inputLines = cms.vstring("HiForest V2",
 #####################################################################################
 
 process.source = cms.Source("PoolSource",
- duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-    fileNames = cms.untracked.vstring(ivars.inputFiles))
+                            skipEvents = cms.untracked.uint32(70),
+                            duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
+                            fileNames = cms.untracked.vstring(ivars.inputFiles))
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
@@ -175,6 +176,8 @@ process.cleanPhotons.primaryVertexProducer = vertexTag
 process.rechitanalyzer.vtxSrc = cms.untracked.InputTag(vertexTag)
 process.pfTowers.vtxSrc = cms.untracked.InputTag(vertexTag)
 
+process.pfTrackElec.PrimaryVertexLabel = vertexTag
+
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
 process.muonTree = process.hltMuTree.clone()
@@ -245,6 +248,38 @@ process.ak4CaloJetAnalyzer.trackTag = trackTag
 process.ak5CaloJetAnalyzer.trackTag = trackTag
 process.ak6CaloJetAnalyzer.trackTag = trackTag
 
+process.isoT11.track = trackTag
+process.isoT12.track = trackTag
+process.isoT13.track = trackTag
+process.isoT14.track = trackTag
+process.isoT21.track = trackTag
+process.isoT22.track = trackTag
+process.isoT23.track = trackTag
+process.isoT24.track = trackTag
+process.isoT31.track = trackTag
+process.isoT32.track = trackTag
+process.isoT33.track = trackTag
+process.isoT34.track = trackTag
+process.isoT41.track = trackTag
+process.isoT42.track = trackTag
+process.isoT43.track = trackTag
+process.isoT44.track = trackTag
+process.isoDR11.track = trackTag
+process.isoDR12.track = trackTag
+process.isoDR13.track = trackTag
+process.isoDR14.track = trackTag
+process.isoDR21.track = trackTag
+process.isoDR22.track = trackTag
+process.isoDR23.track = trackTag
+process.isoDR24.track = trackTag
+process.isoDR31.track = trackTag
+process.isoDR32.track = trackTag
+process.isoDR33.track = trackTag
+process.isoDR34.track = trackTag
+process.isoDR41.track = trackTag
+process.isoDR42.track = trackTag
+process.isoDR43.track = trackTag
+process.isoDR44.track = trackTag
 
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
