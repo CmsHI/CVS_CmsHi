@@ -52,7 +52,7 @@ process.HiForest.inputLines = cms.vstring("HiForest V2",
 #####################################################################################
 
 process.source = cms.Source("PoolSource",
-                            skipEvents = cms.untracked.uint32(70),
+#                            skipEvents = cms.untracked.uint32(70),
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(ivars.inputFiles))
 
@@ -281,7 +281,8 @@ process.isoDR42.track = trackTag
 process.isoDR43.track = trackTag
 process.isoDR44.track = trackTag
 process.gamIsoDepositTk.ExtractorPSet.inputTrackCollection = trackTag
-
+process.multiPhotonAnalyzer.TrackProducer = trackTag
+process.multiPhotonAnalyzer.VertexProducer = vertexTag
 
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
