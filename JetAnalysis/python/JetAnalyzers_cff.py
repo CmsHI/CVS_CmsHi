@@ -38,8 +38,8 @@ akPu3CaloJetAnalyzer = icPu5JetAnalyzer.clone(
     
     )
 
-icPu5JetAnalyzer.jetTag = cms.InputTag("iterativeConePu5CaloJets")
-ic5JetAnalyzer = icPu5JetAnalyzer.clone(jetTag = cms.InputTag("iterativeCone5CaloJets"),genjetTag = 'ak3HiGenJets',rParam = 0.5)
+icPu5JetAnalyzer.jetTag = cms.InputTag("icPu5patJets")
+#ic5JetAnalyzer = icPu5JetAnalyzer.clone(jetTag = cms.InputTag("ic5patJets"),genjetTag = 'ak3HiGenJets',rParam = 0.5)
 
 akPu1PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu1PFpatJets"),genjetTag = 'ak1HiGenJets',rParam = 0.1,matchTag = 'akPu1CalopatJets')
 akPu2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu2PFpatJets"),genjetTag = 'ak2HiGenJets',rParam = 0.2,matchTag = 'akPu2CalopatJets')

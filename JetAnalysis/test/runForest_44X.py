@@ -70,7 +70,7 @@ process.source.dropDescendantsOfDroppedBranches=cms.untracked.bool(False)
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(-1))
+            input = cms.untracked.int32(ivars.maxEvents))
 
 
 #####################################################################################
