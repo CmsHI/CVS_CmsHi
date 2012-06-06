@@ -5,8 +5,8 @@ hitrkEffAnalyzer_Basic = hitrkEffAnalyzer.clone(
        # evt
        neededCentBins = cms.untracked.vint32(0, 1, 3, 11, 19, 39),
           # simtrk selection
-          label_tp_fake = "cutsTPForFakPxl",
-          label_tp_effic = "cutsTPForEffPxl",
+          label_tp_fake = "cutsTPForFak",
+          label_tp_effic = "cutsTPForEff",
           # trk selection
           tracks = "hiSelectedTracks",
           useQaulityStr = True,
@@ -43,7 +43,7 @@ hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer_Basic.clone(
       jets = 'akPu3PFpatJets',
         )
 
-trackeff_seq = cms.Sequence( cutsTPForFakPxl * cutsTPForEffPxl *
+trackeff_seq = cms.Sequence( 
                                                hitrkEffAnalyzer_MergedSelected *
                                                hitrkEffAnalyzer_MergedGeneral *
                                                hitrkEffAnalyzer_MergedGeneralCalo

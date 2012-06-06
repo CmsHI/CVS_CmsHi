@@ -158,8 +158,7 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
-process.muonTree = process.hltMuTree.clone()
-process.muonTree.doGen = cms.untracked.bool(True)
+process.hltMuTree.doGen = cms.untracked.bool(True)
 
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
@@ -196,9 +195,6 @@ process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
 process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
 
-#process.load("edwenger.HiTrkEffAnalyzer.hitrkEffAnalyzer_cff")
-
-process.cutsTPForFak.tracks = cms.untracked.InputTag('TrackingParticles')
 
 #  Following is the reco before adding b-tagging -Matt
 
@@ -398,14 +394,13 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
-#                                      process.cutsTPForFak +
-#                                      process.cutsTPForEff +
+                                      process.cutsTPForFak +
+                                      process.cutsTPForEff +
                                       process.trackeff_seq+
                                       process.anaTrack + process.pixelTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.rechitAna +
                                       process.met * process.anaMET +
-				      process.muonTree +
 				      process.hiEvtAnalyzer +
 #                                      process.randomCones +
                                       process.hltMuTree +
