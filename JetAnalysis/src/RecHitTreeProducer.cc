@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.18 2011/11/20 15:45:10 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.19 2011/11/30 21:26:08 yilmaz Exp $
 //
 //
 
@@ -69,7 +69,7 @@
 
 using namespace std;
 
-#define MAXHITS 1000000
+#define MAXHITS 100000
 
 struct MyRecHit{
   int depth[MAXHITS];
