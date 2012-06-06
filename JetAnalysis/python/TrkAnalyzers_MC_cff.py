@@ -15,7 +15,6 @@ mergedTrack.doSimTrack = True
 mergedTrack.simTrackPtMin = 1
 mergedTrack.fillSimTrack = cms.untracked.bool(True)
 
-
 anaTrack.tpFakeSrc = cms.untracked.InputTag("cutsTPForFak")
 anaTrack.tpEffSrc = cms.untracked.InputTag("cutsTPForEff")
 pixelTrack.tpFakeSrc = cms.untracked.InputTag("cutsTPForFak")
@@ -25,6 +24,9 @@ anaTrack.tpEffSrc = cms.untracked.InputTag("cutsTPForEff")
 pixelTrack.tpFakeSrc = cms.untracked.InputTag("cutsTPForFak")
 pixelTrack.tpEffSrc = cms.untracked.InputTag("cutsTPForEff")
 
+
+cutsTPForFak.ptMin = 0.45
+cutsTPForEff.ptMin = 0.45
 
 
                                                                           
