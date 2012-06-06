@@ -155,6 +155,12 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
                                  VertexProducer = cms.untracked.string("hiSelectedVertex")
                                  )
 
+#########################
+# Track Analyzer
+#########################
+process.anaTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
+process.pixelTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
+process.mergedTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
 
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
@@ -397,7 +403,8 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.cutsTPForFak +
                                       process.cutsTPForEff +
                                       process.trackeff_seq+
-                                      process.anaTrack + process.pixelTrack + process.mergedTrack +
+#                                       process.anaTrack + process.pixelTrack + process.mergedTrack +
+                                      process.anaTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.rechitAna +
                                       process.met * process.anaMET +
