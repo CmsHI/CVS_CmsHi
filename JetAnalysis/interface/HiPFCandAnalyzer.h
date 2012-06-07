@@ -16,7 +16,7 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include <vector>
 
-const Int_t MAXPARTICLE = 100000;
+const Int_t MAXPARTICLE = 10000;
 //
 // DiJet ana Event Data Tree definition
 //
