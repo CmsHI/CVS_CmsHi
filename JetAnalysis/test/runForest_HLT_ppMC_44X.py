@@ -13,9 +13,9 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
-ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet30/reco_v8_v0_v8/set1_random10000_HydjetDrum_126.root"
-ivars.outputFile = './forest_pp0_test4.root'
- 
+ivars.inputFiles = "file:/net/hisrv0001/home/yetkin/hidsk0001/prod/test0525/reco_test16.root"
+ivars.outputFile = './forest_v16_hlt16.root'
+
 ivars.parseArguments()
 
 
@@ -160,6 +160,9 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
                                  VertexProducer = cms.untracked.string("hiSelectedVertex")
                                  )
 
+#########################
+# Track Analyzer
+#########################
 
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
@@ -171,10 +174,6 @@ process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 # Not working for the moment..
 #process.hiEvtAnalyzer.doMC = cms.bool(True)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
-
-process.anaTrack.doSimTrack = False
-process.pixelTrack.doSimTrack = False
-process.mergedTrack.doSimTrack = False
 
 genTag="hiSignal"
 process.heavyIon.generators =  cms.vstring(genTag)
@@ -189,10 +188,6 @@ process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
-
-process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
-process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
-
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
@@ -219,7 +214,7 @@ process.pfTrack.TrackQuality = cms.string(hiTrackQuality)
 
 process.reco_extra =  cms.Path(
     process.hiTrackReco
-#    +process.hiTrackDebug
+    +process.hiTrackDebug
     
     #        *process.muonRecoPbPb
     *process.HiParticleFlowLocalReco
@@ -408,10 +403,10 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
-#                                      process.cutsTPForFak +
-#                                      process.cutsTPForEff +
-#                                      process.trackeff_seq+
-                                      process.anaTrack + process.pixelTrack + process.mergedTrack +
+                                      process.cutsTPForFak +
+                                      process.cutsTPForEff +
+                                      process.trackeff_seq+
+                                      process.anaTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
                                       process.rechitAna +
                                       process.met * process.anaMET +
@@ -440,7 +435,7 @@ setPhotonObject(process,"cleanPhotons")
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
-process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
 process.hltAna = cms.EndPath(process.hltanalysis)
 process.reco_extra*=process.L1Extra
 

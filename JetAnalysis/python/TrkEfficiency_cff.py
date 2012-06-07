@@ -44,7 +44,7 @@ hitrkEffAnalyzer_akpu3pf = hitrkEffAnalyzer_Basic.clone(
         )
 
 trackeff_seq = cms.Sequence( 
-                                               hitrkEffAnalyzer_MergedSelected *
-                                               hitrkEffAnalyzer_MergedGeneral *
-                                               hitrkEffAnalyzer_MergedGeneralCalo
-                                            )
+    hitrkEffAnalyzer_MergedSelected *
+    hitrkEffAnalyzer_MergedGeneral *
+    hitrkEffAnalyzer_MergedGeneralCalo
+    )
