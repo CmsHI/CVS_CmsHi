@@ -42,13 +42,16 @@ void TriggerPrimitivesTree_single::Loop(int single_event,
 
   if(histo)
   {
-    original_map = new TH2I("original_map","Detector Map before subtraction",22,0,22,18,0,18);
-    subtracted_map = new TH2I("subtracted_map","Detector Map after subtraction",22,0,22,18,0,18);
+    stringstream maptit1, maptit2;
+    maptit1 << "Detector Map before subtraction, event #" << event;
+    maptit2 << "Detector Map after subtraction, event #" << event;
+    original_map = new TH2I("original_map",maptit1.str().c_str(),22,0,22,18,0,18);
+    subtracted_map = new TH2I("subtracted_map",maptit2.str().c_str(),22,0,22,18,0,18);
 
     stringstream boxplot_title1, boxplot_title2;
-    boxplot_title1 << "Region Et distribution for event #: " << event << " before subtraction";
+    boxplot_title1 << "Region Et distribution before subtraction, event #" << event;
     original_boxplot = new TH2I("boxplot",boxplot_title1.str().c_str(), 22,0,22,100,0,100);
-    boxplot_title2 << "Region Et distribution for event #: " << event << " after subtraction";
+    boxplot_title2 << "Region Et distribution after subtraction, event #" << event;
     subtracted_boxplot = new TH2I("boxplot",boxplot_title2.str().c_str(), 22,0,22,100,0,100);
   }
 
@@ -253,28 +256,28 @@ void TriggerPrimitivesTree_single::Loop(int single_event,
   
   qsort(head, 18*2*3, sizeof(jet), sort_func_jet);
 
-  print_jets(head, 18*2*3, threshold);
+  //print_jets(head, 18*2*3, threshold);
     
   if(histo)
   {
     TCanvas *c1 = new TCanvas();
-    original_map->SetXTitle("Eta");
-    original_map->SetYTitle("Phi");
+    original_map->SetXTitle("#eta");
+    original_map->SetYTitle("#phi");
     original_map->Draw("Lego2");
 
     TCanvas *c2 = new TCanvas();
-    subtracted_map->SetXTitle("Eta");
-    subtracted_map->SetYTitle("Phi");
+    subtracted_map->SetXTitle("#eta");
+    subtracted_map->SetYTitle("#phi");
     subtracted_map->Draw("Lego2");
 
     TCanvas *c3 = new TCanvas();
-    original_boxplot->SetXTitle("Eta");
-    original_boxplot->SetYTitle("Et");
+    original_boxplot->SetXTitle("#eta");
+    original_boxplot->SetYTitle("Compressed Et");
     original_boxplot->Draw("box");
 
     TCanvas *c4 = new TCanvas();
-    subtracted_boxplot->SetXTitle("Eta");
-    subtracted_boxplot->SetYTitle("Et");
+    subtracted_boxplot->SetXTitle("#eta");
+    subtracted_boxplot->SetYTitle("Compressed Et");
     subtracted_boxplot->Draw("box");
   }    
 }

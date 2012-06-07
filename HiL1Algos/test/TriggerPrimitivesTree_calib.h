@@ -13,10 +13,10 @@
 #include <TFile.h>
 
 //! include the other tree objects
-//#include "HLTMuTree.C"
-//#include "HiTree.C"
-//#include "HltTree.C"
-//#include "JetTree.C"
+#include "HLTMuTree.C"
+#include "HiTree.C"
+#include "HltTree.C"
+#include "JetTree.C"
 
 
 class TriggerPrimitivesTree_calib {
@@ -90,14 +90,14 @@ public :
   virtual Int_t    GetEntry(Long64_t entry);
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
-  virtual void     Loop(int total_events = 0);
+  virtual TH1D*    Loop(int total_events = 0, int cent_bin = 0);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);
   
   
   //! declare the other tree objects
-  //HltTree        *fhlt;   
-  //HiTree         *fhiinfo;
+  HltTree        *fhlt;   
+  HiTree         *fhiinfo;
   //JetTree        *fjet;
   //HLTMuTree      *fmu;
 
@@ -119,9 +119,10 @@ TriggerPrimitivesTree_calib::TriggerPrimitivesTree_calib(TFile *f)
     //tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
     
     }
+  
   TTree *tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
-  //fhlt = new HltTree::HltTree();
-  //fhiinfo = new HiTree::HiTree();
+  fhlt = new HltTree::HltTree((TTree*)gDirectory->Get("hltanalysis/HltTree"));
+  fhiinfo = new HiTree::HiTree((TTree*)gDirectory->Get("hiEvtAnalyzer/HiTree"));
   //fjet = new JetTree::JetTree();
   //fmu = new HLTMuTree::HLTMuTree();  
   

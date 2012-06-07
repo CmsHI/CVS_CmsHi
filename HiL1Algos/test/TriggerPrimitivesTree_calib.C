@@ -4,14 +4,32 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <iostream>
+#include <sstream>
 
-void TriggerPrimitivesTree_calib::Loop(int total_events)
+TH1D* TriggerPrimitivesTree_calib::Loop(int total_events, int cent_bin)
 {
-  if (fChain == 0) return;
+  if (fChain == 0) return(0);
   
   Long64_t nentries = fChain->GetEntriesFast();
   
   Long64_t nbytes = 0, nb = 0;
+
+  stringstream title;
+  int bin_diff;
+  if(cent_bin == -1)
+  {
+    bin_diff = 40;
+    cent_bin = 0;
+    title << "p-p events.";
+  }
+  else
+  {
+    bin_diff = 5;
+    title << "Centrality bins " << cent_bin << " to " << cent_bin + bin_diff -1 << ".";
+  }
+
+  //int max_evts = 3000;
+  int evts = 0;
   
   double averages[22][18];
 
@@ -26,6 +44,15 @@ void TriggerPrimitivesTree_calib::Loop(int total_events)
 
     if (ientry < 0) break;
     
+    fhlt->GetEntry(jentry);
+    fhiinfo->GetEntry(jentry);
+
+    if( !(!(fhlt->L1Tech_BSC_halo_beam2_inner_v0 || fhlt->L1Tech_BSC_halo_beam2_outer_v0 || fhlt->L1Tech_BSC_halo_beam1_inner_v0 || fhlt->L1Tech_BSC_halo_beam1_outer_v0 ) && fhiinfo->hiNtracks>0 && fhiinfo->hiHFplus>3 && fhiinfo->hiHFminus>3 && fhiinfo->hiBin>=cent_bin && fhiinfo->hiBin<cent_bin+bin_diff))
+      continue;
+
+    evts++;
+    if(evts > total_events) break;
+   
     //! here it loads the same event from all the trees
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
@@ -41,40 +68,44 @@ void TriggerPrimitivesTree_calib::Loop(int total_events)
       {
 	averages[i][j] += (double)fulldetector[i][j]/total_events;
       }
-
-    
-    if(jentry > total_events - 2) break;
   }
 
   double calibration[22][18];
-  double big_average = 0;
+  //double big_average = 0;
 
-  for(int i = 0; i < 22; i++)
-    for(int j = 0; j < 18; j++)
-    {
-      big_average += averages[i][j]/(22*18);
-    }
-
-  TH2D *calibrationpic = new TH2D("calibrationpic", "Average Response of each region",
-				  22,0,22,18,0,18);
-  
-  cout << "calibrations!" << endl;
-  cout << "{";
+  TH1D *calibrationpic = new TH1D("calibrationpic", title.str().c_str(),
+				  22,0,22);
   for(int i = 0; i < 22; i++)
   {
-    cout << "{";
+    double phi_average = 0;
     for(int j = 0; j < 18; j++)
     {
-      calibration[i][j] = big_average/averages[i][j];
-      calibrationpic->Fill(i, j, averages[i][j]);
-      cout << calibration[i][j];
-      if(j != 17) cout << ",";
+      //big_average += averages[i][j]/(22*18);
+      phi_average += averages[i][j]/18;
     }
-    cout << "}";
-    if(i != 21) cout << ",";
+    calibrationpic->Fill(i, phi_average);
   }
-  cout << "}"<< endl;
+  
+  // cout << "calibrations!" << endl;
+  // cout << "{";
+  // for(int i = 0; i < 22; i++)
+  // {
+  //   cout << "{";
+  //   for(int j = 0; j < 18; j++)
+  //   {
+  //     calibration[i][j] = big_average/averages[i][j];
+  //     cout << calibration[i][j];
+  //     if(j != 17) cout << ",";
+  //   }
+  //   cout << "}";
+  //   if(i != 21) cout << ",";
+  // }
+  // cout << "}"<< endl;
 
-  calibrationpic->Draw("Lego2");
+  calibrationpic->SetXTitle("#eta");
+  calibrationpic->SetYTitle("Compressed Et");
+  //calibrationpic->Draw();
+
+  return(calibrationpic);
   
 }

@@ -11,12 +11,13 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include "TH1.h"
 
 //! include the other tree objects
-//#include "HLTMuTree.C"
-//#include "HiTree.C"
-//#include "HltTree.C"
-//#include "JetTree.C"
+#include "HLTMuTree.C"
+#include "HiTree.C"
+#include "HltTree.C"
+#include "JetTree.C"
 
 
 class TriggerPrimitivesTree_alex {
@@ -88,7 +89,7 @@ public :
     NONE = 0,
     RCT_MINIMUM = 1,
     RCT_AVERAGE = 2,
-    ETA_AVERAGE = 3,
+    PHI_AVERAGE = 3,
     MIN_3X3 = 4
   };
 
@@ -104,7 +105,7 @@ public :
   virtual Int_t    GetEntry(Long64_t entry);
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
-  virtual void     Loop(int total_events = 0, 
+  virtual TH1D*    Loop(int total_events = 0, 
 			int threshhold = 0,
 			enum CALIBRATION_TYPE = NO,
 			enum SUBTRACT_ALGORITHM algorithm = NONE,
@@ -115,10 +116,10 @@ public :
   
   
   //! declare the other tree objects
-  //HltTree        *fhlt;   
-  //HiTree         *fhiinfo;
-  //JetTree        *fjet;
-  //HLTMuTree      *fmu;
+  HltTree        *fhlt;   
+  HiTree         *fhiinfo;
+  JetTree        *fjet;
+  HLTMuTree      *fmu;
 
 
 };
@@ -137,8 +138,10 @@ TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
     
     //tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
     
-    }
+  }
   TTree *tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
+  fhlt = new HltTree::HltTree((TTree*)gDirectory->Get("hltanalysis/HltTree"));
+  fhiinfo = new HiTree::HiTree((TTree*)gDirectory->Get("hiEvtAnalyzer/HiTree"));
   //fhlt = new HltTree::HltTree();
   //fhiinfo = new HiTree::HiTree();
   //fjet = new JetTree::JetTree();

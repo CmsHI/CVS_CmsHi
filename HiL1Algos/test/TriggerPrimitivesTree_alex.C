@@ -17,7 +17,7 @@ int sort_func_jet(const void *a, const void *b);
 
 void print_jets(jet *clusters, int jet_length);
 
-void TriggerPrimitivesTree_alex::Loop(int total_events, 
+TH1D* TriggerPrimitivesTree_alex::Loop(int total_events, 
 				      int threshhold,
 				      enum CALIBRATION_TYPE calibration,
 				      enum SUBTRACT_ALGORITHM algorithm,
@@ -47,7 +47,7 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
   // METHOD2: replace line
   //    fChain->GetEntry(jentry);       //read all branches
   //by  b_branchname->GetEntry(ientry); //read only this branch
-  if (fChain == 0) return;
+  if (fChain == 0) return(0);
   
   Long64_t nentries = fChain->GetEntriesFast();
   
@@ -55,16 +55,16 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
   
   int event_should_trigger = 0;
 
-  TH1I *max_jet_energy;
+  TH1D *max_jet_energy;
   TH1D *efficiency_curve;
   TH2D *before, *after;
   TH2I *max_jet_location;
 
   if(histo)
   {
-    max_jet_energy = new TH1I("max_jet_energy",
+    max_jet_energy = new TH1D("max_jet_energy",
 			      "Maximum jet energy for each event",
-			      180,0,900);
+			      100,0,700);
     
     max_jet_location = new TH2I("max_jet_location","Location of max jet for each event",
 				22,0,22,18,0,18);
@@ -76,15 +76,24 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
   int digital_calibrations[] = {2, 2, 2, 2, 4, 2, 1, 1, 1, 1, 1,
 				1, 1, 1, 1, 1, 2, 4, 2, 2, 2, 2};
 
+  int evts = 0;
   
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
 
     if (ientry < 0) break;
     
-    //! here it loads the same event from all the trees
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    fhlt->GetEntry(jentry);
+    fhiinfo->GetEntry(jentry);
 
+    if( !(!(fhlt->L1Tech_BSC_halo_beam2_inner_v0 || fhlt->L1Tech_BSC_halo_beam2_outer_v0 || fhlt->L1Tech_BSC_halo_beam1_inner_v0 || fhlt->L1Tech_BSC_halo_beam1_outer_v0 ) && fhiinfo->hiNtracks>0 && fhiinfo->hiHFplus>3 && fhiinfo->hiHFminus>3))
+      continue;
+
+    evts++;
+    if(evts > total_events) break;
+
+    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    
     double fulldetector[22][18]; //[eta][phi]
     int RCTs[18][11][2]; //[region #][eta][phi]
     for(int i = 0; i < numRegions; i++)
@@ -162,7 +171,7 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
 	}
       break;
       
-    case ETA_AVERAGE:
+    case PHI_AVERAGE:
       
       for(int ieta = 0; ieta < 22; ieta++)
 	for(int iphi = 0; iphi < 18; iphi++){
@@ -275,48 +284,46 @@ void TriggerPrimitivesTree_alex::Loop(int total_events,
       if(histo)
       {
 	max_jet_energy->Fill(head[0].et);
-	max_jet_location->Fill(head[0].eta, head[0].phi);
+	//max_jet_location->Fill(head[0].eta, head[0].phi);
 	//max_jet_location->Fill(head[0].eta, head[0].phi, head[0].et);
       }
     }
-    
-    if(jentry > total_events - 2) break;
   }
   
-  cout << "Percentage of passing events: " << ((double)event_should_trigger)/total_events << endl;
+  //cout << "Percentage of passing events: " << ((double)event_should_trigger)/total_events << endl;
 
-  if(histo)
+
+  efficiency_curve = new TH1D("efficiency_curve","Fraction of passing events versus threshold",
+			      180,0,600);
+  double total_integral = max_jet_energy->Integral();
+
+  for(int i = 0; i < 180; i++)
   {
-    efficiency_curve = new TH1D("efficiency_curve","Fraction of passing events versus threshold",
-				 180,0,600);
-    double total_integral = max_jet_energy->Integral();
-
-    for(int i = 0; i < 180; i++)
-    {
-      double j = (double)i*600./180.;
-      double integral = max_jet_energy->Integral(i, 180);
-      efficiency_curve->Fill(j, (double)integral/total_integral);      
-    }
-    
-    // TCanvas *c1 = new TCanvas();
-    // max_jet_energy->SetXTitle("Et");
-    // max_jet_energy->Draw();
-
-    // TCanvas *c2 = new TCanvas();
-    // max_jet_location->SetXTitle("Eta index");
-    // max_jet_location->SetYTitle("Phi index");
-    // max_jet_location->Draw("Lego2");
-
-    // TCanvas *c4 = new TCanvas();
-    efficiency_curve->SetTitle(filename);
-    efficiency_curve->SetXTitle("Threshold (compressed Et)");
-    efficiency_curve->SetYTitle("Fraction of passing events");
-    // efficiency_curve->Draw("L");
-
-
-    TFile f(filename += ".root","recreate");
-    efficiency_curve->Write();
+    double j = (double)i*600./180.;
+    double integral = max_jet_energy->Integral(i, 180);
+    efficiency_curve->Fill(j, (double)integral/total_integral);      
   }
+    
+  // TCanvas *c1 = new TCanvas();
+  max_jet_energy->SetTitle(filename);
+  max_jet_energy->SetXTitle("Compressed Et");
+  max_jet_energy->SetYTitle("Counts");
+  // max_jet_energy->Draw();
+
+  // TCanvas *c2 = new TCanvas();
+  // max_jet_location->SetXTitle("Eta index");
+  // max_jet_location->SetYTitle("Phi index");
+  // max_jet_location->Draw("Lego2");
+
+  // TCanvas *c4 = new TCanvas();
+  efficiency_curve->SetTitle(filename);
+  efficiency_curve->SetXTitle("Threshold (compressed Et)");
+  efficiency_curve->SetYTitle("Fraction of passing events");
+  // efficiency_curve->Draw("L");
+
+
+  //TFile f(filename += ".root","recreate");
+  return(efficiency_curve);
 }
 
 int sort_func_jet(const void *a, const void *b) 
