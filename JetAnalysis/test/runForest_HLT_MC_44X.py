@@ -409,8 +409,8 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
-#                                      process.cutsTPForFak +
-#                                      process.cutsTPForEff +
+                                      process.cutsTPForFak +
+                                      process.cutsTPForEff +
                                       process.trackeff_seq+
                                       process.anaTrack + process.mergedTrack +
                                       process.pfcandAnalyzer +
