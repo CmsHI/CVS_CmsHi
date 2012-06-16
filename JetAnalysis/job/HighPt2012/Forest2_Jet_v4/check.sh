@@ -1,7 +1,14 @@
 #!/bin/bash
 for (( ; ; ))
 do
-  for job in promptskim-hihighpt-hltjet80-pt90-v3-lumi1 promptskim-hihighpt-hltjet80-pt90-v3-lumi2 promptskim-hihighpt-hltjet80-pt90-v3-lumi3; do
+  for job in \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi1 \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi2 \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi3 \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi4 \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi5 \
+   promptskim-hihighpt-hltjet80-pt90-v4-lumi6
+   do
     crab -c $job -status>& crablog.tmp
     cat crablog.tmp
     cat crablog.tmp |grep 'Jobs Aborted'|awk '{print "./beep"}'|bash
