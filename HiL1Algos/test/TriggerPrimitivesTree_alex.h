@@ -109,7 +109,7 @@ public :
 			int threshhold = 0,
 			enum CALIBRATION_TYPE = NO,
 			enum SUBTRACT_ALGORITHM algorithm = NONE,
-			bool histo = true,
+			bool cut_noise_events = true,
 			TString filename = "dump.root");
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);

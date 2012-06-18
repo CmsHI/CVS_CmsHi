@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.13 2012/04/06 19:56:58 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.14 2012/05/06 20:45:57 richard Exp $
 //
 //
 
@@ -43,14 +43,14 @@
 #include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
 
 // Includes for the Calo Scales
-#include "CondFormats/DataRecord/interface/L1CaloEcalScaleRcd.h"
-#include "CondFormats/L1TObjects/interface/L1CaloEcalScale.h"
-#include "CondFormats/DataRecord/interface/L1CaloHcalScaleRcd.h"
-#include "CondFormats/L1TObjects/interface/L1CaloHcalScale.h"
+// #include "CondFormats/DataRecord/interface/L1CaloEcalScaleRcd.h"
+// #include "CondFormats/L1TObjects/interface/L1CaloEcalScale.h"
+// #include "CondFormats/DataRecord/interface/L1CaloHcalScaleRcd.h"
+// #include "CondFormats/L1TObjects/interface/L1CaloHcalScale.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 
-#include "CondFormats/L1TObjects/interface/L1CaloEtScale.h" 
-#include "CondFormats/L1TObjects/interface/L1CaloEtScaleRcd.h"
+// #include "CondFormats/L1TObjects/interface/L1CaloEtScale.h" 
+// #include "CondFormats/L1TObjects/interface/L1CaloEtScaleRcd.h"
 
 // system include files
 #include <memory>
@@ -101,8 +101,8 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       // ----------member data ---------------------------
 
 
-      const L1CaloEcalScale *mEcalScale;
-      const L1CaloHcalScale *mHcalScale;
+      //const L1CaloEcalScale *mEcalScale;
+      //const L1CaloHcalScale *mHcalScale;
 
       // Calorimeter Digis
       edm::InputTag mEcalDigiInputTag;
@@ -212,13 +212,13 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
   using namespace edm;
   using namespace std;
 
-  edm::ESHandle < L1CaloEcalScale > lEcalScaleHandle;
-  iSetup.get < L1CaloEcalScaleRcd > (  ).get( lEcalScaleHandle );
-  mEcalScale = lEcalScaleHandle.product(  );
+  // edm::ESHandle < L1CaloEcalScale > lEcalScaleHandle;
+  // iSetup.get < L1CaloEcalScaleRcd > (  ).get( lEcalScaleHandle );
+  // mEcalScale = lEcalScaleHandle.product(  );
   
-  edm::ESHandle < L1CaloHcalScale > lHcalScaleHandle;
-  iSetup.get < L1CaloHcalScaleRcd > (  ).get( lHcalScaleHandle );
-  mHcalScale = lHcalScaleHandle.product(  );
+  // edm::ESHandle < L1CaloHcalScale > lHcalScaleHandle;
+  // iSetup.get < L1CaloHcalScaleRcd > (  ).get( lHcalScaleHandle );
+  // mHcalScale = lHcalScaleHandle.product(  );
   
 
   event = iEvent.id().event();
@@ -239,8 +239,8 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       ecalPhiIndex[i] = lEcalTPItr->id(  ).iphi(  );
       ecalFineGrain[i] = lEcalTPItr->fineGrain(  );
 
-      ecalEt[i] = (int)(2 * mEcalScale->et(ecalCompressedEt[i],abs(ecalEtaIndex[i]),
-					   (ecalEtaIndex[i] > 0 ? +1 : -1 ) ) );
+      // ecalEt[i] = (int)(2 * mEcalScale->et(ecalCompressedEt[i],abs(ecalEtaIndex[i]),
+      // 					   (ecalEtaIndex[i] > 0 ? +1 : -1 ) ) );
 
       ecalEta[i] = getRealTowerEta(ecalEtaIndex[i]);
       ecalTag[i] = getDetectorTag(ecalEtaIndex[i]);
@@ -266,8 +266,8 @@ TriggerPrimitives::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
       hcalPhiIndex[i] = lHcalTPItr->id(  ).iphi(  );
       hcalFineGrain[i] = lHcalTPItr->SOI_fineGrain(  );
 
-      hcalEt[i] = (int)(2 * mHcalScale->et(hcalCompressedEt[i],abs(hcalEtaIndex[i]),
-					   (hcalEtaIndex[i] > 0 ? +1 : -1 ) ) );
+      // hcalEt[i] = (int)(2 * mHcalScale->et(hcalCompressedEt[i],abs(hcalEtaIndex[i]),
+      // 					   (hcalEtaIndex[i] > 0 ? +1 : -1 ) ) );
 
       hcalEta[i] = getRealTowerEta(hcalEtaIndex[i]);
       hcalTag[i] = getDetectorTag(hcalEtaIndex[i]);

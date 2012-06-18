@@ -93,12 +93,6 @@ public :
     MIN_3X3 = 4
   };
 
-  enum CALIBRATION_TYPE{
-    NO = 0,
-    IDEAL = 1,
-    DIGITAL = 2
-  };
-  
   TriggerPrimitivesTree_jetcurve(TFile *f=0);
   virtual ~TriggerPrimitivesTree_jetcurve();
   virtual Int_t    Cut(Long64_t entry);
@@ -107,7 +101,6 @@ public :
   virtual void     Init(TTree *tree);
   virtual TH1D*    Loop(int total_events = 0, 
 			int threshhold = 0,
-			enum CALIBRATION_TYPE = NO,
 			enum SUBTRACT_ALGORITHM algorithm = NONE);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);

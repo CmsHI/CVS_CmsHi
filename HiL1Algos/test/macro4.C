@@ -16,8 +16,8 @@ void macro4()
     new TriggerPrimitivesTree_alex(new TFile("jet.root"));
   TriggerPrimitivesTree_alex *cen =
     new TriggerPrimitivesTree_alex(new TFile("central.root"));
-  // TriggerPrimitivesTree_alex *pp =
-  //   new TriggerPrimitivesTree_alex(new TFile("pp.root"));
+  TriggerPrimitivesTree_alex *pp =
+    new TriggerPrimitivesTree_alex(new TFile("pp.root"));
 
   TCanvas* plot[2];
  
@@ -27,7 +27,7 @@ void macro4()
   TH1D* h_min[2]; 
   TH1D* h_jet[2];
   TH1D* h_cen[2];
-  //TH1D* h_pp[4];
+  TH1D* h_pp[2];
 
   TLegend* leg[2];
   // TLatex* tit[4];
@@ -61,10 +61,10 @@ void macro4()
     }    
 
 
-    h_min[i] = (TH1D*)min->Loop(total_events, 0, cal, algo, true, "Minbias Sample")->Clone();
+    h_min[i] = (TH1D*)min->Loop(total_events, 0, cal, algo, false, "Minbias Sample")->Clone();
     h_jet[i] = (TH1D*)jet->Loop(total_events, 0, cal, algo, true, "Jet95 Sample")->Clone();
-    h_cen[i] = (TH1D*)cen->Loop(total_events, 0, cal, algo, true, "Central Sample")->Clone();
-    //h_pp[i] =  (TH1D*)pp->Loop(total_events, 0, cal, algo, true, "p-p Sample")->Clone();
+    h_cen[i] = (TH1D*)cen->Loop(total_events, 0, cal, algo, false, "Central Sample")->Clone();
+    h_pp[i] =  (TH1D*)pp->Loop(total_events, 0, cal, algo, false, "p-p Sample")->Clone();
 
 
     plot[i] = new TCanvas();
@@ -100,16 +100,16 @@ void macro4()
     h_cen[i]->SetLineColor(46);
     h_cen[i]->Draw("L,same");
 
-    //h_pp[i]->Draw("L,same");
+    h_pp[i]->Draw("L,same");
 
     leg[i] = new TLegend(0.5,0.5,0.8,0.7);
 
     leg[i]->SetFillColor(0);
     //leg[i]->SetHeader(title[i].str().c_str());
     leg[i]->AddEntry(h_min[i],"Minbias Sample","l");
-    leg[i]->AddEntry(h_jet[i],"Jet95 Sample","l");
+    leg[i]->AddEntry(h_jet[i],"Jet95 Sample (without noise)","l");
     leg[i]->AddEntry(h_cen[i],"Central Sample","l");    
-    //leg[i]->AddEntry(h_pp[i],"p-p Sample","l");
+    leg[i]->AddEntry(h_pp[i],"p-p minbias Sample","l");
     leg[i]->AddEntry(fivep_l,"Minbias 5%","l");
     leg[i]->Draw();
  
