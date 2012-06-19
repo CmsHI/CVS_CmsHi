@@ -40,7 +40,7 @@ namespace names{
   string AlgoRename[100] = {
     "icPu5calo",       "ic5calo",       "akPu3calo",       "ak3calo",       "akPu3PF",           "ak3PF",           "akPu5calo",       "ak5calo",       "akPu5PF",           "ak5PF"};
   string AlgoAnalyzer[100] = {
-    "icPu5JetAnalyzer","ic5JetAnalyzer","akPu3JetAnalyzer","ak3JetAnalyzer","akPu3PFJetAnalyzer","ak3PFJetAnalyzer","akPu5JetAnalyzer","ak5JetAnalyzer","akPu5PFJetAnalyzer","ak5PFJetAnalyzer"};
+"icPu5JetAnalyzer","ic5JetAnalyzer","akPu3JetAnalyzer","ak3JetAnalyzer","akPu3PFJetAnalyzer","ak3PFJetAnalyzer","akPu5JetAnalyzer","ak5JetAnalyzer","akPu5PFJetAnalyzer","ak5PFJetAnalyzer"};
 }
 
 class HiForest : public TNamed
@@ -50,42 +50,46 @@ class HiForest : public TNamed
    HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0, bool isrecorrected = 0, TString jetAlgo="akPu3PF");
   ~HiForest();
 
+  //==================================================================================================================================
   // Utility functions
+  //==================================================================================================================================
+  void CheckTree(TTree *t,const char *title);			// Check the status of a tree
+  void CheckArraySizes();					// Check if array size is large enough
   void GetEntry(int i);
   int  GetEntries();  						// Get the number of entries 
-  void InitTree();
-  void CheckTree(TTree *t,const char *title);				// Check the status of a tree
-
-  void CheckArraySizes();
+  void GetEnergyScaleTable(char *fileNameTable);                // Get photon energy scale table
+  void InitTree();						// Initialize track correction
   void PrintStatus();						// Print the status of the hiForest
   void SetOutputFile(const char *name);               		// Set output file name for skim
   void AddCloneTree(TTree* t, const char *dirName, const char *treeName);   // Add a clone tree to the clone forest
   void FillOutput();						// Fill output forest  
   
-  void GetEnergyScaleTable(char *fileNameTable);
-  float getCorrEt(int j);
   Long64_t Draw(const char* varexp, const char* selection, Option_t* option = "", Long64_t nentries = 1000000000, Long64_t firstentry = 0){
      return tree->Draw(varexp,selection,option,nentries,firstentry);
   }
 
+  //==================================================================================================================================
   // Event filtering utility functions
+  //==================================================================================================================================
   bool selectEvent();
   TCut eventSelection();
 
+  //==================================================================================================================================
   // Photon utility functions
-  bool isSpike(int i);                          // return true if it is considered as a spike candidate
+  //==================================================================================================================================
+  bool isSpike(int i);                          		// return true if it is considered as a spike candidate
   bool isLooseEGamma(int i);
   bool isLoosePhoton(int i);
-  bool isGoodPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
-  bool isIsolatedPhoton(int i);                     // return true if it is considered as a hiGoodPhoton candidate
+  bool isGoodPhoton(int i);                   			// return true if it is considered as a hiGoodPhoton candidate
+  bool isIsolatedPhoton(int i);                     		// return true if it is considered as a hiGoodPhoton candidate
   bool isMCSignal(int i);
   bool isDirectPhoton(int i);
   bool isFragPhoton(int i);
+  float getCorrEt(int j);                                       // Get Corrected photon Et
 
-
-  //bool isSidebandPhoton(int i);                     // return true if it is considered as a photon sideband
-
+  //==================================================================================================================================
   // Jet utility functions
+  //==================================================================================================================================
   void sortJets(TTree* jetTree, Jets& jets, double etaMax = 2, double ptMin = 40, bool allEvents = 1, int smearType = -1);
   int leadingJet();
   int subleadingJet();
@@ -93,24 +97,29 @@ class HiForest : public TNamed
   double deltaPhiDijet(Jets& jets);
   bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
   void fakeRejection(TTree *jetTree, Jets &jets, bool allEvents);
-  
-  // Get track-jet correlated variables. Not needed if correlatePF is run.
-  void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
-  // Build correlations between jet & its constituents, builds jetIDs
-  void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
-
   double jetFracChg(int i);
   double jetFracNeut(int i);
   double jetFracEM(int i);
 
+  //==================================================================================================================================
   // Track utility functions
+  //==================================================================================================================================
   int getMatchedCaloTowerAllowReuse(int j);
   int getMatchedHBHEAllowReuse(int j);
   void matchTrackCalo(bool allEvents = 1);
+  
+  //==================================================================================================================================
+  // Get track-jet correlated variables. Not needed if correlatePF is run.
+  //==================================================================================================================================
+  void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
+  // Build correlations between jet & its constituents, builds jetIDs
+  void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
 
+
+  
   // TFile
   TFile *inf; 					// Input file 
-  TFile *outf;                                  // Output file
+  TFile *outf;                                  // Output file if we want to export the forest
 
   // Trees
   TTree *photonTree;				// Photon Tree, see branches in SetupPhotonTree.h
@@ -270,10 +279,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
-  if (photonTree==0)  photonTree   = (TTree*) inf->Get("NTuples/Analysis");
-  trackTree    = (TTree*) inf->Get("anaTrack/trackTree");
-  pixtrackTree = (TTree*) inf->Get("pixelTrack/trackTree");
-  //pixtrackTree = (TTree*) inf->Get("anaPixTrack/trackTree");
+  trackTree    = (TTree*) inf->Get("mergedTrack/trackTree");
   towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu3jetTree = (TTree*) inf->Get(jetAlgo+"JetAnalyzer/t");
@@ -284,35 +290,21 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   pfTree      = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
   genpTree     = (TTree*) inf->Get("genpana/photon");
   genParticleTree     = (TTree*) inf->Get("HiGenParticleAna/hi");
-/*
-  if(pp){
-    icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
-    akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::ak3PF].data()));
-  }else{
-    icPu5jetTree = 0;//(TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::icPu5calo].data()));
-    if(recjec){
-       akPu3jetTree = (TTree*) inf->Get(Form("%s/t",(names::AlgoAnalyzer[names::akPu3PF]+"_recorrected").data()));
-       cout<<"HEEY, the jets are: "<<akPu3jetTree->GetName()<<endl;
-    }else{
-       akPu3jetTree = (TTree*) inf->Get(Form("%s/t",names::AlgoAnalyzer[names::akPu3PF].data()));
-    }
-  }
-*/
+
   // Check the validity of the trees.
   hasPhotonTree    = (photonTree   != 0);
-  hasPFTree        = (pfTree   != 0);
-  hasEvtTree       = (evtTree   != 0);
-  hasMetTree       = (metTree   != 0);
+  hasPFTree        = (pfTree  	   != 0);
+  hasEvtTree       = (evtTree      != 0);
+  hasMetTree       = (metTree      != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
   hasTrackTree     = (trackTree    != 0);
-  hasPixTrackTree  = (pixtrackTree    != 0);
   hasHltTree       = (hltTree      != 0);
   hasSkimTree      = (skimTree     != 0);
   hasTowerTree     = (towerTree    != 0);
   hasHbheTree      = (hbheTree     != 0);
-  hasEbTree        = (ebTree     != 0);
-  hasGenpTree	   = (genpTree   !=0);
+  hasEbTree        = (ebTree       != 0);
+  hasGenpTree	   = (genpTree     !=0);
   hasGenParticleTree = (genParticleTree   !=0);
   setupOutput = false;
   
@@ -456,6 +448,7 @@ int HiForest::GetEntries()
   // get the entries of the available trees
   return nEntries;
 }
+
 
 void HiForest::InitTree()
 {
