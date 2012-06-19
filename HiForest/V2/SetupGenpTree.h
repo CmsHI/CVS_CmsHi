@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Nov 28 23:50:13 2011 by ROOT version 5.27/06b
+// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
 // from TTree photon/Tree of Rechits around photon
-// found on file: ../../ntout/GenHiForest_HyPhton50_all_v2.root
+// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -22,13 +22,13 @@ public :
    Float_t         hf;
    Int_t           nPar;
    Float_t         recoVtxZ;
-   Float_t         et[maxEntry];   //[nPar]
-   Float_t         eta[maxEntry];   //[nPar]
-   Float_t         phi[maxEntry];   //[nPar]
-   Int_t           id[maxEntry];   //[nPar]
-   Int_t           momId[maxEntry];   //[nPar]
-   Int_t           status[maxEntry];   //[nPar]
-   Int_t           collId[maxEntry];   //[nPar]
+   Float_t         et[316];   //[nPar]
+   Float_t         eta[316];   //[nPar]
+   Float_t         phi[316];   //[nPar]
+   Int_t           id[316];   //[nPar]
+   Int_t           momId[316];   //[nPar]
+   Int_t           status[316];   //[nPar]
+   Int_t           collId[316];   //[nPar]
 
    // List of branches
    TBranch        *b_cBin;   //!
@@ -61,7 +61,7 @@ void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 0)
    t->SetBranchAddress("status", tGenps.status, &tGenps.b_status);
    t->SetBranchAddress("collId", tGenps.collId, &tGenps.b_collId);
    if (doCheck) {
-     if (t->GetMaximum("nPar")>maxEntry) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
+      if (t->GetMaximum("nPar")>316) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
    }
 }
 

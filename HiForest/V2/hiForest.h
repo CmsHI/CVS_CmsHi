@@ -36,11 +36,11 @@
 
 namespace names{
   enum Algo{
-     icPu5calo,         ic5calo,         akPu3calo,         ak3calo,         akPu3PF,             ak3PF,             akPu5calo,         ak5calo,         akPu5PF,             ak5PF};
+  };
   string AlgoRename[100] = {
-    "icPu5calo",       "ic5calo",       "akPu3calo",       "ak3calo",       "akPu3PF",           "ak3PF",           "akPu5calo",       "ak5calo",       "akPu5PF",           "ak5PF"};
+  };
   string AlgoAnalyzer[100] = {
-"icPu5JetAnalyzer","ic5JetAnalyzer","akPu3JetAnalyzer","ak3JetAnalyzer","akPu3PFJetAnalyzer","ak3PFJetAnalyzer","akPu5JetAnalyzer","ak5JetAnalyzer","akPu5PFJetAnalyzer","ak5PFJetAnalyzer"};
+  };
 }
 
 class HiForest : public TNamed
@@ -124,7 +124,12 @@ class HiForest : public TNamed
   // Trees
   TTree *photonTree;				// Photon Tree, see branches in SetupPhotonTree.h
   TTree *icPu5jetTree;				// Jet Tree with icPu5 algorithm, see branches in SetupJetTree.h
+  TTree *akPu2jetTree;				// Jet Tree with akPu2PF algorithm, see branches in SetupJetTree.h
   TTree *akPu3jetTree;				// Jet Tree with akPu3PF algorithm, see branches in SetupJetTree.h
+  TTree *akPu4jetTree;				// Jet Tree with akPu4PF algorithm, see branches in SetupJetTree.h
+  TTree *akPu2CaloJetTree;			// Jet Tree with akPu2Calo algorithm, see branches in SetupJetTree.h
+  TTree *akPu3CaloJetTree;			// Jet Tree with akPu3Calo algorithm, see branches in SetupJetTree.h
+  TTree *akPu4CaloJetTree;		        // Jet Tree with akPu4Calo algorithm, see branches in SetupJetTree.h
   TTree *hltTree;				// OpenHLT Tree, see branches in SetupHltTree.h
   TTree *trackTree;				// Track Tree, see branches in SetupTrackTree.h
   TTree *pixtrackTree;				// Track Tree, see branches in SetupTrackTree.h
@@ -543,15 +548,8 @@ void HiForest::SetOutputFile(const char *name)
   outf = new TFile(name,"recreate");
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
-
-     if(pp){
-	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::ak3PF].data(), "t");
-     }else{
-	if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, names::AlgoAnalyzer[names::icPu5calo].data(),   "t");
-	if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, names::AlgoAnalyzer[names::akPu3PF].data(), "t");
-     }
-
+  if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, "icPu5JetAnalyzer",   "t");
+  if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, "akPu3PFJetAnalyzer", "t");
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");

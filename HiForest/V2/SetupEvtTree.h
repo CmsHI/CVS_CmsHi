@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  7 12:57:09 2011 by ROOT version 5.27/06b
+// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
 // from TTree HiTree/
-// found on file: ../HiForestMinBias_v2.root
+// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -46,7 +46,7 @@ public :
    Int_t           hiNtracksEtaCut;
    Int_t           hiNtracksEtaPtCut;
    Int_t           hiNevtPlane;
-   Float_t         hiEvtPlanes[100];   //[hiNevtPlane]
+   Float_t         hiEvtPlanes[76];   //[hiNevtPlane]
 
    // List of branches
    TBranch        *b_run;   //!

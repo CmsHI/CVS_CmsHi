@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Dec  7 12:57:09 2011 by ROOT version 5.27/06b
+// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
 // from TTree pfTree/dijet tree
-// found on file: ../HiForestMinBias_v2.root
+// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -19,10 +19,10 @@ public :
 
    // Declaration of leaf types
    Int_t           nPFpart;
-   Int_t           pfId[maxEntryTrack];   //[nPFpart]
-   Float_t         pfPt[maxEntryTrack];   //[nPFpart]
-   Float_t         pfEta[maxEntryTrack];   //[nPFpart]
-   Float_t         pfPhi[maxEntryTrack];   //[nPFpart]
+   Int_t           pfId[10352];   //[nPFpart]
+   Float_t         pfPt[10352];   //[nPFpart]
+   Float_t         pfEta[10352];   //[nPFpart]
+   Float_t         pfPhi[10352];   //[nPFpart]
 
    // List of branches
    TBranch        *b_nPFpart;   //!
@@ -43,7 +43,7 @@ void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
    t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
    t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
    if (doCheck) {
-     if (t->GetMaximum("nPFpart")>maxEntryTrack) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
+      if (t->GetMaximum("nPFpart")>10352) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
    }
 }
 
