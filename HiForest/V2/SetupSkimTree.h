@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 19 11:32:05 2012 by ROOT version 5.27/06b
+// Tue Jun 19 11:35:34 2012 by ROOT version 5.27/06b
 // from TTree HltTree/
 // found on file: ../HiForest-promptskim-hihighpt-hltjet80-pt90-v2_v3_part2.root
 //////////////////////////////////////////////////////////
@@ -26,8 +26,6 @@ public :
    Int_t           pHBHENoiseFilter;
    Int_t           hltAna;
    Int_t           rechitAna;
-   Int_t           phfCoincFilter;
-   Int_t           ppurityFractionFilter;
 
    // List of branches
    TBranch        *b_reco_extra;   //!
@@ -38,8 +36,6 @@ public :
    TBranch        *b_pHBHENoiseFilter;   //!
    TBranch        *b_hltAna;   //!
    TBranch        *b_rechitAna;   //!
-   TBranch        *b_phfCoincFilter;   //!
-   TBranch        *b_ppurityFractionFilter;   //!
 
 };
 
@@ -55,8 +51,6 @@ void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 0)
    t->SetBranchAddress("pHBHENoiseFilter", &tSkims.pHBHENoiseFilter, &tSkims.b_pHBHENoiseFilter);
    t->SetBranchAddress("hltAna", &tSkims.hltAna, &tSkims.b_hltAna);
    t->SetBranchAddress("rechitAna", &tSkims.rechitAna, &tSkims.b_rechitAna);
-   t->SetBranchAddress("phfCoincFilter", &tSkims.phfCoincFilter, &tSkims.b_phfCoincFilter);
-   t->SetBranchAddress("ppurityFractionFilter", &tSkims.ppurityFractionFilter, &tSkims.b_ppurityFractionFilter);
    if (doCheck) {
    }
 }
