@@ -157,7 +157,12 @@ class HiForest : public TNamed
   vector<Jets> alljets;
 
   Jets icPu5;
+  Jets akPu2PF;
   Jets akPu3PF;
+  Jets akPu4PF;
+  Jets akPu2Calo;
+  Jets akPu3Calo;
+  Jets akPu4Calo;
 
   Photons photon;
   Tracks track;
@@ -177,7 +182,12 @@ class HiForest : public TNamed
   bool hasMetTree;
   bool hasPFTree;
   bool hasIcPu5JetTree;
+  bool hasAkPu2JetTree;
   bool hasAkPu3JetTree;
+  bool hasAkPu4JetTree;
+  bool hasAkPu2CaloJetTree;
+  bool hasAkPu3CaloJetTree;
+  bool hasAkPu4CaloJetTree;
   bool hasHltTree;
   bool hasTrackTree;
   bool hasPixTrackTree;
@@ -307,7 +317,12 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasEvtTree       = (evtTree      != 0);
   hasMetTree       = (metTree      != 0);
   hasIcPu5JetTree  = (icPu5jetTree != 0);
+  hasAkPu2JetTree  = (akPu2jetTree != 0);
   hasAkPu3JetTree  = (akPu3jetTree != 0);
+  hasAkPu4JetTree  = (akPu4jetTree != 0);
+  hasAkPu2CaloJetTree  = (akPu2CaloJetTree != 0);
+  hasAkPu3CaloJetTree  = (akPu3CaloJetTree != 0);
+  hasAkPu4CaloJetTree  = (akPu4CaloJetTree != 0);
   hasTrackTree     = (trackTree    != 0);
   hasHltTree       = (hltTree      != 0);
   hasSkimTree      = (skimTree     != 0);
@@ -356,11 +371,41 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     setupJetTree(icPu5jetTree,icPu5);
   }
 
+  if (hasAkPu2JetTree) {
+    akPu2jetTree->SetName("akPu2PF");
+    if (tree == 0) tree = akPu2jetTree; else tree->AddFriend(akPu2jetTree);
+    setupJetTree(akPu2jetTree,akPu2PF);
+  }
+
   if (hasAkPu3JetTree) {
     akPu3jetTree->SetName("akPu3PF");
     if (tree == 0) tree = akPu3jetTree; else tree->AddFriend(akPu3jetTree);
     setupJetTree(akPu3jetTree,akPu3PF);
   }
+
+  if (hasAkPu4JetTree) {
+    akPu4jetTree->SetName("akPu4PF");
+    if (tree == 0) tree = akPu4jetTree; else tree->AddFriend(akPu4jetTree);
+    setupJetTree(akPu4jetTree,akPu4PF);
+  }
+  if (hasAkPu2CaloJetTree) {
+    akPu2CaloJetTree->SetName("akPu2Calo");
+    if (tree == 0) tree = akPu2CaloJetTree; else tree->AddFriend(akPu2CaloJetTree);
+    setupJetTree(akPu2CaloJetTree,akPu2Calo);
+  }
+
+  if (hasAkPu3CaloJetTree) {
+    akPu3CaloJetTree->SetName("akPu3Calo");
+    if (tree == 0) tree = akPu3CaloJetTree; else tree->AddFriend(akPu3CaloJetTree);
+    setupJetTree(akPu3CaloJetTree,akPu3Calo);
+  }
+
+  if (hasAkPu4CaloJetTree) {
+    akPu4CaloJetTree->SetName("akPu4Calo");
+    if (tree == 0) tree = akPu4CaloJetTree; else tree->AddFriend(akPu4CaloJetTree);
+    setupJetTree(akPu4CaloJetTree,akPu4Calo);
+  }
+
 
   if (hasTrackTree) {
     trackTree->SetName("track");
@@ -415,9 +460,6 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Print the status of thre forest
   PrintStatus();
 
-  //fakeRejection(icPu5jetTree, icPu5, 1);
-  //fakeRejection(akPu3jetTree, akPu3PF, 1);
-  //  CheckArraySizes();
 }
 
 HiForest::~HiForest()
@@ -443,7 +485,12 @@ void HiForest::GetEntry(int i)
   if (hasHltTree)      hltTree      ->GetEntry(i);
   if (hasSkimTree)     skimTree     ->GetEntry(i);
   if (hasIcPu5JetTree) icPu5jetTree ->GetEntry(i);
+  if (hasAkPu2JetTree) akPu2jetTree ->GetEntry(i);
   if (hasAkPu3JetTree) akPu3jetTree ->GetEntry(i);
+  if (hasAkPu4JetTree) akPu4jetTree ->GetEntry(i);
+  if (hasAkPu2CaloJetTree) akPu2CaloJetTree ->GetEntry(i);
+  if (hasAkPu3CaloJetTree) akPu3CaloJetTree ->GetEntry(i);
+  if (hasAkPu4CaloJetTree) akPu4CaloJetTree ->GetEntry(i);
   if (hasTrackTree)    trackTree    ->GetEntry(i);
   if (hasPixTrackTree) pixtrackTree ->GetEntry(i);
   if (hasTowerTree)    towerTree    ->GetEntry(i);
@@ -534,7 +581,12 @@ void HiForest::PrintStatus()
   if (hasHltTree)      CheckTree(hltTree,      "HltTree");
   if (hasSkimTree)     CheckTree(skimTree,     "SkimTree");
   if (hasIcPu5JetTree) CheckTree(icPu5jetTree, "IcPu5jetTree");
+  if (hasAkPu2JetTree) CheckTree(akPu2jetTree, "AkPu2jetTree");
   if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
+  if (hasAkPu4JetTree) CheckTree(akPu4jetTree, "AkPu4jetTree");
+  if (hasAkPu2CaloJetTree) CheckTree(akPu2CaloJetTree, "AkPu2CaloJetTree");
+  if (hasAkPu3CaloJetTree) CheckTree(akPu3CaloJetTree, "AkPu3CaloJetTree");
+  if (hasAkPu4CaloJetTree) CheckTree(akPu4CaloJetTree, "AkPu4CaloJetTree");
   if (hasTrackTree)    CheckTree(trackTree,    "TrackTree");
   if (hasPixTrackTree) CheckTree(pixtrackTree, "PixTrackTree");
   if (hasPhotonTree)   CheckTree(photonTree,   "PhotonTree");
@@ -554,7 +606,12 @@ void HiForest::SetOutputFile(const char *name)
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
   if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, "icPu5JetAnalyzer",   "t");
+  if (hasAkPu2JetTree) AddCloneTree(akPu2jetTree, "akPu2PFJetAnalyzer", "t");
   if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, "akPu3PFJetAnalyzer", "t");
+  if (hasAkPu4JetTree) AddCloneTree(akPu4jetTree, "akPu4PFJetAnalyzer", "t");
+  if (hasAkPu2CaloJetTree) AddCloneTree(akPu2CaloJetTree, "akPu2CaloJetAnalyzer", "t");
+  if (hasAkPu3CaloJetTree) AddCloneTree(akPu3CaloJetTree, "akPu3CaloJetAnalyzer", "t");
+  if (hasAkPu4CaloJetTree) AddCloneTree(akPu4CaloJetTree, "akPu4CaloJetAnalyzer", "t");
   if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
