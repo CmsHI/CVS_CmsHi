@@ -96,7 +96,7 @@ class HiForest : public TNamed
   int thirdJet();
   double deltaPhiDijet(Jets& jets);
   bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
-  void fakeRejection(TTree *jetTree, Jets &jets, bool allEvents);
+  //void fakeRejection(TTree *jetTree, Jets &jets, bool allEvents);
   double jetFracChg(int i);
   double jetFracNeut(int i);
   double jetFracEM(int i);
