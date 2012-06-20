@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree HiTree/
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ public :
 };
 
 
-void setupEvtTree(TTree *t,Evts &tEvts,bool doCheck = 0)
+void setupEvtTree(TTree *t,Evts &tEvts,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("run")) t->SetBranchAddress("run", &tEvts.run, &tEvts.b_run);
@@ -115,7 +115,7 @@ void setupEvtTree(TTree *t,Evts &tEvts,bool doCheck = 0)
    if (t->GetBranch("hiNevtPlane")) t->SetBranchAddress("hiNevtPlane", &tEvts.hiNevtPlane, &tEvts.b_hiNevtPlane);
    if (t->GetBranch("hiEvtPlanes")) t->SetBranchAddress("hiEvtPlanes", tEvts.hiEvtPlanes, &tEvts.b_hiEvtPlanes);
    if (doCheck) {
-      if (t->GetMaximum("hiNevtPlane")>76) cout <<"FATAL ERROR: Arrary size of hiNevtPlane too small!!!  "<<t->GetMaximum("hiNevtPlane")<<endl;
+      if (t->GetMaximum("hiNevtPlane")>126) cout <<"FATAL ERROR: Arrary size of hiNevtPlane too small!!!  "<<t->GetMaximum("hiNevtPlane")<<endl;
    }
 }
 

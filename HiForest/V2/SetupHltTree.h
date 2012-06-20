@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree HltTree/
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -1992,7 +1992,7 @@ public :
 };
 
 
-void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 0)
+void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("NL1IsolEm")) t->SetBranchAddress("NL1IsolEm", &tHlts.NL1IsolEm, &tHlts.b_NL1IsolEm);
@@ -2980,12 +2980,12 @@ void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 0)
    if (t->GetBranch("L1Tech_RPC_TTU_pointing_Cosmics.v0")) t->SetBranchAddress("L1Tech_RPC_TTU_pointing_Cosmics.v0", &tHlts.L1Tech_RPC_TTU_pointing_Cosmics_v0, &tHlts.b_L1Tech_RPC_TTU_pointing_Cosmics_v0);
    if (t->GetBranch("L1Tech_RPC_TTU_pointing_Cosmics.v0_Prescl")) t->SetBranchAddress("L1Tech_RPC_TTU_pointing_Cosmics.v0_Prescl", &tHlts.L1Tech_RPC_TTU_pointing_Cosmics_v0_Prescl, &tHlts.b_L1Tech_RPC_TTU_pointing_Cosmics_v0_Prescl);
    if (doCheck) {
-      if (t->GetMaximum("NL1IsolEm")>8) cout <<"FATAL ERROR: Arrary size of NL1IsolEm too small!!!  "<<t->GetMaximum("NL1IsolEm")<<endl;
-      if (t->GetMaximum("NL1NIsolEm")>8) cout <<"FATAL ERROR: Arrary size of NL1NIsolEm too small!!!  "<<t->GetMaximum("NL1NIsolEm")<<endl;
-      if (t->GetMaximum("NL1Mu")>8) cout <<"FATAL ERROR: Arrary size of NL1Mu too small!!!  "<<t->GetMaximum("NL1Mu")<<endl;
-      if (t->GetMaximum("NL1CenJet")>8) cout <<"FATAL ERROR: Arrary size of NL1CenJet too small!!!  "<<t->GetMaximum("NL1CenJet")<<endl;
-      if (t->GetMaximum("NL1ForJet")>8) cout <<"FATAL ERROR: Arrary size of NL1ForJet too small!!!  "<<t->GetMaximum("NL1ForJet")<<endl;
-      if (t->GetMaximum("NL1Tau")>8) cout <<"FATAL ERROR: Arrary size of NL1Tau too small!!!  "<<t->GetMaximum("NL1Tau")<<endl;
+      if (t->GetMaximum("NL1IsolEm")>58) cout <<"FATAL ERROR: Arrary size of NL1IsolEm too small!!!  "<<t->GetMaximum("NL1IsolEm")<<endl;
+      if (t->GetMaximum("NL1NIsolEm")>58) cout <<"FATAL ERROR: Arrary size of NL1NIsolEm too small!!!  "<<t->GetMaximum("NL1NIsolEm")<<endl;
+      if (t->GetMaximum("NL1Mu")>58) cout <<"FATAL ERROR: Arrary size of NL1Mu too small!!!  "<<t->GetMaximum("NL1Mu")<<endl;
+      if (t->GetMaximum("NL1CenJet")>58) cout <<"FATAL ERROR: Arrary size of NL1CenJet too small!!!  "<<t->GetMaximum("NL1CenJet")<<endl;
+      if (t->GetMaximum("NL1ForJet")>58) cout <<"FATAL ERROR: Arrary size of NL1ForJet too small!!!  "<<t->GetMaximum("NL1ForJet")<<endl;
+      if (t->GetMaximum("NL1Tau")>58) cout <<"FATAL ERROR: Arrary size of NL1Tau too small!!!  "<<t->GetMaximum("NL1Tau")<<endl;
    }
 }
 

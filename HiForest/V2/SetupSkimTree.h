@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree HltTree/
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ public :
 };
 
 
-void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 0)
+void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("L1simulation_step")) t->SetBranchAddress("L1simulation_step", &tSkims.L1simulation_step, &tSkims.b_L1simulation_step);

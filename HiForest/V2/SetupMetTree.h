@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree metTree/v1
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ public :
 };
 
 
-void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 0)
+void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("nEv")) t->SetBranchAddress("nEv", &tMets.nEv, &tMets.b_nEv);
@@ -52,7 +52,7 @@ void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 0)
    if (t->GetBranch("METPhi")) t->SetBranchAddress("METPhi", tMets.METPhi, &tMets.b_METPhi);
    if (t->GetBranch("SumEt")) t->SetBranchAddress("SumEt", tMets.SumEt, &tMets.b_SumEt);
    if (doCheck) {
-      if (t->GetMaximum("nMET")>2) cout <<"FATAL ERROR: Arrary size of nMET too small!!!  "<<t->GetMaximum("nMET")<<endl;
+      if (t->GetMaximum("nMET")>52) cout <<"FATAL ERROR: Arrary size of nMET too small!!!  "<<t->GetMaximum("nMET")<<endl;
    }
 }
 

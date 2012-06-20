@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ public :
 };
 
 
-void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
+void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("evt")) t->SetBranchAddress("evt", &tJets.evt, &tJets.b_evt);
@@ -214,8 +214,8 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
    if (t->GetBranch("fr01EM")) t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
    if (t->GetBranch("fr01")) t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-      if (t->GetMaximum("nref")>450) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
-      if (t->GetMaximum("ngen")>26) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;
+      if (t->GetMaximum("nref")>500) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
+      if (t->GetMaximum("ngen")>76) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;
    }
 }
 

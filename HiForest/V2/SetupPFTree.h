@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree pfTree/dijet tree
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ public :
 };
 
 
-void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
+void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("nPFpart")) t->SetBranchAddress("nPFpart", &tPFs.nPFpart, &tPFs.b_nPFpart);
@@ -43,7 +43,7 @@ void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
    if (t->GetBranch("pfEta")) t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
    if (t->GetBranch("pfPhi")) t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
    if (doCheck) {
-      if (t->GetMaximum("nPFpart")>10352) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
+      if (t->GetMaximum("nPFpart")>10402) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
    }
 }
 

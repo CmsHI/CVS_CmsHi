@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree photon/v1
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -402,7 +402,7 @@ public :
 };
 
 
-void setupPhotonTree(TTree *t,Photons &tPhotons,bool doCheck = 0)
+void setupPhotonTree(TTree *t,Photons &tPhotons,bool doCheck = 1)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("run")) t->SetBranchAddress("run", &tPhotons.run, &tPhotons.b_run);
@@ -595,8 +595,8 @@ void setupPhotonTree(TTree *t,Photons &tPhotons,bool doCheck = 0)
    if (t->GetBranch("gpId")) t->SetBranchAddress("gpId", tPhotons.gpId, &tPhotons.b_gpId);
    if (t->GetBranch("gpMomId")) t->SetBranchAddress("gpMomId", tPhotons.gpMomId, &tPhotons.b_gpMomId);
    if (doCheck) {
-      if (t->GetMaximum("nPhotons")>80) cout <<"FATAL ERROR: Arrary size of nPhotons too small!!!  "<<t->GetMaximum("nPhotons")<<endl;
-      if (t->GetMaximum("nGp")>180) cout <<"FATAL ERROR: Arrary size of nGp too small!!!  "<<t->GetMaximum("nGp")<<endl;
+      if (t->GetMaximum("nPhotons")>130) cout <<"FATAL ERROR: Arrary size of nPhotons too small!!!  "<<t->GetMaximum("nPhotons")<<endl;
+      if (t->GetMaximum("nGp")>230) cout <<"FATAL ERROR: Arrary size of nGp too small!!!  "<<t->GetMaximum("nGp")<<endl;
    }
 }
 
