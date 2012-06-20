@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 19 12:25:44 2012 by ROOT version 5.27/06b
+// Wed Jun 20 11:25:52 2012 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -77,6 +77,9 @@ public :
    Float_t         gendrjt[26];   //[ngen]
    Int_t           gensubid[26];   //[ngen]
    Float_t         smpt[450];   //[nref]
+   Float_t         fr01Chg[450];   //[nref]
+   Float_t         fr01EM[450];   //[nref]
+   Float_t         fr01[450];   //[nref]
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -138,6 +141,9 @@ public :
    TBranch        *b_gendrjt;   //!
    TBranch        *b_gensubid;   //!
    TBranch        *b_smpt;   //!
+   TBranch        *b_fr01Chg;   //!
+   TBranch        *b_fr01EM;   //!
+   TBranch        *b_fr01;   //!
 
 };
 
@@ -204,6 +210,9 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
    t->SetBranchAddress("gendrjt", tJets.gendrjt, &tJets.b_gendrjt);
    t->SetBranchAddress("gensubid", tJets.gensubid, &tJets.b_gensubid);
    t->SetBranchAddress("smpt", tJets.smpt, &tJets.b_smpt);
+   t->SetBranchAddress("fr01Chg", tJets.fr01Chg, &tJets.b_fr01Chg);
+   t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
+   t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
       if (t->GetMaximum("nref")>450) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
       if (t->GetMaximum("ngen")>26) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;

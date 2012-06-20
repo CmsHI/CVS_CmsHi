@@ -390,7 +390,6 @@ double HiForest::jetFracChg(int i){ return 0;}
 double HiForest::jetFracNeut(int i){ return 0;}
 double HiForest::jetFracEM(int i){ return 0;}
 
-/*
 void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 {
 	std::vector<TBranch *> branch;
@@ -519,7 +518,6 @@ void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 	}
 }
 
-*/
 double jetHadFraction(Jets& jets, int ijet, Hits& hbhe, double radius = 0.3){
 
   double x = 0;
