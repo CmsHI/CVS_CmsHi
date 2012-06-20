@@ -140,8 +140,8 @@ class HiForest : public TNamed
   TTree *evtTree;                               // Event Tree
   TTree *metTree;                               // MET Tree
   TTree *pfTree;                                // PF candidate Tree, see branches in SetupPFTree.h
-  TTree *genpTree;                               // Gen photon of the signal event Tree
-  TTree *genParticleTree;                        // Stable Gen particles
+  TTree *genpTree;                              // Gen photon of the signal event Tree
+  TTree *genParticleTree;                       // Stable Gen particles
   
   TTree *tree;					// Pointer to the available tree, all trees in the forest are friended to each other
 
@@ -336,6 +336,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
     photonTree->SetName("photon");
+    photonTree->SetAlias("swiss","1-(eRight+eLeft+eTop+eBottom)/eMax");
     if (tree == 0) tree = photonTree; else tree->AddFriend(photonTree);
     setupPhotonTree(photonTree,photon);
   }
