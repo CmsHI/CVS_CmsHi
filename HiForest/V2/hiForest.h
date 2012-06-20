@@ -291,46 +291,46 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   doTrackCorrections = 0;
 
   // Load trees. Hard coded for the moment
-  hltTree      = (TTree*) inf->Get("hltanalysis/HltTree");
-  skimTree     = (TTree*) inf->Get("skimanalysis/HltTree");
-  photonTree   = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
-  trackTree    = (TTree*) inf->Get("mergedTrack/trackTree");
-  towerTree    = (TTree*) inf->Get("rechitanalyzer/tower");
-  icPu5jetTree = (TTree*) inf->Get("icPu5JetAnalyzer/t");
-  akPu2jetTree = (TTree*) inf->Get("akPu2PFJetAnalyzer/t");
-  akPu3jetTree = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
-  akPu4jetTree = (TTree*) inf->Get("akPu4PFJetAnalyzer/t");
+  hltTree          = (TTree*) inf->Get("hltanalysis/HltTree");
+  skimTree         = (TTree*) inf->Get("skimanalysis/HltTree");
+  photonTree       = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
+  trackTree        = (TTree*) inf->Get("mergedTrack/trackTree");
+  towerTree        = (TTree*) inf->Get("rechitanalyzer/tower");
+  icPu5jetTree     = (TTree*) inf->Get("icPu5JetAnalyzer/t");
+  akPu2jetTree     = (TTree*) inf->Get("akPu2PFJetAnalyzer/t");
+  akPu3jetTree     = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
+  akPu4jetTree     = (TTree*) inf->Get("akPu4PFJetAnalyzer/t");
   akPu2CaloJetTree = (TTree*) inf->Get("akPu2CaloJetAnalyzer/t");
   akPu3CaloJetTree = (TTree*) inf->Get("akPu3CaloJetAnalyzer/t");
   akPu4CaloJetTree = (TTree*) inf->Get("akPu4CaloJetAnalyzer/t");
-  hbheTree     = (TTree*) inf->Get("rechitanalyzer/hbhe");
-  ebTree       = (TTree*) inf->Get("rechitanalyzer/eb");
-  evtTree      = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
-  metTree      = (TTree*) inf->Get("anaMET/metTree");
-  pfTree      = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
-  genpTree     = (TTree*) inf->Get("genpana/photon");
-  genParticleTree     = (TTree*) inf->Get("HiGenParticleAna/hi");
+  hbheTree         = (TTree*) inf->Get("rechitanalyzer/hbhe");
+  ebTree           = (TTree*) inf->Get("rechitanalyzer/eb");
+  evtTree          = (TTree*) inf->Get("hiEvtAnalyzer/HiTree");
+  metTree          = (TTree*) inf->Get("anaMET/metTree");
+  pfTree           = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
+  genpTree         = (TTree*) inf->Get("genpana/photon");
+  genParticleTree  = (TTree*) inf->Get("HiGenParticleAna/hi");
 
   // Check the validity of the trees.
-  hasPhotonTree    = (photonTree   != 0);
-  hasPFTree        = (pfTree  	   != 0);
-  hasEvtTree       = (evtTree      != 0);
-  hasMetTree       = (metTree      != 0);
-  hasIcPu5JetTree  = (icPu5jetTree != 0);
-  hasAkPu2JetTree  = (akPu2jetTree != 0);
-  hasAkPu3JetTree  = (akPu3jetTree != 0);
-  hasAkPu4JetTree  = (akPu4jetTree != 0);
-  hasAkPu2CaloJetTree  = (akPu2CaloJetTree != 0);
-  hasAkPu3CaloJetTree  = (akPu3CaloJetTree != 0);
-  hasAkPu4CaloJetTree  = (akPu4CaloJetTree != 0);
-  hasTrackTree     = (trackTree    != 0);
-  hasHltTree       = (hltTree      != 0);
-  hasSkimTree      = (skimTree     != 0);
-  hasTowerTree     = (towerTree    != 0);
-  hasHbheTree      = (hbheTree     != 0);
-  hasEbTree        = (ebTree       != 0);
-  hasGenpTree	   = (genpTree     !=0);
-  hasGenParticleTree = (genParticleTree   !=0);
+  hasPhotonTree        = (photonTree       	!= 0);
+  hasPFTree            = (pfTree     		!= 0);
+  hasEvtTree           = (evtTree      		!= 0);
+  hasMetTree           = (metTree      		!= 0);
+  hasIcPu5JetTree      = (icPu5jetTree 		!= 0);
+  hasAkPu2JetTree      = (akPu2jetTree 		!= 0);
+  hasAkPu3JetTree      = (akPu3jetTree 		!= 0);
+  hasAkPu4JetTree      = (akPu4jetTree 		!= 0);
+  hasAkPu2CaloJetTree  = (akPu2CaloJetTree 	!= 0);
+  hasAkPu3CaloJetTree  = (akPu3CaloJetTree 	!= 0);
+  hasAkPu4CaloJetTree  = (akPu4CaloJetTree 	!= 0);
+  hasTrackTree     = (trackTree    		!= 0);
+  hasHltTree       = (hltTree    		!= 0);
+  hasSkimTree      = (skimTree   		!= 0);
+  hasTowerTree     = (towerTree    		!= 0);
+  hasHbheTree      = (hbheTree     		!= 0);
+  hasEbTree        = (ebTree       		!= 0);
+  hasGenpTree	   = (genpTree     		!=0);
+  hasGenParticleTree = (genParticleTree   	!=0);
   setupOutput = false;
   
   // Setup branches. See also Setup*.h
@@ -516,17 +516,17 @@ void HiForest::InitTree()
 
       for(int i = 0; i < trackCorrections.size(); ++i){
          if (pp) {
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq30_ppcorrpthgtv4.root",30);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq50_ppcorrpthgtv4.root",50);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq80_ppcorrpthgtv4.root",80);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq110_ppcorrpthgtv4.root",110);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq170_ppcorrpthgtv4.root",170);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj30_Forest2_v19.root",30);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj50_Forest2_v19.root",50);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj80_Forest2_v19.root",80);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj110_Forest2_v19.root",110);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj170_Forest2_v19.root",170);
          } else {
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq30_tev9hgtv4_3.root",30);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq50_tev9hgtv4_3.root",50);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq80_tev9hgtv4_3.root",80);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq110_tev9hgtv4_3.root",110);
-            trackCorrections[i]->AddSample("trkcorr/trkCorrHisAna_djuq170_tev9hgtv4_3.root",170);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj30_Forest2_v19.root",30);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj50_Forest2_v19.root",50);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj80_Forest2_v19.root",80);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj110_Forest2_v19.root",110);
+            trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj170_Forest2_v19.root",170);
          }
          trackCorrections[i]->smoothLevel_ = 1; 	 
          trackCorrections[i]->Init(); 	 
