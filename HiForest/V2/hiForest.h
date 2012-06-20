@@ -411,6 +411,8 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   if (hasTrackTree) {
     trackTree->SetName("track");
     if (tree == 0) tree = trackTree; else tree->AddFriend(trackTree);
+    trackTree->SetAlias("mergedGeneral","(trkAlgo<4||(highPurity))");
+    trackTree->SetAlias("mergedSelected","(trkAlgo<4||(highPurity&&trkAlgo==4)))");
     setupTrackTree(trackTree,track);
   }
    
