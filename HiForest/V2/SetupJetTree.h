@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 11:25:52 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -151,68 +151,68 @@ public :
 void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
-   t->SetBranchAddress("evt", &tJets.evt, &tJets.b_evt);
-   t->SetBranchAddress("b", &tJets.b, &tJets.b_b);
-   t->SetBranchAddress("nref", &tJets.nref, &tJets.b_nref);
-   t->SetBranchAddress("rawpt", tJets.rawpt, &tJets.b_rawpt);
-   t->SetBranchAddress("jtpt", tJets.jtpt, &tJets.b_jtpt);
-   t->SetBranchAddress("jteta", tJets.jteta, &tJets.b_jteta);
-   t->SetBranchAddress("jty", tJets.jty, &tJets.b_jty);
-   t->SetBranchAddress("jtphi", tJets.jtphi, &tJets.b_jtphi);
-   t->SetBranchAddress("jtpu", tJets.jtpu, &tJets.b_jtpu);
-   t->SetBranchAddress("jtm", tJets.jtm, &tJets.b_jtm);
-   t->SetBranchAddress("discr_fr01", tJets.discr_fr01, &tJets.b_discr_fr01);
-   t->SetBranchAddress("trackMax", tJets.trackMax, &tJets.b_trackMax);
-   t->SetBranchAddress("trackSum", tJets.trackSum, &tJets.b_trackSum);
-   t->SetBranchAddress("trackN", tJets.trackN, &tJets.b_trackN);
-   t->SetBranchAddress("trackHardSum", tJets.trackHardSum, &tJets.b_trackHardSum);
-   t->SetBranchAddress("trackHardN", tJets.trackHardN, &tJets.b_trackHardN);
-   t->SetBranchAddress("chargedMax", tJets.chargedMax, &tJets.b_chargedMax);
-   t->SetBranchAddress("chargedSum", tJets.chargedSum, &tJets.b_chargedSum);
-   t->SetBranchAddress("chargedN", tJets.chargedN, &tJets.b_chargedN);
-   t->SetBranchAddress("chargedHardSum", tJets.chargedHardSum, &tJets.b_chargedHardSum);
-   t->SetBranchAddress("chargedHardN", tJets.chargedHardN, &tJets.b_chargedHardN);
-   t->SetBranchAddress("photonMax", tJets.photonMax, &tJets.b_photonMax);
-   t->SetBranchAddress("photonSum", tJets.photonSum, &tJets.b_photonSum);
-   t->SetBranchAddress("photonN", tJets.photonN, &tJets.b_photonN);
-   t->SetBranchAddress("photonHardSum", tJets.photonHardSum, &tJets.b_photonHardSum);
-   t->SetBranchAddress("photonHardN", tJets.photonHardN, &tJets.b_photonHardN);
-   t->SetBranchAddress("neutralMax", tJets.neutralMax, &tJets.b_neutralMax);
-   t->SetBranchAddress("neutralSum", tJets.neutralSum, &tJets.b_neutralSum);
-   t->SetBranchAddress("neutralN", tJets.neutralN, &tJets.b_neutralN);
-   t->SetBranchAddress("eMax", tJets.eMax, &tJets.b_eMax);
-   t->SetBranchAddress("eSum", tJets.eSum, &tJets.b_eSum);
-   t->SetBranchAddress("eN", tJets.eN, &tJets.b_eN);
-   t->SetBranchAddress("muMax", tJets.muMax, &tJets.b_muMax);
-   t->SetBranchAddress("muSum", tJets.muSum, &tJets.b_muSum);
-   t->SetBranchAddress("muN", tJets.muN, &tJets.b_muN);
-   t->SetBranchAddress("matchedPt", tJets.matchedPt, &tJets.b_matchedPt);
-   t->SetBranchAddress("matchedR", tJets.matchedR, &tJets.b_matchedR);
-   t->SetBranchAddress("beamId1", &tJets.beamId1, &tJets.b_beamId1);
-   t->SetBranchAddress("beamId2", &tJets.beamId2, &tJets.b_beamId2);
-   t->SetBranchAddress("pthat", &tJets.pthat, &tJets.b_pthat);
-   t->SetBranchAddress("refpt", tJets.refpt, &tJets.b_refpt);
-   t->SetBranchAddress("refeta", tJets.refeta, &tJets.b_refeta);
-   t->SetBranchAddress("refy", tJets.refy, &tJets.b_refy);
-   t->SetBranchAddress("refphi", tJets.refphi, &tJets.b_refphi);
-   t->SetBranchAddress("refdphijt", tJets.refdphijt, &tJets.b_refdphijt);
-   t->SetBranchAddress("refdrjt", tJets.refdrjt, &tJets.b_refdrjt);
-   t->SetBranchAddress("refparton_pt", tJets.refparton_pt, &tJets.b_refparton_pt);
-   t->SetBranchAddress("refparton_flavor", tJets.refparton_flavor, &tJets.b_refparton_flavor);
-   t->SetBranchAddress("refparton_flavorForB", tJets.refparton_flavorForB, &tJets.b_refparton_flavorForB);
-   t->SetBranchAddress("ngen", &tJets.ngen, &tJets.b_ngen);
-   t->SetBranchAddress("genmatchindex", tJets.genmatchindex, &tJets.b_genmatchindex);
-   t->SetBranchAddress("genpt", tJets.genpt, &tJets.b_genpt);
-   t->SetBranchAddress("geneta", tJets.geneta, &tJets.b_geneta);
-   t->SetBranchAddress("geny", tJets.geny, &tJets.b_geny);
-   t->SetBranchAddress("genphi", tJets.genphi, &tJets.b_genphi);
-   t->SetBranchAddress("gendphijt", tJets.gendphijt, &tJets.b_gendphijt);
-   t->SetBranchAddress("gendrjt", tJets.gendrjt, &tJets.b_gendrjt);
-   t->SetBranchAddress("gensubid", tJets.gensubid, &tJets.b_gensubid);
-   t->SetBranchAddress("smpt", tJets.smpt, &tJets.b_smpt);
-   t->SetBranchAddress("fr01Chg", tJets.fr01Chg, &tJets.b_fr01Chg);
-   t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
-   t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
+   if (t->GetBranch("evt")) t->SetBranchAddress("evt", &tJets.evt, &tJets.b_evt);
+   if (t->GetBranch("b")) t->SetBranchAddress("b", &tJets.b, &tJets.b_b);
+   if (t->GetBranch("nref")) t->SetBranchAddress("nref", &tJets.nref, &tJets.b_nref);
+   if (t->GetBranch("rawpt")) t->SetBranchAddress("rawpt", tJets.rawpt, &tJets.b_rawpt);
+   if (t->GetBranch("jtpt")) t->SetBranchAddress("jtpt", tJets.jtpt, &tJets.b_jtpt);
+   if (t->GetBranch("jteta")) t->SetBranchAddress("jteta", tJets.jteta, &tJets.b_jteta);
+   if (t->GetBranch("jty")) t->SetBranchAddress("jty", tJets.jty, &tJets.b_jty);
+   if (t->GetBranch("jtphi")) t->SetBranchAddress("jtphi", tJets.jtphi, &tJets.b_jtphi);
+   if (t->GetBranch("jtpu")) t->SetBranchAddress("jtpu", tJets.jtpu, &tJets.b_jtpu);
+   if (t->GetBranch("jtm")) t->SetBranchAddress("jtm", tJets.jtm, &tJets.b_jtm);
+   if (t->GetBranch("discr_fr01")) t->SetBranchAddress("discr_fr01", tJets.discr_fr01, &tJets.b_discr_fr01);
+   if (t->GetBranch("trackMax")) t->SetBranchAddress("trackMax", tJets.trackMax, &tJets.b_trackMax);
+   if (t->GetBranch("trackSum")) t->SetBranchAddress("trackSum", tJets.trackSum, &tJets.b_trackSum);
+   if (t->GetBranch("trackN")) t->SetBranchAddress("trackN", tJets.trackN, &tJets.b_trackN);
+   if (t->GetBranch("trackHardSum")) t->SetBranchAddress("trackHardSum", tJets.trackHardSum, &tJets.b_trackHardSum);
+   if (t->GetBranch("trackHardN")) t->SetBranchAddress("trackHardN", tJets.trackHardN, &tJets.b_trackHardN);
+   if (t->GetBranch("chargedMax")) t->SetBranchAddress("chargedMax", tJets.chargedMax, &tJets.b_chargedMax);
+   if (t->GetBranch("chargedSum")) t->SetBranchAddress("chargedSum", tJets.chargedSum, &tJets.b_chargedSum);
+   if (t->GetBranch("chargedN")) t->SetBranchAddress("chargedN", tJets.chargedN, &tJets.b_chargedN);
+   if (t->GetBranch("chargedHardSum")) t->SetBranchAddress("chargedHardSum", tJets.chargedHardSum, &tJets.b_chargedHardSum);
+   if (t->GetBranch("chargedHardN")) t->SetBranchAddress("chargedHardN", tJets.chargedHardN, &tJets.b_chargedHardN);
+   if (t->GetBranch("photonMax")) t->SetBranchAddress("photonMax", tJets.photonMax, &tJets.b_photonMax);
+   if (t->GetBranch("photonSum")) t->SetBranchAddress("photonSum", tJets.photonSum, &tJets.b_photonSum);
+   if (t->GetBranch("photonN")) t->SetBranchAddress("photonN", tJets.photonN, &tJets.b_photonN);
+   if (t->GetBranch("photonHardSum")) t->SetBranchAddress("photonHardSum", tJets.photonHardSum, &tJets.b_photonHardSum);
+   if (t->GetBranch("photonHardN")) t->SetBranchAddress("photonHardN", tJets.photonHardN, &tJets.b_photonHardN);
+   if (t->GetBranch("neutralMax")) t->SetBranchAddress("neutralMax", tJets.neutralMax, &tJets.b_neutralMax);
+   if (t->GetBranch("neutralSum")) t->SetBranchAddress("neutralSum", tJets.neutralSum, &tJets.b_neutralSum);
+   if (t->GetBranch("neutralN")) t->SetBranchAddress("neutralN", tJets.neutralN, &tJets.b_neutralN);
+   if (t->GetBranch("eMax")) t->SetBranchAddress("eMax", tJets.eMax, &tJets.b_eMax);
+   if (t->GetBranch("eSum")) t->SetBranchAddress("eSum", tJets.eSum, &tJets.b_eSum);
+   if (t->GetBranch("eN")) t->SetBranchAddress("eN", tJets.eN, &tJets.b_eN);
+   if (t->GetBranch("muMax")) t->SetBranchAddress("muMax", tJets.muMax, &tJets.b_muMax);
+   if (t->GetBranch("muSum")) t->SetBranchAddress("muSum", tJets.muSum, &tJets.b_muSum);
+   if (t->GetBranch("muN")) t->SetBranchAddress("muN", tJets.muN, &tJets.b_muN);
+   if (t->GetBranch("matchedPt")) t->SetBranchAddress("matchedPt", tJets.matchedPt, &tJets.b_matchedPt);
+   if (t->GetBranch("matchedR")) t->SetBranchAddress("matchedR", tJets.matchedR, &tJets.b_matchedR);
+   if (t->GetBranch("beamId1")) t->SetBranchAddress("beamId1", &tJets.beamId1, &tJets.b_beamId1);
+   if (t->GetBranch("beamId2")) t->SetBranchAddress("beamId2", &tJets.beamId2, &tJets.b_beamId2);
+   if (t->GetBranch("pthat")) t->SetBranchAddress("pthat", &tJets.pthat, &tJets.b_pthat);
+   if (t->GetBranch("refpt")) t->SetBranchAddress("refpt", tJets.refpt, &tJets.b_refpt);
+   if (t->GetBranch("refeta")) t->SetBranchAddress("refeta", tJets.refeta, &tJets.b_refeta);
+   if (t->GetBranch("refy")) t->SetBranchAddress("refy", tJets.refy, &tJets.b_refy);
+   if (t->GetBranch("refphi")) t->SetBranchAddress("refphi", tJets.refphi, &tJets.b_refphi);
+   if (t->GetBranch("refdphijt")) t->SetBranchAddress("refdphijt", tJets.refdphijt, &tJets.b_refdphijt);
+   if (t->GetBranch("refdrjt")) t->SetBranchAddress("refdrjt", tJets.refdrjt, &tJets.b_refdrjt);
+   if (t->GetBranch("refparton_pt")) t->SetBranchAddress("refparton_pt", tJets.refparton_pt, &tJets.b_refparton_pt);
+   if (t->GetBranch("refparton_flavor")) t->SetBranchAddress("refparton_flavor", tJets.refparton_flavor, &tJets.b_refparton_flavor);
+   if (t->GetBranch("refparton_flavorForB")) t->SetBranchAddress("refparton_flavorForB", tJets.refparton_flavorForB, &tJets.b_refparton_flavorForB);
+   if (t->GetBranch("ngen")) t->SetBranchAddress("ngen", &tJets.ngen, &tJets.b_ngen);
+   if (t->GetBranch("genmatchindex")) t->SetBranchAddress("genmatchindex", tJets.genmatchindex, &tJets.b_genmatchindex);
+   if (t->GetBranch("genpt")) t->SetBranchAddress("genpt", tJets.genpt, &tJets.b_genpt);
+   if (t->GetBranch("geneta")) t->SetBranchAddress("geneta", tJets.geneta, &tJets.b_geneta);
+   if (t->GetBranch("geny")) t->SetBranchAddress("geny", tJets.geny, &tJets.b_geny);
+   if (t->GetBranch("genphi")) t->SetBranchAddress("genphi", tJets.genphi, &tJets.b_genphi);
+   if (t->GetBranch("gendphijt")) t->SetBranchAddress("gendphijt", tJets.gendphijt, &tJets.b_gendphijt);
+   if (t->GetBranch("gendrjt")) t->SetBranchAddress("gendrjt", tJets.gendrjt, &tJets.b_gendrjt);
+   if (t->GetBranch("gensubid")) t->SetBranchAddress("gensubid", tJets.gensubid, &tJets.b_gensubid);
+   if (t->GetBranch("smpt")) t->SetBranchAddress("smpt", tJets.smpt, &tJets.b_smpt);
+   if (t->GetBranch("fr01Chg")) t->SetBranchAddress("fr01Chg", tJets.fr01Chg, &tJets.b_fr01Chg);
+   if (t->GetBranch("fr01EM")) t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
+   if (t->GetBranch("fr01")) t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
       if (t->GetMaximum("nref")>450) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl;
       if (t->GetMaximum("ngen")>26) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl;

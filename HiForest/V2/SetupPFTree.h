@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
 // from TTree pfTree/dijet tree
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -37,11 +37,11 @@ public :
 void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
-   t->SetBranchAddress("nPFpart", &tPFs.nPFpart, &tPFs.b_nPFpart);
-   t->SetBranchAddress("pfId", tPFs.pfId, &tPFs.b_pfId);
-   t->SetBranchAddress("pfPt", tPFs.pfPt, &tPFs.b_pfPt);
-   t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
-   t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
+   if (t->GetBranch("nPFpart")) t->SetBranchAddress("nPFpart", &tPFs.nPFpart, &tPFs.b_nPFpart);
+   if (t->GetBranch("pfId")) t->SetBranchAddress("pfId", tPFs.pfId, &tPFs.b_pfId);
+   if (t->GetBranch("pfPt")) t->SetBranchAddress("pfPt", tPFs.pfPt, &tPFs.b_pfPt);
+   if (t->GetBranch("pfEta")) t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
+   if (t->GetBranch("pfPhi")) t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
    if (doCheck) {
       if (t->GetMaximum("nPFpart")>10352) cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl;
    }

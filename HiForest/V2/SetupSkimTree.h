@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 11:30:51 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
 // from TTree HltTree/
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -53,19 +53,19 @@ public :
 void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
-   t->SetBranchAddress("L1simulation_step", &tSkims.L1simulation_step, &tSkims.b_L1simulation_step);
-   t->SetBranchAddress("reco_extra", &tSkims.reco_extra, &tSkims.b_reco_extra);
-   t->SetBranchAddress("reco_extra_jet", &tSkims.reco_extra_jet, &tSkims.b_reco_extra_jet);
-   t->SetBranchAddress("gen_step", &tSkims.gen_step, &tSkims.b_gen_step);
-   t->SetBranchAddress("pat_step", &tSkims.pat_step, &tSkims.b_pat_step);
-   t->SetBranchAddress("extrapatstep", &tSkims.extrapatstep, &tSkims.b_extrapatstep);
-   t->SetBranchAddress("ana_step", &tSkims.ana_step, &tSkims.b_ana_step);
-   t->SetBranchAddress("phltJetHI", &tSkims.phltJetHI, &tSkims.b_phltJetHI);
-   t->SetBranchAddress("pcollisionEventSelection", &tSkims.pcollisionEventSelection, &tSkims.b_pcollisionEventSelection);
-   t->SetBranchAddress("pHBHENoiseFilter", &tSkims.pHBHENoiseFilter, &tSkims.b_pHBHENoiseFilter);
-   t->SetBranchAddress("phiEcalRecHitSpikeFilter", &tSkims.phiEcalRecHitSpikeFilter, &tSkims.b_phiEcalRecHitSpikeFilter);
-   t->SetBranchAddress("phfCoincFilter", &tSkims.phfCoincFilter, &tSkims.b_phfCoincFilter);
-   t->SetBranchAddress("ppurityFractionFilter", &tSkims.ppurityFractionFilter, &tSkims.b_ppurityFractionFilter);
+   if (t->GetBranch("L1simulation_step")) t->SetBranchAddress("L1simulation_step", &tSkims.L1simulation_step, &tSkims.b_L1simulation_step);
+   if (t->GetBranch("reco_extra")) t->SetBranchAddress("reco_extra", &tSkims.reco_extra, &tSkims.b_reco_extra);
+   if (t->GetBranch("reco_extra_jet")) t->SetBranchAddress("reco_extra_jet", &tSkims.reco_extra_jet, &tSkims.b_reco_extra_jet);
+   if (t->GetBranch("gen_step")) t->SetBranchAddress("gen_step", &tSkims.gen_step, &tSkims.b_gen_step);
+   if (t->GetBranch("pat_step")) t->SetBranchAddress("pat_step", &tSkims.pat_step, &tSkims.b_pat_step);
+   if (t->GetBranch("extrapatstep")) t->SetBranchAddress("extrapatstep", &tSkims.extrapatstep, &tSkims.b_extrapatstep);
+   if (t->GetBranch("ana_step")) t->SetBranchAddress("ana_step", &tSkims.ana_step, &tSkims.b_ana_step);
+   if (t->GetBranch("phltJetHI")) t->SetBranchAddress("phltJetHI", &tSkims.phltJetHI, &tSkims.b_phltJetHI);
+   if (t->GetBranch("pcollisionEventSelection")) t->SetBranchAddress("pcollisionEventSelection", &tSkims.pcollisionEventSelection, &tSkims.b_pcollisionEventSelection);
+   if (t->GetBranch("pHBHENoiseFilter")) t->SetBranchAddress("pHBHENoiseFilter", &tSkims.pHBHENoiseFilter, &tSkims.b_pHBHENoiseFilter);
+   if (t->GetBranch("phiEcalRecHitSpikeFilter")) t->SetBranchAddress("phiEcalRecHitSpikeFilter", &tSkims.phiEcalRecHitSpikeFilter, &tSkims.b_phiEcalRecHitSpikeFilter);
+   if (t->GetBranch("phfCoincFilter")) t->SetBranchAddress("phfCoincFilter", &tSkims.phfCoincFilter, &tSkims.b_phfCoincFilter);
+   if (t->GetBranch("ppurityFractionFilter")) t->SetBranchAddress("ppurityFractionFilter", &tSkims.ppurityFractionFilter, &tSkims.b_ppurityFractionFilter);
    if (doCheck) {
    }
 }

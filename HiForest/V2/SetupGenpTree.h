@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
 // from TTree photon/Tree of Rechits around photon
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -49,17 +49,17 @@ public :
 void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
-   t->SetBranchAddress("cBin", &tGenps.cBin, &tGenps.b_cBin);
-   t->SetBranchAddress("hf", &tGenps.hf, &tGenps.b_hf);
-   t->SetBranchAddress("nPar", &tGenps.nPar, &tGenps.b_nPar);
-   t->SetBranchAddress("recoVtxZ", &tGenps.recoVtxZ, &tGenps.b_recoVtxZ);
-   t->SetBranchAddress("et", tGenps.et, &tGenps.b_et);
-   t->SetBranchAddress("eta", tGenps.eta, &tGenps.b_eta);
-   t->SetBranchAddress("phi", tGenps.phi, &tGenps.b_phi);
-   t->SetBranchAddress("id", tGenps.id, &tGenps.b_id);
-   t->SetBranchAddress("momId", tGenps.momId, &tGenps.b_momId);
-   t->SetBranchAddress("status", tGenps.status, &tGenps.b_status);
-   t->SetBranchAddress("collId", tGenps.collId, &tGenps.b_collId);
+   if (t->GetBranch("cBin")) t->SetBranchAddress("cBin", &tGenps.cBin, &tGenps.b_cBin);
+   if (t->GetBranch("hf")) t->SetBranchAddress("hf", &tGenps.hf, &tGenps.b_hf);
+   if (t->GetBranch("nPar")) t->SetBranchAddress("nPar", &tGenps.nPar, &tGenps.b_nPar);
+   if (t->GetBranch("recoVtxZ")) t->SetBranchAddress("recoVtxZ", &tGenps.recoVtxZ, &tGenps.b_recoVtxZ);
+   if (t->GetBranch("et")) t->SetBranchAddress("et", tGenps.et, &tGenps.b_et);
+   if (t->GetBranch("eta")) t->SetBranchAddress("eta", tGenps.eta, &tGenps.b_eta);
+   if (t->GetBranch("phi")) t->SetBranchAddress("phi", tGenps.phi, &tGenps.b_phi);
+   if (t->GetBranch("id")) t->SetBranchAddress("id", tGenps.id, &tGenps.b_id);
+   if (t->GetBranch("momId")) t->SetBranchAddress("momId", tGenps.momId, &tGenps.b_momId);
+   if (t->GetBranch("status")) t->SetBranchAddress("status", tGenps.status, &tGenps.b_status);
+   if (t->GetBranch("collId")) t->SetBranchAddress("collId", tGenps.collId, &tGenps.b_collId);
    if (doCheck) {
       if (t->GetMaximum("nPar")>316) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
    }

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun 19 11:19:47 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:11:32 2012 by ROOT version 5.27/06b
 // from TTree metTree/v1
 // found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
@@ -43,14 +43,14 @@ public :
 void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
-   t->SetBranchAddress("nEv", &tMets.nEv, &tMets.b_nEv);
-   t->SetBranchAddress("nLumi", &tMets.nLumi, &tMets.b_nLumi);
-   t->SetBranchAddress("nBX", &tMets.nBX, &tMets.b_nBX);
-   t->SetBranchAddress("nRun", &tMets.nRun, &tMets.b_nRun);
-   t->SetBranchAddress("nMET", &tMets.nMET, &tMets.b_nMET);
-   t->SetBranchAddress("MET", tMets.MET, &tMets.b_MET);
-   t->SetBranchAddress("METPhi", tMets.METPhi, &tMets.b_METPhi);
-   t->SetBranchAddress("SumEt", tMets.SumEt, &tMets.b_SumEt);
+   if (t->GetBranch("nEv")) t->SetBranchAddress("nEv", &tMets.nEv, &tMets.b_nEv);
+   if (t->GetBranch("nLumi")) t->SetBranchAddress("nLumi", &tMets.nLumi, &tMets.b_nLumi);
+   if (t->GetBranch("nBX")) t->SetBranchAddress("nBX", &tMets.nBX, &tMets.b_nBX);
+   if (t->GetBranch("nRun")) t->SetBranchAddress("nRun", &tMets.nRun, &tMets.b_nRun);
+   if (t->GetBranch("nMET")) t->SetBranchAddress("nMET", &tMets.nMET, &tMets.b_nMET);
+   if (t->GetBranch("MET")) t->SetBranchAddress("MET", tMets.MET, &tMets.b_MET);
+   if (t->GetBranch("METPhi")) t->SetBranchAddress("METPhi", tMets.METPhi, &tMets.b_METPhi);
+   if (t->GetBranch("SumEt")) t->SetBranchAddress("SumEt", tMets.SumEt, &tMets.b_SumEt);
    if (doCheck) {
       if (t->GetMaximum("nMET")>2) cout <<"FATAL ERROR: Arrary size of nMET too small!!!  "<<t->GetMaximum("nMET")<<endl;
    }
