@@ -163,6 +163,9 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 #########################
 # Track Analyzer
 #########################
+process.anaTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
+process.pixelTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
+process.mergedTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
 
 # Muons 
 process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
@@ -188,6 +191,10 @@ process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
 process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
+process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+
+
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
 
@@ -195,6 +202,9 @@ process.HiGenParticleAna = cms.EDAnalyzer("HiGenAnalyzer")
 process.HiGenParticleAna.src= cms.untracked.InputTag("hiGenParticles")
 process.HiGenParticleAna.chargedOnly = cms.untracked.bool(False)
 process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
+
+# Remove neutrinos
+process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
 
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
@@ -434,7 +444,7 @@ setPhotonObject(process,"cleanPhotons")
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
-process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
 process.hltAna = cms.EndPath(process.hltanalysis)
 process.reco_extra*=process.L1Extra
 
