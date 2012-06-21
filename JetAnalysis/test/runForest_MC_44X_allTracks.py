@@ -172,6 +172,9 @@ process.ak3PFJetAnalyzer = process.icPu5JetAnalyzer.clone(
 process.ak5extra = cms.Sequence(process.ak5CaloJets*process.ak5corr*process.ak5patJets*process.ak5CaloJetAnalyzer)
 process.ak3extra = cms.Sequence(process.ak3PFJetsX*process.ak3corrX*process.ak3patJetsX*process.ak3PFJetAnalyzer)
 
+# Remove neutrinos
+process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
+
 #process.load("edwenger.Skims.EventFilter_cff")
 #from edwenger.Skims.customise_cfi import *
 #run2760GeVmode(process)
