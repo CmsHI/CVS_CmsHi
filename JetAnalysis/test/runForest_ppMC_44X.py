@@ -183,6 +183,8 @@ process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 
+# Remove neutrinos
+process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
