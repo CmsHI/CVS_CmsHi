@@ -197,6 +197,10 @@ process.HiGenParticleAna.src= cms.untracked.InputTag("hiGenParticles")
 process.HiGenParticleAna.chargedOnly = cms.untracked.bool(False)
 process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
 
+# Remove neutrinos
+process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
+
+
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
 process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
@@ -388,6 +392,7 @@ process.pat_step.remove(process.interestingTrackEcalDetIds)
 process.photonMatch.matched = cms.InputTag("hiGenParticles")
 #process.pat_step.remove(process.photonMatch)
 #+ process.patPhotons)
+
 
 process.patPhotons.addPhotonID = cms.bool(False)
 #process.makeHeavyIonPhotons)
