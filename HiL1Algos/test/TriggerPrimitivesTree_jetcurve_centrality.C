@@ -1,5 +1,5 @@
-#define TriggerPrimitivesTree_jetcurve_cxx
-#include "TriggerPrimitivesTree_jetcurve.h"
+#define TriggerPrimitivesTree_jetcurve_centrality_cxx
+#include "TriggerPrimitivesTree_jetcurve_centrality.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -8,7 +8,6 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
 
 typedef struct{
   int eta;
@@ -20,11 +19,8 @@ int sort_func_jet(const void *a, const void *b);
 
 void print_jets(jet *clusters, int jet_length);
 
-TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
-					   int threshold,
-					   enum SUBTRACT_ALGORITHM algorithm,
-					   int minCentBin,
-					   int maxCentBin)
+TH1D* TriggerPrimitivesTree_jetcurve_centrality::Loop(int threshold,
+				      enum SUBTRACT_ALGORITHM algorithm)
 {
   TH1::SetDefaultSumw2();
   
@@ -55,50 +51,59 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
   
   Long64_t nentries = fChain->GetEntriesFast();
   
-  const int nbins = 40; //number of jet pt bins
-  const int MAX_JET_EN = 200; //max energy shown by the histogram, in GeV
+  const int nbins = 30; //number of jet pt bins from 0 to MAX_JET_EN
+  const int MAX_JET_EN = 300;
+  const int cenhists = 1;
+  const int etabins = 1;
   
-  TH1D* jet_curve;
-  TH1I* total_in_bin;
+  TH1D* jet_curve[cenhists][etabins];
+  TH1I* total_in_bin[cenhists][etabins];
 
-  TString method;
-  TString method_s;
+  string method;
   switch(algorithm)
   {
   case RCT_MINIMUM:
     method = "minsub";
-    method_s = method;
     break;
   case RCT_AVERAGE:
     method = "avgsub";
-    method_s = method;
     break;
   case PHI_AVERAGE:
-    method = "Region-Level Phi-Ring Subtraction";
-    method_s = "phisub";
+    method = "phisub";
     break;
   case MIN_3X3:
     method = "3x3sub";
-    method_s = method;
     break;
   default:
-    method = "Current L1 System";
-    method_s = "nosub";
+    method = "nosub";
     break;
   }
 
-  stringstream name1,name2,name3;
-  name1 << "Jet Turn-On. "<< method <<  " Threshold:" << threshold;
-  name2 << "total_in_bin";
-  name3 << "jet_curve";
-  jet_curve = new TH1D(name3.str().c_str(), name1.str().c_str(),
-		       nbins,0,MAX_JET_EN);
-  total_in_bin = new TH1I(name2.str().c_str(),name2.str().c_str(),
-			  nbins,0,MAX_JET_EN);
+  double centrality[cenhists+1];
+  for(int i = 0; i <= cenhists; i++)
+    centrality[i] = (double)i/cenhists*100.;
+  // double mineta[etabins] = {-4.5, -3.6, -2, -1, 1, 2, 3.6};
+  // double maxeta[etabins] = {-3.6, -2, -1, 1, 2, 3.6, 4.5};
 
-  int evts = 0;
-  bool break_early = total_events != -1;
-  
+  for(int i = 0; i < cenhists; i++)
+  {
+    for(int j = 0; j < etabins; j++)
+    {
+      stringstream name1,name2,name3;
+      name1 << method
+	    << ". Threshold:" << threshold
+	    << ". Centrality:"<< centrality[i] << "% to " << centrality[i+1] << "%";
+      //<< ". Eta: " << mineta[j] << " to " << maxeta[j];
+      name2 << "total_in_bin_" << i << j;
+      name3 << "jet_curve_centrality_"<< i << j;
+      jet_curve[i][j] = new TH1D(name3.str().c_str(), name1.str().c_str(),
+				 nbins,0, MAX_JET_EN);
+      total_in_bin[i][j] = new TH1I(name2.str().c_str(),name2.str().c_str(),
+				    nbins,0, MAX_JET_EN);
+    }
+  }
+
+  int evts = 0;  
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
@@ -108,25 +113,42 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 
     // If the event has halo, no tracks, or energy less than 3GeV in
     // both forward calorimeters than skip it.
-    if( !(!(fhlt->L1Tech_BSC_halo_beam2_inner_v0 ||
-	    fhlt->L1Tech_BSC_halo_beam2_outer_v0 ||
-	    fhlt->L1Tech_BSC_halo_beam1_inner_v0 ||
-	    fhlt->L1Tech_BSC_halo_beam1_outer_v0 )
-	  && fhiinfo->hiNtracks>0
-	  && fhiinfo->hiHFplus>3
-	  && fhiinfo->hiHFminus>3))
+    if(!(
+	 !(fhlt->L1Tech_BSC_halo_beam2_inner_v0 ||
+	   fhlt->L1Tech_BSC_halo_beam2_outer_v0 ||
+	   fhlt->L1Tech_BSC_halo_beam1_inner_v0 ||
+	   fhlt->L1Tech_BSC_halo_beam1_outer_v0 )
+	 && fhiinfo->hiNtracks>0
+	 && fhiinfo->hiHFplus>3
+	 && fhiinfo->hiHFminus>3
+	 )
+      )
       continue;
 
     fjet->GetEntry(jentry);
     // If there are no jets in the event skip it.
     if (fjet->nref <= 0) continue;
-    float_t realJetPt = fjet->jtpt[0];
-    int centBin = fhiinfo->hiBin;
-    if(centBin < minCentBin || centBin > maxCentBin) continue;
+    // cut some noise events from the jet sample
+    if (fjet->jtpt[0] < 95) continue;
 
     evts++;
-    if(break_early && (evts > total_events)) break;
 
+    float_t realJetPt = fjet->jtpt[0];
+    
+    int jetCentBin = fhiinfo->hiBin;
+    int jetCentHist = jetCentBin*cenhists/40;
+    
+    float_t realJetEta = fjet->jteta[0];
+    if( realJetEta < -1 || realJetEta > 1) continue;
+    int jetEtaBin = 0;
+    // if(realJetEta < -3.6) jetEtaBin = 0;
+    // else if(realJetEta < -2) jetEtaBin = 1;
+    // else if(realJetEta < -1) jetEtaBin = 2;
+    // else if(realJetEta < 1) jetEtaBin = 3;
+    // else if(realJetEta < 2) jetEtaBin = 4;
+    // else if(realJetEta < 3.6) jetEtaBin = 5;
+    // else jetEtaBin = 6;
+    
     fChain->GetEntry(jentry);
 
     double fulldetector[22][18]; //[eta][phi]
@@ -296,29 +318,38 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
     qsort(head, 18*2*3, sizeof(jet), sort_func_jet);
     
     if(head[0].et > threshold)
-      jet_curve->Fill(realJetPt);
-    else
-      jet_curve->Fill(realJetPt,0);
+      jet_curve[jetCentHist][jetEtaBin]->Fill(realJetPt);
+    // else
+    //   jet_curve[jetCentHist]->Fill(realJetPt,0);
     
-    total_in_bin->Fill(realJetPt);
+    total_in_bin[jetCentHist][jetEtaBin]->Fill(realJetPt);
+  }
+
+  cout << "Total Events: " << evts << endl;
+
+  TCanvas *plots[cenhists][etabins];
+  for(int i = 0; i < cenhists; i++)
+  {
+    for(int j = 0; j < etabins; j++)
+    {
+      stringstream filename;
+      filename << "jetto_" << method << "_" << threshold
+	       << "_" << i <<"_"<< j << ".gif";
+      
+      plots[i][j] = new TCanvas();
+      jet_curve[i][j]->Divide(total_in_bin[i][j]);
+  
+      jet_curve[i][j]->SetXTitle("Real Jet Pt (GeV)");
+      jet_curve[i][j]->SetYTitle("Fraction Accepted");
+      
+      jet_curve[i][j]->GetYaxis()->SetRangeUser(0,1);
+      jet_curve[i][j]->Draw("E");
+      
+      plots[i][j]->SaveAs(filename.str().c_str());
+    }
   }
   
-//TCanvas *plot;
-
-  stringstream filename;
-  filename << "jetto_" << method_s << "_" << threshold << ".gif";
-//plot = new TCanvas();
-  //jet_curve->Divide(total_in_bin);
-  jet_curve->Divide(jet_curve, total_in_bin, 1, 1, "b");
-  jet_curve->SetXTitle("Real Jet Pt (GeV)");
-  jet_curve->SetYTitle("Fraction Accepted");
-
-  jet_curve->GetYaxis()->SetRangeUser(0,1);
-  //jet_curve->Draw("E");
-
-//plots[i]->SaveAs(filename.str().c_str());
-  
-  return(jet_curve);
+  return(jet_curve[0][0]);
 }
 
 int sort_func_jet(const void *a, const void *b) 

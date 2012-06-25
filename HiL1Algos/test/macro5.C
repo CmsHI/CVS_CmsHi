@@ -1,0 +1,112 @@
+#include "TH1.h"
+#include "TriggerPrimitivesTree_jetcurve.h"
+#include "TFile.h"
+#include "TCanvas.h"
+#include "TStyle.h"
+#include "TLegend.h"
+#include "TLatex.h"
+#include "TString.h"
+
+void macro5()
+{
+  TriggerPrimitivesTree_jetcurve *min =
+    new TriggerPrimitivesTree_jetcurve(new TFile("minbias.root"));
+
+  TriggerPrimitivesTree_jetcurve::SUBTRACT_ALGORITHM algo;
+
+  const int total_events = -1;
+  
+  TH1D* h_min[6]; 
+  //stringstream title[4];
+  TCanvas *plot[3];
+  TLegend *leg[3];
+  TString title;
+  
+  int threshold;
+  int minCentBin, maxCentBin;
+  for(int i = 0; i < 6; i++)
+  {
+    switch(i)
+    {
+    case 0:
+      title = "Current L1 System, 5\% Threshold";
+      minCentBin = 0;
+      maxCentBin = 11;
+      algo = TriggerPrimitivesTree_jetcurve::NONE;
+      threshold = 372;
+      break;
+    case 1:
+      title = "Current L1 System, 5\% Threshold";
+      minCentBin = 20;
+      maxCentBin = 40;
+      algo = TriggerPrimitivesTree_jetcurve::NONE;
+      threshold = 372;
+      break;      
+    case 2:
+      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold";
+      minCentBin = 0;
+      maxCentBin = 11;     
+      algo = TriggerPrimitivesTree_jetcurve::PHI_AVERAGE;
+      threshold = 75;
+      break;
+    case 3:
+      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold";
+      minCentBin = 20;
+      maxCentBin = 40;     
+      algo = TriggerPrimitivesTree_jetcurve::PHI_AVERAGE;
+      threshold = 75;
+      break;
+    case 4:
+      title = "Current L1 System, Threshold 75 CeT";
+      minCentBin = 0;
+      maxCentBin = 11;
+      algo = TriggerPrimitivesTree_jetcurve::NONE;
+      threshold = 75;
+      break;
+    case 5:
+      title = "Current L1 System, Threshold 75 CeT";
+      minCentBin = 20;
+      maxCentBin = 40;
+      algo = TriggerPrimitivesTree_jetcurve::NONE;
+      threshold = 75;
+      break;
+    }    
+
+    h_min[i] = (TH1D*)min->Loop(total_events, threshold, algo, minCentBin, maxCentBin)->Clone();
+    h_min[i]->SetTitle(title);
+    //h_min[i]->Draw("E");
+  }
+
+  plot[0] = new TCanvas();
+  h_min[0]->Draw("p,E");
+  h_min[1]->SetMarkerStyle(24);
+  h_min[1]->Draw("p,E,same");
+  leg[0] = new TLegend(0.2,0.6,0.5,0.8);
+  leg[0]->SetFillColor(0);
+  leg[0]->AddEntry(h_min[0],"0-30\% Centrality","p");
+  leg[0]->AddEntry(h_min[1],"50-100\% Centrality","p");
+  leg[0]->Draw();
+  plot[0]->Update();
+
+  plot[1] = new TCanvas();
+  h_min[2]->Draw("p,E");
+  h_min[3]->SetMarkerStyle(24);
+  h_min[3]->Draw("p,E,same");
+  leg[1] = new TLegend(0.6,0.4,0.9,0.6);
+  leg[1]->SetFillColor(0);
+  leg[1]->AddEntry(h_min[2],"0-30\% Centrality","p");
+  leg[1]->AddEntry(h_min[3],"50-100\% Centrality","p");
+  leg[1]->Draw();
+  plot[1]->Update();
+
+  plot[2] = new TCanvas();
+  h_min[4]->Draw("p,E");
+  h_min[5]->SetMarkerStyle(24);
+  h_min[5]->Draw("p,E,same");
+  leg[2] = new TLegend(0.6,0.4,0.9,0.6);
+  leg[2]->SetFillColor(0);
+  leg[2]->AddEntry(h_min[4],"0-30\% Centrality","p");
+  leg[2]->AddEntry(h_min[5],"50-100\% Centrality","p");
+  leg[2]->Draw();
+  plot[2]->Update();
+}

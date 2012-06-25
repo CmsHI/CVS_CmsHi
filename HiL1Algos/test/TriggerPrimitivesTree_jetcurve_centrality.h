@@ -5,8 +5,8 @@
 // found on file: HiForest.root
 //////////////////////////////////////////////////////////
 
-#ifndef TriggerPrimitivesTree_alex_h
-#define TriggerPrimitivesTree_alex_h
+#ifndef TriggerPrimitivesTree_jetcurve_centrality_h
+#define TriggerPrimitivesTree_jetcurve_centrality_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -20,7 +20,7 @@
 #include "JetTree.C"
 
 
-class TriggerPrimitivesTree_alex {
+class TriggerPrimitivesTree_jetcurve_centrality {
 public :
   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
   Int_t           fCurrent; //!current Tree number in a TChain
@@ -93,16 +93,14 @@ public :
     MIN_3X3 = 4
   };
 
-  TriggerPrimitivesTree_alex(TFile *f=0);
-  virtual ~TriggerPrimitivesTree_alex();
+  TriggerPrimitivesTree_jetcurve_centrality(TFile *f=0);
+  virtual ~TriggerPrimitivesTree_jetcurve_centrality();
   virtual Int_t    Cut(Long64_t entry);
   virtual Int_t    GetEntry(Long64_t entry);
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
-  virtual TH1D*    Loop(int total_events = 0, 
-			int threshhold = 0,
-			enum SUBTRACT_ALGORITHM algorithm = NONE,
-			bool cut_noise_events = false);
+  virtual TH1D*    Loop(int threshhold = 0,
+			enum SUBTRACT_ALGORITHM algorithm = NONE);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);
   
@@ -118,8 +116,8 @@ public :
 
 #endif
 
-#ifdef TriggerPrimitivesTree_alex_cxx
-TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
+#ifdef TriggerPrimitivesTree_jetcurve_centrality_cxx
+TriggerPrimitivesTree_jetcurve_centrality::TriggerPrimitivesTree_jetcurve_centrality(TFile *f)
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -130,8 +128,9 @@ TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
     
     //tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
     
-  }
+    }
   TTree *tree = (TTree*)gDirectory->Get("demo/TriggerPrimitivesTree");
+  fjet = new JetTree::JetTree((TTree*)gDirectory->Get("icPu5JetAnalyzer/t"));
   fhlt = new HltTree::HltTree((TTree*)gDirectory->Get("hltanalysis/HltTree"));
   fhiinfo = new HiTree::HiTree((TTree*)gDirectory->Get("hiEvtAnalyzer/HiTree"));
   //fhlt = new HltTree::HltTree();
@@ -142,19 +141,19 @@ TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
   Init(tree);
 }
 
-TriggerPrimitivesTree_alex::~TriggerPrimitivesTree_alex()
+TriggerPrimitivesTree_jetcurve_centrality::~TriggerPrimitivesTree_jetcurve_centrality()
 {
   if (!fChain) return;
   delete fChain->GetCurrentFile();
 }
 
-Int_t TriggerPrimitivesTree_alex::GetEntry(Long64_t entry)
+Int_t TriggerPrimitivesTree_jetcurve_centrality::GetEntry(Long64_t entry)
 {
   // Read contents of entry.
   if (!fChain) return 0;
   return fChain->GetEntry(entry);
 }
-Long64_t TriggerPrimitivesTree_alex::LoadTree(Long64_t entry)
+Long64_t TriggerPrimitivesTree_jetcurve_centrality::LoadTree(Long64_t entry)
 {
   // Set the environment to read one entry
   if (!fChain) return -5;
@@ -169,7 +168,7 @@ Long64_t TriggerPrimitivesTree_alex::LoadTree(Long64_t entry)
   return centry;
 }
 
-void TriggerPrimitivesTree_alex::Init(TTree *tree)
+void TriggerPrimitivesTree_jetcurve_centrality::Init(TTree *tree)
 {
   // The Init() function is called when the selector needs to initialize
   // a new tree or chain. Typically here the branch addresses and branch
@@ -216,7 +215,7 @@ void TriggerPrimitivesTree_alex::Init(TTree *tree)
   Notify();
 }
 
-Bool_t TriggerPrimitivesTree_alex::Notify()
+Bool_t TriggerPrimitivesTree_jetcurve_centrality::Notify()
 {
   // The Notify() function is called when a new file is opened. This
   // can be either for a new TTree in a TChain or when when a new TTree
@@ -227,18 +226,18 @@ Bool_t TriggerPrimitivesTree_alex::Notify()
   return kTRUE;
 }
 
-void TriggerPrimitivesTree_alex::Show(Long64_t entry)
+void TriggerPrimitivesTree_jetcurve_centrality::Show(Long64_t entry)
 {
   // Print contents of entry.
   // If entry is not specified, print current entry
   if (!fChain) return;
   fChain->Show(entry);
 }
-Int_t TriggerPrimitivesTree_alex::Cut(Long64_t entry)
+Int_t TriggerPrimitivesTree_jetcurve_centrality::Cut(Long64_t entry)
 {
   // This function may be called from Loop.
   // returns  1 if entry is accepted.
   // returns -1 otherwise.
   return 1;
 }
-#endif // #ifdef TriggerPrimitivesTree_alex_cxx
+#endif // #ifdef TriggerPrimitivesTree_jetcurve_centrality_cxx

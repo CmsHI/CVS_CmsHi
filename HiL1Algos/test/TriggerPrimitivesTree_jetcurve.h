@@ -99,9 +99,11 @@ public :
   virtual Int_t    GetEntry(Long64_t entry);
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
-  virtual TH1D*    Loop(int total_events = 0, 
+  virtual TH1D*    Loop(int total_events = -1,
 			int threshhold = 0,
-			enum SUBTRACT_ALGORITHM algorithm = NONE);
+			enum SUBTRACT_ALGORITHM algorithm = NONE,
+			int minCentBin = 0,
+			int maxCentBin = 40);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);
   
