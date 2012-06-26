@@ -19,7 +19,7 @@ void print_jets(jet *clusters, int jet_length);
 
 TH1D* TriggerPrimitivesTree_alex::Loop(int total_events, 
 				       int threshhold,
-				       enum SUBTRACT_ALGORITHM algorithm,
+				       bool PHI_AVERAGE,
 				       bool cut_noise_events)
 {
   const int NBINS = 200;
@@ -101,53 +101,10 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
       RCTs[rctnum][caloRCTRegionEtaIndex[i]][caloRCTRegionPhiIndex[i]] = caloRegionEt[i];
     }
 
-    switch(algorithm)
-    {
-    case RCT_MINIMUM:
-      int rct_minimums[18];
-      for(int i = 0; i < 18; i++)
-      {
-	rct_minimums[i] = 500;
-	for(int ieta = 0; ieta < 11; ieta++)
-	  for(int iphi = 0; iphi < 2; iphi++){
-	    if (RCTs[i][ieta][iphi] < rct_minimums[i])
-	      rct_minimums[i] = RCTs[i][ieta][iphi];
-	  }
-      }
-      
-      for(int ieta = 0; ieta < 22; ieta++)
-	for(int iphi = 0; iphi < 18; iphi++){
-	  int rctnum = (9*(ieta/11))+(iphi/2);
-	  fulldetector[ieta][iphi] -= rct_minimums[rctnum];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
-	}
-      break;
-      
-    case RCT_AVERAGE:
-      double rct_averages[18];
-      for(int i = 0; i < 18; i++)
-      {
-	rct_averages[i] = 0;
-	
-	for(int ieta = 0; ieta < 11; ieta++)
-	  for(int iphi = 0; iphi < 2; iphi++){
-	    rct_averages[i] += RCTs[i][ieta][iphi];
-	  }
-	rct_averages[i] /= 22;
-      } 
-      
-      for(int ieta = 0; ieta < 22; ieta++)
-	for(int iphi = 0; iphi < 18; iphi++){
-	  int rctnum = (9*(ieta/11))+(iphi/2);
-	  fulldetector[ieta][iphi] -= rct_averages[rctnum];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
-	}
-      break;
-      
-    case PHI_AVERAGE:
 
+      
+    if(PHI_AVERAGE)
+    {
       double phi_average[22];
       for(int ieta = 0; ieta < 22; ieta++){
 	phi_average[ieta] = 0;
@@ -163,14 +120,9 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;
 	}
-      break;
-      
-    default:
-      break;
-    }    
+    }
 
     jet jets[18][2][3]; //[rct #][phi][jet #]
-    int min_3x3[18];    //[rct #]
     
     for(int i = 0; i < 18; i++)
     {
@@ -181,7 +133,6 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 	  jets[i][j][k].phi = -1;
 	  jets[i][j][k].eta = -1;
 	}
-      min_3x3[i] = 65535;
     }
     
     for(int ieta = 1; ieta < 21; ieta++)
@@ -237,24 +188,7 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 	    jets[rctnum][rctphi][2].phi = iphi;
 	  }	
 	}
-
-	// however, if the cluster is the smallest in the RCT then save it.
-	if(cluster < min_3x3[rctnum])
-	  min_3x3[rctnum] = cluster;
-
       }
-
-    if(algorithm == MIN_3X3)
-    {
-      for(int i = 0; i < 18; i++)
-	for(int j = 0; j < 2; j++) 
-	  for(int k = 0; k < 3; k++)
-	  {
-	    jets[i][j][k].et -= min_3x3[i];
-	    if(jets[i][j][k].et < 0)
-	      jets[i][j][k].et = 0;
-	  }
-    }
     
     jet *head = &jets[0][0][0];
     
@@ -288,7 +222,7 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
   // max_jet_location->Draw("Lego2");
 
   //efficiency_curve->SetTitle("Efficiency Curve");
-  efficiency_curve->SetXTitle("Threshold (compressed Et)");
+  efficiency_curve->SetXTitle("L1 Jet Threshold (GeV)");
   efficiency_curve->SetYTitle("Fraction of passing events");
 
   return(efficiency_curve);

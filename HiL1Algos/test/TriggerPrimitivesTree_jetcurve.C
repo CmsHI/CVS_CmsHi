@@ -22,7 +22,7 @@ void print_jets(jet *clusters, int jet_length);
 
 TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 					   int threshold,
-					   enum SUBTRACT_ALGORITHM algorithm,
+					   bool PHI_AVERAGE,
 					   int minCentBin,
 					   int maxCentBin)
 {
@@ -63,28 +63,16 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 
   TString method;
   TString method_s;
-  switch(algorithm)
+
+  if(PHI_AVERAGE)
   {
-  case RCT_MINIMUM:
-    method = "minsub";
-    method_s = method;
-    break;
-  case RCT_AVERAGE:
-    method = "avgsub";
-    method_s = method;
-    break;
-  case PHI_AVERAGE:
     method = "Region-Level Phi-Ring Subtraction";
     method_s = "phisub";
-    break;
-  case MIN_3X3:
-    method = "3x3sub";
-    method_s = method;
-    break;
-  default:
+  }
+  else
+  {
     method = "Current L1 System";
     method_s = "nosub";
-    break;
   }
 
   stringstream name1,name2,name3;
@@ -138,53 +126,10 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
       RCTs[rctnum][caloRCTRegionEtaIndex[i]][caloRCTRegionPhiIndex[i]] = caloRegionEt[i];
     }
 
-    switch(algorithm)
-    {
-    case RCT_MINIMUM:
-      int rct_minimums[18];
-      for(int i = 0; i < 18; i++)
-      {
-	rct_minimums[i] = 500;
-	for(int ieta = 0; ieta < 11; ieta++)
-	  for(int iphi = 0; iphi < 2; iphi++){
-	    if (RCTs[i][ieta][iphi] < rct_minimums[i])
-	      rct_minimums[i] = RCTs[i][ieta][iphi];
-	  }
-      }
-      
-      for(int ieta = 0; ieta < 22; ieta++)
-	for(int iphi = 0; iphi < 18; iphi++){
-	  int rctnum = (9*(ieta/11))+(iphi/2);
-	  fulldetector[ieta][iphi] -= rct_minimums[rctnum];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
-	}
-      break;
-      
-    case RCT_AVERAGE:
-      double rct_averages[18];
-      for(int i = 0; i < 18; i++)
-      {
-	rct_averages[i] = 0;
-	
-	for(int ieta = 0; ieta < 11; ieta++)
-	  for(int iphi = 0; iphi < 2; iphi++){
-	    rct_averages[i] += RCTs[i][ieta][iphi];
-	  }
-	rct_averages[i] /= 22;
-      } 
-      
-      for(int ieta = 0; ieta < 22; ieta++)
-	for(int iphi = 0; iphi < 18; iphi++){
-	  int rctnum = (9*(ieta/11))+(iphi/2);
-	  fulldetector[ieta][iphi] -= rct_averages[rctnum];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
-	}
-      break;
-      
-    case PHI_AVERAGE:
 
+      
+    if(PHI_AVERAGE)
+    {
       double phi_average[22];
       for(int ieta = 0; ieta < 22; ieta++){
 	phi_average[ieta] = 0;
@@ -200,14 +145,9 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;
 	}
-      break;
-      
-    default:
-      break;
     }    
 
     jet jets[18][2][3]; //[rct #][phi][jet #]
-    int min_3x3[18];    //[rct #]    
     for(int i = 0; i < 18; i++)
     {
       for(int j = 0; j < 2; j++) 
@@ -217,7 +157,6 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 	  jets[i][j][k].phi = -1;
 	  jets[i][j][k].eta = -1;
 	}
-      min_3x3[i] = 65535;
     }
     
     for(int ieta = 1; ieta < 21; ieta++)
@@ -273,32 +212,15 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 	    jets[rctnum][rctphi][2].phi = iphi;
 	  }	
 	}
-
-	// however, if the cluster is the smallest in the RCT then save it.
-	if(cluster < min_3x3[rctnum])
-	  min_3x3[rctnum] = cluster;
-
       }
-
-    if(algorithm == MIN_3X3)
-    {
-      for(int i = 0; i < 18; i++)
-	for(int j = 0; j < 2; j++) 
-	  for(int k = 0; k < 3; k++)
-	  {
-	    jets[i][j][k].et -= min_3x3[i];
-	    if(jets[i][j][k].et < 0)
-	      jets[i][j][k].et = 0;
-	  }
-    }
     
     jet *head = &jets[0][0][0];    
     qsort(head, 18*2*3, sizeof(jet), sort_func_jet);
     
     if(head[0].et > threshold)
       jet_curve->Fill(realJetPt);
-    else
-      jet_curve->Fill(realJetPt,0);
+    // else
+    //   jet_curve->Fill(realJetPt,0);
     
     total_in_bin->Fill(realJetPt);
   }
@@ -310,7 +232,7 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 //plot = new TCanvas();
   //jet_curve->Divide(total_in_bin);
   jet_curve->Divide(jet_curve, total_in_bin, 1, 1, "b");
-  jet_curve->SetXTitle("Real Jet Pt (GeV)");
+  jet_curve->SetXTitle("HLT Jet Pt (GeV)");
   jet_curve->SetYTitle("Fraction Accepted");
 
   jet_curve->GetYaxis()->SetRangeUser(0,1);

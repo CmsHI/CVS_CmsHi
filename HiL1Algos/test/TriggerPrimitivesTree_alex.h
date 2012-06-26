@@ -85,14 +85,6 @@ public :
   TBranch        *b_caloRCTRegionEtaIndex;   //!
   TBranch        *b_caloRCTRegionPhiIndex;   //!
 
-  enum SUBTRACT_ALGORITHM{
-    NONE = 0,
-    RCT_MINIMUM = 1,
-    RCT_AVERAGE = 2,
-    PHI_AVERAGE = 3,
-    MIN_3X3 = 4
-  };
-
   TriggerPrimitivesTree_alex(TFile *f=0);
   virtual ~TriggerPrimitivesTree_alex();
   virtual Int_t    Cut(Long64_t entry);
@@ -101,7 +93,7 @@ public :
   virtual void     Init(TTree *tree);
   virtual TH1D*    Loop(int total_events = 0, 
 			int threshhold = 0,
-			enum SUBTRACT_ALGORITHM algorithm = NONE,
+			bool PHI_AVERAGE = false,
 			bool cut_noise_events = false);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);

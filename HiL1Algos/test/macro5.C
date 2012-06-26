@@ -12,9 +12,11 @@ void macro5()
   TriggerPrimitivesTree_jetcurve *min =
     new TriggerPrimitivesTree_jetcurve(new TFile("minbias.root"));
 
-  TriggerPrimitivesTree_jetcurve::SUBTRACT_ALGORITHM algo;
+  bool phi_subtract;
 
   const int total_events = -1;
+  const int current_5p_threshold = 372;
+  const int improved_5p_threshold = 75;
   
   TH1D* h_min[6]; 
   //stringstream title[4];
@@ -29,50 +31,50 @@ void macro5()
     switch(i)
     {
     case 0:
-      title = "Current L1 System, 5\% Threshold";
+      title = "Current L1 System, 5\% Threshold 372 GeV";
       minCentBin = 0;
       maxCentBin = 11;
-      algo = TriggerPrimitivesTree_jetcurve::NONE;
-      threshold = 372;
+      phi_subtract = false;
+      threshold = current_5p_threshold;
       break;
     case 1:
-      title = "Current L1 System, 5\% Threshold";
+      title = "Current L1 System, 5\% Threshold 372 GeV";
       minCentBin = 20;
       maxCentBin = 40;
-      algo = TriggerPrimitivesTree_jetcurve::NONE;
-      threshold = 372;
+      phi_subtract = false;
+      threshold = current_5p_threshold;
       break;      
     case 2:
-      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold";
+      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold 75 GeV";
       minCentBin = 0;
       maxCentBin = 11;     
-      algo = TriggerPrimitivesTree_jetcurve::PHI_AVERAGE;
-      threshold = 75;
+      phi_subtract = true;
+      threshold = improved_5p_threshold;
       break;
     case 3:
-      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold";
+      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold 75 GeV";
       minCentBin = 20;
       maxCentBin = 40;     
-      algo = TriggerPrimitivesTree_jetcurve::PHI_AVERAGE;
-      threshold = 75;
+      phi_subtract = true;
+      threshold = improved_5p_threshold;
       break;
     case 4:
-      title = "Current L1 System, Threshold 75 CeT";
+      title = "Current L1 System, Threshold 75 GeV";
       minCentBin = 0;
       maxCentBin = 11;
-      algo = TriggerPrimitivesTree_jetcurve::NONE;
-      threshold = 75;
+      phi_subtract = false;
+      threshold = improved_5p_threshold;
       break;
     case 5:
-      title = "Current L1 System, Threshold 75 CeT";
+      title = "Current L1 System, Threshold 75 GeV";
       minCentBin = 20;
       maxCentBin = 40;
-      algo = TriggerPrimitivesTree_jetcurve::NONE;
-      threshold = 75;
+      phi_subtract = false;
+      threshold = improved_5p_threshold;
       break;
     }    
 
-    h_min[i] = (TH1D*)min->Loop(total_events, threshold, algo, minCentBin, maxCentBin)->Clone();
+    h_min[i] = (TH1D*)min->Loop(total_events, threshold, phi_subtract, minCentBin, maxCentBin)->Clone();
     h_min[i]->SetTitle(title);
     //h_min[i]->Draw("E");
   }

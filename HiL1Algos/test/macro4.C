@@ -12,7 +12,7 @@ using namespace std;
 
 void macro4()
 {
-  int total_events = 1000;
+  int total_events = -1;
   TriggerPrimitivesTree_alex *min =
     new TriggerPrimitivesTree_alex(new TFile("minbias.root"));
   // TriggerPrimitivesTree_alex *jet =
@@ -20,7 +20,7 @@ void macro4()
   
   TCanvas* plot;
  
-  TriggerPrimitivesTree_alex::SUBTRACT_ALGORITHM algo[2];
+  bool algo[2];
   
   TH1D* h_min[2];
   TH1D* h_jet[2];
@@ -29,8 +29,8 @@ void macro4()
 
   TString title = "Efficiency";
 
-  algo[0] = TriggerPrimitivesTree_alex::NONE;  
-  algo[1] = TriggerPrimitivesTree_alex::PHI_AVERAGE;
+  algo[0] = false;  
+  algo[1] = true;
 
   h_min[0] = (TH1D*)min->Loop(total_events, 0, algo[0], false)->Clone();
   h_min[1] = (TH1D*)min->Loop(total_events, 0, algo[1], false)->Clone();
