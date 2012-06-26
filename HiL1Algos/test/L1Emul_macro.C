@@ -84,9 +84,9 @@ void L1Emul_macro()
   int total_events = 5000;
   TH1D *temp[2];
   temp[0] = (TH1D*)min->Loop(total_events, 0,
-		     TriggerPrimitivesTree_alex::NONE, false)->Clone();
+		     false, false)->Clone();
   temp[1] = (TH1D*)min->Loop(total_events, 0,
-		     TriggerPrimitivesTree_alex::PHI_AVERAGE, false)->Clone();
+		     true, false)->Clone();
   for(int j = 0; j < 2; j++)
   {
     stringstream s;
