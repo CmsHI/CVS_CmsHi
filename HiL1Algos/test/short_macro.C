@@ -1,23 +1,14 @@
 short_macro()
 {
-TFile f("Minbias_digital_calib_3x3sub.root");
-TFile g("Central_digital_calib_3x3sub.root");
-TFile h("Jet_digital_calib_3x3sub.root");
+  TCanvas *c0 = new TCanvas();
+  TF1 *f1 = new TF1("f1","TMath::Gaus(x,0,0.15)",-3, 3);
+  f1->SetTitle("Jet Without Background");
+  f1->GetYaxis()->SetRangeUser(0,1.5);
+  f1->Draw();
 
-TH1D *h1 = (TH1D*)f.Get("efficiency_curve");
-h1->SetLineStyle(0);
-//h1->SetTitle("RCT Minimum region subtraction algorithm"); 
-TH1D *h2 = (TH1D*)g.Get("efficiency_curve");
-h2->SetLineStyle(2);
-TH1D *h3 = (TH1D*)h.Get("efficiency_curve");
-h3->SetLineStyle(3);
-
-TCanvas *c1 = new TCanvas("c1","c1");
-//gPad->SetTitle("test title");
-
-h1->Draw("L");
-h2->Draw("L,same");
-h3->Draw("L,same");
-
-c1->BuildLegend();
+  TCanvas *c1 = new TCanvas();
+  TF1 *f2 = new TF1("f2","TMath::Gaus(x,0,0.15)+0.4",-3, 3);
+  f2->SetTitle("Jet With Background");
+  f2->GetYaxis()->SetRangeUser(0,1.5);
+  f2->Draw();
 }
