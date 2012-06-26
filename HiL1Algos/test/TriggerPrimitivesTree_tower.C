@@ -20,8 +20,8 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
 				       bool PHI_AVERAGE,
 				       bool cut_noise_events)
 {
-  const int NBINS = 128;
-  const int MAX_EN = 256;
+  const int NBINS = 64;
+  const int MAX_EN = 128;
   const int NETA = 88;
   const int NPHI = 72;
 
@@ -37,7 +37,16 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
   // detectormap = new TH2I("detectormap",
   // 			 "Detector Map",
   // 			 NETA,0,NETA,NPHI,0,NPHI);
-
+  // detectormap->SetXTitle("#eta");
+  // detectormap->SetYTitle("#phi");
+  
+  // TH2I *detectormapafter;
+  // detectormapafter = new TH2I("detectormapafter",
+  // 			 "Detector Map After Subtraction",
+  // 			 NETA,0,NETA,NPHI,0,NPHI);
+  // detectormapafter->SetXTitle("#eta");
+  // detectormapafter->SetYTitle("#phi");
+  
   max_highPtTrack_energy = new TH1D("max_highPtTrack_energy",
 			    "Maximum highPtTrack energy for each event",
 			    NBINS,0,MAX_EN);
@@ -141,6 +150,13 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;
 	}
+
+      // for(int i = 0; i < NETA; i++)
+      // 	for(int j = 0; j < NPHI; j++)
+      // 	  detectormapafter->Fill(i, j, fulldetector[i][j]);
+
+      // TCanvas *c4 = new TCanvas();
+      // detectormapafter->Draw("Lego2");
     }    
 
     highPtTrack highPtTrack1;
@@ -165,117 +181,38 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
 	if(iphi == NPHI -1) plusPhi = 0;
 	else plusPhi = iphi + 1;
 
-	if(ieta == 0)
+	int max_cluster = -1;
+	int index = -1;
+	int phi1 = -1;
+	
+	int starti = 0; if(ieta == 0) starti = 3;
+	int endi = 9; if(ieta == NETA -1) endi = 6;
+	for(int i = starti; i < endi; i++)
 	{
-	  int cluster[] = {
-	    fulldetector[ieta][minusPhi],
-	    fulldetector[ieta][iphi],
-	    fulldetector[ieta][plusPhi],
-	    fulldetector[ieta+1][minusPhi],
-	    fulldetector[ieta+1][iphi],
-	    fulldetector[ieta+1][plusPhi]
-	  };
-
-	  int max_cluster = -1;
-	  int index = -1;
-	  for(int i = 0; i < 6; i ++)
-	  {
-	    if(max_cluster < cluster[i])
-	    {
-	      max_cluster = cluster[i];
-	      index = i;
-	    }
-	  }
-	  subTower.sumEt = max_cluster;
-	  subTower.eta1 = (ieta) + (index / 3);
-	  switch(index%3)
+	  int phi_i;
+	  switch(i%3)
 	  {
 	  case 0:
-	    subTower.phi1 = minusPhi;
+	    phi_i = minusPhi;
 	    break;
 	  case 1:
-	    subTower.phi1 = iphi;
+	    phi_i = iphi;
 	    break;
 	  case 2:
-	    subTower.phi1 = plusPhi;
+	    phi_i = plusPhi;
 	    break;
-	  }	  
-	}
-	else if (ieta == NETA -1)
-	{
-	  int cluster[] = {
-	    fulldetector[ieta-1][minusPhi],
-	    fulldetector[ieta-1][iphi],
-	    fulldetector[ieta-1][plusPhi],
-	    fulldetector[ieta][minusPhi],
-	    fulldetector[ieta][iphi],
-	    fulldetector[ieta][plusPhi]
-	  };
-
-	  int max_cluster = -1;
-	  int index = -1;
-	  for(int i = 0; i < 6; i ++)
-	  {
-	    if(max_cluster < cluster[i])
-	    {
-	      max_cluster = cluster[i];
-	      index = i;
-	    }
 	  }
-	  subTower.sumEt = max_cluster;
-	  subTower.eta1 = (ieta-1) + (index / 3);
-	  switch(index%3)
+	  if(max_cluster < fulldetector[ieta-1 +i/3][phi_i])
 	  {
-	  case 0:
-	    subTower.phi1 = minusPhi;
-	    break;
-	  case 1:
-	    subTower.phi1 = iphi;
-	    break;
-	  case 2:
-	    subTower.phi1 = plusPhi;
-	    break;
-	  }	  
-	}
-	else
-	{
-	  int cluster[] = {
-	    fulldetector[ieta-1][minusPhi],
-	    fulldetector[ieta-1][iphi],
-	    fulldetector[ieta-1][plusPhi],
-	    fulldetector[ieta][minusPhi],
-	    fulldetector[ieta][iphi],
-	    fulldetector[ieta][plusPhi],
-	    fulldetector[ieta+1][minusPhi],
-	    fulldetector[ieta+1][iphi],
-	    fulldetector[ieta+1][plusPhi]
-	  };
-
-	  int max_cluster = -1;
-	  int index = -1;
-	  for(int i = 0; i < 9; i ++)
-	  {
-	    if(max_cluster < cluster[i])
-	    {
-	      max_cluster = cluster[i];
-	      index = i;
-	    }
+	    max_cluster = fulldetector[ieta-1 +i/3][phi_i];
+	    index = i;
+	    phi1 = phi_i;
 	  }
-	  subTower.sumEt = max_cluster;
-	  subTower.eta1 = (ieta-1) + (index / 3);
-	  switch(index%3)
-	  {
-	  case 0:
-	    subTower.phi1 = minusPhi;
-	    break;
-	  case 1:
-	    subTower.phi1 = iphi;
-	    break;
-	  case 2:
-	    subTower.phi1 = plusPhi;
-	    break;
-	  }	  
 	}
+	
+	subTower.sumEt = max_cluster;
+	subTower.eta1 = (ieta-1) + (index / 3);
+	subTower.phi1 = phi1;    
 	
 	//only consider the subtowers which are less than the primary tower
 	if(subTower.sumEt < temp.sumEt)
@@ -311,7 +248,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
   // max_highPtTrack_energy->SetTitle("max_highPtTrack_energy");
   max_highPtTrack_energy->SetXTitle("Compressed Et");
   max_highPtTrack_energy->SetYTitle("Counts");
-  // max_highPtTrack_energy->Draw();
+  //max_highPtTrack_energy->Draw();
 
   // TCanvas *c2 = new TCanvas();
   // max_highPtTrack_location->SetXTitle("Eta index");
@@ -322,7 +259,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
   // efficiency_curve->SetTitle("Efficiency Curve");
   efficiency_curve->SetXTitle("Threshold (compressed Et)");
   efficiency_curve->SetYTitle("Fraction of passing events");
-  // efficiency_curve->Draw();
+  //efficiency_curve->Draw();
 
   return(efficiency_curve);
 }
