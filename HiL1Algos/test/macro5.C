@@ -15,8 +15,8 @@ void macro5()
   bool phi_subtract;
 
   const int total_events = -1;
-  const int current_5p_threshold = 372;
-  const int improved_5p_threshold = 75;
+  const int current_5p_threshold = 64;
+  const int improved_5p_threshold = 64;
   
   TH1D* h_min[6]; 
   //stringstream title[4];
@@ -26,33 +26,33 @@ void macro5()
   
   int threshold;
   int minCentBin, maxCentBin;
-  for(int i = 0; i < 6; i++)
+  for(int i = 0; i < 2; i++)
   {
     switch(i)
     {
     case 0:
-      title = "Current L1 System, 5\% Threshold 372 GeV";
+      title = "Current L1 System, Threshold 64 GeV";
       minCentBin = 0;
       maxCentBin = 11;
       phi_subtract = false;
       threshold = current_5p_threshold;
       break;
     case 1:
-      title = "Current L1 System, 5\% Threshold 372 GeV";
+      title = "Current L1 System, Threshold 64 GeV";
       minCentBin = 20;
       maxCentBin = 40;
       phi_subtract = false;
       threshold = current_5p_threshold;
       break;      
     case 2:
-      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold 75 GeV";
+      title = "Region-Level Phi-Ring Subtraction, Threshold 64 GeV";
       minCentBin = 0;
       maxCentBin = 11;     
       phi_subtract = true;
       threshold = improved_5p_threshold;
       break;
     case 3:
-      title = "Region-Level Phi-Ring Subtraction, 5\% Threshold 75 GeV";
+      title = "Region-Level Phi-Ring Subtraction, Threshold 64 GeV";
       minCentBin = 20;
       maxCentBin = 40;     
       phi_subtract = true;
@@ -83,32 +83,32 @@ void macro5()
   h_min[0]->Draw("p,E");
   h_min[1]->SetMarkerStyle(24);
   h_min[1]->Draw("p,E,same");
-  leg[0] = new TLegend(0.2,0.6,0.5,0.8);
+  leg[0] = new TLegend(0.6,0.4,0.9,0.6);
   leg[0]->SetFillColor(0);
   leg[0]->AddEntry(h_min[0],"0-30\% Centrality","p");
   leg[0]->AddEntry(h_min[1],"50-100\% Centrality","p");
   leg[0]->Draw();
   plot[0]->Update();
 
-  plot[1] = new TCanvas();
-  h_min[2]->Draw("p,E");
-  h_min[3]->SetMarkerStyle(24);
-  h_min[3]->Draw("p,E,same");
-  leg[1] = new TLegend(0.6,0.4,0.9,0.6);
-  leg[1]->SetFillColor(0);
-  leg[1]->AddEntry(h_min[2],"0-30\% Centrality","p");
-  leg[1]->AddEntry(h_min[3],"50-100\% Centrality","p");
-  leg[1]->Draw();
-  plot[1]->Update();
+  // plot[1] = new TCanvas();
+  // h_min[2]->Draw("p,E");
+  // h_min[3]->SetMarkerStyle(24);
+  // h_min[3]->Draw("p,E,same");
+  // leg[1] = new TLegend(0.6,0.4,0.9,0.6);
+  // leg[1]->SetFillColor(0);
+  // leg[1]->AddEntry(h_min[2],"0-30\% Centrality","p");
+  // leg[1]->AddEntry(h_min[3],"50-100\% Centrality","p");
+  // leg[1]->Draw();
+  // plot[1]->Update();
 
-  plot[2] = new TCanvas();
-  h_min[4]->Draw("p,E");
-  h_min[5]->SetMarkerStyle(24);
-  h_min[5]->Draw("p,E,same");
-  leg[2] = new TLegend(0.6,0.4,0.9,0.6);
-  leg[2]->SetFillColor(0);
-  leg[2]->AddEntry(h_min[4],"0-30\% Centrality","p");
-  leg[2]->AddEntry(h_min[5],"50-100\% Centrality","p");
-  leg[2]->Draw();
-  plot[2]->Update();
+  // plot[2] = new TCanvas();
+  // h_min[4]->Draw("p,E");
+  // h_min[5]->SetMarkerStyle(24);
+  // h_min[5]->Draw("p,E,same");
+  // leg[2] = new TLegend(0.6,0.4,0.9,0.6);
+  // leg[2]->SetFillColor(0);
+  // leg[2]->AddEntry(h_min[4],"0-30\% Centrality","p");
+  // leg[2]->AddEntry(h_min[5],"50-100\% Centrality","p");
+  // leg[2]->Draw();
+  // plot[2]->Update();
 }

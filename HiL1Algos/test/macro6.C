@@ -25,12 +25,12 @@ void macro6()
   TH1D* h_min[2];
   // TH1D* h_jet[2];
 
-  TLegend* leg;
+  // TLegend* leg;
 
-  TString title = "Efficiency";
+  TString title = "High Pt Tracks Rate vs. Threshold";
 
   h_min[0] = (TH1D*)min->Loop(total_events, 0, phi_subtract[0], false)->Clone();
-  h_min[1] = (TH1D*)min->Loop(total_events, 0, phi_subtract[1], false)->Clone();
+  // h_min[1] = (TH1D*)min->Loop(total_events, 0, phi_subtract[1], false)->Clone();
 
   // h_jet[0] = (TH1D*)jet->Loop(total_events, 0, phi_subtract[0], true)->Clone();
   // h_jet[1] = (TH1D*)jet->Loop(total_events, 0, phi_subtract[1], true)->Clone();
@@ -62,12 +62,12 @@ void macro6()
   //   cout << "five_p " << fivep_p << endl;
   // }
   /***********************************************************/
-  h_min[0]->SetLineColor(kRed);
+  //h_min[0]->SetLineColor(kRed);
   h_min[0]->SetTitle(title);
   h_min[0]->Draw("L");
 
-  h_min[1]->SetLineColor(kBlue);
-  h_min[1]->Draw("L,same");
+  // h_min[1]->SetLineColor(kBlue);
+  // h_min[1]->Draw("L,same");
 
   // h_jet[0]->Draw("L,same");
   // h_jet[1]->SetLineColor(kGreen);
@@ -79,19 +79,19 @@ void macro6()
   // fivep_l[1]->SetLineColor(kBlue);
   // fivep_l[1]->Draw("same");  
 
-  leg = new TLegend(0.5,0.5,0.8,0.7);
+  // leg = new TLegend(0.5,0.5,0.8,0.7);
 
-  leg->SetFillColor(0);
+  // leg->SetFillColor(0);
 
-  leg->AddEntry(h_min[0],"Current L1 System","l");
-  leg->AddEntry(h_min[1],"Phi-Ring Subtraction","l");
+  // leg->AddEntry(h_min[0],"Current L1 System","l");
+  // leg->AddEntry(h_min[1],"Phi-Ring Subtraction","l");
   // leg->AddEntry(fivep_l[0],"Current System 5%","l");
   // leg->AddEntry(fivep_l[1],"Phi-Ring Subtraction 5%","l");
 
   // leg->AddEntry(h_jet[0],"Current L1 System Jet","l");
   // leg->AddEntry(h_jet[1],"Phi-Ring Subtraction Jet","l");
   
-  leg->Draw();
+  // leg->Draw();
  
   plot->Update();
 }  
