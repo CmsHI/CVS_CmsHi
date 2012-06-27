@@ -5,7 +5,7 @@ macro_doga()
   hmb = (TH2*)f1->Get("JetEt");
 
   TProfile* p1=hmb->ProfileX("p1",0,99);
-  p1->SetTitle("Tower-Level Phi-Ring Subtracton, 5% Threshold 75 GeV");
+  p1->SetTitle("Tower-Level Phi-Ring Subtracton, 5% Threshold 64 GeV");
 // p1->SetTitle("Minimum bias data without event selection");
   p1->GetXaxis()->SetTitle("HLT Jet Pt (GeV)");
   p1->GetXaxis()->SetRangeUser(0,200);
