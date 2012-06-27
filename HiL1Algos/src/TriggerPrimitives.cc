@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.16 2012/06/27 08:32:41 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.17 2012/06/27 08:36:50 richard Exp $
 //
 //
 
@@ -100,9 +100,6 @@ class TriggerPrimitives : public edm::EDAnalyzer {
 
       // ----------member data ---------------------------
 
-
-      //const L1CaloEcalScale *mEcalScale;
-      //const L1CaloHcalScale *mHcalScale;
 
       // Calorimeter Digis
       edm::InputTag mEcalDigiInputTag;

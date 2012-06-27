@@ -36,7 +36,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.5 $'),
+    version = cms.untracked.string('$Revision: 1.6 $'),
     annotation = cms.untracked.string('step2 nevts:2'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -81,7 +81,9 @@ process.RECODEBUGoutput_step = cms.EndPath(process.RECODEBUGoutput)
 # Schedule definition
 #process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.RECODEBUGoutput_step,process.p)
 
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.p)
+#process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.p)
+
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.p,process.endjob_step,process.RECODEBUGoutput_step)
 
 from Configuration.PyReleaseValidation.ConfigBuilder import MassReplaceInputTag
 MassReplaceInputTag(process)
