@@ -13,7 +13,7 @@
 //
 // Original Author:  Richard Alexander Barbieri
 //         Created:  Sun Mar 18 14:50:18 EDT 2012
-// $Id: TriggerPrimitives.cc,v 1.15 2012/06/18 08:36:53 richard Exp $
+// $Id: TriggerPrimitives.cc,v 1.16 2012/06/27 08:32:41 richard Exp $
 //
 //
 
@@ -50,7 +50,7 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 
 #include "CondFormats/L1TObjects/interface/L1CaloEtScale.h" 
-#include "CondFormats/L1TObjects/interface/L1CaloEtScaleRcd.h"
+//#include "CondFormats/L1TObjects/interface/L1CaloEtScaleRcd.h"
 
 // system include files
 #include <memory>
@@ -109,6 +109,9 @@ class TriggerPrimitives : public edm::EDAnalyzer {
       edm::InputTag mHcalDigiInputTag;
       edm::InputTag mGCTDigiInputTag;
       edm::Service<TFileService> fs;
+
+      const L1CaloEcalScale *mEcalScale;
+      const L1CaloHcalScale *mHcalScale;
 
       TTree * RRTree;
       int event;
