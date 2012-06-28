@@ -22,10 +22,10 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
   const int MAX_EN = 512;
   const int NETA = 88;
   const int NPHI = 72;
-  const int JET_RADIUS = 4;
+  const int JET_RADIUS = 6;
   const int JET_DISTANCE_2 = (JET_RADIUS-1)*(JET_RADIUS-1) +
     (JET_RADIUS-1)*(JET_RADIUS-1); 
-  const bool CIRCULAR_JETS = true; //otherwise square jets
+  const bool CIRCULAR_JETS = false; //otherwise square jets
 
   if (fChain == 0) return(0);
   
