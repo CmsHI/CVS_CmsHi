@@ -30,6 +30,7 @@ public :
   Int_t           run;
   Int_t           ecalDetectorMapSize;
   Int_t           ecalCompressedEt[4032];   //[ecalDetectorMapSize]
+  Int_t           ecalEt[4032]; //[ecalDetectorMapSize]
   Int_t           ecalEtaIndex[4032];   //[ecalDetectorMapSize]
   Int_t           ecalPhiIndex[4032];   //[ecalDetectorMapSize]
   Double_t        ecalEta[4032];   //[ecalDetectorMapSize]
@@ -38,6 +39,7 @@ public :
   Int_t           ecalTag[4032];   //[ecalDetectorMapSize]
   Int_t           hcalDetectorMapSize;
   Int_t           hcalCompressedEt[4176];   //[hcalDetectorMapSize]
+  Int_t           hcalEt[4176];   //[hcalDetectorMapSize]
   Int_t           hcalEtaIndex[4176];   //[hcalDetectorMapSize]
   Int_t           hcalPhiIndex[4176];   //[hcalDetectorMapSize]
   Double_t        hcalEta[4176];   //[hcalDetectorMapSize]
@@ -60,6 +62,7 @@ public :
   TBranch        *b_run;   //!
   TBranch        *b_ecalDetectorMapSize;   //!
   TBranch        *b_ecalCompressedEt;   //!
+  TBranch        *b_ecalEt;   //!
   TBranch        *b_ecalEtaIndex;   //!
   TBranch        *b_ecalPhiIndex;   //!
   TBranch        *b_ecalEta;   //!
@@ -68,6 +71,7 @@ public :
   TBranch        *b_ecalTag;   //!
   TBranch        *b_hcalDetectorMapSize;   //!
   TBranch        *b_hcalCompressedEt;   //!
+  TBranch        *b_hcalEt;   //!
   TBranch        *b_hcalEtaIndex;   //!
   TBranch        *b_hcalPhiIndex;   //!
   TBranch        *b_hcalEta;   //!
@@ -181,6 +185,7 @@ void TriggerPrimitivesTree_tower::Init(TTree *tree)
   fChain->SetBranchAddress("run", &run, &b_run);
   fChain->SetBranchAddress("ecalDetectorMapSize", &ecalDetectorMapSize, &b_ecalDetectorMapSize);
   fChain->SetBranchAddress("ecalCompressedEt", ecalCompressedEt, &b_ecalCompressedEt);
+  fChain->SetBranchAddress("ecalEt", ecalEt, &b_ecalEt);
   fChain->SetBranchAddress("ecalEtaIndex", ecalEtaIndex, &b_ecalEtaIndex);
   fChain->SetBranchAddress("ecalPhiIndex", ecalPhiIndex, &b_ecalPhiIndex);
   fChain->SetBranchAddress("ecalEta", ecalEta, &b_ecalEta);
@@ -189,6 +194,7 @@ void TriggerPrimitivesTree_tower::Init(TTree *tree)
   fChain->SetBranchAddress("ecalTag", ecalTag, &b_ecalTag);
   fChain->SetBranchAddress("hcalDetectorMapSize", &hcalDetectorMapSize, &b_hcalDetectorMapSize);
   fChain->SetBranchAddress("hcalCompressedEt", hcalCompressedEt, &b_hcalCompressedEt);
+  fChain->SetBranchAddress("hcalEt", hcalEt, &b_hcalEt);
   fChain->SetBranchAddress("hcalEtaIndex", hcalEtaIndex, &b_hcalEtaIndex);
   fChain->SetBranchAddress("hcalPhiIndex", hcalPhiIndex, &b_hcalPhiIndex);
   fChain->SetBranchAddress("hcalEta", hcalEta, &b_hcalEta);

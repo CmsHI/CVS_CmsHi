@@ -14,7 +14,7 @@ void macro6()
 {
   int total_events = 5000;
   TriggerPrimitivesTree_tower *min =
-    new TriggerPrimitivesTree_tower(new TFile("minbias.root"));
+    new TriggerPrimitivesTree_tower(new TFile("prod/HiForest.root"));
   // TriggerPrimitivesTree_tower *jet =
   //   new TriggerPrimitivesTree_tower(new TFile("jet.root"));
   

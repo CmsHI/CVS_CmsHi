@@ -93,7 +93,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
       if(hcalEtaIndex[i]<0 && hcalEtaIndex[i]>-29){
 	for (int j=0;j<ecalDetectorMapSize;j++){
 	  if(ecalEtaIndex[j]==hcalEtaIndex[i] && ecalPhiIndex[j]==hcalPhiIndex[i]){
-	    int towertotal=hcalCompressedEt[i]+ecalCompressedEt[j];
+	    int towertotal=hcalEt[i]+ecalEt[j];
 	    fulldetector[hcalEtaIndex[i]+28+16][hcalPhiIndex[i]-1]=towertotal;
 	    break;
 	  }
@@ -102,7 +102,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
       if(hcalEtaIndex[i]>0 && hcalEtaIndex[i]<29){
 	for (int j=0;j<ecalDetectorMapSize;j++){
 	  if(ecalEtaIndex[j]==hcalEtaIndex[i] && ecalPhiIndex[j]==hcalPhiIndex[i]){
-	    int towertotal=hcalCompressedEt[i]+ecalCompressedEt[j];
+	    int towertotal=hcalEt[i]+ecalEt[j];
 	    fulldetector[hcalEtaIndex[i]+27+16][hcalPhiIndex[i]-1]=towertotal;
 	    break;
 	  }
@@ -111,7 +111,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
       if (hcalEtaIndex[i]<-28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalCompressedEt[i]/16.0;
+	    int towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -119,7 +119,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
       if (hcalEtaIndex[i]>28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalCompressedEt[i]/16.0;
+	    int towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -246,7 +246,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
 
   // TCanvas *c1 = new TCanvas();
   // max_highPtTrack_energy->SetTitle("max_highPtTrack_energy");
-  max_highPtTrack_energy->SetXTitle("Compressed Et");
+  max_highPtTrack_energy->SetXTitle("GeV");
   max_highPtTrack_energy->SetYTitle("Counts");
   //max_highPtTrack_energy->Draw();
 
@@ -257,7 +257,7 @@ TH1D* TriggerPrimitivesTree_tower::Loop(int total_events,
 
   // TCanvas *c3 = new TCanvas();
   // efficiency_curve->SetTitle("Efficiency Curve");
-  efficiency_curve->SetXTitle("Threshold (compressed Et)");
+  efficiency_curve->SetXTitle("Threshold (GeV)");
   efficiency_curve->SetYTitle("Fraction of passing events");
   //efficiency_curve->Draw();
 
