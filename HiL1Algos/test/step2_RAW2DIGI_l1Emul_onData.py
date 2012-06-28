@@ -21,20 +21,22 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
     secondaryFileNames = cms.untracked.vstring(),
-    fileNames = cms.untracked.vstring('file:/net/hisrv0001/home/dav2105/hdir/raw/181985/00026B4D-DD11-E111-B567-00237DDC5CB0.root')
+    fileNames = cms.untracked.vstring('file:/d102/richard/HIminbias2011_RAW/SD_MinBiasHI_100_1_D9e.root',
+                                      'file:/d102/richard/HIminbias2011_RAW/SD_MinBiasHI_101_1_r6h.root',
+                                      'file:/d102/richard/HIminbias2011_RAW/SD_MinBiasHI_10_1_wmy.root')
 )
 
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True))
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    version = cms.untracked.string('$Revision: 1.341.2.2 $'),
+    version = cms.untracked.string('$Revision: 1.1 $'),
     annotation = cms.untracked.string('step2 nevts:2'),
     name = cms.untracked.string('PyReleaseValidation')
 )
@@ -44,8 +46,8 @@ process.configurationMetadata = cms.untracked.PSet(
 process.RECODEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    outputCommands = process.RECODEBUGEventContent.outputCommands,
-    fileName = cms.untracked.string('step2_RAW2DIGI_L1_RECO.root'),
+    #outputCommands = process.RECODEBUGEventContent.outputCommands,
+    fileName = cms.untracked.string('/d102/richard/l1emul_reco/minbias_l1emul_reco_1.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('RECO')
@@ -65,8 +67,8 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RECODEBUGoutput_step = cms.EndPath(process.RECODEBUGoutput)
 
 # Schedule definition
-#process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.reconstruction_step,process.endjob_step,process.RECODEBUGoutput_step)
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step,process.reconstruction_step,process.endjob_step,process.RECODEBUGoutput_step)
+#process.schedule = cms.Schedule(process.raw2digi_step,process.L1simulation_step)
 
 from Configuration.PyReleaseValidation.ConfigBuilder import MassReplaceInputTag
 MassReplaceInputTag(process)
