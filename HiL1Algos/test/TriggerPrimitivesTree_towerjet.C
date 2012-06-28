@@ -175,9 +175,9 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	temp.eta_center = ieta;
 	temp.phi_center = iphi;
 
-	for(ieta_i = ieta - JET_RADIUS; ieta_i < ieta + JET_RADIUS; ieta_i++)
+	for(int ieta_i = ieta - JET_RADIUS; ieta_i < ieta + JET_RADIUS; ieta_i++)
 	{
-	  for(iphi_i = iphi - JET_RADIUS; iphi_i < iphi + JET_RADIUS; i_phi++)
+	  for(int iphi_i = iphi - JET_RADIUS; iphi_i < iphi + JET_RADIUS; iphi_i++)
 	  {
 	    //cut the corners off the square
 	    if(CIRCULAR_JETS)
@@ -203,7 +203,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
     if(highestJet.sumEt > threshhold)
     {
       max_towerjet_energy->Fill(highestJet.sumEt);
-      max_towerJet_location->Fill(highestJet.eta_center, highestJet.phi_center);
+      max_towerjet_location->Fill(highestJet.eta_center, highestJet.phi_center);
     }
   }
   
