@@ -51,8 +51,8 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
   
   Long64_t nentries = fChain->GetEntriesFast();
 
-  const int NBINS = 256;
-  const int MAX_EN = 512;
+  const int NBINS = 64;
+  const int MAX_EN = 128;
   const int NETA = 88;
   const int NPHI = 72;
   const int JET_RADIUS = 6;
@@ -65,7 +65,7 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 
   jet_curve = new TH1D("jet_curve","Jet Curve, Tower Level",
 		       NBINS,0,MAX_EN);
-  total_in_bin = new TH1I("total_in_bin","total_in_bin"
+  total_in_bin = new TH1I("total_in_bin","total_in_bin",
 			  NBINS,0,MAX_EN);
 
   int evts = 0;
