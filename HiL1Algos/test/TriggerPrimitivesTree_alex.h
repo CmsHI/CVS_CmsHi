@@ -19,7 +19,6 @@
 #include "HltTree.C"
 #include "JetTree.C"
 
-
 class TriggerPrimitivesTree_alex {
 public :
   TTree          *fChain;   //!pointer to the analyzed TTree or TChain

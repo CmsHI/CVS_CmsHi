@@ -6,16 +6,7 @@
 #include <TString.h>
 #include <iostream>
 
-
-typedef struct{
-  int eta;
-  int phi;
-  int et;
-} jet;
-
-int sort_func_jet(const void *a, const void *b);
-
-void print_jets(jet *clusters, int jet_length);
+#include "FindRegionJet.C"
 
 TH1D* TriggerPrimitivesTree_alex::Loop(int total_events, 
 				       int threshhold,
@@ -24,29 +15,7 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 {
   const int NBINS = 200;
   const int MAX_EN = 600;
-  //   In a ROOT session, you can do:
-  //      Root > .L TriggerPrimitivesTree.C
-  //      Root > TriggerPrimitivesTree t
-  //      Root > t.GetEntry(12); // Fill t data members with entry number 12
-  //      Root > t.Show();       // Show values of entry 12
-  //      Root > t.Show(16);     // Read and show values of entry 16
-  //      Root > t.Loop();       // Loop on all entries
-  //
 
-  //     This is the loop skeleton where:
-  //    jentry is the global entry number in the chain
-  //    ientry is the entry number in the current Tree
-  //  Note that the argument to GetEntry must be:
-  //    jentry for TChain::GetEntry
-  //    ientry for TTree::GetEntry and TBranch::GetEntry
-  //
-  //       To read only selected branches, Insert statements like:
-  // METHOD1:
-  //    fChain->SetBranchStatus("*",0);  // disable all branches
-  //    fChain->SetBranchStatus("branchname",1);  // activate branchname
-  // METHOD2: replace line
-  //    fChain->GetEntry(jentry);       //read all branches
-  //by  b_branchname->GetEntry(ientry); //read only this branch
   if (fChain == 0) return(0);
   
   Long64_t nentries = fChain->GetEntriesFast();
@@ -92,111 +61,36 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 
     fChain->GetEntry(jentry);
     
-    double fulldetector[22][18]; //[eta][phi]
-    int RCTs[18][11][2]; //[region #][eta][phi]
+    double fulldetector[NETA][NPHI]; //[eta][phi]
     for(int i = 0; i < numRegions; i++)
     {
       fulldetector[caloRegionEtaIndex[i]][caloRegionPhiIndex[i]] = caloRegionEt[i];
-      int rctnum = (9*(caloRegionEtaIndex[i]/11)) + (caloRegionPhiIndex[i]/2);
-      RCTs[rctnum][caloRCTRegionEtaIndex[i]][caloRCTRegionPhiIndex[i]] = caloRegionEt[i];
     }
-
-
       
     if(PHI_AVERAGE)
     {
-      double phi_average[22];
-      for(int ieta = 0; ieta < 22; ieta++){
+      double phi_average[NETA];
+      for(int ieta = 0; ieta < NETA; ieta++){
 	phi_average[ieta] = 0;
-	for(int iphi = 0; iphi < 18; iphi++){
+	for(int iphi = 0; iphi < NPHI; iphi++){
 	  phi_average[ieta] += fulldetector[ieta][iphi];
 	}
-	phi_average[ieta] /= 18;
+	phi_average[ieta] /= NPHI;
       }
       
-      for(int ieta = 0; ieta < 22; ieta++)
-	for(int iphi = 0; iphi < 18; iphi++){
+      for(int ieta = 0; ieta < NETA; ieta++)
+	for(int iphi = 0; iphi < NPHI; iphi++){
 	  fulldetector[ieta][iphi] -= phi_average[ieta];
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;
 	}
     }
 
-    jet jets[18][2][3]; //[rct #][phi][jet #]
+    RegionJet highestJet = findRegionJet(fulldetector);
     
-    for(int i = 0; i < 18; i++)
+    if(highestJet.et > threshhold)
     {
-      for(int j = 0; j < 2; j++) 
-	for(int k = 0; k < 3; k++)
-	{
-	  jets[i][j][k].et = -1;
-	  jets[i][j][k].phi = -1;
-	  jets[i][j][k].eta = -1;
-	}
-    }
-    
-    for(int ieta = 1; ieta < 21; ieta++)
-      for(int iphi = 0; iphi < 18; iphi++){
-	
-	int rctnum = (9*(ieta/11))+(iphi/2);
-	int rctphi = iphi%2;
-	
-	int plusPhi =  (iphi != 17) ? iphi + 1: 0;
-	int minusPhi =  (iphi != 0) ? iphi - 1: 17;
-
-	int cluster = fulldetector[ieta-1][minusPhi] +
-	  fulldetector[ieta-1][iphi] +		
-	  fulldetector[ieta-1][plusPhi] +		
-	  fulldetector[ieta][minusPhi] +		
-	  fulldetector[ieta][iphi] +		
-	  fulldetector[ieta][plusPhi] +		
-	  fulldetector[ieta+1][minusPhi] +		
-	  fulldetector[ieta+1][iphi] +		
-	  fulldetector[ieta+1][plusPhi];
-
-	//if the region is a local maximum...
-	if((fulldetector[ieta][iphi] >= fulldetector[ieta-1][minusPhi]) && 
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta-1][iphi]) &&	
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta-1][plusPhi]) && 
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta][minusPhi]) && 
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta][plusPhi]) &&	
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta+1][minusPhi]) &&
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta+1][iphi]) &&	
-	   (fulldetector[ieta][iphi] >= fulldetector[ieta+1][plusPhi]))
-	{
-	  // and if the cluster is bigger than one of the jets
-	  // then add the cluster to the list of jets.
-	  if(cluster >= jets[rctnum][rctphi][0].et)
-	  {
-	    jets[rctnum][rctphi][2] = jets[rctnum][rctphi][1];
-	    jets[rctnum][rctphi][1] = jets[rctnum][rctphi][0];
-	    jets[rctnum][rctphi][0].et = cluster;
-	    jets[rctnum][rctphi][0].eta = ieta;
-	    jets[rctnum][rctphi][0].phi = iphi;
-	  }
-	  else if (cluster >= jets[rctnum][rctphi][1].et)
-	  {
-	    jets[rctnum][rctphi][2] = jets[rctnum][rctphi][1];
-	    jets[rctnum][rctphi][1].et = cluster;
-	    jets[rctnum][rctphi][1].eta = ieta;
-	    jets[rctnum][rctphi][1].phi = iphi;
-	  }
-	  else if (cluster >= jets[rctnum][rctphi][2].et)
-	  {
-	    jets[rctnum][rctphi][2].et = cluster;
-	    jets[rctnum][rctphi][2].eta = ieta;
-	    jets[rctnum][rctphi][2].phi = iphi;
-	  }	
-	}
-      }
-    
-    jet *head = &jets[0][0][0];
-    
-    qsort(head, 18*2*3, sizeof(jet), sort_func_jet);
-    
-    if(head[0].et > threshhold)
-    {
-      max_jet_energy->Fill(head[0].et);
+      max_jet_energy->Fill(highestJet.et);
       //max_jet_location->Fill(head[0].eta, head[0].phi);
       //max_jet_location->Fill(head[0].eta, head[0].phi, head[0].et);
     }
@@ -226,20 +120,4 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
   efficiency_curve->SetYTitle("Fraction of passing events");
 
   return(efficiency_curve);
-}
-
-int sort_func_jet(const void *a, const void *b) 
-{ 
-  jet *ia = (jet *)a;
-  jet *ib = (jet *)b;
-  return (int)(ib->et - ia->et);
-} 
-
-void print_jets(jet *clusters, int jet_length)
-{
-  cout << "List of jets:" << endl;
-  for(int i = 0; i < jet_length; i++)
-  {
-    cout << clusters[i].et << " " << clusters[i].eta << " " << clusters[i].phi << endl;
-  }
 }

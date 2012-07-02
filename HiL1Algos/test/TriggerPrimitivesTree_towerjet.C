@@ -6,12 +6,7 @@
 #include <TString.h>
 #include <iostream>
 
-
-typedef struct{
-  int eta_center;
-  int phi_center;
-  int sumEt;
-} towerJet;
+#include "FindTowerJet.C"
 
 TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events, 
 				       int threshhold,
@@ -20,11 +15,9 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 {
   const int NBINS = 256;
   const int MAX_EN = 512;
-  const int NETA = 88;
-  const int NPHI = 72;
-  const int JET_RADIUS = 6;
-  const int JET_DISTANCE_2 = (JET_RADIUS-1)*(JET_RADIUS-1) +
-    (JET_RADIUS-1)*(JET_RADIUS-1); 
+
+  const int JET_RADIUS = 6; //radius = 6 about equals area for region jets for square,
+                            //radius = 7 about equals area for region jets for circle
   const bool CIRCULAR_JETS = false; //otherwise square jets
 
   if (fChain == 0) return(0);
@@ -113,7 +106,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
       if (hcalEtaIndex[i]<-28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalEt[i]/16.0;
+	    double towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -121,7 +114,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
       if (hcalEtaIndex[i]>28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalEt[i]/16.0;
+	    double towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -161,44 +154,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
       // detectormapafter->Draw("Lego2");
     }    
 
-    towerJet highestJet;
-    
-    highestJet.sumEt = -1;
-    highestJet.phi_center = -1;
-    highestJet.eta_center = -1;
-    
-    for(int ieta = JET_RADIUS; ieta < NETA - JET_RADIUS; ieta++){
-      for(int iphi = 0; iphi < NPHI; iphi++){
-
-        towerJet temp;
-	temp.sumEt = fulldetector[ieta][iphi];
-	temp.eta_center = ieta;
-	temp.phi_center = iphi;
-
-	for(int ieta_i = ieta - JET_RADIUS; ieta_i < ieta + JET_RADIUS; ieta_i++)
-	{
-	  for(int iphi_i = iphi - JET_RADIUS; iphi_i < iphi + JET_RADIUS; iphi_i++)
-	  {
-	    //cut the corners off the square
-	    if(CIRCULAR_JETS)
-	    {
-	      int distance2 = (iphi-temp.phi_center)*(iphi-temp.phi_center) +
-		(ieta-temp.eta_center)*(ieta-temp.eta_center);
-	      if(distance2 >= JET_DISTANCE_2)
-		continue;
-	    }
-	    
-	    int realiphi_i;
-	    (iphi_i < 0) ? realiphi_i = iphi_i + NPHI : realiphi_i = iphi_i;
-
-	    temp.sumEt += fulldetector[ieta_i][realiphi_i];
-	  }
-	}
-
-	if(temp.sumEt > highestJet.sumEt)
-	  highestJet = temp;
-      }
-    }
+    TowerJet highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_RADIUS);
     
     if(highestJet.sumEt > threshhold)
     {

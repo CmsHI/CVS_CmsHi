@@ -8,13 +8,9 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
+#include "FindTowerJet.C"
 
-typedef struct{
-  int eta_center;
-  int phi_center;
-  int sumEt;
-} towerJet;
+using namespace std;
 
 TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 					   int threshold,
@@ -24,40 +20,14 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 {
   TH1::SetDefaultSumw2();
   
-  //   In a ROOT session, you can do:
-  //      Root > .L TriggerPrimitivesTree.C
-  //      Root > TriggerPrimitivesTree t
-  //      Root > t.GetEntry(12); // Fill t data members with entry number 12
-  //      Root > t.Show();       // Show values of entry 12
-  //      Root > t.Show(16);     // Read and show values of entry 16
-  //      Root > t.Loop();       // Loop on all entries
-  //
-
-  //     This is the loop skeleton where:
-  //    jentry is the global entry number in the chain
-  //    ientry is the entry number in the current Tree
-  //  Note that the argument to GetEntry must be:
-  //    jentry for TChain::GetEntry
-  //    ientry for TTree::GetEntry and TBranch::GetEntry
-  //
-  //       To read only selected branches, Insert statements like:
-  // METHOD1:
-  //    fChain->SetBranchStatus("*",0);  // disable all branches
-  //    fChain->SetBranchStatus("branchname",1);  // activate branchname
-  // METHOD2: replace line
-  //    fChain->GetEntry(jentry);       //read all branches
-  //by  b_branchname->GetEntry(ientry); //read only this branch
   if (fChain == 0) return(0);
   
   Long64_t nentries = fChain->GetEntriesFast();
 
   const int NBINS = 64;
   const int MAX_EN = 128;
-  const int NETA = 88;
-  const int NPHI = 72;
+
   const int JET_RADIUS = 6;
-  const int JET_DISTANCE_2 = (JET_RADIUS-1)*(JET_RADIUS-1) +
-    (JET_RADIUS-1)*(JET_RADIUS-1); 
   const bool CIRCULAR_JETS = false; //otherwise square jets
   
   TH1D* jet_curve;
@@ -161,44 +131,7 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 	}
     }    
 
-    towerJet highestJet;
-    
-    highestJet.sumEt = -1;
-    highestJet.phi_center = -1;
-    highestJet.eta_center = -1;
-    
-    for(int ieta = JET_RADIUS; ieta < NETA - JET_RADIUS; ieta++){
-      for(int iphi = 0; iphi < NPHI; iphi++){
-
-        towerJet temp;
-	temp.sumEt = fulldetector[ieta][iphi];
-	temp.eta_center = ieta;
-	temp.phi_center = iphi;
-
-	for(int ieta_i = ieta - JET_RADIUS; ieta_i < ieta + JET_RADIUS; ieta_i++)
-	{
-	  for(int iphi_i = iphi - JET_RADIUS; iphi_i < iphi + JET_RADIUS; iphi_i++)
-	  {
-	    //cut the corners off the square
-	    if(CIRCULAR_JETS)
-	    {
-	      int distance2 = (iphi-temp.phi_center)*(iphi-temp.phi_center) +
-		(ieta-temp.eta_center)*(ieta-temp.eta_center);
-	      if(distance2 >= JET_DISTANCE_2)
-		continue;
-	    }
-	    
-	    int realiphi_i;
-	    (iphi_i < 0) ? realiphi_i = iphi_i + NPHI : realiphi_i = iphi_i;
-
-	    temp.sumEt += fulldetector[ieta_i][realiphi_i];
-	  }
-	}
-
-	if(temp.sumEt > highestJet.sumEt)
-	  highestJet = temp;
-      }
-    }
+    TowerJet highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_RADIUS);
     
     if(highestJet.sumEt > threshold)
       jet_curve->Fill(realJetPt);
