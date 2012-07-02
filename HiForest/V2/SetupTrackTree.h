@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
+// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
 // from TTree trackTree/v1
-// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -241,9 +241,9 @@ void setupTrackTree(TTree *t,Tracks &tTracks,bool doCheck = 1)
    if (t->GetBranch("mtrkPfSumEcal")) t->SetBranchAddress("mtrkPfSumEcal", tTracks.mtrkPfSumEcal, &tTracks.b_mtrkPfSumEcal);
    if (t->GetBranch("mtrkPfSumHcal")) t->SetBranchAddress("mtrkPfSumHcal", tTracks.mtrkPfSumHcal, &tTracks.b_mtrkPfSumHcal);
    if (doCheck) {
-      if (t->GetMaximum("nv")>54) cout <<"FATAL ERROR: Arrary size of nv too small!!!  "<<t->GetMaximum("nv")<<endl;
-      if (t->GetMaximum("nTrk")>7036) cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl;
-      if (t->GetMaximum("nParticle")>4090) cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl;
-   }
+      if (t->GetMaximum("nv")>54) { cout <<"FATAL ERROR: Arrary size of nv too small!!!  "<<t->GetMaximum("nv")<<endl; exit(0);
+ }      if (t->GetMaximum("nTrk")>7036) { cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl; exit(0);
+ }      if (t->GetMaximum("nParticle")>4090) { cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl; exit(0);
+ }   }
 }
 

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
+// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
 // from TTree photon/Tree of Rechits around photon
-// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -61,7 +61,7 @@ void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 1)
    if (t->GetBranch("status")) t->SetBranchAddress("status", tGenps.status, &tGenps.b_status);
    if (t->GetBranch("collId")) t->SetBranchAddress("collId", tGenps.collId, &tGenps.b_collId);
    if (doCheck) {
-      if (t->GetMaximum("nPar")>366) cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl;
-   }
+      if (t->GetMaximum("nPar")>366) { cout <<"FATAL ERROR: Arrary size of nPar too small!!!  "<<t->GetMaximum("nPar")<<endl; exit(0);
+ }   }
 }
 

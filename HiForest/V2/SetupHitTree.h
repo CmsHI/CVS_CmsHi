@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
+// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
 // from TTree hbhe/v1
-// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -52,7 +52,7 @@ void setupHitTree(TTree *t,Hits &tHits,bool doCheck = 1)
    if (t->GetBranch("isjet")) t->SetBranchAddress("isjet", tHits.isjet, &tHits.b_isjet);
    if (t->GetBranch("depth")) t->SetBranchAddress("depth", tHits.depth, &tHits.b_depth);
    if (doCheck) {
-      if (t->GetMaximum("n")>62) cout <<"FATAL ERROR: Arrary size of n too small!!!  "<<t->GetMaximum("n")<<endl;
-   }
+      if (t->GetMaximum("n")>62) { cout <<"FATAL ERROR: Arrary size of n too small!!!  "<<t->GetMaximum("n")<<endl; exit(0);
+ }   }
 }
 

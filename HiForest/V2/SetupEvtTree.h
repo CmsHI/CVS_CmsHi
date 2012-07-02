@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
+// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
 // from TTree HiTree/
-// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -115,7 +115,7 @@ void setupEvtTree(TTree *t,Evts &tEvts,bool doCheck = 1)
    if (t->GetBranch("hiNevtPlane")) t->SetBranchAddress("hiNevtPlane", &tEvts.hiNevtPlane, &tEvts.b_hiNevtPlane);
    if (t->GetBranch("hiEvtPlanes")) t->SetBranchAddress("hiEvtPlanes", tEvts.hiEvtPlanes, &tEvts.b_hiEvtPlanes);
    if (doCheck) {
-      if (t->GetMaximum("hiNevtPlane")>126) cout <<"FATAL ERROR: Arrary size of hiNevtPlane too small!!!  "<<t->GetMaximum("hiNevtPlane")<<endl;
-   }
+      if (t->GetMaximum("hiNevtPlane")>126) { cout <<"FATAL ERROR: Arrary size of hiNevtPlane too small!!!  "<<t->GetMaximum("hiNevtPlane")<<endl; exit(0);
+ }   }
 }
 
