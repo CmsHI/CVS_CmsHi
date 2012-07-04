@@ -13,7 +13,7 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 				       bool PHI_AVERAGE,
 				       bool cut_noise_events)
 {
-  const int NBINS = 200;
+  const int NBINS = 300;
   const int MAX_EN = 600;
 
   if (fChain == 0) return(0);
@@ -61,32 +61,32 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 
     fChain->GetEntry(jentry);
     
-    double fulldetector[NETA][NPHI]; //[eta][phi]
+    double fullDetectorRegions[NETA_REGIONS][NPHI_REGIONS]; //[eta][phi]
     for(int i = 0; i < numRegions; i++)
     {
-      fulldetector[caloRegionEtaIndex[i]][caloRegionPhiIndex[i]] = caloRegionEt[i];
+      fullDetectorRegions[caloRegionEtaIndex[i]][caloRegionPhiIndex[i]] = caloRegionEt[i];
     }
       
     if(PHI_AVERAGE)
     {
-      double phi_average[NETA];
-      for(int ieta = 0; ieta < NETA; ieta++){
-	phi_average[ieta] = 0;
-	for(int iphi = 0; iphi < NPHI; iphi++){
-	  phi_average[ieta] += fulldetector[ieta][iphi];
+      double phiAverageRegions[NETA_REGIONS];
+      for(int ieta = 0; ieta < NETA_REGIONS; ieta++){
+	phiAverageRegions[ieta] = 0;
+	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
+	  phiAverageRegions[ieta] += fullDetectorRegions[ieta][iphi];
 	}
-	phi_average[ieta] /= NPHI;
+	phiAverageRegions[ieta] /= NPHI_REGIONS;
       }
       
-      for(int ieta = 0; ieta < NETA; ieta++)
-	for(int iphi = 0; iphi < NPHI; iphi++){
-	  fulldetector[ieta][iphi] -= phi_average[ieta];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
+      for(int ieta = 0; ieta < NETA_REGIONS; ieta++)
+	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
+	  fullDetectorRegions[ieta][iphi] -= phiAverageRegions[ieta];
+	  if(fullDetectorRegions[ieta][iphi] < 0)
+	    fullDetectorRegions[ieta][iphi] = 0;
 	}
     }
 
-    RegionJet highestJet = findRegionJet(fulldetector);
+    RegionJet highestJet = findRegionJet(fullDetectorRegions);
     
     if(highestJet.et > threshhold)
     {

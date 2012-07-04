@@ -24,8 +24,8 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
   
   Long64_t nentries = fChain->GetEntriesFast();
 
-  const int NBINS = 64;
-  const int MAX_EN = 128;
+  const int NBINS = 40;
+  const int MAX_EN = 200;
 
   const int JET_RADIUS = 6;
   const bool CIRCULAR_JETS = false; //otherwise square jets
@@ -71,7 +71,7 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 
     fChain->GetEntry(jentry);
 
-    double fulldetector[NETA][NPHI]; //[eta][phi]
+    double fulldetector[NETA_TOWERS][NPHI_TOWERS]; //[eta][phi]
 
     //------Fills in the phi-eta matrix for total Et values using eta and phi indexes------
     //Stolen from Doga
@@ -97,7 +97,7 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
       if (hcalEtaIndex[i]<-28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalEt[i]/16.0;
+	    double towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -105,7 +105,7 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
       if (hcalEtaIndex[i]>28){
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
-	    int towertotal=hcalEt[i]/16.0;
+	    double towertotal=hcalEt[i]/16.0;
 	    fulldetector[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
@@ -114,21 +114,26 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
 
     if(PHI_AVERAGE)
     {
-      double phi_average[NETA];
-      for(int ieta = 0; ieta < NETA; ieta++){
+      double phi_average[NETA_TOWERS];
+      for(int ieta = 0; ieta < NETA_TOWERS; ieta++)
+      {
 	phi_average[ieta] = 0;
-	for(int iphi = 0; iphi < NPHI; iphi++){
+	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++)
+	{
 	  phi_average[ieta] += fulldetector[ieta][iphi];
 	}
-	phi_average[ieta] /= NPHI;
+	phi_average[ieta] /= NPHI_TOWERS;
       }
       
-      for(int ieta = 0; ieta < NETA; ieta++)
-	for(int iphi = 0; iphi < NPHI; iphi++){
+      for(int ieta = 0; ieta < NETA_TOWERS; ieta++)
+      {
+	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++)
+	{
 	  fulldetector[ieta][iphi] -= phi_average[ieta];
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;
 	}
+      }
     }    
 
     TowerJet highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_RADIUS);
@@ -139,18 +144,18 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
     total_in_bin->Fill(realJetPt);
   }
   
-  TCanvas *plot;
+  // TCanvas *plot;
 
   //stringstream filename;
   //filename << "jetto_" << threshold << ".gif";
-  plot = new TCanvas();
+  // plot = new TCanvas();
   //jet_curve->Divide(total_in_bin);
   jet_curve->Divide(jet_curve, total_in_bin, 1, 1, "b");
   jet_curve->SetXTitle("HLT Jet Pt (GeV)");
   jet_curve->SetYTitle("Fraction Accepted");
 
   jet_curve->GetYaxis()->SetRangeUser(0,1);
-  jet_curve->Draw("E");
+  // jet_curve->Draw("E");
 
 //plots[i]->SaveAs(filename.str().c_str());
   

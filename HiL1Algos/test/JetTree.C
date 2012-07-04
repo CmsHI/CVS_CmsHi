@@ -1,3 +1,5 @@
+#ifndef JetTree_cxx
+
 #define JetTree_cxx
 #include "JetTree.h"
 #include <TH2.h>
@@ -41,3 +43,5 @@ void JetTree::Loop()
       // if (Cut(ientry) < 0) continue;
    }
 }
+
+#endif

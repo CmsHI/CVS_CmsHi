@@ -1,5 +1,5 @@
-const int NETA = 22;
-const int NPHI = 18;
+const int NETA_REGIONS = 22;
+const int NPHI_REGIONS = 18;
 
 typedef struct{
   int eta;
@@ -7,15 +7,15 @@ typedef struct{
   int et;
 } RegionJet;
 
-RegionJet findRegionJet(double fulldetector[NETA][NPHI])
+RegionJet findRegionJet(double fulldetector[NETA_REGIONS][NPHI_REGIONS])
 {
   RegionJet highestJet;  
   highestJet.et = -1;
   highestJet.eta = -1;
   highestJet.phi = -1;
     
-  for(int ieta = 1; ieta < NETA-1; ieta++)
-    for(int iphi = 0; iphi < NPHI; iphi++){
+  for(int ieta = 1; ieta < NETA_REGIONS-1; ieta++)
+    for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
 	
       int plusPhi =  (iphi != 17) ? iphi + 1: 0;
       int minusPhi =  (iphi != 0) ? iphi - 1: 17;

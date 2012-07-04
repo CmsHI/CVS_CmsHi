@@ -1,3 +1,4 @@
+#ifndef HLTMuTree_cxx
 #define HLTMuTree_cxx
 #include "HLTMuTree.h"
 #include <TH2.h>
@@ -41,3 +42,4 @@ void HLTMuTree::Loop()
       // if (Cut(ientry) < 0) continue;
    }
 }
+#endif

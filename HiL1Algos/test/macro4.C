@@ -16,7 +16,7 @@ void macro4()
 {  
   int total_events = -1;
   TriggerPrimitivesTree_alex *min =
-    new TriggerPrimitivesTree_alex(new TFile("minbias.root"));
+    new TriggerPrimitivesTree_alex(new TFile("minbias_v2.root"));
   // TriggerPrimitivesTree_alex *jet =
   //   new TriggerPrimitivesTree_alex(new TFile("jet.root"));
   

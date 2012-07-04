@@ -13,8 +13,8 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 				       bool PHI_AVERAGE,
 				       bool cut_noise_events)
 {
-  const int NBINS = 256;
-  const int MAX_EN = 512;
+  const int NBINS = 300;
+  const int MAX_EN = 600;
 
   const int JET_RADIUS = 6; //radius = 6 about equals area for region jets for square,
                             //radius = 7 about equals area for region jets for circle
@@ -26,19 +26,19 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
   
   TH1D *max_towerjet_energy;
   TH1D *efficiency_curve;
-  TH2I *max_towerjet_location;
+  // TH2I *max_towerjet_location;
 
   // TH2I *detectormap;
   // detectormap = new TH2I("detectormap",
   // 			 "Detector Map",
-  // 			 NETA,0,NETA,NPHI,0,NPHI);
+  // 			 NETA_TOWERS,0,NETA_TOWERS,NPHI_TOWERS,0,NPHI_TOWERS);
   // detectormap->SetXTitle("#eta");
   // detectormap->SetYTitle("#phi");
   
   // TH2I *detectormapafter;
   // detectormapafter = new TH2I("detectormapafter",
   // 			 "Detector Map After Subtraction",
-  // 			 NETA,0,NETA,NPHI,0,NPHI);
+  // 			 NETA_TOWERS,0,NETA_TOWERS,NPHI_TOWERS,0,NPHI_TOWERS);
   // detectormapafter->SetXTitle("#eta");
   // detectormapafter->SetYTitle("#phi");
   
@@ -46,9 +46,9 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 				 "Maximum towerjet energy for each event",
 				 NBINS,0,MAX_EN);
   
-  max_towerjet_location = new TH2I("max_towerjet_location",
-				   "Location of max towerjet for each event",
-				   NETA,0,NETA,NPHI,0,NPHI);
+  // max_towerjet_location = new TH2I("max_towerjet_location",
+  // 				   "Location of max towerjet for each event",
+  // 				   NETA_TOWERS,0,NETA_TOWERS,NPHI_TOWERS,0,NPHI_TOWERS);
   
 
   int evts = 0;
@@ -80,7 +80,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 
     fChain->GetEntry(jentry);
     
-    double fulldetector[NETA][NPHI]; //[eta][phi]
+    double fullDetectorTowers[NETA_TOWERS][NPHI_TOWERS]; //[eta][phi]
 
     //------Fills in the phi-eta matrix for total Et values using eta and phi indexes------
     //Stolen from Doga
@@ -89,7 +89,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	for (int j=0;j<ecalDetectorMapSize;j++){
 	  if(ecalEtaIndex[j]==hcalEtaIndex[i] && ecalPhiIndex[j]==hcalPhiIndex[i]){
 	    int towertotal=hcalEt[i]+ecalEt[j];
-	    fulldetector[hcalEtaIndex[i]+28+16][hcalPhiIndex[i]-1]=towertotal;
+	    fullDetectorTowers[hcalEtaIndex[i]+28+16][hcalPhiIndex[i]-1]=towertotal;
 	    break;
 	  }
 	}
@@ -98,7 +98,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	for (int j=0;j<ecalDetectorMapSize;j++){
 	  if(ecalEtaIndex[j]==hcalEtaIndex[i] && ecalPhiIndex[j]==hcalPhiIndex[i]){
 	    int towertotal=hcalEt[i]+ecalEt[j];
-	    fulldetector[hcalEtaIndex[i]+27+16][hcalPhiIndex[i]-1]=towertotal;
+	    fullDetectorTowers[hcalEtaIndex[i]+27+16][hcalPhiIndex[i]-1]=towertotal;
 	    break;
 	  }
 	}
@@ -107,7 +107,7 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
 	    double towertotal=hcalEt[i]/16.0;
-	    fulldetector[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
+	    fullDetectorTowers[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
       }
@@ -115,51 +115,51 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	for (int k=0; k<4; k++){
 	  for (int l=0; l<4; l++){
 	    double towertotal=hcalEt[i]/16.0;
-	    fulldetector[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
+	    fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
 	  }
 	}
       }
     }
 
-    // for(int i = 0; i < NETA; i++)
-    //   for(int j = 0; j < NPHI; j++)
-    // 	detectormap->Fill(i, j, fulldetector[i][j]);
+    // for(int i = 0; i < NETA_TOWERS; i++)
+    //   for(int j = 0; j < NPHI_TOWERS; j++)
+    // 	detectormap->Fill(i, j, fullDetectorTowers[i][j]);
 
     // TCanvas *c0 = new TCanvas();
     // detectormap->Draw("Lego2");
 
     if(PHI_AVERAGE)
     {
-      double phi_average[NETA];
-      for(int ieta = 0; ieta < NETA; ieta++){
-	phi_average[ieta] = 0;
-	for(int iphi = 0; iphi < NPHI; iphi++){
-	  phi_average[ieta] += fulldetector[ieta][iphi];
+      double phiAverageTowers[NETA_TOWERS];
+      for(int ieta = 0; ieta < NETA_TOWERS; ieta++){
+	phiAverageTowers[ieta] = 0;
+	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
+	  phiAverageTowers[ieta] += fullDetectorTowers[ieta][iphi];
 	}
-	phi_average[ieta] /= NPHI;
+	phiAverageTowers[ieta] /= NPHI_TOWERS;
       }
       
-      for(int ieta = 0; ieta < NETA; ieta++)
-	for(int iphi = 0; iphi < NPHI; iphi++){
-	  fulldetector[ieta][iphi] -= phi_average[ieta];
-	  if(fulldetector[ieta][iphi] < 0)
-	    fulldetector[ieta][iphi] = 0;
+      for(int ieta = 0; ieta < NETA_TOWERS; ieta++)
+	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
+	  fullDetectorTowers[ieta][iphi] -= phiAverageTowers[ieta];
+	  if(fullDetectorTowers[ieta][iphi] < 0)
+	    fullDetectorTowers[ieta][iphi] = 0;
 	}
 
-      // for(int i = 0; i < NETA; i++)
-      // 	for(int j = 0; j < NPHI; j++)
-      // 	  detectormapafter->Fill(i, j, fulldetector[i][j]);
+      // for(int i = 0; i < NETA_TOWERS; i++)
+      // 	for(int j = 0; j < NPHI_TOWERS; j++)
+      // 	  detectormapafter->Fill(i, j, fullDetectorTowers[i][j]);
 
       // TCanvas *c4 = new TCanvas();
       // detectormapafter->Draw("Lego2");
     }    
 
-    TowerJet highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_RADIUS);
+    TowerJet highestJet = findTowerJet(fullDetectorTowers, CIRCULAR_JETS, JET_RADIUS);
     
     if(highestJet.sumEt > threshhold)
     {
       max_towerjet_energy->Fill(highestJet.sumEt);
-      max_towerjet_location->Fill(highestJet.eta_center, highestJet.phi_center);
+      // max_towerjet_location->Fill(highestJet.eta_center, highestJet.phi_center);
     }
   }
   
@@ -174,22 +174,22 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
     efficiency_curve->Fill(j, (double)integral/total_integral);      
   }
 
-  TCanvas *c1 = new TCanvas();
+  // TCanvas *c1 = new TCanvas();
   max_towerjet_energy->SetTitle("max_towerjet_energy");
   max_towerjet_energy->SetXTitle("GeV");
   max_towerjet_energy->SetYTitle("Counts");
-  max_towerjet_energy->Draw();
+  // max_towerjet_energy->Draw();
 
-  TCanvas *c2 = new TCanvas();
-  max_towerjet_location->SetXTitle("Eta index");
-  max_towerjet_location->SetYTitle("Phi index");
-  max_towerjet_location->Draw("Lego2");
+  // TCanvas *c2 = new TCanvas();
+  // max_towerjet_location->SetXTitle("Eta index");
+  // max_towerjet_location->SetYTitle("Phi index");
+  // max_towerjet_location->Draw("Lego2");
 
-  TCanvas *c3 = new TCanvas();
+  // TCanvas *c3 = new TCanvas();
   efficiency_curve->SetTitle("Efficiency Curve");
   efficiency_curve->SetXTitle("Threshold (GeV)");
   efficiency_curve->SetYTitle("Fraction of passing events");
-  efficiency_curve->Draw();
+  // efficiency_curve->Draw();
 
   return(efficiency_curve);
 }

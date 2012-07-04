@@ -12,7 +12,7 @@
 void macro5()
 {
   TriggerPrimitivesTree_jetcurve *min =
-    new TriggerPrimitivesTree_jetcurve(new TFile("minbias.root"));
+    new TriggerPrimitivesTree_jetcurve(new TFile("minbias_v2.root"));
 
   bool phi_subtract;
 
@@ -85,7 +85,7 @@ void macro5()
   h_min[0]->Draw("p,E");
   h_min[1]->SetMarkerStyle(24);
   h_min[1]->Draw("p,E,same");
-  leg[0] = new TLegend(0.1,0.5,0.5,0.8);
+  leg[0] = new TLegend(0.2,0.5,0.5,0.7);
   leg[0]->SetFillColor(0);
   leg[0]->AddEntry(h_min[0],"0-30\% Centrality","p");
   leg[0]->AddEntry(h_min[1],"50-100\% Centrality","p");

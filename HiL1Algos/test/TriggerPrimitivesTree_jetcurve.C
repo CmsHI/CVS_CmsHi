@@ -86,7 +86,7 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 
     fChain->GetEntry(jentry);
 
-    double fulldetector[NETA][NPHI]; //[eta][phi]
+    double fulldetector[NETA_REGIONS][NPHI_REGIONS]; //[eta][phi]
     for(int i = 0; i < numRegions; i++)
     {
       fulldetector[caloRegionEtaIndex[i]][caloRegionPhiIndex[i]] = caloRegionEt[i];
@@ -94,17 +94,17 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
       
     if(PHI_AVERAGE)
     {
-      double phi_average[NETA];
-      for(int ieta = 0; ieta < NETA; ieta++){
+      double phi_average[NETA_REGIONS];
+      for(int ieta = 0; ieta < NETA_REGIONS; ieta++){
 	phi_average[ieta] = 0;
-	for(int iphi = 0; iphi < NPHI; iphi++){
+	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
 	  phi_average[ieta] += fulldetector[ieta][iphi];
 	}
-	phi_average[ieta] /= NPHI;
+	phi_average[ieta] /= NPHI_REGIONS;
       }
       
-      for(int ieta = 0; ieta < NETA; ieta++)
-	for(int iphi = 0; iphi < NPHI; iphi++){
+      for(int ieta = 0; ieta < NETA_REGIONS; ieta++)
+	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
 	  fulldetector[ieta][iphi] -= phi_average[ieta];
 	  if(fulldetector[ieta][iphi] < 0)
 	    fulldetector[ieta][iphi] = 0;

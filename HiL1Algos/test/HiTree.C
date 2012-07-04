@@ -1,3 +1,4 @@
+#ifndef HiTree_cxx
 #define HiTree_cxx
 #include "HiTree.h"
 #include <TH2.h>
@@ -41,3 +42,5 @@ void HiTree::Loop()
       // if (Cut(ientry) < 0) continue;
    }
 }
+
+#endif

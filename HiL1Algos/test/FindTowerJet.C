@@ -4,10 +4,10 @@ typedef struct{
   int sumEt;
 } TowerJet;
 
-const int NETA = 88;
-const int NPHI = 72;
+const int NETA_TOWERS = 88;
+const int NPHI_TOWERS = 72;
 
-TowerJet findTowerJet(double fulldetector[NETA][NPHI], bool circularJets, int jetRadius)
+TowerJet findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circularJets, int jetRadius)
 {
 
   int jetCircleDistance2 = (jetRadius-1)*(jetRadius-1) +
@@ -19,8 +19,8 @@ TowerJet findTowerJet(double fulldetector[NETA][NPHI], bool circularJets, int je
   highestJet.phi_center = -1;
   highestJet.eta_center = -1;
     
-  for(int ieta = jetRadius; ieta < NETA - jetRadius; ieta++){
-    for(int iphi = 0; iphi < NPHI; iphi++){
+  for(int ieta = jetRadius; ieta < NETA_TOWERS - jetRadius; ieta++){
+    for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
 
       TowerJet temp;
       temp.sumEt = fulldetector[ieta][iphi];
@@ -41,7 +41,7 @@ TowerJet findTowerJet(double fulldetector[NETA][NPHI], bool circularJets, int je
 	  }
 	    
 	  int realiphi_i;
-	  (iphi_i < 0) ? realiphi_i = iphi_i + NPHI : realiphi_i = iphi_i;
+	  (iphi_i < 0) ? realiphi_i = iphi_i + NPHI_TOWERS : realiphi_i = iphi_i;
 
 	  temp.sumEt += fulldetector[ieta_i][realiphi_i];
 	}
