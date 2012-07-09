@@ -88,6 +88,8 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
   HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
 
+  genParticleSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("genParticles",edm::InputTag("hiGenParticles"));
+
   if(doTrigger_){
     L1gtReadout_ = iConfig.getParameter<edm::InputTag>("L1gtReadout");
     hltResName_ = iConfig.getUntrackedParameter<string>("hltTrgResults","TriggerResults::HLT");
@@ -402,6 +404,9 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    iEvent.getByLabel(EBSrc_,ebHits);
    iEvent.getByLabel(EESrc_,eeHits);
 
+   edm::Handle<reco::GenParticleCollection> genparts;
+   iEvent.getByLabel(genParticleSrc_,genparts);
+
 
    // FILL JRA TREE
    jets_.b = b;
@@ -677,7 +682,6 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
        }
      }
 
-
      // Alternative reconstruction matching (PF for calo, calo for PF)
 
      double drMin = 100;
@@ -764,6 +768,23 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.jtm[jets_.nref] = jet.mass();
 	 
      if(isMC_ && usePat_){
+
+       for(UInt_t i = 0; i < genparts->size(); ++i){
+	 const reco::GenParticle& p = (*genparts)[i];
+	 if (p.status()!=1) continue;
+	 if (p.charge()==0) continue;
+	 double dr = deltaR(jet,p);
+	 if(dr < rParam){
+	   double ppt = p.pt();
+	   jets_.genChargedSum[jets_.nref] += ppt;
+	   if(ppt > hardPtMin_) jets_.genHardSum[jets_.nref] += ppt;
+	   if(p.collisionId() == 0){
+	     jets_.signalChargedSum[jets_.nref] += ppt;
+	     if(ppt > hardPtMin_) jets_.signalHardSum[jets_.nref] += ppt;
+	   }
+
+	 }
+       }
 
        const reco::GenJet * genjet = (*patjets)[j].genJet();
 	 

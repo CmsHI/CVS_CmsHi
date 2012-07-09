@@ -76,6 +76,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   edm::InputTag HcalRecHitHBHESrc_;
   edm::InputTag EBSrc_;
   edm::InputTag EESrc_;
+  edm::InputTag genParticleSrc_;
 
   std::vector<float> usedStringPts;
 
