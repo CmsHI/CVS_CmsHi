@@ -1,5 +1,5 @@
-#ifndef TrackingCorrections_h
-#define TrackingCorrections_h
+#ifndef TrackingCorrections2_h
+#define TrackingCorrections2_h
 #include <iostream>
 #include <vector>
 #include "TFile.h"
@@ -10,7 +10,7 @@
 #include "TLine.h"
 using namespace std;
 
-class TrackingCorrections
+class TrackingCorrections2
 {
 public:
    vector<TFile*> sample_;
@@ -43,7 +43,7 @@ public:
    vector<vector<vector<TH3F*> > > combInputHists_;
    vector<vector<TH3F*> > correctionHists_;
    
-   TrackingCorrections(TString name="trkCorrHisAna_djuqv1",TString mod="hitrkEffAnalyzer");
+   TrackingCorrections2(TString name="trkCorrHisAna_djuqv1",TString mod="hitrkEffAnalyzer");
    void AddSample(TString file, Float_t pthat) {
       sample_.push_back(new TFile(file));
       //cout << "sameple" << sample_.size() << ": " << sample_.back()->GetName() << endl;
@@ -56,7 +56,7 @@ public:
    TH1 * InspectCorr(Int_t lv, Int_t centBeg, Int_t centEnd, Int_t jetBegBin, Int_t jetEndBin,Int_t mode=0,Int_t begbin=0, Int_t endbin=-1);
 };
 
-TrackingCorrections::TrackingCorrections(TString name, TString mod) :
+TrackingCorrections2::TrackingCorrections2(TString name, TString mod) :
 corrSetName_(name),
 trkCorrModule_(mod),
 ptRebinFactor_(1),
@@ -91,7 +91,7 @@ isLeadingJet_(true)
    matName_.push_back("Den");   
 }
 
-void TrackingCorrections::Init()
+void TrackingCorrections2::Init()
 {
    cout << "==============================================" << endl;
    cout << " correction set: " << corrSetName_ << " module: " << trkCorrModule_ << endl;
@@ -238,7 +238,7 @@ void TrackingCorrections::Init()
    }
 }
 
-Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float_t cent, Double_t * outCorr)
+Float_t TrackingCorrections2::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float_t cent, Double_t * outCorr)
 {
    // Find Correction Bin
    Int_t ptBin = ptBin_->FindBin(pt);
@@ -275,14 +275,14 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    return (1-fake)*(1-sec)/(eff*(1+mul));
 }
 
-TH2D* TrackingCorrections::ProjectPtEta(TH3F * h3, Int_t zbinbeg, Int_t zbinend)
+TH2D* TrackingCorrections2::ProjectPtEta(TH3F * h3, Int_t zbinbeg, Int_t zbinend)
 {
    h3->GetZaxis()->SetRange(zbinbeg,zbinend);
    TH2D * h2 = (TH2D*)h3->Project3D(Form("yx_%d_%d",zbinbeg,zbinend));
    return h2;
 }
 
-void TrackingCorrections::Write()
+void TrackingCorrections2::Write()
 {
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       for (Int_t s=0; s<sample_.size(); ++s) {
@@ -295,7 +295,7 @@ void TrackingCorrections::Write()
    }
 }
 
-TH1 * TrackingCorrections::InspectCorr(Int_t lv, Int_t centBeg, Int_t centEnd, Int_t jetBegBin, Int_t jetEndBin, Int_t mode, Int_t begbin, Int_t endbin)
+TH1 * TrackingCorrections2::InspectCorr(Int_t lv, Int_t centBeg, Int_t centEnd, Int_t jetBegBin, Int_t jetEndBin, Int_t mode, Int_t begbin, Int_t endbin)
 {
    Int_t rebinFactor=1;
    TH3F *hNum=0, *hDen=0;
@@ -360,4 +360,4 @@ TH1 * TrackingCorrections::InspectCorr(Int_t lv, Int_t centBeg, Int_t centEnd, I
    }
    return hCorr1D;
 }
-#endif // TrackingCorrections_h
+#endif // TrackingCorrections2_h

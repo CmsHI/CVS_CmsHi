@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
+// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
 // from TTree metTree/v1
-// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -23,9 +23,9 @@ public :
    Int_t           nBX;
    Int_t           nRun;
    Int_t           nMET;
-   Float_t         MET[2];   //[nMET]
-   Float_t         METPhi[2];   //[nMET]
-   Float_t         SumEt[2];   //[nMET]
+   Float_t         MET[52];   //[nMET]
+   Float_t         METPhi[52];   //[nMET]
+   Float_t         SumEt[52];   //[nMET]
 
    // List of branches
    TBranch        *b_nEv;   //!

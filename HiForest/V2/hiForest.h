@@ -18,6 +18,7 @@
 #include "SetupPFTree.h"
 #include "SetupGenParticleTree.h"
 #include "TrackingCorrections2012.h"
+#include "TrackingCorrections_trkPhi.h"
 
 #include <TTree.h>
 #include <TFile.h>
@@ -265,6 +266,7 @@ class HiForest : public TNamed
   FactorizedJetCorrector *_JEC_HI310X;
 
   vector<TrackingCorrections*> trackCorrections;
+  vector<TrackingCorrections2*> trackCorrections2;
   TF1* fEnergyScale[2][10];  // [a][b],  a =0 for unconverted,  a=1 for converted.   b: 1,2,3 is centrality bin. b=0 is empty                                                                                       
   
  private:
@@ -309,7 +311,9 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   metTree          = (TTree*) inf->Get("anaMET/metTree");
   pfTree           = (TTree*) inf->Get("pfcandAnalyzer/pfTree");
   genpTree         = (TTree*) inf->Get("genpana/photon");
-  genParticleTree  = (TTree*) inf->Get("HiGenParticleAna/hi");
+  
+  // doesn't load genParticle by default
+  //genParticleTree  = (TTree*) inf->Get("HiGenParticleAna/hi");
 
   // Check the validity of the trees.
   hasPhotonTree        = (photonTree       	!= 0);
@@ -514,27 +518,37 @@ void HiForest::InitTree()
 {
    // Setup Track Corrections 	 
    if(doTrackCorrections){
-//       trackCorrections.push_back(new TrackingCorrections("QM2011","hitrkEffAnalyzer_akpu3pf")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2_v19","hitrkEffAnalyzer_MergedGeneral")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2_v19","hitrkEffAnalyzer_MergedSelected")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2_v19","hitrkEffAnalyzer_MergedGeneralCalo"));
+      //trackCorrections.push_back(new TrackingCorrections("QM2011","hitrkEffAnalyzer_akpu3pf")); 	 
+      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedGeneral")); 	 
+      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedSelected")); 	 
+      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedGeneralCalo"));
 
-      for(int i = 0; i < trackCorrections.size(); ++i){
-         if (pp) {
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj30_Forest2_v19.root",30);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj50_Forest2_v19.root",50);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj80_Forest2_v19.root",80);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj120_Forest2_v19.root",120);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_sigdj170_Forest2_v19.root",170);
-         } else {
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj30_Forest2_v19.root",30);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj50_Forest2_v19.root",50);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj80_Forest2_v19.root",80);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj120_Forest2_v19.root",120);
-              trackCorrections[i]->AddSample("trkcorr/Forest2_v19/trkcorr_hy18dj170_Forest2_v19.root",170);
-         }
+      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet")); 	 
+      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_j1")); 	 
+      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_j2"));
+
+      for(int i = 0; i < 3; ++i){
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj30_Forest2_TrkCorrv4.root",30);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj50_Forest2_TrkCorrv4.root",50);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj80_Forest2_TrkCorrv4.root",80);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj120_Forest2_TrkCorrv4.root",120);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj200_Forest2_TrkCorrv4.root",200);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj250_Forest2_TrkCorrv4.root",250);
+         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj300_Forest2_TrkCorrv4.root",300);
          trackCorrections[i]->smoothLevel_ = 0;
-         trackCorrections[i]->Init(); 	 
+         trackCorrections[i]->Init();
+      }
+
+      for(int i = 0; i < 3; ++i){
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj30_Forest2_TrkCorrv5.root",30);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj50_Forest2_TrkCorrv5.root",50);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj80_Forest2_TrkCorrv5.root",80);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj120_Forest2_TrkCorrv5.root",120);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj200_Forest2_TrkCorrv5.root",200);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj250_Forest2_TrkCorrv5.root",250);
+         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj300_Forest2_TrkCorrv5.root",300);
+         trackCorrections2[i]->weightSamples_ = 0;
+         trackCorrections2[i]->Init();
       }
    }
 }
@@ -618,7 +632,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasAkPu2CaloJetTree) AddCloneTree(akPu2CaloJetTree, "akPu2CaloJetAnalyzer", "t");
   if (hasAkPu3CaloJetTree) AddCloneTree(akPu3CaloJetTree, "akPu3CaloJetAnalyzer", "t");
   if (hasAkPu4CaloJetTree) AddCloneTree(akPu4CaloJetTree, "akPu4CaloJetAnalyzer", "t");
-  if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
+  if (hasTrackTree)    AddCloneTree(trackTree,    "mergedTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasPFTree)   AddCloneTree(pfTree,   "pfcandAnalyzer",            "pfTree");

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
+// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
-// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -21,65 +21,65 @@ public :
    Int_t           evt;
    Float_t         b;
    Int_t           nref;
-   Float_t         rawpt[450];   //[nref]
-   Float_t         jtpt[450];   //[nref]
-   Float_t         jteta[450];   //[nref]
-   Float_t         jty[450];   //[nref]
-   Float_t         jtphi[450];   //[nref]
-   Float_t         jtpu[450];   //[nref]
-   Float_t         jtm[450];   //[nref]
-   Float_t         discr_fr01[450];   //[nref]
-   Float_t         trackMax[450];   //[nref]
-   Float_t         trackSum[450];   //[nref]
-   Int_t           trackN[450];   //[nref]
-   Float_t         trackHardSum[450];   //[nref]
-   Int_t           trackHardN[450];   //[nref]
-   Float_t         chargedMax[450];   //[nref]
-   Float_t         chargedSum[450];   //[nref]
-   Int_t           chargedN[450];   //[nref]
-   Float_t         chargedHardSum[450];   //[nref]
-   Int_t           chargedHardN[450];   //[nref]
-   Float_t         photonMax[450];   //[nref]
-   Float_t         photonSum[450];   //[nref]
-   Int_t           photonN[450];   //[nref]
-   Float_t         photonHardSum[450];   //[nref]
-   Int_t           photonHardN[450];   //[nref]
-   Float_t         neutralMax[450];   //[nref]
-   Float_t         neutralSum[450];   //[nref]
-   Int_t           neutralN[450];   //[nref]
-   Float_t         eMax[450];   //[nref]
-   Float_t         eSum[450];   //[nref]
-   Int_t           eN[450];   //[nref]
-   Float_t         muMax[450];   //[nref]
-   Float_t         muSum[450];   //[nref]
-   Int_t           muN[450];   //[nref]
-   Float_t         matchedPt[450];   //[nref]
-   Float_t         matchedR[450];   //[nref]
+   Float_t         rawpt[504];   //[nref]
+   Float_t         jtpt[504];   //[nref]
+   Float_t         jteta[504];   //[nref]
+   Float_t         jty[504];   //[nref]
+   Float_t         jtphi[504];   //[nref]
+   Float_t         jtpu[504];   //[nref]
+   Float_t         jtm[504];   //[nref]
+   Float_t         discr_fr01[504];   //[nref]
+   Float_t         trackMax[504];   //[nref]
+   Float_t         trackSum[504];   //[nref]
+   Int_t           trackN[504];   //[nref]
+   Float_t         trackHardSum[504];   //[nref]
+   Int_t           trackHardN[504];   //[nref]
+   Float_t         chargedMax[504];   //[nref]
+   Float_t         chargedSum[504];   //[nref]
+   Int_t           chargedN[504];   //[nref]
+   Float_t         chargedHardSum[504];   //[nref]
+   Int_t           chargedHardN[504];   //[nref]
+   Float_t         photonMax[504];   //[nref]
+   Float_t         photonSum[504];   //[nref]
+   Int_t           photonN[504];   //[nref]
+   Float_t         photonHardSum[504];   //[nref]
+   Int_t           photonHardN[504];   //[nref]
+   Float_t         neutralMax[504];   //[nref]
+   Float_t         neutralSum[504];   //[nref]
+   Int_t           neutralN[504];   //[nref]
+   Float_t         eMax[504];   //[nref]
+   Float_t         eSum[504];   //[nref]
+   Int_t           eN[504];   //[nref]
+   Float_t         muMax[504];   //[nref]
+   Float_t         muSum[504];   //[nref]
+   Int_t           muN[504];   //[nref]
+   Float_t         matchedPt[504];   //[nref]
+   Float_t         matchedR[504];   //[nref]
    Int_t           beamId1;
    Int_t           beamId2;
    Float_t         pthat;
-   Float_t         refpt[450];   //[nref]
-   Float_t         refeta[450];   //[nref]
-   Float_t         refy[450];   //[nref]
-   Float_t         refphi[450];   //[nref]
-   Float_t         refdphijt[450];   //[nref]
-   Float_t         refdrjt[450];   //[nref]
-   Float_t         refparton_pt[450];   //[nref]
-   Int_t           refparton_flavor[450];   //[nref]
-   Int_t           refparton_flavorForB[450];   //[nref]
+   Float_t         refpt[504];   //[nref]
+   Float_t         refeta[504];   //[nref]
+   Float_t         refy[504];   //[nref]
+   Float_t         refphi[504];   //[nref]
+   Float_t         refdphijt[504];   //[nref]
+   Float_t         refdrjt[504];   //[nref]
+   Float_t         refparton_pt[504];   //[nref]
+   Int_t           refparton_flavor[504];   //[nref]
+   Int_t           refparton_flavorForB[504];   //[nref]
    Int_t           ngen;
-   Int_t           genmatchindex[26];   //[ngen]
-   Float_t         genpt[26];   //[ngen]
-   Float_t         geneta[26];   //[ngen]
-   Float_t         geny[26];   //[ngen]
-   Float_t         genphi[26];   //[ngen]
-   Float_t         gendphijt[26];   //[ngen]
-   Float_t         gendrjt[26];   //[ngen]
-   Int_t           gensubid[26];   //[ngen]
-   Float_t         smpt[450];   //[nref]
-   Float_t         fr01Chg[450];   //[nref]
-   Float_t         fr01EM[450];   //[nref]
-   Float_t         fr01[450];   //[nref]
+   Int_t           genmatchindex[74];   //[ngen]
+   Float_t         genpt[74];   //[ngen]
+   Float_t         geneta[74];   //[ngen]
+   Float_t         geny[74];   //[ngen]
+   Float_t         genphi[74];   //[ngen]
+   Float_t         gendphijt[74];   //[ngen]
+   Float_t         gendrjt[74];   //[ngen]
+   Int_t           gensubid[74];   //[ngen]
+   Float_t         smpt[504];   //[nref]
+   Float_t         fr01Chg[504];   //[nref]
+   Float_t         fr01EM[504];   //[nref]
+   Float_t         fr01[504];   //[nref]
 
    // List of branches
    TBranch        *b_evt;   //!
@@ -214,8 +214,8 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
    if (t->GetBranch("fr01EM")) t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
    if (t->GetBranch("fr01")) t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-      if (t->GetMaximum("nref")>500) { cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);
- }      if (t->GetMaximum("ngen")>76) { cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);
+      if (t->GetMaximum("nref")>504) { cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);
+ }      if (t->GetMaximum("ngen")>74) { cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);
  }   }
 }
 

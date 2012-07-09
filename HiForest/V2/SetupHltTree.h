@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
+// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
 // from TTree HltTree/
-// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -19,41 +19,41 @@ public :
 
    // Declaration of leaf types
    Int_t           NL1IsolEm;
-   Float_t         L1IsolEmEt[8];   //[NL1IsolEm]
-   Float_t         L1IsolEmE[8];   //[NL1IsolEm]
-   Float_t         L1IsolEmEta[8];   //[NL1IsolEm]
-   Float_t         L1IsolEmPhi[8];   //[NL1IsolEm]
+   Float_t         L1IsolEmEt[58];   //[NL1IsolEm]
+   Float_t         L1IsolEmE[58];   //[NL1IsolEm]
+   Float_t         L1IsolEmEta[58];   //[NL1IsolEm]
+   Float_t         L1IsolEmPhi[58];   //[NL1IsolEm]
    Int_t           NL1NIsolEm;
-   Float_t         L1NIsolEmEt[8];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmE[8];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmEta[8];   //[NL1NIsolEm]
-   Float_t         L1NIsolEmPhi[8];   //[NL1NIsolEm]
+   Float_t         L1NIsolEmEt[58];   //[NL1NIsolEm]
+   Float_t         L1NIsolEmE[58];   //[NL1NIsolEm]
+   Float_t         L1NIsolEmEta[58];   //[NL1NIsolEm]
+   Float_t         L1NIsolEmPhi[58];   //[NL1NIsolEm]
    Int_t           NL1Mu;
-   Float_t         L1MuPt[8];   //[NL1Mu]
-   Float_t         L1MuE[8];   //[NL1Mu]
-   Float_t         L1MuEta[8];   //[NL1Mu]
-   Float_t         L1MuPhi[8];   //[NL1Mu]
-   Int_t           L1MuIsol[8];   //[NL1Mu]
-   Int_t           L1MuMip[8];   //[NL1Mu]
-   Int_t           L1MuFor[8];   //[NL1Mu]
-   Int_t           L1MuRPC[8];   //[NL1Mu]
-   Int_t           L1MuQal[8];   //[NL1Mu]
-   Int_t           L1MuChg[8];   //[NL1Mu]
+   Float_t         L1MuPt[58];   //[NL1Mu]
+   Float_t         L1MuE[58];   //[NL1Mu]
+   Float_t         L1MuEta[58];   //[NL1Mu]
+   Float_t         L1MuPhi[58];   //[NL1Mu]
+   Int_t           L1MuIsol[58];   //[NL1Mu]
+   Int_t           L1MuMip[58];   //[NL1Mu]
+   Int_t           L1MuFor[58];   //[NL1Mu]
+   Int_t           L1MuRPC[58];   //[NL1Mu]
+   Int_t           L1MuQal[58];   //[NL1Mu]
+   Int_t           L1MuChg[58];   //[NL1Mu]
    Int_t           NL1CenJet;
-   Float_t         L1CenJetEt[8];   //[NL1CenJet]
-   Float_t         L1CenJetE[8];   //[NL1CenJet]
-   Float_t         L1CenJetEta[8];   //[NL1CenJet]
-   Float_t         L1CenJetPhi[8];   //[NL1CenJet]
+   Float_t         L1CenJetEt[58];   //[NL1CenJet]
+   Float_t         L1CenJetE[58];   //[NL1CenJet]
+   Float_t         L1CenJetEta[58];   //[NL1CenJet]
+   Float_t         L1CenJetPhi[58];   //[NL1CenJet]
    Int_t           NL1ForJet;
-   Float_t         L1ForJetEt[8];   //[NL1ForJet]
-   Float_t         L1ForJetE[8];   //[NL1ForJet]
-   Float_t         L1ForJetEta[8];   //[NL1ForJet]
-   Float_t         L1ForJetPhi[8];   //[NL1ForJet]
+   Float_t         L1ForJetEt[58];   //[NL1ForJet]
+   Float_t         L1ForJetE[58];   //[NL1ForJet]
+   Float_t         L1ForJetEta[58];   //[NL1ForJet]
+   Float_t         L1ForJetPhi[58];   //[NL1ForJet]
    Int_t           NL1Tau;
-   Float_t         L1TauEt[8];   //[NL1Tau]
-   Float_t         L1TauE[8];   //[NL1Tau]
-   Float_t         L1TauEta[8];   //[NL1Tau]
-   Float_t         L1TauPhi[8];   //[NL1Tau]
+   Float_t         L1TauEt[58];   //[NL1Tau]
+   Float_t         L1TauE[58];   //[NL1Tau]
+   Float_t         L1TauEta[58];   //[NL1Tau]
+   Float_t         L1TauPhi[58];   //[NL1Tau]
    Float_t         L1Met;
    Float_t         L1MetPhi;
    Float_t         L1EtTot;
@@ -74,68 +74,122 @@ public :
    Int_t           Bx;
    Int_t           Orbit;
    Double_t        AvgInstDelLumi;
-   Int_t           L1simulation_step;
-   Int_t           L1simulation_step_Prescl;
-   Int_t           reco_extra;
-   Int_t           reco_extra_Prescl;
-   Int_t           reco_extra_jet;
-   Int_t           reco_extra_jet_Prescl;
-   Int_t           gen_step;
-   Int_t           gen_step_Prescl;
-   Int_t           pat_step;
-   Int_t           pat_step_Prescl;
-   Int_t           extrapatstep;
-   Int_t           extrapatstep_Prescl;
-   Int_t           ana_step;
-   Int_t           ana_step_Prescl;
-   Int_t           phltJetHI;
-   Int_t           phltJetHI_Prescl;
-   Int_t           pcollisionEventSelection;
-   Int_t           pcollisionEventSelection_Prescl;
-   Int_t           pHBHENoiseFilter;
-   Int_t           pHBHENoiseFilter_Prescl;
-   Int_t           phiEcalRecHitSpikeFilter;
-   Int_t           phiEcalRecHitSpikeFilter_Prescl;
-   Int_t           HLT_HIL1DoubleMu0_HighQ_v1;
-   Int_t           HLT_HIL1DoubleMu0_HighQ_v1_Prescl;
+   Int_t           raw2digi_step;
+   Int_t           raw2digi_step_Prescl;
+   Int_t           reconstruction_step;
+   Int_t           reconstruction_step_Prescl;
+   Int_t           HLTriggerFirstPath;
+   Int_t           HLTriggerFirstPath_Prescl;
+   Int_t           HLT_HIDTCalibration_v1;
+   Int_t           HLT_HIDTCalibration_v1_Prescl;
+   Int_t           HLT_HIEcalCalibration_v1;
+   Int_t           HLT_HIEcalCalibration_v1_Prescl;
+   Int_t           HLT_HIHcalCalibration_v1;
+   Int_t           HLT_HIHcalCalibration_v1_Prescl;
+   Int_t           HLT_HIZeroBias_v1;
+   Int_t           HLT_HIZeroBias_v1_Prescl;
+   Int_t           HLT_HIZeroBiasXOR_v1;
+   Int_t           HLT_HIZeroBiasXOR_v1_Prescl;
+   Int_t           HLT_HIZeroBiasPixel_SingleTrack_v1;
+   Int_t           HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl;
+   Int_t           HLT_HIMinBiasBSC_v1;
+   Int_t           HLT_HIMinBiasBSC_v1_Prescl;
+   Int_t           HLT_HIMinBiasBSC_OR_v1;
+   Int_t           HLT_HIMinBiasBSC_OR_v1_Prescl;
+   Int_t           HLT_HIMinBiasHF_v1;
+   Int_t           HLT_HIMinBiasHF_v1_Prescl;
+   Int_t           HLT_HIMinBiasHf_OR_v1;
+   Int_t           HLT_HIMinBiasHf_OR_v1_Prescl;
+   Int_t           HLT_HIMinBiasHfOrBSC_v1;
+   Int_t           HLT_HIMinBiasHfOrBSC_v1_Prescl;
+   Int_t           HLT_HIMinBiasPixel_SingleTrack_v1;
+   Int_t           HLT_HIMinBiasPixel_SingleTrack_v1_Prescl;
+   Int_t           HLT_HIMinBiasZDC_Calo_v1;
+   Int_t           HLT_HIMinBiasZDC_Calo_v1_Prescl;
+   Int_t           HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1;
+   Int_t           HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl;
+   Int_t           HLT_HIMinBiasZDCPixel_SingleTrack_v1;
+   Int_t           HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl;
+   Int_t           HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1;
+   Int_t           HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl;
+   Int_t           HLT_HIBptxXOR_v1;
+   Int_t           HLT_HIBptxXOR_v1_Prescl;
+   Int_t           HLT_HIL1Algo_BptxXOR_BSC_OR_v1;
+   Int_t           HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl;
    Int_t           HLT_HIL1DoubleMuOpen_v1;
    Int_t           HLT_HIL1DoubleMuOpen_v1_Prescl;
-   Int_t           HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1;
-   Int_t           HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl;
-   Int_t           HLT_HIL2DoubleMu0_NHitQ_v1;
-   Int_t           HLT_HIL2DoubleMu0_NHitQ_v1_Prescl;
-   Int_t           HLT_HIL2DoubleMu0_v1;
-   Int_t           HLT_HIL2DoubleMu0_v1_Prescl;
-   Int_t           HLT_HIL2DoubleMu3_v1;
-   Int_t           HLT_HIL2DoubleMu3_v1_Prescl;
-   Int_t           HLT_HIL2Mu15_v1;
-   Int_t           HLT_HIL2Mu15_v1_Prescl;
-   Int_t           HLT_HIL2Mu3_NHitQ_v1;
-   Int_t           HLT_HIL2Mu3_NHitQ_v1_Prescl;
+   Int_t           HLT_HIL1DoubleMu0_HighQ_v1;
+   Int_t           HLT_HIL1DoubleMu0_HighQ_v1_Prescl;
    Int_t           HLT_HIL2Mu3_v1;
    Int_t           HLT_HIL2Mu3_v1_Prescl;
+   Int_t           HLT_HIL2Mu3_NHitQ_v1;
+   Int_t           HLT_HIL2Mu3_NHitQ_v1_Prescl;
    Int_t           HLT_HIL2Mu7_v1;
    Int_t           HLT_HIL2Mu7_v1_Prescl;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_v1;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_SS_v1;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_v1;
-   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl;
-   Int_t           HLT_HIL3DoubleMuOpen_v1;
-   Int_t           HLT_HIL3DoubleMuOpen_v1_Prescl;
+   Int_t           HLT_HIL2Mu15_v1;
+   Int_t           HLT_HIL2Mu15_v1_Prescl;
+   Int_t           HLT_HIL2DoubleMu0_v1;
+   Int_t           HLT_HIL2DoubleMu0_v1_Prescl;
+   Int_t           HLT_HIL2DoubleMu0_NHitQ_v1;
+   Int_t           HLT_HIL2DoubleMu0_NHitQ_v1_Prescl;
+   Int_t           HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1;
+   Int_t           HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl;
+   Int_t           HLT_HIL2DoubleMu3_v1;
+   Int_t           HLT_HIL2DoubleMu3_v1_Prescl;
    Int_t           HLT_HIL3Mu3_v1;
    Int_t           HLT_HIL3Mu3_v1_Prescl;
-   Int_t           HLT_HIDiJet55_v1;
-   Int_t           HLT_HIDiJet55_v1_Prescl;
+   Int_t           HLT_HIL3DoubleMuOpen_v1;
+   Int_t           HLT_HIL3DoubleMuOpen_v1_Prescl;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_v1;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_SS_v1;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_v1;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1;
+   Int_t           HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl;
+   Int_t           HLT_HISinglePhoton15_v1;
+   Int_t           HLT_HISinglePhoton15_v1_Prescl;
+   Int_t           HLT_HISinglePhoton20_v1;
+   Int_t           HLT_HISinglePhoton20_v1_Prescl;
+   Int_t           HLT_HISinglePhoton30_v1;
+   Int_t           HLT_HISinglePhoton30_v1_Prescl;
+   Int_t           HLT_HISinglePhoton40_v1;
+   Int_t           HLT_HISinglePhoton40_v1_Prescl;
+   Int_t           HLT_HIPhoton10_Photon15_v1;
+   Int_t           HLT_HIPhoton10_Photon15_v1_Prescl;
+   Int_t           HLT_HIPhoton15_Photon20_v1;
+   Int_t           HLT_HIPhoton15_Photon20_v1_Prescl;
    Int_t           HLT_HIDoublePhoton10_v1;
    Int_t           HLT_HIDoublePhoton10_v1_Prescl;
    Int_t           HLT_HIDoublePhoton15_v1;
    Int_t           HLT_HIDoublePhoton15_v1_Prescl;
    Int_t           HLT_HIDoublePhoton20_v1;
    Int_t           HLT_HIDoublePhoton20_v1_Prescl;
+   Int_t           HLT_HIJet55_v1;
+   Int_t           HLT_HIJet55_v1_Prescl;
+   Int_t           HLT_HIJet65_v1;
+   Int_t           HLT_HIJet65_v1_Prescl;
+   Int_t           HLT_HIJet80_v1;
+   Int_t           HLT_HIJet80_v1_Prescl;
+   Int_t           HLT_HIJet95_v1;
+   Int_t           HLT_HIJet95_v1_Prescl;
+   Int_t           HLT_HIDiJet55_v1;
+   Int_t           HLT_HIDiJet55_v1_Prescl;
+   Int_t           HLT_HIJet65_Jet55_v1;
+   Int_t           HLT_HIJet65_Jet55_v1_Prescl;
+   Int_t           HLT_HIJetE30_NoBPTX_v1;
+   Int_t           HLT_HIJetE30_NoBPTX_v1_Prescl;
+   Int_t           HLT_HIJetE50_NoBPTX3BX_NoHalo_v1;
+   Int_t           HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl;
+   Int_t           HLT_HIActivityHF_Coincidence3_v1;
+   Int_t           HLT_HIActivityHF_Coincidence3_v1_Prescl;
+   Int_t           HLT_HIActivityHF_Single3_v1;
+   Int_t           HLT_HIActivityHF_Single3_v1_Prescl;
+   Int_t           HLT_HIClusterVertexCompatibility_v1;
+   Int_t           HLT_HIClusterVertexCompatibility_v1_Prescl;
+   Int_t           HLT_HICentralityVeto_v1;
+   Int_t           HLT_HICentralityVeto_v1_Prescl;
    Int_t           HLT_HIFullTrack12_L1Central_v1;
    Int_t           HLT_HIFullTrack12_L1Central_v1_Prescl;
    Int_t           HLT_HIFullTrack12_L1Peripheral_v1;
@@ -152,92 +206,36 @@ public :
    Int_t           HLT_HIFullTrack25_L1Central_v1_Prescl;
    Int_t           HLT_HIFullTrack25_L1Peripheral_v1;
    Int_t           HLT_HIFullTrack25_L1Peripheral_v1_Prescl;
-   Int_t           HLT_HIJet55_v1;
-   Int_t           HLT_HIJet55_v1_Prescl;
-   Int_t           HLT_HIJet65_Jet55_v1;
-   Int_t           HLT_HIJet65_Jet55_v1_Prescl;
-   Int_t           HLT_HIJet65_v1;
-   Int_t           HLT_HIJet65_v1_Prescl;
-   Int_t           HLT_HIJet80_v1;
-   Int_t           HLT_HIJet80_v1_Prescl;
-   Int_t           HLT_HIJet95_v1;
-   Int_t           HLT_HIJet95_v1_Prescl;
-   Int_t           HLT_HIJetE30_NoBPTX_v1;
-   Int_t           HLT_HIJetE30_NoBPTX_v1_Prescl;
-   Int_t           HLT_HIJetE50_NoBPTX3BX_NoHalo_v1;
-   Int_t           HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl;
-   Int_t           HLT_HIMET120_v1;
-   Int_t           HLT_HIMET120_v1_Prescl;
-   Int_t           HLT_HIMET200_v1;
-   Int_t           HLT_HIMET200_v1_Prescl;
-   Int_t           HLT_HIMET220_v1;
-   Int_t           HLT_HIMET220_v1_Prescl;
-   Int_t           HLT_HIPhoton10_Photon15_v1;
-   Int_t           HLT_HIPhoton10_Photon15_v1_Prescl;
-   Int_t           HLT_HIPhoton15_Photon20_v1;
-   Int_t           HLT_HIPhoton15_Photon20_v1_Prescl;
-   Int_t           HLT_HISinglePhoton15_v1;
-   Int_t           HLT_HISinglePhoton15_v1_Prescl;
-   Int_t           HLT_HISinglePhoton20_v1;
-   Int_t           HLT_HISinglePhoton20_v1_Prescl;
-   Int_t           HLT_HISinglePhoton30_v1;
-   Int_t           HLT_HISinglePhoton30_v1_Prescl;
-   Int_t           HLT_HISinglePhoton40_v1;
-   Int_t           HLT_HISinglePhoton40_v1_Prescl;
-   Int_t           HLT_HIBptxXOR_v1;
-   Int_t           HLT_HIBptxXOR_v1_Prescl;
-   Int_t           HLT_HICentral10_v1;
-   Int_t           HLT_HICentral10_v1_Prescl;
-   Int_t           HLT_HICentralityVeto_v1;
-   Int_t           HLT_HICentralityVeto_v1_Prescl;
-   Int_t           HLT_HIL1Algo_BptxXOR_BSC_OR_v1;
-   Int_t           HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl;
-   Int_t           HLT_HIMinBiasBSC_OR_v1;
-   Int_t           HLT_HIMinBiasBSC_OR_v1_Prescl;
-   Int_t           HLT_HIMinBiasBSC_v1;
-   Int_t           HLT_HIMinBiasBSC_v1_Prescl;
-   Int_t           HLT_HIMinBiasHF_v1;
-   Int_t           HLT_HIMinBiasHF_v1_Prescl;
-   Int_t           HLT_HIMinBiasHfOrBSC_v1;
-   Int_t           HLT_HIMinBiasHfOrBSC_v1_Prescl;
-   Int_t           HLT_HIMinBiasHf_OR_v1;
-   Int_t           HLT_HIMinBiasHf_OR_v1_Prescl;
-   Int_t           HLT_HIMinBiasPixel_SingleTrack_v1;
-   Int_t           HLT_HIMinBiasPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIMinBiasZDCPixel_SingleTrack_v1;
-   Int_t           HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1;
-   Int_t           HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl;
-   Int_t           HLT_HIMinBiasZDC_Calo_v1;
-   Int_t           HLT_HIMinBiasZDC_Calo_v1_Prescl;
-   Int_t           HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1;
-   Int_t           HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIPhysics_v1;
-   Int_t           HLT_HIPhysics_v1_Prescl;
    Int_t           HLT_HIRandom_v1;
    Int_t           HLT_HIRandom_v1_Prescl;
    Int_t           HLT_HIUCC010_v1;
    Int_t           HLT_HIUCC010_v1_Prescl;
    Int_t           HLT_HIUCC015_v1;
    Int_t           HLT_HIUCC015_v1_Prescl;
+   Int_t           HLT_HICentral10_v1;
+   Int_t           HLT_HICentral10_v1_Prescl;
+   Int_t           HLT_HIUPCNeuMuPixel_SingleTrack_v1;
+   Int_t           HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl;
    Int_t           HLT_HIUPCNeuEG2Pixel_SingleTrack_v1;
    Int_t           HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl;
    Int_t           HLT_HIUPCNeuEG5Pixel_SingleTrack_v1;
    Int_t           HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl;
+   Int_t           HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1;
+   Int_t           HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl;
    Int_t           HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1;
    Int_t           HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl;
    Int_t           HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1;
    Int_t           HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1;
-   Int_t           HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIUPCNeuMuPixel_SingleTrack_v1;
-   Int_t           HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIZeroBiasPixel_SingleTrack_v1;
-   Int_t           HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl;
-   Int_t           HLT_HIZeroBiasXOR_v1;
-   Int_t           HLT_HIZeroBiasXOR_v1_Prescl;
-   Int_t           HLT_HIZeroBias_v1;
-   Int_t           HLT_HIZeroBias_v1_Prescl;
+   Int_t           HLTriggerFinalPath;
+   Int_t           HLTriggerFinalPath_Prescl;
+   Int_t           HLT_HIMET120_v1;
+   Int_t           HLT_HIMET120_v1_Prescl;
+   Int_t           HLT_HIMET200_v1;
+   Int_t           HLT_HIMET200_v1_Prescl;
+   Int_t           HLT_HIMET220_v1;
+   Int_t           HLT_HIMET220_v1_Prescl;
+   Int_t           HLT_HIPhysics_v1;
+   Int_t           HLT_HIPhysics_v1_Prescl;
    Int_t           HLT_HIL1DoubleMu0_HighQ_v2;
    Int_t           HLT_HIL1DoubleMu0_HighQ_v2_Prescl;
    Int_t           HLT_HIL1DoubleMuOpen_v2;
@@ -1060,68 +1058,122 @@ public :
    TBranch        *b_Bx;   //!
    TBranch        *b_Orbit;   //!
    TBranch        *b_AvgInstDelLumi;   //!
-   TBranch        *b_L1simulation_step;   //!
-   TBranch        *b_L1simulation_step_Prescl;   //!
-   TBranch        *b_reco_extra;   //!
-   TBranch        *b_reco_extra_Prescl;   //!
-   TBranch        *b_reco_extra_jet;   //!
-   TBranch        *b_reco_extra_jet_Prescl;   //!
-   TBranch        *b_gen_step;   //!
-   TBranch        *b_gen_step_Prescl;   //!
-   TBranch        *b_pat_step;   //!
-   TBranch        *b_pat_step_Prescl;   //!
-   TBranch        *b_extrapatstep;   //!
-   TBranch        *b_extrapatstep_Prescl;   //!
-   TBranch        *b_ana_step;   //!
-   TBranch        *b_ana_step_Prescl;   //!
-   TBranch        *b_phltJetHI;   //!
-   TBranch        *b_phltJetHI_Prescl;   //!
-   TBranch        *b_pcollisionEventSelection;   //!
-   TBranch        *b_pcollisionEventSelection_Prescl;   //!
-   TBranch        *b_pHBHENoiseFilter;   //!
-   TBranch        *b_pHBHENoiseFilter_Prescl;   //!
-   TBranch        *b_phiEcalRecHitSpikeFilter;   //!
-   TBranch        *b_phiEcalRecHitSpikeFilter_Prescl;   //!
-   TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v1;   //!
-   TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v1_Prescl;   //!
+   TBranch        *b_raw2digi_step;   //!
+   TBranch        *b_raw2digi_step_Prescl;   //!
+   TBranch        *b_reconstruction_step;   //!
+   TBranch        *b_reconstruction_step_Prescl;   //!
+   TBranch        *b_HLTriggerFirstPath;   //!
+   TBranch        *b_HLTriggerFirstPath_Prescl;   //!
+   TBranch        *b_HLT_HIDTCalibration_v1;   //!
+   TBranch        *b_HLT_HIDTCalibration_v1_Prescl;   //!
+   TBranch        *b_HLT_HIEcalCalibration_v1;   //!
+   TBranch        *b_HLT_HIEcalCalibration_v1_Prescl;   //!
+   TBranch        *b_HLT_HIHcalCalibration_v1;   //!
+   TBranch        *b_HLT_HIHcalCalibration_v1_Prescl;   //!
+   TBranch        *b_HLT_HIZeroBias_v1;   //!
+   TBranch        *b_HLT_HIZeroBias_v1_Prescl;   //!
+   TBranch        *b_HLT_HIZeroBiasXOR_v1;   //!
+   TBranch        *b_HLT_HIZeroBiasXOR_v1_Prescl;   //!
+   TBranch        *b_HLT_HIZeroBiasPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasBSC_v1;   //!
+   TBranch        *b_HLT_HIMinBiasBSC_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasBSC_OR_v1;   //!
+   TBranch        *b_HLT_HIMinBiasBSC_OR_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasHF_v1;   //!
+   TBranch        *b_HLT_HIMinBiasHF_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasHf_OR_v1;   //!
+   TBranch        *b_HLT_HIMinBiasHf_OR_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasHfOrBSC_v1;   //!
+   TBranch        *b_HLT_HIMinBiasHfOrBSC_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIMinBiasPixel_SingleTrack_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_Calo_v1;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_Calo_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasZDCPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl;   //!
+   TBranch        *b_HLT_HIBptxXOR_v1;   //!
+   TBranch        *b_HLT_HIBptxXOR_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1;   //!
+   TBranch        *b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl;   //!
    TBranch        *b_HLT_HIL1DoubleMuOpen_v1;   //!
    TBranch        *b_HLT_HIL1DoubleMuOpen_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_NHitQ_v1;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_NHitQ_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_v1;   //!
-   TBranch        *b_HLT_HIL2DoubleMu0_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2DoubleMu3_v1;   //!
-   TBranch        *b_HLT_HIL2DoubleMu3_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2Mu15_v1;   //!
-   TBranch        *b_HLT_HIL2Mu15_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL2Mu3_NHitQ_v1;   //!
-   TBranch        *b_HLT_HIL2Mu3_NHitQ_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v1;   //!
+   TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v1_Prescl;   //!
    TBranch        *b_HLT_HIL2Mu3_v1;   //!
    TBranch        *b_HLT_HIL2Mu3_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2Mu3_NHitQ_v1;   //!
+   TBranch        *b_HLT_HIL2Mu3_NHitQ_v1_Prescl;   //!
    TBranch        *b_HLT_HIL2Mu7_v1;   //!
    TBranch        *b_HLT_HIL2Mu7_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_v1;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_v1;   //!
-   TBranch        *b_HLT_HIL3DoubleMuOpen_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2Mu15_v1;   //!
+   TBranch        *b_HLT_HIL2Mu15_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_v1;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_NHitQ_v1;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_NHitQ_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1;   //!
+   TBranch        *b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL2DoubleMu3_v1;   //!
+   TBranch        *b_HLT_HIL2DoubleMu3_v1_Prescl;   //!
    TBranch        *b_HLT_HIL3Mu3_v1;   //!
    TBranch        *b_HLT_HIL3Mu3_v1_Prescl;   //!
-   TBranch        *b_HLT_HIDiJet55_v1;   //!
-   TBranch        *b_HLT_HIDiJet55_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_v1;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_v1;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1;   //!
+   TBranch        *b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl;   //!
+   TBranch        *b_HLT_HISinglePhoton15_v1;   //!
+   TBranch        *b_HLT_HISinglePhoton15_v1_Prescl;   //!
+   TBranch        *b_HLT_HISinglePhoton20_v1;   //!
+   TBranch        *b_HLT_HISinglePhoton20_v1_Prescl;   //!
+   TBranch        *b_HLT_HISinglePhoton30_v1;   //!
+   TBranch        *b_HLT_HISinglePhoton30_v1_Prescl;   //!
+   TBranch        *b_HLT_HISinglePhoton40_v1;   //!
+   TBranch        *b_HLT_HISinglePhoton40_v1_Prescl;   //!
+   TBranch        *b_HLT_HIPhoton10_Photon15_v1;   //!
+   TBranch        *b_HLT_HIPhoton10_Photon15_v1_Prescl;   //!
+   TBranch        *b_HLT_HIPhoton15_Photon20_v1;   //!
+   TBranch        *b_HLT_HIPhoton15_Photon20_v1_Prescl;   //!
    TBranch        *b_HLT_HIDoublePhoton10_v1;   //!
    TBranch        *b_HLT_HIDoublePhoton10_v1_Prescl;   //!
    TBranch        *b_HLT_HIDoublePhoton15_v1;   //!
    TBranch        *b_HLT_HIDoublePhoton15_v1_Prescl;   //!
    TBranch        *b_HLT_HIDoublePhoton20_v1;   //!
    TBranch        *b_HLT_HIDoublePhoton20_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJet55_v1;   //!
+   TBranch        *b_HLT_HIJet55_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJet65_v1;   //!
+   TBranch        *b_HLT_HIJet65_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJet80_v1;   //!
+   TBranch        *b_HLT_HIJet80_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJet95_v1;   //!
+   TBranch        *b_HLT_HIJet95_v1_Prescl;   //!
+   TBranch        *b_HLT_HIDiJet55_v1;   //!
+   TBranch        *b_HLT_HIDiJet55_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJet65_Jet55_v1;   //!
+   TBranch        *b_HLT_HIJet65_Jet55_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJetE30_NoBPTX_v1;   //!
+   TBranch        *b_HLT_HIJetE30_NoBPTX_v1_Prescl;   //!
+   TBranch        *b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1;   //!
+   TBranch        *b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl;   //!
+   TBranch        *b_HLT_HIActivityHF_Coincidence3_v1;   //!
+   TBranch        *b_HLT_HIActivityHF_Coincidence3_v1_Prescl;   //!
+   TBranch        *b_HLT_HIActivityHF_Single3_v1;   //!
+   TBranch        *b_HLT_HIActivityHF_Single3_v1_Prescl;   //!
+   TBranch        *b_HLT_HIClusterVertexCompatibility_v1;   //!
+   TBranch        *b_HLT_HIClusterVertexCompatibility_v1_Prescl;   //!
+   TBranch        *b_HLT_HICentralityVeto_v1;   //!
+   TBranch        *b_HLT_HICentralityVeto_v1_Prescl;   //!
    TBranch        *b_HLT_HIFullTrack12_L1Central_v1;   //!
    TBranch        *b_HLT_HIFullTrack12_L1Central_v1_Prescl;   //!
    TBranch        *b_HLT_HIFullTrack12_L1Peripheral_v1;   //!
@@ -1138,92 +1190,36 @@ public :
    TBranch        *b_HLT_HIFullTrack25_L1Central_v1_Prescl;   //!
    TBranch        *b_HLT_HIFullTrack25_L1Peripheral_v1;   //!
    TBranch        *b_HLT_HIFullTrack25_L1Peripheral_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJet55_v1;   //!
-   TBranch        *b_HLT_HIJet55_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJet65_Jet55_v1;   //!
-   TBranch        *b_HLT_HIJet65_Jet55_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJet65_v1;   //!
-   TBranch        *b_HLT_HIJet65_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJet80_v1;   //!
-   TBranch        *b_HLT_HIJet80_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJet95_v1;   //!
-   TBranch        *b_HLT_HIJet95_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJetE30_NoBPTX_v1;   //!
-   TBranch        *b_HLT_HIJetE30_NoBPTX_v1_Prescl;   //!
-   TBranch        *b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1;   //!
-   TBranch        *b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMET120_v1;   //!
-   TBranch        *b_HLT_HIMET120_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMET200_v1;   //!
-   TBranch        *b_HLT_HIMET200_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMET220_v1;   //!
-   TBranch        *b_HLT_HIMET220_v1_Prescl;   //!
-   TBranch        *b_HLT_HIPhoton10_Photon15_v1;   //!
-   TBranch        *b_HLT_HIPhoton10_Photon15_v1_Prescl;   //!
-   TBranch        *b_HLT_HIPhoton15_Photon20_v1;   //!
-   TBranch        *b_HLT_HIPhoton15_Photon20_v1_Prescl;   //!
-   TBranch        *b_HLT_HISinglePhoton15_v1;   //!
-   TBranch        *b_HLT_HISinglePhoton15_v1_Prescl;   //!
-   TBranch        *b_HLT_HISinglePhoton20_v1;   //!
-   TBranch        *b_HLT_HISinglePhoton20_v1_Prescl;   //!
-   TBranch        *b_HLT_HISinglePhoton30_v1;   //!
-   TBranch        *b_HLT_HISinglePhoton30_v1_Prescl;   //!
-   TBranch        *b_HLT_HISinglePhoton40_v1;   //!
-   TBranch        *b_HLT_HISinglePhoton40_v1_Prescl;   //!
-   TBranch        *b_HLT_HIBptxXOR_v1;   //!
-   TBranch        *b_HLT_HIBptxXOR_v1_Prescl;   //!
-   TBranch        *b_HLT_HICentral10_v1;   //!
-   TBranch        *b_HLT_HICentral10_v1_Prescl;   //!
-   TBranch        *b_HLT_HICentralityVeto_v1;   //!
-   TBranch        *b_HLT_HICentralityVeto_v1_Prescl;   //!
-   TBranch        *b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1;   //!
-   TBranch        *b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasBSC_OR_v1;   //!
-   TBranch        *b_HLT_HIMinBiasBSC_OR_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasBSC_v1;   //!
-   TBranch        *b_HLT_HIMinBiasBSC_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasHF_v1;   //!
-   TBranch        *b_HLT_HIMinBiasHF_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasHfOrBSC_v1;   //!
-   TBranch        *b_HLT_HIMinBiasHfOrBSC_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasHf_OR_v1;   //!
-   TBranch        *b_HLT_HIMinBiasHf_OR_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIMinBiasPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasZDCPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_Calo_v1;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_Calo_v1_Prescl;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIPhysics_v1;   //!
-   TBranch        *b_HLT_HIPhysics_v1_Prescl;   //!
    TBranch        *b_HLT_HIRandom_v1;   //!
    TBranch        *b_HLT_HIRandom_v1_Prescl;   //!
    TBranch        *b_HLT_HIUCC010_v1;   //!
    TBranch        *b_HLT_HIUCC010_v1_Prescl;   //!
    TBranch        *b_HLT_HIUCC015_v1;   //!
    TBranch        *b_HLT_HIUCC015_v1_Prescl;   //!
+   TBranch        *b_HLT_HICentral10_v1;   //!
+   TBranch        *b_HLT_HICentral10_v1_Prescl;   //!
+   TBranch        *b_HLT_HIUPCNeuMuPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl;   //!
    TBranch        *b_HLT_HIUPCNeuEG2Pixel_SingleTrack_v1;   //!
    TBranch        *b_HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl;   //!
    TBranch        *b_HLT_HIUPCNeuEG5Pixel_SingleTrack_v1;   //!
    TBranch        *b_HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl;   //!
+   TBranch        *b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1;   //!
+   TBranch        *b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl;   //!
    TBranch        *b_HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1;   //!
    TBranch        *b_HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl;   //!
    TBranch        *b_HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1;   //!
    TBranch        *b_HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIUPCNeuMuPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIZeroBiasPixel_SingleTrack_v1;   //!
-   TBranch        *b_HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl;   //!
-   TBranch        *b_HLT_HIZeroBiasXOR_v1;   //!
-   TBranch        *b_HLT_HIZeroBiasXOR_v1_Prescl;   //!
-   TBranch        *b_HLT_HIZeroBias_v1;   //!
-   TBranch        *b_HLT_HIZeroBias_v1_Prescl;   //!
+   TBranch        *b_HLTriggerFinalPath;   //!
+   TBranch        *b_HLTriggerFinalPath_Prescl;   //!
+   TBranch        *b_HLT_HIMET120_v1;   //!
+   TBranch        *b_HLT_HIMET120_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMET200_v1;   //!
+   TBranch        *b_HLT_HIMET200_v1_Prescl;   //!
+   TBranch        *b_HLT_HIMET220_v1;   //!
+   TBranch        *b_HLT_HIMET220_v1_Prescl;   //!
+   TBranch        *b_HLT_HIPhysics_v1;   //!
+   TBranch        *b_HLT_HIPhysics_v1_Prescl;   //!
    TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v2;   //!
    TBranch        *b_HLT_HIL1DoubleMu0_HighQ_v2_Prescl;   //!
    TBranch        *b_HLT_HIL1DoubleMuOpen_v2;   //!
@@ -2051,68 +2047,122 @@ void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 1)
    if (t->GetBranch("Bx")) t->SetBranchAddress("Bx", &tHlts.Bx, &tHlts.b_Bx);
    if (t->GetBranch("Orbit")) t->SetBranchAddress("Orbit", &tHlts.Orbit, &tHlts.b_Orbit);
    if (t->GetBranch("AvgInstDelLumi")) t->SetBranchAddress("AvgInstDelLumi", &tHlts.AvgInstDelLumi, &tHlts.b_AvgInstDelLumi);
-   if (t->GetBranch("L1simulation_step")) t->SetBranchAddress("L1simulation_step", &tHlts.L1simulation_step, &tHlts.b_L1simulation_step);
-   if (t->GetBranch("L1simulation_step_Prescl")) t->SetBranchAddress("L1simulation_step_Prescl", &tHlts.L1simulation_step_Prescl, &tHlts.b_L1simulation_step_Prescl);
-   if (t->GetBranch("reco_extra")) t->SetBranchAddress("reco_extra", &tHlts.reco_extra, &tHlts.b_reco_extra);
-   if (t->GetBranch("reco_extra_Prescl")) t->SetBranchAddress("reco_extra_Prescl", &tHlts.reco_extra_Prescl, &tHlts.b_reco_extra_Prescl);
-   if (t->GetBranch("reco_extra_jet")) t->SetBranchAddress("reco_extra_jet", &tHlts.reco_extra_jet, &tHlts.b_reco_extra_jet);
-   if (t->GetBranch("reco_extra_jet_Prescl")) t->SetBranchAddress("reco_extra_jet_Prescl", &tHlts.reco_extra_jet_Prescl, &tHlts.b_reco_extra_jet_Prescl);
-   if (t->GetBranch("gen_step")) t->SetBranchAddress("gen_step", &tHlts.gen_step, &tHlts.b_gen_step);
-   if (t->GetBranch("gen_step_Prescl")) t->SetBranchAddress("gen_step_Prescl", &tHlts.gen_step_Prescl, &tHlts.b_gen_step_Prescl);
-   if (t->GetBranch("pat_step")) t->SetBranchAddress("pat_step", &tHlts.pat_step, &tHlts.b_pat_step);
-   if (t->GetBranch("pat_step_Prescl")) t->SetBranchAddress("pat_step_Prescl", &tHlts.pat_step_Prescl, &tHlts.b_pat_step_Prescl);
-   if (t->GetBranch("extrapatstep")) t->SetBranchAddress("extrapatstep", &tHlts.extrapatstep, &tHlts.b_extrapatstep);
-   if (t->GetBranch("extrapatstep_Prescl")) t->SetBranchAddress("extrapatstep_Prescl", &tHlts.extrapatstep_Prescl, &tHlts.b_extrapatstep_Prescl);
-   if (t->GetBranch("ana_step")) t->SetBranchAddress("ana_step", &tHlts.ana_step, &tHlts.b_ana_step);
-   if (t->GetBranch("ana_step_Prescl")) t->SetBranchAddress("ana_step_Prescl", &tHlts.ana_step_Prescl, &tHlts.b_ana_step_Prescl);
-   if (t->GetBranch("phltJetHI")) t->SetBranchAddress("phltJetHI", &tHlts.phltJetHI, &tHlts.b_phltJetHI);
-   if (t->GetBranch("phltJetHI_Prescl")) t->SetBranchAddress("phltJetHI_Prescl", &tHlts.phltJetHI_Prescl, &tHlts.b_phltJetHI_Prescl);
-   if (t->GetBranch("pcollisionEventSelection")) t->SetBranchAddress("pcollisionEventSelection", &tHlts.pcollisionEventSelection, &tHlts.b_pcollisionEventSelection);
-   if (t->GetBranch("pcollisionEventSelection_Prescl")) t->SetBranchAddress("pcollisionEventSelection_Prescl", &tHlts.pcollisionEventSelection_Prescl, &tHlts.b_pcollisionEventSelection_Prescl);
-   if (t->GetBranch("pHBHENoiseFilter")) t->SetBranchAddress("pHBHENoiseFilter", &tHlts.pHBHENoiseFilter, &tHlts.b_pHBHENoiseFilter);
-   if (t->GetBranch("pHBHENoiseFilter_Prescl")) t->SetBranchAddress("pHBHENoiseFilter_Prescl", &tHlts.pHBHENoiseFilter_Prescl, &tHlts.b_pHBHENoiseFilter_Prescl);
-   if (t->GetBranch("phiEcalRecHitSpikeFilter")) t->SetBranchAddress("phiEcalRecHitSpikeFilter", &tHlts.phiEcalRecHitSpikeFilter, &tHlts.b_phiEcalRecHitSpikeFilter);
-   if (t->GetBranch("phiEcalRecHitSpikeFilter_Prescl")) t->SetBranchAddress("phiEcalRecHitSpikeFilter_Prescl", &tHlts.phiEcalRecHitSpikeFilter_Prescl, &tHlts.b_phiEcalRecHitSpikeFilter_Prescl);
-   if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v1")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v1", &tHlts.HLT_HIL1DoubleMu0_HighQ_v1, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v1);
-   if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v1_Prescl", &tHlts.HLT_HIL1DoubleMu0_HighQ_v1_Prescl, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v1_Prescl);
+   if (t->GetBranch("raw2digi_step")) t->SetBranchAddress("raw2digi_step", &tHlts.raw2digi_step, &tHlts.b_raw2digi_step);
+   if (t->GetBranch("raw2digi_step_Prescl")) t->SetBranchAddress("raw2digi_step_Prescl", &tHlts.raw2digi_step_Prescl, &tHlts.b_raw2digi_step_Prescl);
+   if (t->GetBranch("reconstruction_step")) t->SetBranchAddress("reconstruction_step", &tHlts.reconstruction_step, &tHlts.b_reconstruction_step);
+   if (t->GetBranch("reconstruction_step_Prescl")) t->SetBranchAddress("reconstruction_step_Prescl", &tHlts.reconstruction_step_Prescl, &tHlts.b_reconstruction_step_Prescl);
+   if (t->GetBranch("HLTriggerFirstPath")) t->SetBranchAddress("HLTriggerFirstPath", &tHlts.HLTriggerFirstPath, &tHlts.b_HLTriggerFirstPath);
+   if (t->GetBranch("HLTriggerFirstPath_Prescl")) t->SetBranchAddress("HLTriggerFirstPath_Prescl", &tHlts.HLTriggerFirstPath_Prescl, &tHlts.b_HLTriggerFirstPath_Prescl);
+   if (t->GetBranch("HLT_HIDTCalibration_v1")) t->SetBranchAddress("HLT_HIDTCalibration_v1", &tHlts.HLT_HIDTCalibration_v1, &tHlts.b_HLT_HIDTCalibration_v1);
+   if (t->GetBranch("HLT_HIDTCalibration_v1_Prescl")) t->SetBranchAddress("HLT_HIDTCalibration_v1_Prescl", &tHlts.HLT_HIDTCalibration_v1_Prescl, &tHlts.b_HLT_HIDTCalibration_v1_Prescl);
+   if (t->GetBranch("HLT_HIEcalCalibration_v1")) t->SetBranchAddress("HLT_HIEcalCalibration_v1", &tHlts.HLT_HIEcalCalibration_v1, &tHlts.b_HLT_HIEcalCalibration_v1);
+   if (t->GetBranch("HLT_HIEcalCalibration_v1_Prescl")) t->SetBranchAddress("HLT_HIEcalCalibration_v1_Prescl", &tHlts.HLT_HIEcalCalibration_v1_Prescl, &tHlts.b_HLT_HIEcalCalibration_v1_Prescl);
+   if (t->GetBranch("HLT_HIHcalCalibration_v1")) t->SetBranchAddress("HLT_HIHcalCalibration_v1", &tHlts.HLT_HIHcalCalibration_v1, &tHlts.b_HLT_HIHcalCalibration_v1);
+   if (t->GetBranch("HLT_HIHcalCalibration_v1_Prescl")) t->SetBranchAddress("HLT_HIHcalCalibration_v1_Prescl", &tHlts.HLT_HIHcalCalibration_v1_Prescl, &tHlts.b_HLT_HIHcalCalibration_v1_Prescl);
+   if (t->GetBranch("HLT_HIZeroBias_v1")) t->SetBranchAddress("HLT_HIZeroBias_v1", &tHlts.HLT_HIZeroBias_v1, &tHlts.b_HLT_HIZeroBias_v1);
+   if (t->GetBranch("HLT_HIZeroBias_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBias_v1_Prescl", &tHlts.HLT_HIZeroBias_v1_Prescl, &tHlts.b_HLT_HIZeroBias_v1_Prescl);
+   if (t->GetBranch("HLT_HIZeroBiasXOR_v1")) t->SetBranchAddress("HLT_HIZeroBiasXOR_v1", &tHlts.HLT_HIZeroBiasXOR_v1, &tHlts.b_HLT_HIZeroBiasXOR_v1);
+   if (t->GetBranch("HLT_HIZeroBiasXOR_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBiasXOR_v1_Prescl", &tHlts.HLT_HIZeroBiasXOR_v1_Prescl, &tHlts.b_HLT_HIZeroBiasXOR_v1_Prescl);
+   if (t->GetBranch("HLT_HIZeroBiasPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIZeroBiasPixel_SingleTrack_v1", &tHlts.HLT_HIZeroBiasPixel_SingleTrack_v1, &tHlts.b_HLT_HIZeroBiasPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasBSC_v1")) t->SetBranchAddress("HLT_HIMinBiasBSC_v1", &tHlts.HLT_HIMinBiasBSC_v1, &tHlts.b_HLT_HIMinBiasBSC_v1);
+   if (t->GetBranch("HLT_HIMinBiasBSC_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasBSC_v1_Prescl", &tHlts.HLT_HIMinBiasBSC_v1_Prescl, &tHlts.b_HLT_HIMinBiasBSC_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasBSC_OR_v1")) t->SetBranchAddress("HLT_HIMinBiasBSC_OR_v1", &tHlts.HLT_HIMinBiasBSC_OR_v1, &tHlts.b_HLT_HIMinBiasBSC_OR_v1);
+   if (t->GetBranch("HLT_HIMinBiasBSC_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasBSC_OR_v1_Prescl", &tHlts.HLT_HIMinBiasBSC_OR_v1_Prescl, &tHlts.b_HLT_HIMinBiasBSC_OR_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasHF_v1")) t->SetBranchAddress("HLT_HIMinBiasHF_v1", &tHlts.HLT_HIMinBiasHF_v1, &tHlts.b_HLT_HIMinBiasHF_v1);
+   if (t->GetBranch("HLT_HIMinBiasHF_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHF_v1_Prescl", &tHlts.HLT_HIMinBiasHF_v1_Prescl, &tHlts.b_HLT_HIMinBiasHF_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasHf_OR_v1")) t->SetBranchAddress("HLT_HIMinBiasHf_OR_v1", &tHlts.HLT_HIMinBiasHf_OR_v1, &tHlts.b_HLT_HIMinBiasHf_OR_v1);
+   if (t->GetBranch("HLT_HIMinBiasHf_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHf_OR_v1_Prescl", &tHlts.HLT_HIMinBiasHf_OR_v1_Prescl, &tHlts.b_HLT_HIMinBiasHf_OR_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasHfOrBSC_v1")) t->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1", &tHlts.HLT_HIMinBiasHfOrBSC_v1, &tHlts.b_HLT_HIMinBiasHfOrBSC_v1);
+   if (t->GetBranch("HLT_HIMinBiasHfOrBSC_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1_Prescl", &tHlts.HLT_HIMinBiasHfOrBSC_v1_Prescl, &tHlts.b_HLT_HIMinBiasHfOrBSC_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIMinBiasPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasPixel_SingleTrack_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_v1", &tHlts.HLT_HIMinBiasZDC_Calo_v1, &tHlts.b_HLT_HIMinBiasZDC_Calo_v1);
+   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_Calo_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_Calo_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1", &tHlts.HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1, &tHlts.b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1);
+   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasZDCPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasZDCPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasZDCPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasZDCPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl);
+   if (t->GetBranch("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl);
+   if (t->GetBranch("HLT_HIBptxXOR_v1")) t->SetBranchAddress("HLT_HIBptxXOR_v1", &tHlts.HLT_HIBptxXOR_v1, &tHlts.b_HLT_HIBptxXOR_v1);
+   if (t->GetBranch("HLT_HIBptxXOR_v1_Prescl")) t->SetBranchAddress("HLT_HIBptxXOR_v1_Prescl", &tHlts.HLT_HIBptxXOR_v1_Prescl, &tHlts.b_HLT_HIBptxXOR_v1_Prescl);
+   if (t->GetBranch("HLT_HIL1Algo_BptxXOR_BSC_OR_v1")) t->SetBranchAddress("HLT_HIL1Algo_BptxXOR_BSC_OR_v1", &tHlts.HLT_HIL1Algo_BptxXOR_BSC_OR_v1, &tHlts.b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1);
+   if (t->GetBranch("HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl", &tHlts.HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl, &tHlts.b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl);
    if (t->GetBranch("HLT_HIL1DoubleMuOpen_v1")) t->SetBranchAddress("HLT_HIL1DoubleMuOpen_v1", &tHlts.HLT_HIL1DoubleMuOpen_v1, &tHlts.b_HLT_HIL1DoubleMuOpen_v1);
    if (t->GetBranch("HLT_HIL1DoubleMuOpen_v1_Prescl")) t->SetBranchAddress("HLT_HIL1DoubleMuOpen_v1_Prescl", &tHlts.HLT_HIL1DoubleMuOpen_v1_Prescl, &tHlts.b_HLT_HIL1DoubleMuOpen_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1", &tHlts.HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1, &tHlts.b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_NHitQ_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_NHitQ_v1", &tHlts.HLT_HIL2DoubleMu0_NHitQ_v1, &tHlts.b_HLT_HIL2DoubleMu0_NHitQ_v1);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_NHitQ_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_NHitQ_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_v1", &tHlts.HLT_HIL2DoubleMu0_v1, &tHlts.b_HLT_HIL2DoubleMu0_v1);
-   if (t->GetBranch("HLT_HIL2DoubleMu0_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2DoubleMu3_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu3_v1", &tHlts.HLT_HIL2DoubleMu3_v1, &tHlts.b_HLT_HIL2DoubleMu3_v1);
-   if (t->GetBranch("HLT_HIL2DoubleMu3_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu3_v1_Prescl", &tHlts.HLT_HIL2DoubleMu3_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu3_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2Mu15_v1")) t->SetBranchAddress("HLT_HIL2Mu15_v1", &tHlts.HLT_HIL2Mu15_v1, &tHlts.b_HLT_HIL2Mu15_v1);
-   if (t->GetBranch("HLT_HIL2Mu15_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu15_v1_Prescl", &tHlts.HLT_HIL2Mu15_v1_Prescl, &tHlts.b_HLT_HIL2Mu15_v1_Prescl);
-   if (t->GetBranch("HLT_HIL2Mu3_NHitQ_v1")) t->SetBranchAddress("HLT_HIL2Mu3_NHitQ_v1", &tHlts.HLT_HIL2Mu3_NHitQ_v1, &tHlts.b_HLT_HIL2Mu3_NHitQ_v1);
-   if (t->GetBranch("HLT_HIL2Mu3_NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu3_NHitQ_v1_Prescl", &tHlts.HLT_HIL2Mu3_NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2Mu3_NHitQ_v1_Prescl);
+   if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v1")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v1", &tHlts.HLT_HIL1DoubleMu0_HighQ_v1, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v1);
+   if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v1_Prescl", &tHlts.HLT_HIL1DoubleMu0_HighQ_v1_Prescl, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v1_Prescl);
    if (t->GetBranch("HLT_HIL2Mu3_v1")) t->SetBranchAddress("HLT_HIL2Mu3_v1", &tHlts.HLT_HIL2Mu3_v1, &tHlts.b_HLT_HIL2Mu3_v1);
    if (t->GetBranch("HLT_HIL2Mu3_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu3_v1_Prescl", &tHlts.HLT_HIL2Mu3_v1_Prescl, &tHlts.b_HLT_HIL2Mu3_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2Mu3_NHitQ_v1")) t->SetBranchAddress("HLT_HIL2Mu3_NHitQ_v1", &tHlts.HLT_HIL2Mu3_NHitQ_v1, &tHlts.b_HLT_HIL2Mu3_NHitQ_v1);
+   if (t->GetBranch("HLT_HIL2Mu3_NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu3_NHitQ_v1_Prescl", &tHlts.HLT_HIL2Mu3_NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2Mu3_NHitQ_v1_Prescl);
    if (t->GetBranch("HLT_HIL2Mu7_v1")) t->SetBranchAddress("HLT_HIL2Mu7_v1", &tHlts.HLT_HIL2Mu7_v1, &tHlts.b_HLT_HIL2Mu7_v1);
    if (t->GetBranch("HLT_HIL2Mu7_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu7_v1_Prescl", &tHlts.HLT_HIL2Mu7_v1_Prescl, &tHlts.b_HLT_HIL2Mu7_v1_Prescl);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_SS_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_v1);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_v1", &tHlts.HLT_HIL3DoubleMuOpen_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_v1);
-   if (t->GetBranch("HLT_HIL3DoubleMuOpen_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2Mu15_v1")) t->SetBranchAddress("HLT_HIL2Mu15_v1", &tHlts.HLT_HIL2Mu15_v1, &tHlts.b_HLT_HIL2Mu15_v1);
+   if (t->GetBranch("HLT_HIL2Mu15_v1_Prescl")) t->SetBranchAddress("HLT_HIL2Mu15_v1_Prescl", &tHlts.HLT_HIL2Mu15_v1_Prescl, &tHlts.b_HLT_HIL2Mu15_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_v1", &tHlts.HLT_HIL2DoubleMu0_v1, &tHlts.b_HLT_HIL2DoubleMu0_v1);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_NHitQ_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_NHitQ_v1", &tHlts.HLT_HIL2DoubleMu0_NHitQ_v1, &tHlts.b_HLT_HIL2DoubleMu0_NHitQ_v1);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_NHitQ_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_NHitQ_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1", &tHlts.HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1, &tHlts.b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1);
+   if (t->GetBranch("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl", &tHlts.HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu0_L1HighQL2NHitQ_v1_Prescl);
+   if (t->GetBranch("HLT_HIL2DoubleMu3_v1")) t->SetBranchAddress("HLT_HIL2DoubleMu3_v1", &tHlts.HLT_HIL2DoubleMu3_v1, &tHlts.b_HLT_HIL2DoubleMu3_v1);
+   if (t->GetBranch("HLT_HIL2DoubleMu3_v1_Prescl")) t->SetBranchAddress("HLT_HIL2DoubleMu3_v1_Prescl", &tHlts.HLT_HIL2DoubleMu3_v1_Prescl, &tHlts.b_HLT_HIL2DoubleMu3_v1_Prescl);
    if (t->GetBranch("HLT_HIL3Mu3_v1")) t->SetBranchAddress("HLT_HIL3Mu3_v1", &tHlts.HLT_HIL3Mu3_v1, &tHlts.b_HLT_HIL3Mu3_v1);
    if (t->GetBranch("HLT_HIL3Mu3_v1_Prescl")) t->SetBranchAddress("HLT_HIL3Mu3_v1_Prescl", &tHlts.HLT_HIL3Mu3_v1_Prescl, &tHlts.b_HLT_HIL3Mu3_v1_Prescl);
-   if (t->GetBranch("HLT_HIDiJet55_v1")) t->SetBranchAddress("HLT_HIDiJet55_v1", &tHlts.HLT_HIDiJet55_v1, &tHlts.b_HLT_HIDiJet55_v1);
-   if (t->GetBranch("HLT_HIDiJet55_v1_Prescl")) t->SetBranchAddress("HLT_HIDiJet55_v1_Prescl", &tHlts.HLT_HIDiJet55_v1_Prescl, &tHlts.b_HLT_HIDiJet55_v1_Prescl);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_v1", &tHlts.HLT_HIL3DoubleMuOpen_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_v1);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_v1_Prescl);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_v1);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_v1_Prescl);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_SS_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_SS_v1_Prescl);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_v1_Prescl);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1);
+   if (t->GetBranch("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl")) t->SetBranchAddress("HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl", &tHlts.HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl, &tHlts.b_HLT_HIL3DoubleMuOpen_Mgt2_OS_NoCowboy_v1_Prescl);
+   if (t->GetBranch("HLT_HISinglePhoton15_v1")) t->SetBranchAddress("HLT_HISinglePhoton15_v1", &tHlts.HLT_HISinglePhoton15_v1, &tHlts.b_HLT_HISinglePhoton15_v1);
+   if (t->GetBranch("HLT_HISinglePhoton15_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton15_v1_Prescl", &tHlts.HLT_HISinglePhoton15_v1_Prescl, &tHlts.b_HLT_HISinglePhoton15_v1_Prescl);
+   if (t->GetBranch("HLT_HISinglePhoton20_v1")) t->SetBranchAddress("HLT_HISinglePhoton20_v1", &tHlts.HLT_HISinglePhoton20_v1, &tHlts.b_HLT_HISinglePhoton20_v1);
+   if (t->GetBranch("HLT_HISinglePhoton20_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton20_v1_Prescl", &tHlts.HLT_HISinglePhoton20_v1_Prescl, &tHlts.b_HLT_HISinglePhoton20_v1_Prescl);
+   if (t->GetBranch("HLT_HISinglePhoton30_v1")) t->SetBranchAddress("HLT_HISinglePhoton30_v1", &tHlts.HLT_HISinglePhoton30_v1, &tHlts.b_HLT_HISinglePhoton30_v1);
+   if (t->GetBranch("HLT_HISinglePhoton30_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton30_v1_Prescl", &tHlts.HLT_HISinglePhoton30_v1_Prescl, &tHlts.b_HLT_HISinglePhoton30_v1_Prescl);
+   if (t->GetBranch("HLT_HISinglePhoton40_v1")) t->SetBranchAddress("HLT_HISinglePhoton40_v1", &tHlts.HLT_HISinglePhoton40_v1, &tHlts.b_HLT_HISinglePhoton40_v1);
+   if (t->GetBranch("HLT_HISinglePhoton40_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton40_v1_Prescl", &tHlts.HLT_HISinglePhoton40_v1_Prescl, &tHlts.b_HLT_HISinglePhoton40_v1_Prescl);
+   if (t->GetBranch("HLT_HIPhoton10_Photon15_v1")) t->SetBranchAddress("HLT_HIPhoton10_Photon15_v1", &tHlts.HLT_HIPhoton10_Photon15_v1, &tHlts.b_HLT_HIPhoton10_Photon15_v1);
+   if (t->GetBranch("HLT_HIPhoton10_Photon15_v1_Prescl")) t->SetBranchAddress("HLT_HIPhoton10_Photon15_v1_Prescl", &tHlts.HLT_HIPhoton10_Photon15_v1_Prescl, &tHlts.b_HLT_HIPhoton10_Photon15_v1_Prescl);
+   if (t->GetBranch("HLT_HIPhoton15_Photon20_v1")) t->SetBranchAddress("HLT_HIPhoton15_Photon20_v1", &tHlts.HLT_HIPhoton15_Photon20_v1, &tHlts.b_HLT_HIPhoton15_Photon20_v1);
+   if (t->GetBranch("HLT_HIPhoton15_Photon20_v1_Prescl")) t->SetBranchAddress("HLT_HIPhoton15_Photon20_v1_Prescl", &tHlts.HLT_HIPhoton15_Photon20_v1_Prescl, &tHlts.b_HLT_HIPhoton15_Photon20_v1_Prescl);
    if (t->GetBranch("HLT_HIDoublePhoton10_v1")) t->SetBranchAddress("HLT_HIDoublePhoton10_v1", &tHlts.HLT_HIDoublePhoton10_v1, &tHlts.b_HLT_HIDoublePhoton10_v1);
    if (t->GetBranch("HLT_HIDoublePhoton10_v1_Prescl")) t->SetBranchAddress("HLT_HIDoublePhoton10_v1_Prescl", &tHlts.HLT_HIDoublePhoton10_v1_Prescl, &tHlts.b_HLT_HIDoublePhoton10_v1_Prescl);
    if (t->GetBranch("HLT_HIDoublePhoton15_v1")) t->SetBranchAddress("HLT_HIDoublePhoton15_v1", &tHlts.HLT_HIDoublePhoton15_v1, &tHlts.b_HLT_HIDoublePhoton15_v1);
    if (t->GetBranch("HLT_HIDoublePhoton15_v1_Prescl")) t->SetBranchAddress("HLT_HIDoublePhoton15_v1_Prescl", &tHlts.HLT_HIDoublePhoton15_v1_Prescl, &tHlts.b_HLT_HIDoublePhoton15_v1_Prescl);
    if (t->GetBranch("HLT_HIDoublePhoton20_v1")) t->SetBranchAddress("HLT_HIDoublePhoton20_v1", &tHlts.HLT_HIDoublePhoton20_v1, &tHlts.b_HLT_HIDoublePhoton20_v1);
    if (t->GetBranch("HLT_HIDoublePhoton20_v1_Prescl")) t->SetBranchAddress("HLT_HIDoublePhoton20_v1_Prescl", &tHlts.HLT_HIDoublePhoton20_v1_Prescl, &tHlts.b_HLT_HIDoublePhoton20_v1_Prescl);
+   if (t->GetBranch("HLT_HIJet55_v1")) t->SetBranchAddress("HLT_HIJet55_v1", &tHlts.HLT_HIJet55_v1, &tHlts.b_HLT_HIJet55_v1);
+   if (t->GetBranch("HLT_HIJet55_v1_Prescl")) t->SetBranchAddress("HLT_HIJet55_v1_Prescl", &tHlts.HLT_HIJet55_v1_Prescl, &tHlts.b_HLT_HIJet55_v1_Prescl);
+   if (t->GetBranch("HLT_HIJet65_v1")) t->SetBranchAddress("HLT_HIJet65_v1", &tHlts.HLT_HIJet65_v1, &tHlts.b_HLT_HIJet65_v1);
+   if (t->GetBranch("HLT_HIJet65_v1_Prescl")) t->SetBranchAddress("HLT_HIJet65_v1_Prescl", &tHlts.HLT_HIJet65_v1_Prescl, &tHlts.b_HLT_HIJet65_v1_Prescl);
+   if (t->GetBranch("HLT_HIJet80_v1")) t->SetBranchAddress("HLT_HIJet80_v1", &tHlts.HLT_HIJet80_v1, &tHlts.b_HLT_HIJet80_v1);
+   if (t->GetBranch("HLT_HIJet80_v1_Prescl")) t->SetBranchAddress("HLT_HIJet80_v1_Prescl", &tHlts.HLT_HIJet80_v1_Prescl, &tHlts.b_HLT_HIJet80_v1_Prescl);
+   if (t->GetBranch("HLT_HIJet95_v1")) t->SetBranchAddress("HLT_HIJet95_v1", &tHlts.HLT_HIJet95_v1, &tHlts.b_HLT_HIJet95_v1);
+   if (t->GetBranch("HLT_HIJet95_v1_Prescl")) t->SetBranchAddress("HLT_HIJet95_v1_Prescl", &tHlts.HLT_HIJet95_v1_Prescl, &tHlts.b_HLT_HIJet95_v1_Prescl);
+   if (t->GetBranch("HLT_HIDiJet55_v1")) t->SetBranchAddress("HLT_HIDiJet55_v1", &tHlts.HLT_HIDiJet55_v1, &tHlts.b_HLT_HIDiJet55_v1);
+   if (t->GetBranch("HLT_HIDiJet55_v1_Prescl")) t->SetBranchAddress("HLT_HIDiJet55_v1_Prescl", &tHlts.HLT_HIDiJet55_v1_Prescl, &tHlts.b_HLT_HIDiJet55_v1_Prescl);
+   if (t->GetBranch("HLT_HIJet65_Jet55_v1")) t->SetBranchAddress("HLT_HIJet65_Jet55_v1", &tHlts.HLT_HIJet65_Jet55_v1, &tHlts.b_HLT_HIJet65_Jet55_v1);
+   if (t->GetBranch("HLT_HIJet65_Jet55_v1_Prescl")) t->SetBranchAddress("HLT_HIJet65_Jet55_v1_Prescl", &tHlts.HLT_HIJet65_Jet55_v1_Prescl, &tHlts.b_HLT_HIJet65_Jet55_v1_Prescl);
+   if (t->GetBranch("HLT_HIJetE30_NoBPTX_v1")) t->SetBranchAddress("HLT_HIJetE30_NoBPTX_v1", &tHlts.HLT_HIJetE30_NoBPTX_v1, &tHlts.b_HLT_HIJetE30_NoBPTX_v1);
+   if (t->GetBranch("HLT_HIJetE30_NoBPTX_v1_Prescl")) t->SetBranchAddress("HLT_HIJetE30_NoBPTX_v1_Prescl", &tHlts.HLT_HIJetE30_NoBPTX_v1_Prescl, &tHlts.b_HLT_HIJetE30_NoBPTX_v1_Prescl);
+   if (t->GetBranch("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1")) t->SetBranchAddress("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1", &tHlts.HLT_HIJetE50_NoBPTX3BX_NoHalo_v1, &tHlts.b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1);
+   if (t->GetBranch("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl")) t->SetBranchAddress("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl", &tHlts.HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl, &tHlts.b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl);
+   if (t->GetBranch("HLT_HIActivityHF_Coincidence3_v1")) t->SetBranchAddress("HLT_HIActivityHF_Coincidence3_v1", &tHlts.HLT_HIActivityHF_Coincidence3_v1, &tHlts.b_HLT_HIActivityHF_Coincidence3_v1);
+   if (t->GetBranch("HLT_HIActivityHF_Coincidence3_v1_Prescl")) t->SetBranchAddress("HLT_HIActivityHF_Coincidence3_v1_Prescl", &tHlts.HLT_HIActivityHF_Coincidence3_v1_Prescl, &tHlts.b_HLT_HIActivityHF_Coincidence3_v1_Prescl);
+   if (t->GetBranch("HLT_HIActivityHF_Single3_v1")) t->SetBranchAddress("HLT_HIActivityHF_Single3_v1", &tHlts.HLT_HIActivityHF_Single3_v1, &tHlts.b_HLT_HIActivityHF_Single3_v1);
+   if (t->GetBranch("HLT_HIActivityHF_Single3_v1_Prescl")) t->SetBranchAddress("HLT_HIActivityHF_Single3_v1_Prescl", &tHlts.HLT_HIActivityHF_Single3_v1_Prescl, &tHlts.b_HLT_HIActivityHF_Single3_v1_Prescl);
+   if (t->GetBranch("HLT_HIClusterVertexCompatibility_v1")) t->SetBranchAddress("HLT_HIClusterVertexCompatibility_v1", &tHlts.HLT_HIClusterVertexCompatibility_v1, &tHlts.b_HLT_HIClusterVertexCompatibility_v1);
+   if (t->GetBranch("HLT_HIClusterVertexCompatibility_v1_Prescl")) t->SetBranchAddress("HLT_HIClusterVertexCompatibility_v1_Prescl", &tHlts.HLT_HIClusterVertexCompatibility_v1_Prescl, &tHlts.b_HLT_HIClusterVertexCompatibility_v1_Prescl);
+   if (t->GetBranch("HLT_HICentralityVeto_v1")) t->SetBranchAddress("HLT_HICentralityVeto_v1", &tHlts.HLT_HICentralityVeto_v1, &tHlts.b_HLT_HICentralityVeto_v1);
+   if (t->GetBranch("HLT_HICentralityVeto_v1_Prescl")) t->SetBranchAddress("HLT_HICentralityVeto_v1_Prescl", &tHlts.HLT_HICentralityVeto_v1_Prescl, &tHlts.b_HLT_HICentralityVeto_v1_Prescl);
    if (t->GetBranch("HLT_HIFullTrack12_L1Central_v1")) t->SetBranchAddress("HLT_HIFullTrack12_L1Central_v1", &tHlts.HLT_HIFullTrack12_L1Central_v1, &tHlts.b_HLT_HIFullTrack12_L1Central_v1);
    if (t->GetBranch("HLT_HIFullTrack12_L1Central_v1_Prescl")) t->SetBranchAddress("HLT_HIFullTrack12_L1Central_v1_Prescl", &tHlts.HLT_HIFullTrack12_L1Central_v1_Prescl, &tHlts.b_HLT_HIFullTrack12_L1Central_v1_Prescl);
    if (t->GetBranch("HLT_HIFullTrack12_L1Peripheral_v1")) t->SetBranchAddress("HLT_HIFullTrack12_L1Peripheral_v1", &tHlts.HLT_HIFullTrack12_L1Peripheral_v1, &tHlts.b_HLT_HIFullTrack12_L1Peripheral_v1);
@@ -2129,92 +2179,36 @@ void setupHltTree(TTree *t,Hlts &tHlts,bool doCheck = 1)
    if (t->GetBranch("HLT_HIFullTrack25_L1Central_v1_Prescl")) t->SetBranchAddress("HLT_HIFullTrack25_L1Central_v1_Prescl", &tHlts.HLT_HIFullTrack25_L1Central_v1_Prescl, &tHlts.b_HLT_HIFullTrack25_L1Central_v1_Prescl);
    if (t->GetBranch("HLT_HIFullTrack25_L1Peripheral_v1")) t->SetBranchAddress("HLT_HIFullTrack25_L1Peripheral_v1", &tHlts.HLT_HIFullTrack25_L1Peripheral_v1, &tHlts.b_HLT_HIFullTrack25_L1Peripheral_v1);
    if (t->GetBranch("HLT_HIFullTrack25_L1Peripheral_v1_Prescl")) t->SetBranchAddress("HLT_HIFullTrack25_L1Peripheral_v1_Prescl", &tHlts.HLT_HIFullTrack25_L1Peripheral_v1_Prescl, &tHlts.b_HLT_HIFullTrack25_L1Peripheral_v1_Prescl);
-   if (t->GetBranch("HLT_HIJet55_v1")) t->SetBranchAddress("HLT_HIJet55_v1", &tHlts.HLT_HIJet55_v1, &tHlts.b_HLT_HIJet55_v1);
-   if (t->GetBranch("HLT_HIJet55_v1_Prescl")) t->SetBranchAddress("HLT_HIJet55_v1_Prescl", &tHlts.HLT_HIJet55_v1_Prescl, &tHlts.b_HLT_HIJet55_v1_Prescl);
-   if (t->GetBranch("HLT_HIJet65_Jet55_v1")) t->SetBranchAddress("HLT_HIJet65_Jet55_v1", &tHlts.HLT_HIJet65_Jet55_v1, &tHlts.b_HLT_HIJet65_Jet55_v1);
-   if (t->GetBranch("HLT_HIJet65_Jet55_v1_Prescl")) t->SetBranchAddress("HLT_HIJet65_Jet55_v1_Prescl", &tHlts.HLT_HIJet65_Jet55_v1_Prescl, &tHlts.b_HLT_HIJet65_Jet55_v1_Prescl);
-   if (t->GetBranch("HLT_HIJet65_v1")) t->SetBranchAddress("HLT_HIJet65_v1", &tHlts.HLT_HIJet65_v1, &tHlts.b_HLT_HIJet65_v1);
-   if (t->GetBranch("HLT_HIJet65_v1_Prescl")) t->SetBranchAddress("HLT_HIJet65_v1_Prescl", &tHlts.HLT_HIJet65_v1_Prescl, &tHlts.b_HLT_HIJet65_v1_Prescl);
-   if (t->GetBranch("HLT_HIJet80_v1")) t->SetBranchAddress("HLT_HIJet80_v1", &tHlts.HLT_HIJet80_v1, &tHlts.b_HLT_HIJet80_v1);
-   if (t->GetBranch("HLT_HIJet80_v1_Prescl")) t->SetBranchAddress("HLT_HIJet80_v1_Prescl", &tHlts.HLT_HIJet80_v1_Prescl, &tHlts.b_HLT_HIJet80_v1_Prescl);
-   if (t->GetBranch("HLT_HIJet95_v1")) t->SetBranchAddress("HLT_HIJet95_v1", &tHlts.HLT_HIJet95_v1, &tHlts.b_HLT_HIJet95_v1);
-   if (t->GetBranch("HLT_HIJet95_v1_Prescl")) t->SetBranchAddress("HLT_HIJet95_v1_Prescl", &tHlts.HLT_HIJet95_v1_Prescl, &tHlts.b_HLT_HIJet95_v1_Prescl);
-   if (t->GetBranch("HLT_HIJetE30_NoBPTX_v1")) t->SetBranchAddress("HLT_HIJetE30_NoBPTX_v1", &tHlts.HLT_HIJetE30_NoBPTX_v1, &tHlts.b_HLT_HIJetE30_NoBPTX_v1);
-   if (t->GetBranch("HLT_HIJetE30_NoBPTX_v1_Prescl")) t->SetBranchAddress("HLT_HIJetE30_NoBPTX_v1_Prescl", &tHlts.HLT_HIJetE30_NoBPTX_v1_Prescl, &tHlts.b_HLT_HIJetE30_NoBPTX_v1_Prescl);
-   if (t->GetBranch("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1")) t->SetBranchAddress("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1", &tHlts.HLT_HIJetE50_NoBPTX3BX_NoHalo_v1, &tHlts.b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1);
-   if (t->GetBranch("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl")) t->SetBranchAddress("HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl", &tHlts.HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl, &tHlts.b_HLT_HIJetE50_NoBPTX3BX_NoHalo_v1_Prescl);
-   if (t->GetBranch("HLT_HIMET120_v1")) t->SetBranchAddress("HLT_HIMET120_v1", &tHlts.HLT_HIMET120_v1, &tHlts.b_HLT_HIMET120_v1);
-   if (t->GetBranch("HLT_HIMET120_v1_Prescl")) t->SetBranchAddress("HLT_HIMET120_v1_Prescl", &tHlts.HLT_HIMET120_v1_Prescl, &tHlts.b_HLT_HIMET120_v1_Prescl);
-   if (t->GetBranch("HLT_HIMET200_v1")) t->SetBranchAddress("HLT_HIMET200_v1", &tHlts.HLT_HIMET200_v1, &tHlts.b_HLT_HIMET200_v1);
-   if (t->GetBranch("HLT_HIMET200_v1_Prescl")) t->SetBranchAddress("HLT_HIMET200_v1_Prescl", &tHlts.HLT_HIMET200_v1_Prescl, &tHlts.b_HLT_HIMET200_v1_Prescl);
-   if (t->GetBranch("HLT_HIMET220_v1")) t->SetBranchAddress("HLT_HIMET220_v1", &tHlts.HLT_HIMET220_v1, &tHlts.b_HLT_HIMET220_v1);
-   if (t->GetBranch("HLT_HIMET220_v1_Prescl")) t->SetBranchAddress("HLT_HIMET220_v1_Prescl", &tHlts.HLT_HIMET220_v1_Prescl, &tHlts.b_HLT_HIMET220_v1_Prescl);
-   if (t->GetBranch("HLT_HIPhoton10_Photon15_v1")) t->SetBranchAddress("HLT_HIPhoton10_Photon15_v1", &tHlts.HLT_HIPhoton10_Photon15_v1, &tHlts.b_HLT_HIPhoton10_Photon15_v1);
-   if (t->GetBranch("HLT_HIPhoton10_Photon15_v1_Prescl")) t->SetBranchAddress("HLT_HIPhoton10_Photon15_v1_Prescl", &tHlts.HLT_HIPhoton10_Photon15_v1_Prescl, &tHlts.b_HLT_HIPhoton10_Photon15_v1_Prescl);
-   if (t->GetBranch("HLT_HIPhoton15_Photon20_v1")) t->SetBranchAddress("HLT_HIPhoton15_Photon20_v1", &tHlts.HLT_HIPhoton15_Photon20_v1, &tHlts.b_HLT_HIPhoton15_Photon20_v1);
-   if (t->GetBranch("HLT_HIPhoton15_Photon20_v1_Prescl")) t->SetBranchAddress("HLT_HIPhoton15_Photon20_v1_Prescl", &tHlts.HLT_HIPhoton15_Photon20_v1_Prescl, &tHlts.b_HLT_HIPhoton15_Photon20_v1_Prescl);
-   if (t->GetBranch("HLT_HISinglePhoton15_v1")) t->SetBranchAddress("HLT_HISinglePhoton15_v1", &tHlts.HLT_HISinglePhoton15_v1, &tHlts.b_HLT_HISinglePhoton15_v1);
-   if (t->GetBranch("HLT_HISinglePhoton15_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton15_v1_Prescl", &tHlts.HLT_HISinglePhoton15_v1_Prescl, &tHlts.b_HLT_HISinglePhoton15_v1_Prescl);
-   if (t->GetBranch("HLT_HISinglePhoton20_v1")) t->SetBranchAddress("HLT_HISinglePhoton20_v1", &tHlts.HLT_HISinglePhoton20_v1, &tHlts.b_HLT_HISinglePhoton20_v1);
-   if (t->GetBranch("HLT_HISinglePhoton20_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton20_v1_Prescl", &tHlts.HLT_HISinglePhoton20_v1_Prescl, &tHlts.b_HLT_HISinglePhoton20_v1_Prescl);
-   if (t->GetBranch("HLT_HISinglePhoton30_v1")) t->SetBranchAddress("HLT_HISinglePhoton30_v1", &tHlts.HLT_HISinglePhoton30_v1, &tHlts.b_HLT_HISinglePhoton30_v1);
-   if (t->GetBranch("HLT_HISinglePhoton30_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton30_v1_Prescl", &tHlts.HLT_HISinglePhoton30_v1_Prescl, &tHlts.b_HLT_HISinglePhoton30_v1_Prescl);
-   if (t->GetBranch("HLT_HISinglePhoton40_v1")) t->SetBranchAddress("HLT_HISinglePhoton40_v1", &tHlts.HLT_HISinglePhoton40_v1, &tHlts.b_HLT_HISinglePhoton40_v1);
-   if (t->GetBranch("HLT_HISinglePhoton40_v1_Prescl")) t->SetBranchAddress("HLT_HISinglePhoton40_v1_Prescl", &tHlts.HLT_HISinglePhoton40_v1_Prescl, &tHlts.b_HLT_HISinglePhoton40_v1_Prescl);
-   if (t->GetBranch("HLT_HIBptxXOR_v1")) t->SetBranchAddress("HLT_HIBptxXOR_v1", &tHlts.HLT_HIBptxXOR_v1, &tHlts.b_HLT_HIBptxXOR_v1);
-   if (t->GetBranch("HLT_HIBptxXOR_v1_Prescl")) t->SetBranchAddress("HLT_HIBptxXOR_v1_Prescl", &tHlts.HLT_HIBptxXOR_v1_Prescl, &tHlts.b_HLT_HIBptxXOR_v1_Prescl);
-   if (t->GetBranch("HLT_HICentral10_v1")) t->SetBranchAddress("HLT_HICentral10_v1", &tHlts.HLT_HICentral10_v1, &tHlts.b_HLT_HICentral10_v1);
-   if (t->GetBranch("HLT_HICentral10_v1_Prescl")) t->SetBranchAddress("HLT_HICentral10_v1_Prescl", &tHlts.HLT_HICentral10_v1_Prescl, &tHlts.b_HLT_HICentral10_v1_Prescl);
-   if (t->GetBranch("HLT_HICentralityVeto_v1")) t->SetBranchAddress("HLT_HICentralityVeto_v1", &tHlts.HLT_HICentralityVeto_v1, &tHlts.b_HLT_HICentralityVeto_v1);
-   if (t->GetBranch("HLT_HICentralityVeto_v1_Prescl")) t->SetBranchAddress("HLT_HICentralityVeto_v1_Prescl", &tHlts.HLT_HICentralityVeto_v1_Prescl, &tHlts.b_HLT_HICentralityVeto_v1_Prescl);
-   if (t->GetBranch("HLT_HIL1Algo_BptxXOR_BSC_OR_v1")) t->SetBranchAddress("HLT_HIL1Algo_BptxXOR_BSC_OR_v1", &tHlts.HLT_HIL1Algo_BptxXOR_BSC_OR_v1, &tHlts.b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1);
-   if (t->GetBranch("HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl", &tHlts.HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl, &tHlts.b_HLT_HIL1Algo_BptxXOR_BSC_OR_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasBSC_OR_v1")) t->SetBranchAddress("HLT_HIMinBiasBSC_OR_v1", &tHlts.HLT_HIMinBiasBSC_OR_v1, &tHlts.b_HLT_HIMinBiasBSC_OR_v1);
-   if (t->GetBranch("HLT_HIMinBiasBSC_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasBSC_OR_v1_Prescl", &tHlts.HLT_HIMinBiasBSC_OR_v1_Prescl, &tHlts.b_HLT_HIMinBiasBSC_OR_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasBSC_v1")) t->SetBranchAddress("HLT_HIMinBiasBSC_v1", &tHlts.HLT_HIMinBiasBSC_v1, &tHlts.b_HLT_HIMinBiasBSC_v1);
-   if (t->GetBranch("HLT_HIMinBiasBSC_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasBSC_v1_Prescl", &tHlts.HLT_HIMinBiasBSC_v1_Prescl, &tHlts.b_HLT_HIMinBiasBSC_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasHF_v1")) t->SetBranchAddress("HLT_HIMinBiasHF_v1", &tHlts.HLT_HIMinBiasHF_v1, &tHlts.b_HLT_HIMinBiasHF_v1);
-   if (t->GetBranch("HLT_HIMinBiasHF_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHF_v1_Prescl", &tHlts.HLT_HIMinBiasHF_v1_Prescl, &tHlts.b_HLT_HIMinBiasHF_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasHfOrBSC_v1")) t->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1", &tHlts.HLT_HIMinBiasHfOrBSC_v1, &tHlts.b_HLT_HIMinBiasHfOrBSC_v1);
-   if (t->GetBranch("HLT_HIMinBiasHfOrBSC_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHfOrBSC_v1_Prescl", &tHlts.HLT_HIMinBiasHfOrBSC_v1_Prescl, &tHlts.b_HLT_HIMinBiasHfOrBSC_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasHf_OR_v1")) t->SetBranchAddress("HLT_HIMinBiasHf_OR_v1", &tHlts.HLT_HIMinBiasHf_OR_v1, &tHlts.b_HLT_HIMinBiasHf_OR_v1);
-   if (t->GetBranch("HLT_HIMinBiasHf_OR_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasHf_OR_v1_Prescl", &tHlts.HLT_HIMinBiasHf_OR_v1_Prescl, &tHlts.b_HLT_HIMinBiasHf_OR_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIMinBiasPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasZDCPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasZDCPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasZDCPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasZDCPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDCPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1", &tHlts.HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1, &tHlts.b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1);
-   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_Calo_PlusOrMinus_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_v1", &tHlts.HLT_HIMinBiasZDC_Calo_v1, &tHlts.b_HLT_HIMinBiasZDC_Calo_v1);
-   if (t->GetBranch("HLT_HIMinBiasZDC_Calo_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_Calo_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_Calo_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_Calo_v1_Prescl);
-   if (t->GetBranch("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1", &tHlts.HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1, &tHlts.b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIMinBiasZDC_PlusOrMinusPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIPhysics_v1")) t->SetBranchAddress("HLT_HIPhysics_v1", &tHlts.HLT_HIPhysics_v1, &tHlts.b_HLT_HIPhysics_v1);
-   if (t->GetBranch("HLT_HIPhysics_v1_Prescl")) t->SetBranchAddress("HLT_HIPhysics_v1_Prescl", &tHlts.HLT_HIPhysics_v1_Prescl, &tHlts.b_HLT_HIPhysics_v1_Prescl);
    if (t->GetBranch("HLT_HIRandom_v1")) t->SetBranchAddress("HLT_HIRandom_v1", &tHlts.HLT_HIRandom_v1, &tHlts.b_HLT_HIRandom_v1);
    if (t->GetBranch("HLT_HIRandom_v1_Prescl")) t->SetBranchAddress("HLT_HIRandom_v1_Prescl", &tHlts.HLT_HIRandom_v1_Prescl, &tHlts.b_HLT_HIRandom_v1_Prescl);
    if (t->GetBranch("HLT_HIUCC010_v1")) t->SetBranchAddress("HLT_HIUCC010_v1", &tHlts.HLT_HIUCC010_v1, &tHlts.b_HLT_HIUCC010_v1);
    if (t->GetBranch("HLT_HIUCC010_v1_Prescl")) t->SetBranchAddress("HLT_HIUCC010_v1_Prescl", &tHlts.HLT_HIUCC010_v1_Prescl, &tHlts.b_HLT_HIUCC010_v1_Prescl);
    if (t->GetBranch("HLT_HIUCC015_v1")) t->SetBranchAddress("HLT_HIUCC015_v1", &tHlts.HLT_HIUCC015_v1, &tHlts.b_HLT_HIUCC015_v1);
    if (t->GetBranch("HLT_HIUCC015_v1_Prescl")) t->SetBranchAddress("HLT_HIUCC015_v1_Prescl", &tHlts.HLT_HIUCC015_v1_Prescl, &tHlts.b_HLT_HIUCC015_v1_Prescl);
+   if (t->GetBranch("HLT_HICentral10_v1")) t->SetBranchAddress("HLT_HICentral10_v1", &tHlts.HLT_HICentral10_v1, &tHlts.b_HLT_HICentral10_v1);
+   if (t->GetBranch("HLT_HICentral10_v1_Prescl")) t->SetBranchAddress("HLT_HICentral10_v1_Prescl", &tHlts.HLT_HICentral10_v1_Prescl, &tHlts.b_HLT_HICentral10_v1_Prescl);
+   if (t->GetBranch("HLT_HIUPCNeuMuPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuMuPixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuMuPixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuMuPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl);
    if (t->GetBranch("HLT_HIUPCNeuEG2Pixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuEG2Pixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuEG2Pixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuEG2Pixel_SingleTrack_v1);
    if (t->GetBranch("HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuEG2Pixel_SingleTrack_v1_Prescl);
    if (t->GetBranch("HLT_HIUPCNeuEG5Pixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuEG5Pixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuEG5Pixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuEG5Pixel_SingleTrack_v1);
    if (t->GetBranch("HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuEG5Pixel_SingleTrack_v1_Prescl);
+   if (t->GetBranch("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1);
+   if (t->GetBranch("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl);
    if (t->GetBranch("HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1);
    if (t->GetBranch("HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuHcalHfEG2Pixel_SingleTrack_v1_Prescl);
    if (t->GetBranch("HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1);
    if (t->GetBranch("HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuHcalHfEG5Pixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuHcalHfMuPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIUPCNeuMuPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIUPCNeuMuPixel_SingleTrack_v1", &tHlts.HLT_HIUPCNeuMuPixel_SingleTrack_v1, &tHlts.b_HLT_HIUPCNeuMuPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIUPCNeuMuPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIZeroBiasPixel_SingleTrack_v1")) t->SetBranchAddress("HLT_HIZeroBiasPixel_SingleTrack_v1", &tHlts.HLT_HIZeroBiasPixel_SingleTrack_v1, &tHlts.b_HLT_HIZeroBiasPixel_SingleTrack_v1);
-   if (t->GetBranch("HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl", &tHlts.HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl, &tHlts.b_HLT_HIZeroBiasPixel_SingleTrack_v1_Prescl);
-   if (t->GetBranch("HLT_HIZeroBiasXOR_v1")) t->SetBranchAddress("HLT_HIZeroBiasXOR_v1", &tHlts.HLT_HIZeroBiasXOR_v1, &tHlts.b_HLT_HIZeroBiasXOR_v1);
-   if (t->GetBranch("HLT_HIZeroBiasXOR_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBiasXOR_v1_Prescl", &tHlts.HLT_HIZeroBiasXOR_v1_Prescl, &tHlts.b_HLT_HIZeroBiasXOR_v1_Prescl);
-   if (t->GetBranch("HLT_HIZeroBias_v1")) t->SetBranchAddress("HLT_HIZeroBias_v1", &tHlts.HLT_HIZeroBias_v1, &tHlts.b_HLT_HIZeroBias_v1);
-   if (t->GetBranch("HLT_HIZeroBias_v1_Prescl")) t->SetBranchAddress("HLT_HIZeroBias_v1_Prescl", &tHlts.HLT_HIZeroBias_v1_Prescl, &tHlts.b_HLT_HIZeroBias_v1_Prescl);
+   if (t->GetBranch("HLTriggerFinalPath")) t->SetBranchAddress("HLTriggerFinalPath", &tHlts.HLTriggerFinalPath, &tHlts.b_HLTriggerFinalPath);
+   if (t->GetBranch("HLTriggerFinalPath_Prescl")) t->SetBranchAddress("HLTriggerFinalPath_Prescl", &tHlts.HLTriggerFinalPath_Prescl, &tHlts.b_HLTriggerFinalPath_Prescl);
+   if (t->GetBranch("HLT_HIMET120_v1")) t->SetBranchAddress("HLT_HIMET120_v1", &tHlts.HLT_HIMET120_v1, &tHlts.b_HLT_HIMET120_v1);
+   if (t->GetBranch("HLT_HIMET120_v1_Prescl")) t->SetBranchAddress("HLT_HIMET120_v1_Prescl", &tHlts.HLT_HIMET120_v1_Prescl, &tHlts.b_HLT_HIMET120_v1_Prescl);
+   if (t->GetBranch("HLT_HIMET200_v1")) t->SetBranchAddress("HLT_HIMET200_v1", &tHlts.HLT_HIMET200_v1, &tHlts.b_HLT_HIMET200_v1);
+   if (t->GetBranch("HLT_HIMET200_v1_Prescl")) t->SetBranchAddress("HLT_HIMET200_v1_Prescl", &tHlts.HLT_HIMET200_v1_Prescl, &tHlts.b_HLT_HIMET200_v1_Prescl);
+   if (t->GetBranch("HLT_HIMET220_v1")) t->SetBranchAddress("HLT_HIMET220_v1", &tHlts.HLT_HIMET220_v1, &tHlts.b_HLT_HIMET220_v1);
+   if (t->GetBranch("HLT_HIMET220_v1_Prescl")) t->SetBranchAddress("HLT_HIMET220_v1_Prescl", &tHlts.HLT_HIMET220_v1_Prescl, &tHlts.b_HLT_HIMET220_v1_Prescl);
+   if (t->GetBranch("HLT_HIPhysics_v1")) t->SetBranchAddress("HLT_HIPhysics_v1", &tHlts.HLT_HIPhysics_v1, &tHlts.b_HLT_HIPhysics_v1);
+   if (t->GetBranch("HLT_HIPhysics_v1_Prescl")) t->SetBranchAddress("HLT_HIPhysics_v1_Prescl", &tHlts.HLT_HIPhysics_v1_Prescl, &tHlts.b_HLT_HIPhysics_v1_Prescl);
    if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v2")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v2", &tHlts.HLT_HIL1DoubleMu0_HighQ_v2, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v2);
    if (t->GetBranch("HLT_HIL1DoubleMu0_HighQ_v2_Prescl")) t->SetBranchAddress("HLT_HIL1DoubleMu0_HighQ_v2_Prescl", &tHlts.HLT_HIL1DoubleMu0_HighQ_v2_Prescl, &tHlts.b_HLT_HIL1DoubleMu0_HighQ_v2_Prescl);
    if (t->GetBranch("HLT_HIL1DoubleMuOpen_v2")) t->SetBranchAddress("HLT_HIL1DoubleMuOpen_v2", &tHlts.HLT_HIL1DoubleMuOpen_v2, &tHlts.b_HLT_HIL1DoubleMuOpen_v2);

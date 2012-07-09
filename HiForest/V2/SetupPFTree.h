@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
+// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
 // from TTree pfTree/dijet tree
-// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -19,10 +19,10 @@ public :
 
    // Declaration of leaf types
    Int_t           nPFpart;
-   Int_t           pfId[10352];   //[nPFpart]
-   Float_t         pfPt[10352];   //[nPFpart]
-   Float_t         pfEta[10352];   //[nPFpart]
-   Float_t         pfPhi[10352];   //[nPFpart]
+   Int_t           pfId[10412];   //[nPFpart]
+   Float_t         pfPt[10412];   //[nPFpart]
+   Float_t         pfEta[10412];   //[nPFpart]
+   Float_t         pfPhi[10412];   //[nPFpart]
 
    // List of branches
    TBranch        *b_nPFpart;   //!
@@ -43,7 +43,7 @@ void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 1)
    if (t->GetBranch("pfEta")) t->SetBranchAddress("pfEta", tPFs.pfEta, &tPFs.b_pfEta);
    if (t->GetBranch("pfPhi")) t->SetBranchAddress("pfPhi", tPFs.pfPhi, &tPFs.b_pfPhi);
    if (doCheck) {
-      if (t->GetMaximum("nPFpart")>10402) { cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl; exit(0);
+      if (t->GetMaximum("nPFpart")>10412) { cout <<"FATAL ERROR: Arrary size of nPFpart too small!!!  "<<t->GetMaximum("nPFpart")<<endl; exit(0);
  }   }
 }
 
