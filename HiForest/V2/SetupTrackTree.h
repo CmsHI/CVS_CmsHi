@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Jul  2 23:56:37 2012 by ROOT version 5.27/06b
+// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
 // from TTree trackTree/v1
-// found on file: /d102/yjlee/hiForest2MC/Pythia30_HydjetDrum_mix01_HiForest2_v19.root
+// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -23,72 +23,72 @@ public :
    Int_t           nBX;
    Int_t           nRun;
    Int_t           nv;
-   Float_t         vx[4];   //[nv]
-   Float_t         vy[4];   //[nv]
-   Float_t         vz[4];   //[nv]
+   Float_t         vx[54];   //[nv]
+   Float_t         vy[54];   //[nv]
+   Float_t         vz[54];   //[nv]
    Int_t           nTrk;
-   Float_t         trkPt[6986];   //[nTrk]
-   Float_t         trkPtError[6986];   //[nTrk]
-   Int_t           trkNHit[6986];   //[nTrk]
-   Int_t           trkNlayer[6986];   //[nTrk]
-   Int_t           trkNlayer3D[6986];   //[nTrk]
-   Float_t         trkEta[6986];   //[nTrk]
-   Float_t         trkPhi[6986];   //[nTrk]
-   Float_t         dedx[6986];   //[nTrk]
-   Bool_t          highPurity[6986];   //[nTrk]
-   Bool_t          highPuritySetWithPV[6986];   //[nTrk]
-   Float_t         trkChi2[6986];   //[nTrk]
-   Float_t         trkChi2hit1D[6986];   //[nTrk]
-   Float_t         trkNdof[6986];   //[nTrk]
-   Float_t         trkDz[6986];   //[nTrk]
-   Float_t         trkDzError[6986];   //[nTrk]
-   Float_t         trkDzError1[6986];   //[nTrk]
-   Float_t         trkDzError2[6986];   //[nTrk]
-   Float_t         trkDxy[6986];   //[nTrk]
-   Float_t         trkDxyBS[6986];   //[nTrk]
-   Float_t         trkDxy1[6986];   //[nTrk]
-   Float_t         trkDxy2[6986];   //[nTrk]
-   Float_t         trkDxyError[6986];   //[nTrk]
-   Float_t         trkDxyErrorBS[6986];   //[nTrk]
-   Float_t         trkDxyError1[6986];   //[nTrk]
-   Float_t         trkDxyError2[6986];   //[nTrk]
-   Float_t         trkDz1[6986];   //[nTrk]
-   Float_t         trkDz2[6986];   //[nTrk]
-   Float_t         trkVx[6986];   //[nTrk]
-   Float_t         trkVy[6986];   //[nTrk]
-   Float_t         trkVz[6986];   //[nTrk]
-   Bool_t          trkFake[6986];   //[nTrk]
-   Float_t         trkAlgo[6986];   //[nTrk]
-   Int_t           pfType[6986];   //[nTrk]
-   Float_t         pfCandPt[6986];   //[nTrk]
-   Float_t         pfSumEcal[6986];   //[nTrk]
-   Float_t         pfSumHcal[6986];   //[nTrk]
+   Float_t         trkPt[7074];   //[nTrk]
+   Float_t         trkPtError[7074];   //[nTrk]
+   Int_t           trkNHit[7074];   //[nTrk]
+   Int_t           trkNlayer[7074];   //[nTrk]
+   Int_t           trkNlayer3D[7074];   //[nTrk]
+   Float_t         trkEta[7074];   //[nTrk]
+   Float_t         trkPhi[7074];   //[nTrk]
+   Float_t         dedx[7074];   //[nTrk]
+   Bool_t          highPurity[7074];   //[nTrk]
+   Bool_t          highPuritySetWithPV[7074];   //[nTrk]
+   Float_t         trkChi2[7074];   //[nTrk]
+   Float_t         trkChi2hit1D[7074];   //[nTrk]
+   Float_t         trkNdof[7074];   //[nTrk]
+   Float_t         trkDz[7074];   //[nTrk]
+   Float_t         trkDzError[7074];   //[nTrk]
+   Float_t         trkDzError1[7074];   //[nTrk]
+   Float_t         trkDzError2[7074];   //[nTrk]
+   Float_t         trkDxy[7074];   //[nTrk]
+   Float_t         trkDxyBS[7074];   //[nTrk]
+   Float_t         trkDxy1[7074];   //[nTrk]
+   Float_t         trkDxy2[7074];   //[nTrk]
+   Float_t         trkDxyError[7074];   //[nTrk]
+   Float_t         trkDxyErrorBS[7074];   //[nTrk]
+   Float_t         trkDxyError1[7074];   //[nTrk]
+   Float_t         trkDxyError2[7074];   //[nTrk]
+   Float_t         trkDz1[7074];   //[nTrk]
+   Float_t         trkDz2[7074];   //[nTrk]
+   Float_t         trkVx[7074];   //[nTrk]
+   Float_t         trkVy[7074];   //[nTrk]
+   Float_t         trkVz[7074];   //[nTrk]
+   Bool_t          trkFake[7074];   //[nTrk]
+   Float_t         trkAlgo[7074];   //[nTrk]
+   Int_t           pfType[7074];   //[nTrk]
+   Float_t         pfCandPt[7074];   //[nTrk]
+   Float_t         pfSumEcal[7074];   //[nTrk]
+   Float_t         pfSumHcal[7074];   //[nTrk]
    Int_t           nParticle;
-   Float_t         pStatus[4040];   //[nParticle]
-   Float_t         pPId[4040];   //[nParticle]
-   Float_t         pEta[4040];   //[nParticle]
-   Float_t         pPhi[4040];   //[nParticle]
-   Float_t         pPt[4040];   //[nParticle]
-   Float_t         pAcc[4040];   //[nParticle]
-   Float_t         pNRec[4040];   //[nParticle]
-   Int_t           pNHit[4040];   //[nParticle]
-   Float_t         mtrkPt[4040];   //[nParticle]
-   Float_t         mtrkPtError[4040];   //[nParticle]
-   Int_t           mtrkNHit[4040];   //[nParticle]
-   Int_t           mtrkNlayer[4040];   //[nParticle]
-   Int_t           mtrkNlayer3D[4040];   //[nParticle]
-   Int_t           mtrkQual[4040];   //[nParticle]
-   Float_t         mtrkChi2[4040];   //[nParticle]
-   Float_t         mtrkNdof[4040];   //[nParticle]
-   Float_t         mtrkDz1[4040];   //[nParticle]
-   Float_t         mtrkDzError1[4040];   //[nParticle]
-   Float_t         mtrkDxy1[4040];   //[nParticle]
-   Float_t         mtrkDxyError1[4040];   //[nParticle]
-   Float_t         mtrkAlgo[4040];   //[nParticle]
-   Int_t           mtrkPfType[4040];   //[nParticle]
-   Float_t         mtrkPfCandPt[4040];   //[nParticle]
-   Float_t         mtrkPfSumEcal[4040];   //[nParticle]
-   Float_t         mtrkPfSumHcal[4040];   //[nParticle]
+   Float_t         pStatus[6000];   //[nParticle]
+   Float_t         pPId[6000];   //[nParticle]
+   Float_t         pEta[6000];   //[nParticle]
+   Float_t         pPhi[6000];   //[nParticle]
+   Float_t         pPt[6000];   //[nParticle]
+   Float_t         pAcc[6000];   //[nParticle]
+   Float_t         pNRec[6000];   //[nParticle]
+   Int_t           pNHit[6000];   //[nParticle]
+   Float_t         mtrkPt[6000];   //[nParticle]
+   Float_t         mtrkPtError[6000];   //[nParticle]
+   Int_t           mtrkNHit[6000];   //[nParticle]
+   Int_t           mtrkNlayer[6000];   //[nParticle]
+   Int_t           mtrkNlayer3D[6000];   //[nParticle]
+   Int_t           mtrkQual[6000];   //[nParticle]
+   Float_t         mtrkChi2[6000];   //[nParticle]
+   Float_t         mtrkNdof[6000];   //[nParticle]
+   Float_t         mtrkDz1[6000];   //[nParticle]
+   Float_t         mtrkDzError1[6000];   //[nParticle]
+   Float_t         mtrkDxy1[6000];   //[nParticle]
+   Float_t         mtrkDxyError1[6000];   //[nParticle]
+   Float_t         mtrkAlgo[6000];   //[nParticle]
+   Int_t           mtrkPfType[6000];   //[nParticle]
+   Float_t         mtrkPfCandPt[6000];   //[nParticle]
+   Float_t         mtrkPfSumEcal[6000];   //[nParticle]
+   Float_t         mtrkPfSumHcal[6000];   //[nParticle]
 
    // List of branches
    TBranch        *b_nEv;   //!
@@ -242,8 +242,8 @@ void setupTrackTree(TTree *t,Tracks &tTracks,bool doCheck = 1)
    if (t->GetBranch("mtrkPfSumHcal")) t->SetBranchAddress("mtrkPfSumHcal", tTracks.mtrkPfSumHcal, &tTracks.b_mtrkPfSumHcal);
    if (doCheck) {
       if (t->GetMaximum("nv")>54) { cout <<"FATAL ERROR: Arrary size of nv too small!!!  "<<t->GetMaximum("nv")<<endl; exit(0);
- }      if (t->GetMaximum("nTrk")>7036) { cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl; exit(0);
- }      if (t->GetMaximum("nParticle")>4090) { cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl; exit(0);
+ }      if (t->GetMaximum("nTrk")>7074) { cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl; exit(0);
+ }      if (t->GetMaximum("nParticle")>6000) { cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl; exit(0);
  }   }
 }
 
