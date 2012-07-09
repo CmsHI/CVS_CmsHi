@@ -24,7 +24,7 @@ void dynamicmerge(string infname, string outfname) {
       nlines++;
     }
   }
-
+  
   const int N = 47;
   string dir[N] = {
     "hltanalysis",
