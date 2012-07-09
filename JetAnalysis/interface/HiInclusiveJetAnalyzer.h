@@ -20,6 +20,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
@@ -67,8 +68,14 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
   void saveDaughters( const reco::GenParticle & gen);
   void saveDaughters( const reco::Candidate & gen);
+  double getEt(math::XYZPoint pos, double energy);
+  math::XYZPoint getPosition(const DetId &id, reco::Vertex::Point vtx = reco::Vertex::Point(0,0,0));
 
   edm::InputTag   jetTag_, vtxTag_, genjetTag_, eventInfoTag_, L1gtReadout_, pfCandidateLabel_, trackTag_, matchTag_; 
+  edm::InputTag HcalRecHitHFSrc_;
+  edm::InputTag HcalRecHitHBHESrc_;
+  edm::InputTag EBSrc_;
+  edm::InputTag EESrc_;
 
   std::vector<float> usedStringPts;
 
@@ -98,8 +105,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   edm::Service<TFileService> fs1;
 
   CentralityProvider * centrality_;
-
-
+  const CaloGeometry *geo;
 
   std::string                   hltResName_;         //HLT trigger results name
   std::vector<std::string>      hltProcNames_;       //HLT process name(s)
@@ -167,6 +173,16 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
      float muMax[MAXJETS];
      float muSum[MAXJETS];
      int muN[MAXJETS];
+
+    float genChargedSum[MAXJETS];
+    float genHardSum[MAXJETS];
+    float signalChargedSum[MAXJETS];
+    float signalHardSum[MAXJETS];
+
+    float hcalSum[MAXJETS];
+    float ecalSum[MAXJETS];
+
+    int subid[MAXJETS];
 
      float matchedPt[MAXJETS];
      float matchedR[MAXJETS];

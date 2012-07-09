@@ -19,6 +19,7 @@
 
 #include "DataFormats/HeavyIonEvent/interface/CentralityBins.h"
 #include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
@@ -38,11 +39,16 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerObjectMap.h"
 #include "L1Trigger/GlobalTrigger/interface/L1GlobalTrigger.h"
 
+#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
+
 using namespace std;
 using namespace edm;
 using namespace reco;
 
-HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig) {
+HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig) : 
+  geo(0)
+{
 
   jetTag_ = iConfig.getParameter<InputTag>("jetTag");
   matchTag_ = iConfig.getUntrackedParameter<InputTag>("matchTag",jetTag_);
@@ -76,6 +82,11 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   saveBfragments_  = iConfig.getUntrackedParameter<bool>("saveBfragments",false);
 
   pfCandidateLabel_ = iConfig.getUntrackedParameter<edm::InputTag>("pfCandidateLabel",edm::InputTag("particleFlowTmp"));
+
+  EBSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EBRecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEB"));
+  EESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("EERecHitSrc",edm::InputTag("ecalRecHit","EcalRecHitsEE"));
+  HcalRecHitHFSrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHFRecHitSrc",edm::InputTag("hfreco"));
+  HcalRecHitHBHESrc_ = iConfig.getUntrackedParameter<edm::InputTag>("hcalHBHERecHitSrc",edm::InputTag("hbhereco"));
 
   if(doTrigger_){
     L1gtReadout_ = iConfig.getParameter<edm::InputTag>("L1gtReadout");
@@ -173,6 +184,9 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("neutralSum", jets_.neutralSum,"neutralSum[nref]/F");
   t->Branch("neutralN", jets_.neutralN,"neutralN[nref]/I");
 
+  t->Branch("hcalSum", jets_.hcalSum,"hcalSum[nref]/F");
+  t->Branch("ecalSum", jets_.ecalSum,"ecalSum[nref]/F");
+
   t->Branch("eMax", jets_.eMax,"eMax[nref]/F");
   t->Branch("eSum", jets_.eSum,"eSum[nref]/F");
   t->Branch("eN", jets_.eN,"eN[nref]/I");
@@ -250,6 +264,15 @@ HiInclusiveJetAnalyzer::beginJob() {
     t->Branch("refparton_flavor",jets_.refparton_flavor,"refparton_flavor[nref]/I");
     t->Branch("refparton_flavorForB",jets_.refparton_flavorForB,"refparton_flavorForB[nref]/I");
 
+    t->Branch("genChargedSum", jets_.genChargedSum,"genChargedSum[nref]/F");
+    t->Branch("genHardSum", jets_.genHardSum,"genHardSum[nref]/F");
+    t->Branch("signalChargedSum", jets_.signalChargedSum,"signalChargedSum[nref]/F");
+    t->Branch("signalHardSum", jets_.signalHardSum,"signalHardSum[nref]/F");
+
+    if(doSubEvent_){
+      t->Branch("subid",jets_.subid,"subid[nref]/I");
+    }
+
     if(fillGenJets_){
        // For all gen jets, matched or unmatched
        t->Branch("ngen",&jets_.ngen,"ngen/I");
@@ -318,6 +341,11 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
   double hf = 0.;
   double b = 999.;
 
+  if(!geo){
+    edm::ESHandle<CaloGeometry> pGeo;
+    iSetup.get<CaloGeometryRecord>().get(pGeo);
+    geo = pGeo.product();
+  }
   if(useCentrality_){
       if(!centrality_) centrality_ = new CentralityProvider(iSetup);      
       centrality_->newEvent(iEvent,iSetup); // make sure you do this first in every event
@@ -335,17 +363,18 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
    jets_.bin = bin;
    jets_.hf = hf;
    
+   reco::Vertex::Point vtx(0,0,0);
+   if (useVtx_) {
+     edm::Handle<vector<reco::Vertex> >vertex;
+     iEvent.getByLabel(vtxTag_, vertex);
 
-	 if (useVtx_) {
-      edm::Handle<vector<reco::Vertex> >vertex;
-      iEvent.getByLabel(vtxTag_, vertex);
-
-      if(vertex->size()>0) {
-        jets_.vx=vertex->begin()->x();
-        jets_.vy=vertex->begin()->y();
-        jets_.vz=vertex->begin()->z();
-      }
-	 }
+     if(vertex->size()>0) {
+       jets_.vx=vertex->begin()->x();
+       jets_.vy=vertex->begin()->y();
+       jets_.vz=vertex->begin()->z();
+       vtx = vertex->begin()->position();
+     }
+   }
    
    edm::Handle<pat::JetCollection> patjets;
    if(usePat_)iEvent.getByLabel(jetTag_, patjets);
@@ -361,6 +390,18 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
  
    edm::Handle<reco::TrackCollection> tracks;
    iEvent.getByLabel(trackTag_,tracks);
+
+   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > ebHits;
+   edm::Handle<edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> > > eeHits;
+
+   edm::Handle<HFRecHitCollection> hfHits;
+   edm::Handle<HBHERecHitCollection> hbheHits;
+
+   iEvent.getByLabel(HcalRecHitHBHESrc_,hbheHits);
+   iEvent.getByLabel(HcalRecHitHFSrc_,hfHits);
+   iEvent.getByLabel(EBSrc_,ebHits);
+   iEvent.getByLabel(EESrc_,eeHits);
+
 
    // FILL JRA TREE
    jets_.b = b;
@@ -509,6 +550,17 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.trackHardSum[jets_.nref] = 0;
      jets_.trackHardN[jets_.nref] = 0;
 
+     jets_.hcalSum[jets_.nref] = 0;
+     jets_.ecalSum[jets_.nref] = 0;
+
+     jets_.genChargedSum[jets_.nref] = 0;
+     jets_.genHardSum[jets_.nref] = 0;
+
+     jets_.signalChargedSum[jets_.nref] = 0;
+     jets_.signalHardSum[jets_.nref] = 0;
+
+     jets_.subid[jets_.nref] = -1;
+
      for(unsigned int icand = 0; icand < tracks->size(); ++icand){
 	const reco::Track& track = (*tracks)[icand];
 	if(useQuality_ ){
@@ -585,6 +637,48 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	   }
 	}
      }
+
+     // Calorimeter fractions
+
+     for(unsigned int i = 0; i < hbheHits->size(); ++i){
+       const HBHERecHit & hit= (*hbheHits)[i];
+       math::XYZPoint pos = getPosition(hit.id(),vtx);
+       double dr = deltaR(jet.eta(),jet.phi(),pos.eta(),pos.phi());
+       if(dr < rParam){
+	 jets_.hcalSum[jets_.nref] += getEt(pos,hit.energy());
+       }
+     }
+
+     for(unsigned int i = 0; i < hfHits->size(); ++i){
+       const HFRecHit & hit= (*hfHits)[i];
+       math::XYZPoint pos = getPosition(hit.id(),vtx);
+       double dr = deltaR(jet.eta(),jet.phi(),pos.eta(),pos.phi());
+       if(dr < rParam){
+         jets_.hcalSum[jets_.nref] += getEt(pos,hit.energy());
+       }
+     }
+
+
+     for(unsigned int i = 0; i < ebHits->size(); ++i){
+       const EcalRecHit & hit= (*ebHits)[i];
+       math::XYZPoint pos = getPosition(hit.id(),vtx);
+       double dr = deltaR(jet.eta(),jet.phi(),pos.eta(),pos.phi());
+       if(dr < rParam){
+         jets_.ecalSum[jets_.nref] += getEt(pos,hit.energy());
+       }
+     }
+
+     for(unsigned int i = 0; i < eeHits->size(); ++i){
+       const EcalRecHit & hit= (*eeHits)[i];
+       math::XYZPoint pos = getPosition(hit.id(),vtx);
+       double dr = deltaR(jet.eta(),jet.phi(),pos.eta(),pos.phi());
+       if(dr < rParam){
+         jets_.ecalSum[jets_.nref] += getEt(pos,hit.energy());
+       }
+     }
+
+
+     // Alternative reconstruction matching (PF for calo, calo for PF)
 
      double drMin = 100;
      for(unsigned int imatch = 0 ; imatch < matchedjets->size(); ++imatch){
@@ -680,6 +774,12 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.refy[jets_.nref] = genjet->eta();
 	 jets_.refdphijt[jets_.nref] = reco::deltaPhi(jet.phi(), genjet->phi());	
 	 jets_.refdrjt[jets_.nref] = reco::deltaR(jet.eta(),jet.phi(),genjet->eta(),genjet->phi());	       
+
+	 if(doSubEvent_){
+	   const GenParticle* gencon = genjet->getGenConstituent(0);
+	   jets_.subid[jets_.nref] = gencon->collisionId();
+         }
+
        }else{
 	 jets_.refpt[jets_.nref] = -999.;
 	 jets_.refeta[jets_.nref] = -999.;
@@ -1031,5 +1131,18 @@ HiInclusiveJetAnalyzer::saveDaughters(const reco::Candidate &gen){
     saveDaughters(daughter);
   }
 }
+
+double HiInclusiveJetAnalyzer::getEt(math::XYZPoint pos, double energy){
+  double et = energy*sin(pos.theta());
+  return et;
+}
+
+math::XYZPoint HiInclusiveJetAnalyzer::getPosition(const DetId &id, reco::Vertex::Point vtx){
+  const GlobalPoint& pos=geo->getPosition(id);
+  math::XYZPoint posV(pos.x() - vtx.x(),pos.y() - vtx.y(),pos.z() - vtx.z());
+  return posV;
+}
+
+
 				     					
 DEFINE_FWK_MODULE(HiInclusiveJetAnalyzer);
