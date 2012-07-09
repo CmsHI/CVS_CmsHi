@@ -4,8 +4,8 @@ then
   exit 1
 fi
 
-ls -1 /mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia$1_HydjetDrum_mix02/HiForest2_v21/*.root > list$1.txt
-output="test$1.root"
+ls -1 /mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia${1}_HydjetDrum_mix02/HiForest2_v21/*.root > list${1}.txt
+output="test${1}.root"
 
 
 rootn.exe -b <<EOF
