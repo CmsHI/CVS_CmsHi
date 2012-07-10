@@ -31,13 +31,15 @@ public:
    vector<vector<TString> > levelInput_;
    vector<TString> matName_;
    vector<Float_t> ptHatMin_;
-   vector<Float_t> sampleWeight_;
+   vector<Float_t> sampleCroSec_;
    
    Int_t numCentBins_;
    Int_t numPtBins_;
    Int_t numEtaBins_;
    Int_t numJEtBins_;
    Int_t numLevels_;
+   
+   vector< vector<TH1D*> >  hNoEvts_;
    
    vector<vector<vector<vector<TH3F*> > > > inputHists_;
    vector<vector<vector<TH3F*> > > combInputHists_;
@@ -170,22 +172,39 @@ void TrackingCorrections2::Init()
       cout << endl;
    }
 
+   
+   // get the number of events                                                                                                                
+   vector<vector<TH1D*> > hnoe(ptHatMin_.size(), vector<TH1D*>(numCentBins_));
+   hNoEvts_ = hnoe;
+   for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
+     for (Int_t c=0; c<numCentBins_; ++c) {
+       TString hnameNoE(Form("hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet/hPtHat_cbin%s",centBin_[c].Data()));
+       hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
+       cout << " number of events in ptHat :" << ptHatMin_[s] << ", centrality : " << centBin_[c].Data()  << "  = " << hNoEvts_[s][c]->Integral() << endl;
+     }
+     
+   }
+   
+   
    // =============================
    // set sample weights
    // =============================
-   sampleWeight_.reserve(ptHatMin_.size());
+   
+   sampleCroSec_.reserve(ptHatMin_.size());
    for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight
-      if ( fabs(ptHatMin_[s]-30)<0.1 ) sampleWeight_[s] = 1.079e-02;
-      if ( fabs(ptHatMin_[s]-50)<0.1 ) sampleWeight_[s] = 1.021e-03;
-      if ( fabs(ptHatMin_[s]-80)<0.1 ) sampleWeight_[s] = 9.913e-05;
-      if ( fabs(ptHatMin_[s]-120)<0.1 ) sampleWeight_[s] = 1.128e-05;
-      if ( fabs(ptHatMin_[s]-170)<0.1 ) sampleWeight_[s] = 1.470e-06;
-      if ( fabs(ptHatMin_[s]-200)<0.1 ) sampleWeight_[s] = 5.310e-07;
-      if ( fabs(ptHatMin_[s]-250)<0.1 ) sampleWeight_[s] = 1.192e-07;
-      if ( fabs(ptHatMin_[s]-300)<0.1 ) sampleWeight_[s] = 3.176e-08;
-      cout << "sample pthat: " << ptHatMin_[s] << " weight: " << sampleWeight_[s] << endl;
-   }
+     if ( ptHatMin_[s] == 30    ) sampleCroSec_[s] = 1.079e-02 - 1.021e-03;
+     else if ( ptHatMin_[s]==50 ) sampleCroSec_[s] = 1.021e-03 - 9.913e-05;
+     else if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 1.128e-05;
+     else if ( ptHatMin_[s]==120) sampleCroSec_[s] = 1.128e-05 - 1.470e-06;
+     else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
+     else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07 - 1.192e-07;
+     else if ( ptHatMin_[s]==250) sampleCroSec_[s] = 1.192e-07 - 3.176e-08;
+     else if ( ptHatMin_[s]==300) sampleCroSec_[s] = 3.176e-08;
+     else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
+     cout << "sample pthat: " << ptHatMin_[s] << " cross section: " << sampleCroSec_[s] << endl;
 
+   }
+   
    // =============================
    // weight inputs
    // =============================
@@ -193,8 +212,11 @@ void TrackingCorrections2::Init()
                                       vector<vector<TH3F*> > (numCentBins_,
                                                               vector<TH3F*>(2)
                                                               )
-                                      );
+				       );
    combInputHists_ = vci;
+
+  
+   
 
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       for (Int_t m=0; m<2; ++m) {
@@ -212,16 +234,17 @@ void TrackingCorrections2::Init()
                            content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet);
                            error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet),2));
                         } else {
-                           content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet)*sampleWeight_[s];
-                           error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet)*sampleWeight_[s],2));
+			  content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet)*sampleCroSec_[s]/hNoEvts_[s][c]->Integral();
+			  error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet)*sampleCroSec_[s]/hNoEvts_[s][c]->Integral(),2));
                         }
                      } // end of for pt hat loop
                      combInputHists_[lv][c][m]->SetBinContent(ieta,ipt,ijet, content[m]);
                      combInputHists_[lv][c][m]->SetBinError(ieta,ipt,ijet, error[m]);
                   } // end for each correction bin
                }
-            }
-         }
+	    }
+	    
+	 }
       }
    }
 
@@ -234,9 +257,12 @@ void TrackingCorrections2::Init()
       for (Int_t c=0; c<numCentBins_; ++c) {
          correctionHists_[lv][c] = (TH3F*)combInputHists_[lv][c][0]->Clone(Form("correctionHists_lv%d_c%d",lv,c));
          correctionHists_[lv][c]->Divide(combInputHists_[lv][c][1]);
+	 
       }
    }
 }
+
+
 
 Float_t TrackingCorrections2::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float_t cent, Double_t * outCorr)
 {
