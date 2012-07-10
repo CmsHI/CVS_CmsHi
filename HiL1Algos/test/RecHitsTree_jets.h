@@ -57,12 +57,12 @@ public :
   /* Int_t           caloRCTRegionEtaIndex[396];   //[numRegions] */
   /* Int_t           caloRCTRegionPhiIndex[396];   //[numRegions] */
   Int_t n;
-  Float_t e[4194]; //[n]
-  Float_t et[4194]; //[n]
-  Float_t eta[4194]; //[n]
-  Float_t phi[4194]; //[n]
-  Float_t emEt[4194]; //[n]
-  Float_t hadEt[4194]; //[n]
+  Float_t e[4320]; //[n]
+  Float_t et[4320]; //[n]
+  Float_t eta[4320]; //[n]
+  Float_t phi[4320]; //[n]
+  Float_t emEt[4320]; //[n]
+  Float_t hadEt[4320]; //[n]
   
 
   /* // List of branches */
@@ -104,6 +104,13 @@ public :
   TBranch *b_emEt;
   TBranch *b_hadEt;
 
+  enum returnHist {
+    TOWER_ENERGY,
+    TOWER_EFF,
+    REGION_ENERGY,
+    REGION_EFF
+  };
+  
   RecHitsTree_jets(TFile *f=0);
   virtual ~RecHitsTree_jets();
   virtual Int_t    Cut(Long64_t entry);
@@ -111,7 +118,7 @@ public :
   virtual Long64_t LoadTree(Long64_t entry);
   virtual void     Init(TTree *tree);
   virtual TH1D*    Loop(int total_events = 0, 
-			int threshhold = 0,
+			returnHist whichHist = TOWER_EFF,
 			bool PHI_AVERAGE = false,
 			bool cut_noise_events = false);
   virtual Bool_t   Notify();
@@ -135,7 +142,7 @@ RecHitsTree_jets::RecHitsTree_jets(TFile *f)
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
   if (f == 0) {
-    f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/minbiasL1/HiForestL1_merged_v2.root");
+    f = new TFile("/mnt/hadoop/cms/store/user/luck/HiMinbias_RecHitTowers/HiForest_bothVtx_all.root");
     //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/L1jet/HiForestL1-jet_merged_v1.root");
     //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
     
@@ -226,7 +233,7 @@ void RecHitsTree_jets::Init(TTree *tree)
   /* fChain->SetBranchAddress("caloRegionTag", caloRegionTag, &b_caloRegionTag); */
   /* fChain->SetBranchAddress("caloRCTRegionEtaIndex", caloRCTRegionEtaIndex, &b_caloRCTRegionEtaIndex); */
   /* fChain->SetBranchAddress("caloRCTRegionPhiIndex", caloRCTRegionPhiIndex, &b_caloRCTRegionPhiIndex); */
-  fChain->SetBranchAddress("n", n, &b_n);
+  fChain->SetBranchAddress("n", &n, &b_n);
   fChain->SetBranchAddress("et", et, &b_et);
   fChain->SetBranchAddress("eta", eta, &b_eta);
   fChain->SetBranchAddress("phi", phi, &b_phi);

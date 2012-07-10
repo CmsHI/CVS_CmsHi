@@ -4,7 +4,7 @@ typedef struct{
   int sumEt;
 } TowerJet;
 
-const int NETA_TOWERS = 88;
+const int NETA_TOWERS = 82;
 const int NPHI_TOWERS = 72;
 
 TowerJet findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circularJets, int jetRadius)
