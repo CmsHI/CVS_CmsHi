@@ -165,6 +165,23 @@ process.mergedTrack.simTrackPtMin = 4.
 process.mergedTrack.doPFMatching = False
 process.mergedTrack.tpFakeSrc = cms.untracked.InputTag("cutsTPForFakPxl")
 process.mergedTrack.tpEffSrc = cms.untracked.InputTag("cutsTPForEffPxl")
+#########################
+# Track Eff Analyzer
+#########################
+ptHatMin=-1
+ptHatMax=9999
+for m in [process.hitrkEffAnalyzer_MergedGeneral,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j1_50to120,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j1_120to200,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j1_200to999,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j2_50to120,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j2_120to200,
+            process.hitrkEffAnalyzer_MergedGeneral_trkPhi_j2_200to999
+         ]:
+   m.ptHatMin=ptHatMin
+   m.ptHatMax=ptHatMax
+
 
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
