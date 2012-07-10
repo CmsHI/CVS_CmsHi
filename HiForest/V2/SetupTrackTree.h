@@ -64,31 +64,31 @@ public :
    Float_t         pfSumEcal[7074];   //[nTrk]
    Float_t         pfSumHcal[7074];   //[nTrk]
    Int_t           nParticle;
-   Float_t         pStatus[6000];   //[nParticle]
-   Float_t         pPId[6000];   //[nParticle]
-   Float_t         pEta[6000];   //[nParticle]
-   Float_t         pPhi[6000];   //[nParticle]
-   Float_t         pPt[6000];   //[nParticle]
-   Float_t         pAcc[6000];   //[nParticle]
-   Float_t         pNRec[6000];   //[nParticle]
-   Int_t           pNHit[6000];   //[nParticle]
-   Float_t         mtrkPt[6000];   //[nParticle]
-   Float_t         mtrkPtError[6000];   //[nParticle]
-   Int_t           mtrkNHit[6000];   //[nParticle]
-   Int_t           mtrkNlayer[6000];   //[nParticle]
-   Int_t           mtrkNlayer3D[6000];   //[nParticle]
-   Int_t           mtrkQual[6000];   //[nParticle]
-   Float_t         mtrkChi2[6000];   //[nParticle]
-   Float_t         mtrkNdof[6000];   //[nParticle]
-   Float_t         mtrkDz1[6000];   //[nParticle]
-   Float_t         mtrkDzError1[6000];   //[nParticle]
-   Float_t         mtrkDxy1[6000];   //[nParticle]
-   Float_t         mtrkDxyError1[6000];   //[nParticle]
-   Float_t         mtrkAlgo[6000];   //[nParticle]
-   Int_t           mtrkPfType[6000];   //[nParticle]
-   Float_t         mtrkPfCandPt[6000];   //[nParticle]
-   Float_t         mtrkPfSumEcal[6000];   //[nParticle]
-   Float_t         mtrkPfSumHcal[6000];   //[nParticle]
+   Float_t         pStatus[13000];   //[nParticle]
+   Float_t         pPId[13000];   //[nParticle]
+   Float_t         pEta[13000];   //[nParticle]
+   Float_t         pPhi[13000];   //[nParticle]
+   Float_t         pPt[13000];   //[nParticle]
+   Float_t         pAcc[13000];   //[nParticle]
+   Float_t         pNRec[13000];   //[nParticle]
+   Int_t           pNHit[13000];   //[nParticle]
+   Float_t         mtrkPt[13000];   //[nParticle]
+   Float_t         mtrkPtError[13000];   //[nParticle]
+   Int_t           mtrkNHit[13000];   //[nParticle]
+   Int_t           mtrkNlayer[13000];   //[nParticle]
+   Int_t           mtrkNlayer3D[13000];   //[nParticle]
+   Int_t           mtrkQual[13000];   //[nParticle]
+   Float_t         mtrkChi2[13000];   //[nParticle]
+   Float_t         mtrkNdof[13000];   //[nParticle]
+   Float_t         mtrkDz1[13000];   //[nParticle]
+   Float_t         mtrkDzError1[13000];   //[nParticle]
+   Float_t         mtrkDxy1[13000];   //[nParticle]
+   Float_t         mtrkDxyError1[13000];   //[nParticle]
+   Float_t         mtrkAlgo[13000];   //[nParticle]
+   Int_t           mtrkPfType[13000];   //[nParticle]
+   Float_t         mtrkPfCandPt[13000];   //[nParticle]
+   Float_t         mtrkPfSumEcal[13000];   //[nParticle]
+   Float_t         mtrkPfSumHcal[13000];   //[nParticle]
 
    // List of branches
    TBranch        *b_nEv;   //!
@@ -243,7 +243,7 @@ void setupTrackTree(TTree *t,Tracks &tTracks,bool doCheck = 1)
    if (doCheck) {
       if (t->GetMaximum("nv")>54) { cout <<"FATAL ERROR: Arrary size of nv too small!!!  "<<t->GetMaximum("nv")<<endl; exit(0);
  }      if (t->GetMaximum("nTrk")>7074) { cout <<"FATAL ERROR: Arrary size of nTrk too small!!!  "<<t->GetMaximum("nTrk")<<endl; exit(0);
- }      if (t->GetMaximum("nParticle")>6000) { cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl; exit(0);
+ }      if (t->GetMaximum("nParticle")>13000) { cout <<"FATAL ERROR: Arrary size of nParticle too small!!!  "<<t->GetMaximum("nParticle")<<endl; exit(0);
  }   }
 }
 
