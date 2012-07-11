@@ -11,6 +11,7 @@
 
 int getEtaIndex(double eta);
 int getPhiIndex(double phi, double eta);
+int numPhiTowers(int ieta);
 
 TH1D* RecHitsTree_jets::Loop(int total_events, 
 			     returnHist whichReturn,
@@ -142,7 +143,7 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
   	  phiAverageTowers[ieta] += fullDetectorTowers[ieta][iphi];
   	}
-  	phiAverageTowers[ieta] /= NPHI_TOWERS;
+  	phiAverageTowers[ieta] /= numPhiTowers(ieta);
       }
       
       for(int ieta = 0; ieta < NETA_TOWERS2; ieta++)
@@ -247,7 +248,7 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   // efficiency_curve_tower->Draw();
   // efficiency_curve_region->Draw("same");
 
-  switch(whichHist)
+  switch(whichReturn)
   {
   case TOWER_ENERGY:
     return(max_towerjet_energy);
@@ -471,4 +472,14 @@ int getPhiIndex(double phi, double eta)
 	return(i*4);
     }
   }
+}
+
+int numPhiTowers(int ieta)
+{
+  if(ieta < 2 || ieta > 79)
+    return(18);
+  else if(ieta < 21 || ieta > 60)
+    return(36);
+  else
+    return(72);
 }
