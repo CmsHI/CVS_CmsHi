@@ -48,7 +48,7 @@ UserCode/ASYoon/PbPbTrackingTools/VertexConstraintProducer
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_04 -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 cvs co -r HiForest_V02_00 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_24 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_25 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 #PixelTrack
@@ -85,7 +85,7 @@ cvs co -r branch_hi44X HLTrigger/HLTanalyzers
 cvs co -r HiForest_V02_00 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
-cvs co -r HiForest_V02_01 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
+cvs co -r HiForest_V02_00 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 #echo '54c54
 #< reconstructionHeavyIons_withPF *= HiParticleFlowReco

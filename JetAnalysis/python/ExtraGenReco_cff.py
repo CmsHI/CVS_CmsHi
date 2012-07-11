@@ -7,6 +7,8 @@ from RecoHI.HiJetAlgos.HiGenJets_cff import *
 from RecoHI.HiJetAlgos.HiGenCleaner_cff import *
 from PhysicsTools.PatAlgos.producersHeavyIons.heavyIonProducer_cfi import heavyIon
 
+hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
+
 hiGenParticles.srcVector = cms.vstring('hiSignal')
 
 ak1HiGenJets = ak3HiGenJets.clone(rParam = 0.1)
