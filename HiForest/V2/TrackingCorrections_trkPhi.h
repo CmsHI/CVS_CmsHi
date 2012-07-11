@@ -40,7 +40,7 @@ public:
    Int_t numLevels_;
    
    vector< vector<TH1D*> >  hNoEvts_;
-   
+   vector< vector<float> >  numOfEvts_;// number of events
    vector<vector<vector<vector<TH3F*> > > > inputHists_;
    vector<vector<vector<TH3F*> > > combInputHists_;
    vector<vector<TH3F*> > correctionHists_;
@@ -176,13 +176,20 @@ void TrackingCorrections2::Init()
    // get the number of events                                                                                                                
    vector<vector<TH1D*> > hnoe(ptHatMin_.size(), vector<TH1D*>(numCentBins_));
    hNoEvts_ = hnoe;
-   for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
-     for (Int_t c=0; c<numCentBins_; ++c) {
-       TString hnameNoE(Form("hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet/hPtHat_cbin%s",centBin_[c].Data()));
-       hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
-       cout << " number of events in ptHat :" << ptHatMin_[s] << ", centrality : " << centBin_[c].Data()  << "  = " << hNoEvts_[s][c]->Integral() << endl;
-     }
-     
+   
+   
+   vector<vector<float> > noeTemp(ptHatMin_.size(), vector<float>(numCentBins_,1));
+   numOfEvts_ = noeTemp;
+   
+   if (weightSamples_) {
+      for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
+        for (Int_t c=0; c<numCentBins_; ++c) {
+          TString hnameNoE(Form("hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet/hPtHat_cbin%s",centBin_[c].Data()));
+          hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
+          numOfEvts_[s][c] = hNoEvts_[s][c]->Integral();
+          cout << " number of events in ptHat :" << ptHatMin_[s] << ", centrality : " << centBin_[c].Data()  << "  = " << numOfEvts_[s][c] << endl;
+        }
+      }
    }
    
    
@@ -234,8 +241,8 @@ void TrackingCorrections2::Init()
                            content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet);
                            error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet),2));
                         } else {
-			  content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet)*sampleCroSec_[s]/hNoEvts_[s][c]->Integral();
-			  error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet)*sampleCroSec_[s]/hNoEvts_[s][c]->Integral(),2));
+                           content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta,ipt,ijet)*sampleCroSec_[s]/numOfEvts_[s][c];
+                           error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta,ipt,ijet)*sampleCroSec_[s]/numOfEvts_[s][c],2));
                         }
                      } // end of for pt hat loop
                      combInputHists_[lv][c][m]->SetBinContent(ieta,ipt,ijet, content[m]);
