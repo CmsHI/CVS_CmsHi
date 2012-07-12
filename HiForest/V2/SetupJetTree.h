@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Jul  8 19:18:37 2012 by ROOT version 5.27/06b
+// Wed Jun 20 12:21:51 2012 by ROOT version 5.27/06b
 // from TTree t/akPu3PFpatJets Jet Analysis Tree
-// found on file: /d102/yjlee/hiForest2MC/Pythia80_HydjetDrum_mix01_HiForest2_v20.root
+// found on file: ../Pythia30_HydjetDrum_mix01_HiForest2_v19.root
 //////////////////////////////////////////////////////////
 #include "commonSetup.h"
 #include <iostream>
@@ -47,6 +47,10 @@ public :
    Float_t         neutralMax[504];   //[nref]
    Float_t         neutralSum[504];   //[nref]
    Int_t           neutralN[504];   //[nref]
+
+   Float_t         hcalSum[504];   //[nref]
+   Float_t         ecalSum[504];   //[nref]
+
    Float_t         eMax[504];   //[nref]
    Float_t         eSum[504];   //[nref]
    Int_t           eN[504];   //[nref]
@@ -67,15 +71,25 @@ public :
    Float_t         refparton_pt[504];   //[nref]
    Int_t           refparton_flavor[504];   //[nref]
    Int_t           refparton_flavorForB[504];   //[nref]
+
+   Float_t         genChargedSum[504];   //[nref]
+   Float_t         genHardSum[504];   //[nref]
+
+   Float_t         signalChargedSum[504];   //[nref]
+   Float_t         signalHardSum[504];   //[nref]
+
+   Int_t           subid[504];   //[nref]
+
    Int_t           ngen;
-   Int_t           genmatchindex[74];   //[ngen]
-   Float_t         genpt[74];   //[ngen]
-   Float_t         geneta[74];   //[ngen]
-   Float_t         geny[74];   //[ngen]
-   Float_t         genphi[74];   //[ngen]
-   Float_t         gendphijt[74];   //[ngen]
-   Float_t         gendrjt[74];   //[ngen]
-   Int_t           gensubid[74];   //[ngen]
+   Int_t           genmatchindex[100];   //[ngen]
+   Float_t         genpt[100];   //[ngen]
+   Float_t         geneta[100];   //[ngen]
+   Float_t         geny[100];   //[ngen]
+   Float_t         genphi[100];   //[ngen]
+   Float_t         gendphijt[100];   //[ngen]
+   Float_t         gendrjt[100];   //[ngen]
+   Int_t           gensubid[100];   //[ngen]
+
    Float_t         smpt[504];   //[nref]
    Float_t         fr01Chg[504];   //[nref]
    Float_t         fr01EM[504];   //[nref]
@@ -111,6 +125,10 @@ public :
    TBranch        *b_neutralMax;   //!
    TBranch        *b_neutralSum;   //!
    TBranch        *b_neutralN;   //!
+
+   TBranch        *b_hcalSum;   //!
+   TBranch        *b_ecalSum;   //!
+
    TBranch        *b_eMax;   //!
    TBranch        *b_eSum;   //!
    TBranch        *b_eN;   //!
@@ -131,6 +149,13 @@ public :
    TBranch        *b_refparton_pt;   //!
    TBranch        *b_refparton_flavor;   //!
    TBranch        *b_refparton_flavorForB;   //!
+
+   TBranch        *b_genChargedSum;   //!
+   TBranch        *b_genHardSum;   //!
+   TBranch        *b_signalChargedSum;   //!
+   TBranch        *b_signalHardSum;   //!
+   TBranch        *b_subid;   //!
+
    TBranch        *b_ngen;   //!
    TBranch        *b_genmatchindex;   //!
    TBranch        *b_genpt;   //!
@@ -180,6 +205,10 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
    if (t->GetBranch("neutralMax")) t->SetBranchAddress("neutralMax", tJets.neutralMax, &tJets.b_neutralMax);
    if (t->GetBranch("neutralSum")) t->SetBranchAddress("neutralSum", tJets.neutralSum, &tJets.b_neutralSum);
    if (t->GetBranch("neutralN")) t->SetBranchAddress("neutralN", tJets.neutralN, &tJets.b_neutralN);
+
+   if (t->GetBranch("hcalSum")) t->SetBranchAddress("hcalSum", tJets.hcalSum, &tJets.b_hcalSum);
+   if (t->GetBranch("ecalSum")) t->SetBranchAddress("ecalSum", tJets.ecalSum, &tJets.b_ecalSum);
+
    if (t->GetBranch("eMax")) t->SetBranchAddress("eMax", tJets.eMax, &tJets.b_eMax);
    if (t->GetBranch("eSum")) t->SetBranchAddress("eSum", tJets.eSum, &tJets.b_eSum);
    if (t->GetBranch("eN")) t->SetBranchAddress("eN", tJets.eN, &tJets.b_eN);
@@ -200,6 +229,13 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
    if (t->GetBranch("refparton_pt")) t->SetBranchAddress("refparton_pt", tJets.refparton_pt, &tJets.b_refparton_pt);
    if (t->GetBranch("refparton_flavor")) t->SetBranchAddress("refparton_flavor", tJets.refparton_flavor, &tJets.b_refparton_flavor);
    if (t->GetBranch("refparton_flavorForB")) t->SetBranchAddress("refparton_flavorForB", tJets.refparton_flavorForB, &tJets.b_refparton_flavorForB);
+
+   if (t->GetBranch("genChargedSum")) t->SetBranchAddress("genChargedSum", tJets.genChargedSum, &tJets.b_genChargedSum);
+   if (t->GetBranch("genHardSum")) t->SetBranchAddress("genHardSum", tJets.genHardSum, &tJets.b_genHardSum);
+   if (t->GetBranch("signalChargedSum")) t->SetBranchAddress("signalChargedSum", tJets.signalChargedSum, &tJets.b_signalChargedSum);
+   if (t->GetBranch("signalHardSum")) t->SetBranchAddress("signalHardSum", tJets.signalHardSum, &tJets.b_signalHardSum);
+   if (t->GetBranch("subid")) t->SetBranchAddress("subid", tJets.subid, &tJets.b_subid);
+
    if (t->GetBranch("ngen")) t->SetBranchAddress("ngen", &tJets.ngen, &tJets.b_ngen);
    if (t->GetBranch("genmatchindex")) t->SetBranchAddress("genmatchindex", tJets.genmatchindex, &tJets.b_genmatchindex);
    if (t->GetBranch("genpt")) t->SetBranchAddress("genpt", tJets.genpt, &tJets.b_genpt);
@@ -214,8 +250,8 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
    if (t->GetBranch("fr01EM")) t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
    if (t->GetBranch("fr01")) t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-      if (t->GetMaximum("nref")>504) { cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);
- }      if (t->GetMaximum("ngen")>74) { cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);
- }   }
+     if (t->GetMaximum("nref")>500) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);
+     if (t->GetMaximum("ngen")>100) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);
+   }
 }
 
