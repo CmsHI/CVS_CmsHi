@@ -15,6 +15,7 @@ public:
 };
 
 static const int MAXTRK = 30000;
+static const int NTRKQUAL = 3;
 
 class DiJet{
 public:
@@ -38,13 +39,20 @@ public:
    float trkPt[MAXTRK];
    float trkEta[MAXTRK];
    float trkPhi[MAXTRK];   
-   float trkJetDr[MAXTRK];
+   float trkJetDr[MAXTRK][2];
    float trkWt[MAXTRK];
+   float vtrkWt[MAXTRK][NTRKQUAL];
+   float vtrkEff[MAXTRK][NTRKQUAL];
+   float vtrkFak[MAXTRK][NTRKQUAL];
    float trkEff[MAXTRK];
    float trkFak[MAXTRK];
+   float trkNHit[MAXTRK];
    float trkChi2Norm[MAXTRK];
    bool trkHP[MAXTRK];
    int trkAlgo[MAXTRK];
+   bool vtrkQual[MAXTRK][NTRKQUAL];
+   bool trkSel[MAXTRK];
+   bool trkIsFake[MAXTRK];
    int nJet;
    float inclJetPt[MAXTRK];
    float inclJetEta[MAXTRK];
@@ -68,6 +76,12 @@ public:
    float genpPhi[MAXTRK];
    int genpCh[MAXTRK];
    int genpSube[MAXTRK];
+   bool genpSel[MAXTRK];
+   int nSim;
+   float simPt[MAXTRK];
+   float simEta[MAXTRK];
+   float simPhi[MAXTRK];
+   bool simHasRec[MAXTRK];
    TString leaves;
    void clear() {
       pt1=-99; pt1raw=-99; eta1=-99; phi1=-99; pt2=-99; pt2raw=-99; eta2=-99; phi2=-99; deta=-99; dphi=-99; Aj=-99;
@@ -76,10 +90,13 @@ public:
       jlpfPt=-99; jlpfEta=-99; jlpfPhi=-99; jlpfJetDr=-99; jlpfId=-99; pfPhoPt=0;
       ref1pt=-99; ref1eta=-99; ref1phi=-99; ref1partonpt=-99; ref1partonflavor=-99; ref2pt=-99; ref2eta=-99; ref2phi=-99; ref2partonpt=-99; ref2partonflavor;
       genjetpt1=-99; genjeteta1=-99; genjetphi1=-99; genjetpt2=-99; genjeteta2=-99; genjetphi2;
-      nTrk=0; nJet=0; nGenJet=0; nPf=0; nGenp=0;
+      nTrk=0; nJet=0; nGenJet=0; nPf=0; nGenp=0; nSim=0;
    }
    void clearParticles() {
-      nTrk=0; nPf=0; nGenp=0;
+      nTrk=0; nPf=0; nGenp=0; nSim=0;
+   }
+   void clearTracks() {
+      nTrk=0; nPf=0;
    }
 };
 
@@ -90,13 +107,19 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {
    tgj->Branch("trkPt",gj.trkPt,"trkPt[nTrk]/F");
    tgj->Branch("trkEta",gj.trkEta,"trkEta[nTrk]/F");
    tgj->Branch("trkPhi",gj.trkPhi,"trkPhi[nTrk]/F");
-//    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk]/F");
+//    tgj->Branch("trkJetDr",gj.trkJetDr,"trkJetDr[nTrk][2]/F");
    tgj->Branch("trkWt",gj.trkWt,"trkWt[nTrk]/F");
+   tgj->Branch("vtrkWt",gj.vtrkWt,Form("vtrkWt[nTrk][%d]/F",NTRKQUAL));
+//    tgj->Branch("vtrkEff",gj.vtrkEff,Form("vtrkEff[nTrk][%d]/F",NTRKQUAL));
+//    tgj->Branch("vtrkFak",gj.vtrkFak,Form("vtrkFak[nTrk][%d]/F",NTRKQUAL));
    tgj->Branch("trkEff",gj.trkEff,"trkEff[nTrk]/F");
    tgj->Branch("trkFak",gj.trkFak,"trkFak[nTrk]/F");
+   tgj->Branch("trkNHit",gj.trkNHit,"trkNHit[nTrk]/F");
    tgj->Branch("trkChi2Norm",gj.trkChi2Norm,"trkChi2Norm[nTrk]/F");
    tgj->Branch("trkHP",gj.trkHP,"trkHP[nTrk]/O");
    tgj->Branch("trkAlgo",gj.trkAlgo,"trkAlgo[nTrk]/I");
+   tgj->Branch("vtrkQual",gj.vtrkQual,Form("vtrkQual[nTrk][%d]/O",NTRKQUAL));
+   tgj->Branch("trkIsFake",gj.trkIsFake,"trkIsFake[nTrk]/O");
    tgj->Branch("nJet",&gj.nJet,"nJet/I");
    tgj->Branch("inclJetPt",gj.inclJetPt,"inclJetPt[nJet]/F");
    tgj->Branch("inclJetEta",gj.inclJetEta,"inclJetEta[nJet]/F");
@@ -118,8 +141,13 @@ void BookGJBranches(TTree * tgj, EvtSel & evt, DiJet & gj) {
    tgj->Branch("genpPt",gj.genpPt,"genpPt[nGenp]/F");
    tgj->Branch("genpEta",gj.genpEta,"genpEta[nGenp]/F");
    tgj->Branch("genpPhi",gj.genpPhi,"genpPhi[nGenp]/F");
-   tgj->Branch("genpCh",gj.genpCh,"genpCh[nGenp]/I");
+//    tgj->Branch("genpCh",gj.genpCh,"genpCh[nGenp]/I");
    tgj->Branch("genpSube",gj.genpSube,"genpSube[nGenp]/I");
+   tgj->Branch("nSim",&gj.nSim,"nSim/I");
+   tgj->Branch("simPt",gj.simPt,"simPt[nSim]/F");
+   tgj->Branch("simEta",gj.simEta,"simEta[nSim]/F");
+   tgj->Branch("simPhi",gj.simPhi,"simPhi[nSim]/F");
+   tgj->Branch("simHasRec",gj.simHasRec,"simHasRec[nSim]/O");
 }
 
 class CentralityReWeight {
