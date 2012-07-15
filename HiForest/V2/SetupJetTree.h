@@ -250,8 +250,8 @@ void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
    if (t->GetBranch("fr01EM")) t->SetBranchAddress("fr01EM", tJets.fr01EM, &tJets.b_fr01EM);
    if (t->GetBranch("fr01")) t->SetBranchAddress("fr01", tJets.fr01, &tJets.b_fr01);
    if (doCheck) {
-     if (t->GetMaximum("nref")>500) cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);
-     if (t->GetMaximum("ngen")>100) cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);
+     if (t->GetMaximum("nref")>504){ cout <<"FATAL ERROR: Arrary size of nref too small!!!  "<<t->GetMaximum("nref")<<endl; exit(0);}
+     if (t->GetMaximum("ngen")>100){ cout <<"FATAL ERROR: Arrary size of ngen too small!!!  "<<t->GetMaximum("ngen")<<endl; exit(0);}
    }
 }
 
