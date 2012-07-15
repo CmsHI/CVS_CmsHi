@@ -325,6 +325,9 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    }
 
    // if eff==0, no correction, b/c too few statistics   
+   if (corr[0]<0.001) {
+     cout << " warning eff=0 for pt eta jet cent: " << pt << " " << eta << " " << jet << " " << cent << endl;
+   }
    Double_t eff = (corr[0]<0.001 ? 1 : corr[0]);
    Double_t fake = corr[1];
    Double_t mul = corr[2];
