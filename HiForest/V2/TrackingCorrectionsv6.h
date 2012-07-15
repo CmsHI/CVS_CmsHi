@@ -104,13 +104,12 @@ void TrackingCorrections::Init()
 {
    cout << "==============================================" << endl;
    cout << " correction set: " << corrSetName_ << " module: " << trkCorrModule_ << endl;
-   //cout << " isLeadingJet: " << isLeadingJet_ << " inputMethod: " << inputMethod << ", ptRebinFactor: " << ptRebinFactor_ << endl;
-   cout << " Setup - smoothLevel: " << smoothLevel_ << endl;
+   cout << " Setup - smoothLevel: " << smoothLevel_ << " trkPhiMode: " << trkPhiMode_ << endl;
    cout << "==============================================" << endl;
    // =============================
    // Setup Inputs
    // =============================
-   for (Int_t i=0; i<sample_.size(); ++i) cout << sample_[i]->GetName() << endl;
+   for (UInt_t i=0; i<sample_.size(); ++i) cout << sample_[i]->GetName() << endl;
    
    if (sample_.size()==0||!sample_[0]) {
       cout << "No input correction file" << endl;
@@ -160,7 +159,7 @@ void TrackingCorrections::Init()
    // =============================
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       cout << "Load " << levelName_[lv] << " Histograms for ptHatMin";
-      for (Int_t s=0; s<sample_.size(); ++s) {
+      for (UInt_t s=0; s<sample_.size(); ++s) {
          cout << " " << ptHatMin_[s] << endl;
          for (Int_t c=0; c<numCentBins_; ++c) {
             for (Int_t m=0; m<2; ++m) {
@@ -189,9 +188,9 @@ void TrackingCorrections::Init()
    numOfEvts_ = noeTemp;
    
    if (weightSamples_) {
-      for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
+      for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
         for (Int_t c=0; c<numCentBins_; ++c) {
-          TString hnameNoE(Form("hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet/hPtHat_cbin%s",centBin_[c].Data()));
+          TString hnameNoE(Form("hPtHat_c%d",c));
           hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
           numOfEvts_[s][c] = hNoEvts_[s][c]->Integral();
           cout << " number of events in ptHat :" << ptHatMin_[s] << ", centrality : " << centBin_[c].Data()  << "  = " << numOfEvts_[s][c] << endl;
@@ -204,10 +203,11 @@ void TrackingCorrections::Init()
    // set sample weights
    // =============================
    sampleCroSec_.reserve(ptHatMin_.size());
-   for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight
+   for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight
      if ( ptHatMin_[s] == 30    ) sampleCroSec_[s] = 1.079e-02 - 1.021e-03;
      else if ( ptHatMin_[s]==50 ) sampleCroSec_[s] = 1.021e-03 - 9.913e-05;
-     else if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 1.128e-05;
+     else if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 3.0698e-05;
+     else if ( ptHatMin_[s]==100) sampleCroSec_[s] = 3.069-05 - 1.128e-05;
      else if ( ptHatMin_[s]==120) sampleCroSec_[s] = 1.128e-05 - 1.470e-06;
      else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
      else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07 - 1.192e-07;
@@ -227,7 +227,7 @@ void TrackingCorrections::Init()
                                       );
    combInputHists_ = vci;
 
-   Float_t ptHatMargin=-0.1; // 10
+//    Float_t ptHatMargin=-0.1; // 10
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       for (Int_t m=0; m<2; ++m) {
          for (Int_t c=0; c<numCentBins_; ++c) {
@@ -262,9 +262,9 @@ void TrackingCorrections::Init()
 //                                  if (smoothLevel_==0||jetBin_->GetBinLowEdge(ijet_neighbor)<40) break;
 //                                  else if (abs(ijet_neighbor-ijet)>=2) break;
                               }
-                              for (Int_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples
+                              for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples
                                  // only merge pt hat samples that has less pt hat than this jet bin
-                                 if (!trkPhiMode_&&jetBin_->GetBinLowEdge(ijet_neighbor)>=40 && (ptHatMin_[s]+ptHatMargin > jetBin_->GetBinLowEdge(ijet_neighbor))) continue;
+//                                  if (!trkPhiMode_&&jetBin_->GetBinLowEdge(ijet_neighbor)>=40 && (ptHatMin_[s]+ptHatMargin > jetBin_->GetBinLowEdge(ijet_neighbor))) continue;
                                  
 if (!weightSamples_) {                                 content[m]+=inputHists_[lv][s][c][m]->GetBinContent(ieta_neighbor,ipt_neighbor,ijet_neighbor);
                                  error[m] = sqrt(pow(error[m],2)+pow(inputHists_[lv][s][c][m]->GetBinError(ieta_neighbor,ipt_neighbor,ijet_neighbor),2));
@@ -321,14 +321,11 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
    Double_t corr[4]={1,1,1,1};
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       corr[lv] = correctionHists_[lv][bin]->GetBinContent(etaBin,ptBin,jetBin);
-      if (lv==0&&corr[lv]<0.001) { // if eff==0, no correction, b/c too few statistics
-         cout << " warning eff=0 for pt eta jet cent: " << pt << " " << eta << " " << jet << " " << cent << endl;
-         corr[lv] = 1;
-      }
       if (outCorr) outCorr[lv] = corr[lv];
    }
-   
-   Double_t eff = corr[0];
+
+   // if eff==0, no correction, b/c too few statistics   
+   Double_t eff = (corr[0]<0.001 ? 1 : corr[0]);
    Double_t fake = corr[1];
    Double_t mul = corr[2];
    Double_t sec = corr[3];
@@ -345,7 +342,7 @@ TH2D* TrackingCorrections::ProjectPtEta(TH3F * h3, Int_t zbinbeg, Int_t zbinend)
 void TrackingCorrections::Write()
 {
    for (Int_t lv=0; lv<numLevels_; ++lv) {
-      for (Int_t s=0; s<sample_.size(); ++s) {
+      for (UInt_t s=0; s<sample_.size(); ++s) {
          for (Int_t c=0; c<numCentBins_; ++c) {
             for (Int_t m=0; m<2; ++m) {
                inputHists_[lv][s][c][m]->Write();
