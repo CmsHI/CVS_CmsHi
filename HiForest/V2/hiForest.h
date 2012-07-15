@@ -17,9 +17,7 @@
 #include "SetupGenpTree.h"
 #include "SetupPFTree.h"
 #include "SetupGenParticleTree.h"
-#include "TrackingCorrections2012.h"
-#include "TrackingCorrections_trkPhi.h"
-
+#include "TrackingCorrectionsv6.h"
 #include <TTree.h>
 #include <TFile.h>
 #include <TString.h>
@@ -266,7 +264,6 @@ class HiForest : public TNamed
   FactorizedJetCorrector *_JEC_HI310X;
 
   vector<TrackingCorrections*> trackCorrections;
-  vector<TrackingCorrections2*> trackCorrections2;
   TF1* fEnergyScale[2][10];  // [a][b],  a =0 for unconverted,  a=1 for converted.   b: 1,2,3 is centrality bin. b=0 is empty                                                                                       
   
  private:
@@ -518,37 +515,25 @@ void HiForest::InitTree()
 {
    // Setup Track Corrections 	 
    if(doTrackCorrections){
-      //trackCorrections.push_back(new TrackingCorrections("QM2011","hitrkEffAnalyzer_akpu3pf")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedGeneral")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedSelected")); 	 
-      trackCorrections.push_back(new TrackingCorrections("Forest2","hitrkEffAnalyzer_MergedGeneralCalo"));
 
-      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_noJet")); 	 
-      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_j1")); 	 
-      trackCorrections2.push_back(new TrackingCorrections2("Forest2","hitrkEffAnalyzer_MergedGeneral_trkPhi_j2"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_noJet"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_50to120"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_120to999"));
 
       for(int i = 0; i < 3; ++i){
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj30_Forest2_TrkCorrv4.root",30);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj50_Forest2_TrkCorrv4.root",50);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj80_Forest2_TrkCorrv4.root",80);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj120_Forest2_TrkCorrv4.root",120);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj200_Forest2_TrkCorrv4.root",200);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj250_Forest2_TrkCorrv4.root",250);
-         trackCorrections[i]->AddSample("trkcorr/Forest2_TrkCorrv4/trkcorr_hy18dj300_Forest2_TrkCorrv4.root",300);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj30_icPu5.root",30);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj50_icPu5.root",50);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj80_icPu5.root",80);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj100_icPu5.root",100);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj120_icPu5.root",120);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj170_icPu5.root",170);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj200_icPu5.root",200);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj250_icPu5.root",250);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj300_icPu5.root",300);
+         trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
+         trackCorrections[i]->trkPhiMode_ = true;
          trackCorrections[i]->Init();
-      }
-
-      for(int i = 0; i < 3; ++i){
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj30_Forest2_TrkCorrv5.root",30);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj50_Forest2_TrkCorrv5.root",50);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj80_Forest2_TrkCorrv5.root",80);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj120_Forest2_TrkCorrv5.root",120);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj200_Forest2_TrkCorrv5.root",200);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj250_Forest2_TrkCorrv5.root",250);
-         trackCorrections2[i]->AddSample("trkcorr/Forest2_TrkCorrv5/trkcorr_hy18dj300_Forest2_TrkCorrv5.root",300);
-         trackCorrections2[i]->weightSamples_ = 0;
-         trackCorrections2[i]->Init();
       }
    }
 }
