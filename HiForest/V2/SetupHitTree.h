@@ -19,13 +19,13 @@ public :
 
    // Declaration of leaf types
    Int_t           n;
-   Float_t         e[66];   //[n]
-   Float_t         et[66];   //[n]
-   Float_t         eta[66];   //[n]
-   Float_t         phi[66];   //[n]
-   Float_t         perp[66];   //[n]
-   Bool_t          isjet[66];   //[n]
-   Int_t           depth[66];   //[n]
+   Float_t         e[6000];   //[n]
+   Float_t         et[6000];   //[n]
+   Float_t         eta[6000];   //[n]
+   Float_t         phi[6000];   //[n]
+   Float_t         perp[6000];   //[n]
+   Bool_t          isjet[6000];   //[n]
+   Int_t           depth[6000];   //[n]
 
    // List of branches
    TBranch        *b_n;   //!
@@ -52,7 +52,7 @@ void setupHitTree(TTree *t,Hits &tHits,bool doCheck = 1)
    if (t->GetBranch("isjet")) t->SetBranchAddress("isjet", tHits.isjet, &tHits.b_isjet);
    if (t->GetBranch("depth")) t->SetBranchAddress("depth", tHits.depth, &tHits.b_depth);
    if (doCheck) {
-      if (t->GetMaximum("n")>66) { cout <<"FATAL ERROR: Arrary size of n too small!!!  "<<t->GetMaximum("n")<<endl; exit(0);
+      if (t->GetMaximum("n")>6000) { cout <<"FATAL ERROR: Arrary size of n too small!!!  "<<t->GetMaximum("n")<<endl; exit(0);
  }   }
 }
 

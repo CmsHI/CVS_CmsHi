@@ -386,9 +386,6 @@ bool HiForest::hasDiJet(Jets& jets, double pt1, double pt2, double dphiMin){
   return true;
 };
 
-double HiForest::jetFracChg(int i){ return 0;}
-double HiForest::jetFracNeut(int i){ return 0;}
-double HiForest::jetFracEM(int i){ return 0;}
 
 void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
 {
