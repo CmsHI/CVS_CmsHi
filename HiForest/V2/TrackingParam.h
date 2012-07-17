@@ -32,6 +32,12 @@ public:
    TF1* fFitCent_3_8;
    TF1* fFitCent_8_20;
    TF1* fFitCent_20_Inf;
+   
+   TH2D *hFak2D;
+   TH2D *hRec2D;
+
+   TH3D *hFak3D;
+   TH3D *hRec3D;
 
    TH1D* hResCorr;
 
@@ -53,6 +59,9 @@ TrackingParam::TrackingParam()
   hAccCorr_eta_phi_pT_8_20 = (TH2D*)fAccCorr->Get("hSim3D_eta_phi_pT_8_20");
   hAccCorr_eta_phi_pT_20_Inf = (TH2D*)fAccCorr->Get("hSim3D_eta_phi_pT_20_Inf");
 
+  hFak3D = (TH3D*)fAccCorr->Get("hFak3D");
+  hRec3D = (TH3D*)fAccCorr->Get("hRec3D");
+
   fFitCent_05_14 = (TF1*)fCenCorr->Get("fFitCent_05_14");
   fFitCent_14_18 = (TF1*)fCenCorr->Get("fFitCent_14_18");
   fFitCent_18_3 = (TF1*)fCenCorr->Get("fFitCent_18_3");
@@ -61,6 +70,10 @@ TrackingParam::TrackingParam()
   fFitCent_20_Inf = (TF1*)fCenCorr->Get("fFitCent_20_Inf");
 
   hResCorr = (TH1D*)fResCorr->Get("hCorrRecPt_clone");  
+
+  hFak2D = (TH2D*) hFak3D->Project3D("xy");
+  hRec2D = (TH2D*) hRec3D->Project3D("xy");
+
 }
 
 Float_t TrackingParam::GetCorr(float eta, float pt, float phi, int cent)
@@ -100,6 +113,21 @@ Float_t TrackingParam::GetCorr(float eta, float pt, float phi, int cent)
       funCentCorr = fFitCent_20_Inf;
    }
 
+   double fakeRate = hFak2D->GetBinContent(hFak2D->GetXaxis()->FindBin(pt),hFak2D->GetYaxis()->FindBin(eta));
+   double nRec     = hRec2D->GetBinContent(hRec2D->GetXaxis()->FindBin(pt),hRec2D->GetYaxis()->FindBin(eta));
+
+   if (nRec!=0) {
+      fakeRate /= nRec;
+   } else {
+      fakeRate = 0;
+      std::cerr<<"[TrackingParam] Not enough tracks for fake rate estimation!! Set to 0.."<<std::endl;
+      std::cerr<<"     eta: " << eta << std::endl;
+      std::cerr<<"     phi: " << phi << std::endl;
+      std::cerr<<"     pT: " << pt << std::endl;
+      std::cerr<< hFak2D->GetXaxis()->FindBin(pt)<<" "<<hFak2D->GetYaxis()->FindBin(eta)<<endl;
+   }
+   
+   //cout <<fakeRate<<" "<<nRec<<endl;
    weight_cen = funCentCorr->Eval(cent);
 
    int whichPtBin = hResCorr->FindBin(pt);
@@ -116,7 +144,7 @@ Float_t TrackingParam::GetCorr(float eta, float pt, float phi, int cent)
       std::cerr<<"     pT: " << pt << std::endl;
    }
 
-   float effcorr = (weight_acc/weight_cen/weight_res);
+   float effcorr = (weight_acc/weight_cen/weight_res)*(1-fakeRate);
 
    return effcorr;
 }

@@ -70,4 +70,16 @@ int HiForest::getMatchedHBHEAllowReuse(int j)
    return best;
 }
 
+
+double HiForest::getTrackCorrectionPara(int j)
+{
+   float trackWt_fromParam=0;
+   if (initialized) {
+      trackWt_fromParam = trackCorrFromParam->GetCorr(track.trkEta[j],track.trkPt[j],track.trkPhi[j],evt.hiBin);
+   } else {
+      cout <<"FATAL: Tracking correction is not initialized. Return 0, Please do HiForest->InitTree()."<<endl;
+   }   
+   return trackWt_fromParam;
+}
+
 #endif

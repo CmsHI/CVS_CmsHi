@@ -104,14 +104,13 @@ class HiForest : public TNamed
   int getMatchedCaloTowerAllowReuse(int j);
   int getMatchedHBHEAllowReuse(int j);
   void matchTrackCalo(bool allEvents = 1);
+  double getTrackCorrectionPara(int j);
   
   //==================================================================================================================================
   // Get track-jet correlated variables. Not needed if correlatePF is run.
   //==================================================================================================================================
   void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
 
-
-  
   // TFile
   TFile *inf; 					// Input file 
   TFile *outf;                                  // Output file if we want to export the forest
@@ -255,6 +254,7 @@ class HiForest : public TNamed
   int nEntries;
   int currentEvent;
   double cone;
+  bool initialized;
 
   vector<JetCorrectorParameters> vpar_HI310x;
   FactorizedJetCorrector *_JEC_HI310X;
@@ -287,6 +287,9 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
 
   cone = 0.3;
   doTrackCorrections = 0;
+
+  // Track correction initialized?
+  initialized = 0;
 
   // Load trees. Hard coded for the moment
   hltTree          = (TTree*) inf->Get("hltanalysis/HltTree");
@@ -536,6 +539,7 @@ void HiForest::InitTree()
          trackCorrections[i]->trkPhiMode_ = true;
          trackCorrections[i]->Init();
       }
+      initialized = 1;
    }
 }
 
