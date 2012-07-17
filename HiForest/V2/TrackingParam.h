@@ -41,9 +41,9 @@ public:
 
 TrackingParam::TrackingParam()
 {
-  fAccCorr = new TFile("/home/krajczar/tracking_FromForest/HiForest/TrkCorr_3DHistos_pThat80_Inclusive.root");
-  fCenCorr = new TFile("/home/krajczar/tracking_FromForest/HiForest/CentralityWeights.root");
-  fResCorr = new TFile("/home/krajczar/tracking_FromForest/HiForest/PtResidualWeights.root");
+  fAccCorr = new TFile("trkPara/v0/TrkCorr_3DHistos_pThat80_Inclusive.root");
+  fCenCorr = new TFile("trkPara/v0/CentralityWeights.root");
+  fResCorr = new TFile("trkPara/v0/PtResidualWeights.root");
 
   hAccCorr_eta_phi_pT_05_14 = (TH2D*)fAccCorr->Get("hSim3D_eta_phi_pT_05_14");
   hAccCorr_eta_phi_pT_14_16 = (TH2D*)fAccCorr->Get("hSim3D_eta_phi_pT_14_16");
@@ -69,7 +69,7 @@ Float_t TrackingParam::GetCorr(float eta, float pt, float phi, int cent)
    float weight_cen = 0.;
    float weight_res = 0.;
 
-   TF1 *funCentCorr;
+   TF1 *funCentCorr = fFitCent_05_14;
 
    if(pt>0.5 && pt<=1.4) {
       weight_acc = hAccCorr_eta_phi_pT_05_14->GetBinContent(hAccCorr_eta_phi_pT_05_14->GetXaxis()->FindBin(eta),hAccCorr_eta_phi_pT_05_14->GetYaxis()->FindBin(phi));
