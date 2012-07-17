@@ -525,15 +525,15 @@ void HiForest::InitTree()
       trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_120to999"));
 
       for(int i = 0; i < 3; ++i){
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj30_icPu5.root",30);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj50_icPu5.root",50);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj80_icPu5.root",80);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj100_icPu5.root",100);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj120_icPu5.root",120);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj170_icPu5.root",170);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj200_icPu5.root",200);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj250_icPu5.root",250);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv9XSec/TrkCorrv9XSec_hy18dj300_icPu5.root",300);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj30_icPu5.root",30);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj50_icPu5.root",50);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj80_icPu5.root",80);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj100_icPu5.root",100);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj120_icPu5.root",120);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj170_icPu5.root",170);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj200_icPu5.root",200);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj250_icPu5.root",250);
+         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj300_icPu5.root",300);
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
          trackCorrections[i]->trkPhiMode_ = true;
