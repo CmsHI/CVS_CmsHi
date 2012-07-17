@@ -4,7 +4,7 @@ double angularRangeReduce(double x)
   const double two_pi_0 = 6.2831853071795649157;
   const double two_pi_1 = 2.1561211432631314669e-14;
   const double two_pi_2 = 1.1615423895917441336e-27;
-  double ret;
+  double ret = 0;
 
   if(x >= -cody_waite_x_max && x <= cody_waite_x_max) {
     const double inverse_two_pi =
