@@ -109,8 +109,6 @@ class HiForest : public TNamed
   // Get track-jet correlated variables. Not needed if correlatePF is run.
   //==================================================================================================================================
   void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
-  // Build correlations between jet & its constituents, builds jetIDs
-  void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
 
 
   
