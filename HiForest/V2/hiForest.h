@@ -18,6 +18,7 @@
 #include "SetupPFTree.h"
 #include "SetupGenParticleTree.h"
 #include "TrackingCorrectionsv6.h"
+#include "TrackingParam.h"
 #include <TTree.h>
 #include <TFile.h>
 #include <TString.h>
@@ -96,9 +97,6 @@ class HiForest : public TNamed
   double deltaPhiDijet(Jets& jets);
   bool hasDiJet(Jets& jets, double pt1 = 100, double pt2 = 40, double dphiMin = 2.*3.1415926/3.);
   void fakeRejection(TTree *jetTree, Jets &jets, bool allEvents);
-  double jetFracChg(int i);
-  double jetFracNeut(int i);
-  double jetFracEM(int i);
 
   //==================================================================================================================================
   // Track utility functions
@@ -262,6 +260,9 @@ class HiForest : public TNamed
 
   vector<JetCorrectorParameters> vpar_HI310x;
   FactorizedJetCorrector *_JEC_HI310X;
+
+//  TrackingParam trackCorrFromParam("TrkCorr_3DHistos_pThat80_Inclusive.root","CentralityWeights.root","PtResidualWeights.root");
+  TrackingParam *trackCorrFromParam;
 
   vector<TrackingCorrections*> trackCorrections;
   TF1* fEnergyScale[2][10];  // [a][b],  a =0 for unconverted,  a=1 for converted.   b: 1,2,3 is centrality bin. b=0 is empty                                                                                       
@@ -515,6 +516,8 @@ void HiForest::InitTree()
 {
    // Setup Track Corrections 	 
    if(doTrackCorrections){
+
+      trackCorrFromParam = new TrackingParam();
 
       trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_noJet"));
       trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_50to120"));
