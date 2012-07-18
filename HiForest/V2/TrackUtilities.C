@@ -82,4 +82,47 @@ double HiForest::getTrackCorrectionPara(int j)
    return trackWt_fromParam;
 }
 
+double HiForest::getTrackCorrection(int j)
+{   
+   double trkWt = 0;
+
+   if (initialized) {
+      // check if the leading and subleading jet is found
+      if (leadingJetPtForTrkCor<-1) {
+      // Select leading and subleading jet
+         for (int k=0;j<icPu5.nref;k++) {
+            if (fabs(icPu5.jteta[k])>2) continue;
+            if (icPu5.jtpt[k]>leadingJetPtForTrkCor) {
+     	       leadingJetPtForTrkCor = icPu5.jtpt[k];
+	       leadingJetEtaForTrkCor = icPu5.jteta[k];
+	       leadingJetPhiForTrkCor = icPu5.jtphi[k];
+   	    }   
+	    if (icPu5.jtpt[k]>subleadingJetPtForTrkCor && icPu5.jtpt[k] < leadingJetPtForTrkCor) {
+	       subleadingJetPtForTrkCor = icPu5.jtpt[k];
+	       subleadingJetEtaForTrkCor = icPu5.jteta[k];
+	       subleadingJetPhiForTrkCor = icPu5.jtphi[k];
+            }
+	    if (icPu5.jtpt[k]<subleadingJetPtForTrkCor) break;	 
+         }
+      }
+   } else {
+      cout <<"FATAL: Tracking correction is not initialized. Return 0, Please do HiForest->InitTree()."<<endl;
+      return 0;
+   }   
+   
+   double dr1 = deltaR(track.trkEta[j], track.trkPhi[j],leadingJetEtaForTrkCor, leadingJetPhiForTrkCor);
+   double dr2 = deltaR(track.trkEta[j], track.trkPhi[j],subleadingJetEtaForTrkCor, subleadingJetPhiForTrkCor);
+   
+   if (leadingJetPtForTrkCor>=50&&dr1<0.5) {
+      trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],leadingJetPtForTrkCor,evt.hiBin);
+   } else if (subleadingJetPtForTrkCor>=50&&dr2<0.5) {
+      trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],subleadingJetPtForTrkCor,evt.hiBin);
+   } else {
+      trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],0,evt.hiBin);
+   }
+
+   return trkWt;
+}
+
+
 #endif

@@ -105,6 +105,7 @@ class HiForest : public TNamed
   int getMatchedHBHEAllowReuse(int j);
   void matchTrackCalo(bool allEvents = 1);
   double getTrackCorrectionPara(int j);
+  double getTrackCorrection(int j);
   
   //==================================================================================================================================
   // Get track-jet correlated variables. Not needed if correlatePF is run.
@@ -250,6 +251,12 @@ class HiForest : public TNamed
   Float_t* corrLead;
   Float_t* corrSubLead;
 
+  Float_t leadingJetPtForTrkCor;
+  Float_t subleadingJetPtForTrkCor;
+  Float_t leadingJetEtaForTrkCor;
+  Float_t subleadingJetEtaForTrkCor;
+  Float_t leadingJetPhiForTrkCor;
+  Float_t subleadingJetPhiForTrkCor;
 
   int nEntries;
   int currentEvent;
@@ -504,6 +511,13 @@ void HiForest::GetEntry(int i)
   if (hasEbTree)       ebTree     ->GetEntry(i);
   if (hasGenpTree)     genpTree   ->GetEntry(i);
   if (hasGenParticleTree) genParticleTree   ->GetEntry(i);
+
+  leadingJetPtForTrkCor = -100;
+  subleadingJetPtForTrkCor = -100;
+  leadingJetEtaForTrkCor = -100;
+  subleadingJetEtaForTrkCor = -100;
+  leadingJetPhiForTrkCor = -100;
+  subleadingJetPhiForTrkCor = -100;
 }
 
 int HiForest::GetEntries()
@@ -520,13 +534,9 @@ void HiForest::InitTree()
 
       trackCorrFromParam = new TrackingParam();
 
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_noJet"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_50to120"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_trkPhi_jet_120to999"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral"));
 
-      for(int i = 0; i < 3; ++i){
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj30_icPu5.root",30);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj50_icPu5.root",50);
+      for(int i = 0; i < trackCorrections.size(); ++i){
          trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj80_icPu5.root",80);
          trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj100_icPu5.root",100);
          trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj120_icPu5.root",120);
@@ -536,7 +546,7 @@ void HiForest::InitTree()
          trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj300_icPu5.root",300);
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
-         trackCorrections[i]->trkPhiMode_ = true;
+         trackCorrections[i]->trkPhiMode_ = false;
          trackCorrections[i]->Init();
       }
       initialized = 1;
