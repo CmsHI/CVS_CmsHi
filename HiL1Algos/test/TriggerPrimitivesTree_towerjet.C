@@ -104,20 +104,24 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	}
       }
       if (hcalEtaIndex[i]<-28){
-	for (int k=0; k<4; k++){
-	  for (int l=0; l<4; l++){
-	    double towertotal=hcalEt[i]/16.0;
-	    fullDetectorTowers[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
-	  }
-	}
+	// for (int k=0; k<4; k++){
+	//   for (int l=0; l<4; l++){
+	//     double towertotal=hcalEt[i]/16.0;
+	//     fullDetectorTowers[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
+	//   }
+	// }
+	double towertotal=hcalEt[i];
+	fullDetectorTowers[(hcalEtaIndex[i]+32)*4][hcalPhiIndex[i]-1]=towertotal;
       }
       if (hcalEtaIndex[i]>28){
-	for (int k=0; k<4; k++){
-	  for (int l=0; l<4; l++){
-	    double towertotal=hcalEt[i]/16.0;
-	    fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
-	  }
-	}
+	// for (int k=0; k<4; k++){
+	//   for (int l=0; l<4; l++){
+	//     double towertotal=hcalEt[i]/16.0;
+	//     fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
+	//   }
+	// }
+	double towertotal=hcalEt[i];
+	fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72][hcalPhiIndex[i]-1]=towertotal;
       }
     }
 

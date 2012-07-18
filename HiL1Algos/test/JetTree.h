@@ -29,6 +29,12 @@ class JetTree {
   Float_t         jtphi[2400];   //[nref]
   Float_t         jtpu[2400];   //[nref]
 
+  Int_t           ngen;
+  Float_t         genpt[500];
+  Float_t         geneta[500];
+  Float_t         genphi[500];
+  Int_t           gensubid[500];
+
   // List of branches
   TBranch        *b_evt;   //!
   TBranch        *b_b;   //!
@@ -39,6 +45,12 @@ class JetTree {
   TBranch        *b_jty;   //!
   TBranch        *b_jtphi;   //!
   TBranch        *b_jtpu;   //!
+
+  TBranch        *b_ngen;
+  TBranch        *b_genpt;
+  TBranch        *b_geneta;
+  TBranch        *b_genphi;
+  TBranch        *b_gensubid;
 
   JetTree(TTree *tree=0);
   virtual ~JetTree();
@@ -117,6 +129,13 @@ void JetTree::Init(TTree *tree)
   fChain->SetBranchAddress("jty", jty, &b_jty);
   fChain->SetBranchAddress("jtphi", jtphi, &b_jtphi);
   fChain->SetBranchAddress("jtpu", jtpu, &b_jtpu);
+
+  fChain->SetBranchAddress("ngen", &ngen, &b_ngen);
+  fChain->SetBranchAddress("genpt", genpt, &b_genpt);
+  fChain->SetBranchAddress("geneta", geneta, &b_geneta);
+  fChain->SetBranchAddress("genphi", genphi, &b_genphi);
+  fChain->SetBranchAddress("gensubid", &gensubid, &b_gensubid);
+  
   Notify();
 }
 

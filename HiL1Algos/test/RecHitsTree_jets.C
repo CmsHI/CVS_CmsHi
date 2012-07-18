@@ -49,6 +49,13 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   max_regionjet_energy = new TH1D("max_regionjet_energy",
 				  "Maximum regionjet energy for each event",
 				  NBINS,0,MAX_EN);
+
+  // TH1D *avg_energy_eta = new TH1D("avg_energy_eta",
+  // 			    "avg_energy_eta",
+  // 			    NETA_TOWERS2,0,NETA_TOWERS2);
+  // TH1D *num_hits_eta = new TH1D("num_hits_eta",
+  // 			      "num_hits_eta",
+  // 			      NETA_TOWERS2,0,NETA_TOWERS2);
   
   // max_towerjet_location = new TH2I("max_towerjet_location",
   // 				   "Location of max towerjet for each event",
@@ -97,6 +104,8 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
       int iphi = getPhiIndex(phi[i], eta[i]);
       fullDetectorTowers[ieta][iphi] = et[i];
       //printf("%lf %d %lf %d\n",eta[i],ieta,phi[i],iphi);
+      // avg_energy_eta->Fill(ieta,et[i]);
+      // num_hits_eta->Fill(ieta);
     }
   
     //printf("Initialized Towers. Moving on to Regions...\n");
@@ -104,20 +113,20 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     double fullDetectorRegions[NETA_REGIONS][NPHI_REGIONS];
     for(int i = 0; i < NETA_REGIONS; i++){
       for(int j = 0; j < NPHI_REGIONS; j++){
-  	fullDetectorRegions[i][j] = 0;
+    	fullDetectorRegions[i][j] = 0;
       }
     }
     //printf("Regions zeroed.\n");
     for(int i = 0; i < NETA_TOWERS2; i++){
       for(int j = 0; j < NPHI_TOWERS; j++){
-  	int regionEta;
-	if(i == 0) regionEta = i;
-	else if(i == 81) regionEta = NETA_REGIONS-1;
-	else regionEta =  (i-1)/4 + 1;
-  	int regionPhi = j/4;
+    	int regionEta;
+    	if(i == 0) regionEta = i;
+    	else if(i == 81) regionEta = NETA_REGIONS-1;
+    	else regionEta =  (i-1)/4 + 1;
+    	int regionPhi = j/4;
 	
-  	fullDetectorRegions[regionEta][regionPhi] += fullDetectorTowers[i][j];
-	//printf("%d %d %lf\n",regionEta,regionPhi,fullDetectorTowers[i][j]);
+    	fullDetectorRegions[regionEta][regionPhi] += fullDetectorTowers[i][j];
+    	//printf("%d %d %lf\n",regionEta,regionPhi,fullDetectorTowers[i][j]);
       }
     }
     //printf("Finished Regions. Now drawing.\n");
@@ -139,19 +148,19 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     {
       double phiAverageTowers[NETA_TOWERS2];
       for(int ieta = 0; ieta < NETA_TOWERS2; ieta++){
-  	phiAverageTowers[ieta] = 0;
-  	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
-  	  phiAverageTowers[ieta] += fullDetectorTowers[ieta][iphi];
-  	}
-  	phiAverageTowers[ieta] /= numPhiTowers(ieta);
+    	phiAverageTowers[ieta] = 0;
+    	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
+    	  phiAverageTowers[ieta] += fullDetectorTowers[ieta][iphi];
+    	}
+    	phiAverageTowers[ieta] /= numPhiTowers(ieta);
       }
       
       for(int ieta = 0; ieta < NETA_TOWERS2; ieta++)
-  	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
-  	  fullDetectorTowers[ieta][iphi] -= phiAverageTowers[ieta];
-  	  if(fullDetectorTowers[ieta][iphi] < 0)
-  	    fullDetectorTowers[ieta][iphi] = 0;
-  	}
+    	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
+    	  fullDetectorTowers[ieta][iphi] -= phiAverageTowers[ieta];
+    	  if(fullDetectorTowers[ieta][iphi] < 0)
+    	    fullDetectorTowers[ieta][iphi] = 0;
+    	}
 
       // for(int i = 0; i < NETA_TOWERS2; i++)
       // 	for(int j = 0; j < NPHI_TOWERS; j++)
@@ -165,19 +174,19 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     {
       double phiAverageRegions[NETA_REGIONS];
       for(int ieta = 0; ieta < NETA_REGIONS; ieta++){
-  	phiAverageRegions[ieta] = 0;
-  	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
-  	  phiAverageRegions[ieta] += fullDetectorRegions[ieta][iphi];
-  	}
-  	phiAverageRegions[ieta] /= NPHI_REGIONS;
+    	phiAverageRegions[ieta] = 0;
+    	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
+    	  phiAverageRegions[ieta] += fullDetectorRegions[ieta][iphi];
+    	}
+    	phiAverageRegions[ieta] /= NPHI_REGIONS;
       }
       
       for(int ieta = 0; ieta < NETA_REGIONS; ieta++)
-  	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
-  	  fullDetectorRegions[ieta][iphi] -= phiAverageRegions[ieta];
-  	  if(fullDetectorRegions[ieta][iphi] < 0)
-  	    fullDetectorRegions[ieta][iphi] = 0;
-  	}
+    	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
+    	  fullDetectorRegions[ieta][iphi] -= phiAverageRegions[ieta];
+    	  if(fullDetectorRegions[ieta][iphi] < 0)
+    	    fullDetectorRegions[ieta][iphi] = 0;
+    	}
 
       // for(int i = 0; i < NETA_REGIONS; i++)
       // 	for(int j = 0; j < NPHI_REGIONS; j++)
@@ -247,6 +256,9 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
 
   // efficiency_curve_tower->Draw();
   // efficiency_curve_region->Draw("same");
+
+  // avg_energy_eta->Divide(num_hits_eta);
+  // avg_energy_eta->Draw();
 
   switch(whichReturn)
   {
@@ -322,7 +334,7 @@ int getEtaIndex(double eta)
   int sign = (eta > 0) ? 1: -1;
   int index = -1;
   
-  if(aeta < 1.785000)
+  if(aeta < 1.785000-epsilon)
   {
     for(int i = 0; i < 20; i++)
     {
@@ -333,7 +345,7 @@ int getEtaIndex(double eta)
       }
     }
   }
-  else if (aeta < 4.802500)
+  else if (aeta < 4.802500-epsilon)
   {
     for(int i = 0; i < 19; i++)
     {
@@ -448,7 +460,7 @@ int getPhiIndex(double phi, double eta)
   int sign = (phi > 0) ? 1: -1;
   int plus = (phi > 0) ? 0: 1;
   
-  if(aeta < 1.785000)
+  if(aeta < 1.785000-epsilon)
   {
     for(int i = 0; i < 36; i++)
     {
@@ -456,7 +468,7 @@ int getPhiIndex(double phi, double eta)
 	return(35 + sign*i + plus);
     }
   }
-  else if (aeta < 4.802500)
+  else if (aeta < 4.802500-epsilon)
   {
     for(int i = 0; i < 18; i++)
     {
