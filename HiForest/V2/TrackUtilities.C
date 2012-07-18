@@ -74,6 +74,7 @@ int HiForest::getMatchedHBHEAllowReuse(int j)
 double HiForest::getTrackCorrectionPara(int j)
 {
    float trackWt_fromParam=0;
+   if (track.trkAlgo[j]>=4&&!(track.highPurity[j])) return 0;
    if (initialized) {
       trackWt_fromParam = trackCorrFromParam->GetCorr(track.trkEta[j],track.trkPt[j],track.trkPhi[j],evt.hiBin);
    } else {
@@ -85,6 +86,7 @@ double HiForest::getTrackCorrectionPara(int j)
 double HiForest::getTrackCorrection(int j)
 {   
    double trkWt = 0;
+   if (track.trkAlgo[j]>=4&&!(track.highPurity[j])) return 0;
 
    if (initialized) {
       // check if the leading and subleading jet is found
