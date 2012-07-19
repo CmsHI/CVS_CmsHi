@@ -537,13 +537,23 @@ void HiForest::InitTree()
       trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral"));
 
       for(int i = 0; i < trackCorrections.size(); ++i){
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj80_akPu3PF.root",80);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj100_akPu3PF.root",100);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj120_akPu3PF.root",120);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj170_akPu3PF.root",170);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj200_akPu3PF.root",200);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj250_akPu3PF.root",250);
-         trackCorrections[i]->AddSample("trkcorr/TrkCorrv10XSec/TrkCorrv10XSec_hy18dj300_akPu3PF.root",300);
+         if (!pp) {
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj80_akPu3PF.root",80);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj100_akPu3PF.root",100);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj120_akPu3PF.root",120);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj170_akPu3PF.root",170);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj200_akPu3PF.root",200);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj250_akPu3PF.root",250);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj300_akPu3PF.root",300);
+         } else {
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj80_akPu3PF.root",80);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj100_akPu3PF.root",100);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj120_akPu3PF.root",120);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj170_akPu3PF.root",170);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj200_akPu3PF.root",200);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj250_akPu3PF.root",250);
+           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj300_akPu3PF.root",300);
+         }
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
          trackCorrections[i]->trkPhiMode_ = false;
