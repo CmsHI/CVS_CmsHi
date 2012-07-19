@@ -87,7 +87,7 @@ trkPhiMode_(false)
    if (name.Contains("Forest2STA")) {
       centBin_.clear();
       centBin_.push_back("0to12");
-      centBin_.push_back("12to30");
+      centBin_.push_back("12to40");
    }
    numCentBins_ = centBin_.size();
    
