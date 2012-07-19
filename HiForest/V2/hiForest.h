@@ -547,7 +547,6 @@ void HiForest::InitTree()
            trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj300_akPu3PF.root",300);
          } else {
            trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj80_akPu3PF.root",80);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj100_akPu3PF.root",100);
            trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj120_akPu3PF.root",120);
            trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj170_akPu3PF.root",170);
            trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj200_akPu3PF.root",200);
