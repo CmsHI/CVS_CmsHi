@@ -115,10 +115,15 @@ double HiForest::getTrackCorrection(int j)
    double dr1 = deltaR(track.trkEta[j], track.trkPhi[j],leadingJetEtaForTrkCor, leadingJetPhiForTrkCor);
    double dr2 = deltaR(track.trkEta[j], track.trkPhi[j],subleadingJetEtaForTrkCor, subleadingJetPhiForTrkCor);
    
+   int leadingSet=0, subleadingSet=0;
+   if (doTrackingSeparateLeadingSubleading) {
+      leadingSet=1;
+      subleadingSet=2;
+   }
    if (leadingJetPtForTrkCor>=50&&dr1<0.5) {
-      trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],leadingJetPtForTrkCor,evt.hiBin);
+      trkWt = trackCorrections[leadingSet]->GetCorr(track.trkPt[j],track.trkEta[j],leadingJetPtForTrkCor,evt.hiBin);
    } else if (subleadingJetPtForTrkCor>=50&&dr2<0.5) {
-      trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],subleadingJetPtForTrkCor,evt.hiBin);
+      trkWt = trackCorrections[subleadingSet]->GetCorr(track.trkPt[j],track.trkEta[j],subleadingJetPtForTrkCor,evt.hiBin);
    } else {
       trkWt = trackCorrections[0]->GetCorr(track.trkPt[j],track.trkEta[j],0,evt.hiBin);
    }

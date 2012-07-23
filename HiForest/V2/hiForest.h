@@ -199,6 +199,7 @@ class HiForest : public TNamed
   bool mc;
   bool doJetCorrection;
   bool doTrackCorrections;
+  bool doTrackingSeparateLeadingSubleading;
 
   // Extra variables
   Float_t* towerEt;
@@ -535,6 +536,8 @@ void HiForest::InitTree()
       trackCorrFromParam = new TrackingParam();
 
       trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_j1"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_j2"));
 
       for(int i = 0; i < trackCorrections.size(); ++i){
          if (!pp) {
@@ -559,6 +562,10 @@ void HiForest::InitTree()
          trackCorrections[i]->Init();
       }
       initialized = 1;
+      if (doTrackingSeparateLeadingSubleading&&trackCorrections.size()<3) {
+         cout << "Fatal Error: Not enough correction tables to do separate leading/subleading jet tracking correction" << endl;
+         exit(1);
+      }
    }
 }
 
