@@ -5,6 +5,10 @@
 #include <TCanvas.h>
 #include <TString.h>
 #include <stdio.h>
+#include <TH2.h>
+#include <TNtuple.h>
+
+const int NETA_TOWERS = 82; //Why not 88?
 
 #include "FindTowerJet.C"
 #include "FindRegionJet.C"
@@ -16,16 +20,16 @@ int numPhiTowers(int ieta);
 TH1D* RecHitsTree_jets::Loop(int total_events, 
 			     returnHist whichReturn,
 			     bool PHI_AVERAGE,
-			     bool cut_noise_events)
+			     bool cut_noise_events,
+			     bool DO_JET_ENERGY_CORRECTIONS)
 {
   const int NBINS = 300;
   const int MAX_EN = 600;
 
-  const int NETA_TOWERS2 = 82; //Why not 88?
-
-  const int JET_RADIUS = 6; //radius = 6 about equals area for region jets for square,
-                            //radius = 7 about equals area for region jets for circle
-  const bool CIRCULAR_JETS = false; //otherwise square jets
+  //towerjet parameters. diamater = 9 and circular jets for the
+  //correction table.
+  const int JET_DIAMETER = 9;
+  const bool CIRCULAR_JETS = true; //otherwise square jets
 
   if (fChain == 0) return(0);
   
@@ -33,12 +37,23 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   
   TH1D *max_towerjet_energy, *max_regionjet_energy;
   TH1D *efficiency_curve_tower, *efficiency_curve_region;
+
+  
+  TFile *outf = new TFile("L1vsOffline.root", "recreate");
+  TNtuple *matchedTowerJets =
+    new TNtuple("TowerJets","TowerJets",
+  		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
+  TNtuple *matchedRegionJets =
+    new TNtuple("RegionJets","RegionJets",
+  		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
+
+
   // TH2I *max_towerjet_location;
   
   // TH2I *detectormapafter;
   // detectormapafter = new TH2I("detectormapafter",
   // 			 "Detector Map After Subtraction",
-  // 			 NETA_TOWERS2,0,NETA_TOWERS2,NPHI_TOWERS,0,NPHI_TOWERS);
+  // 			 NETA_TOWERS,0,NETA_TOWERS,NPHI_TOWERS,0,NPHI_TOWERS);
   // detectormapafter->SetXTitle("#eta");
   // detectormapafter->SetYTitle("#phi");
   
@@ -49,18 +64,26 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   max_regionjet_energy = new TH1D("max_regionjet_energy",
 				  "Maximum regionjet energy for each event",
 				  NBINS,0,MAX_EN);
+  
+  TH1D *max_regionjet_location = new TH1D("max_regionjet_location",
+					  "Eta Location of max regionjet, offlinejet jet 1<eta<2",
+					  4*NETA_REGIONS,-4.5,4.5);
 
-  // TH1D *avg_energy_eta = new TH1D("avg_energy_eta",
-  // 			    "avg_energy_eta",
-  // 			    NETA_TOWERS2,0,NETA_TOWERS2);
-  // TH1D *num_hits_eta = new TH1D("num_hits_eta",
-  // 			      "num_hits_eta",
-  // 			      NETA_TOWERS2,0,NETA_TOWERS2);
-  
-  // max_towerjet_location = new TH2I("max_towerjet_location",
-  // 				   "Location of max towerjet for each event",
-  // 				   NETA_TOWERS2,0,NETA_TOWERS2,NPHI_TOWERS,0,NPHI_TOWERS);
-  
+  TH1D *max_towerjet_location = new TH1D("max_towerjet_location",
+					 "Eta Location of max towerjet, offlinejet jet 1<eta<2",
+					 4*NETA_TOWERS,-4.5,4.5);
+
+
+  TH2D *regionL1JetEnergyCorrection;
+  TH2D *towerL1JetEnergyCorrection;
+  if(DO_JET_ENERGY_CORRECTIONS)
+  {
+    TFile *infile = new TFile("JetEnergyCorrectionsTable.root");
+    regionL1JetEnergyCorrection =
+      (TH2D*)infile->Get("regionL1JetEnergyCorrection");
+    towerL1JetEnergyCorrection =
+      (TH2D*)infile->Get("towerL1JetEnergyCorrection");
+  }
 
   int evts = 0;
   bool break_early = total_events != -1;
@@ -69,9 +92,10 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     Long64_t ientry = LoadTree(jentry);
 
     if (ientry < 0) break;
-    
+
     fhlt->GetEntry(jentry);
     fhiinfo->GetEntry(jentry);
+    fjet->GetEntry(jentry);
 
     if(cut_noise_events)
     if( !(
@@ -86,29 +110,25 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
       )
       continue;
 
-    evts++;
-    if(break_early && (evts > total_events)) break;
-
     fChain->GetEntry(jentry);
 
+    if(fjet->nref < 1) continue;
+    //if(fabs(fabs(fjet->jteta[0])-3) > 1.0) continue;
+
     //in case not all towers show up, assume they are 0
-    double fullDetectorTowers[NETA_TOWERS2][NPHI_TOWERS]; //[eta][phi]
-    for(int i = 0; i < NETA_TOWERS2; i++) for(int j = 0; j < NPHI_TOWERS; j++){
+    double fullDetectorTowers[NETA_TOWERS][NPHI_TOWERS]; //[eta][phi]
+    for(int i = 0; i < NETA_TOWERS; i++) for(int j = 0; j < NPHI_TOWERS; j++){
 	fullDetectorTowers[i][j]=0;
       }
 
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-      //printf("%lf\t%lf\n", eta[i], phi[i]);
-      int ieta = getEtaIndex(eta[i]);
-      int iphi = getPhiIndex(phi[i], eta[i]);
-      fullDetectorTowers[ieta][iphi] = et[i];
-      //printf("%lf %d %lf %d\n",eta[i],ieta,phi[i],iphi);
-      // avg_energy_eta->Fill(ieta,et[i]);
-      // num_hits_eta->Fill(ieta);
+      if(ieta[i] < 0)
+	fullDetectorTowers[ ieta[i]+41 ][ iphi[i]-1 ] = et[i];
+      else
+	fullDetectorTowers[ ieta[i]+40 ][ iphi[i]-1 ] = et[i];
     }
   
-    //printf("Initialized Towers. Moving on to Regions...\n");
     //initialize and fill the regions from the towers
     double fullDetectorRegions[NETA_REGIONS][NPHI_REGIONS];
     for(int i = 0; i < NETA_REGIONS; i++){
@@ -116,8 +136,7 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     	fullDetectorRegions[i][j] = 0;
       }
     }
-    //printf("Regions zeroed.\n");
-    for(int i = 0; i < NETA_TOWERS2; i++){
+    for(int i = 0; i < NETA_TOWERS; i++){
       for(int j = 0; j < NPHI_TOWERS; j++){
     	int regionEta;
     	if(i == 0) regionEta = i;
@@ -134,7 +153,7 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     // TH2D *detectormap;
     // detectormap = new TH2D("detectormap",
     // 			   "Detector Map",
-    // 			   //NETA_TOWERS2,0,NETA_TOWERS2,NPHI_TOWERS,0,NPHI_TOWERS);
+    // 			   //NETA_TOWERS,0,NETA_TOWERS,NPHI_TOWERS,0,NPHI_TOWERS);
     // 			   NETA_REGIONS,0,NETA_REGIONS,NPHI_REGIONS,0,NPHI_REGIONS);
     // detectormap->SetXTitle("#eta");
     // detectormap->SetYTitle("#phi");
@@ -146,23 +165,23 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
 
     if(PHI_AVERAGE)
     {
-      double phiAverageTowers[NETA_TOWERS2];
-      for(int ieta = 0; ieta < NETA_TOWERS2; ieta++){
-    	phiAverageTowers[ieta] = 0;
-    	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
-    	  phiAverageTowers[ieta] += fullDetectorTowers[ieta][iphi];
+      double phiAverageTowers[NETA_TOWERS];
+      for(int ieta_i = 0; ieta_i < NETA_TOWERS; ieta_i++){
+    	phiAverageTowers[ieta_i] = 0;
+    	for(int iphi_i = 0; iphi_i < NPHI_TOWERS; iphi_i++){
+    	  phiAverageTowers[ieta_i] += fullDetectorTowers[ieta_i][iphi_i];
     	}
-    	phiAverageTowers[ieta] /= numPhiTowers(ieta);
+    	phiAverageTowers[ieta_i] /= numPhiTowers(ieta_i);
       }
       
-      for(int ieta = 0; ieta < NETA_TOWERS2; ieta++)
-    	for(int iphi = 0; iphi < NPHI_TOWERS; iphi++){
-    	  fullDetectorTowers[ieta][iphi] -= phiAverageTowers[ieta];
-    	  if(fullDetectorTowers[ieta][iphi] < 0)
-    	    fullDetectorTowers[ieta][iphi] = 0;
+      for(int ieta_i = 0; ieta_i < NETA_TOWERS; ieta_i++)
+    	for(int iphi_i = 0; iphi_i < NPHI_TOWERS; iphi_i++){
+    	  fullDetectorTowers[ieta_i][iphi_i] -= phiAverageTowers[ieta_i];
+    	  if(fullDetectorTowers[ieta_i][iphi_i] < 0)
+    	    fullDetectorTowers[ieta_i][iphi_i] = 0;
     	}
 
-      // for(int i = 0; i < NETA_TOWERS2; i++)
+      // for(int i = 0; i < NETA_TOWERS; i++)
       // 	for(int j = 0; j < NPHI_TOWERS; j++)
       // 	  detectormapafter->Fill(i, j, fullDetectorTowers[i][j]);
 
@@ -173,19 +192,19 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
     if(PHI_AVERAGE)
     {
       double phiAverageRegions[NETA_REGIONS];
-      for(int ieta = 0; ieta < NETA_REGIONS; ieta++){
-    	phiAverageRegions[ieta] = 0;
-    	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
-    	  phiAverageRegions[ieta] += fullDetectorRegions[ieta][iphi];
+      for(int ieta_i = 0; ieta_i < NETA_REGIONS; ieta_i++){
+    	phiAverageRegions[ieta_i] = 0;
+    	for(int iphi_i = 0; iphi_i < NPHI_REGIONS; iphi_i++){
+    	  phiAverageRegions[ieta_i] += fullDetectorRegions[ieta_i][iphi_i];
     	}
-    	phiAverageRegions[ieta] /= NPHI_REGIONS;
+    	phiAverageRegions[ieta_i] /= NPHI_REGIONS;
       }
       
-      for(int ieta = 0; ieta < NETA_REGIONS; ieta++)
-    	for(int iphi = 0; iphi < NPHI_REGIONS; iphi++){
-    	  fullDetectorRegions[ieta][iphi] -= phiAverageRegions[ieta];
-    	  if(fullDetectorRegions[ieta][iphi] < 0)
-    	    fullDetectorRegions[ieta][iphi] = 0;
+      for(int ieta_i = 0; ieta_i < NETA_REGIONS; ieta_i++)
+    	for(int iphi_i = 0; iphi_i < NPHI_REGIONS; iphi_i++){
+    	  fullDetectorRegions[ieta_i][iphi_i] -= phiAverageRegions[ieta_i];
+    	  if(fullDetectorRegions[ieta_i][iphi_i] < 0)
+    	    fullDetectorRegions[ieta_i][iphi_i] = 0;
     	}
 
       // for(int i = 0; i < NETA_REGIONS; i++)
@@ -196,62 +215,117 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
       // detectormapafter->Draw("Lego2");
     }
 
-    TowerJet highestTowerJet = findTowerJet(fullDetectorTowers, CIRCULAR_JETS, JET_RADIUS);
-    RegionJet highestRegionJet = findRegionJet(fullDetectorRegions);
-    
-    //if(highestJet.sumEt > threshhold)
+    TowerJet *highestTowerJet = findTowerJet(fullDetectorTowers,
+					     CIRCULAR_JETS,
+					     JET_DIAMETER);
+    RegionJet *highestRegionJet = findRegionJet(fullDetectorRegions);
+
+    for(int i = 0; i < 1; i ++)
     {
-      max_towerjet_energy->Fill(highestTowerJet.sumEt);
-      max_regionjet_energy->Fill(highestRegionJet.et);
-      // max_towerjet_location->Fill(highestJet.eta_center, highestJet.phi_center);
+      double uncoTowerEt, uncoRegionEt;
+      if(DO_JET_ENERGY_CORRECTIONS)
+      {
+	int correctionBin =
+	  towerL1JetEnergyCorrection->FindBin(highestTowerJet[i].sumEt,
+					      highestTowerJet[i].eta);
+	double correctionFactor =
+	  towerL1JetEnergyCorrection->GetBinContent(correctionBin);
+	uncoTowerEt = highestTowerJet[i].sumEt;
+	highestTowerJet[i].sumEt /= correctionFactor;
+
+	correctionBin =
+	  regionL1JetEnergyCorrection->FindBin(highestRegionJet[i].sumEt,
+					       highestRegionJet[i].eta);
+	correctionFactor =
+	  regionL1JetEnergyCorrection->GetBinContent(correctionBin);
+	uncoRegionEt = highestRegionJet[i].sumEt;
+	highestRegionJet[i].sumEt /= correctionFactor;
+      }
+      matchedTowerJets->Fill(
+      	highestTowerJet[i].phi,
+      	highestTowerJet[i].realPhi,
+      	highestTowerJet[i].eta,
+      	highestTowerJet[i].realEta,
+      	highestTowerJet[i].sumEt,
+      	uncoTowerEt,
+	fjet->jteta[0],
+	fjet->jtphi[0],
+	fjet->jtpt[0]
+      	);
+
+      matchedRegionJets->Fill(
+      	highestRegionJet[i].phi,
+      	highestRegionJet[i].realPhi,
+      	highestRegionJet[i].eta,
+      	highestRegionJet[i].realEta,
+      	highestRegionJet[i].sumEt,
+      	uncoRegionEt,
+	fjet->jteta[0],
+	fjet->jtphi[0],
+	fjet->jtpt[0]
+      	);
+
+
+      max_towerjet_energy->Fill(highestTowerJet[i].sumEt);
+      max_regionjet_energy->Fill(highestRegionJet[i].sumEt);
+
+      max_regionjet_location->Fill(highestRegionJet[i].realEta);
+      max_towerjet_location->Fill(highestTowerJet[i].realEta);
     }
+
+    if(break_early && (evts > total_events)) break;
+    evts++;
   }
   
-  efficiency_curve_tower = new TH1D("efficiency_curve_tower","Towerjet Efficiency",
-  				    NBINS,0,MAX_EN);
-  efficiency_curve_region = new TH1D("efficiency_curve_region","Reigonjet Efficiency",
-  				    NBINS,0,MAX_EN);
+  // efficiency_curve_tower = new TH1D("efficiency_curve_tower",
+  // 				    "Towerjet Efficiency",
+  // 				    NBINS,0,MAX_EN);
+  // efficiency_curve_region = new TH1D("efficiency_curve_region",
+  // 				     "Reigonjet Efficiency",
+  // 				    NBINS,0,MAX_EN);
   
-  double total_integral_tower = max_towerjet_energy->Integral();
-  double total_integral_region = max_regionjet_energy->Integral();
+  // double total_integral_tower = max_towerjet_energy->Integral();
+  // double total_integral_region = max_regionjet_energy->Integral();
 
-  for(int i = 0; i < NBINS; i++)
-  {
-    double j = (double)i*(double)MAX_EN/(double)NBINS;
+  // for(int i = 0; i < NBINS; i++)
+  // {
+  //   double j = (double)i*(double)MAX_EN/(double)NBINS;
     
-    double integral_tower = max_towerjet_energy->Integral(i, NBINS);
-    double integral_region = max_regionjet_energy->Integral(i, NBINS);
+  //   double integral_tower = max_towerjet_energy->Integral(i, NBINS);
+  //   double integral_region = max_regionjet_energy->Integral(i, NBINS);
   
-    efficiency_curve_tower->Fill(j, (double)integral_tower/total_integral_tower);      
-    efficiency_curve_region->Fill(j, (double)integral_region/total_integral_region);      
-  }
+  //   efficiency_curve_tower->Fill(j, (double)integral_tower/total_integral_tower);      
+  //   efficiency_curve_region->Fill(j, (double)integral_region/total_integral_region);
+  // }
 
-  // TCanvas *c1 = new TCanvas();
-  // max_towerjet_energy->SetTitle("max_towerjet_energy");
+  TCanvas *c1 = new TCanvas();
+  max_towerjet_energy->SetTitle("max_towerjet_energy");
   max_towerjet_energy->SetXTitle("GeV");
   max_towerjet_energy->SetYTitle("Counts");
-  // max_towerjet_energy->SetLineColor(kRed);
+  max_towerjet_energy->SetLineColor(kRed);
   
-  // max_regionjet_energy->SetTitle("max_regionjet_energy");
+  max_regionjet_energy->SetTitle("max_regionjet_energy");
   max_regionjet_energy->SetXTitle("GeV");
   max_regionjet_energy->SetYTitle("Counts");
-  // max_regionjet_energy->SetLineColor(kBlue);
+  max_regionjet_energy->SetLineColor(kBlue);
   
-  // max_towerjet_energy->Draw();
-  // max_regionjet_energy->Draw("same");
+  max_towerjet_energy->Draw();
+  max_regionjet_energy->Draw("same");
   
-  // TCanvas *c2 = new TCanvas();
-  // max_towerjet_location->SetXTitle("Eta index");
-  // max_towerjet_location->SetYTitle("Phi index");
-  // max_towerjet_location->Draw("Lego2");
+  TCanvas *c2 = new TCanvas();
+  max_towerjet_location->SetLineColor(kRed);
+  max_towerjet_location->Draw();
+
+  max_regionjet_location->SetLineColor(kBlue);
+  max_regionjet_location->Draw("same");
 
   // TCanvas *c3 = new TCanvas();
-  efficiency_curve_tower->SetXTitle("Threshold (GeV)");
-  efficiency_curve_tower->SetYTitle("Fraction of passing events");
+  // efficiency_curve_tower->SetXTitle("Threshold (GeV)");
+  // efficiency_curve_tower->SetYTitle("Fraction of passing events");
   // efficiency_curve_tower->SetLineColor(kRed);
 
-  efficiency_curve_region->SetXTitle("Threshold (GeV)");
-  efficiency_curve_region->SetYTitle("Fraction of passing events");
+  // efficiency_curve_region->SetXTitle("Threshold (GeV)");
+  // efficiency_curve_region->SetYTitle("Fraction of passing events");
   // efficiency_curve_region->SetLineColor(kBlue);
 
   // efficiency_curve_tower->Draw();
@@ -260,21 +334,27 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   // avg_energy_eta->Divide(num_hits_eta);
   // avg_energy_eta->Draw();
 
-  switch(whichReturn)
-  {
-  case TOWER_ENERGY:
-    return(max_towerjet_energy);
-    break;
-  case TOWER_EFF:
-    return(efficiency_curve_tower);
-    break;
-  case REGION_ENERGY:
-    return(max_regionjet_energy);
-    break;
-  case REGION_EFF:
-    return(efficiency_curve_region);
-    break;
-  }    
+  outf->cd();
+  matchedTowerJets->Write();
+  matchedRegionJets->Write();
+  outf->Close();
+
+  // switch(whichReturn)
+  // {
+  // case TOWER_ENERGY:
+  //   return(max_towerjet_energy);
+  //   break;
+  // case TOWER_EFF:
+  //   return(efficiency_curve_tower);
+  //   break;
+  // case REGION_ENERGY:
+  //   return(max_regionjet_energy);
+  //   break;
+  // case REGION_EFF:
+  //   return(efficiency_curve_region);
+  //   break;
+  // }
+  return(max_towerjet_energy);
 }
 
 int getEtaIndex(double eta)

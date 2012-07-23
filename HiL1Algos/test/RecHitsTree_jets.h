@@ -63,7 +63,8 @@ public :
   Float_t phi[4320]; //[n]
   Float_t emEt[4320]; //[n]
   Float_t hadEt[4320]; //[n]
-  
+  Int_t ieta[4320]; //[n]
+  Int_t iphi[4320]; //[n]
 
   /* // List of branches */
   /* TBranch        *b_event;   //! */
@@ -103,6 +104,8 @@ public :
   TBranch *b_phi;
   TBranch *b_emEt;
   TBranch *b_hadEt;
+  TBranch *b_ieta;
+  TBranch *b_iphi;
 
   enum returnHist {
     TOWER_ENERGY,
@@ -120,7 +123,8 @@ public :
   virtual TH1D*    Loop(int total_events = 0, 
 			returnHist whichHist = TOWER_EFF,
 			bool PHI_AVERAGE = false,
-			bool cut_noise_events = false);
+			bool cut_noise_events = false,
+			bool DO_JET_ENERGY_CORRECTIONS = false);
   virtual Bool_t   Notify();
   virtual void     Show(Long64_t entry = -1);
   
@@ -142,7 +146,7 @@ RecHitsTree_jets::RecHitsTree_jets(TFile *f)
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
   if (f == 0) {
-    f = new TFile("/mnt/hadoop/cms/store/user/luck/HiMinbias_RecHitTowers/HiForest_bothVtx_all.root");
+    f = new TFile("/mnt/hadoop/cms/store/user/luck/HiMinbias_RecHitTowers_v2/HiMinbias_RecHitTowers_all.root");
     //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/L1jet/HiForestL1-jet_merged_v1.root");
     //f = new TFile("/net/hidsk0001/d00/scratch/dgulhan/mergedforest/central/HiForestL1-centeral_merged_v0.root");
     
@@ -152,6 +156,7 @@ RecHitsTree_jets::RecHitsTree_jets(TFile *f)
   TTree *tree = (TTree*)gDirectory->Get("rechitanalyzer/tower");
   fhlt = new HltTree::HltTree((TTree*)gDirectory->Get("hltanalysis/HltTree"));
   fhiinfo = new HiTree::HiTree((TTree*)gDirectory->Get("hiEvtAnalyzer/HiTree"));
+  fjet = new JetTree::JetTree((TTree*)gDirectory->Get("icPu5JetAnalyzer/t"));
   //fhlt = new HltTree::HltTree();
   //fhiinfo = new HiTree::HiTree();
   //fjet = new JetTree::JetTree();
@@ -240,6 +245,8 @@ void RecHitsTree_jets::Init(TTree *tree)
   fChain->SetBranchAddress("e", e, &b_e);
   fChain->SetBranchAddress("emEt", emEt, &b_emEt);
   fChain->SetBranchAddress("hadEt", hadEt, &b_hadEt);
+  fChain->SetBranchAddress("ieta", ieta, &b_ieta);
+  fChain->SetBranchAddress("iphi", iphi, &b_iphi);
   
   Notify();
 }

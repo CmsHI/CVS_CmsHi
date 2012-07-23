@@ -6,15 +6,17 @@ typedef struct{
   double realPhi;
 } TowerJet;
 
-const int NETA_TOWERS = 82;
+//const int NETA_TOWERS = 82; //should be declared in calling file
 const int NPHI_TOWERS = 72;
 
 double towerEta(int etaIndex);
 double towerPhi(int phiIndex, int etaIndex);
 
-TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circularJets, int jetRadius)
+TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circularJets, int jetDiameter)
 {
-
+  int even = (jetDiameter%2 == 0) ? 1 : 0;
+  int jetRadius = jetDiameter/2;
+  
   int jetCircleDistance2 = (jetRadius-1)*(jetRadius-1) +
     (jetRadius-1)*(jetRadius-1); 
   
@@ -27,7 +29,7 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
   highestJet[1].eta = -1;
 
   //Find leading jet
-  for(int ieta = jetRadius; ieta < NETA_TOWERS - jetRadius; ieta++)
+  for(int ieta = jetRadius-even; ieta < NETA_TOWERS - jetRadius; ieta++)
   {
     for(int iphi = 0; iphi < NPHI_TOWERS; iphi++)
     {
@@ -36,11 +38,11 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
       temp.eta = ieta;
       temp.phi = iphi;
 
-      for(int ieta_i = ieta - jetRadius; ieta_i < ieta + jetRadius; ieta_i++)
+      for(int ieta_i = ieta - jetRadius - even; ieta_i < ieta + jetRadius; ieta_i++)
       {
-	for(int iphi_i = iphi - jetRadius; iphi_i < iphi + jetRadius; iphi_i++)
+	for(int iphi_i = iphi - jetRadius - even; iphi_i < iphi + jetRadius; iphi_i++)
 	{
-	  //cut the corners off the square
+	  //cut the corners off the square ONLY CORRECT FOR ODD DIAMETER
 	  if(circularJets)
 	  {
 	    int distance2 = (iphi-temp.phi)*(iphi-temp.phi) +
@@ -60,8 +62,9 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
 	highestJet[0] = temp;
     }
   }
-  
-  for(int ieta = jetRadius; ieta < NETA_TOWERS - jetRadius; ieta++)
+
+  //find subleading jet
+  for(int ieta = jetRadius - even; ieta < NETA_TOWERS - jetRadius; ieta++)
   {
     for(int iphi = 0; iphi < NPHI_TOWERS; iphi++)
     {
@@ -75,11 +78,11 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
       temp.eta = ieta;
       temp.phi = iphi;
 
-      for(int ieta_i = ieta - jetRadius; ieta_i < ieta + jetRadius; ieta_i++)
+      for(int ieta_i = ieta - jetRadius - even; ieta_i < ieta + jetRadius; ieta_i++)
       {
-	for(int iphi_i = iphi - jetRadius; iphi_i < iphi + jetRadius; iphi_i++)
+	for(int iphi_i = iphi - jetRadius - even; iphi_i < iphi + jetRadius; iphi_i++)
 	{
-	  //cut the corners off the square
+	  //cut the corners off the square ONLY CORRECT FOR ODD DIAMETER
 	  if(circularJets)
 	  {
 	    int distance2 = (iphi-temp.phi)*(iphi-temp.phi) +
