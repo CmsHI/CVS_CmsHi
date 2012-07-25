@@ -28,12 +28,12 @@ public :
    Int_t           n[3];
    Float_t         ptav[3];
    Int_t           mult;
-   Float_t         pt[32526];   //[mult]
-   Float_t         eta[32526];   //[mult]
-   Float_t         phi[32526];   //[mult]
-   Int_t           pdg[32526];   //[mult]
-   Int_t           chg[32526];   //[mult]
-   Int_t           sube[32526];   //[mult]
+   Float_t         pt[maxEntrySim];   //[mult]
+   Float_t         eta[maxEntrySim];   //[mult]
+   Float_t         phi[maxEntrySim];   //[mult]
+   Int_t           pdg[maxEntrySim];   //[mult]
+   Int_t           chg[maxEntrySim];   //[mult]
+   Int_t           sube[maxEntrySim];   //[mult]
    Float_t         vx;
    Float_t         vy;
    Float_t         vz;
@@ -88,7 +88,7 @@ void setupGenParticleTree(TTree *t,GenParticles &tGenParticles,bool doCheck = 1)
    if (t->GetBranch("vz")) t->SetBranchAddress("vz", &tGenParticles.vz, &tGenParticles.b_vz);
    if (t->GetBranch("vr")) t->SetBranchAddress("vr", &tGenParticles.vr, &tGenParticles.b_vr);
    if (doCheck) {
-      if (t->GetMaximum("mult")>32576) { cout <<"FATAL ERROR: Arrary size of mult too small!!!  "<<t->GetMaximum("mult")<<endl; exit(0);
+      if (t->GetMaximum("mult")>maxEntrySim) { cout <<"FATAL ERROR: Arrary size of mult too small!!!  "<<t->GetMaximum("mult")<<endl; exit(0);
  }   }
 }
 
