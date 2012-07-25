@@ -23,9 +23,8 @@ void drawTrkCorrPtvCent(
    c->doTrackCorrections = true;
    c->InitTree();
    
-   TrackingCorrections * trkCorr = c->trackCorrections[1]; // leading
-//    TrackingCorrections * trkCorr = c->trackCorrections[2]; // subleading
-//    TrackingCorrections * trkCorr = c->trackCorrections[0]; // else
+   int corrSet = 1; // 1=leading, 2=subleading, 0=else
+   TrackingCorrections * trkCorr = c->trackCorrections[corrSet];
       
    cout << endl << "========= plot =========" << endl;
    Int_t etaPM=2; // 7 +2,-3 for |eta|<1.2, 7 =5,-6 for full eta
@@ -34,7 +33,7 @@ void drawTrkCorrPtvCent(
    Int_t jetEndBin = trkCorr->numJEtBins_;
    cout << Form("jet pt %.0f bin: ",jetPtMin) << jetBegBin << " to " << jetEndBin << endl;
    cout << "========================" << endl;
-   bool doTestCorr = false;
+   bool doTestCorr = true;
    
    string infpath=trkCorr->sample_[0]->GetName();
    TString src=infpath.substr(infpath.find_last_of('/')+1);
@@ -146,7 +145,7 @@ void drawTrkCorrPtvCent(
    /////////////////////////////////////////////////////////////////////////////////////
 	TCanvas * cEff2D = new TCanvas("cEff2D","cEff2D",800,800);
 	gPad->SetLogy();
-   Double_t pt=8,eta=0,jet=110;
+   Double_t pt=8,eta=0,jet=101.  ;
    Int_t cBin = 0;
    cEff2D->Divide(2,2);
    cEff2D->cd(1);
@@ -165,14 +164,14 @@ void drawTrkCorrPtvCent(
    hCorr2DFak->Draw("colz");
    cEff2D->cd(3);
 	gPad->SetLogy();
-   hCorr2D = (TH2D*)trkCorr->InspectCorr(0,cBin,cBin,trkCorr->jetBin_->FindBin(45),trkCorr->jetBin_->FindBin(jet));
+   hCorr2D = (TH2D*)trkCorr->InspectCorr(0,cBin,cBin,trkCorr->jetBin_->FindBin(41.),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
    hCorr2D->SetAxisRange(0.5,119.9,"Y");
    hCorr2D->SetAxisRange(0,1,"Z");
    hCorr2D->Draw("colz");
    cEff2D->cd(4);
 	gPad->SetLogy();
-   hCorr2DFak= (TH2D*)trkCorr->InspectCorr(1,cBin,cBin,trkCorr->jetBin_->FindBin(45),trkCorr->jetBin_->FindBin(jet));
+   hCorr2DFak= (TH2D*)trkCorr->InspectCorr(1,cBin,cBin,trkCorr->jetBin_->FindBin(41.),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
    hCorr2DFak->SetAxisRange(0.5,119.9,"Y");
    hCorr2DFak->SetAxisRange(0,1,"Z");
@@ -182,6 +181,9 @@ void drawTrkCorrPtvCent(
    /////////////////////////////////////////////////////////////////////////////////////
    // Test corr
    /////////////////////////////////////////////////////////////////////////////////////
+   if (corrSet==1) jet=101;
+   if (corrSet==2) jet=41;
+   if (corrSet==0) jet=0;
    if (doTestCorr) {
       cout << "trk weight: " << trkCorr->GetCorr(pt,eta,jet,cBin) << endl;
       Double_t corr[4];
