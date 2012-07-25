@@ -252,6 +252,7 @@ class HiForest : public TNamed
   Float_t* corrLead;
   Float_t* corrSubLead;
 
+  Float_t minJetPtForTrkCor;
   Float_t leadingJetPtForTrkCor;
   Float_t subleadingJetPtForTrkCor;
   Float_t leadingJetEtaForTrkCor;
@@ -513,6 +514,7 @@ void HiForest::GetEntry(int i)
   if (hasGenpTree)     genpTree   ->GetEntry(i);
   if (hasGenParticleTree) genParticleTree   ->GetEntry(i);
 
+  minJetPtForTrkCor = 40;
   leadingJetPtForTrkCor = -100;
   subleadingJetPtForTrkCor = -100;
   leadingJetEtaForTrkCor = -100;
@@ -535,32 +537,28 @@ void HiForest::InitTree()
 
       trackCorrFromParam = new TrackingParam();
 
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_j1"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STA","Forest2_MergedGeneral_j2"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j1"));
+      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j2"));
 
       for(int i = 0; i < trackCorrections.size(); ++i){
          if (!pp) {
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj80_akPu3PF.root",80);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj100_akPu3PF.root",100);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj120_akPu3PF.root",120);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj170_akPu3PF.root",170);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj200_akPu3PF.root",200);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj250_akPu3PF.root",250);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_hy18dj300_akPu3PF.root",300);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_100_40_2749_genJetMode0.root",100);
+           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_-1_-1_-1000_genJetMode0.root");
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_100_40_2749_genJetMode0.root",200);
+           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_-1_-1_-1000_genJetMode0.root");
          } else {
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj80_akPu3PF.root",80);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj120_akPu3PF.root",120);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj170_akPu3PF.root",170);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj200_akPu3PF.root",200);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj250_akPu3PF.root",250);
-           trackCorrections[i]->AddSample("trkcorr/TrkCorrv11XSec/TrkCorrv11XSec_sigdj300_akPu3PF.root",300);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_100_40_2749_genJetMode0.root",100);
+           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_-1_-1_-1000_genJetMode0.root");
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_100_40_2749_genJetMode0.root",200);
+           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_-1_-1_-1000_genJetMode0.root");
          }
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
          trackCorrections[i]->trkPhiMode_ = false;
          trackCorrections[i]->Init();
       }
+      minJetPtForTrkCor = 40;
       initialized = 1;
       if (doTrackingSeparateLeadingSubleading&&trackCorrections.size()<3) {
          cout << "Fatal Error: Not enough correction tables to do separate leading/subleading jet tracking correction" << endl;

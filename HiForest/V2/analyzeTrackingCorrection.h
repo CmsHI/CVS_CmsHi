@@ -69,6 +69,7 @@ class TrkCorrHisAna
     TString name_;
     bool trkPhiMode_;
     TFile * outFile_;
+    float jetPtMin;
 
     // SimTrack
     TH2F* hsim;
@@ -106,16 +107,17 @@ class TrkCorrHisAna
     std::vector<TH2F*> vhSimJetPtDr;
 
     // methods
-    TrkCorrHisAna(TString name, TFile * outf);
+    TrkCorrHisAna(TString name, TFile * outf, float jetPtMin=40);
     void DeclareHistograms();
     void FillRecHistograms(const EvtSel & evt, const DiJet & gj, const RecTrack_t & r);
     void FillSimHistograms(const EvtSel & evt, const DiJet & gj, const SimTrack_t & s);
 };
 
 
-TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf) :
+TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf, float jPtMin) :
   name_(name),
-  trkPhiMode_(false)
+  trkPhiMode_(false),
+  jetPtMin(jPtMin)
 {
    outFile_ = outf;
    
@@ -138,13 +140,15 @@ TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf) :
    // phi bins
    double phiMin   = -TMath::Pi();
    double phiMax   =  TMath::Pi();
-   double phiWidth =  (phiMax - phiMin)/15;
+   double phiWidth =  (phiMax - phiMin)/10;
    for(double phi = phiMin; phi < phiMax + phiWidth/2; phi += phiWidth)
       phiBins.push_back(phi);
        
    //jet bins
-   const Int_t numJetBins=10;
-   Float_t jBins[numJetBins+1] = {0,20,40,60,80,120,160,200,250,500,1000};
+//    const Int_t numJetBins=10;
+//    Float_t jBins[numJetBins+1] = {0,20,40,60,80,120,160,200,250,500,1000};
+   const Int_t numJetBins=5;
+   Float_t jBins[numJetBins+1] = {0,jetPtMin,80,120,200,1000};
    jetBins.insert(jetBins.end(),jBins,jBins+numJetBins+1);
 
    //centrality bins
@@ -153,17 +157,23 @@ TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf) :
 //    centBins.push_back(4);
    centBins.push_back(12);
 //    centBins.push_back(20);
-   centBins.push_back(30);
-   
-   ////////////////////////////////////////////
-   // Set 3rd Dimension
-   ////////////////////////////////////////////
-   zBins = jetBins;
-   if (trkPhiMode_) zBins = phiBins;   
+//   centBins.push_back(30);   
+   centBins.push_back(40);   
 }
 
 void TrkCorrHisAna::DeclareHistograms()
 {
+   ////////////////////////////////////////////
+   // Set 3rd Dimension
+   ////////////////////////////////////////////
+   zBins = jetBins;
+   TString zTitle = "jet E_{T} (GeV/c)";
+
+   if (trkPhiMode_) {
+      zBins = phiBins;   
+      zTitle = "#phi";
+   }
+   
    cout << "===== " << name_ << " =====" << endl;
 	cout << endl << "Pt " << ptBins.size()-1 << " bins:";
 	for (Int_t i=0; i<ptBins.size(); ++i) cout << ptBins[i] << " ";
@@ -216,40 +226,39 @@ void TrkCorrHisAna::DeclareHistograms()
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0]);
    
-   
    // simulated 3D 
-   hsim3D = new TH3F("hsim3D","Sim Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   hsim3D = new TH3F("hsim3D","Sim Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
    
    // efficiency  3D 
-   heff3D = new TH3F("heff3D","Effic Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   heff3D = new TH3F("heff3D","Effic Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
    
    // multiply reconstructed 3D 
-   hmul3D = new TH3F("hmul3D","Mult Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   hmul3D = new TH3F("hmul3D","Mult Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
    
    
    // reconstructed 3D 
-   hrec3D = new TH3F("hrec3D","Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   hrec3D = new TH3F("hrec3D","Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
    
    // fakes 3D 
-   hfak3D = new TH3F("hfak3D","Fake Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   hfak3D = new TH3F("hfak3D","Fake Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
    
    // secondary
-   hsec3D = new TH3F("hsec3D","Secondary Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+   hsec3D = new TH3F("hsec3D","Secondary Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0],
       ptBins.size()-1, &ptBins[0],
       zBins.size()-1, &zBins[0]);
@@ -261,16 +270,16 @@ void TrkCorrHisAna::DeclareHistograms()
       ptBins.size()-1, &ptBins[0]);
 
    for(unsigned i=0;i<centBins.size()-1;i++){
-      vhsim3D.push_back(new TH3F("","Sim Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
-      vheff3D.push_back(new TH3F("","Effic Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+      vhsim3D.push_back(new TH3F("","Sim Tracks;#eta;p_{T} (GeV/c);"+zTitle, etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
+      vheff3D.push_back(new TH3F("","Effic Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
-      vhmul3D.push_back(new TH3F("","Mult Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+      vhmul3D.push_back(new TH3F("","Mult Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
-      vhrec3D.push_back(new TH3F("","Rec Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+      vhrec3D.push_back(new TH3F("","Rec Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
-      vhfak3D.push_back(new TH3F("","Fake Rec Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+      vhfak3D.push_back(new TH3F("","Fake Rec Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
-      vhsec3D.push_back(new TH3F("","Secondary Tracks;#eta;p_{T} (GeV/c);jet E_{T} (GeV/c)",
+      vhsec3D.push_back(new TH3F("","Secondary Tracks;#eta;p_{T} (GeV/c);"+zTitle,
       etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], zBins.size()-1, &zBins[0]) );
       vhresStoR3D.push_back(new TH3F("","Momentum resolution (sim to rec);#eta;sim p_{T} (GeV/c);rec p_{T} (GeV/c)", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0], ptBins.size()-1, &ptBins[0]) );
 
@@ -290,27 +299,33 @@ for (int j=0; j<2; ++j) vhSimJetPtDr.push_back(new TH2F(Form("hSimJet%dDr",j+1),
 
 void TrkCorrHisAna::FillRecHistograms(const EvtSel & evt, const DiJet & gj, const RecTrack_t & r)
 {
+   float zvar = r.jet;
+   if (trkPhiMode_) zvar = r.phir;
+
    // monitor
    vhTrkJetPtDr[0]->Fill(deltaR(r.etar,r.phir,gj.eta1,gj.phi1),r.ptr);
    vhTrkJetPtDr[1]->Fill(deltaR(r.etar,r.phir,gj.eta2,gj.phi2),r.ptr);
 
    // corrections
    hrec->Fill(r.etar, r.ptr);
-   hrec3D->Fill(r.etar, r.ptr, r.jet);
-   if(!r.nsim) hfak->Fill(r.etar, r.ptr), hfak3D->Fill(r.etar, r.ptr, r.jet);
-   if(r.nsim>0 && r.status<0) hsec->Fill(r.etar, r.ptr), hsec3D->Fill(r.etar, r.ptr, r.jet); // nsim>0 redudant?
+   hrec3D->Fill(r.etar, r.ptr, zvar);
+   if(!r.nsim) hfak->Fill(r.etar, r.ptr), hfak3D->Fill(r.etar, r.ptr, zvar);
+   if(r.nsim>0 && r.status<0) hsec->Fill(r.etar, r.ptr), hsec3D->Fill(r.etar, r.ptr, zvar); // nsim>0 redudant?
    
    // filling histogram in vector
    for(unsigned i=0;i<centBins.size()-1;i++){
       if(evt.cBin>=centBins[i] && evt.cBin<centBins[i+1]){
-         vhrec3D[i]->Fill(r.etar, r.ptr, r.jet);
-         if(!r.nsim) vhfak3D[i]->Fill(r.etar, r.ptr, r.jet);
-         if(r.nsim>0 && r.status<0) vhsec3D[i]->Fill(r.etar, r.ptr, r.jet);
+         vhrec3D[i]->Fill(r.etar, r.ptr, zvar);
+         if(!r.nsim) vhfak3D[i]->Fill(r.etar, r.ptr, zvar);
+         if(r.nsim>0 && r.status<0) vhsec3D[i]->Fill(r.etar, r.ptr, zvar);
       }
    } // end of vector loop
 }
 
 void TrkCorrHisAna::FillSimHistograms(const EvtSel & evt, const DiJet & gj, const SimTrack_t & s) {
+   float zvar = s.jet;
+   if (trkPhiMode_) zvar = s.phis;
+
    if(s.status>0) {
       // monitor
       vhSimJetPtDr[0]->Fill(deltaR(s.etas,s.phis,gj.eta1,gj.phi1),s.pts);
@@ -318,22 +333,54 @@ void TrkCorrHisAna::FillSimHistograms(const EvtSel & evt, const DiJet & gj, cons
       
       // corrections
       hsim->Fill(s.etas, s.pts);
-      hsim3D->Fill(s.etas, s.pts, s.jet);
+      hsim3D->Fill(s.etas, s.pts, zvar);
       if(s.acc)    hacc->Fill(s.etas, s.pts);
-      if(s.nrec>0) heff->Fill(s.etas, s.pts), heff3D->Fill(s.etas, s.pts, s.jet);
+      if(s.nrec>0) heff->Fill(s.etas, s.pts), heff3D->Fill(s.etas, s.pts, zvar);
       if(s.nrec==1) hresStoR3D->Fill(s.etas, s.pts, s.ptr);
-      if(s.nrec>1) hmul->Fill(s.etas, s.pts), hmul3D->Fill(s.etas, s.pts, s.jet);
+      if(s.nrec>1) hmul->Fill(s.etas, s.pts), hmul3D->Fill(s.etas, s.pts, zvar);
       
       // filling histogram in vector 
       for(unsigned i=0;i<centBins.size()-1;i++){
          if(evt.cBin>=centBins[i] && evt.cBin<centBins[i+1]){
-            vhsim3D[i]->Fill(s.etas, s.pts, s.jet);
-            if(s.nrec>0) vheff3D[i]->Fill(s.etas, s.pts, s.jet);
+            vhsim3D[i]->Fill(s.etas, s.pts, zvar);
+            if(s.nrec>0) vheff3D[i]->Fill(s.etas, s.pts, zvar);
             if(s.nrec==1) vhresStoR3D[i]->Fill(s.etas, s.pts, s.ptr);
-            if(s.nrec>1) vhmul3D[i]->Fill(s.etas, s.pts, s.jet);
+            if(s.nrec>1) vhmul3D[i]->Fill(s.etas, s.pts, zvar);
          }
       } // end of vector loop 
    } // end of (s.status) loop 
 }
 
+
+class TrkReso {
+public:
+   // Tracking Resolution
+   TF1 * fGaus;
+   TF1 * fReso;
+   TrkReso(float pt=-1) {
+      fGaus = new TF1("fGaus","gaus",-1,3);
+      fGaus->SetParameter(0,1); // normalization
+      fGaus->SetParameter(1,1); // mean
+      fReso = new TF1("fReso","[0]*pow(x,[3])/(1+exp([1]*(x+[2]))) + [4]*pow(x,[5])",0.8,120);
+      fReso->FixParameter(0,-0.351);
+      fReso->FixParameter(1,0.0177);
+      fReso->FixParameter(2,9.084);
+      fReso->FixParameter(3,-0.174);
+      fReso->FixParameter(4,0.221);
+      fReso->FixParameter(5,-0.299);
+      if (pt>0.5) {
+         float reso = fReso->Eval(pt);
+         fGaus->SetParameter(2,reso); // resolution
+      }
+     }
+   float GetSmear(float pt) {
+      float reso = fReso->Eval(pt);
+      fGaus->SetParameter(2,reso);
+      float sm = fGaus->GetRandom();
+      return sm;
+   }
+   float GetSmear() {
+      return fGaus->GetRandom();
+   }
+};
 #endif //analyzeTrackingCorrection_h
