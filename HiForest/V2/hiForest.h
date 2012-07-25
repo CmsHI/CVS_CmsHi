@@ -304,7 +304,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hltTree          = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree         = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree       = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
-  trackTree        = (TTree*) inf->Get("mergedTrack/trackTree");
+  trackTree        = (TTree*) inf->Get("anaTrack/trackTree");
   towerTree        = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree     = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu2jetTree     = (TTree*) inf->Get("akPu2PFJetAnalyzer/t");
@@ -646,7 +646,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasAkPu2CaloJetTree) AddCloneTree(akPu2CaloJetTree, "akPu2CaloJetAnalyzer", "t");
   if (hasAkPu3CaloJetTree) AddCloneTree(akPu3CaloJetTree, "akPu3CaloJetAnalyzer", "t");
   if (hasAkPu4CaloJetTree) AddCloneTree(akPu4CaloJetTree, "akPu4CaloJetAnalyzer", "t");
-  if (hasTrackTree)    AddCloneTree(trackTree,    "mergedTrack",           "trackTree");
+  if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasPFTree)   AddCloneTree(pfTree,   "pfcandAnalyzer",            "pfTree");
