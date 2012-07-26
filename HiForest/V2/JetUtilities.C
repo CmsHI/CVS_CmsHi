@@ -14,22 +14,34 @@ bool comparePt(JetIndex a, JetIndex b) {return a.pt > b.pt;}
 
 double getProjectedZ(double jetpt, double jeteta, double jetphi, double trackpt, double tracketa, double trackphi, double eventEta = 0){
   
-  double jetetaB = jeteta - eventEta;
-  double tracketaB = tracketa - eventEta;
-
-  double thetaJt = 2*atan(exp(-jetetaB));
-  double thetaTr = 2*atan(exp(-tracketaB));
-
-  double dphi = trackphi - jetphi;
-  // angle between jet and track in dijet frame // Nooo - theta phi sit on curved space
-  //  double alpha = sqrt(fabs(thetaJt*thetaJt + thetaTr*thetaTr - 2* thetaTr*thetaJt*cos(dphi)));
-  double alpha = acos(cos(dphi)*sin(thetaJt)*sin(thetaTr)+cos(thetaJt)*cos(thetaTr));
-  double pJet = jetpt/sin(thetaJt);
-  double pTrack = trackpt/sin(thetaTr);
-  return pTrack*cos(alpha)/pJet;
+  if(0){
+    double jetetaB = jeteta - eventEta;
+    double tracketaB = tracketa - eventEta;
+    
+    double thetaJt = 2*atan(exp(-jetetaB));
+    double thetaTr = 2*atan(exp(-tracketaB));
+    
+    double dphi = trackphi - jetphi;
+    // angle between jet and track in dijet frame // Nooo - theta phi sit on curved space  
+    //  double alpha = sqrt(fabs(thetaJt*thetaJt + thetaTr*thetaTr - 2* thetaTr*thetaJt*cos(dphi)));
+    double alpha = acos(cos(dphi)*sin(thetaJt)*sin(thetaTr)+cos(thetaJt)*cos(thetaTr));
+    double pJet = jetpt/sin(thetaJt);
+    double pTrack = trackpt/sin(thetaTr);
+    return pTrack*cos(alpha)/pJet;
+  }else{
+    
+    double thetaJt = 2*atan(exp(-jeteta));
+    double thetaTr = 2*atan(exp(-tracketa));
+    
+    double pTrack = trackpt/sin(thetaTr);
+    double pJet = jetpt/sin(thetaJt);
+    
+    double dr = deltaR(jeteta,jetphi,tracketa,trackphi);
+    return pTrack*cos(dr)/pJet;
+    
+  }
 
 }
-
 
 
 namespace jetsmear{
