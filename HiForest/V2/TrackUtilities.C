@@ -92,7 +92,7 @@ double HiForest::getTrackCorrection(int j)
       // check if the leading and subleading jet is found
       if (leadingJetPtForTrkCor<-1) {
       // Select leading and subleading jet
-         for (int k=0;j<akPu3PF.nref;k++) {
+         for (int k=0; k<akPu3PF.nref; k++) {
             if (fabs(akPu3PF.jteta[k])>2) continue;
             if (akPu3PF.jtpt[k]>leadingJetPtForTrkCor) {
      	       leadingJetPtForTrkCor = akPu3PF.jtpt[k];
