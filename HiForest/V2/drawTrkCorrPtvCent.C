@@ -23,8 +23,7 @@ void drawTrkCorrPtvCent(
    c->doTrackCorrections = true;
    c->InitTree();
    
-   int corrSet = 1; // 1=leading, 2=subleading, 0=else
-   TrackingCorrections * trkCorr = c->trackCorrections[corrSet];
+   TrackingCorrections * trkCorr = c->trackCorrections[0];
       
    cout << endl << "========= plot =========" << endl;
    Int_t etaPM=2; // 7 +2,-3 for |eta|<1.2, 7 =5,-6 for full eta
@@ -181,9 +180,6 @@ void drawTrkCorrPtvCent(
    /////////////////////////////////////////////////////////////////////////////////////
    // Test corr
    /////////////////////////////////////////////////////////////////////////////////////
-   if (corrSet==1) jet=200;
-   if (corrSet==2) jet=100;
-   if (corrSet==0) jet=0;
    if (doTestCorr) {
       cout << "trk weight: " << trkCorr->GetCorr(pt,eta,jet,cBin) << endl;
       Double_t corr[4];
