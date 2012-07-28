@@ -8,7 +8,7 @@
 #include "commonUtility.h"
 
 void drawTrkCorrPtvCent(
-                           TString outdir="fig/07.24_Iter"
+                           TString outdir="fig/07.28_preapproval"
 )
 {
    TH1::SetDefaultSumw2();
@@ -45,32 +45,32 @@ void drawTrkCorrPtvCent(
    /////////////////////////////////////////////////////////////////////////////////////
    // Get Eff/fake histograms
    int numCentBin=trkCorr->numCentBins_;
-	TH1D * vhCorrPtRef[2][5], *vhCorrPt[2][5];
-	Int_t colors[10] = {kBlack,kRed,kYellow+2,kGreen+2,kBlue};
+   TH1D * vhCorrPtRef[2][5], *vhCorrPt[2][5];
+   Int_t colors[10] = {kBlack,kRed,kYellow+2,kGreen+2,kBlue};
    Int_t styles[2] = {kFullCircle,kOpenCircle};
-	for (Int_t lv=0; lv<2; ++lv) {
-		for (Int_t c=0; c<numCentBin; ++c) {
-			vhCorrPt[lv][c] = (TH1D*) trkCorr->InspectCorr(lv,c,c,jetBegBin,jetEndBin,2,7-etaPM-1,7+etaPM);
-         vhCorrPt[lv][c]->SetMarkerStyle(styles[lv]);
-			handsomeTH1(vhCorrPt[lv][c],colors[c]);
-         vhCorrPt[lv][c]->SetAxisRange(xmin,xmax,"X");
-		}
-	}
+   for (Int_t lv=0; lv<2; ++lv) {
+     for (Int_t c=0; c<numCentBin; ++c) {
+       vhCorrPt[lv][c] = (TH1D*) trkCorr->InspectCorr(lv,c,c,jetBegBin,jetEndBin,2,7-etaPM-1,7+etaPM);
+       vhCorrPt[lv][c]->SetMarkerStyle(styles[lv]);
+       handsomeTH1(vhCorrPt[lv][c],colors[c]);
+       vhCorrPt[lv][c]->SetAxisRange(xmin,xmax,"X");
+     }
+   }
    
    // Draw Histograms
-	TCanvas * cEff = new TCanvas("cEff","cEff",500,500);
+   TCanvas * cEff = new TCanvas("cEff","cEff",500,500);
    cEff->SetLogx();
    vhCorrPt[0][0]->SetAxisRange(0,1,"Y");
    vhCorrPt[0][0]->SetTitle(";Track p_{T} (GeV/c);A #times #epsilon");
    vhCorrPt[0][0]->SetTitleOffset(1.2);
    vhCorrPt[0][0]->SetTitleSize(0.055);
-	vhCorrPt[0][0]->Draw("E");
-	vhCorrPt[1][0]->Draw("sameE");
-	for (Int_t lv=0; lv<2; ++lv) {
-		for (Int_t c=numCentBin-1; c>=0; --c) {
-			vhCorrPt[lv][c]->Draw("sameE");
-		}
-	}
+   vhCorrPt[0][0]->Draw("E");
+   vhCorrPt[1][0]->Draw("sameE");
+   for (Int_t lv=0; lv<2; ++lv) {
+     for (Int_t c=numCentBin-1; c>=0; --c) {
+       vhCorrPt[lv][c]->Draw("sameE");
+     }
+   }
    TLegend *leg0 = new TLegend(0.16,0.786,0.46,0.92);
    leg0->SetFillStyle(0);
    leg0->SetBorderSize(0);
@@ -78,7 +78,7 @@ void drawTrkCorrPtvCent(
    leg0->AddEntry(vhCorrPt[0][0],"PYTHIA+HYDJET","");
    if (jetPtMin >= 40) leg0->AddEntry(vhCorrPt[0][0],Form("Jet p_{T} #geq %.0f GeV/c",jetPtMin),"");
    leg0->AddEntry(vhCorrPt[0][0],Form("Track %.1f < #eta < %.1f",trkCorr->etaBin_->GetBinLowEdge(7-etaPM-1), trkCorr->etaBin_->GetBinLowEdge(7+etaPM+1)),"");
-	leg0->Draw();
+   leg0->Draw();
    TLine * l = new TLine(xmin,1,xmax,1);
    l->SetLineStyle(2);
    l->Draw();
@@ -143,46 +143,46 @@ void drawTrkCorrPtvCent(
    /////////////////////////////////////////////////////////////////////////////////////
    // Inspect Each Bin
    /////////////////////////////////////////////////////////////////////////////////////
-	TCanvas * cEff2D = new TCanvas("cEff2D","cEff2D",800,800);
+      TCanvas * cEff2D = new TCanvas("cEff2D","cEff2D",800,800);
 	gPad->SetLogy();
    Double_t pt=8,eta=0,jet=101.  ;
    Int_t cBin = 0;
    cEff2D->Divide(2,2);
    cEff2D->cd(1);
-	gPad->SetLogy();
+   gPad->SetLogy();
    TH2D * hCorr2D = (TH2D*)trkCorr->InspectCorr(0,cBin,cBin,trkCorr->jetBin_->FindBin(jet),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
    hCorr2D->SetAxisRange(0.5,119.9,"Y");
    hCorr2D->SetAxisRange(0,1,"Z");
    hCorr2D->Draw("colz");
    cEff2D->cd(2);
-	gPad->SetLogy();
+   gPad->SetLogy();
    TH2D * hCorr2DFak= (TH2D*)trkCorr->InspectCorr(1,cBin,cBin,trkCorr->jetBin_->FindBin(jet),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
    hCorr2DFak->SetAxisRange(0.5,119.9,"Y");
    hCorr2DFak->SetAxisRange(0,1,"Z");
    hCorr2DFak->Draw("colz");
    cEff2D->cd(3);
-	gPad->SetLogy();
-   hCorr2D = (TH2D*)trkCorr->InspectCorr(0,cBin,cBin,trkCorr->jetBin_->FindBin(41.),trkCorr->jetBin_->FindBin(jet));
+   gPad->SetLogy();
+   hCorr2D = (TH2D*)trkCorr->InspectCorr(0,cBin,cBin,trkCorr->jetBin_->FindBin(200.),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
-   hCorr2D->SetAxisRange(0.5,119.9,"Y");
+   hCorr2D->SetAxisRange(1,119.9,"Y");
    hCorr2D->SetAxisRange(0,1,"Z");
    hCorr2D->Draw("colz");
    cEff2D->cd(4);
-	gPad->SetLogy();
-   hCorr2DFak= (TH2D*)trkCorr->InspectCorr(1,cBin,cBin,trkCorr->jetBin_->FindBin(41.),trkCorr->jetBin_->FindBin(jet));
+   gPad->SetLogy();
+   hCorr2DFak= (TH2D*)trkCorr->InspectCorr(1,cBin,cBin,trkCorr->jetBin_->FindBin(200.),trkCorr->jetBin_->FindBin(jet));
    gPad->SetRightMargin(0.15);
-   hCorr2DFak->SetAxisRange(0.5,119.9,"Y");
+   hCorr2DFak->SetAxisRange(1,119.9,"Y");
    hCorr2DFak->SetAxisRange(0,1,"Z");
    hCorr2DFak->Draw("colz");
-	cEff2D->Print(outdir+"/"+tag+"_2D.gif");
+   cEff2D->Print(outdir+"/"+tag+"_2D.gif");
    
    /////////////////////////////////////////////////////////////////////////////////////
    // Test corr
    /////////////////////////////////////////////////////////////////////////////////////
-   if (corrSet==1) jet=101;
-   if (corrSet==2) jet=41;
+   if (corrSet==1) jet=200;
+   if (corrSet==2) jet=100;
    if (corrSet==0) jet=0;
    if (doTestCorr) {
       cout << "trk weight: " << trkCorr->GetCorr(pt,eta,jet,cBin) << endl;

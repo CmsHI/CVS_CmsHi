@@ -1,5 +1,7 @@
 {
-
+   // from dN/dEta
+   // * http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/ASYoon/dNdEtaPlotMacros/paper/rootlogon.C?view=markup
+   gStyle->SetErrorX(0);
    gStyle->SetPalette(1,0);
    gStyle->SetPadColor(0);
    gStyle->SetPadBorderSize(0);
@@ -10,8 +12,8 @@
    gStyle->SetFrameBorderMode(0);
    gStyle->SetFrameLineColor(0);
    gStyle->SetTitleColor(0);
-   gStyle->SetTitleBorderSize(0);
-   gStyle->SetPalette(1,0);
+   gStyle->SetTitleBorderSize(0); 
+   gStyle->SetPalette(1,0); 
    gStyle->SetPadTickX(1);
    gStyle->SetPadTickY(1);
    gStyle->SetPadColor(0);
@@ -22,42 +24,41 @@
    gStyle->SetCanvasBorderSize(0);
    gStyle->SetFrameBorderMode(0);
    gStyle->SetFrameLineColor(0);
-   gStyle->SetFrameFillColor(0);
-   gStyle->SetTextFont(43);
-   gStyle->SetTextSize(22);
-   gStyle->SetLabelFont(43,"XYZ");
-   gStyle->SetTitleFont(43,"XYZ");
+   gStyle->SetTextFont(62);
+   gStyle->SetLabelFont(42,"XYZ");
+   gStyle->SetTitleFont(42,"XYZ");
    gStyle->SetTitleColor(0);
    gStyle->SetTitleBorderSize(0);
-   gStyle->SetTitleXSize(32);
-   gStyle->SetTitleYSize(32);
-   gStyle->SetTitleXOffset(1.2);
-   gStyle->SetTitleYOffset(1.2);
-
-   gStyle->SetLabelSize(24,"XYZ");
+   gStyle->SetTitleXSize(.055);
+   gStyle->SetTitleYSize(.055);
+   gStyle->SetTitleXOffset(1.0);
+   gStyle->SetTitleYOffset(1.4);
+   gStyle->SetLabelSize(0.045,"XYZ");
    gStyle->SetLabelOffset(0.01,"X");
    gStyle->SetLabelOffset(0.01,"Y");
    gStyle->SetTitleColor(1,"XYZ");
+   gStyle->SetHistFillColor(1);
+   gStyle->SetHistFillStyle(0);
    gStyle->SetHistLineColor(1);
    gStyle->SetHistLineStyle(0);
-   gStyle->SetHistLineWidth(3);
    gStyle->SetHistLineWidth(1);
-   //   gStyle->SetHistMarkerSize(.3);
-
    gStyle->SetEndErrorSize(0);
-   gStyle->SetErrorX(0);
+   gStyle->SetErrorX(0);  
    gStyle->SetMarkerStyle(20);
-   gStyle->SetMarkerSize(1.2);
+   gStyle->SetMarkerSize(1);
    gStyle->SetOptFit(1111);
    gStyle->SetStatColor(0);
    gStyle->SetStatBorderSize(1);
+   gStyle->SetOptTitle(0);
    gStyle->SetOptStat(0);
    gStyle->SetPadLeftMargin(0.17);
    gStyle->SetPadBottomMargin(0.15);
    gStyle->SetPadTopMargin(0.05);
-   gStyle->SetPadRightMargin(0.08);
+   gStyle->SetPadRightMargin(0.04);
+   gROOT->ForceStyle();
 
-
-
+   // for tlegend
+   gStyle->SetTextFont(62);
+   gStyle->SetLegendBorderSize(0);
+   gStyle->SetTextSize(0.02);
 }
-
