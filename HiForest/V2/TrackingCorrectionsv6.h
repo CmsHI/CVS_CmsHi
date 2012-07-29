@@ -28,6 +28,7 @@ public:
    Bool_t weightSamples_;
    Bool_t isLeadingJet_;
    Bool_t trkPhiMode_;
+   Bool_t ppMode_;
    
    vector<TString> levelName_;
    vector<vector<TString> > levelInput_;
@@ -76,7 +77,8 @@ trkCorrModule_(mod),
 ptRebinFactor_(1),
 smoothLevel_(0),
 isLeadingJet_(true),
-trkPhiMode_(false)
+trkPhiMode_(false),
+ppMode_(false)
 {
    centBin_.push_back("0to1");
    centBin_.push_back("2to3");
@@ -120,7 +122,7 @@ void TrackingCorrections::Init()
 {
    cout << "==============================================" << endl;
    cout << " correction set: " << corrSetName_ << " module: " << trkCorrModule_ << endl;
-   cout << " Setup - smoothLevel: " << smoothLevel_ << " trkPhiMode: " << trkPhiMode_;
+   cout << " Setup - smoothLevel: " << smoothLevel_ << " ppMode: " << ppMode_ << " trkPhiMode: " << trkPhiMode_;
    cout << "         weight samples: " << weightSamples_ << endl;
    cout << "==============================================" << endl;
    // =============================
@@ -132,6 +134,12 @@ void TrackingCorrections::Init()
       cout << "No input correction file" << endl;
       exit(1);
    }
+
+   if (ppMode_) {
+      centBin_.clear();
+      centBin_.push_back("0to40");
+   }
+   numCentBins_ = centBin_.size();
    
    // =============================
    // Get x,y,z bins
@@ -207,7 +215,8 @@ void TrackingCorrections::Init()
    if (weightSamples_) {
       for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
         for (Int_t c=0; c<numCentBins_; ++c) {
-          TString hnameNoE(Form("hPtHat_c%d",c));
+          TString hnameNoE(Form("hPtHatBeforeSel"));
+//           TString hnameNoE(Form("hPtHat_c%d",c));
           if (!normFiles_.size()) hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
           else hNoEvts_[s][c] =  (TH1D*)normFiles_[s]->Get(hnameNoE);
           if (!hNoEvts_[s][c]) {
@@ -231,6 +240,15 @@ void TrackingCorrections::Init()
         else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
         else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07;
         else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
+     } else if (corrSetName_=="Forest2STAv13") {
+        if ( ptHatMin_[s]==50 ) sampleCroSec_[s] = 1.021e-03 - 9.913e-05;
+        else if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 3.0698e-05;
+        else if ( ptHatMin_[s]==100) sampleCroSec_[s] = 3.069e-05 - 1.470e-06;
+        else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
+        else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07 - 1.192e-07;
+        else if ( ptHatMin_[s]==250) sampleCroSec_[s] = 1.192e-07 - 3.176e-08;
+        else if ( ptHatMin_[s]==300) sampleCroSec_[s] = (3.176e-08);
+        else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
      } else {
         if ( ptHatMin_[s] == 30    ) sampleCroSec_[s] = 1.079e-02 - 1.021e-03;
         else if ( ptHatMin_[s]==50 ) sampleCroSec_[s] = 1.021e-03 - 9.913e-05;
@@ -241,6 +259,14 @@ void TrackingCorrections::Init()
         else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07 - 1.192e-07;
         else if ( ptHatMin_[s]==250) sampleCroSec_[s] = 1.192e-07 - 3.176e-08;
         else if ( ptHatMin_[s]==300) sampleCroSec_[s] = (3.176e-08);
+        else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
+     }
+     if (ppMode_) {
+        if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 1.128e-05;
+        else if ( ptHatMin_[s]==120) sampleCroSec_[s] = 1.128e-05 - 1.470e-06;
+        else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
+        else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07 - 1.192e-07;
+        else if ( ptHatMin_[s]==250) sampleCroSec_[s] = 1.192e-07;
         else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
      }
      float basePtHat;
@@ -349,6 +375,7 @@ Float_t TrackingCorrections::GetCorr(Float_t pt, Float_t eta, Float_t jet, Float
       else if (cent<20) bin = 3;   
       else bin = 4;
    }
+   if (ppMode_) bin=0;
    Double_t corr[4]={1,1,1,1};
    for (Int_t lv=0; lv<numLevels_; ++lv) {
       corr[lv] = correctionHists_[lv][bin]->GetBinContent(etaBin,ptBin,jetBin);
@@ -458,6 +485,7 @@ TH1 * TrackingCorrections::InspectCorr(Int_t lv, Int_t centBeg, Int_t centEnd, I
    for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
       for (Int_t c=0; c<numCentBins_; ++c) {
          TString hname(Form("hPtHat_c%d",c));
+         if (ppMode_) hname = "hPtHat";
          TH1D * h =  (TH1D*)sample_[s]->Get(hname);
          if (!h) {
             cout << "bad histogram: " << hname << endl;

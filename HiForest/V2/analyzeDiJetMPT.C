@@ -1,5 +1,4 @@
-#include "hiForest.h"
-#include "MPTUtilities.C"
+#include "../HiForest_HEAD/hiForest.h"
 #include <TFile.h>
 #include <TH1D.h>
 #include <TNtuple.h>
@@ -8,170 +7,95 @@
 #include <utility>
 #include <vector>
 #include "TChain.h"
-#include "analyzeDiJetMPT.h"
-
-class DuplicateEvents {
-public:
-   DuplicateEvents(TString infname) {
-      inf = TFile::Open(infname);
-      t = (TTree*)inf->Get("hltanalysis/HltTree");
-   };
-   ~DuplicateEvents() {
-      delete inf;
-   }
-   void MakeList() {
-      cout << "Starting Making List to check for duplicate events" << endl;
-      evts.clear();
-      occurrence.clear();
-      int run,evt;
-      t->SetBranchAddress("Run",&run);
-      t->SetBranchAddress("Event",&evt);
-      for (int i=0;i<t->GetEntries();i++) {
-         t->GetEntry(i);
-         if (i%100000==0) cout <<i<<" / "<<t->GetEntries() << " run: " << run << " evt: " << evt << endl;
-         int occur = (int)FindOccurrences(run,evt);
-         if (occur==0) occurrence.push_back(1);
-         else occurrence.push_back(2);
-         evts.push_back(std::make_pair(run,evt));
-      }         
-   }
-   int FindOccurrences(int run, int evt) {
-      int noccur = count(evts.begin(), evts.end(), std::make_pair(run,evt));
-      return noccur;
-   }
-   TFile * inf;
-   TTree * t;
-   vector<pair<int, int> > evts;
-   vector<int> occurrence;
-};
+#include "TMath.h"
+#include "analyzeTrackingCorrection.h"
+using namespace std;
+using namespace TMath;
 
 void analyzeDiJetMPT(
-                      TString jetAlgo = "icPu5",
-                      TString inname="/mnt/hadoop/cms/store/user/velicanu/forest/HiForestDijet_v7.root",
-                      TString outname="output-data-DiJet-v7_v0.root",
-                      int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
-                      double samplePtHat=0,
-                      double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
-                      bool doCentReWeight=false,
-                      TString mcfname="",
-                      TString datafname="output-data-Photon-v7_v30.root",
-                      int makeMixing=0, // 0=default (no mix), 1=make mixing classes 2=mix
-                      TString mixfname="output-data-Photon-v7_v30classes.root",
-                      int maxEntries = -1
+   TString jetAlgo = "akPu3PF",
+   TString trkCol = "anaTrack",
+   TString inname="/mnt/hadoop/cms/store/user/yenjie/HiForest_v27/Dijet${pthat}_HydjetDrum_v27_mergedV1.root",
+   TString outname="output.root",
+   bool isPP=false,
+   int dataSrcType = 1, // 0 mc, 1 hi, 2 pp 2.76 TeV, 3 pp 7TeV
+   double samplePtHat=0,
+   double ptHatMax=9999,
+   double sampleWeight = 1, // data: 1, mc: s = 0.62, b = 0.38
+   double vzMax = 15,
+   int maxEntries = -1,
+   double leadingJetPtMin=-1,
+   double subleadingJetPtMin=-1,
+   double sigDPhi=-1,
+   bool genJetMode=false,
+   bool doCentReWeight=false,
+   TString mcfname="",
+   TString datafname="output-data-Photon-v7_v30.root"
                       )
 {
-   bool doSkim=true;
-   //bool checkDup=( (dataSrcType==1)&&(makeMixing==0||makeMixing==2)&&!inname.Contains("noDuplicate") );
-   bool checkDup=false;
-   bool doMPT=true, saveAllCands=false;
-   bool onlyTrkAlgo4=true, onlyTrkHP=true;
-   bool saveParticles=true;
-   bool doSimTrk=true;
-   outname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   mcfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   datafname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   mixfname.ReplaceAll(".root",Form("_%s.root",jetAlgo.Data()));
-   double cutjetPt = 30;
+   ///////////////////////////////////////////////////
+   // Setup Analysis
+   ///////////////////////////////////////////////////
+   int saveTracks = 1; // 0=none, 1=all, 10=cone
+   double cutjetPt = 100;
    double cutjetEta = 2;
-   double cutPtTrk=0.5;
-   double cutEtaTrk = 8;
-   double cutPtPfCand=4;
-   // Centrality reweiting
-   CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>120&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
+   double cutPtTrk=1.;
+   double cutEtaTrk = 2.4;
+   double trkJetAssoR=0.3;
 
-   // Check for duplicate events
-   DuplicateEvents dupEvt(inname);
-   if (checkDup) dupEvt.MakeList();
-   
+   TString tag=Form("%s_%.0f_%.0f_%.0f_saveTrk%d_jmin%.0f_tmin%.0f_genJetMode%d_corrppv14jetfinexsec",jetAlgo.Data(),leadingJetPtMin,subleadingJetPtMin,sigDPhi*1000,saveTracks,cutjetPt,cutPtTrk,genJetMode);
+   outname.ReplaceAll(".root",Form("_%s.root",tag.Data()));
+   cout << "Input: " << inname << " isPP: " << isPP << endl;
+   cout << "Sample pthat = " << samplePtHat << " ptHatMax = " << ptHatMax << endl;
+   cout << "Track pt min = " << cutPtTrk << endl;
+   cout << "skim: leading Jet > " << leadingJetPtMin << " subleading > " << subleadingJetPtMin << " dphi > " << sigDPhi  << endl;
+   cout << "Genjet mode: " << genJetMode << endl;
+   cout << "Output: " << outname << endl;
+
+   // Centrality reweiting
+   CentralityReWeight cw(datafname,mcfname,"offlSel&&pt1>100&&pt2>0&&acos(cos(phi2-phi1))>2./3*3.14159");
+
    // Define the input file and HiForest
-   HiForest *c = new HiForest(inname,"forest",0,0,0,jetAlgo);
-   c->doTrackCorrections = 1;
+//    HiForest * c = new HiForest(inname,trkCol.Data(),0);
+   HiForest * c = new HiForest(inname,trkCol.Data(),isPP);
+   c->doTrackCorrections = true;
+   c->doTrackingSeparateLeadingSubleading = false;
    c->InitTree();
+
    // intialize jet variables
-   Jets * anajet = &(c->akPu3PF);   
-   
-   // pfid
-   TTree * pfTree = (TTree*) c->inf->Get("pfcandAnalyzer/pfTree");
-   PFs pfs;
-   if (pfTree) {
-      c->CheckTree(pfTree,"PfTree");
-      setupPFTree(pfTree,pfs,1);
+   Jets * anajet = 0;
+   if (jetAlgo=="akPu3PF") anajet = &(c->akPu3PF);
+   else if (jetAlgo=="akPu3Calo") anajet = &(c->akPu3Calo);
+   else {
+      cout << "Fatal Error: jetalgo " << jetAlgo << " not defined" << endl;
+      exit(1);
    }
-      
+   
    // Output file
    cout << "Output: " << outname << endl;
    TFile *output = new TFile(outname,"recreate");
    if (doCentReWeight&&mcfname!="") {
       cw.Init(); //cw.hCentData->Draw(); cw.hCentMc->Draw("same");
    }
-   
-   TH1D * hTrkPt = new TH1D("hTrkPt",";p_{T} (GeV/c)",nptrange,ptranges);
-   TH1D * hTrkCorrPt = new TH1D("hTrkCorrPt",";p_{T} (GeV/c)",nptrange,ptranges);
-   TH1D * hGenpPt = new TH1D("hGenpPt",";p_{T} (GeV/c)",nptrange,ptranges);
+
+   // basics
+   output->cd();
+   TH1D * hCent = new TH1D("hCent","",40,0,40);
+   TH1D * hVz = new TH1D("hVz","",60,-30,30);
+   TH1D * hPtHatBeforeSel = new TH1D("hPtHatBeforeSel","",200,0,1000);
+   TH1D * hPtHat = new TH1D("hPtHat","",200,0,1000);
+   TH2D * hJetPt2D = new TH2D("hJetPt2D","",100,0,500,100,0,500);
+   TH1D * hJDPhi = new TH1D("hJDPhi","",40,0,Pi());
+   TH1D * hAj = new TH1D("hAj","",32,0,0.8);   
+   TH1D * hTrkPt = new TH1D("hTrkPt",";p_{T} (GeV/c)",200,0,200);
+   TH1D * hTrkCorrPt = new TH1D("hTrkCorrPt",";p_{T} (GeV/c)",200,0,200);
+   TH1D * hGenpPt = new TH1D("hGenpPt",";p_{T} (GeV/c)",200,0,200);
 
    EvtSel evt;
    DiJet gj;
    TTree * tgj = new TTree("tgj","dijet jet tree");
    BookGJBranches(tgj,evt,gj);
-//   AnaMPT pfmpt("pf",0);
-//   AnaMPT pf4mpt("pf4",0,4);
-   AnaMPT trkmpt("trk",0);
-   AnaMPT genpSigmpt("genpSig",0);
-   AnaMPT genpAllmpt("genpAll",0);
-   if (doMPT) {
-//       pfmpt.Init(tgj);  
-      //pf4mpt.Init(tgj);  
 
-      trkmpt.trackingCorrectionTypes.push_back(0); trkmpt.trackingCorrectionNames.push_back("Corr");
-      trkmpt.Init(tgj);
-      
-//       genpSigmpt.Init(tgj);
-//       genpAllmpt.Init(tgj);
-   }
-   
-   // mixing classes
-   int nCentBin=40;
-   //int nEPBin=11;
-   int nEPBin=1;
-   vector<vector<TTree*> > vtgj(nCentBin,vector<TTree*>(nEPBin));
-   vector<vector<EvtSel> > vevt(nCentBin,vector<EvtSel>(nEPBin));
-   vector<vector<DiJet> > vgj(nCentBin,vector<DiJet>(nEPBin));
-   vector<vector<int> > vmixNEvt(nCentBin,vector<int>(nEPBin));
-   vector<vector<int> > vmixEntry(nCentBin,vector<int>(nEPBin));
-   if (makeMixing==1) {
-      cout << "Mixing step 1: " << endl;
-      for (int ib=0; ib<nCentBin; ++ib) {
-         for (int e=0; e<nEPBin; ++e) {
-            vtgj[ib][e] = new TTree(Form("tgj_%d_%d",ib,e),"gamma jet tree");
-            vtgj[ib][e]->Branch("evt",&vevt[ib][e].run,vevt[ib][e].leaves);
-            vtgj[ib][e]->Branch("jet",&vgj[ib][e].pt1,vgj[ib][e].leaves);
-            vtgj[ib][e]->Branch("nJet",&vgj[ib][e].nJet,"nJet/I");
-            vtgj[ib][e]->Branch("inclJetPt",vgj[ib][e].inclJetPt,"inclJetPt[nJet]/F");
-            vtgj[ib][e]->Branch("inclJetEta",vgj[ib][e].inclJetEta,"inclJetEta[nJet]/F");
-            vtgj[ib][e]->Branch("inclJetPhi",vgj[ib][e].inclJetPhi,"inclJetPhi[nJet]/F");
-         }
-      }
-      cout << "Branch set for mixing step 1" << endl;
-   } else if (makeMixing==2) {
-      cout << "Mixing step 2: " << endl;
-      TFile * mixf = TFile::Open(mixfname);
-      for (int ib=0; ib<nCentBin; ++ib) {
-         for (int e=0; e<nEPBin; ++e) {
-            vtgj[ib][e] = (TTree*)mixf->Get(Form("tgj_%d_%d",ib,e));
-            vtgj[ib][e]->SetBranchAddress("evt",&vevt[ib][e].run);
-            vtgj[ib][e]->SetBranchAddress("jet",&vgj[ib][e].pt1);
-            vtgj[ib][e]->SetBranchAddress("nJet",&vgj[ib][e].nJet);
-            vtgj[ib][e]->SetBranchAddress("inclJetPt",vgj[ib][e].inclJetPt);
-            vtgj[ib][e]->SetBranchAddress("inclJetEta",vgj[ib][e].inclJetEta);
-            vtgj[ib][e]->SetBranchAddress("inclJetPhi",vgj[ib][e].inclJetPhi);
-            vmixNEvt[ib][e]=vtgj[ib][e]->GetEntries();
-         int offset=1;
-         vmixEntry[ib][e]=offset;
-         cout << " ib" << ib << ", ep" << e << ": " << vmixNEvt[ib][e] << endl;
-         }
-      }
-   }
-   
    // pp triggers
    int HLT_Photon15_CaloIdVL_v1=0;
    int HLT_Photon50_CaloIdVL_v3=0;
@@ -183,40 +107,21 @@ void analyzeDiJetMPT(
       c->hltTree->SetBranchAddress("HLT_Photon50_CaloIdVL_IsoL_v6",&HLT_Photon50_CaloIdVL_IsoL_v6);
    }
 
-   // jet energy studies
-   Response jetRes;
-   
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
    if (maxEntries<0) maxEntries = c->GetEntries();
-   for (int i=0;i<maxEntries;i++)
-//    for (int i=0;i<1000;i++)
-   {
+   for (int i=0;i<maxEntries;i++) {
       c->GetEntry(i);
-      if (pfTree) pfTree->GetEntry(i);
-      // check if event is duplicate
-      if (checkDup) evt.nOccur = dupEvt.occurrence[i];
-      else evt.nOccur = 1;
       // Event Info
       evt.run = c->hlt.Run;
       evt.evt = c->hlt.Event;
       evt.cBin = c->evt.hiBin;
       if (dataSrcType>1) evt.cBin = 39;
       evt.evtPlane = c->evt.hiEvtPlanes[21];
-      int evtPlaneBin=nEPBin-1;
-//      if (evt.evtPlane>=-TMath::PiOver2()&&evt.evtPlane<=TMath::PiOver2()) {
-//         float dEvtPlaneBin=TMath::Pi()/(nEPBin-1);
-//         for (int e=0; e<(nEPBin-1); ++e) {
-//            if (evt.evtPlane>(-TMath::PiOver2()+e*dEvtPlaneBin) && evt.evtPlane<(-TMath::PiOver2()+(e+1)*dEvtPlaneBin)){
-//               evtPlaneBin=e;
-//            }
-//         }
-//      }
       evt.nJ = anajet->nref;
       evt.nT = c->track.nTrk;
-      if (c->hasHltTree) evt.trig = (c->hlt.HLT_HIJet80_v1 > 0);
-      else evt.trig = true;
+      evt.trig = (c->hlt.HLT_HIJet80_v1 > 0);
       evt.offlSel = (c->skim.pcollisionEventSelection > 0);
       if (!c->hasSkimTree) evt.offlSel = (c->evt.hiNtracks>0 && c->evt.hiHFplus>=4 && c->evt.hiHFminus>=4);
       evt.noiseFilt = (c->skim.pHBHENoiseFilter > 0);
@@ -228,10 +133,9 @@ void analyzeDiJetMPT(
          }
          evt.offlSel = (c->skim.phfCoincFilter && c->skim.ppurityFractionFilter);
       }
-      evt.anaEvtSel = evt.trig && evt.offlSel && evt.noiseFilt && evt.nOccur==1;
-      if (makeMixing==1) {
-         evt.anaEvtSel = evt.offlSel;
-      }
+      if (!c->hasHltTree) evt.trig = true;
+      evt.anaEvtSel = evt.offlSel && evt.noiseFilt;
+      if (dataSrcType>0) evt.anaEvtSel = evt.anaEvtSel && evt.trig;
       evt.vz = c->track.vz[1];
       // Get Centrality Weight
       if (doCentReWeight) evt.weight = cw.GetWeight(evt.cBin);
@@ -242,46 +146,26 @@ void analyzeDiJetMPT(
       evt.pthat = anajet->pthat;
       evt.samplePtHat = samplePtHat;
 
-      if (i%1000==0) cout <<i<<" / "<<maxEntries << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " epbin: " << evtPlaneBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
+      if (i%1000==0) cout <<i<<" / "<<maxEntries << " run: " << evt.run << " evt: " << evt.evt << " bin: " << evt.cBin << " nT: " << evt.nT << " trig: " <<  evt.trig << " anaEvtSel: " << evt.anaEvtSel <<endl;
 
       // initialize
       int leadingIndex=-1,genLeadingIndex=-1;
       int awayIndex=-1,genAwayIndex=-1;
       gj.clear();
       
-      // Loop over jets to look for leading jet candidate in the event
+      ///////////////////////////////////////////////////////
+      // Find Leading jets
+      ///////////////////////////////////////////////////////
       for (int j=0;j<anajet->nref;j++) {
          if (anajet->jtpt[j]<cutjetPt) continue;
          if (fabs(anajet->jteta[j])>cutjetEta) continue;
+	 if ((anajet->trackMax[j]/anajet->jtpt[j])<0.01) continue;
          if (anajet->jtpt[j] > gj.pt1) {
             gj.pt1 = anajet->jtpt[j];
             leadingIndex = j;
          }
       }
 
-      // Loop over genjets to look for leading genjet candidate in the event
-      for (int j=0;j<anajet->ngen;j++) {
-         if (anajet->genpt[j]<cutjetPt) continue;
-         if (fabs(anajet->geneta[j])>cutjetEta) continue;
-         if (anajet->genpt[j] > gj.genjetpt1) {
-            gj.genjetpt1=anajet->genpt[j];
-            genLeadingIndex=j;
-         }
-      }
-      
-      //
-      // Skim
-      //
-//      if (dataSrcType==0&&makeMixing==2&&evt.evtPlane<-2) continue;
-      if (dataSrcType==2&&!evt.trig) continue;
-      if (makeMixing==1&&!evt.offlSel) continue;
-      if (doSkim) {
-         if (dataSrcType==1&&!evt.anaEvtSel) continue;
-	 if (dataSrcType==0&&!evt.offlSel) continue;
-         if (gj.pt1<110) continue;
-//          if (gj.genjetpt1<120) continue;
-      }
-      
       // Found a leading jet which passed basic quality cut!
       if (leadingIndex!=-1) {
          // set leading jet
@@ -304,7 +188,6 @@ void analyzeDiJetMPT(
             gj.inclJetPhi[gj.nJet] = anajet->jtphi[j];
             gj.inclJetRefPt[gj.nJet] = anajet->refpt[j];
             gj.inclJetRefPartonPt[gj.nJet] = anajet->refparton_pt[j];
-            gj.inclJetRefResp[gj.nJet] = jetRes.GetSmear(evt.cBin,gj.inclJetRefPt[gj.nJet]);
             if (j!=leadingIndex&&anajet->jtpt[j] > gj.pt2) {
                gj.pt2 = anajet->jtpt[j];
                awayIndex = j;
@@ -324,74 +207,22 @@ void analyzeDiJetMPT(
             gj.ref2phi = anajet->refphi[awayIndex];
             gj.ref2partonpt = anajet->refparton_pt[awayIndex];
             gj.ref2partonflavor = anajet->refparton_flavor[awayIndex];
-         }
-
-         // if mix, overwrite jets from mixed events
-         if (makeMixing==2) {
-            gj.nJet=0;
-            int im=0;
-            while (im<40) {
-               int ient = (vmixEntry[evt.cBin][evtPlaneBin]) % (vmixNEvt[evt.cBin][evtPlaneBin]);
-               //cout << im << " get mix entry: " << ient << endl;
-               vtgj[evt.cBin][evtPlaneBin]->GetEntry(ient);
-               ++vmixEntry[evt.cBin][evtPlaneBin];
-               for (int j=0; j<vgj[evt.cBin][evtPlaneBin].nJet; ++j) {
-                  gj.inclJetPt[gj.nJet] = vgj[evt.cBin][evtPlaneBin].inclJetPt[j];
-                  gj.inclJetEta[gj.nJet] = vgj[evt.cBin][evtPlaneBin].inclJetEta[j];
-                  gj.inclJetPhi[gj.nJet] = vgj[evt.cBin][evtPlaneBin].inclJetPhi[j];
-                  ++gj.nJet;
-               }
-               ++im;
-            }
-         }
-         
-         // xcheck with pfcands
-         gj.nPf=0;
-         for (int it=0; it<pfs.nPFpart; ++it) {
-            if (pfs.pfPt[it] < cutPtPfCand) continue;
-            if (fabs(pfs.pfEta[it]) > cutEtaTrk) continue;
-            gj.pfPt[gj.nPf]=pfs.pfPt[it];
-            gj.pfEta[gj.nPf]=pfs.pfEta[it];
-            gj.pfPhi[gj.nPf]=pfs.pfPhi[it];
-            gj.pfId[gj.nPf]=pfs.pfId[it];
-            // find leading pfcand in jet
-            float dr = deltaR(pfs.pfEta[it],pfs.pfPhi[it],gj.eta2,gj.phi2);
-            if (dr<0.3 && pfs.pfPt[it]>gj.jlpfPt) {
-               gj.jlpfPt = pfs.pfPt[it];
-               gj.jlpfEta = pfs.pfEta[it];
-               gj.jlpfPhi = pfs.pfPhi[it];
-               gj.jlpfId = pfs.pfId[it];
-            }
-            ++gj.nPf;
-         }
-         
+         }         
       } // end of if leadingIndex
       
-      // mixing classes
-      if (makeMixing==1) {
-         // mixing classes
-         vevt[evt.cBin][evtPlaneBin] = evt;
-
-         vgj[evt.cBin][evtPlaneBin].clear();
-         vgj[evt.cBin][evtPlaneBin].pt1 = gj.pt1;
-         vgj[evt.cBin][evtPlaneBin].eta1 = gj.eta1;
-         vgj[evt.cBin][evtPlaneBin].phi1 = gj.phi1;
-         
-         vgj[evt.cBin][evtPlaneBin].nJet = 0;
-         for (int j=0;j<anajet->nref;j++) {
-            if (anajet->jtpt[j]<cutjetPt) continue;
-            if (fabs(anajet->jteta[j])>cutjetEta) continue;
-            // mixing classes
-            vgj[evt.cBin][evtPlaneBin].inclJetPt[vgj[evt.cBin][evtPlaneBin].nJet] = anajet->jtpt[j];
-            vgj[evt.cBin][evtPlaneBin].inclJetEta[vgj[evt.cBin][evtPlaneBin].nJet] = anajet->jteta[j];
-            vgj[evt.cBin][evtPlaneBin].inclJetPhi[vgj[evt.cBin][evtPlaneBin].nJet] = anajet->jtphi[j];
-            ++vgj[evt.cBin][evtPlaneBin].nJet;
+      ////////////////////////////////////////
+      // Find Leading Genjets
+      ////////////////////////////////////////
+      // Loop over genjets to look for leading genjet candidate in the event
+      for (int j=0;j<anajet->ngen;j++) {
+         if (anajet->genpt[j]<cutjetPt) continue;
+         if (fabs(anajet->geneta[j])>cutjetEta) continue;
+         if (anajet->genpt[j] > gj.genjetpt1) {
+            gj.genjetpt1=anajet->genpt[j];
+            genLeadingIndex=j;
          }
       }
-      
-      ////////////////////////////////////////
-      // If mc, write genjets
-      ////////////////////////////////////////
+
       if (genLeadingIndex!=-1) {
          gj.genjeteta1=anajet->geneta[genLeadingIndex];
          gj.genjetphi1=anajet->genphi[genLeadingIndex];
@@ -404,7 +235,6 @@ void analyzeDiJetMPT(
          gj.inclGenJetPt[gj.nGenJet] = anajet->genpt[j];
          gj.inclGenJetEta[gj.nGenJet] = anajet->geneta[j];
          gj.inclGenJetPhi[gj.nGenJet] = anajet->genphi[j];
-         gj.inclGenJetResp[gj.nGenJet] = jetRes.GetSmear(evt.cBin,gj.inclGenJetPt[gj.nGenJet]);
          if (j!=genLeadingIndex && anajet->genpt[j]>gj.genjetpt2) {
             gj.genjetpt2=anajet->genpt[j];
             gj.genjeteta2=anajet->geneta[j];
@@ -412,6 +242,35 @@ void analyzeDiJetMPT(
          }
          ++gj.nGenJet;
       }
+      if (genJetMode) {
+         gj.pt1 = gj.genjetpt1;
+         gj.eta1 = gj.genjeteta1;
+         gj.phi1 = gj.genjetphi1;
+         gj.pt2 = gj.genjetpt2;
+         gj.eta2 = gj.genjeteta2;
+         gj.phi2 = gj.genjetphi2;
+         gj.dphi   = deltaPhi(gj.phi2,gj.phi1);
+      }
+
+      ///////////////////////////////////////////////////////
+      // Skim
+      ///////////////////////////////////////////////////////
+      if (!evt.anaEvtSel) continue;
+      if (samplePtHat>0 && evt.pthat>=ptHatMax) continue;
+      if (vzMax>0 && fabs(evt.vz)>vzMax) continue;
+      hPtHatBeforeSel->Fill(evt.pthat);
+      // ensure jet distribution unbiased by pthat turn on
+      if (leadingJetPtMin>0&&gj.pt1<leadingJetPtMin) continue;
+      if (subleadingJetPtMin>0&&gj.pt2<subleadingJetPtMin) continue;
+      if (sigDPhi>0&&fabs(gj.dphi)<sigDPhi) continue;
+      
+      // Fill Baisc Event info
+      hCent->Fill(evt.cBin);
+      hVz->Fill(evt.vz);
+      hPtHat->Fill(evt.pthat);
+      hJetPt2D->Fill(gj.pt1,gj.pt2);
+      hJDPhi->Fill(fabs(gj.dphi));
+      hAj->Fill(gj.Aj);
 
       ///////////////////////////////////////////////////////
       // Tracks
@@ -426,6 +285,8 @@ void analyzeDiJetMPT(
             // Kinematic Selection
             if (anaTrks[iset]->trkPt[it] < cutPtTrk) continue;
             if (fabs(anaTrks[iset]->trkEta[it]) > cutEtaTrk) continue;
+            if (!anaTrks[iset]->highPurity[it]) continue;
+            
             float trkPt = anaTrks[iset]->trkPt[it];
             float trkEta = anaTrks[iset]->trkEta[it];
             float trkPhi = anaTrks[iset]->trkPhi[it];
@@ -439,114 +300,63 @@ void analyzeDiJetMPT(
             gj.trkPt[gj.nTrk] = trkPt;
             gj.trkEta[gj.nTrk] = trkEta;
             gj.trkPhi[gj.nTrk] = trkPhi;
+            gj.trkWt[gj.nTrk] = c->getTrackCorrection(it);
             float dr1 = deltaR(trkEta,trkPhi,gj.eta1,gj.phi1);
             float dr2 = deltaR(trkEta,trkPhi,gj.eta2,gj.phi2);
-            //gj.trkJetDr[gj.nTrk] = dr2;
-            ////////////////////////////////////
-            // Track efficiency/fake correction
-            ////////////////////////////////////
-            for (int icorr=0; icorr<3; ++icorr) {
-               if (gj.pt1>40&&dr1<0.8) {
-                  gj.vtrkWt[gj.nTrk][icorr] = c->trackCorrections[icorr]->GetCorr(trkPt,trkEta,gj.pt1,c->evt.hiBin,trkcorr);
-   //                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt1 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-               } else if (gj.pt2>40&&dr2<0.8) {
-                  gj.vtrkWt[gj.nTrk][icorr] = c->trackCorrections[icorr]->GetCorr(trkPt,trkEta,gj.pt2,c->evt.hiBin,trkcorr);
-   //                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << gj.pt2 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-               } else {
-                  gj.vtrkWt[gj.nTrk][icorr] = c->trackCorrections[icorr]->GetCorr(trkPt,trkEta,0,c->evt.hiBin,trkcorr);
-   //                cout << "trk pt,eta,jet,cBin: " << trkPt << "," << trkEta << "," << 0 << "," << c->evt.hiBin << " eff: " << trkcorr[0] << endl;
-               }
-               gj.vtrkEff[gj.nTrk][icorr] = trkcorr[0];
-               gj.vtrkFak[gj.nTrk][icorr] = trkcorr[1];
-            }
+            float dr1bkg = deltaR(trkEta,trkPhi,-gj.eta1,gj.phi1);
+            float dr2bkg = deltaR(trkEta,trkPhi,-gj.eta2,gj.phi2);
+            gj.trkAsso[gj.nTrk] = 0;
+            if (dr1<trkJetAssoR) gj.trkAsso[gj.nTrk] = 1;
+            else if (dr1bkg<trkJetAssoR) gj.trkAsso[gj.nTrk] = 11;
+            else if (dr2<trkJetAssoR) gj.trkAsso[gj.nTrk] = 2;
+            else if (dr2bkg<trkJetAssoR) gj.trkAsso[gj.nTrk] = 12;
+            // Histogram
+            hTrkPt->Fill(trkPt);
+            hTrkCorrPt->Fill(trkPt,gj.trkWt[gj.nTrk]);
+            // Select what to save
+            if (saveTracks==0) continue;
+            if (saveTracks==10&&gj.trkAsso[gj.nTrk]==0) continue;
+
             // Fill
-            gj.trkWt[gj.nTrk] = gj.vtrkWt[gj.nTrk][0];
-            gj.trkEff[gj.nTrk] = gj.vtrkEff[gj.nTrk][0];
-            gj.trkFak[gj.nTrk] = gj.vtrkFak[gj.nTrk][0];
             gj.trkNHit[gj.nTrk] = trkNHit;
             gj.trkChi2Norm[gj.nTrk] = trkChi2Norm;
             gj.trkAlgo[gj.nTrk] = trkAlgo;
             gj.trkHP[gj.nTrk] = trkHP;
-            gj.vtrkQual[gj.nTrk][0] = anaTrks[iset]->highPurity[it];
-            gj.vtrkQual[gj.nTrk][1] = anaTrks[iset]->highPurity[it]&&trkAlgo==4;
-            gj.vtrkQual[gj.nTrk][2] = anaTrks[iset]->highPuritySetWithPV[it];
             gj.trkIsFake[gj.nTrk] = anaTrks[iset]->trkFake[it];
-            // mpt trk selection
-            gj.trkSel[gj.nTrk] = false;
-            if (trkNHit<=7||gj.vtrkQual[gj.nTrk][0]) {
-               gj.trkSel[gj.nTrk] = true;
-               hTrkPt->Fill(trkPt);
-               hTrkCorrPt->Fill(trkPt,gj.trkWt[gj.nTrk]);
-               // find leading track
-               if (trkPt>gj.ltrkPt) {
-                  gj.ltrkPt = trkPt;
-                  gj.ltrkEta = trkEta;
-                  gj.ltrkPhi = trkPhi;
-                  gj.ltrkJetDr = dr2;
-               }
-               // find leading track in jet
-               if (dr2<0.3 && trkPt>gj.jltrkPt) {
-                  gj.jltrkPt = trkPt;
-                  gj.jltrkEta = trkEta;
-                  gj.jltrkPhi = trkPhi;
-                  gj.jltrkJetDr = dr2;
-               }
-            }
             ++gj.nTrk;
          }
       }
 
-      ////////////////////////      
-      // Gen Particles
-      ////////////////////////
-      gj.nGenp =0;
-      for (int ip=0; ip<c->genparticle.mult; ++ip) {
-         if (c->genparticle.pt[ip] < cutPtTrk) continue;
-         if (fabs(c->genparticle.eta[ip]) > cutEtaTrk) continue;
-         if (abs(int(c->genparticle.chg[ip])) ==0 ) continue;
-         // Fill
-         hGenpPt->Fill(c->genparticle.pt[ip]);
-         gj.genpPt[gj.nGenp] = c->genparticle.pt[ip];
-         gj.genpEta[gj.nGenp] = c->genparticle.eta[ip];
-         gj.genpPhi[gj.nGenp] = c->genparticle.phi[ip];
-         gj.genpCh[gj.nGenp] = c->genparticle.chg[ip];
-         gj.genpSube[gj.nGenp] = c->genparticle.sube[ip];
-         gj.genpSel[gj.nGenp] = (int(c->genparticle.sube[ip]) ==0);
-         ++gj.nGenp;
-      }
-      
-      if (doSimTrk) {
-         gj.nSim=0;
-         for (int ip=0; ip<anaTrks[0]->nParticle; ++ip) {
-            if (anaTrks[0]->pPt[ip] < cutPtTrk) continue;
-            if (fabs(anaTrks[0]->pEta[ip]) > cutEtaTrk) continue;
-            // Fill
-            gj.simPt[gj.nSim] = anaTrks[0]->pPt[ip];
-            gj.simEta[gj.nSim] = anaTrks[0]->pEta[ip];
-            gj.simPhi[gj.nSim] = anaTrks[0]->pPhi[ip];
-            gj.simHasRec[gj.nSim] = (anaTrks[0]->pNRec[ip]==1&&(anaTrks[0]->mtrkAlgo[ip]<4||anaTrks[0]->mtrkQual[ip]>0));
-            ++gj.nSim;
-         }
-      }
+      gj.nSim=0;
+      for (int ip=0; ip<anaTrks[0]->nParticle; ++ip) {
+         if (anaTrks[0]->pPt[ip] < cutPtTrk) continue;
+         if (fabs(anaTrks[0]->pEta[ip]) > cutEtaTrk) continue;
+         float simPt = anaTrks[0]->pPt[ip];
+         float simEta = anaTrks[0]->pEta[ip];
+         float simPhi = anaTrks[0]->pPhi[ip];
+         float dr1 = deltaR(simEta,simPhi,gj.eta1,gj.phi1);
+         float dr2 = deltaR(simEta,simPhi,gj.eta2,gj.phi2);
+         float dr1bkg = deltaR(simEta,simPhi,-gj.eta1,gj.phi1);
+         float dr2bkg = deltaR(simEta,simPhi,-gj.eta2,gj.phi2);
+         gj.simAsso[gj.nSim] = 0;
+         if (dr1<trkJetAssoR) gj.simAsso[gj.nSim] = 1;
+         else if (dr1bkg<trkJetAssoR) gj.simAsso[gj.nSim] = 11;
+         else if (dr2<trkJetAssoR) gj.simAsso[gj.nSim] = 2;
+         else if (dr2bkg<trkJetAssoR) gj.simAsso[gj.nSim] = 12;
+         // Select what to save
+         if (saveTracks==0) continue;
+         if (saveTracks==10&&gj.simAsso[gj.nSim]==0) continue;
 
-      // MPT
-      if (doMPT) {
-         trkmpt.InputEvent(gj.nTrk,gj.trkPt,gj.trkEta,gj.trkPhi,gj.trkWt,gj.trkSel);
-         trkmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-         
-//          genpSigmpt.InputEvent(gj.nGenp,gj.genpPt,gj.genpEta,gj.genpPhi,0,gj.genpSel);
-//          genpSigmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-//          genpAllmpt.InputEvent(gj.nGenp,gj.genpPt,gj.genpEta,gj.genpPhi);
-//          genpAllmpt.AnalyzeEvent(gj.pt1,gj.eta1,gj.phi1,gj.pt2,gj.eta2,gj.phi2);
-        }
+         // Fill
+         gj.simPt[gj.nSim] = simPt;
+         gj.simEta[gj.nSim] = simEta;
+         gj.simPhi[gj.nSim] = simPhi;
+         gj.simHasRec[gj.nSim] = (anaTrks[0]->pNRec[ip]==1&&(anaTrks[0]->mtrkAlgo[ip]<4||anaTrks[0]->mtrkQual[ip]>0));
+         ++gj.nSim;
+      }
       
       // All done
-      if (!saveParticles) gj.clearParticles();
       tgj->Fill();
-      if (makeMixing==1) {
-         // mixing classes
-         vtgj[evt.cBin][evtPlaneBin]->Fill();
-      }
    }
 
    output->Write();

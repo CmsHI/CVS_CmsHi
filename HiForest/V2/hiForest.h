@@ -537,9 +537,13 @@ void HiForest::InitTree()
 
       trackCorrFromParam = new TrackingParam();
 
-      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j1"));
-      trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j2"));
+      if (!pp) {
+         trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral"));
+      } else {
+         trackCorrections.push_back(new TrackingCorrections("Forest2STApp","Forest2_MergedGeneral_jetfine"));
+      }
+//       trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j1"));
+//       trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j2"));
 
       for(int i = 0; i < trackCorrections.size(); ++i){
          if (!pp) {
@@ -548,14 +552,16 @@ void HiForest::InitTree()
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_100_40_2749_genJetMode0.root",200);
            trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_-1_-1_-1000_genJetMode0.root");
          } else {
-           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_100_40_2749_genJetMode0.root",100);
-           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj100_akPu3PF_-1_-1_-1000_genJetMode0.root");
-           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_100_40_2749_genJetMode0.root",200);
-           trackCorrections[i]->AddNormFile("trkcorr/IterTrkCorrv12XSec/IterTrkCorrv12XSec_hy18dj200_akPu3PF_-1_-1_-1000_genJetMode0.root");
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec_pp/IterTrkCorrv14XSec_pp_sigdj80to120_akPu3PF_100_-1_-1000_genJetMode0.root",80);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec_pp/IterTrkCorrv14XSec_pp_sigdj120to170_akPu3PF_100_-1_-1000_genJetMode0.root",120);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec_pp/IterTrkCorrv14XSec_pp_sigdj170to200_akPu3PF_100_-1_-1000_genJetMode0.root",170);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec_pp/IterTrkCorrv14XSec_pp_sigdj200to250_akPu3PF_100_-1_-1000_genJetMode0.root",200);
+           trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec_pp/IterTrkCorrv14XSec_pp_sigdj250to9999_akPu3PF_100_-1_-1000_genJetMode0.root",250);
          }
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
          trackCorrections[i]->trkPhiMode_ = false;
+         trackCorrections[i]->ppMode_ = pp;
          trackCorrections[i]->Init();
       }
       minJetPtForTrkCor = 40;
@@ -614,6 +620,7 @@ void HiForest::PrintStatus()
 {
   if (hasHltTree)      CheckTree(hltTree,      "HltTree");
   if (hasSkimTree)     CheckTree(skimTree,     "SkimTree");
+  if (hasEvtTree)      CheckTree(evtTree,      "EvtTree");
   if (hasIcPu5JetTree) CheckTree(icPu5jetTree, "IcPu5jetTree");
   if (hasAkPu2JetTree) CheckTree(akPu2jetTree, "AkPu2jetTree");
   if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
