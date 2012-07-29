@@ -68,7 +68,6 @@ class TrkCorrHisAna
 
     TString name_;
     bool trkPhiMode_;
-    bool isPP_;
     TFile * outFile_;
     float jetPtMin;
 
@@ -108,16 +107,15 @@ class TrkCorrHisAna
     std::vector<TH2F*> vhSimJetPtDr;
 
     // methods
-    TrkCorrHisAna(TString name, TFile * outf, float jetPtMin=40, bool pp=false);
+    TrkCorrHisAna(TString name, TFile * outf, float jetPtMin=40);
     void DeclareHistograms();
     void FillRecHistograms(const EvtSel & evt, const DiJet & gj, const RecTrack_t & r);
     void FillSimHistograms(const EvtSel & evt, const DiJet & gj, const SimTrack_t & s);
 };
 
 
-TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf, float jPtMin, bool pp) :
+TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf, float jPtMin) :
   name_(name),
-  isPP_(pp),
   trkPhiMode_(false),
   jetPtMin(jPtMin)
 {
@@ -154,14 +152,13 @@ TrkCorrHisAna::TrkCorrHisAna(TString name, TFile * outf, float jPtMin, bool pp) 
    jetBins.insert(jetBins.end(),jBins,jBins+numJetBins+1);
 
    //centrality bins
-   if (!isPP_) {
-      centBins.push_back(0);
-      centBins.push_back(12);
-      centBins.push_back(40);
-   } else {
-      centBins.push_back(0);
-      centBins.push_back(40);
-   }
+   centBins.push_back(0);
+//    centBins.push_back(2);
+//    centBins.push_back(4);
+   centBins.push_back(12);
+//    centBins.push_back(20);
+//   centBins.push_back(30);   
+   centBins.push_back(40);   
 }
 
 void TrkCorrHisAna::DeclareHistograms()

@@ -17,7 +17,6 @@ void analyzeTrackingCorrection(
    TString trkCol = "anaTrack",
    TString inname="/mnt/hadoop/cms/store/user/yenjie/HiForest_v27/Dijet${pthat}_HydjetDrum_v27_mergedV1.root",
    TString outname="trkcorr/test/TrkCorrtest_hy18dj100.root",
-   bool isPP=false,
    double samplePtHat=0,
    double ptHatMax=9999,
    double sampleWeight = 1,
@@ -29,7 +28,6 @@ void analyzeTrackingCorrection(
    double sigDPhi=-1,
    bool genJetMode=false
 ) {
-   TH1::SetDefaultSumw2();
    TString tag=Form("%s_%.0f_%.0f_%.0f_genJetMode%d",jetAlgo.Data(),leadingJetPtMin,subleadingJetPtMin,sigDPhi*1000,genJetMode);
    outname.ReplaceAll(".root",Form("_%s.root",tag.Data()));
    cout << "Input: " << inname << endl;
@@ -72,20 +70,20 @@ void analyzeTrackingCorrection(
    // Book Histograms
    ///////////////////////////////////////////////////
    // Tracking Corrections
-   TrkCorrHisAna effMergedGeneral("Forest2_MergedGeneral",output,40,isPP);
+   TrkCorrHisAna effMergedGeneral("Forest2_MergedGeneral",output,cutjetPt);
    effMergedGeneral.DeclareHistograms();
 
-   TrkCorrHisAna effMergedGeneral_j1("Forest2_MergedGeneral_j1",output,40,isPP);
+   TrkCorrHisAna effMergedGeneral_j1("Forest2_MergedGeneral_j1",output,cutjetPt);
    effMergedGeneral_j1.DeclareHistograms();
 
-   TrkCorrHisAna effMergedGeneral_j2("Forest2_MergedGeneral_j2",output,40,isPP);
+   TrkCorrHisAna effMergedGeneral_j2("Forest2_MergedGeneral_j2",output,cutjetPt);
    effMergedGeneral_j2.DeclareHistograms();
 
-   TrkCorrHisAna effMergedGeneral_jetfine("Forest2_MergedGeneral_jetfine",output,40,isPP);
-   effMergedGeneral_jetfine.jetBins.clear();
-   float fineJetBins[10] = {0,40,80,100,120,160,200,250,500,1000};
-   effMergedGeneral_jetfine.jetBins.insert(effMergedGeneral_jetfine.jetBins.begin(),fineJetBins,fineJetBins+9);
-   effMergedGeneral_jetfine.DeclareHistograms();
+   TrkCorrHisAna effMergedGeneral_jet_fineBin("effMergedGeneral_jet_fineBin",output,cutjetPt);
+   effMergedGeneral_jet_fineBin.jetBins.clear();
+   float fineJetBins[9] = {0,cutjetPt,80,120,160,200,250,500,1000};
+   effMergedGeneral_jet_fineBin.jetBins.insert(effMergedGeneral_jet_fineBin.jetBins.begin(),fineJetBins,fineJetBins+9);
+   effMergedGeneral_jet_fineBin.DeclareHistograms();
 
    // basics
    output->cd();
@@ -100,21 +98,20 @@ void analyzeTrackingCorrection(
    // In separate centrality bins
    vector<TH1D*> vhCent;
    vector<TH1D*> vhPtHat;
-   vector<TH1D*> vhPtHatBeforeSel;
    vector<TH2D*> vhJetPt2D;
    for (int ib=0; ib<effMergedGeneral.centBins.size()-1; ++ib) {
       vhCent.push_back(new TH1D(Form("hCent_c%d",ib),
       Form("cbin%dto%d;Centrality Bin;",effMergedGeneral.centBins[ib],effMergedGeneral.centBins[ib+1]),40,0,40));
       vhPtHat.push_back(new TH1D(Form("hPtHat_c%d",ib),"",200,0,1000));
-      vhPtHatBeforeSel.push_back(new TH1D(Form("hPtHatBeforeSel_c%d",ib),"",200,0,1000));
       vhJetPt2D.push_back(new TH2D(Form("hJetPt2D_c%d",ib),"",100,0,500,100,0,500));
    }
-
+   
    ///////////////////////////////////////////////////
    // Main loop
    ///////////////////////////////////////////////////
    if (maxEntries<0) maxEntries = c->GetEntries();
-   for (int i=0;i<maxEntries;i++) {
+   for (int i=0;i<maxEntries;i++)
+   {
       c->GetEntry(i);
       evt.cBin = c->evt.hiBin;
       evt.evtPlane = c->evt.hiEvtPlanes[21];
@@ -202,7 +199,7 @@ void analyzeTrackingCorrection(
             genLeadingIndex=j;
          }
       }
-
+      
       if (genLeadingIndex!=-1) {
          gj.genjeteta1=anajet->geneta[genLeadingIndex];
          gj.genjetphi1=anajet->genphi[genLeadingIndex];
@@ -241,11 +238,6 @@ void analyzeTrackingCorrection(
       // protection against high pt jet from background event
       if (leadingIndex>=0&&anajet->subid[leadingIndex]>0) continue;
       hPtHatBeforeSel->Fill(evt.pthat);
-      for (int ib=0; ib<effMergedGeneral.centBins.size(); ++ib) {
-         if(evt.cBin>=effMergedGeneral.centBins[ib] && evt.cBin<effMergedGeneral.centBins[ib+1]){
-            vhPtHatBeforeSel[ib]->Fill(evt.pthat);
-         }
-      }
       // ensure jet distribution unbiased by pthat turn on
       if (leadingJetPtMin>0&&gj.pt1<leadingJetPtMin) continue;
       if (subleadingJetPtMin>0&&gj.pt2<subleadingJetPtMin) continue;
@@ -290,12 +282,12 @@ void analyzeTrackingCorrection(
          r.jeta = -99;
          r.jdr  = -99;
          if (samplePtHat>0) {
-           if (dr1<0.5&&gj.pt1>=40) {
+           if (dr1<0.5&&gj.pt1>=cutjetPt) {
               r.jet = gj.pt1;
               r.jeta = gj.eta1;
               r.jdr = dr1;
               effMergedGeneral_j1.FillRecHistograms(evt,gj,r);
-           } else if (dr2<0.5&&gj.pt2>=40) {
+           } else if (dr2<0.5&&gj.pt2>=cutjetPt) {
               r.jet = gj.pt2;
               r.jeta = gj.eta2;
               r.jdr = dr2;
@@ -305,7 +297,7 @@ void analyzeTrackingCorrection(
 
          // Fill
          effMergedGeneral.FillRecHistograms(evt,gj,r);
-         effMergedGeneral_jetfine.FillRecHistograms(evt,gj,r);
+         effMergedGeneral_jet_fineBin.FillRecHistograms(evt,gj,r);
 //          effMergedGeneral_trkPhi.FillRecHistograms(evt,gj,r);
 //          if (r.jet>=120) effMergedGeneral_trkPhi_jet_120to999.FillRecHistograms(evt,gj,r);
 //          else if (r.jet>=cutjetPt) effMergedGeneral_trkPhi_jet_50to120.FillRecHistograms(evt,gj,r);
@@ -337,12 +329,12 @@ void analyzeTrackingCorrection(
          s.jeta = -99;
          s.jdr = -99;
          if (samplePtHat>0) {
-           if (dr1<0.5&&gj.pt1>=40) {
+           if (dr1<0.5&&gj.pt1>=cutjetPt) {
               s.jet = gj.pt1;
               s.jeta = gj.eta1;
               s.jdr = dr1;
               effMergedGeneral_j1.FillSimHistograms(evt,gj,s);
-           } else if (dr2<0.5&&gj.pt2>=40) {
+           } else if (dr2<0.5&&gj.pt2>=cutjetPt) {
               s.jet = gj.pt2;
               s.jeta = gj.eta2;
               s.jdr = dr2;
@@ -351,7 +343,7 @@ void analyzeTrackingCorrection(
          }
          // Fill
          effMergedGeneral.FillSimHistograms(evt,gj,s);
-         effMergedGeneral_jetfine.FillSimHistograms(evt,gj,s);
+         effMergedGeneral_jet_fineBin.FillSimHistograms(evt,gj,s);
 //          effMergedGeneral_trkPhi.FillSimHistograms(evt,gj,s);
 //          if (s.jet>=120) effMergedGeneral_trkPhi_jet_120to999.FillSimHistograms(evt,gj,s);
 //          else if (s.jet>=cutjetPt) effMergedGeneral_trkPhi_jet_50to120.FillSimHistograms(evt,gj,s);
