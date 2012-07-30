@@ -100,7 +100,6 @@ ppMode_(false)
       centBin_.push_back("0to12");
       centBin_.push_back("12to30");
    }
-   numCentBins_ = centBin_.size();
    
    levelName_.push_back("Eff");
    levelName_.push_back("Fak");
@@ -215,10 +214,13 @@ void TrackingCorrections::Init()
    if (weightSamples_) {
       for (UInt_t s=0; s<ptHatMin_.size(); ++s) { // merge pt hat samples with weight                                                             
         for (Int_t c=0; c<numCentBins_; ++c) {
-          TString hnameNoE(Form("hPtHatBeforeSel"));
-//           TString hnameNoE(Form("hPtHat_c%d",c));
-          if (!normFiles_.size()) hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
-          else hNoEvts_[s][c] =  (TH1D*)normFiles_[s]->Get(hnameNoE);
+          TString hnameNoE(Form("hPtHat_c%d",c));
+          if (normFiles_.size()) hNoEvts_[s][c] =  (TH1D*)normFiles_[s]->Get(hnameNoE);
+          else {
+//             hnameNoE = Form("hPtHatBeforeSel");
+            hnameNoE = Form("hPtHatBeforeSel_c%d",c);
+            hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
+          }
           if (!hNoEvts_[s][c]) {
             cout << "bad norm file: " << hnameNoE << endl;
             exit(1);
@@ -240,7 +242,7 @@ void TrackingCorrections::Init()
         else if ( ptHatMin_[s]==170) sampleCroSec_[s] = 1.470e-06 - 5.310e-07;
         else if ( ptHatMin_[s]==200) sampleCroSec_[s] = 5.310e-07;
         else cout << endl << endl << " Error no such pt hat!!!!!" << endl << endl << endl;
-     } else if (corrSetName_=="Forest2STAv13") {
+     } else if (corrSetName_=="Forest2STAv14") {
         if ( ptHatMin_[s]==50 ) sampleCroSec_[s] = 1.021e-03 - 9.913e-05;
         else if ( ptHatMin_[s]==80 ) sampleCroSec_[s] = 9.913e-05 - 3.0698e-05;
         else if ( ptHatMin_[s]==100) sampleCroSec_[s] = 3.069e-05 - 1.470e-06;
