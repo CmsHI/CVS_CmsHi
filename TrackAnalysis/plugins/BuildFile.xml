@@ -1,4 +1,0 @@
-<use name="CmsHi/TrackAnalysis"/>
-<library file="*.cc" name="CmsHiTrackAnalysisPlugins">
-   <flags EdmPlugin="1"/>
-</library>
