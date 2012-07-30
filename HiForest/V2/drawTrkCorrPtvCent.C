@@ -8,7 +8,7 @@
 #include "commonUtility.h"
 
 void drawTrkCorrPtvCent(
-                           TString outdir="fig/07.28_preapproval"
+                           TString outdir="fig/trkcorrv14"
 )
 {
    TH1::SetDefaultSumw2();
