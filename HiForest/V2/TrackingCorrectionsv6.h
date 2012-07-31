@@ -217,8 +217,8 @@ void TrackingCorrections::Init()
           TString hnameNoE(Form("hPtHat_c%d",c));
           if (normFiles_.size()) hNoEvts_[s][c] =  (TH1D*)normFiles_[s]->Get(hnameNoE);
           else {
-            hnameNoE = Form("hPtHatBeforeSel");
-//             hnameNoE = Form("hPtHatBeforeSel_c%d",c);
+//             hnameNoE = Form("hPtHatBeforeSel");
+            hnameNoE = Form("hPtHatBeforeSel_c%d",c);
             hNoEvts_[s][c] =  (TH1D*)sample_[s]->Get(hnameNoE);
           }
           if (!hNoEvts_[s][c]) {
