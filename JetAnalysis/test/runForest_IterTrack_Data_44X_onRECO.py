@@ -19,6 +19,12 @@ ivars.register ('randomNumber',
                 ivars.varType.int,
                 "Random Seed")
 
+ivars.register ('doSkim',
+               False, # default value
+               VarParsing.VarParsing.multiplicity.singleton, # singleton or list
+               VarParsing.VarParsing.varType.bool,          # string, int, or float
+               "whether to do skimming")
+                  
 ivars.randomNumber = 1
 ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankmalocal/data/reco/96A31CE6-1921-E111-B606-00A0D1E953AA.root"
 ivars.outputFile = 'output_data.root'
@@ -278,6 +284,25 @@ process.schedule = cms.Schedule(process.reco_extra, process.reco_extra_jet,proce
 ########### random number seed
 process.RandomNumberGeneratorService.generator.initialSeed = ivars.randomNumber 
 process.RandomNumberGeneratorService.multiPhotonAnalyzer = process.RandomNumberGeneratorService.generator.clone()
+
+#####################################################################################
+# Skimming
+#####################################################################################
+if (ivars.doSkim):
+   import HLTrigger.HLTfilters.hltHighLevel_cfi
+   process.photonFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+   process.photonFilter.HLTPaths = ["HLT_HISinglePhoton30_v*"]
+   process.singlePhotonPtFilter = cms.EDFilter("PhotonSelector",
+                                                src = cms.InputTag("photons"),
+                                                cut = cms.string('pt > 45 && abs(eta) < 1.48 && sigmaIetaIeta > 0.002' ),
+                                                filter = cms.bool(True)
+                                                )
+   
+   process.superFilterSequence = cms.Sequence(process.photonFilter*process.collisionEventSelection*process.singlePhotonPtFilter*process.HBHENoiseFilter)
+   process.superFilterPath = cms.Path(process.superFilterSequence)
+   
+   for path in process.paths:
+       getattr(process,path)._seq = process.superFilterSequence*getattr(process,path)._seq
 
 #####################################################################################
 # Edm Output
