@@ -182,14 +182,14 @@ process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(0)
-process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
+# process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
 
 
 ##################### Track Analyzers
+process.anaTrack.trackSrc = cms.InputTag("hiTracks")
 process.anaTrack.qualityStrings = cms.untracked.vstring('highPurity')
 process.anaTrack.simTrackPtMin = 0.8
 process.anaTrack.fillSimTrack = True
-process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
 
 ############################################ Pf Analyzers
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
@@ -256,10 +256,10 @@ process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
 process.ana_step          = cms.Path( process.genpana +
                                       process.hcalNoise +
-                                      process.jetAnalyzers                                
-#                                       process.multiPhotonAnalyzer +
-#                                       process.HiGenParticleAna +
-#                                       process.anaTrack +
+                                      process.jetAnalyzers +
+                                      process.multiPhotonAnalyzer +
+                                      process.HiGenParticleAna +
+                                      (process.cutsTPForFak * process.cutsTPForEff * process.anaTrack)
 #                                       process.pfcandAnalyzer +
 #                                       process.hiEvtAnalyzer +
 #                                       process.HiForest
@@ -275,7 +275,7 @@ process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 from CmsHi.JetAnalysis.customise_cfi import *
 setPhotonObject(process,"cleanPhotons")
 
-process.schedule = cms.Schedule(process.gen_step, process.reco_extra, process.reco_extra_jet, process.pat_step, process.extrapatstep)
+process.schedule = cms.Schedule(process.gen_step, process.reco_extra, process.reco_extra_jet, process.pat_step, process.extrapatstep,process.ana_step)
 
 # process.load('L1Trigger.Configuration.L1Extra_cff')
 # process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
@@ -293,6 +293,7 @@ process.schedule = cms.Schedule(process.gen_step, process.reco_extra, process.re
 
 ########### random number seed
 process.RandomNumberGeneratorService.generator.initialSeed = ivars.randomNumber 
+process.RandomNumberGeneratorService.multiPhotonAnalyzer = process.RandomNumberGeneratorService.generator.clone()
 
 #####################################################################################
 # Edm Output
