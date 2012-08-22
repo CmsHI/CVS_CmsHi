@@ -9,8 +9,6 @@ process.options = cms.untracked.PSet(
 #####################################################################################
 # High Level Setup
 #####################################################################################
-saveAllGenParticles = True
-
 import FWCore.ParameterSet.VarParsing as VarParsing
 
 ivars = VarParsing.VarParsing('python')
@@ -39,7 +37,6 @@ process.HiForest.inputLines = cms.vstring("HiForest V2",
 #####################################################################################
 # Input source
 #####################################################################################
-
 process.source = cms.Source("PoolSource",
  duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
     fileNames = cms.untracked.vstring(ivars.inputFiles))
@@ -47,6 +44,9 @@ process.source = cms.Source("PoolSource",
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
             input = cms.untracked.int32(ivars.maxEvents))
+
+# Gen signal event
+genTag="hiSignal"
 
 
 #####################################################################################
@@ -110,6 +110,9 @@ process.load('CmsHi.JetAnalysis.JetAnalyzers_MC_cff')
 process.load('CmsHi.JetAnalysis.TrkAnalyzers_MC_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 
+##################### Gen Related
+process.hiGenParticles.srcVector = cms.vstring('hiSignal','generator')
+
 ##################### Track Related
 process.load("RecoHI.HiTracking.hiIterTracking_cff")
 process.heavyIonTracking *= process.hiIterTracking
@@ -151,6 +154,8 @@ for m in [
    process.ak6CaloJetAnalyzer
    ]:
    m.trackTag = "hiTracks"
+   m.eventInfoTag = cms.InputTag(genTag)
+   m.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
 
 ##################### Photon Related
 # EcalSeverityLevel ES Producer
@@ -183,6 +188,8 @@ process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(0)
 process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
+process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
+process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
 
 ##################### Track Analyzers
@@ -196,8 +203,7 @@ process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
 process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0.5
 
-############################################ Other MC Info
-process.hiGenParticles.srcVector = cms.vstring('hiSignal')
+############################################ Gen Particle Analyzers
 process.HiGenParticleAna = cms.EDAnalyzer('HiGenAnalyzer',
     useHepMCProduct = cms.untracked.bool(False),
     ptMin = cms.untracked.double(0.8),
@@ -206,8 +212,8 @@ process.HiGenParticleAna = cms.EDAnalyzer('HiGenAnalyzer',
     genpSrc = cms.untracked.InputTag("hiGenParticles"), # save just the signal genp
     genHiSrc = cms.untracked.InputTag("heavyIon"),
     )
-if saveAllGenParticles:
-    process.HiGenParticleAna.genpSrc = cms.untracked.InputTag("hiGenParticles","","HISIGNAL")
+# if saveAllGenParticles:
+#     process.HiGenParticleAna.genpSrc = cms.untracked.InputTag("hiGenParticles","","HISIGNAL")
 
 process.genpana = cms.EDAnalyzer("GenParticleCounter",
                               src = cms.untracked.string("hiGenParticles"),
@@ -215,21 +221,7 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
                               VertexProducer = cms.untracked.string("hiSelectedVertex")
                               )
 
-genTag="hiSignal"
-process.hiGenParticles.srcVector = cms.vstring('hiSignal','generator')
-process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu2PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu3PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu4PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu5PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-process.akPu6PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
-
-process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
-process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
-
-process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
-process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+############################################ Other MC Info
 
 ##################### Final Paths
 process.gen_step          = cms.Path( process.hiGen )
