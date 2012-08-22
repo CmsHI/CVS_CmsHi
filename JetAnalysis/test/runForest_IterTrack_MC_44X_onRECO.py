@@ -260,10 +260,10 @@ process.ana_step          = cms.Path( process.genpana +
                                       process.jetAnalyzers +
                                       process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
-                                      (process.cutsTPForFak * process.cutsTPForEff * process.anaTrack)
-#                                       process.pfcandAnalyzer +
-#                                       process.hiEvtAnalyzer +
-#                                       process.HiForest
+                                      (process.cutsTPForFak * process.cutsTPForEff * process.anaTrack) +
+                                      process.pfcandAnalyzer +
+                                      process.hiEvtAnalyzer +
+                                      process.HiForest
                                       )
 
 
@@ -276,18 +276,25 @@ process.phiEcalRecHitSpikeFilter = cms.Path(process.hiEcalRecHitSpikeFilter )
 from CmsHi.JetAnalysis.customise_cfi import *
 setPhotonObject(process,"cleanPhotons")
 
-process.schedule = cms.Schedule(process.gen_step, process.reco_extra, process.reco_extra_jet, process.pat_step, process.extrapatstep,process.ana_step)
+#############################################################################
+# Event Triggering/Filtering
+#############################################################################
+process.load('L1Trigger.Configuration.L1Extra_cff')
+process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
+process.hltAna = cms.EndPath(process.hltanalysis)
+process.reco_extra*=process.L1Extra
+process.L1simulation_step = cms.Path(process.SimL1Emulator)
 
-# process.load('L1Trigger.Configuration.L1Extra_cff')
-# process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
-# process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
-# process.hltAna = cms.EndPath(process.hltanalysis)
-# process.reco_extra*=process.L1Extra
-# 
-# process.pAna = cms.EndPath(process.skimanalysis)
-# process.endjob_step = cms.EndPath(process.endOfProcess)
-# process.schedule = cms.Schedule(process.L1simulation_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step, process.extrapatstep,process.ana_step, process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
-# 
+process.skimanalysis.hltresults = cms.InputTag("TriggerResults","",process.name_())
+process.pAna = cms.EndPath(process.skimanalysis)
+process.endjob_step = cms.EndPath(process.endOfProcess)
+
+#############################################################################
+# Final Schedule
+#############################################################################
+process.schedule = cms.Schedule(process.L1simulation_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step, process.extrapatstep,process.ana_step, process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
+
 # process.HLTSchedule.extend(process.schedule)
 
 
