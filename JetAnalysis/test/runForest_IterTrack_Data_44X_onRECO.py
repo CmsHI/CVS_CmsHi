@@ -20,8 +20,8 @@ ivars.register ('randomNumber',
                 "Random Seed")
 
 ivars.randomNumber = 1
-ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/icali/Hydjet1.8/Z2/Dijet120/reco_v1/set1_random10000_HydjetDrum_100.root"
-ivars.outputFile = 'output.root'
+ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankmalocal/data/reco/96A31CE6-1921-E111-B606-00A0D1E953AA.root"
+ivars.outputFile = 'output_data.root'
 ivars.maxEvents = -1
 
 ivars.parseArguments()
@@ -45,10 +45,6 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet(
             input = cms.untracked.int32(ivars.maxEvents))
 
-# Gen signal event
-genTag="hiSignal"
-
-
 #####################################################################################
 # Load some general stuff
 #####################################################################################
@@ -67,19 +63,18 @@ process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 # process.load('HLTrigger.Configuration.HLT_HIon_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 # Data Global Tag 44x 
-#process.GlobalTag.globaltag = 'GR_P_V27::All'
+process.GlobalTag.globaltag = 'GR_P_V27A::All'
 
 # process.Timing = cms.Service("Timing")
 
 # MC Global Tag 44x 
-process.GlobalTag.globaltag = 'STARTHI44_V7::All'
+# process.GlobalTag.globaltag = 'STARTHI44_V7::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
 overrideCentrality(process)
 process.HeavyIonGlobalParameters = cms.PSet(
 	centralityVariable = cms.string("HFtowers"),
-	nonDefaultGlauberModel = cms.string("Hydjet_Drum"),
 	centralitySrc = cms.InputTag("hiCentrality")
 	)
 process.hiCentrality.pixelBarrelOnly = False
@@ -105,13 +100,10 @@ process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
-process.load('CmsHi.JetAnalysis.PatAna_MC_cff')
-process.load('CmsHi.JetAnalysis.JetAnalyzers_MC_cff')
-process.load('CmsHi.JetAnalysis.TrkAnalyzers_MC_cff')
+process.load('CmsHi.JetAnalysis.PatAna_cff')
+process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
+process.load('CmsHi.JetAnalysis.TrkAnalyzers_cff')
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
-
-##################### Gen Related
-process.hiGenParticles.srcVector = cms.vstring('hiSignal','generator')
 
 ##################### Track Related
 process.load("RecoHI.HiTracking.hiIterTracking_cff")
@@ -180,23 +172,18 @@ for m in [
    process.ak6CaloJetAnalyzer
    ]:
    m.trackTag = "hiTracks"
-   m.eventInfoTag = cms.InputTag(genTag)
-   m.hltTrgResults = cms.untracked.string('TriggerResults::RECO')
+   m.hltTrgResults = cms.untracked.string('TriggerResults::HLT')
 
 ##################### Photon Tree Analyzers
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(0)
 process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
-process.multiPhotonAnalyzer.GenEventScale = cms.InputTag(genTag)
-process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
 
 ##################### Track Analyzers
 process.anaTrack.trackSrc = cms.InputTag("hiTracks")
 process.anaTrack.qualityStrings = cms.untracked.vstring('highPurity')
-process.anaTrack.simTrackPtMin = 0.8
-process.anaTrack.fillSimTrack = True
 
 ############################################ Pf Analyzers
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
@@ -224,8 +211,6 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 ############################################ Other MC Info
 
 ##################### Final Paths
-process.gen_step          = cms.Path( process.hiGen )
-
 process.reco_extra =  cms.Path(
    process.hiTrackReReco *
    (process.electronGsfTrackingHi * process.hiElectronSequence) *
@@ -247,12 +232,11 @@ process.pat_step.remove(process.interestingTrackEcalDetIds)
 
 process.extrapatstep = cms.Path(process.selectedPatPhotons)
 
-process.ana_step          = cms.Path( process.genpana +
+process.ana_step          = cms.Path(
                                       process.hcalNoise +
                                       process.jetAnalyzers +
                                       process.multiPhotonAnalyzer +
-                                      process.HiGenParticleAna +
-                                      (process.cutsTPForFak * process.cutsTPForEff * process.anaTrack) +
+                                      (process.anaTrack) +
                                       process.pfcandAnalyzer +
                                       process.hiEvtAnalyzer +
                                       process.HiForest
@@ -271,12 +255,11 @@ setPhotonObject(process,"cleanPhotons")
 #############################################################################
 # Event Triggering/Filtering
 #############################################################################
-process.load('L1Trigger.Configuration.L1Extra_cff')
+# process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
-process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO")
+process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","HLT")
 process.hltAna = cms.EndPath(process.hltanalysis)
-process.reco_extra*=process.L1Extra
-process.L1simulation_step = cms.Path(process.SimL1Emulator)
+# process.reco_extra*=process.L1Extra
 
 process.skimanalysis.hltresults = cms.InputTag("TriggerResults","",process.name_())
 process.pAna = cms.EndPath(process.skimanalysis)
@@ -285,7 +268,8 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 #############################################################################
 # Final Schedule
 #############################################################################
-process.schedule = cms.Schedule(process.L1simulation_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step, process.extrapatstep,process.ana_step, process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
+# process.schedule = cms.Schedule(process.L1simulation_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step, process.extrapatstep,process.ana_step, process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
+process.schedule = cms.Schedule(process.reco_extra, process.reco_extra_jet,process.pat_step, process.extrapatstep,process.ana_step, process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,process.hltAna,process.pAna)
 
 # process.HLTSchedule.extend(process.schedule)
 
