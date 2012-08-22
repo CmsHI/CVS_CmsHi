@@ -182,7 +182,7 @@ process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 process.load('CmsHi.JetAnalysis.EGammaAnalyzers_cff')
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(0)
-# process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
+process.multiPhotonAnalyzer.gsfElectronCollection = cms.untracked.InputTag("ecalDrivenGsfElectrons")
 
 
 ##################### Track Analyzers
@@ -236,6 +236,7 @@ process.gen_step          = cms.Path( process.hiGen )
 
 process.reco_extra =  cms.Path(
    process.hiTrackReReco *
+   (process.electronGsfTrackingHi * process.hiElectronSequence) *
    process.HiParticleFlowLocalReco *
    process.HiParticleFlowReco *
    process.PFTowers
