@@ -264,7 +264,7 @@ setPhotonObject(process,"cleanPhotons")
 # process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","HLT")
-process.hltAna = cms.EndPath(process.hltanalysis)
+process.hltAna = cms.Path(process.hltanalysis)
 # process.reco_extra*=process.L1Extra
 
 process.skimanalysis.hltresults = cms.InputTag("TriggerResults","",process.name_())
@@ -289,6 +289,7 @@ process.RandomNumberGeneratorService.multiPhotonAnalyzer = process.RandomNumberG
 # Skimming
 #####################################################################################
 if (ivars.doSkim):
+   process.schedule.remove(process.pAna)
    import HLTrigger.HLTfilters.hltHighLevel_cfi
    process.photonFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
    process.photonFilter.HLTPaths = ["HLT_HISinglePhoton30_v*"]
