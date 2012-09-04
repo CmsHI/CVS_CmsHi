@@ -85,7 +85,7 @@ cvs co -r branch_hi44X HLTrigger/HLTanalyzers
 cvs co -r HiForest_V02_00 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
-cvs co -r HiForest_V02_00 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
+cvs co -r HiForest_V02_02 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 #echo '54c54
 #< reconstructionHeavyIons_withPF *= HiParticleFlowReco
