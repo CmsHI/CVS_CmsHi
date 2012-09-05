@@ -4,10 +4,17 @@
 #include <TNtuple.h>
 #include <iostream>
 
+double deltaPhi(double phi1, double phi2) {
+        double dePhi = fabs(phi1 - phi2);  
+        if (dePhi > 3.1415926) dePhi = 2 * 3.1415926 - dePhi;
+        return dePhi;
+}
+
+
 void photonJet(double etCut=40)
 {
    // Define the input file and HiForest
-   HiForest *c = new HiForest("skim_Photon.root");
+   HiForest *c = new HiForest("merged_HI2010_SD_Jet35_prod05.root");
 
    // Don't want to loop over trees which is not used in the analysis
    c->hasHltTree=0;
@@ -58,7 +65,7 @@ void photonJet(double etCut=40)
          for (int j=0;j<c->akPu3PF.nref;j++) {
             if (c->akPu3PF.jtpt[j]<25) break;
             if (fabs(c->akPu3PF.jteta[j])>2) continue;
-            if (fabs(deltaPhi(c->akPu3PF.jtphi[j],c->photon.phi[leadingPhoton])<2.5)) continue;
+            if (deltaPhi(c->akPu3PF.jtphi[j],c->photon.phi[leadingPhoton])<2.5) continue;
             leadingJet = j;
             break;
          }	 

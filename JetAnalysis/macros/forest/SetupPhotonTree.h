@@ -1,230 +1,369 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Sun Nov 20 23:20:00 2011 by ROOT version 5.27/06b
-// from TTree photon/v1
-// found on file: /d100/velicanu/forest/PromptHiForestDiJet.root
-//////////////////////////////////////////////////////////
 #include "commonSetup.h"
-#include <iostream>
-#include <TROOT.h>
-#include <TChain.h>
-#include <TFile.h>
 #include <TTree.h>
 #include <TBranch.h>
+class Photons
+{
+  public: 
 
-class Photons {
-public :
-   Photons(){};
-   ~Photons(){};
-
-   // Declaration of leaf types
+  Photons(){};
+  ~Photons(){};
+  
    Int_t           run;
    Int_t           event;
+   Int_t           orbit;
    Int_t           bunchCrossing;
    Int_t           luminosityBlock;
+   Int_t           timesec;
+   Double_t        hf;
+   Double_t        hftp;
+   Double_t        hftm;
+   Double_t        eb;
+   Double_t        eep;
+   Double_t        eem;
+   Int_t           cBin;
+   Int_t           nbins;
+   Int_t           binsize;
+   Double_t        npart;
+   Double_t        npartSigma;
+   Double_t        ncoll;
+   Double_t        ncollSigma;
+   Double_t        nhard;
+   Double_t        nhardSigma;
+   Double_t        b;
+   Double_t        bSigma;
+   Int_t           nTTBits;
+   Int_t           kMaxTTBits;
+   UChar_t         TTBit[64];   //[nTTBits]
+   UChar_t         TTBit34;
+   UChar_t         TTBit40;
+   UChar_t         TTBit41;
+   UChar_t         TTBit0;
+   Int_t           kMaxL1Bits;
+   Int_t           nL1Bits;
+   UChar_t         L1Bit[maxEntry];   //[nL1Bits]
+   Int_t           kMaxTrigFlag;
+   Int_t           nHLTBits;
+   UChar_t         HLTBit[maxEntry];   //[nHLTBits]
+   Int_t           nHfTowersP;
+   Int_t           nHfTowersN;
+   Double_t        beamSpotX;
+   Double_t        beamSpotY;
+   Double_t        beamSpotZ;
+   UChar_t         vtxIsFake;
+   Double_t        vtxX;
+   Double_t        vtxY;
+   Double_t        vtxZ;
+   Double_t        vtxXError;
+   Double_t        vtxYError;
+   Double_t        vtxZError;
+   Int_t           vtxNTrk;
+   Int_t           vtxNTrkWeight05;
+   Double_t        vtxChi2;
+   Double_t        vtxNdof;
+   Double_t        vtxNormChi2;
+   Int_t           nRecTracks;
+   Float_t         trackPt[maxEntry];   //[nRecTracks]
+   Float_t         trackEta[maxEntry];   //[nRecTracks]
+   Float_t         trackPhi[maxEntry];   //[nRecTracks]
+   Int_t           nEvtPlane;
+   Float_t         evtPlane[maxEntry];   //[nEvtPlane]
    Int_t           nPhotons;
-   Float_t         pt[100];   //[nPhotons]
-   Float_t         energy[100];   //[nPhotons]
-   Float_t         rawEnergy[100];   //[nPhotons]
-   Float_t         eta[100];   //[nPhotons]
-   Float_t         phi[100];   //[nPhotons]
-   Float_t         r9[100];   //[nPhotons]
-   Bool_t          isEB[100];   //[nPhotons]
-   Bool_t          isEBGap[100];   //[nPhotons]
-   Bool_t          isEEGap[100];   //[nPhotons]
-   Bool_t          isEBEEGap[100];   //[nPhotons]
-   Bool_t          isTransGap[100];   //[nPhotons]
-   Float_t         preshowerEnergy[100];   //[nPhotons]
-   Float_t         numOfPreshClusters[100];   //[nPhotons]
-   Float_t         ESRatio[100];   //[nPhotons]
-   Float_t         clustersSize[100];   //[nPhotons]
-   Float_t         scSize[100];   //[nPhotons]
-   Float_t         phiWidth[100];   //[nPhotons]
-   Float_t         etaWidth[100];   //[nPhotons]
-   Float_t         scEta[100];   //[nPhotons]
-   Float_t         scPhi[100];   //[nPhotons]
-   Float_t         sigmaEtaEta[100];   //[nPhotons]
-   Float_t         sigmaIetaIeta[100];   //[nPhotons]
-   Float_t         sigmaIphiIphi[100];   //[nPhotons]
-   Float_t         sieie50[100];   //[nPhotons]
-   Float_t         sieie45[100];   //[nPhotons]
-   Float_t         sieie47[100];   //[nPhotons]
-   Float_t         sieie42[100];   //[nPhotons]
-   Float_t         sieie39[100];   //[nPhotons]
-   Float_t         covPhiPhi[100];   //[nPhotons]
-   Float_t         covEtaPhi[100];   //[nPhotons]
-   Float_t         covEtaEta[100];   //[nPhotons]
-   Float_t         r1x5[100];   //[nPhotons]
-   Float_t         r2x5[100];   //[nPhotons]
-   Float_t         e1x5[100];   //[nPhotons]
-   Float_t         e2x5[100];   //[nPhotons]
-   Float_t         eMax[100];   //[nPhotons]
-   Float_t         e2nd[100];   //[nPhotons]
-   Float_t         e2x2[100];   //[nPhotons]
-   Float_t         e3x3[100];   //[nPhotons]
-   Float_t         e3x2[100];   //[nPhotons]
-   Float_t         e4x4[100];   //[nPhotons]
-   Float_t         e5x5[100];   //[nPhotons]
-   Float_t         e2overe8[100];   //[nPhotons]
-   Float_t         eRight[100];   //[nPhotons]
-   Float_t         eLeft[100];   //[nPhotons]
-   Float_t         eTop[100];   //[nPhotons]
-   Float_t         eBottom[100];   //[nPhotons]
-   Float_t         e2x5Right[100];   //[nPhotons]
-   Float_t         e2x5Left[100];   //[nPhotons]
-   Float_t         e2x5Top[100];   //[nPhotons]
-   Float_t         e2x5Bottom[100];   //[nPhotons]
-   Float_t         seedTime[100];   //[nPhotons]
-   Float_t         seedChi2[100];   //[nPhotons]
-   Float_t         seedOutOfTimeChi2[100];   //[nPhotons]
-   Float_t         seedRecoFlag[100];   //[nPhotons]
-   Float_t         seedSeverity[100];   //[nPhotons]
-   Float_t         swissCrx[100];   //[nPhotons]
-   Float_t         hadronicOverEm[100];   //[nPhotons]
-   Float_t         hadronicDepth1OverEm[100];   //[nPhotons]
-   Float_t         hadronicDepth2OverEm[100];   //[nPhotons]
-   Float_t         ecalRecHitSumEtConeDR04[100];   //[nPhotons]
-   Float_t         hcalTowerSumEtConeDR04[100];   //[nPhotons]
-   Float_t         hcalDepth1TowerSumEtConeDR04[100];   //[nPhotons]
-   Float_t         hcalDepth2TowerSumEtConeDR04[100];   //[nPhotons]
-   Float_t         trkSumPtHollowConeDR04[100];   //[nPhotons]
-   Float_t         trkSumPtSolidConeDR04[100];   //[nPhotons]
-   Float_t         ecalRecHitSumEtConeDR03[100];   //[nPhotons]
-   Float_t         hcalTowerSumEtConeDR03[100];   //[nPhotons]
-   Float_t         hcalDepth1TowerSumEtConeDR03[100];   //[nPhotons]
-   Float_t         hcalDepth2TowerSumEtConeDR03[100];   //[nPhotons]
-   Float_t         trkSumPtHollowConeDR03[100];   //[nPhotons]
-   Float_t         trkSumPtSolidConeDR03[100];   //[nPhotons]
-   Int_t           isEle[100];   //[nPhotons]
-   Int_t           hasPixelSeed[100];   //[nPhotons]
-   Float_t         detaEle[100];   //[nPhotons]
-   Float_t         dphiEle[100];   //[nPhotons]
-   Float_t         eleCharge[100];   //[nPhotons]
-   Float_t         eleEoverP[100];   //[nPhotons]
-   Float_t         c1[100];   //[nPhotons]
-   Float_t         c2[100];   //[nPhotons]
-   Float_t         c3[100];   //[nPhotons]
-   Float_t         c4[100];   //[nPhotons]
-   Float_t         c5[100];   //[nPhotons]
-   Float_t         r1[100];   //[nPhotons]
-   Float_t         r2[100];   //[nPhotons]
-   Float_t         r3[100];   //[nPhotons]
-   Float_t         r4[100];   //[nPhotons]
-   Float_t         r5[100];   //[nPhotons]
-   Float_t         t1[100];   //[nPhotons]
-   Float_t         t2[100];   //[nPhotons]
-   Float_t         t3[100];   //[nPhotons]
-   Float_t         t4[100];   //[nPhotons]
-   Float_t         t5[100];   //[nPhotons]
-   Float_t         t1PtCut[100];   //[nPhotons]
-   Float_t         t2PtCut[100];   //[nPhotons]
-   Float_t         t3PtCut[100];   //[nPhotons]
-   Float_t         t4PtCut[100];   //[nPhotons]
-   Float_t         t5PtCut[100];   //[nPhotons]
-   Float_t         cc1[100];   //[nPhotons]
-   Float_t         cc2[100];   //[nPhotons]
-   Float_t         cc3[100];   //[nPhotons]
-   Float_t         cc4[100];   //[nPhotons]
-   Float_t         cc4j[100];   //[nPhotons]
-   Float_t         cc5[100];   //[nPhotons]
-   Float_t         cc05[100];   //[nPhotons]
-   Float_t         cr1[100];   //[nPhotons]
-   Float_t         cr2[100];   //[nPhotons]
-   Float_t         cr3[100];   //[nPhotons]
-   Float_t         cr4[100];   //[nPhotons]
-   Float_t         cr5[100];   //[nPhotons]
-   Float_t         cr4j[100];   //[nPhotons]
-   Float_t         ct1[100];   //[nPhotons]
-   Float_t         ct2[100];   //[nPhotons]
-   Float_t         ct3[100];   //[nPhotons]
-   Float_t         ct4[100];   //[nPhotons]
-   Float_t         ct5[100];   //[nPhotons]
-   Float_t         ct1PtCut20[100];   //[nPhotons]
-   Float_t         ct2PtCut20[100];   //[nPhotons]
-   Float_t         ct3PtCut20[100];   //[nPhotons]
-   Float_t         ct4PtCut20[100];   //[nPhotons]
-   Float_t         ct5PtCut20[100];   //[nPhotons]
-   Float_t         ct4j20[100];   //[nPhotons]
-   Float_t         ct4j10[100];   //[nPhotons]
-   Float_t         ct4j15[100];   //[nPhotons]
-   Float_t         ct4j[100];   //[nPhotons]
-   Float_t         dr11[100];   //[nPhotons]
-   Float_t         dr21[100];   //[nPhotons]
-   Float_t         dr31[100];   //[nPhotons]
-   Float_t         dr41[100];   //[nPhotons]
-   Float_t         dr12[100];   //[nPhotons]
-   Float_t         dr22[100];   //[nPhotons]
-   Float_t         dr32[100];   //[nPhotons]
-   Float_t         dr42[100];   //[nPhotons]
-   Float_t         dr13[100];   //[nPhotons]
-   Float_t         dr23[100];   //[nPhotons]
-   Float_t         dr33[100];   //[nPhotons]
-   Float_t         dr43[100];   //[nPhotons]
-   Float_t         dr14[100];   //[nPhotons]
-   Float_t         dr24[100];   //[nPhotons]
-   Float_t         dr34[100];   //[nPhotons]
-   Float_t         dr44[100];   //[nPhotons]
-   Float_t         t11[100];   //[nPhotons]
-   Float_t         t21[100];   //[nPhotons]
-   Float_t         t31[100];   //[nPhotons]
-   Float_t         t41[100];   //[nPhotons]
-   Float_t         t12[100];   //[nPhotons]
-   Float_t         t22[100];   //[nPhotons]
-   Float_t         t32[100];   //[nPhotons]
-   Float_t         t42[100];   //[nPhotons]
-   Float_t         t13[100];   //[nPhotons]
-   Float_t         t23[100];   //[nPhotons]
-   Float_t         t33[100];   //[nPhotons]
-   Float_t         t43[100];   //[nPhotons]
-   Float_t         t14[100];   //[nPhotons]
-   Float_t         t24[100];   //[nPhotons]
-   Float_t         t34[100];   //[nPhotons]
-   Float_t         t44[100];   //[nPhotons]
-   Int_t           isGenMatched[100];   //[nPhotons]
-   Int_t           genMatchedCollId[100];   //[nPhotons]
-   Float_t         genMatchedPt[100];   //[nPhotons]
-   Float_t         genMatchedEta[100];   //[nPhotons]
-   Float_t         genMatchedPhi[100];   //[nPhotons]
-   Int_t           genMomId[100];   //[nPhotons]
-   Int_t           genGrandMomId[100];   //[nPhotons]
-   Int_t           genNSiblings[100];   //[nPhotons]
-   Float_t         genCalIsoDR03[100];   //[nPhotons]
-   Float_t         genCalIsoDR04[100];   //[nPhotons]
-   Float_t         genTrkIsoDR03[100];   //[nPhotons]
-   Float_t         genTrkIsoDR04[100];   //[nPhotons]
-   Int_t           nGp;
-   Float_t         simVtxX;
-   Float_t         simVtxY;
-   Float_t         simVtxZ;
-   Float_t         ptHat;
-   Float_t         gpEt[2];   //[nGp]
-   Float_t         gpEta[2];   //[nGp]
-   Float_t         gpCalIsoDR04[2];   //[nGp]
-   Float_t         gpCalIsoDR03[2];   //[nGp]
-   Float_t         gpTrkIsoDR03[2];   //[nGp]
-   Float_t         gpTrkIsoDR04[2];   //[nGp]
-   Int_t           gpStatus[2];   //[nGp]
-   Int_t           gpCollId[2];   //[nGp]
-   Int_t           gpId[2];   //[nGp]
-   Int_t           gpMomId[2];   //[nGp]
+   Int_t           kMaxPhotons;
+   Float_t         p[maxEntry];   //[nPhotons]
+   Float_t         et[maxEntry];   //[nPhotons]
+   Float_t         energy[maxEntry];   //[nPhotons]
+   Float_t         momentumX[maxEntry];   //[nPhotons]
+   Float_t         momentumY[maxEntry];   //[nPhotons]
+   Float_t         momentumZ[maxEntry];   //[nPhotons]
+   Float_t         pt[maxEntry];   //[nPhotons]
+   Float_t         eta[maxEntry];   //[nPhotons]
+   Float_t         phi[maxEntry];   //[nPhotons]
+   Float_t         r9[maxEntry];   //[nPhotons]
+   UChar_t         isEBGap[maxEntry];   //[nPhotons]
+   UChar_t         isEEGap[maxEntry];   //[nPhotons]
+   UChar_t         isEBEEGap[maxEntry];   //[nPhotons]
+   UChar_t         isTransGap[maxEntry];   //[nPhotons]
+   UChar_t         isEB[maxEntry];   //[nPhotons]
+   UChar_t         isEE[maxEntry];   //[nPhotons]
+   Float_t         scEnergy[maxEntry];   //[nPhotons]
+   Float_t         rawEnergy[maxEntry];   //[nPhotons]
+   Float_t         preshowerEnergy[maxEntry];   //[nPhotons]
+   Int_t           numOfPreshClusters[maxEntry];   //[nPhotons]
+   Float_t         ESRatio[maxEntry];   //[nPhotons]
+   Int_t           clustersSize[maxEntry];   //[nPhotons]
+   Int_t           scSize[maxEntry];   //[nPhotons]
+   Float_t         phiWidth[maxEntry];   //[nPhotons]
+   Float_t         etaWidth[maxEntry];   //[nPhotons]
+   Float_t         scEta[maxEntry];   //[nPhotons]
+   Float_t         scPhi[maxEntry];   //[nPhotons]
+   Float_t         maxEnergyXtal[maxEntry];   //[nPhotons]
+   Float_t         sigmaEtaEta[maxEntry];   //[nPhotons]
+   Float_t         sigmaIetaIeta[maxEntry];   //[nPhotons]
+   Float_t         sigmaIphiIphi[maxEntry];   //[nPhotons]
+   Float_t         sieie47[maxEntry];   //[nPhotons]
+   Float_t         sieie50[maxEntry];   //[nPhotons]
+   Float_t         sieie46[maxEntry];   //[nPhotons]
+   Float_t         sieie45[maxEntry];   //[nPhotons]
+   Float_t         sieie44[maxEntry];   //[nPhotons]
+   Float_t         sieie43[maxEntry];   //[nPhotons]
+   Float_t         sieie42[maxEntry];   //[nPhotons]
+   Float_t         sieie39[maxEntry];   //[nPhotons]
+   Float_t         sieie02a[maxEntry];   //[nPhotons]
+   Float_t         sieie03a[maxEntry];   //[nPhotons]
+   Float_t         sieie04a[maxEntry];   //[nPhotons]
+   Float_t         sieie05a[maxEntry];   //[nPhotons]
+   Float_t         sieie08a[maxEntry];   //[nPhotons]
+   Float_t         sieie10a[maxEntry];   //[nPhotons]
+   Float_t         sieie022a[maxEntry];   //[nPhotons]
+   Float_t         sieie025a[maxEntry];   //[nPhotons]
+   Float_t         sieie027a[maxEntry];   //[nPhotons]
+   Float_t         sieie032a[maxEntry];   //[nPhotons]
+   Float_t         sieie035a[maxEntry];   //[nPhotons]
+   Float_t         sieie037a[maxEntry];   //[nPhotons]
+   Float_t         r1x5[maxEntry];   //[nPhotons]
+   Float_t         r2x5[maxEntry];   //[nPhotons]
+   Float_t         e1x5[maxEntry];   //[nPhotons]
+   Float_t         e2x5[maxEntry];   //[nPhotons]
+   Float_t         seedTime[maxEntry];   //[nPhotons]
+   Float_t         seedChi2[maxEntry];   //[nPhotons]
+   Float_t         seedOutOfTimeChi2[maxEntry];   //[nPhotons]
+   Int_t           seedRecoFlag[maxEntry];   //[nPhotons]
+   Int_t           seedSeverity[maxEntry];   //[nPhotons]
+   Float_t         seedEnergy[maxEntry];   //[nPhotons]
+   Float_t         tRight[maxEntry];   //[nPhotons]
+   Float_t         tLeft[maxEntry];   //[nPhotons]
+   Float_t         tTop[maxEntry];   //[nPhotons]
+   Float_t         tBottom[maxEntry];   //[nPhotons]
+   Float_t         eMax[maxEntry];   //[nPhotons]
+   Float_t         e2nd[maxEntry];   //[nPhotons]
+   Float_t         e2x2[maxEntry];   //[nPhotons]
+   Float_t         e3x2[maxEntry];   //[nPhotons]
+   Float_t         e3x3[maxEntry];   //[nPhotons]
+   Float_t         e4x4[maxEntry];   //[nPhotons]
+   Float_t         e5x5[maxEntry];   //[nPhotons]
+   Float_t         e2overe8[maxEntry];   //[nPhotons]
+   Float_t         e2x5Right[maxEntry];   //[nPhotons]
+   Float_t         e2x5Left[maxEntry];   //[nPhotons]
+   Float_t         e2x5Top[maxEntry];   //[nPhotons]
+   Float_t         e2x5Bottom[maxEntry];   //[nPhotons]
+   Float_t         eRight[maxEntry];   //[nPhotons]
+   Float_t         eLeft[maxEntry];   //[nPhotons]
+   Float_t         eTop[maxEntry];   //[nPhotons]
+   Float_t         eBottom[maxEntry];   //[nPhotons]
+   Float_t         covPhiPhi[maxEntry];   //[nPhotons]
+   Float_t         covEtaPhi[maxEntry];   //[nPhotons]
+   Float_t         covEtaEta[maxEntry];   //[nPhotons]
+   Float_t         hadronicOverEm[maxEntry];   //[nPhotons]
+   Float_t         hadronicDepth1OverEm[maxEntry];   //[nPhotons]
+   Float_t         hadronicDepth2OverEm[maxEntry];   //[nPhotons]
+   Float_t         trackIso[maxEntry];   //[nPhotons]
+   Float_t         caloIso[maxEntry];   //[nPhotons]
+   Float_t         ecalIso[maxEntry];   //[nPhotons]
+   Float_t         hcalIso[maxEntry];   //[nPhotons]
+   Float_t         compTrackIso[maxEntry];   //[nPhotons]
+   Float_t         compEcalIso[maxEntry];   //[nPhotons]
+   Float_t         compHcalIso[maxEntry];   //[nPhotons]
+   Float_t         ecalRecHitSumEtConeDR04[maxEntry];   //[nPhotons]
+   Float_t         hcalTowerSumEtConeDR04[maxEntry];   //[nPhotons]
+   Float_t         hcalDepth1TowerSumEtConeDR04[maxEntry];   //[nPhotons]
+   Float_t         hcalDepth2TowerSumEtConeDR04[maxEntry];   //[nPhotons]
+   Float_t         trkSumPtSolidConeDR04[maxEntry];   //[nPhotons]
+   Float_t         trkSumPtHollowConeDR04[maxEntry];   //[nPhotons]
+   Int_t           nTrkSolidConeDR04[maxEntry];   //[nPhotons]
+   Int_t           nTrkHollowConeDR04[maxEntry];   //[nPhotons]
+   Float_t         ecalRecHitSumEtConeDR03[maxEntry];   //[nPhotons]
+   Float_t         hcalTowerSumEtConeDR03[maxEntry];   //[nPhotons]
+   Float_t         hcalDepth1TowerSumEtConeDR03[maxEntry];   //[nPhotons]
+   Float_t         hcalDepth2TowerSumEtConeDR03[maxEntry];   //[nPhotons]
+   Float_t         trkSumPtSolidConeDR03[maxEntry];   //[nPhotons]
+   Float_t         trkSumPtHollowConeDR03[maxEntry];   //[nPhotons]
+   Int_t           nTrkSolidConeDR03[maxEntry];   //[nPhotons]
+   Int_t           nTrkHollowConeDR03[maxEntry];   //[nPhotons]
+   UChar_t         isEle[maxEntry];   //[nPhotons]
+   Float_t         detaEle[maxEntry];   //[nPhotons]
+   Float_t         dphiEle[maxEntry];   //[nPhotons]
+   Int_t           eleCharge[maxEntry];   //[nPhotons]
+   Float_t         deltaEtaEleCT[maxEntry];   //[nPhotons]
+   Float_t         deltaPhiEleCT[maxEntry];   //[nPhotons]
+   Float_t         eleEoverP[maxEntry];   //[nPhotons]
+   Float_t         c1[maxEntry];   //[nPhotons]
+   Float_t         c2[maxEntry];   //[nPhotons]
+   Float_t         c3[maxEntry];   //[nPhotons]
+   Float_t         c4[maxEntry];   //[nPhotons]
+   Float_t         c5[maxEntry];   //[nPhotons]
+   Float_t         r1[maxEntry];   //[nPhotons]
+   Float_t         r2[maxEntry];   //[nPhotons]
+   Float_t         r3[maxEntry];   //[nPhotons]
+   Float_t         r4[maxEntry];   //[nPhotons]
+   Float_t         r5[maxEntry];   //[nPhotons]
+   Float_t         t1[maxEntry];   //[nPhotons]
+   Float_t         t2[maxEntry];   //[nPhotons]
+   Float_t         t3[maxEntry];   //[nPhotons]
+   Float_t         t4[maxEntry];   //[nPhotons]
+   Float_t         t5[maxEntry];   //[nPhotons]
+   Float_t         t1PtCut[maxEntry];   //[nPhotons]
+   Float_t         t2PtCut[maxEntry];   //[nPhotons]
+   Float_t         t3PtCut[maxEntry];   //[nPhotons]
+   Float_t         t4PtCut[maxEntry];   //[nPhotons]
+   Float_t         t5PtCut[maxEntry];   //[nPhotons]
+   Float_t         cc1[maxEntry];   //[nPhotons]
+   Float_t         cc2[maxEntry];   //[nPhotons]
+   Float_t         cc3[maxEntry];   //[nPhotons]
+   Float_t         cc4[maxEntry];   //[nPhotons]
+   Float_t         cc5[maxEntry];   //[nPhotons]
+   Float_t         cc05[maxEntry];   //[nPhotons]
+   Float_t         cc4j[maxEntry];   //[nPhotons]
+   Float_t         ct1[maxEntry];   //[nPhotons]
+   Float_t         ct2[maxEntry];   //[nPhotons]
+   Float_t         ct3[maxEntry];   //[nPhotons]
+   Float_t         ct4[maxEntry];   //[nPhotons]
+   Float_t         ct5[maxEntry];   //[nPhotons]
+   Float_t         ct05[maxEntry];   //[nPhotons]
+   Float_t         ct1PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct2PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct3PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct4PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct5PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct05PtCut[maxEntry];   //[nPhotons]
+   Float_t         ct4j[maxEntry];   //[nPhotons]
+   Float_t         ct4j10[maxEntry];   //[nPhotons]
+   Float_t         ct4j15[maxEntry];   //[nPhotons]
+   Float_t         ct4j20[maxEntry];   //[nPhotons]
+   Float_t         trackIsohi[maxEntry];   //[nPhotons]
+   Float_t         trackIsohi10[maxEntry];   //[nPhotons]
+   Float_t         trackIsohi15[maxEntry];   //[nPhotons]
+   Float_t         trackIsohi20[maxEntry];   //[nPhotons]
+   Float_t         trackIsohij[maxEntry];   //[nPhotons]
+   Float_t         trackIsohij10[maxEntry];   //[nPhotons]
+   Float_t         trackIsohij15[maxEntry];   //[nPhotons]
+   Float_t         trackIsohij20[maxEntry];   //[nPhotons]
+   Float_t         mpt0[maxEntry];   //[nPhotons]
+   Float_t         mpt05[maxEntry];   //[nPhotons]
+   Float_t         mpt2[maxEntry];   //[nPhotons]
+   Float_t         mpt4[maxEntry];   //[nPhotons]
+   Float_t         cr1[maxEntry];   //[nPhotons]
+   Float_t         cr2[maxEntry];   //[nPhotons]
+   Float_t         cr3[maxEntry];   //[nPhotons]
+   Float_t         cr4[maxEntry];   //[nPhotons]
+   Float_t         cr5[maxEntry];   //[nPhotons]
+   Float_t         cr05[maxEntry];   //[nPhotons]
+   Float_t         cr4j[maxEntry];   //[nPhotons]
+   Float_t         dr11[maxEntry];   //[nPhotons]
+   Float_t         dr12[maxEntry];   //[nPhotons]
+   Float_t         dr13[maxEntry];   //[nPhotons]
+   Float_t         dr14[maxEntry];   //[nPhotons]
+   Float_t         dr21[maxEntry];   //[nPhotons]
+   Float_t         dr22[maxEntry];   //[nPhotons]
+   Float_t         dr23[maxEntry];   //[nPhotons]
+   Float_t         dr24[maxEntry];   //[nPhotons]
+   Float_t         dr31[maxEntry];   //[nPhotons]
+   Float_t         dr32[maxEntry];   //[nPhotons]
+   Float_t         dr33[maxEntry];   //[nPhotons]
+   Float_t         dr34[maxEntry];   //[nPhotons]
+   Float_t         dr41[maxEntry];   //[nPhotons]
+   Float_t         dr42[maxEntry];   //[nPhotons]
+   Float_t         dr43[maxEntry];   //[nPhotons]
+   Float_t         dr44[maxEntry];   //[nPhotons]
+   Float_t         t11[maxEntry];   //[nPhotons]
+   Float_t         t12[maxEntry];   //[nPhotons]
+   Float_t         t13[maxEntry];   //[nPhotons]
+   Float_t         t14[maxEntry];   //[nPhotons]
+   Float_t         t21[maxEntry];   //[nPhotons]
+   Float_t         t22[maxEntry];   //[nPhotons]
+   Float_t         t23[maxEntry];   //[nPhotons]
+   Float_t         t24[maxEntry];   //[nPhotons]
+   Float_t         t31[maxEntry];   //[nPhotons]
+   Float_t         t32[maxEntry];   //[nPhotons]
+   Float_t         t33[maxEntry];   //[nPhotons]
+   Float_t         t34[maxEntry];   //[nPhotons]
+   Float_t         t41[maxEntry];   //[nPhotons]
+   Float_t         t42[maxEntry];   //[nPhotons]
+   Float_t         t43[maxEntry];   //[nPhotons]
+   Float_t         t44[maxEntry];   //[nPhotons]
+   Float_t         nAllTracks[maxEntry];   //[nPhotons]
+   Float_t         nLocalTracks[maxEntry];   //[nPhotons]
+   UChar_t         hasPixelSeed[maxEntry];   //[nPhotons]
 
    // List of branches
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
+   TBranch        *b_orbit;   //!
    TBranch        *b_bunchCrossing;   //!
    TBranch        *b_luminosityBlock;   //!
+   TBranch        *b_timesec;   //!
+   TBranch        *b_hf;   //!
+   TBranch        *b_hftp;   //!
+   TBranch        *b_hftm;   //!
+   TBranch        *b_eb;   //!
+   TBranch        *b_eep;   //!
+   TBranch        *b_eem;   //!
+   TBranch        *b_cBin;   //!
+   TBranch        *b_nbins;   //!
+   TBranch        *b_binsize;   //!
+   TBranch        *b_npart;   //!
+   TBranch        *b_npartSigma;   //!
+   TBranch        *b_ncoll;   //!
+   TBranch        *b_ncollSigma;   //!
+   TBranch        *b_nhard;   //!
+   TBranch        *b_nhardSigma;   //!
+   TBranch        *b_b;   //!
+   TBranch        *b_bSigma;   //!
+   TBranch        *b_nTTBits;   //!
+   TBranch        *b_kMaxTTBits;   //!
+   TBranch        *b_TTBit;   //!
+   TBranch        *b_TTBit34;   //!
+   TBranch        *b_TTBit40;   //!
+   TBranch        *b_TTBit41;   //!
+   TBranch        *b_TTBit0;   //!
+   TBranch        *b_kMaxL1Bits;   //!
+   TBranch        *b_nL1Bits;   //!
+   TBranch        *b_L1Bit;   //!
+   TBranch        *b_kMaxTrigFlag;   //!
+   TBranch        *b_nHLTBits;   //!
+   TBranch        *b_HLTBit;   //!
+   TBranch        *b_nHfTowersP;   //!
+   TBranch        *b_nHfTowersN;   //!
+   TBranch        *b_beamSpotX;   //!
+   TBranch        *b_beamSpotY;   //!
+   TBranch        *b_beamSpotZ;   //!
+   TBranch        *b_vtxIsFake;   //!
+   TBranch        *b_vtxX;   //!
+   TBranch        *b_vtxY;   //!
+   TBranch        *b_vtxZ;   //!
+   TBranch        *b_vtxXError;   //!
+   TBranch        *b_vtxYError;   //!
+   TBranch        *b_vtxZError;   //!
+   TBranch        *b_vtxNTrk;   //!
+   TBranch        *b_vtxNTrkWeight05;   //!
+   TBranch        *b_vtxChi2;   //!
+   TBranch        *b_vtxNdof;   //!
+   TBranch        *b_vtxNormChi2;   //!
+   TBranch        *b_nRecTracks;   //!
+   TBranch        *b_trackPt;   //!
+   TBranch        *b_trackEta;   //!
+   TBranch        *b_trackPhi;   //!
+   TBranch        *b_nEvtPlane;   //!
+   TBranch        *b_evtPlane;   //!
    TBranch        *b_nPhotons;   //!
-   TBranch        *b_pt;   //!
+   TBranch        *b_kMaxPhotons;   //!
+   TBranch        *b_p;   //!
+   TBranch        *b_et;   //!
    TBranch        *b_energy;   //!
-   TBranch        *b_rawEnergy;   //!
+   TBranch        *b_momentumX;   //!
+   TBranch        *b_momentumY;   //!
+   TBranch        *b_momentumZ;   //!
+   TBranch        *b_pt;   //!
    TBranch        *b_eta;   //!
    TBranch        *b_phi;   //!
    TBranch        *b_r9;   //!
-   TBranch        *b_isEB;   //!
    TBranch        *b_isEBGap;   //!
    TBranch        *b_isEEGap;   //!
    TBranch        *b_isEBEEGap;   //!
    TBranch        *b_isTransGap;   //!
+   TBranch        *b_isEB;   //!
+   TBranch        *b_isEE;   //!
+   TBranch        *b_scEnergy;   //!
+   TBranch        *b_rawEnergy;   //!
    TBranch        *b_preshowerEnergy;   //!
    TBranch        *b_numOfPreshClusters;   //!
    TBranch        *b_ESRatio;   //!
@@ -234,63 +373,95 @@ public :
    TBranch        *b_etaWidth;   //!
    TBranch        *b_scEta;   //!
    TBranch        *b_scPhi;   //!
+   TBranch        *b_maxEnergyXtal;   //!
    TBranch        *b_sigmaEtaEta;   //!
    TBranch        *b_sigmaIetaIeta;   //!
    TBranch        *b_sigmaIphiIphi;   //!
-   TBranch        *b_sieie50;   //!
-   TBranch        *b_sieie45;   //!
    TBranch        *b_sieie47;   //!
+   TBranch        *b_sieie50;   //!
+   TBranch        *b_sieie46;   //!
+   TBranch        *b_sieie45;   //!
+   TBranch        *b_sieie44;   //!
+   TBranch        *b_sieie43;   //!
    TBranch        *b_sieie42;   //!
    TBranch        *b_sieie39;   //!
-   TBranch        *b_covPhiPhi;   //!
-   TBranch        *b_covEtaPhi;   //!
-   TBranch        *b_covEtaEta;   //!
+   TBranch        *b_sieie02a;   //!
+   TBranch        *b_sieie03a;   //!
+   TBranch        *b_sieie04a;   //!
+   TBranch        *b_sieie05a;   //!
+   TBranch        *b_sieie08a;   //!
+   TBranch        *b_sieie10a;   //!
+   TBranch        *b_sieie022a;   //!
+   TBranch        *b_sieie025a;   //!
+   TBranch        *b_sieie027a;   //!
+   TBranch        *b_sieie032a;   //!
+   TBranch        *b_sieie035a;   //!
+   TBranch        *b_sieie037a;   //!
    TBranch        *b_r1x5;   //!
    TBranch        *b_r2x5;   //!
    TBranch        *b_e1x5;   //!
    TBranch        *b_e2x5;   //!
-   TBranch        *b_eMax;   //!
-   TBranch        *b_e2nd;   //!
-   TBranch        *b_e2x2;   //!
-   TBranch        *b_e3x3;   //!
-   TBranch        *b_e3x2;   //!
-   TBranch        *b_e4x4;   //!
-   TBranch        *b_e5x5;   //!
-   TBranch        *b_e2overe8;   //!
-   TBranch        *b_eRight;   //!
-   TBranch        *b_eLeft;   //!
-   TBranch        *b_eTop;   //!
-   TBranch        *b_eBottom;   //!
-   TBranch        *b_e2x5Right;   //!
-   TBranch        *b_e2x5Left;   //!
-   TBranch        *b_e2x5Top;   //!
-   TBranch        *b_e2x5Bottom;   //!
    TBranch        *b_seedTime;   //!
    TBranch        *b_seedChi2;   //!
    TBranch        *b_seedOutOfTimeChi2;   //!
    TBranch        *b_seedRecoFlag;   //!
    TBranch        *b_seedSeverity;   //!
-   TBranch        *b_swissCrx;   //!
+   TBranch        *b_seedEnergy;   //!
+   TBranch        *b_tRight;   //!
+   TBranch        *b_tLeft;   //!
+   TBranch        *b_tTop;   //!
+   TBranch        *b_tBottom;   //!
+   TBranch        *b_eMax;   //!
+   TBranch        *b_e2nd;   //!
+   TBranch        *b_e2x2;   //!
+   TBranch        *b_e3x2;   //!
+   TBranch        *b_e3x3;   //!
+   TBranch        *b_e4x4;   //!
+   TBranch        *b_e5x5;   //!
+   TBranch        *b_e2overe8;   //!
+   TBranch        *b_e2x5Right;   //!
+   TBranch        *b_e2x5Left;   //!
+   TBranch        *b_e2x5Top;   //!
+   TBranch        *b_e2x5Bottom;   //!
+   TBranch        *b_eRight;   //!
+   TBranch        *b_eLeft;   //!
+   TBranch        *b_eTop;   //!
+   TBranch        *b_eBottom;   //!
+   TBranch        *b_covPhiPhi;   //!
+   TBranch        *b_covEtaPhi;   //!
+   TBranch        *b_covEtaEta;   //!
    TBranch        *b_hadronicOverEm;   //!
    TBranch        *b_hadronicDepth1OverEm;   //!
    TBranch        *b_hadronicDepth2OverEm;   //!
+   TBranch        *b_trackIso;   //!
+   TBranch        *b_caloIso;   //!
+   TBranch        *b_ecalIso;   //!
+   TBranch        *b_hcalIso;   //!
+   TBranch        *b_compTrackIso;   //!
+   TBranch        *b_compEcalIso;   //!
+   TBranch        *b_compHcalIso;   //!
    TBranch        *b_ecalRecHitSumEtConeDR04;   //!
    TBranch        *b_hcalTowerSumEtConeDR04;   //!
    TBranch        *b_hcalDepth1TowerSumEtConeDR04;   //!
    TBranch        *b_hcalDepth2TowerSumEtConeDR04;   //!
-   TBranch        *b_trkSumPtHollowConeDR04;   //!
    TBranch        *b_trkSumPtSolidConeDR04;   //!
+   TBranch        *b_trkSumPtHollowConeDR04;   //!
+   TBranch        *b_nTrkSolidConeDR04;   //!
+   TBranch        *b_nTrkHollowConeDR04;   //!
    TBranch        *b_ecalRecHitSumEtConeDR03;   //!
    TBranch        *b_hcalTowerSumEtConeDR03;   //!
    TBranch        *b_hcalDepth1TowerSumEtConeDR03;   //!
    TBranch        *b_hcalDepth2TowerSumEtConeDR03;   //!
-   TBranch        *b_trkSumPtHollowConeDR03;   //!
    TBranch        *b_trkSumPtSolidConeDR03;   //!
+   TBranch        *b_trkSumPtHollowConeDR03;   //!
+   TBranch        *b_nTrkSolidConeDR03;   //!
+   TBranch        *b_nTrkHollowConeDR03;   //!
    TBranch        *b_isEle;   //!
-   TBranch        *b_hasPixelSeed;   //!
    TBranch        *b_detaEle;   //!
    TBranch        *b_dphiEle;   //!
    TBranch        *b_eleCharge;   //!
+   TBranch        *b_deltaEtaEleCT;   //!
+   TBranch        *b_deltaPhiEleCT;   //!
    TBranch        *b_eleEoverP;   //!
    TBranch        *b_c1;   //!
    TBranch        *b_c2;   //!
@@ -316,287 +487,356 @@ public :
    TBranch        *b_cc2;   //!
    TBranch        *b_cc3;   //!
    TBranch        *b_cc4;   //!
-   TBranch        *b_cc4j;   //!
    TBranch        *b_cc5;   //!
    TBranch        *b_cc05;   //!
-   TBranch        *b_cr1;   //!
-   TBranch        *b_cr2;   //!
-   TBranch        *b_cr3;   //!
-   TBranch        *b_cr4;   //!
-   TBranch        *b_cr5;   //!
-   TBranch        *b_cr4j;   //!
+   TBranch        *b_cc4j;   //!
    TBranch        *b_ct1;   //!
    TBranch        *b_ct2;   //!
    TBranch        *b_ct3;   //!
    TBranch        *b_ct4;   //!
    TBranch        *b_ct5;   //!
-   TBranch        *b_ct1PtCut20;   //!
-   TBranch        *b_ct2PtCut20;   //!
-   TBranch        *b_ct3PtCut20;   //!
-   TBranch        *b_ct4PtCut20;   //!
-   TBranch        *b_ct5PtCut20;   //!
-   TBranch        *b_ct4j20;   //!
+   TBranch        *b_ct05;   //!
+   TBranch        *b_ct1PtCut;   //!
+   TBranch        *b_ct2PtCut;   //!
+   TBranch        *b_ct3PtCut;   //!
+   TBranch        *b_ct4PtCut;   //!
+   TBranch        *b_ct5PtCut;   //!
+   TBranch        *b_ct05PtCut;   //!
+   TBranch        *b_ct4j;   //!
    TBranch        *b_ct4j10;   //!
    TBranch        *b_ct4j15;   //!
-   TBranch        *b_ct4j;   //!
+   TBranch        *b_ct4j20;   //!
+   TBranch        *b_trackIsohi;   //!
+   TBranch        *b_trackIsohi10;   //!
+   TBranch        *b_trackIsohi15;   //!
+   TBranch        *b_trackIsohi20;   //!
+   TBranch        *b_trackIsohij;   //!
+   TBranch        *b_trackIsohij10;   //!
+   TBranch        *b_trackIsohij15;   //!
+   TBranch        *b_trackIsohij20;   //!
+   TBranch        *b_mpt0;   //!
+   TBranch        *b_mpt05;   //!
+   TBranch        *b_mpt2;   //!
+   TBranch        *b_mpt4;   //!
+   TBranch        *b_cr1;   //!
+   TBranch        *b_cr2;   //!
+   TBranch        *b_cr3;   //!
+   TBranch        *b_cr4;   //!
+   TBranch        *b_cr5;   //!
+   TBranch        *b_cr05;   //!
+   TBranch        *b_cr4j;   //!
    TBranch        *b_dr11;   //!
-   TBranch        *b_dr21;   //!
-   TBranch        *b_dr31;   //!
-   TBranch        *b_dr41;   //!
    TBranch        *b_dr12;   //!
-   TBranch        *b_dr22;   //!
-   TBranch        *b_dr32;   //!
-   TBranch        *b_dr42;   //!
    TBranch        *b_dr13;   //!
-   TBranch        *b_dr23;   //!
-   TBranch        *b_dr33;   //!
-   TBranch        *b_dr43;   //!
    TBranch        *b_dr14;   //!
+   TBranch        *b_dr21;   //!
+   TBranch        *b_dr22;   //!
+   TBranch        *b_dr23;   //!
    TBranch        *b_dr24;   //!
+   TBranch        *b_dr31;   //!
+   TBranch        *b_dr32;   //!
+   TBranch        *b_dr33;   //!
    TBranch        *b_dr34;   //!
+   TBranch        *b_dr41;   //!
+   TBranch        *b_dr42;   //!
+   TBranch        *b_dr43;   //!
    TBranch        *b_dr44;   //!
    TBranch        *b_t11;   //!
-   TBranch        *b_t21;   //!
-   TBranch        *b_t31;   //!
-   TBranch        *b_t41;   //!
    TBranch        *b_t12;   //!
-   TBranch        *b_t22;   //!
-   TBranch        *b_t32;   //!
-   TBranch        *b_t42;   //!
    TBranch        *b_t13;   //!
-   TBranch        *b_t23;   //!
-   TBranch        *b_t33;   //!
-   TBranch        *b_t43;   //!
    TBranch        *b_t14;   //!
+   TBranch        *b_t21;   //!
+   TBranch        *b_t22;   //!
+   TBranch        *b_t23;   //!
    TBranch        *b_t24;   //!
+   TBranch        *b_t31;   //!
+   TBranch        *b_t32;   //!
+   TBranch        *b_t33;   //!
    TBranch        *b_t34;   //!
+   TBranch        *b_t41;   //!
+   TBranch        *b_t42;   //!
+   TBranch        *b_t43;   //!
    TBranch        *b_t44;   //!
-   TBranch        *b_isGenMatched;   //!
-   TBranch        *b_genMatchedCollId;   //!
-   TBranch        *b_genMatchedPt;   //!
-   TBranch        *b_genMatchedEta;   //!
-   TBranch        *b_genMatchedPhi;   //!
-   TBranch        *b_genMomId;   //!
-   TBranch        *b_genGrandMomId;   //!
-   TBranch        *b_genNSiblings;   //!
-   TBranch        *b_genCalIsoDR03;   //!
-   TBranch        *b_genCalIsoDR04;   //!
-   TBranch        *b_genTrkIsoDR03;   //!
-   TBranch        *b_genTrkIsoDR04;   //!
-   TBranch        *b_nGp;   //!
-   TBranch        *b_simVtxX;   //!
-   TBranch        *b_simVtxY;   //!
-   TBranch        *b_simVtxZ;   //!
-   TBranch        *b_ptHat;   //!
-   TBranch        *b_gpEt;   //!
-   TBranch        *b_gpEta;   //!
-   TBranch        *b_gpCalIsoDR04;   //!
-   TBranch        *b_gpCalIsoDR03;   //!
-   TBranch        *b_gpTrkIsoDR03;   //!
-   TBranch        *b_gpTrkIsoDR04;   //!
-   TBranch        *b_gpStatus;   //!
-   TBranch        *b_gpCollId;   //!
-   TBranch        *b_gpId;   //!
-   TBranch        *b_gpMomId;   //!
-
+   TBranch        *b_nAllTracks;   //!
+   TBranch        *b_nLocalTracks;   //!
+   TBranch        *b_hasPixelSeed;   //!
 };
 
-
-void setupPhotonTree(TTree *t,Photons &tPhotons,bool doCheck = 0)
+void setupPhotonTree(TTree *t, Photons &photons)
 {
-   // Set branch addresses and branch pointers
-   t->SetBranchAddress("run", &tPhotons.run, &tPhotons.b_run);
-   t->SetBranchAddress("event", &tPhotons.event, &tPhotons.b_event);
-   t->SetBranchAddress("bunchCrossing", &tPhotons.bunchCrossing, &tPhotons.b_bunchCrossing);
-   t->SetBranchAddress("luminosityBlock", &tPhotons.luminosityBlock, &tPhotons.b_luminosityBlock);
-   t->SetBranchAddress("nPhotons", &tPhotons.nPhotons, &tPhotons.b_nPhotons);
-   t->SetBranchAddress("pt", tPhotons.pt, &tPhotons.b_pt);
-   t->SetBranchAddress("energy", tPhotons.energy, &tPhotons.b_energy);
-   t->SetBranchAddress("rawEnergy", tPhotons.rawEnergy, &tPhotons.b_rawEnergy);
-   t->SetBranchAddress("eta", tPhotons.eta, &tPhotons.b_eta);
-   t->SetBranchAddress("phi", tPhotons.phi, &tPhotons.b_phi);
-   t->SetBranchAddress("r9", tPhotons.r9, &tPhotons.b_r9);
-   t->SetBranchAddress("isEB", tPhotons.isEB, &tPhotons.b_isEB);
-   t->SetBranchAddress("isEBGap", tPhotons.isEBGap, &tPhotons.b_isEBGap);
-   t->SetBranchAddress("isEEGap", tPhotons.isEEGap, &tPhotons.b_isEEGap);
-   t->SetBranchAddress("isEBEEGap", tPhotons.isEBEEGap, &tPhotons.b_isEBEEGap);
-   t->SetBranchAddress("isTransGap", tPhotons.isTransGap, &tPhotons.b_isTransGap);
-   t->SetBranchAddress("preshowerEnergy", tPhotons.preshowerEnergy, &tPhotons.b_preshowerEnergy);
-   t->SetBranchAddress("numOfPreshClusters", tPhotons.numOfPreshClusters, &tPhotons.b_numOfPreshClusters);
-   t->SetBranchAddress("ESRatio", tPhotons.ESRatio, &tPhotons.b_ESRatio);
-   t->SetBranchAddress("clustersSize", tPhotons.clustersSize, &tPhotons.b_clustersSize);
-   t->SetBranchAddress("scSize", tPhotons.scSize, &tPhotons.b_scSize);
-   t->SetBranchAddress("phiWidth", tPhotons.phiWidth, &tPhotons.b_phiWidth);
-   t->SetBranchAddress("etaWidth", tPhotons.etaWidth, &tPhotons.b_etaWidth);
-   t->SetBranchAddress("scEta", tPhotons.scEta, &tPhotons.b_scEta);
-   t->SetBranchAddress("scPhi", tPhotons.scPhi, &tPhotons.b_scPhi);
-   t->SetBranchAddress("sigmaEtaEta", tPhotons.sigmaEtaEta, &tPhotons.b_sigmaEtaEta);
-   t->SetBranchAddress("sigmaIetaIeta", tPhotons.sigmaIetaIeta, &tPhotons.b_sigmaIetaIeta);
-   t->SetBranchAddress("sigmaIphiIphi", tPhotons.sigmaIphiIphi, &tPhotons.b_sigmaIphiIphi);
-   t->SetBranchAddress("sieie50", tPhotons.sieie50, &tPhotons.b_sieie50);
-   t->SetBranchAddress("sieie45", tPhotons.sieie45, &tPhotons.b_sieie45);
-   t->SetBranchAddress("sieie47", tPhotons.sieie47, &tPhotons.b_sieie47);
-   t->SetBranchAddress("sieie42", tPhotons.sieie42, &tPhotons.b_sieie42);
-   t->SetBranchAddress("sieie39", tPhotons.sieie39, &tPhotons.b_sieie39);
-   t->SetBranchAddress("covPhiPhi", tPhotons.covPhiPhi, &tPhotons.b_covPhiPhi);
-   t->SetBranchAddress("covEtaPhi", tPhotons.covEtaPhi, &tPhotons.b_covEtaPhi);
-   t->SetBranchAddress("covEtaEta", tPhotons.covEtaEta, &tPhotons.b_covEtaEta);
-   t->SetBranchAddress("r1x5", tPhotons.r1x5, &tPhotons.b_r1x5);
-   t->SetBranchAddress("r2x5", tPhotons.r2x5, &tPhotons.b_r2x5);
-   t->SetBranchAddress("e1x5", tPhotons.e1x5, &tPhotons.b_e1x5);
-   t->SetBranchAddress("e2x5", tPhotons.e2x5, &tPhotons.b_e2x5);
-   t->SetBranchAddress("eMax", tPhotons.eMax, &tPhotons.b_eMax);
-   t->SetBranchAddress("e2nd", tPhotons.e2nd, &tPhotons.b_e2nd);
-   t->SetBranchAddress("e2x2", tPhotons.e2x2, &tPhotons.b_e2x2);
-   t->SetBranchAddress("e3x3", tPhotons.e3x3, &tPhotons.b_e3x3);
-   t->SetBranchAddress("e3x2", tPhotons.e3x2, &tPhotons.b_e3x2);
-   t->SetBranchAddress("e4x4", tPhotons.e4x4, &tPhotons.b_e4x4);
-   t->SetBranchAddress("e5x5", tPhotons.e5x5, &tPhotons.b_e5x5);
-   t->SetBranchAddress("e2overe8", tPhotons.e2overe8, &tPhotons.b_e2overe8);
-   t->SetBranchAddress("eRight", tPhotons.eRight, &tPhotons.b_eRight);
-   t->SetBranchAddress("eLeft", tPhotons.eLeft, &tPhotons.b_eLeft);
-   t->SetBranchAddress("eTop", tPhotons.eTop, &tPhotons.b_eTop);
-   t->SetBranchAddress("eBottom", tPhotons.eBottom, &tPhotons.b_eBottom);
-   t->SetBranchAddress("e2x5Right", tPhotons.e2x5Right, &tPhotons.b_e2x5Right);
-   t->SetBranchAddress("e2x5Left", tPhotons.e2x5Left, &tPhotons.b_e2x5Left);
-   t->SetBranchAddress("e2x5Top", tPhotons.e2x5Top, &tPhotons.b_e2x5Top);
-   t->SetBranchAddress("e2x5Bottom", tPhotons.e2x5Bottom, &tPhotons.b_e2x5Bottom);
-   t->SetBranchAddress("seedTime", tPhotons.seedTime, &tPhotons.b_seedTime);
-   t->SetBranchAddress("seedChi2", tPhotons.seedChi2, &tPhotons.b_seedChi2);
-   t->SetBranchAddress("seedOutOfTimeChi2", tPhotons.seedOutOfTimeChi2, &tPhotons.b_seedOutOfTimeChi2);
-   t->SetBranchAddress("seedRecoFlag", tPhotons.seedRecoFlag, &tPhotons.b_seedRecoFlag);
-   t->SetBranchAddress("seedSeverity", tPhotons.seedSeverity, &tPhotons.b_seedSeverity);
-   t->SetBranchAddress("swissCrx", tPhotons.swissCrx, &tPhotons.b_swissCrx);
-   t->SetBranchAddress("hadronicOverEm", tPhotons.hadronicOverEm, &tPhotons.b_hadronicOverEm);
-   t->SetBranchAddress("hadronicDepth1OverEm", tPhotons.hadronicDepth1OverEm, &tPhotons.b_hadronicDepth1OverEm);
-   t->SetBranchAddress("hadronicDepth2OverEm", tPhotons.hadronicDepth2OverEm, &tPhotons.b_hadronicDepth2OverEm);
-   t->SetBranchAddress("ecalRecHitSumEtConeDR04", tPhotons.ecalRecHitSumEtConeDR04, &tPhotons.b_ecalRecHitSumEtConeDR04);
-   t->SetBranchAddress("hcalTowerSumEtConeDR04", tPhotons.hcalTowerSumEtConeDR04, &tPhotons.b_hcalTowerSumEtConeDR04);
-   t->SetBranchAddress("hcalDepth1TowerSumEtConeDR04", tPhotons.hcalDepth1TowerSumEtConeDR04, &tPhotons.b_hcalDepth1TowerSumEtConeDR04);
-   t->SetBranchAddress("hcalDepth2TowerSumEtConeDR04", tPhotons.hcalDepth2TowerSumEtConeDR04, &tPhotons.b_hcalDepth2TowerSumEtConeDR04);
-   t->SetBranchAddress("trkSumPtHollowConeDR04", tPhotons.trkSumPtHollowConeDR04, &tPhotons.b_trkSumPtHollowConeDR04);
-   t->SetBranchAddress("trkSumPtSolidConeDR04", tPhotons.trkSumPtSolidConeDR04, &tPhotons.b_trkSumPtSolidConeDR04);
-   t->SetBranchAddress("ecalRecHitSumEtConeDR03", tPhotons.ecalRecHitSumEtConeDR03, &tPhotons.b_ecalRecHitSumEtConeDR03);
-   t->SetBranchAddress("hcalTowerSumEtConeDR03", tPhotons.hcalTowerSumEtConeDR03, &tPhotons.b_hcalTowerSumEtConeDR03);
-   t->SetBranchAddress("hcalDepth1TowerSumEtConeDR03", tPhotons.hcalDepth1TowerSumEtConeDR03, &tPhotons.b_hcalDepth1TowerSumEtConeDR03);
-   t->SetBranchAddress("hcalDepth2TowerSumEtConeDR03", tPhotons.hcalDepth2TowerSumEtConeDR03, &tPhotons.b_hcalDepth2TowerSumEtConeDR03);
-   t->SetBranchAddress("trkSumPtHollowConeDR03", tPhotons.trkSumPtHollowConeDR03, &tPhotons.b_trkSumPtHollowConeDR03);
-   t->SetBranchAddress("trkSumPtSolidConeDR03", tPhotons.trkSumPtSolidConeDR03, &tPhotons.b_trkSumPtSolidConeDR03);
-   t->SetBranchAddress("isEle", tPhotons.isEle, &tPhotons.b_isEle);
-   t->SetBranchAddress("hasPixelSeed", tPhotons.hasPixelSeed, &tPhotons.b_hasPixelSeed);
-   t->SetBranchAddress("detaEle", tPhotons.detaEle, &tPhotons.b_detaEle);
-   t->SetBranchAddress("dphiEle", tPhotons.dphiEle, &tPhotons.b_dphiEle);
-   t->SetBranchAddress("eleCharge", tPhotons.eleCharge, &tPhotons.b_eleCharge);
-   t->SetBranchAddress("eleEoverP", tPhotons.eleEoverP, &tPhotons.b_eleEoverP);
-   t->SetBranchAddress("c1", tPhotons.c1, &tPhotons.b_c1);
-   t->SetBranchAddress("c2", tPhotons.c2, &tPhotons.b_c2);
-   t->SetBranchAddress("c3", tPhotons.c3, &tPhotons.b_c3);
-   t->SetBranchAddress("c4", tPhotons.c4, &tPhotons.b_c4);
-   t->SetBranchAddress("c5", tPhotons.c5, &tPhotons.b_c5);
-   t->SetBranchAddress("r1", tPhotons.r1, &tPhotons.b_r1);
-   t->SetBranchAddress("r2", tPhotons.r2, &tPhotons.b_r2);
-   t->SetBranchAddress("r3", tPhotons.r3, &tPhotons.b_r3);
-   t->SetBranchAddress("r4", tPhotons.r4, &tPhotons.b_r4);
-   t->SetBranchAddress("r5", tPhotons.r5, &tPhotons.b_r5);
-   t->SetBranchAddress("t1", tPhotons.t1, &tPhotons.b_t1);
-   t->SetBranchAddress("t2", tPhotons.t2, &tPhotons.b_t2);
-   t->SetBranchAddress("t3", tPhotons.t3, &tPhotons.b_t3);
-   t->SetBranchAddress("t4", tPhotons.t4, &tPhotons.b_t4);
-   t->SetBranchAddress("t5", tPhotons.t5, &tPhotons.b_t5);
-   t->SetBranchAddress("t1PtCut", tPhotons.t1PtCut, &tPhotons.b_t1PtCut);
-   t->SetBranchAddress("t2PtCut", tPhotons.t2PtCut, &tPhotons.b_t2PtCut);
-   t->SetBranchAddress("t3PtCut", tPhotons.t3PtCut, &tPhotons.b_t3PtCut);
-   t->SetBranchAddress("t4PtCut", tPhotons.t4PtCut, &tPhotons.b_t4PtCut);
-   t->SetBranchAddress("t5PtCut", tPhotons.t5PtCut, &tPhotons.b_t5PtCut);
-   t->SetBranchAddress("cc1", tPhotons.cc1, &tPhotons.b_cc1);
-   t->SetBranchAddress("cc2", tPhotons.cc2, &tPhotons.b_cc2);
-   t->SetBranchAddress("cc3", tPhotons.cc3, &tPhotons.b_cc3);
-   t->SetBranchAddress("cc4", tPhotons.cc4, &tPhotons.b_cc4);
-   t->SetBranchAddress("cc4j", tPhotons.cc4j, &tPhotons.b_cc4j);
-   t->SetBranchAddress("cc5", tPhotons.cc5, &tPhotons.b_cc5);
-   t->SetBranchAddress("cc05", tPhotons.cc05, &tPhotons.b_cc05);
-   t->SetBranchAddress("cr1", tPhotons.cr1, &tPhotons.b_cr1);
-   t->SetBranchAddress("cr2", tPhotons.cr2, &tPhotons.b_cr2);
-   t->SetBranchAddress("cr3", tPhotons.cr3, &tPhotons.b_cr3);
-   t->SetBranchAddress("cr4", tPhotons.cr4, &tPhotons.b_cr4);
-   t->SetBranchAddress("cr5", tPhotons.cr5, &tPhotons.b_cr5);
-   t->SetBranchAddress("cr4j", tPhotons.cr4j, &tPhotons.b_cr4j);
-   t->SetBranchAddress("ct1", tPhotons.ct1, &tPhotons.b_ct1);
-   t->SetBranchAddress("ct2", tPhotons.ct2, &tPhotons.b_ct2);
-   t->SetBranchAddress("ct3", tPhotons.ct3, &tPhotons.b_ct3);
-   t->SetBranchAddress("ct4", tPhotons.ct4, &tPhotons.b_ct4);
-   t->SetBranchAddress("ct5", tPhotons.ct5, &tPhotons.b_ct5);
-   t->SetBranchAddress("ct1PtCut20", tPhotons.ct1PtCut20, &tPhotons.b_ct1PtCut20);
-   t->SetBranchAddress("ct2PtCut20", tPhotons.ct2PtCut20, &tPhotons.b_ct2PtCut20);
-   t->SetBranchAddress("ct3PtCut20", tPhotons.ct3PtCut20, &tPhotons.b_ct3PtCut20);
-   t->SetBranchAddress("ct4PtCut20", tPhotons.ct4PtCut20, &tPhotons.b_ct4PtCut20);
-   t->SetBranchAddress("ct5PtCut20", tPhotons.ct5PtCut20, &tPhotons.b_ct5PtCut20);
-   t->SetBranchAddress("ct4j20", tPhotons.ct4j20, &tPhotons.b_ct4j20);
-   t->SetBranchAddress("ct4j10", tPhotons.ct4j10, &tPhotons.b_ct4j10);
-   t->SetBranchAddress("ct4j15", tPhotons.ct4j15, &tPhotons.b_ct4j15);
-   t->SetBranchAddress("ct4j", tPhotons.ct4j, &tPhotons.b_ct4j);
-   t->SetBranchAddress("dr11", tPhotons.dr11, &tPhotons.b_dr11);
-   t->SetBranchAddress("dr21", tPhotons.dr21, &tPhotons.b_dr21);
-   t->SetBranchAddress("dr31", tPhotons.dr31, &tPhotons.b_dr31);
-   t->SetBranchAddress("dr41", tPhotons.dr41, &tPhotons.b_dr41);
-   t->SetBranchAddress("dr12", tPhotons.dr12, &tPhotons.b_dr12);
-   t->SetBranchAddress("dr22", tPhotons.dr22, &tPhotons.b_dr22);
-   t->SetBranchAddress("dr32", tPhotons.dr32, &tPhotons.b_dr32);
-   t->SetBranchAddress("dr42", tPhotons.dr42, &tPhotons.b_dr42);
-   t->SetBranchAddress("dr13", tPhotons.dr13, &tPhotons.b_dr13);
-   t->SetBranchAddress("dr23", tPhotons.dr23, &tPhotons.b_dr23);
-   t->SetBranchAddress("dr33", tPhotons.dr33, &tPhotons.b_dr33);
-   t->SetBranchAddress("dr43", tPhotons.dr43, &tPhotons.b_dr43);
-   t->SetBranchAddress("dr14", tPhotons.dr14, &tPhotons.b_dr14);
-   t->SetBranchAddress("dr24", tPhotons.dr24, &tPhotons.b_dr24);
-   t->SetBranchAddress("dr34", tPhotons.dr34, &tPhotons.b_dr34);
-   t->SetBranchAddress("dr44", tPhotons.dr44, &tPhotons.b_dr44);
-   t->SetBranchAddress("t11", tPhotons.t11, &tPhotons.b_t11);
-   t->SetBranchAddress("t21", tPhotons.t21, &tPhotons.b_t21);
-   t->SetBranchAddress("t31", tPhotons.t31, &tPhotons.b_t31);
-   t->SetBranchAddress("t41", tPhotons.t41, &tPhotons.b_t41);
-   t->SetBranchAddress("t12", tPhotons.t12, &tPhotons.b_t12);
-   t->SetBranchAddress("t22", tPhotons.t22, &tPhotons.b_t22);
-   t->SetBranchAddress("t32", tPhotons.t32, &tPhotons.b_t32);
-   t->SetBranchAddress("t42", tPhotons.t42, &tPhotons.b_t42);
-   t->SetBranchAddress("t13", tPhotons.t13, &tPhotons.b_t13);
-   t->SetBranchAddress("t23", tPhotons.t23, &tPhotons.b_t23);
-   t->SetBranchAddress("t33", tPhotons.t33, &tPhotons.b_t33);
-   t->SetBranchAddress("t43", tPhotons.t43, &tPhotons.b_t43);
-   t->SetBranchAddress("t14", tPhotons.t14, &tPhotons.b_t14);
-   t->SetBranchAddress("t24", tPhotons.t24, &tPhotons.b_t24);
-   t->SetBranchAddress("t34", tPhotons.t34, &tPhotons.b_t34);
-   t->SetBranchAddress("t44", tPhotons.t44, &tPhotons.b_t44);
-   t->SetBranchAddress("isGenMatched", tPhotons.isGenMatched, &tPhotons.b_isGenMatched);
-   t->SetBranchAddress("genMatchedCollId", tPhotons.genMatchedCollId, &tPhotons.b_genMatchedCollId);
-   t->SetBranchAddress("genMatchedPt", tPhotons.genMatchedPt, &tPhotons.b_genMatchedPt);
-   t->SetBranchAddress("genMatchedEta", tPhotons.genMatchedEta, &tPhotons.b_genMatchedEta);
-   t->SetBranchAddress("genMatchedPhi", tPhotons.genMatchedPhi, &tPhotons.b_genMatchedPhi);
-   t->SetBranchAddress("genMomId", tPhotons.genMomId, &tPhotons.b_genMomId);
-   t->SetBranchAddress("genGrandMomId", tPhotons.genGrandMomId, &tPhotons.b_genGrandMomId);
-   t->SetBranchAddress("genNSiblings", tPhotons.genNSiblings, &tPhotons.b_genNSiblings);
-   t->SetBranchAddress("genCalIsoDR03", tPhotons.genCalIsoDR03, &tPhotons.b_genCalIsoDR03);
-   t->SetBranchAddress("genCalIsoDR04", tPhotons.genCalIsoDR04, &tPhotons.b_genCalIsoDR04);
-   t->SetBranchAddress("genTrkIsoDR03", tPhotons.genTrkIsoDR03, &tPhotons.b_genTrkIsoDR03);
-   t->SetBranchAddress("genTrkIsoDR04", tPhotons.genTrkIsoDR04, &tPhotons.b_genTrkIsoDR04);
-   t->SetBranchAddress("nGp", &tPhotons.nGp, &tPhotons.b_nGp);
-   t->SetBranchAddress("simVtxX", &tPhotons.simVtxX, &tPhotons.b_simVtxX);
-   t->SetBranchAddress("simVtxY", &tPhotons.simVtxY, &tPhotons.b_simVtxY);
-   t->SetBranchAddress("simVtxZ", &tPhotons.simVtxZ, &tPhotons.b_simVtxZ);
-   t->SetBranchAddress("ptHat", &tPhotons.ptHat, &tPhotons.b_ptHat);
-   t->SetBranchAddress("gpEt", &tPhotons.gpEt, &tPhotons.b_gpEt);
-   t->SetBranchAddress("gpEta", &tPhotons.gpEta, &tPhotons.b_gpEta);
-   t->SetBranchAddress("gpCalIsoDR04", &tPhotons.gpCalIsoDR04, &tPhotons.b_gpCalIsoDR04);
-   t->SetBranchAddress("gpCalIsoDR03", &tPhotons.gpCalIsoDR03, &tPhotons.b_gpCalIsoDR03);
-   t->SetBranchAddress("gpTrkIsoDR03", &tPhotons.gpTrkIsoDR03, &tPhotons.b_gpTrkIsoDR03);
-   t->SetBranchAddress("gpTrkIsoDR04", &tPhotons.gpTrkIsoDR04, &tPhotons.b_gpTrkIsoDR04);
-   t->SetBranchAddress("gpStatus", &tPhotons.gpStatus, &tPhotons.b_gpStatus);
-   t->SetBranchAddress("gpCollId", &tPhotons.gpCollId, &tPhotons.b_gpCollId);
-   t->SetBranchAddress("gpId", &tPhotons.gpId, &tPhotons.b_gpId);
-   t->SetBranchAddress("gpMomId", &tPhotons.gpMomId, &tPhotons.b_gpMomId);
-   if (doCheck) {
-      if (t->GetMaximum("nPhotons")>100) cout <<"FATAL ERROR: Arrary size of nPhotons too small!!!  "<<t->GetMaximum("nPhotons")<<endl;
-      if (t->GetMaximum("nGp")>2) cout <<"FATAL ERROR: Arrary size of nGp too small!!!  "<<t->GetMaximum("nGp")<<endl;
-   }
+  t->SetBranchAddress("run", &photons.run, &photons.b_run);
+  t->SetBranchAddress("event", &photons.event, &photons.b_event);
+  t->SetBranchAddress("orbit", &photons.orbit, &photons.b_orbit);
+  t->SetBranchAddress("bunchCrossing", &photons.bunchCrossing, &photons.b_bunchCrossing);
+  t->SetBranchAddress("luminosityBlock", &photons.luminosityBlock, &photons.b_luminosityBlock);
+  t->SetBranchAddress("timesec", &photons.timesec, &photons.b_timesec);
+  t->SetBranchAddress("hf", &photons.hf, &photons.b_hf);
+  t->SetBranchAddress("hftp", &photons.hftp, &photons.b_hftp);
+  t->SetBranchAddress("hftm", &photons.hftm, &photons.b_hftm);
+  t->SetBranchAddress("eb", &photons.eb, &photons.b_eb);
+  t->SetBranchAddress("eep", &photons.eep, &photons.b_eep);
+  t->SetBranchAddress("eem", &photons.eem, &photons.b_eem);
+  t->SetBranchAddress("cBin", &photons.cBin, &photons.b_cBin);
+  t->SetBranchAddress("nbins", &photons.nbins, &photons.b_nbins);
+  t->SetBranchAddress("binsize", &photons.binsize, &photons.b_binsize);
+  t->SetBranchAddress("npart", &photons.npart, &photons.b_npart);
+  t->SetBranchAddress("npartSigma", &photons.npartSigma, &photons.b_npartSigma);
+  t->SetBranchAddress("ncoll", &photons.ncoll, &photons.b_ncoll);
+  t->SetBranchAddress("ncollSigma", &photons.ncollSigma, &photons.b_ncollSigma);
+  t->SetBranchAddress("nhard", &photons.nhard, &photons.b_nhard);
+  t->SetBranchAddress("nhardSigma", &photons.nhardSigma, &photons.b_nhardSigma);
+  t->SetBranchAddress("b", &photons.b, &photons.b_b);
+  t->SetBranchAddress("bSigma", &photons.bSigma, &photons.b_bSigma);
+  t->SetBranchAddress("nTTBits", &photons.nTTBits, &photons.b_nTTBits);
+  t->SetBranchAddress("kMaxTTBits", &photons.kMaxTTBits, &photons.b_kMaxTTBits);
+  t->SetBranchAddress("TTBit", photons.TTBit, &photons.b_TTBit);
+  t->SetBranchAddress("TTBit34", &photons.TTBit34, &photons.b_TTBit34);
+  t->SetBranchAddress("TTBit40", &photons.TTBit40, &photons.b_TTBit40);
+  t->SetBranchAddress("TTBit41", &photons.TTBit41, &photons.b_TTBit41);
+  t->SetBranchAddress("TTBit0", &photons.TTBit0, &photons.b_TTBit0);
+  t->SetBranchAddress("kMaxL1Bits", &photons.kMaxL1Bits, &photons.b_kMaxL1Bits);
+  t->SetBranchAddress("nL1Bits", &photons.nL1Bits, &photons.b_nL1Bits);
+  t->SetBranchAddress("L1Bit", photons.L1Bit, &photons.b_L1Bit);
+  t->SetBranchAddress("kMaxTrigFlag", &photons.kMaxTrigFlag, &photons.b_kMaxTrigFlag);
+  t->SetBranchAddress("nHLTBits", &photons.nHLTBits, &photons.b_nHLTBits);
+  t->SetBranchAddress("HLTBit", photons.HLTBit, &photons.b_HLTBit);
+  t->SetBranchAddress("nHfTowersP", &photons.nHfTowersP, &photons.b_nHfTowersP);
+  t->SetBranchAddress("nHfTowersN", &photons.nHfTowersN, &photons.b_nHfTowersN);
+  t->SetBranchAddress("beamSpotX", &photons.beamSpotX, &photons.b_beamSpotX);
+  t->SetBranchAddress("beamSpotY", &photons.beamSpotY, &photons.b_beamSpotY);
+  t->SetBranchAddress("beamSpotZ", &photons.beamSpotZ, &photons.b_beamSpotZ);
+  t->SetBranchAddress("vtxIsFake", &photons.vtxIsFake, &photons.b_vtxIsFake);
+  t->SetBranchAddress("vtxX", &photons.vtxX, &photons.b_vtxX);
+  t->SetBranchAddress("vtxY", &photons.vtxY, &photons.b_vtxY);
+  t->SetBranchAddress("vtxZ", &photons.vtxZ, &photons.b_vtxZ);
+  t->SetBranchAddress("vtxXError", &photons.vtxXError, &photons.b_vtxXError);
+  t->SetBranchAddress("vtxYError", &photons.vtxYError, &photons.b_vtxYError);
+  t->SetBranchAddress("vtxZError", &photons.vtxZError, &photons.b_vtxZError);
+  t->SetBranchAddress("vtxNTrk", &photons.vtxNTrk, &photons.b_vtxNTrk);
+  t->SetBranchAddress("vtxNTrkWeight05", &photons.vtxNTrkWeight05, &photons.b_vtxNTrkWeight05);
+  t->SetBranchAddress("vtxChi2", &photons.vtxChi2, &photons.b_vtxChi2);
+  t->SetBranchAddress("vtxNdof", &photons.vtxNdof, &photons.b_vtxNdof);
+  t->SetBranchAddress("vtxNormChi2", &photons.vtxNormChi2, &photons.b_vtxNormChi2);
+  t->SetBranchAddress("nRecTracks", &photons.nRecTracks, &photons.b_nRecTracks);
+  t->SetBranchAddress("trackPt", photons.trackPt, &photons.b_trackPt);
+  t->SetBranchAddress("trackEta", photons.trackEta, &photons.b_trackEta);
+  t->SetBranchAddress("trackPhi", photons.trackPhi, &photons.b_trackPhi);
+  t->SetBranchAddress("nEvtPlane", &photons.nEvtPlane, &photons.b_nEvtPlane);
+  t->SetBranchAddress("evtPlane", photons.evtPlane, &photons.b_evtPlane);
+  t->SetBranchAddress("nPhotons", &photons.nPhotons, &photons.b_nPhotons);
+  t->SetBranchAddress("kMaxPhotons", &photons.kMaxPhotons, &photons.b_kMaxPhotons);
+  t->SetBranchAddress("p", photons.p, &photons.b_p);
+  t->SetBranchAddress("et", photons.et, &photons.b_et);
+  t->SetBranchAddress("energy", photons.energy, &photons.b_energy);
+  t->SetBranchAddress("momentumX", photons.momentumX, &photons.b_momentumX);
+  t->SetBranchAddress("momentumY", photons.momentumY, &photons.b_momentumY);
+  t->SetBranchAddress("momentumZ", photons.momentumZ, &photons.b_momentumZ);
+  t->SetBranchAddress("pt", photons.pt, &photons.b_pt);
+  t->SetBranchAddress("eta", photons.eta, &photons.b_eta);
+  t->SetBranchAddress("phi", photons.phi, &photons.b_phi);
+  t->SetBranchAddress("r9", photons.r9, &photons.b_r9);
+  t->SetBranchAddress("isEBGap", photons.isEBGap, &photons.b_isEBGap);
+  t->SetBranchAddress("isEEGap", photons.isEEGap, &photons.b_isEEGap);
+  t->SetBranchAddress("isEBEEGap", photons.isEBEEGap, &photons.b_isEBEEGap);
+  t->SetBranchAddress("isTransGap", photons.isTransGap, &photons.b_isTransGap);
+  t->SetBranchAddress("isEB", photons.isEB, &photons.b_isEB);
+  t->SetBranchAddress("isEE", photons.isEE, &photons.b_isEE);
+  t->SetBranchAddress("scEnergy", photons.scEnergy, &photons.b_scEnergy);
+  t->SetBranchAddress("rawEnergy", photons.rawEnergy, &photons.b_rawEnergy);
+  t->SetBranchAddress("preshowerEnergy", photons.preshowerEnergy, &photons.b_preshowerEnergy);
+  t->SetBranchAddress("numOfPreshClusters", photons.numOfPreshClusters, &photons.b_numOfPreshClusters);
+  t->SetBranchAddress("ESRatio", photons.ESRatio, &photons.b_ESRatio);
+  t->SetBranchAddress("clustersSize", photons.clustersSize, &photons.b_clustersSize);
+  t->SetBranchAddress("scSize", photons.scSize, &photons.b_scSize);
+  t->SetBranchAddress("phiWidth", photons.phiWidth, &photons.b_phiWidth);
+  t->SetBranchAddress("etaWidth", photons.etaWidth, &photons.b_etaWidth);
+  t->SetBranchAddress("scEta", photons.scEta, &photons.b_scEta);
+  t->SetBranchAddress("scPhi", photons.scPhi, &photons.b_scPhi);
+  t->SetBranchAddress("maxEnergyXtal", photons.maxEnergyXtal, &photons.b_maxEnergyXtal);
+  t->SetBranchAddress("sigmaEtaEta", photons.sigmaEtaEta, &photons.b_sigmaEtaEta);
+  t->SetBranchAddress("sigmaIetaIeta", photons.sigmaIetaIeta, &photons.b_sigmaIetaIeta);
+  t->SetBranchAddress("sigmaIphiIphi", photons.sigmaIphiIphi, &photons.b_sigmaIphiIphi);
+  t->SetBranchAddress("sieie47", photons.sieie47, &photons.b_sieie47);
+  t->SetBranchAddress("sieie50", photons.sieie50, &photons.b_sieie50);
+  t->SetBranchAddress("sieie46", photons.sieie46, &photons.b_sieie46);
+  t->SetBranchAddress("sieie45", photons.sieie45, &photons.b_sieie45);
+  t->SetBranchAddress("sieie44", photons.sieie44, &photons.b_sieie44);
+  t->SetBranchAddress("sieie43", photons.sieie43, &photons.b_sieie43);
+  t->SetBranchAddress("sieie42", photons.sieie42, &photons.b_sieie42);
+  t->SetBranchAddress("sieie39", photons.sieie39, &photons.b_sieie39);
+  t->SetBranchAddress("sieie02a", photons.sieie02a, &photons.b_sieie02a);
+  t->SetBranchAddress("sieie03a", photons.sieie03a, &photons.b_sieie03a);
+  t->SetBranchAddress("sieie04a", photons.sieie04a, &photons.b_sieie04a);
+  t->SetBranchAddress("sieie05a", photons.sieie05a, &photons.b_sieie05a);
+  t->SetBranchAddress("sieie08a", photons.sieie08a, &photons.b_sieie08a);
+  t->SetBranchAddress("sieie10a", photons.sieie10a, &photons.b_sieie10a);
+  t->SetBranchAddress("sieie022a", photons.sieie022a, &photons.b_sieie022a);
+  t->SetBranchAddress("sieie025a", photons.sieie025a, &photons.b_sieie025a);
+  t->SetBranchAddress("sieie027a", photons.sieie027a, &photons.b_sieie027a);
+  t->SetBranchAddress("sieie032a", photons.sieie032a, &photons.b_sieie032a);
+  t->SetBranchAddress("sieie035a", photons.sieie035a, &photons.b_sieie035a);
+  t->SetBranchAddress("sieie037a", photons.sieie037a, &photons.b_sieie037a);
+  t->SetBranchAddress("r1x5", photons.r1x5, &photons.b_r1x5);
+  t->SetBranchAddress("r2x5", photons.r2x5, &photons.b_r2x5);
+  t->SetBranchAddress("e1x5", photons.e1x5, &photons.b_e1x5);
+  t->SetBranchAddress("e2x5", photons.e2x5, &photons.b_e2x5);
+  t->SetBranchAddress("seedTime", photons.seedTime, &photons.b_seedTime);
+  t->SetBranchAddress("seedChi2", photons.seedChi2, &photons.b_seedChi2);
+  t->SetBranchAddress("seedOutOfTimeChi2", photons.seedOutOfTimeChi2, &photons.b_seedOutOfTimeChi2);
+  t->SetBranchAddress("seedRecoFlag", photons.seedRecoFlag, &photons.b_seedRecoFlag);
+  t->SetBranchAddress("seedSeverity", photons.seedSeverity, &photons.b_seedSeverity);
+  t->SetBranchAddress("seedEnergy", photons.seedEnergy, &photons.b_seedEnergy);
+  t->SetBranchAddress("tRight", photons.tRight, &photons.b_tRight);
+  t->SetBranchAddress("tLeft", photons.tLeft, &photons.b_tLeft);
+  t->SetBranchAddress("tTop", photons.tTop, &photons.b_tTop);
+  t->SetBranchAddress("tBottom", photons.tBottom, &photons.b_tBottom);
+  t->SetBranchAddress("eMax", photons.eMax, &photons.b_eMax);
+  t->SetBranchAddress("e2nd", photons.e2nd, &photons.b_e2nd);
+  t->SetBranchAddress("e2x2", photons.e2x2, &photons.b_e2x2);
+  t->SetBranchAddress("e3x2", photons.e3x2, &photons.b_e3x2);
+  t->SetBranchAddress("e3x3", photons.e3x3, &photons.b_e3x3);
+  t->SetBranchAddress("e4x4", photons.e4x4, &photons.b_e4x4);
+  t->SetBranchAddress("e5x5", photons.e5x5, &photons.b_e5x5);
+  t->SetBranchAddress("e2overe8", photons.e2overe8, &photons.b_e2overe8);
+  t->SetBranchAddress("e2x5Right", photons.e2x5Right, &photons.b_e2x5Right);
+  t->SetBranchAddress("e2x5Left", photons.e2x5Left, &photons.b_e2x5Left);
+  t->SetBranchAddress("e2x5Top", photons.e2x5Top, &photons.b_e2x5Top);
+  t->SetBranchAddress("e2x5Bottom", photons.e2x5Bottom, &photons.b_e2x5Bottom);
+  t->SetBranchAddress("eRight", photons.eRight, &photons.b_eRight);
+  t->SetBranchAddress("eLeft", photons.eLeft, &photons.b_eLeft);
+  t->SetBranchAddress("eTop", photons.eTop, &photons.b_eTop);
+  t->SetBranchAddress("eBottom", photons.eBottom, &photons.b_eBottom);
+  t->SetBranchAddress("covPhiPhi", photons.covPhiPhi, &photons.b_covPhiPhi);
+  t->SetBranchAddress("covEtaPhi", photons.covEtaPhi, &photons.b_covEtaPhi);
+  t->SetBranchAddress("covEtaEta", photons.covEtaEta, &photons.b_covEtaEta);
+  t->SetBranchAddress("hadronicOverEm", photons.hadronicOverEm, &photons.b_hadronicOverEm);
+  t->SetBranchAddress("hadronicDepth1OverEm", photons.hadronicDepth1OverEm, &photons.b_hadronicDepth1OverEm);
+  t->SetBranchAddress("hadronicDepth2OverEm", photons.hadronicDepth2OverEm, &photons.b_hadronicDepth2OverEm);
+  t->SetBranchAddress("trackIso", photons.trackIso, &photons.b_trackIso);
+  t->SetBranchAddress("caloIso", photons.caloIso, &photons.b_caloIso);
+  t->SetBranchAddress("ecalIso", photons.ecalIso, &photons.b_ecalIso);
+  t->SetBranchAddress("hcalIso", photons.hcalIso, &photons.b_hcalIso);
+  t->SetBranchAddress("compTrackIso", photons.compTrackIso, &photons.b_compTrackIso);
+  t->SetBranchAddress("compEcalIso", photons.compEcalIso, &photons.b_compEcalIso);
+  t->SetBranchAddress("compHcalIso", photons.compHcalIso, &photons.b_compHcalIso);
+  t->SetBranchAddress("ecalRecHitSumEtConeDR04", photons.ecalRecHitSumEtConeDR04, &photons.b_ecalRecHitSumEtConeDR04);
+  t->SetBranchAddress("hcalTowerSumEtConeDR04", photons.hcalTowerSumEtConeDR04, &photons.b_hcalTowerSumEtConeDR04);
+  t->SetBranchAddress("hcalDepth1TowerSumEtConeDR04", photons.hcalDepth1TowerSumEtConeDR04, &photons.b_hcalDepth1TowerSumEtConeDR04);
+  t->SetBranchAddress("hcalDepth2TowerSumEtConeDR04", photons.hcalDepth2TowerSumEtConeDR04, &photons.b_hcalDepth2TowerSumEtConeDR04);
+  t->SetBranchAddress("trkSumPtSolidConeDR04", photons.trkSumPtSolidConeDR04, &photons.b_trkSumPtSolidConeDR04);
+  t->SetBranchAddress("trkSumPtHollowConeDR04", photons.trkSumPtHollowConeDR04, &photons.b_trkSumPtHollowConeDR04);
+  t->SetBranchAddress("nTrkSolidConeDR04", photons.nTrkSolidConeDR04, &photons.b_nTrkSolidConeDR04);
+  t->SetBranchAddress("nTrkHollowConeDR04", photons.nTrkHollowConeDR04, &photons.b_nTrkHollowConeDR04);
+  t->SetBranchAddress("ecalRecHitSumEtConeDR03", photons.ecalRecHitSumEtConeDR03, &photons.b_ecalRecHitSumEtConeDR03);
+  t->SetBranchAddress("hcalTowerSumEtConeDR03", photons.hcalTowerSumEtConeDR03, &photons.b_hcalTowerSumEtConeDR03);
+  t->SetBranchAddress("hcalDepth1TowerSumEtConeDR03", photons.hcalDepth1TowerSumEtConeDR03, &photons.b_hcalDepth1TowerSumEtConeDR03);
+  t->SetBranchAddress("hcalDepth2TowerSumEtConeDR03", photons.hcalDepth2TowerSumEtConeDR03, &photons.b_hcalDepth2TowerSumEtConeDR03);
+  t->SetBranchAddress("trkSumPtSolidConeDR03", photons.trkSumPtSolidConeDR03, &photons.b_trkSumPtSolidConeDR03);
+  t->SetBranchAddress("trkSumPtHollowConeDR03", photons.trkSumPtHollowConeDR03, &photons.b_trkSumPtHollowConeDR03);
+  t->SetBranchAddress("nTrkSolidConeDR03", photons.nTrkSolidConeDR03, &photons.b_nTrkSolidConeDR03);
+  t->SetBranchAddress("nTrkHollowConeDR03", photons.nTrkHollowConeDR03, &photons.b_nTrkHollowConeDR03);
+  t->SetBranchAddress("isEle", photons.isEle, &photons.b_isEle);
+  t->SetBranchAddress("detaEle", photons.detaEle, &photons.b_detaEle);
+  t->SetBranchAddress("dphiEle", photons.dphiEle, &photons.b_dphiEle);
+  t->SetBranchAddress("eleCharge", photons.eleCharge, &photons.b_eleCharge);
+  t->SetBranchAddress("deltaEtaEleCT", photons.deltaEtaEleCT, &photons.b_deltaEtaEleCT);
+  t->SetBranchAddress("deltaPhiEleCT", photons.deltaPhiEleCT, &photons.b_deltaPhiEleCT);
+  t->SetBranchAddress("eleEoverP", photons.eleEoverP, &photons.b_eleEoverP);
+  t->SetBranchAddress("c1", photons.c1, &photons.b_c1);
+  t->SetBranchAddress("c2", photons.c2, &photons.b_c2);
+  t->SetBranchAddress("c3", photons.c3, &photons.b_c3);
+  t->SetBranchAddress("c4", photons.c4, &photons.b_c4);
+  t->SetBranchAddress("c5", photons.c5, &photons.b_c5);
+  t->SetBranchAddress("r1", photons.r1, &photons.b_r1);
+  t->SetBranchAddress("r2", photons.r2, &photons.b_r2);
+  t->SetBranchAddress("r3", photons.r3, &photons.b_r3);
+  t->SetBranchAddress("r4", photons.r4, &photons.b_r4);
+  t->SetBranchAddress("r5", photons.r5, &photons.b_r5);
+  t->SetBranchAddress("t1", photons.t1, &photons.b_t1);
+  t->SetBranchAddress("t2", photons.t2, &photons.b_t2);
+  t->SetBranchAddress("t3", photons.t3, &photons.b_t3);
+  t->SetBranchAddress("t4", photons.t4, &photons.b_t4);
+  t->SetBranchAddress("t5", photons.t5, &photons.b_t5);
+  t->SetBranchAddress("t1PtCut", photons.t1PtCut, &photons.b_t1PtCut);
+  t->SetBranchAddress("t2PtCut", photons.t2PtCut, &photons.b_t2PtCut);
+  t->SetBranchAddress("t3PtCut", photons.t3PtCut, &photons.b_t3PtCut);
+  t->SetBranchAddress("t4PtCut", photons.t4PtCut, &photons.b_t4PtCut);
+  t->SetBranchAddress("t5PtCut", photons.t5PtCut, &photons.b_t5PtCut);
+  t->SetBranchAddress("cc1", photons.cc1, &photons.b_cc1);
+  t->SetBranchAddress("cc2", photons.cc2, &photons.b_cc2);
+  t->SetBranchAddress("cc3", photons.cc3, &photons.b_cc3);
+  t->SetBranchAddress("cc4", photons.cc4, &photons.b_cc4);
+  t->SetBranchAddress("cc5", photons.cc5, &photons.b_cc5);
+  t->SetBranchAddress("cc05", photons.cc05, &photons.b_cc05);
+  t->SetBranchAddress("cc4j", photons.cc4j, &photons.b_cc4j);
+  t->SetBranchAddress("ct1", photons.ct1, &photons.b_ct1);
+  t->SetBranchAddress("ct2", photons.ct2, &photons.b_ct2);
+  t->SetBranchAddress("ct3", photons.ct3, &photons.b_ct3);
+  t->SetBranchAddress("ct4", photons.ct4, &photons.b_ct4);
+  t->SetBranchAddress("ct5", photons.ct5, &photons.b_ct5);
+  t->SetBranchAddress("ct05", photons.ct05, &photons.b_ct05);
+  t->SetBranchAddress("ct1PtCut", photons.ct1PtCut, &photons.b_ct1PtCut);
+  t->SetBranchAddress("ct2PtCut", photons.ct2PtCut, &photons.b_ct2PtCut);
+  t->SetBranchAddress("ct3PtCut", photons.ct3PtCut, &photons.b_ct3PtCut);
+  t->SetBranchAddress("ct4PtCut", photons.ct4PtCut, &photons.b_ct4PtCut);
+  t->SetBranchAddress("ct5PtCut", photons.ct5PtCut, &photons.b_ct5PtCut);
+  t->SetBranchAddress("ct05PtCut", photons.ct05PtCut, &photons.b_ct05PtCut);
+  t->SetBranchAddress("ct4j", photons.ct4j, &photons.b_ct4j);
+  t->SetBranchAddress("ct4j10", photons.ct4j10, &photons.b_ct4j10);
+  t->SetBranchAddress("ct4j15", photons.ct4j15, &photons.b_ct4j15);
+  t->SetBranchAddress("ct4j20", photons.ct4j20, &photons.b_ct4j20);
+  t->SetBranchAddress("trackIsohi", photons.trackIsohi, &photons.b_trackIsohi);
+  t->SetBranchAddress("trackIsohi10", photons.trackIsohi10, &photons.b_trackIsohi10);
+  t->SetBranchAddress("trackIsohi15", photons.trackIsohi15, &photons.b_trackIsohi15);
+  t->SetBranchAddress("trackIsohi20", photons.trackIsohi20, &photons.b_trackIsohi20);
+  t->SetBranchAddress("trackIsohij", photons.trackIsohij, &photons.b_trackIsohij);
+  t->SetBranchAddress("trackIsohij10", photons.trackIsohij10, &photons.b_trackIsohij10);
+  t->SetBranchAddress("trackIsohij15", photons.trackIsohij15, &photons.b_trackIsohij15);
+  t->SetBranchAddress("trackIsohij20", photons.trackIsohij20, &photons.b_trackIsohij20);
+  t->SetBranchAddress("mpt0", photons.mpt0, &photons.b_mpt0);
+  t->SetBranchAddress("mpt05", photons.mpt05, &photons.b_mpt05);
+  t->SetBranchAddress("mpt2", photons.mpt2, &photons.b_mpt2);
+  t->SetBranchAddress("mpt4", photons.mpt4, &photons.b_mpt4);
+  t->SetBranchAddress("cr1", photons.cr1, &photons.b_cr1);
+  t->SetBranchAddress("cr2", photons.cr2, &photons.b_cr2);
+  t->SetBranchAddress("cr3", photons.cr3, &photons.b_cr3);
+  t->SetBranchAddress("cr4", photons.cr4, &photons.b_cr4);
+  t->SetBranchAddress("cr5", photons.cr5, &photons.b_cr5);
+  t->SetBranchAddress("cr05", photons.cr05, &photons.b_cr05);
+  t->SetBranchAddress("cr4j", photons.cr4j, &photons.b_cr4j);
+  t->SetBranchAddress("dr11", photons.dr11, &photons.b_dr11);
+  t->SetBranchAddress("dr12", photons.dr12, &photons.b_dr12);
+  t->SetBranchAddress("dr13", photons.dr13, &photons.b_dr13);
+  t->SetBranchAddress("dr14", photons.dr14, &photons.b_dr14);
+  t->SetBranchAddress("dr21", photons.dr21, &photons.b_dr21);
+  t->SetBranchAddress("dr22", photons.dr22, &photons.b_dr22);
+  t->SetBranchAddress("dr23", photons.dr23, &photons.b_dr23);
+  t->SetBranchAddress("dr24", photons.dr24, &photons.b_dr24);
+  t->SetBranchAddress("dr31", photons.dr31, &photons.b_dr31);
+  t->SetBranchAddress("dr32", photons.dr32, &photons.b_dr32);
+  t->SetBranchAddress("dr33", photons.dr33, &photons.b_dr33);
+  t->SetBranchAddress("dr34", photons.dr34, &photons.b_dr34);
+  t->SetBranchAddress("dr41", photons.dr41, &photons.b_dr41);
+  t->SetBranchAddress("dr42", photons.dr42, &photons.b_dr42);
+  t->SetBranchAddress("dr43", photons.dr43, &photons.b_dr43);
+  t->SetBranchAddress("dr44", photons.dr44, &photons.b_dr44);
+  t->SetBranchAddress("t11", photons.t11, &photons.b_t11);
+  t->SetBranchAddress("t12", photons.t12, &photons.b_t12);
+  t->SetBranchAddress("t13", photons.t13, &photons.b_t13);
+  t->SetBranchAddress("t14", photons.t14, &photons.b_t14);
+  t->SetBranchAddress("t21", photons.t21, &photons.b_t21);
+  t->SetBranchAddress("t22", photons.t22, &photons.b_t22);
+  t->SetBranchAddress("t23", photons.t23, &photons.b_t23);
+  t->SetBranchAddress("t24", photons.t24, &photons.b_t24);
+  t->SetBranchAddress("t31", photons.t31, &photons.b_t31);
+  t->SetBranchAddress("t32", photons.t32, &photons.b_t32);
+  t->SetBranchAddress("t33", photons.t33, &photons.b_t33);
+  t->SetBranchAddress("t34", photons.t34, &photons.b_t34);
+  t->SetBranchAddress("t41", photons.t41, &photons.b_t41);
+  t->SetBranchAddress("t42", photons.t42, &photons.b_t42);
+  t->SetBranchAddress("t43", photons.t43, &photons.b_t43);
+  t->SetBranchAddress("t44", photons.t44, &photons.b_t44);
+  t->SetBranchAddress("nAllTracks", photons.nAllTracks, &photons.b_nAllTracks);
+  t->SetBranchAddress("nLocalTracks", photons.nLocalTracks, &photons.b_nLocalTracks);
+  t->SetBranchAddress("hasPixelSeed", photons.hasPixelSeed, &photons.b_hasPixelSeed);
 }
-
