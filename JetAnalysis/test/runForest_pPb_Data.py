@@ -95,7 +95,7 @@ process.sim_step = cms.Path(process.mix*process.trackingParticles*process.SimL1E
 process.Timing = cms.Service("Timing")
 
 # MC Global Tag 44x 
-process.GlobalTag.globaltag = 'START52_V12::All'
+process.GlobalTag.globaltag = 'PLEASE_ENTER_GT::All'
 
 # load centrality
 from CmsHi.Analysis2010.CommonFunctions_cff import *
