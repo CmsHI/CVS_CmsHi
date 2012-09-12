@@ -21,16 +21,14 @@ ivars.register ('randomNumber',
 
 ivars.register ('doSkim',
                False, # default value
-               VarParsing.VarParsing.multiplicity.singleton, # singleton or list 
+               VarParsing.VarParsing.multiplicity.singleton, # singleton or list
                VarParsing.VarParsing.varType.bool,          # string, int, or float
                "whether to do skimming")
                   
 ivars.randomNumber = 1
-# ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankmalocal/data/reco/96A31CE6-1921-E111-B606-00A0D1E953AA.root"
-ivars.inputFiles = "file:/d00/dgulhan/testreco/96A31CE6-1921-E111-B606-00A0D1E953AA.root"
-ivars.outputFile = '/d00/dgulhan/output_data.root'
-# ivars.maxEvents = -1
-ivars.maxEvents = 1000
+ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/frankmalocal/data/reco/96A31CE6-1921-E111-B606-00A0D1E953AA.root"
+ivars.outputFile = 'output_data.root'
+ivars.maxEvents = -1
 
 ivars.parseArguments()
 
@@ -132,11 +130,6 @@ process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
 process.load("RecoLocalCalo/EcalRecAlgos/EcalSeverityLevelESProducer_cfi")
 process.load("RecoEcal.EgammaCoreTools.EcalNextToDeadChannelESProducer_cff")
 process.hiSelectedTrackHighPurity = process.hiSelectedTrackQuality.clone()
-
-##################### Muon Related
-process.load("MuTrig.HLTMuTree.hltMuTree_cfi")
-process.muonTree = process.hltMuTree.clone()
-process.muonTree.doGen = cms.untracked.bool(False)
 
 ##################### Particle Flow
 process.particleFlowTmp.postMuonCleaning = False
@@ -252,7 +245,6 @@ process.ana_step          = cms.Path(
                                       (process.anaTrack) +
                                       process.pfcandAnalyzer +
                                       process.hiEvtAnalyzer +
-                                      process.muonTree +
                                       process.HiForest
                                       )
 
