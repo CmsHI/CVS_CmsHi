@@ -11,7 +11,7 @@ cvs co -r HiForest_V02_00 -d       edwenger/Skims                           User
 cvs co -r HiForest_V02_00 -d       edwenger/VertexAnalyzer                  UserCode/edwenger/VertexAnalyzer
 cvs co -r HiForest_V02_00 -d       SpectraAna/JetEtaPhiFilter               UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
 cvs co -r HiForest_V02_00 -d       SpectraAna/TrackSpectraAnalyzer          UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
-cvs co -r HiForest_V02_05 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r HiForest_V02_06 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -r HiForest_V02_00          UserCode/FerencSiklerVertexing
 
 # pat macros
@@ -48,7 +48,7 @@ UserCode/ASYoon/PbPbTrackingTools/VertexConstraintProducer
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_04 -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_31 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_32 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 #PixelTrack
