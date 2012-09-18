@@ -168,7 +168,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 
 	 if(smearType == 0){
 	   entry.pt += res->getFluct(jets,j);
-	   if(!pp && i>=0) cout<<"Flucted"<<endl;
+	   if(collisionMode == cPbPb && i>=0) cout<<"Flucted"<<endl;
 	   jets.smpt[j] = entry.pt;
 	   jets.jtpt[j] = entry.pt;
 	 }
@@ -327,7 +327,7 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
       }
 
       int cbin = evt.hiBin;
-      if(pp) cbin = 33;
+      if(collisionMode == cPP) cbin = 33;
 
       double eventEta = 0;
       if(hasDiJet(jets)) eventEta = (jets.jteta[jtLead]+jets.jteta[jtSubLead])/2.;
@@ -374,7 +374,7 @@ void HiForest::correlateTracks(TTree* jetTree, Jets& jets, bool allEvents, bool 
 	    
 	 }
       }
-      for(int ib = 0; ib < branches.size(); ++ib){
+      for(unsigned int ib = 0; ib < branches.size(); ++ib){
          branches[ib]->Fill();
       }
    }
