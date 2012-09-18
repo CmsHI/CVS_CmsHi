@@ -308,14 +308,14 @@ HiForest::HiForest(const char *infName, const char* name, collisionType cMode, b
   // Print out collision mode:
   cout <<"Collision Mode:";
   if (collisionMode == cPP) cout <<" P+P"<<endl;  
-  if (collisionMode == cPPb) cout <<" P+P"<<endl;  
+  if (collisionMode == cPPb) cout <<" P+Pb"<<endl;  
   if (collisionMode == cPbPb) cout <<" Pb+Pb"<<endl;  
 
   // Load trees. Hard coded for the moment
   hltTree          = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree         = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree       = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
-  trackTree        = (TTree*) inf->Get("anaTrack/trackTree");
+  if (collisionMode == cPbPb || collisionMode == cPP) trackTree        = (TTree*) inf->Get("anaTrack/trackTree");
   if (collisionMode == cPPb) trackTree        = (TTree*) inf->Get("ppTrack/trackTree");
   towerTree        = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree     = (TTree*) inf->Get("icPu5JetAnalyzer/t");
@@ -358,6 +358,7 @@ HiForest::HiForest(const char *infName, const char* name, collisionType cMode, b
   hasGenpTree	   = (genpTree     		!=0);
   hasGenParticleTree = (genParticleTree   	!=0);
   setupOutput = false;
+
   
   // Setup branches. See also Setup*.h
   if (hasPhotonTree) {
@@ -399,7 +400,7 @@ HiForest::HiForest(const char *infName, const char* name, collisionType cMode, b
   }
 
   if (hasAk5CaloJetTree) {
-    icPu5jetTree->SetName("icPu5");
+    ak5CaloJetTree->SetName("ak5Calo");
     if (tree == 0) tree = ak5CaloJetTree; else tree->AddFriend(ak5CaloJetTree);
     setupJetTree(ak5CaloJetTree,ak5Calo);
   }
