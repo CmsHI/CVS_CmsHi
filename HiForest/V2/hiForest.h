@@ -43,11 +43,13 @@ namespace names{
   };
 }
 
+enum collisionType { cPbPb, cPP, cPPb };
+
 class HiForest : public TNamed
 {
 
   public: 
-   HiForest(const char *file, const char *name="forest", bool ispp = 0, bool ismc = 0, bool isrecorrected = 0);
+   HiForest(const char *file, const char *name="forest", collisionType cMode = cPbPb, bool ismc = 0, bool isrecorrected = 0);
   ~HiForest();
 
   //==================================================================================================================================
@@ -122,6 +124,7 @@ class HiForest : public TNamed
   TTree *akPu2jetTree;				// Jet Tree with akPu2PF algorithm, see branches in SetupJetTree.h
   TTree *akPu3jetTree;				// Jet Tree with akPu3PF algorithm, see branches in SetupJetTree.h
   TTree *akPu4jetTree;				// Jet Tree with akPu4PF algorithm, see branches in SetupJetTree.h
+  TTree *ak5CaloJetTree;			// Jet Tree with ak5Calo algorithm, see branches in SetupJetTree.h
   TTree *akPu2CaloJetTree;			// Jet Tree with akPu2Calo algorithm, see branches in SetupJetTree.h
   TTree *akPu3CaloJetTree;			// Jet Tree with akPu3Calo algorithm, see branches in SetupJetTree.h
   TTree *akPu4CaloJetTree;		        // Jet Tree with akPu4Calo algorithm, see branches in SetupJetTree.h
@@ -155,6 +158,7 @@ class HiForest : public TNamed
   Jets akPu2PF;
   Jets akPu3PF;
   Jets akPu4PF;
+  Jets ak5Calo;
   Jets akPu2Calo;
   Jets akPu3Calo;
   Jets akPu4Calo;
@@ -181,6 +185,7 @@ class HiForest : public TNamed
   bool hasAkPu3JetTree;
   bool hasAkPu4JetTree;
   bool hasAkPu2CaloJetTree;
+  bool hasAk5CaloJetTree;
   bool hasAkPu3CaloJetTree;
   bool hasAkPu4CaloJetTree;
   bool hasHltTree;
@@ -195,7 +200,7 @@ class HiForest : public TNamed
 
   bool setupOutput;
   bool verbose;
-  bool pp;
+  collisionType collisionMode;
   bool mc;
   bool doJetCorrection;
   bool doTrackCorrections;
@@ -280,11 +285,11 @@ class HiForest : public TNamed
   
 };
 
-HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, bool recjec):
+HiForest::HiForest(const char *infName, const char* name, collisionType cMode, bool ismc, bool recjec):
    tree(0),
    fGauss(0),
    verbose(0),
-   pp(ispp),
+   collisionMode(cMode),
    mc(ismc),
    nEntries(0),
    currentEvent(0)
@@ -300,16 +305,24 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   // Track correction initialized?
   initialized = 0;
 
+  // Print out collision mode:
+  cout <<"Collision Mode:";
+  if (collisionMode == cPP) cout <<" P+P"<<endl;  
+  if (collisionMode == cPPb) cout <<" P+P"<<endl;  
+  if (collisionMode == cPbPb) cout <<" Pb+Pb"<<endl;  
+
   // Load trees. Hard coded for the moment
   hltTree          = (TTree*) inf->Get("hltanalysis/HltTree");
   skimTree         = (TTree*) inf->Get("skimanalysis/HltTree");
   photonTree       = (TTree*) inf->Get("multiPhotonAnalyzer/photon");
   trackTree        = (TTree*) inf->Get("anaTrack/trackTree");
+  if (collisionMode == cPPb) trackTree        = (TTree*) inf->Get("ppTrack/trackTree");
   towerTree        = (TTree*) inf->Get("rechitanalyzer/tower");
   icPu5jetTree     = (TTree*) inf->Get("icPu5JetAnalyzer/t");
   akPu2jetTree     = (TTree*) inf->Get("akPu2PFJetAnalyzer/t");
   akPu3jetTree     = (TTree*) inf->Get("akPu3PFJetAnalyzer/t");
   akPu4jetTree     = (TTree*) inf->Get("akPu4PFJetAnalyzer/t");
+  ak5CaloJetTree     = (TTree*) inf->Get("ak5CaloJetAnalyzer/t");
   akPu2CaloJetTree = (TTree*) inf->Get("akPu2CaloJetAnalyzer/t");
   akPu3CaloJetTree = (TTree*) inf->Get("akPu3CaloJetAnalyzer/t");
   akPu4CaloJetTree = (TTree*) inf->Get("akPu4CaloJetAnalyzer/t");
@@ -321,7 +334,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   genpTree         = (TTree*) inf->Get("genpana/photon");
   
   // doesn't load genParticle by default
-  //genParticleTree  = (TTree*) inf->Get("HiGenParticleAna/hi");
+  genParticleTree  = (TTree*) inf->Get("HiGenParticleAna/hi");
 
   // Check the validity of the trees.
   hasPhotonTree        = (photonTree       	!= 0);
@@ -332,6 +345,7 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
   hasAkPu2JetTree      = (akPu2jetTree 		!= 0);
   hasAkPu3JetTree      = (akPu3jetTree 		!= 0);
   hasAkPu4JetTree      = (akPu4jetTree 		!= 0);
+  hasAk5CaloJetTree    = (ak5CaloJetTree 	!= 0);
   hasAkPu2CaloJetTree  = (akPu2CaloJetTree 	!= 0);
   hasAkPu3CaloJetTree  = (akPu3CaloJetTree 	!= 0);
   hasAkPu4CaloJetTree  = (akPu4CaloJetTree 	!= 0);
@@ -384,6 +398,11 @@ HiForest::HiForest(const char *infName, const char* name, bool ispp, bool ismc, 
     setupJetTree(icPu5jetTree,icPu5);
   }
 
+  if (hasAk5CaloJetTree) {
+    icPu5jetTree->SetName("icPu5");
+    if (tree == 0) tree = ak5CaloJetTree; else tree->AddFriend(ak5CaloJetTree);
+    setupJetTree(ak5CaloJetTree,ak5Calo);
+  }
   if (hasAkPu2JetTree) {
     akPu2jetTree->SetName("akPu2PF");
     if (tree == 0) tree = akPu2jetTree; else tree->AddFriend(akPu2jetTree);
@@ -503,6 +522,7 @@ void HiForest::GetEntry(int i)
   if (hasAkPu2JetTree) akPu2jetTree ->GetEntry(i);
   if (hasAkPu3JetTree) akPu3jetTree ->GetEntry(i);
   if (hasAkPu4JetTree) akPu4jetTree ->GetEntry(i);
+  if (hasAk5CaloJetTree) ak5CaloJetTree ->GetEntry(i);
   if (hasAkPu2CaloJetTree) akPu2CaloJetTree ->GetEntry(i);
   if (hasAkPu3CaloJetTree) akPu3CaloJetTree ->GetEntry(i);
   if (hasAkPu4CaloJetTree) akPu4CaloJetTree ->GetEntry(i);
@@ -537,7 +557,7 @@ void HiForest::InitTree()
 
       trackCorrFromParam = new TrackingParam();
 
-      if (!pp) {
+      if (collisionMode==cPbPb) {
          trackCorrections.push_back(new TrackingCorrections("Forest2STAv14","Forest2_MergedGeneral_jetfine"));
       } else {
          trackCorrections.push_back(new TrackingCorrections("Forest2STApp","Forest2_MergedGeneral_jetfine"));
@@ -546,7 +566,7 @@ void HiForest::InitTree()
 //       trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j2"));
 
       for(int i = 0; i < trackCorrections.size(); ++i){
-         if (!pp) {
+         if (collisionMode==cPbPb) {
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec/IterTrkCorrv14XSec_hy18dj80to100_akPu3PF_100_-1_-1000_genJetMode0.root",80);
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec/IterTrkCorrv14XSec_hy18dj100to170_akPu3PF_100_-1_-1000_genJetMode0.root",100);
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec/IterTrkCorrv14XSec_hy18dj170to200_akPu3PF_100_-1_-1000_genJetMode0.root",170);
@@ -568,7 +588,7 @@ void HiForest::InitTree()
          trackCorrections[i]->weightSamples_ = true;
          trackCorrections[i]->smoothLevel_ = 0;
          trackCorrections[i]->trkPhiMode_ = false;
-         trackCorrections[i]->ppMode_ = pp;
+         trackCorrections[i]->ppMode_ = (collisionMode==cPP);
          trackCorrections[i]->Init();
       }
       minJetPtForTrkCor = 40;
@@ -618,10 +638,7 @@ void HiForest::CheckArraySizes(){
 
   if(objectOverflow.size() == 0) cout<<"Object sizes OK"<<endl;
   else cout<<"objects crash"<<endl; // TODO : really crash
-
 }
-
-
 
 void HiForest::PrintStatus()
 {
@@ -632,6 +649,7 @@ void HiForest::PrintStatus()
   if (hasAkPu2JetTree) CheckTree(akPu2jetTree, "AkPu2jetTree");
   if (hasAkPu3JetTree) CheckTree(akPu3jetTree, "AkPu3jetTree");
   if (hasAkPu4JetTree) CheckTree(akPu4jetTree, "AkPu4jetTree");
+  if (hasAk5CaloJetTree) CheckTree(ak5CaloJetTree, "Ak5CaloJetTree");
   if (hasAkPu2CaloJetTree) CheckTree(akPu2CaloJetTree, "AkPu2CaloJetTree");
   if (hasAkPu3CaloJetTree) CheckTree(akPu3CaloJetTree, "AkPu3CaloJetTree");
   if (hasAkPu4CaloJetTree) CheckTree(akPu4CaloJetTree, "AkPu4CaloJetTree");
@@ -645,7 +663,6 @@ void HiForest::PrintStatus()
   if (hasEbTree)       CheckTree(ebTree,     "EbTree");
   if (hasGenpTree)      CheckTree(genpTree,   "GenpTree");
   if (hasGenParticleTree)      CheckTree(genParticleTree,   "GenParticleTree");
-
 }
 
 void HiForest::SetOutputFile(const char *name)
@@ -654,6 +671,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasHltTree)      AddCloneTree(hltTree,      "hltanalysis",        "HltTree");
   if (hasSkimTree)     AddCloneTree(skimTree,     "skimanalysis",       "HltTree");
   if (hasIcPu5JetTree) AddCloneTree(icPu5jetTree, "icPu5JetAnalyzer",   "t");
+  if (hasAk5CaloJetTree) AddCloneTree(ak5CaloJetTree, "Ak5CaloJetAnalyzer",   "t");
   if (hasAkPu2JetTree) AddCloneTree(akPu2jetTree, "akPu2PFJetAnalyzer", "t");
   if (hasAkPu3JetTree) AddCloneTree(akPu3jetTree, "akPu3PFJetAnalyzer", "t");
   if (hasAkPu4JetTree) AddCloneTree(akPu4jetTree, "akPu4PFJetAnalyzer", "t");
@@ -712,7 +730,7 @@ bool HiForest::selectEvent(){
       skim.phiEcalRecHitSpikeFilter;
   */
   bool select = skim.pHBHENoiseFilter;
-   if(!pp){
+   if(collisionMode==cPbPb){
       select = select && skim.pcollisionEventSelection;
    }else{
      //      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
@@ -723,7 +741,7 @@ bool HiForest::selectEvent(){
 TCut HiForest::eventSelection(){
   //   TCut select("skim.phbheReflagNewTimeEnv && skim.phcalTimingFilter && skim.pHBHENoiseFilter && skim.phiEcalRecHitSpikeFilter");
   TCut select("skim.pHBHENoiseFilter");
-  if(!pp){
+  if(collisionMode==cPbPb){
     select = select && "skim.pcollisionEventSelection";
   }else{
     //      select = select && "skim.phfCoincFilter && skim.ppurityFractionFilter";
