@@ -123,6 +123,9 @@ process.hiTracks.src = "hiGeneralTracks"
 process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
 process.heavyIonTracking *= process.hiTracks
 
+process.load("RecoHI.HiTracking.HICaloCompatibleTracks_cff")
+process.hiGeneralCaloMatchedTracks = process.hiCaloCompatibleTracks.clone(srcTracks = 'hiGeneralTracks')
+
 ##################### Jet Related
 # Remove neutrinos
 process.hiGenParticlesForJets.ignoreParticleIDs += cms.vuint32( 12,14,16)
@@ -141,7 +144,8 @@ process.muonTree.doGen = cms.untracked.bool(False)
 ##################### Particle Flow
 process.particleFlowTmp.postMuonCleaning = False
 process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
-process.pfTrack.TrackQuality = cms.string('loose') # To recover tracks before calo matching
+process.pfTrack.TrackQuality = cms.string('highPurity') # To recover tracks before calo matching
+process.pfTrack.UseQuality = True
 process.pfTrack.TkColList = cms.VInputTag("hiGeneralTracks") # needed to run the calo matching on hiGeneralTracks
 
 ##################### Pat
