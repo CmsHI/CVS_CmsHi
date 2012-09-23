@@ -193,7 +193,7 @@ def overrideGlobalTag(process):
         cms.PSet(record = cms.string("JetCorrectionsRecord"),
                  tag = cms.string("JetCorrectorParametersCollection_IC5Calo_2760GeV_v0_offline"),
                  connect = cms.untracked.string("frontier://FrontierProd/CMS_COND_31X_PHYSICSTOOLS"),
-                 label = cms.untracked.string("IC5Calo_HI")
+                 label = cms.untracked.string("IC5Calo_2760GeV")
                  ),
         
 #==================== DATA ONLY, FIXED RUN TAGS =====================================
