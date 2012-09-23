@@ -34,7 +34,6 @@ cvs co -r hi44X_03                 RecoHI/HiJetAlgos
 cvs co -r hi44X_03                 RecoHI/HiCentralityAlgos
 cvs co -r hi44X_03                 RecoHI/HiEvtPlaneAlgos
 cvs co -r hi44X_03                 CondFormats/HIObjects
-cvs co -r hi44X_02                 DataFormats/HeavyIonEvent
 
 # Track validation histograms
 cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/HiTrackValidator UserCode/ASYoon/PbPbTrackingTools/HiTrackValidator
@@ -47,6 +46,8 @@ UserCode/ASYoon/PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_05 -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
+cvs co -r HiForest_V02_01 -d       CmsHi/Analysis2012 UserCode/CmsHi/Analysis2012
+
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
 cvs co -r HiForest_V02_32 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
@@ -74,9 +75,6 @@ cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 #>    track = cms.InputTag("hiSelectedTrackHighPurity"),
 
 cvs co -r hi44X_04                 RecoHI/HiEgammaAlgos
-
-# Yen-Jie: checking with Matt to see if we need to update to HEAD
-cvs co -r hi44X_02_01              RecoHI/Configuration
 
 # trigger analyzers
 cvs co -r branch_hi44X HLTrigger/HLTanalyzers
