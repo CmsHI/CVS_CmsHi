@@ -40,7 +40,7 @@ public :
 };
 
 
-void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 1)
+void setupMetTree(TTree *t,Mets &tMets,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("nEv")) t->SetBranchAddress("nEv", &tMets.nEv, &tMets.b_nEv);

@@ -679,7 +679,7 @@ void HiForest::SetOutputFile(const char *name)
   if (hasAkPu2CaloJetTree) AddCloneTree(akPu2CaloJetTree, "akPu2CaloJetAnalyzer", "t");
   if (hasAkPu3CaloJetTree) AddCloneTree(akPu3CaloJetTree, "akPu3CaloJetAnalyzer", "t");
   if (hasAkPu4CaloJetTree) AddCloneTree(akPu4CaloJetTree, "akPu4CaloJetAnalyzer", "t");
-  if (hasTrackTree)    AddCloneTree(trackTree,    "anaTrack",           "trackTree");
+  if (hasTrackTree)    AddCloneTree(trackTree,    "ppTrack",           "trackTree");
   if (hasPixTrackTree) AddCloneTree(pixtrackTree, "anaPixTrack",        "trackTree");
   if (hasPhotonTree)   AddCloneTree(photonTree,   "multiPhotonAnalyzer",            "photon");
   if (hasPFTree)   AddCloneTree(pfTree,   "pfcandAnalyzer",            "pfTree");

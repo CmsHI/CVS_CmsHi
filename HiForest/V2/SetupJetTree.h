@@ -173,7 +173,7 @@ public :
 };
 
 
-void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 1)
+void setupJetTree(TTree *t,Jets &tJets,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("evt")) t->SetBranchAddress("evt", &tJets.evt, &tJets.b_evt);

@@ -46,7 +46,7 @@ public :
 };
 
 
-void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 1)
+void setupGenpTree(TTree *t,Genps &tGenps,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("cBin")) t->SetBranchAddress("cBin", &tGenps.cBin, &tGenps.b_cBin);

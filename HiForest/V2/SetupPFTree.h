@@ -34,7 +34,7 @@ public :
 };
 
 
-void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 1)
+void setupPFTree(TTree *t,PFs &tPFs,bool doCheck = 0)
 {
    // Set branch addresses and branch pointers
    if (t->GetBranch("nPFpart")) t->SetBranchAddress("nPFpart", &tPFs.nPFpart, &tPFs.b_nPFpart);
