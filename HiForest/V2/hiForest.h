@@ -108,6 +108,7 @@ class HiForest : public TNamed
   void matchTrackCalo(bool allEvents = 1);
   double getTrackCorrectionPara(int j);
   double getTrackCorrection(int j);
+  bool selectTrack(int j);
   
   //==================================================================================================================================
   // Get track-jet correlated variables. Not needed if correlatePF is run.
@@ -730,11 +731,21 @@ bool HiForest::selectEvent(){
       && 
       skim.phiEcalRecHitSpikeFilter;
   */
-  bool select = skim.pHBHENoiseFilter;
+
+   bool select = skim.pHBHENoiseFilter;
    if(collisionMode==cPbPb){
       select = select && skim.pcollisionEventSelection;
-   }else{
-     //      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
+   }else if(collisionMode==cPPb){
+      select = 
+	 hlt.HLT_PAZeroBiasPixel_SingleTrack_v1 &&
+	 //	 skim.pPAcollisionEventSelection &&
+	 skim.phfPosFilter1&&
+	 skim.phfNegFilter1&&
+	 skim.phltPixelClusterShapeFilter&&
+	 skim.pHBHENoiseFilter&&
+	 skim.pprimaryvertexFilter;
+   }else if(collisionMode==cPP){
+      select = select && skim.phfCoincFilter && skim.ppurityFractionFilter;
    }
    return select;
 }
