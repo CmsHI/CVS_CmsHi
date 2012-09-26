@@ -135,12 +135,19 @@ bool HiForest::selectTrack(int j){
 
    if(j >= track.nTrk) return 0;
 
-   if(!(track.highPurity[j])) return 0 ;
-   if(fabs(track.trkDz1[j]/track.trkDzError1[j]) > 3) return 0 ;
-   if(fabs(track.trkDxy1[j]/track.trkDxyError1[j]) > 3) return 0 ;
-   if(track.trkPtError[j]/track.trkPt[j]>0.1) return 0 ;
-   if(fabs(track.trkEta[j]) > 2.4) return 0;
-   if(track.trkPt[j] < 0.4) return 0;
+   if(collisionMode==cPPb){
+      if(!(track.highPurity[j])) return 0 ;
+      if(fabs(track.trkDz1[j]/track.trkDzError1[j]) > 3) return 0 ;
+      if(fabs(track.trkDxy1[j]/track.trkDxyError1[j]) > 3) return 0 ;
+      if(track.trkPtError[j]/track.trkPt[j]>0.1) return 0 ;
+      if(fabs(track.trkEta[j]) > 2.4) return 0;
+      if(track.trkPt[j] < 0.4) return 0;      
+   }else{
+      cout<<"Track selection not implemented for this type of collision!"<<endl;
+      return 0;
+   }
+
+
    return 1;
    
 }
