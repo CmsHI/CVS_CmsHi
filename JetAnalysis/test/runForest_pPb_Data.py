@@ -27,8 +27,6 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('hiForestAna2011')
 
-process.Timing = cms.Service("Timing")
-
 process.options = cms.untracked.PSet(
    # wantSummary = cms.untracked.bool(True)
 )
