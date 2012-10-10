@@ -1,28 +1,5 @@
 import FWCore.ParameterSet.VarParsing as VarParsing
 
-ivars = VarParsing.VarParsing('python')
-
-ivars.register ('randomNumber',
-                1,
-                ivars.multiplicity.singleton,
-                ivars.varType.int,
-                "Random Seed")
-
-ivars.register ('secFiles',
-                1,
-                ivars.multiplicity.singleton,
-                ivars.varType.string,
-                "Random Seed")
-
-ivars.randomNumber = 1
-
-ivars.inputFiles = "file:FEF78146-3DFD-E111-8343-001D09F2AF1E.root"
-# "/store/hidata/express/PARun2012/ExpressPhysics/FEVT/Express-v1/000/202/792/FEF78146-3DFD-E111-8343-001D09F2AF1E.root"
-ivars.outputFile = './forest.root'
-
-ivars.parseArguments()
-
-
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('hiForestAna2011')
@@ -55,8 +32,7 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-                            fileNames = cms.untracked.vstring(ivars.inputFiles),
-#                            secondaryFileNames = cms.untracked.vstring(ivars.secFiles),
+                            fileNames = cms.untracked.vstring("file:input.root"),
                             )
 
 # Number of events we want to process, -1 = all events
@@ -93,8 +69,6 @@ process.sim_step = cms.Path(process.mix*process.trackingParticles*
 # Data Global Tag 44x 
 process.GlobalTag.globaltag = 'GR_P_V41::All'
 
-process.Timing = cms.Service("Timing")
-
 # load centrality
 from CmsHi.Analysis2012.CommonFunctions_cff import *
 overrideCentrality(process)
@@ -107,7 +81,7 @@ process.HeavyIonGlobalParameters = cms.PSet(
 
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
-process.RandomNumberGeneratorService.generator.initialSeed = ivars.randomNumber 
+process.RandomNumberGeneratorService.generator.initialSeed = 1
 process.RandomNumberGeneratorService.akPu3PFConesAna = process.RandomNumberGeneratorService.generator.clone()
 process.RandomNumberGeneratorService.icPu5CaloConesAna = process.RandomNumberGeneratorService.generator.clone()
 process.RandomNumberGeneratorService.akPu5PFConesAna = process.RandomNumberGeneratorService.generator.clone()
@@ -124,7 +98,7 @@ process.load("RecoEcal.EgammaCoreTools.EcalNextToDeadChannelESProducer_cff")
 #####################################################################################
 
 process.TFileService = cms.Service("TFileService",
-                                  fileName=cms.string(ivars.outputFile))
+                                  fileName=cms.string("pPb_hiForest2.root"))
 
 #####################################################################################
 # Additional Reconstruction and Analysis
@@ -498,8 +472,8 @@ process.patDefaultSequence.remove(process.cleanPatJets)
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
-process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
-process.hltanalysis.HLTProcessName = "hiForestAna2011"
+#process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
+#process.hltanalysis.HLTProcessName = "hiForestAna2011"
 process.hltanalysis.dummyBranches = []
 
 process.hltAna = cms.EndPath(process.hltanalysis)
