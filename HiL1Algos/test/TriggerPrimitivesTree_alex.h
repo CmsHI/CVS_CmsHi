@@ -136,7 +136,7 @@ TriggerPrimitivesTree_alex::TriggerPrimitivesTree_alex(TFile *f)
 TriggerPrimitivesTree_alex::~TriggerPrimitivesTree_alex()
 {
   if (!fChain) return;
-  delete fChain->GetCurrentFile();
+  //delete fChain->GetCurrentFile();
 }
 
 Int_t TriggerPrimitivesTree_alex::GetEntry(Long64_t entry)

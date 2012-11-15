@@ -141,7 +141,7 @@ TriggerPrimitivesTree_towerjet::TriggerPrimitivesTree_towerjet(TFile *f)
 TriggerPrimitivesTree_towerjet::~TriggerPrimitivesTree_towerjet()
 {
   if (!fChain) return;
-  delete fChain->GetCurrentFile();
+  //delete fChain->GetCurrentFile();
 }
 
 Int_t TriggerPrimitivesTree_towerjet::GetEntry(Long64_t entry)

@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 
+
+const int NETA_TOWERS = 88;
 #include "FindTowerJet.C"
 
 using namespace std;
@@ -27,8 +29,8 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
   const int NBINS = 40;
   const int MAX_EN = 200;
 
-  const int JET_RADIUS = 6;
-  const bool CIRCULAR_JETS = false; //otherwise square jets
+  const int JET_DIAMETER = 7;
+  const bool CIRCULAR_JETS = true; //otherwise square jets
   
   TH1D* jet_curve;
   TH1I* total_in_bin;
@@ -70,8 +72,12 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
     if(break_early && (evts > total_events)) break;
 
     fChain->GetEntry(jentry);
-
+    
     double fulldetector[NETA_TOWERS][NPHI_TOWERS]; //[eta][phi]
+    for(int i = 0; i < NETA_TOWERS; i++)
+      for(int j = 0; j < NPHI_TOWERS; j++)
+	fulldetector[i][j]=0;
+    
 
     //------Fills in the phi-eta matrix for total Et values using eta and phi indexes------
     //Stolen from Doga
@@ -136,9 +142,11 @@ TH1D* TriggerPrimitivesTree_jetcurvetower::Loop(int total_events,
       }
     }    
 
-    TowerJet highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_RADIUS);
+    TowerJet *highestJet = findTowerJet(fulldetector, CIRCULAR_JETS, JET_DIAMETER);
+
+    //cout << highestJet[0].sumEt << endl;
     
-    if(highestJet.sumEt > threshold)
+    if(highestJet[0].sumEt > threshold)
       jet_curve->Fill(realJetPt);
 
     total_in_bin->Fill(realJetPt);

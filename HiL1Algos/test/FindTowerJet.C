@@ -12,13 +12,15 @@ const int NPHI_TOWERS = 72;
 double towerEta(int etaIndex);
 double towerPhi(int phiIndex, int etaIndex);
 
-TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circularJets, int jetDiameter)
+TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS],
+		       bool circularJets, int jetDiameter)
 {
   int even = (jetDiameter%2 == 0) ? 1 : 0;
   int jetRadius = jetDiameter/2;
+
+  //printf("jet radius: %d, even: %d\n",jetRadius,even);
   
-  int jetCircleDistance2 = (jetRadius-1)*(jetRadius-1) +
-    (jetRadius-1)*(jetRadius-1); 
+  int jetCircleDistance2 = (jetRadius)*(jetRadius) + 1; 
   
   TowerJet *highestJet = new TowerJet[2];    
   highestJet[0].sumEt = -1;
@@ -34,34 +36,49 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
     for(int iphi = 0; iphi < NPHI_TOWERS; iphi++)
     {
       TowerJet temp;
-      temp.sumEt = fulldetector[ieta][iphi];
+      temp.sumEt = 0;
       temp.eta = ieta;
       temp.phi = iphi;
 
-      for(int ieta_i = ieta - jetRadius - even; ieta_i < ieta + jetRadius; ieta_i++)
+      for(int ieta_i = ieta - (jetRadius - even);
+	  ieta_i <= ieta + jetRadius; ieta_i++)
       {
-	for(int iphi_i = iphi - jetRadius - even; iphi_i < iphi + jetRadius; iphi_i++)
+	for(int iphi_i = iphi - (jetRadius - even);
+	    iphi_i <= iphi + jetRadius; iphi_i++)
 	{
 	  //cut the corners off the square ONLY CORRECT FOR ODD DIAMETER
 	  if(circularJets)
 	  {
-	    int distance2 = (iphi-temp.phi)*(iphi-temp.phi) +
-	      (ieta-temp.eta)*(ieta-temp.eta);
-	    if(distance2 >= jetCircleDistance2)
+	    int distance2 = (iphi_i-temp.phi)*(iphi_i-temp.phi) +
+	      (ieta_i-temp.eta)*(ieta_i-temp.eta);
+	    if(distance2 > jetCircleDistance2)
 	      continue;
 	  }
 	    
 	  int realiphi_i;
-	  (iphi_i < 0) ? realiphi_i = iphi_i + NPHI_TOWERS : realiphi_i = iphi_i;
+	  if(iphi_i < 0)
+	    realiphi_i = iphi_i + NPHI_TOWERS;
+	  else if(iphi_i >= NPHI_TOWERS)
+	    realiphi_i = iphi_i%NPHI_TOWERS;
+	  else
+	    realiphi_i = iphi_i;
+	  
+	  // (iphi_i < 0) ? realiphi_i = iphi_i + NPHI_TOWERS :
+	  //   realiphi_i = iphi_i;
+	  // (iphi_i >= NPHI_TOWERS) ? realiphi_i = iphi_i%NPHI_TOWERS :
+	  //   realiphi_i = iphi_i;
 
 	  temp.sumEt += fulldetector[ieta_i][realiphi_i];
+	  //printf("%d %d %lf\n",ieta_i,realiphi_i,fulldetector[ieta_i][realiphi_i]);
 	}
       }
 
+      //printf("%lf\n",temp.sumEt);
       if(temp.sumEt > highestJet[0].sumEt)
 	highestJet[0] = temp;
     }
   }
+  //printf("%lf\n",highestJet[0].sumEt);
 
   //find subleading jet
   for(int ieta = jetRadius - even; ieta < NETA_TOWERS - jetRadius; ieta++)
@@ -74,25 +91,39 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
 	continue;
 
       TowerJet temp;
-      temp.sumEt = fulldetector[ieta][iphi];
+      temp.sumEt = 0;
       temp.eta = ieta;
       temp.phi = iphi;
-
-      for(int ieta_i = ieta - jetRadius - even; ieta_i < ieta + jetRadius; ieta_i++)
+      
+      for(int ieta_i = ieta - (jetRadius - even);
+	  ieta_i <= ieta + jetRadius; ieta_i++)
       {
-	for(int iphi_i = iphi - jetRadius - even; iphi_i < iphi + jetRadius; iphi_i++)
+	for(int iphi_i = iphi - (jetRadius - even);
+	    iphi_i <= iphi + jetRadius; iphi_i++)
 	{
 	  //cut the corners off the square ONLY CORRECT FOR ODD DIAMETER
 	  if(circularJets)
 	  {
-	    int distance2 = (iphi-temp.phi)*(iphi-temp.phi) +
-	      (ieta-temp.eta)*(ieta-temp.eta);
-	    if(distance2 >= jetCircleDistance2)
+	    int distance2 = (iphi_i-temp.phi)*(iphi_i-temp.phi) +
+	      (ieta_i-temp.eta)*(ieta_i-temp.eta);
+	    if(distance2 > jetCircleDistance2)
 	      continue;
 	  }
-	    
+
+	  	    
 	  int realiphi_i;
-	  (iphi_i < 0) ? realiphi_i = iphi_i + NPHI_TOWERS : realiphi_i = iphi_i;
+	  if(iphi_i < 0)
+	    realiphi_i = iphi_i + NPHI_TOWERS;
+	  else if(iphi_i >= NPHI_TOWERS)
+	    realiphi_i = iphi_i%NPHI_TOWERS;
+	  else
+	    realiphi_i = iphi_i;
+	  
+	  // int realiphi_i;
+	  // (iphi_i < 0) ? realiphi_i = iphi_i + NPHI_TOWERS :
+	  //   realiphi_i = iphi_i;
+	  // (iphi_i >= NPHI_TOWERS) ? realiphi_i = iphi_i%NPHI_TOWERS :
+	  //   realiphi_i = iphi_i;
 
 	  temp.sumEt += fulldetector[ieta_i][realiphi_i];
 	}
@@ -108,7 +139,8 @@ TowerJet* findTowerJet(double fulldetector[NETA_TOWERS][NPHI_TOWERS], bool circu
     highestJet[i].realEta = towerEta(highestJet[i].eta);
     highestJet[i].realPhi = towerPhi(highestJet[i].phi,highestJet[i].eta);
   }
-  
+
+  //printf("%lf\n",highestJet[0].sumEt);
   return(highestJet);
 }
 

@@ -6,6 +6,7 @@
 #include <TString.h>
 #include <iostream>
 
+const int NETA_TOWERS = 88;
 #include "FindTowerJet.C"
 
 TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events, 
@@ -16,9 +17,8 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
   const int NBINS = 300;
   const int MAX_EN = 600;
 
-  const int JET_RADIUS = 6; //radius = 6 about equals area for region jets for square,
-                            //radius = 7 about equals area for region jets for circle
-  const bool CIRCULAR_JETS = false; //otherwise square jets
+  const int JET_DIAMETER = 7;
+  const bool CIRCULAR_JETS = true; //otherwise square jets
 
   if (fChain == 0) return(0);
   
@@ -81,6 +81,10 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
     fChain->GetEntry(jentry);
     
     double fullDetectorTowers[NETA_TOWERS][NPHI_TOWERS]; //[eta][phi]
+    for(int i = 0; i < NETA_TOWERS; i++)
+      for(int j = 0; j < NPHI_TOWERS; j++)
+	fullDetectorTowers[i][j]=0;
+    
 
     //------Fills in the phi-eta matrix for total Et values using eta and phi indexes------
     //Stolen from Doga
@@ -104,24 +108,24 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
 	}
       }
       if (hcalEtaIndex[i]<-28){
-	// for (int k=0; k<4; k++){
-	//   for (int l=0; l<4; l++){
-	//     double towertotal=hcalEt[i]/16.0;
-	//     fullDetectorTowers[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
-	//   }
-	// }
-	double towertotal=hcalEt[i];
-	fullDetectorTowers[(hcalEtaIndex[i]+32)*4][hcalPhiIndex[i]-1]=towertotal;
+	for (int k=0; k<4; k++){
+	  for (int l=0; l<4; l++){
+	    double towertotal=hcalEt[i]/16.0;
+	    fullDetectorTowers[(hcalEtaIndex[i]+32)*4+k][hcalPhiIndex[i]-1+l]=towertotal;
+	  }
+	}
+	// double towertotal=hcalEt[i];
+	// fullDetectorTowers[(hcalEtaIndex[i]+32)*4][hcalPhiIndex[i]-1]=towertotal;
       }
       if (hcalEtaIndex[i]>28){
-	// for (int k=0; k<4; k++){
-	//   for (int l=0; l<4; l++){
-	//     double towertotal=hcalEt[i]/16.0;
-	//     fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
-	//   }
-	// }
-	double towertotal=hcalEt[i];
-	fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72][hcalPhiIndex[i]-1]=towertotal;
+	for (int k=0; k<4; k++){
+	  for (int l=0; l<4; l++){
+	    double towertotal=hcalEt[i]/16.0;
+	    fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72+k][hcalPhiIndex[i]-1+l]=towertotal;
+	  }
+	}
+	// double towertotal=hcalEt[i];
+	// fullDetectorTowers[(hcalEtaIndex[i]-29)*4+72][hcalPhiIndex[i]-1]=towertotal;
       }
     }
 
@@ -158,11 +162,11 @@ TH1D* TriggerPrimitivesTree_towerjet::Loop(int total_events,
       // detectormapafter->Draw("Lego2");
     }    
 
-    TowerJet highestJet = findTowerJet(fullDetectorTowers, CIRCULAR_JETS, JET_RADIUS);
+    TowerJet *highestJet = findTowerJet(fullDetectorTowers, CIRCULAR_JETS, JET_DIAMETER);
     
-    if(highestJet.sumEt > threshhold)
+    if(highestJet[0].sumEt > threshhold)
     {
-      max_towerjet_energy->Fill(highestJet.sumEt);
+      max_towerjet_energy->Fill(highestJet[0].sumEt);
       // max_towerjet_location->Fill(highestJet.eta_center, highestJet.phi_center);
     }
   }

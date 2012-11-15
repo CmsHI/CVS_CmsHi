@@ -35,7 +35,7 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 
   if(PHI_AVERAGE)
   {
-    method = "Region-Level Phi-Ring Subtraction";
+    method = "2015 System";
     method_s = "phisub";
   }
   else
@@ -111,9 +111,9 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 	}
     }    
 
-    RegionJet highestJet = findRegionJet(fulldetector);
+    RegionJet *highestJet = findRegionJet(fulldetector);
     
-    if(highestJet.et > threshold)
+    if(highestJet[0].sumEt > threshold)
       jet_curve->Fill(realJetPt);
     
     total_in_bin->Fill(realJetPt);
@@ -122,7 +122,7 @@ TH1D* TriggerPrimitivesTree_jetcurve::Loop(int total_events,
 //TCanvas *plot;
 
   stringstream filename;
-  filename << "jetto_" << method_s << "_" << threshold << ".gif";
+  //filename << "jetto_" << method_s << "_" << threshold << ".gif";
 //plot = new TCanvas();
   //jet_curve->Divide(total_in_bin);
   jet_curve->Divide(jet_curve, total_in_bin, 1, 1, "b");

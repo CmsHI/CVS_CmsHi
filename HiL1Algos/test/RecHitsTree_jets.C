@@ -28,7 +28,7 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
 
   //towerjet parameters. diamater = 9 and circular jets for the
   //correction table.
-  const int JET_DIAMETER = 9;
+  const int JET_DIAMETER = 5;
   const bool CIRCULAR_JETS = true; //otherwise square jets
 
   if (fChain == 0) return(0);
@@ -39,13 +39,13 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   TH1D *efficiency_curve_tower, *efficiency_curve_region;
 
   
-  TFile *outf = new TFile("L1vsOffline.root", "recreate");
-  TNtuple *matchedTowerJets =
-    new TNtuple("TowerJets","TowerJets",
-  		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
-  TNtuple *matchedRegionJets =
-    new TNtuple("RegionJets","RegionJets",
-  		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
+  // TFile *outf = new TFile("L1vsOffline.root", "recreate");
+  // TNtuple *matchedTowerJets =
+  //   new TNtuple("TowerJets","TowerJets",
+  // 		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
+  // TNtuple *matchedRegionJets =
+  //   new TNtuple("RegionJets","RegionJets",
+  // 		"L1IPhi:L1Phi:L1IEta:L1Eta:L1correctedEt:L1uncorrectedEt:offlineEta:offlinePhi:offlinePt");  
 
 
   // TH2I *max_towerjet_location;
@@ -65,13 +65,13 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
 				  "Maximum regionjet energy for each event",
 				  NBINS,0,MAX_EN);
   
-  TH1D *max_regionjet_location = new TH1D("max_regionjet_location",
-					  "Eta Location of max regionjet, offlinejet jet 1<eta<2",
-					  4*NETA_REGIONS,-4.5,4.5);
+  // TH1D *max_regionjet_location = new TH1D("max_regionjet_location",
+  // 					  "Eta Location of max regionjet, offlinejet jet 1<eta<2",
+  // 					  4*NETA_REGIONS,-4.5,4.5);
 
-  TH1D *max_towerjet_location = new TH1D("max_towerjet_location",
-					 "Eta Location of max towerjet, offlinejet jet 1<eta<2",
-					 4*NETA_TOWERS,-4.5,4.5);
+  // TH1D *max_towerjet_location = new TH1D("max_towerjet_location",
+  // 					 "Eta Location of max towerjet, offlinejet jet 1<eta<2",
+  // 					 4*NETA_TOWERS,-4.5,4.5);
 
 
   TH2D *regionL1JetEnergyCorrection;
@@ -241,87 +241,88 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
 	uncoRegionEt = highestRegionJet[i].sumEt;
 	highestRegionJet[i].sumEt /= correctionFactor;
       }
-      matchedTowerJets->Fill(
-      	highestTowerJet[i].phi,
-      	highestTowerJet[i].realPhi,
-      	highestTowerJet[i].eta,
-      	highestTowerJet[i].realEta,
-      	highestTowerJet[i].sumEt,
-      	uncoTowerEt,
-	fjet->jteta[0],
-	fjet->jtphi[0],
-	fjet->jtpt[0]
-      	);
+      // matchedTowerJets->Fill(
+      // 	highestTowerJet[i].phi,
+      // 	highestTowerJet[i].realPhi,
+      // 	highestTowerJet[i].eta,
+      // 	highestTowerJet[i].realEta,
+      // 	highestTowerJet[i].sumEt,
+      // 	uncoTowerEt,
+      // 	fjet->jteta[0],
+      // 	fjet->jtphi[0],
+      // 	fjet->jtpt[0]
+      // 	);
 
-      matchedRegionJets->Fill(
-      	highestRegionJet[i].phi,
-      	highestRegionJet[i].realPhi,
-      	highestRegionJet[i].eta,
-      	highestRegionJet[i].realEta,
-      	highestRegionJet[i].sumEt,
-      	uncoRegionEt,
-	fjet->jteta[0],
-	fjet->jtphi[0],
-	fjet->jtpt[0]
-      	);
+      // matchedRegionJets->Fill(
+      // 	highestRegionJet[i].phi,
+      // 	highestRegionJet[i].realPhi,
+      // 	highestRegionJet[i].eta,
+      // 	highestRegionJet[i].realEta,
+      // 	highestRegionJet[i].sumEt,
+      // 	uncoRegionEt,
+      // 	fjet->jteta[0],
+      // 	fjet->jtphi[0],
+      // 	fjet->jtpt[0]
+      // 	);
 
 
       max_towerjet_energy->Fill(highestTowerJet[i].sumEt);
       max_regionjet_energy->Fill(highestRegionJet[i].sumEt);
 
-      max_regionjet_location->Fill(highestRegionJet[i].realEta);
-      max_towerjet_location->Fill(highestTowerJet[i].realEta);
+      // max_regionjet_location->Fill(highestRegionJet[i].realEta);
+      // max_towerjet_location->Fill(highestTowerJet[i].realEta);
     }
 
     if(break_early && (evts > total_events)) break;
     evts++;
   }
   
-  // efficiency_curve_tower = new TH1D("efficiency_curve_tower",
-  // 				    "Towerjet Efficiency",
-  // 				    NBINS,0,MAX_EN);
-  // efficiency_curve_region = new TH1D("efficiency_curve_region",
-  // 				     "Reigonjet Efficiency",
-  // 				    NBINS,0,MAX_EN);
+  efficiency_curve_tower = new TH1D("efficiency_curve_tower",
+  				    "Towerjet Efficiency",
+  				    NBINS,0,MAX_EN);
+  efficiency_curve_region = new TH1D("efficiency_curve_region",
+  				     "Reigonjet Efficiency",
+  				    NBINS,0,MAX_EN);
   
-  // double total_integral_tower = max_towerjet_energy->Integral();
-  // double total_integral_region = max_regionjet_energy->Integral();
+  double total_integral_tower = max_towerjet_energy->Integral();
+  double total_integral_region = max_regionjet_energy->Integral();
 
-  // for(int i = 0; i < NBINS; i++)
-  // {
-  //   double j = (double)i*(double)MAX_EN/(double)NBINS;
+  for(int i = 0; i < NBINS; i++)
+  {
+    double j = (double)i*(double)MAX_EN/(double)NBINS;
     
-  //   double integral_tower = max_towerjet_energy->Integral(i, NBINS);
-  //   double integral_region = max_regionjet_energy->Integral(i, NBINS);
+    double integral_tower = max_towerjet_energy->Integral(i, NBINS);
+    double integral_region = max_regionjet_energy->Integral(i, NBINS);
   
-  //   efficiency_curve_tower->Fill(j, (double)integral_tower/total_integral_tower);      
-  //   efficiency_curve_region->Fill(j, (double)integral_region/total_integral_region);
-  // }
+    efficiency_curve_tower->Fill(j, (double)integral_tower/total_integral_tower);      
+    efficiency_curve_region->Fill(j, (double)integral_region/total_integral_region);
+  }
 
-  TCanvas *c1 = new TCanvas();
-  max_towerjet_energy->SetTitle("max_towerjet_energy");
-  max_towerjet_energy->SetXTitle("GeV");
-  max_towerjet_energy->SetYTitle("Counts");
-  max_towerjet_energy->SetLineColor(kRed);
+  // TCanvas *c1 = new TCanvas();
+  // max_towerjet_energy->SetTitle("max_towerjet_energy");
+  // max_towerjet_energy->SetXTitle("GeV");
+  // max_towerjet_energy->SetYTitle("Counts");
+  // max_towerjet_energy->SetLineColor(kRed);
   
-  max_regionjet_energy->SetTitle("max_regionjet_energy");
-  max_regionjet_energy->SetXTitle("GeV");
-  max_regionjet_energy->SetYTitle("Counts");
-  max_regionjet_energy->SetLineColor(kBlue);
+  // max_regionjet_energy->SetTitle("max_regionjet_energy");
+  // max_regionjet_energy->SetXTitle("GeV");
+  // max_regionjet_energy->SetYTitle("Counts");
+  // max_regionjet_energy->SetLineColor(kBlue);
   
-  max_towerjet_energy->Draw();
-  max_regionjet_energy->Draw("same");
+  // max_towerjet_energy->Draw();
+  // max_regionjet_energy->Draw("same");
   
-  TCanvas *c2 = new TCanvas();
-  max_towerjet_location->SetLineColor(kRed);
-  max_towerjet_location->Draw();
+  // TCanvas *c2 = new TCanvas();
+  // max_towerjet_location->SetLineColor(kRed);
+  // max_towerjet_location->Draw();
 
-  max_regionjet_location->SetLineColor(kBlue);
-  max_regionjet_location->Draw("same");
+  // max_regionjet_location->SetLineColor(kBlue);
+  // max_regionjet_location->Draw("same");
 
   // TCanvas *c3 = new TCanvas();
-  // efficiency_curve_tower->SetXTitle("Threshold (GeV)");
-  // efficiency_curve_tower->SetYTitle("Fraction of passing events");
+  // efficiency_curve_tower->SetTitle("RecHit Tower Jets");
+  // efficiency_curve_tower->SetXTitle("L1 Threshold (GeV)");
+  // efficiency_curve_tower->SetYTitle("L1 Accept Fraction");
   // efficiency_curve_tower->SetLineColor(kRed);
 
   // efficiency_curve_region->SetXTitle("Threshold (GeV)");
@@ -334,27 +335,26 @@ TH1D* RecHitsTree_jets::Loop(int total_events,
   // avg_energy_eta->Divide(num_hits_eta);
   // avg_energy_eta->Draw();
 
-  outf->cd();
-  matchedTowerJets->Write();
-  matchedRegionJets->Write();
-  outf->Close();
+  // outf->cd();
+  // matchedTowerJets->Write();
+  // matchedRegionJets->Write();
+  // outf->Close();
 
-  // switch(whichReturn)
-  // {
-  // case TOWER_ENERGY:
-  //   return(max_towerjet_energy);
-  //   break;
-  // case TOWER_EFF:
-  //   return(efficiency_curve_tower);
-  //   break;
-  // case REGION_ENERGY:
-  //   return(max_regionjet_energy);
-  //   break;
-  // case REGION_EFF:
-  //   return(efficiency_curve_region);
-  //   break;
-  // }
-  return(max_towerjet_energy);
+  switch(whichReturn)
+  {
+  case TOWER_ENERGY:
+    return(max_towerjet_energy);
+    break;
+  case TOWER_EFF:
+    return(efficiency_curve_tower);
+    break;
+  case REGION_ENERGY:
+    return(max_regionjet_energy);
+    break;
+  case REGION_EFF:
+    return(efficiency_curve_region);
+    break;
+  }
 }
 
 int getEtaIndex(double eta)

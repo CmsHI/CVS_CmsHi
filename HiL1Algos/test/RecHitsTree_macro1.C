@@ -11,11 +11,9 @@
 #include "RecHitsTree_jets.C"
 
 
-using namespace std;
-
-void RecHitsTree_macro1()
+void RecHitsTree_macro1(int total_events = -1)
 {  
-  int total_events = 5000;
+  //int total_events = -1;
   RecHitsTree_jets *minbias = new RecHitsTree_jets();
   
   TCanvas* plot;
@@ -27,13 +25,22 @@ void RecHitsTree_macro1()
 
   TLegend* leg;
 
-  algo[0] = false;  
-  algo[1] = true;
-
   //h_towers[0] = (TH1D*)minbias->Loop(total_events, RecHitsTree_jets::TOWER_EFF, algo[0], false)->Clone();
-  h_towers[1] = (TH1D*)minbias->Loop(total_events, RecHitsTree_jets::TOWER_EFF, algo[1], false)->Clone();
-  h_regions[0] = (TH1D*)minbias->Loop(total_events,RecHitsTree_jets::REGION_EFF, algo[0], false)->Clone();
-  h_regions[1] = (TH1D*)minbias->Loop(total_events,RecHitsTree_jets::REGION_EFF, algo[1], false)->Clone();
+  h_towers[1] = (TH1D*)minbias->Loop(total_events,
+				     RecHitsTree_jets::TOWER_EFF,
+				     true,
+				     false,
+				     false)->Clone();
+  h_regions[0] = (TH1D*)minbias->Loop(total_events,
+				      RecHitsTree_jets::REGION_EFF,
+				      false,
+				      false,
+				      false)->Clone();
+  h_regions[1] = (TH1D*)minbias->Loop(total_events,
+				      RecHitsTree_jets::REGION_EFF,
+				      true,
+				      false,
+				      false)->Clone();
 
   plot = new TCanvas();
 
@@ -63,19 +70,23 @@ void RecHitsTree_macro1()
   // }
   /***********************************************************/
   
-  h_regions[0]->SetTitle("Comparison of L1 Systems");
+  h_regions[0]->SetTitle("RecHit Tower Jets");
+  h_regions[0]->SetXTitle("L1 Threshold (GeV)");
+  h_regions[0]->SetYTitle("L1 Accept Fraction");
   h_regions[0]->Draw("L");
   // h_towers[0]->SetLineColor(kRed);
   // h_towers[0]->Draw("L");
 
-  h_towers[1]->SetLineColor(kBlue);
+  h_regions[1]->SetLineColor(kBlue);
+  h_regions[1]->Draw("L,same");
+
+
+  h_towers[1]->SetLineColor(kRed);
   h_towers[1]->Draw("L,same");
   // h_regions[0]->SetLineColor(kRed);
 
 
-  h_regions[1]->SetLineColor(kRed);
-  h_regions[1]->Draw("L,same");
-
+ 
 
   // fivep_l[0]->SetLineColor(kRed);
   // fivep_l[0]->Draw("same");
@@ -87,9 +98,9 @@ void RecHitsTree_macro1()
   leg->SetFillColor(0);
 
   //leg->AddEntry(h_towers[0],"nosub towers","l");
-  leg->AddEntry(h_regions[0],"Current L1 System","l");
-  leg->AddEntry(h_regions[1],"2015 System","l");
-  leg->AddEntry(h_towers[1],"SLHC System","l");
+  leg->AddEntry(h_regions[0],"Current L1 trigger","l");
+  leg->AddEntry(h_regions[1],"2015 intermediate trigger","l");
+  leg->AddEntry(h_towers[1],"SLHC trigger","l");
 
   // leg->AddEntry(h_min[2],"Tower Level Phi-Ring Subtraction","l");
   // leg->AddEntry(fivep_l[0],"Current System 5%","l");
@@ -100,6 +111,7 @@ void RecHitsTree_macro1()
  
   plot->Update();
 
-  plot->SaveAs("eff_all_rechits_for_bolek.gif");
+  plot->SaveAs("efficiency_comparison_rechits.C");
+  plot->SaveAs("efficiency_comparison_rechits.gif");
 }  
 

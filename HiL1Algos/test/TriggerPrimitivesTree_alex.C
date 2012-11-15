@@ -86,11 +86,11 @@ TH1D* TriggerPrimitivesTree_alex::Loop(int total_events,
 	}
     }
 
-    RegionJet highestJet = findRegionJet(fullDetectorRegions);
+    RegionJet *highestJet = findRegionJet(fullDetectorRegions);
     
-    if(highestJet.et > threshhold)
+    if(highestJet[0].sumEt > threshhold)
     {
-      max_jet_energy->Fill(highestJet.et);
+      max_jet_energy->Fill(highestJet[0].sumEt);
       //max_jet_location->Fill(head[0].eta, head[0].phi);
       //max_jet_location->Fill(head[0].eta, head[0].phi, head[0].et);
     }
