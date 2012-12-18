@@ -1,0 +1,34 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/corr_ana/setupfiles/setupfile_BASE
+
+export EVENTTYPE="PPData_Minbias_7TeV"
+#export ISCORR=0
+export ISHI=0
+export ISDOEVENTSHAPE=1
+export JETETFRACTION=0.25
+
+export ZVTXCENTER=-0.3
+export YVTXCENTER=0.014
+export XVTXCENTER=0.095
+export ZVTXMIN=-150
+export ZVTXMAX=150
+export ZVTXBIN=5
+export RHOMIN=0.0
+export RHOMAX=0.2
+
+export PTTRGMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0 1.0 2.0 4.0"
+export PTTRGMAXARRAY="1.0 2.0 3.0 4.0 5.0 6.0 3.0 4.0 6.0"
+export PTASSMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0 1.0 2.0 4.0"
+export PTASSMAXARRAY="1.0 2.0 3.0 4.0 5.0 6.0 3.0 4.0 6.0"
+
+#export PTTRGMINARRAY="1.0"
+#export PTTRGMAXARRAY="3.0"
+#export PTASSMINARRAY="1.0"
+#export PTASSMAXARRAY="3.0"
+
+export JETETMIN=15.0
+export JETETMAX=9999.0
+
+export NETABINS=32
+export NPHIBINS=32
+export BKGFACTOR=10
