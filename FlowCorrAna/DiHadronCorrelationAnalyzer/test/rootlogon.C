@@ -12,15 +12,10 @@
     //
     cout << "Loading FW Lite setup." << endl;
     gSystem->Load("libFWCoreFWLite.so");
-//    gSystem->Load("libDataFormatsFWLite.so");
-//    gSystem->Load("libDataFormatsCommon");
-//    gSystem->Load("libDataFormatsCaloTowers");
-//    gSystem->Load("libDataFormatsHeavyIonEvent");
-//    gSystem->Load("libSimDataFormatsHiGenData");
     gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
     gSystem->AddIncludePath("-I$CMSSW_RELEASE_BASE/src/");
     AutoLibraryLoader::enable();
   }
 
-gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/pluginWeisQCDAnaDiHadronCorrelationAnalyzer.so");
+gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/pluginFlowCorrAnaDiHadronCorrelationAnalyzer.so");
 }

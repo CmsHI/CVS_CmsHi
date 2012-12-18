@@ -5,7 +5,7 @@
 
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 #include "setupDiHadronCorrelation.h"
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationMultiAnalyzerFWLite.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationMultiAnalyzerFWLite.h"
 #endif
 
 void setup(int ffrom, int fto,

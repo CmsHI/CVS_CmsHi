@@ -1,5 +1,5 @@
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationMultiBaseFWLite.h"
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/EventShape.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationMultiBaseFWLite.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/EventShape.h"
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>

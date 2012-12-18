@@ -49,8 +49,8 @@
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "RecoJets/JetAlgorithms/interface/JetAlgoHelper.h"
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/CutParameters.h"
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationEvent.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/CutParameters.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationEvent.h"
 #endif
 
 #include "DataFormats/FWLite/interface/ChainEvent.h"

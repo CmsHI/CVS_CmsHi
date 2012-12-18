@@ -11,7 +11,7 @@
 #include <TList.h>
 #include <TString.h>
 #if !defined(__CINT__) && !defined(__MAKECINT__)
-#include "WeisQCDAna/DiHadronCorrelationAnalyzer/interface/CutParameters.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/CutParameters.h"
 #include "RunAna.C"
 #endif
 
