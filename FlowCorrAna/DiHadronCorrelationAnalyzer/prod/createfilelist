@@ -1,0 +1,9 @@
+#!/bin/sh
+
+currentdir=$PWD
+
+dataset=PAData_Minbias_5TeV_MBNEW
+datadir=/mnt/hadoop/cms/store/user/davidlw/PAPhysics/PA2012_TRKANASKIM_MB_v7/*
+
+mkdir -p filesets
+ls -l $datadir/*.root  | awk '{print "file:" $9}' > ./filesets/fileset_${dataset}.txt
