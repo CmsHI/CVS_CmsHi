@@ -31,19 +31,6 @@ DiHadronCorrelationMultiBaseFWLite::DiHadronCorrelationMultiBaseFWLite(fwlite::C
   centRunnum(181502),
   hEffWeight(0),
   hTrgWeight(0),
-  IsGenMult(0),
-  IsGenVtx(0),
-  IsVtxSel(0),
-  IsInvMass(0),
-  IsCorr(1),
-  IsHI(0),
-  IsDoEventShape(0),
-  IsTrackNtuple(0),
-  IsHIGenInfoNtuple(0),
-  IsLeadTrack(0),
-  IsSubJet(0),
-  IsMonoJet(0),
-  IsFullMatrix(0),
   checksign(-1),
   eventClass(-1),
   hf(0),
@@ -115,6 +102,19 @@ DiHadronCorrelationMultiBaseFWLite::DiHadronCorrelationMultiBaseFWLite(fwlite::C
   cutPara.pthard1=1.0;
   cutPara.pthard2=0.4;
   cutPara.delta=0.7;
+  cutPara.IsGenMult=0;
+  cutPara.IsGenVtx=0;
+  cutPara.IsVtxSel=0;
+  cutPara.IsInvMass=0;
+  cutPara.IsCorr=1;
+  cutPara.IsHI=0;
+  cutPara.IsDoEventShape=0;
+  cutPara.IsTrackNtuple=0;
+  cutPara.IsHIGenInfoNtuple=0;
+  cutPara.IsLeadTrack=0;
+  cutPara.IsSubJet=0;
+  cutPara.IsMonoJet=0;
+  cutPara.IsFullMatrix=0;
 }
 
 DiHadronCorrelationMultiBaseFWLite::~DiHadronCorrelationMultiBaseFWLite()
@@ -177,7 +177,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
 
   // Select vertex
   double zvtxbincentertmp=0;
-  if(IsVtxSel)
+  if(cutPara.IsVtxSel)
   {
     GetVertices();
     double zVtxtmp = zVtx-cutPara.zvtxcenter;
@@ -186,7 +186,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
     double rhotmp = sqrt(xVtxtmp*xVtxtmp+yVtxtmp*yVtxtmp);
     zvtxbincentertmp = (int)((zVtxtmp-cutPara.zvtxmin)/cutPara.zvtxbin)*cutPara.zvtxbin+cutPara.zvtxmin+cutPara.zvtxbin/2;
     if( zVtxtmp<cutPara.zvtxmin || zVtxtmp>cutPara.zvtxmax || rhotmp<cutPara.rhomin || rhotmp>cutPara.rhomax ) return;
-    if(IsGenVtx)
+    if(cutPara.IsGenVtx)
     {
       GetSimVertices();
       hZVtxRecoVsSim->Fill(zVtx,zVtxSim);
@@ -211,7 +211,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   hXYZVtxSepMin->Fill(minVtxSep);
   hMultMaxVsSec->Fill(maxofflinetracks,secofflinetracks);
 
-  if(IsVtxSel && IsGenVtx)
+  if(cutPara.IsVtxSel && cutPara.IsGenVtx)
   {
     hZVtxResVsNMult->Fill(nMult,zVtx-zVtxSim);
     hXVtxResVsNMult->Fill(nMult,xVtx-xVtxSim);
@@ -296,9 +296,11 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
        LoopCaloTower(1);
        break;
      case kKshort:
+       massTrg=0.498;
        LoopV0Candidates(1, "Kshort");
        break;
      case kLambda:
+       massTrg=1.116;
        LoopV0Candidates(1, "Lambda");
        break;
      default:
@@ -371,9 +373,11 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
        LoopCaloTower(0);
        break;
      case kKshort:
+       massAss=0.498;
        LoopV0Candidates(0, "Kshort");
        break;
      case kLambda:
+       massAss=1.116;
        LoopV0Candidates(0, "Lambda");
        break;
      default:
@@ -385,7 +389,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   double thrust = 0;
   double recoil = 0;
   double sphericity = 0;
-  if(IsDoEventShape)
+  if(cutPara.IsDoEventShape)
   {
     EventShape t((eventcorr->pVect_all).begin(), (eventcorr->pVect_all).end());
     t.SetTran();
@@ -395,7 +399,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   }
 
   // Fill gen-level information ntuple
-  if(IsHIGenInfoNtuple)
+  if(cutPara.IsHIGenInfoNtuple)
   {
     fwlite::Handle<HepMCProduct> himc;
     himc.getByLabel(event,"generator");
@@ -440,7 +444,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
 //    eventNtuple->Fill(ntupledata);
   }
 
-  if(IsInvMass) FillHistsInvariantMass(*eventcorr);
+  if(cutPara.IsInvMass) FillHistsInvariantMass(*eventcorr);
 
   eventcorr->nmult=nMult;
   eventcorr->centbin=hiCentrality;
@@ -575,6 +579,7 @@ void DiHadronCorrelationMultiBaseFWLite::MakeHists()
   hInvMass_diphoton = new TH1D("invmass_diphoton",";Invariant Mass (GeV)",10000,0,100);
   hInvMassVsPt_diphoton = new TH2D("invmassvspt_diphoton",";p_{T}(GeV);Invariant Mass (GeV)",200,0,10,1000,0,2);
   hOpenAngleVsPt_diphoton = new TH2D("openanglevspt_diphoton",";p_{T}(GeV);Opening angle (rads)",200,0,10,100,0,0.5);
+  hV0InvMassVsPt = new TH2D("v0invmassvspt",";p_{T}(GeV);Invariant Mass (GeV)",200,0,20,1000,0,5);
 
   for(int itrg=0;itrg<(int)(cutPara.pttrgmin.size());itrg++)
   {
@@ -679,12 +684,13 @@ void DiHadronCorrelationMultiBaseFWLite::DeleteHists()
   delete hInvMass_diphoton;
   delete hInvMassVsPt_diphoton;
   delete hOpenAngleVsPt_diphoton;
+  delete hV0InvMassVsPt;
 }
 
 // ---------------------------------------------------------------
 void DiHadronCorrelationMultiBaseFWLite::GetMult()
 {
-   if(!IsGenMult) 
+   if(!cutPara.IsGenMult) 
    {
      //----- loop over tracks -----
      fwlite::Handle<std::vector<reco::Track> > tracks;
@@ -876,7 +882,7 @@ void DiHadronCorrelationMultiBaseFWLite::LoopTracks(bool istrg, TString input)
      }
      hdNdPtdcostheta->Fill(trk.theta(),pt,1.0/fabs(sin(trk.theta())));
 */
-     if(IsVtxSel)
+     if(cutPara.IsVtxSel)
      {
        hTrkZVtxRes->Fill(vz-zVtx);
        hTrkXYVtxRes->Fill(vx-xVtx,vy-yVtx);
@@ -888,23 +894,23 @@ void DiHadronCorrelationMultiBaseFWLite::LoopTracks(bool istrg, TString input)
        hTrkZVtxResVsPt->Fill(pt,vz-zVtx);
        hTrkXVtxResVsPt->Fill(pt,vx-xVtx);
        hTrkYVtxResVsPt->Fill(pt,vy-yVtx);
-       if(IsGenVtx)
+       if(cutPara.IsGenVtx)
        {
          hTrkZVtxSimResVsNMult->Fill(nMult,vz-zVtxSim);
          hTrkXVtxSimResVsNMult->Fill(nMult,vx-xVtxSim);
          hTrkYVtxSimResVsNMult->Fill(nMult,vy-yVtxSim);
        }
      }
-     if(IsTrackNtuple) trackNtuple->Fill(vx,vy,vz,dz,dxy,sqrt(dzerror*dzerror+zVtxError*zVtxError),sqrt(dxyerror*dxyerror+xVtxError*yVtxError),nhits,chi2,algo,eta,phi,pt,pterror);
+     if(cutPara.IsTrackNtuple) trackNtuple->Fill(vx,vy,vz,dz,dxy,sqrt(dzerror*dzerror+zVtxError*zVtxError),sqrt(dxyerror*dxyerror+xVtxError*yVtxError),nhits,chi2,algo,eta,phi,pt,pterror);
 
      double effweight = GetEffWeight(eta,pt,0.5*(cutPara.zvtxmax+cutPara.zvtxmin),hiCentrality);
      double trgweight = GetTrgWeight(nMult);
 
-     if(istrg && !IsLeadTrack) AssignTrgPtBins(pt,eta,phi,charge,effweight*trgweight);
+     if(istrg && !cutPara.IsLeadTrack) AssignTrgPtBins(pt,eta,phi,charge,effweight*trgweight);
      else AssignAssPtBins(pt,eta,phi,charge,effweight*trgweight);
    }
 /*
-   if(IsLeadTrack && istrg) 
+   if(cutPara.IsLeadTrack && istrg) 
    {
      double effweight = GetEffWeight(leadeta,leadpt,0.5*(cutPara.zvtxmax+cutPara.zvtxmin),hiCentrality);
      AssignTrgPtBins(leadpt,leadeta,leadphi,leadcharge,effweight);
@@ -1008,7 +1014,7 @@ void DiHadronCorrelationMultiBaseFWLite::LoopJets(bool istrg)
      double charge = 0; 
 
      // sub-leading jet
-     if(IsSubJet && jets->size()>1)
+     if(cutPara.IsSubJet && jets->size()>1)
      {
        if(fabs(eta)<2 && et>cutPara.leadjetetmin)
        {
@@ -1029,7 +1035,7 @@ void DiHadronCorrelationMultiBaseFWLite::LoopJets(bool istrg)
        else break;
      }
 
-     if(IsMonoJet)
+     if(cutPara.IsMonoJet)
      {
        if(fabs(eta)<2 && et>cutPara.leadjetetmin)
        {
@@ -1231,12 +1237,15 @@ void DiHadronCorrelationMultiBaseFWLite::LoopV0Candidates(bool istrg, TString ca
 
      double eta = v0candidate.eta();
      double phi = v0candidate.phi();
-     double et  = v0candidate.et();
+     double pt  = v0candidate.pt();
+     double mass = v0candidate.mass();
      double charge = v0candidate.charge();
 
+     hV0InvMassVsPt->Fill(pt,mass);
+
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,charge,effweight);
    }
 }
 
@@ -1551,7 +1560,7 @@ double DiHadronCorrelationMultiBaseFWLite::GetEffWeight(double eta, double pt, d
 //  if(pt>10) pt=10;
   double effweight = 1.0;
   if(!hEffWeight) return effweight;
-  if(!IsHI) effweight = hEffWeight->GetBinContent(hEffWeight->FindBin(eta,pt));
+  if(!cutPara.IsHI) effweight = hEffWeight->GetBinContent(hEffWeight->FindBin(eta,pt));
   else effweight = hEffWeight->GetBinContent(hEffWeight->FindBin(eta,pt,centbin));
   if(effweight<0.01) effweight=1.0;
   return effweight;
@@ -1635,10 +1644,11 @@ TList* DiHadronCorrelationMultiBaseFWLite::GetOutputs()
   outputlist->Add(hInvMass_diphoton);
   outputlist->Add(hInvMassVsPt_diphoton);
   outputlist->Add(hOpenAngleVsPt_diphoton);
+  outputlist->Add(hV0InvMassVsPt);
 
   outputlist->Add(eventNtuple);
   outputlist->Add(highmultNtuple);
-  if(IsTrackNtuple) outputlist->Add(trackNtuple);
+  if(cutPara.IsTrackNtuple) outputlist->Add(trackNtuple);
   outputlist->Add(hiGenInfoNtuple);
 
   return outputlist;
