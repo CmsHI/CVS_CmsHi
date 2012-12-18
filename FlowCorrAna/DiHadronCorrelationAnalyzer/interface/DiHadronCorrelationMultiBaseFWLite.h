@@ -198,6 +198,7 @@ class DiHadronCorrelationMultiBaseFWLite{
    TH1D*  hInvMass_diphoton;
    TH2D*  hInvMassVsPt_diphoton;
    TH2D*  hOpenAngleVsPt_diphoton;
+   TH2D*  hV0InvMassVsPt;
 
    TH2D*  hdNdetadphi_trg[MAXPTTRGBINS];
    TH2D*  hdNdetadphi_ass[MAXPTASSBINS];
@@ -225,19 +226,6 @@ class DiHadronCorrelationMultiBaseFWLite{
    
    // parameters
    CutParameters cutPara;
-   bool IsGenMult;
-   bool IsGenVtx;
-   bool IsVtxSel;
-   bool IsInvMass;
-   bool IsCorr;
-   bool IsHI;
-   bool IsDoEventShape;
-   bool IsTrackNtuple;
-   bool IsHIGenInfoNtuple;
-   bool IsLeadTrack;
-   bool IsSubJet;
-   bool IsMonoJet;
-   bool IsFullMatrix;
    int  checksign;
    int  eventClass;
    double hf;
@@ -336,19 +324,6 @@ class DiHadronCorrelationMultiBaseFWLite{
    void SetAssID(ParticleType assid) {assID = assid;}
    void SetCentrality(TFile* centfile=0, TString centtablename=0, int ncentbins=20, int centrunnum=181502) {centFile = centfile; centTableName = centtablename; nCentBins = ncentbins; centRunnum=centrunnum;}
    void SetEventPlaneIndex(int epindex=-1) {EPIndex = epindex;}
-   void SetIsGenMult() {IsGenMult=1;}
-   void SetIsGenVtx() {IsGenVtx=1;}
-   void SetIsVtxSel() {IsVtxSel=1;}
-   void SetIsInvMass() {IsInvMass=1;}
-   void SetNoCorr() {IsCorr=0;}
-   void SetIsHI() {IsHI=1;}
-   void SetIsDoEventShape() {IsDoEventShape=1;}
-   void SetIsTrackNtuple() {IsTrackNtuple=1;}
-   void SetIsHIGenInfoNtuple() {IsHIGenInfoNtuple=1;}
-   void SetIsLeadTrack() {IsLeadTrack=1;}
-   void SetIsSubJet() {IsSubJet=1;}
-   void SetIsMonoJet() {IsMonoJet=1;}
-   void SetIsFullMatrix() {IsFullMatrix=1;}
    void SetCheckSign(int setchecksign) {checksign = setchecksign;}
    void SetEventClass(int eventclass=-1) {eventClass = eventclass;}
    void LoadEffWeight(TH3D* effweight) {hEffWeight=effweight;}

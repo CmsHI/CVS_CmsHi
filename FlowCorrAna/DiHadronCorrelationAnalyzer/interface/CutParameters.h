@@ -58,6 +58,22 @@ class CutParameters {
    TString chargeCandidateCollection;
    TString superClusterCollection;
    TString superClusterFwdCollection;
+   bool IsGenMult;
+   bool IsGenVtx;
+   bool IsVtxSel;
+   bool IsInvMass;
+   bool IsCorr;
+   bool IsHI;
+   bool IsDoEventShape;
+   bool IsTrackNtuple;
+   bool IsHIGenInfoNtuple;
+   bool IsLeadTrack;
+   bool IsSubJet;
+   bool IsMonoJet;
+   bool IsFullMatrix;
+   bool IsSymmetrize;
+   bool IsPtWeight;
+   bool IsHarmonics;
 };
 
 #endif  // CutParameters_

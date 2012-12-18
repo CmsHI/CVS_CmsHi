@@ -20,24 +20,6 @@ class DiHadronCorrelationMultiAnalyzerFWLite : public DiHadronCorrelationMultiBa
 
    // histograms
    TH1D*  hDeltaZvtx;
-/*
-   TH2D*  hdNdetadphi_trg[MAXPTTRGBINS];
-   TH2D*  hdNdetadphi_ass[MAXPTASSBINS];
-   TH2D*  hdNdetadphiCorr_trg[MAXPTTRGBINS];
-   TH2D*  hdNdetadphiCorr_ass[MAXPTASSBINS];
-   TH1D*  hMult_trg[MAXPTTRGBINS];
-   TH1D*  hMult_ass[MAXPTASSBINS];
-   TH1D*  hMultCorr_trg[MAXPTTRGBINS];
-   TH1D*  hMultCorr_ass[MAXPTASSBINS];
-   TH1D*  hpT_Signal_trg[MAXPTTRGBINS];
-   TH1D*  hpT_Signal_ass[MAXPTASSBINS];
-   TH1D*  hpTCorr_Signal_trg[MAXPTTRGBINS];
-   TH1D*  hpTCorr_Signal_ass[MAXPTASSBINS];
-   TH1D*  hpT_Background_trg[MAXPTTRGBINS];
-   TH1D*  hpT_Background_ass[MAXPTASSBINS];
-   TH1D*  hpTCorr_Background_trg[MAXPTTRGBINS];
-   TH1D*  hpTCorr_Background_ass[MAXPTASSBINS];
-*/
    TH2D* hSignal[MAXPTTRGBINS][MAXPTASSBINS];
    TH2D* hBackground[MAXPTTRGBINS][MAXPTASSBINS];
    TH2D* hCorrelation[MAXPTTRGBINS][MAXPTASSBINS];
@@ -77,23 +59,11 @@ class DiHadronCorrelationMultiAnalyzerFWLite : public DiHadronCorrelationMultiBa
    TH2D* hMultBackgroundPairVsPhiTotal[MAXPTTRGBINS][MAXPTASSBINS];
 
    // parameters
-   bool IsSymmetrize;
-   bool IsPtWeight;
-   bool IsHarmonics;
    double signalTrgEffWeight;
    double bkgTrgEffWeight;
    double bkgAssEffWeight;
-   int  bkgFactor;
-/*
-   unsigned int nMult_trg[MAXPTTRGBINS];
-   unsigned int nMult_ass[MAXPTASSBINS];
-   double nMultCorr_trg[MAXPTTRGBINS];
-   double nMultCorr_ass[MAXPTASSBINS];
-   double ptMean_trg[MAXPTTRGBINS];
-   double ptMean_ass[MAXPTASSBINS];
-   double ptMean2_trg[MAXPTTRGBINS];
-   double ptMean2_ass[MAXPTASSBINS];
-*/
+   int    bkgFactor;
+
    virtual void Process(); 
    virtual void MakeHists();
    virtual void NormalizeHists();
@@ -106,10 +76,6 @@ class DiHadronCorrelationMultiAnalyzerFWLite : public DiHadronCorrelationMultiBa
    DiHadronCorrelationMultiAnalyzerFWLite(fwlite::ChainEvent&);
    virtual ~DiHadronCorrelationMultiAnalyzerFWLite();
 
-   void SetSymmetrize() {IsSymmetrize = 1;}
-   void SetPtWeight() {IsPtWeight = 1;}
-   void SetHarmonics() {IsHarmonics = 1;}
    void SetBkgFactor(int bkgfactor) {bkgFactor = bkgfactor;}
 };
 #endif  // DiHadronCorrelationMultiAnalyzerFWLite_
-
