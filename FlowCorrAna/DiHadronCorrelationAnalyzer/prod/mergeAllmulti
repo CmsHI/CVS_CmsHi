@@ -1,12 +1,12 @@
 #!/bin/sh
 
-dir=$CMSSW_BASE/src/WeisQCDAna/DiHadronCorrelationAnalyzer
+dir=$CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer
 dataset=$1
 export TAG=$2
 addition=$3
 
-SETUPFILE_BASE="$dir/prod/corr_ana/setupfiles/setupfile_BASE"
-SETUPFILE="$dir/prod/corr_ana/setupfiles/setupfile_$dataset"
+SETUPFILE_BASE="$dir/prod/setupfiles/setupfile_BASE"
+SETUPFILE="$dir/prod/setupfiles/setupfile_$dataset"
 
 source ${SETUPFILE_BASE}
 source ${SETUPFILE}
