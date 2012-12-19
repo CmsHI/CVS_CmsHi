@@ -1,5 +1,5 @@
 #!/bin/sh
-export FILESETDIR="$CMSSW_BASE/src/WeisQCDAna/DiHadronCorrelationAnalyzer/prod/corr_ana/filesets"
+export FILESETDIR="$CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/filesets"
 export OUTPUTDIR="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/outputs_312"
 export TRGTRACKCOLLECTION="selectTracks"
 export ASSTRACKCOLLECTION="selectTracks"

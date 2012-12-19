@@ -1,5 +1,5 @@
 #!/bin/sh
-source $CMSSW_BASE/src/WeisQCDAna/DiHadronCorrelationAnalyzer/prod/corr_ana/setupfiles/setupfile_BASE_HighMult
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
 export EVENTTYPE="PAData_Minbias_5TeV"
 export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
 #export TRGHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trgEff_minbias.root"

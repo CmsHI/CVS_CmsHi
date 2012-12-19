@@ -1,5 +1,5 @@
 #!/bin/sh
-source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/corr_ana/setupfiles/setupfile_BASE
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE
 
 export EVENTTYPE="PPData_Minbias_7TeV"
 #export ISCORR=0
