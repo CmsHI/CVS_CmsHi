@@ -5,10 +5,10 @@
 
 #if !defined(__CINT__) && !defined(__MAKECINT__)
 #include "setupDiHadronCorrelation.h"
-#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/DiHadronCorrelationMultiAnalyzerFWLite.h"
+#include "FlowCorrAna/DiHadronCorrelationAnalyzer/interface/EventPlaneAnalyzerFWLite.h"
 #endif
 
-void RunDiHadronCorrelationMultiAnalysisFWLite(
+void RunEventPlaneAnalysisFWLite(
            int ffrom, int fto,
            double zvtxmin, double zvtxmax,
            int nmin, int nmax,
@@ -26,18 +26,12 @@ void RunDiHadronCorrelationMultiAnalysisFWLite(
   }
 
   vector<string> fileNames = GetDataVector(files,gFfrom,gFto);
-//  fileNames.push_back("dcache:/pnfs/cmsaf.mit.edu/t2bat/cms/store/user/edwenger/trkAnaSkim/MB_C10-PromptReco_v8_pptrkana_skim/v4/trkAnaSkimAOD_114_1.root");
   fwlite::ChainEvent event(fileNames);  
 
   //Initialize the analyzer      
-  DiHadronCorrelationMultiAnalyzerFWLite* corr = new DiHadronCorrelationMultiAnalyzerFWLite(event);
-  if(gTag.Contains("Isotropic")) corr->SetEventClass(2);
-  if(gTag.Contains("Hard")) corr->SetEventClass(1);
-  if(gTag.Contains("Soft")) corr->SetEventClass(0);
-  corr->SetCheckSign(gCheckSign);
+  EventPlaneAnalyzerFWLite* corr = new EventPlaneAnalyzerFWLite(event);
   corr->SetCutParameters(gCut);
   corr->SetNEtaPhiBins(gNEtaBins,gNPhiBins);
-  corr->SetBkgFactor(gBkgFactor);
   if(gEPIndex>=0) corr->SetEventPlaneIndex(gEPIndex);
 
   TString strtrgid = "Track";
@@ -51,12 +45,12 @@ void RunDiHadronCorrelationMultiAnalysisFWLite(
 
   if(gCentfilename.Contains("root"))
   {
-    cout<<"Running correlation analysis in Heavy Ion!"<<endl;
+    cout<<"Running event-plane analysis in Heavy Ion!"<<endl;
     TFile* fcentfile = new TFile(gCentfilename.Data());
     if(fcentfile->IsOpen()) corr->SetCentrality(fcentfile,gCenttablename,gNCentBins,gCentRunnum);
     else cout<<"Centrality table cannot be opened!"<<endl;
   }
-  else cout<<"Running correlation analysis in pp!"<<endl;
+  else cout<<"Running event-plane analysis in pp!"<<endl;
 
   if(gEffhistname.Contains("root"))
   {
@@ -95,17 +89,6 @@ void RunDiHadronCorrelationMultiAnalysisFWLite(
     else cout<<"Triggering efficiency weighting file cannot be opened!"<<endl;
   }
   else cout<<"No Triggering efficiency weighting histogram is found, or it's running MC!"<<endl;
-
-  if(gPileupdistfunchistname.Contains("root"))
-  {
-    TFile* fpileupdistfunchist = new TFile(gPileupdistfunchistname.Data());
-    if(fpileupdistfunchist->IsOpen())
-    {
-      corr->LoadPileUpDistFunc((TH1D*)fpileupdistfunchist->Get("distfunc"));
-      cout<<"Pileup distfunc histogram is loaded!"<<endl;
-    }
-    else cout<<"Pileup distfunc file cannot be opened!"<<endl;
-  }
 
   corr->Process();
 
