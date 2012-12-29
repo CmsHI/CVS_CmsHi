@@ -1,0 +1,48 @@
+#!/bin/sh
+source $CMSSW_BASE/src/WeisQCDAna/DiHadronCorrelationAnalyzer/prod/corr_ana/setupfiles/setupfile_BASE_HighMult
+export EVENTTYPE="PythiaReco_Minbias_7TeV"
+export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
+export EFFHISTNAME="NULL"
+
+export ZVTXBIN=200
+export ZVTXMIN=-100
+export ZVTXMAX=100
+export RHOMIN=0.0
+export RHOMAX=2.0
+
+export PTTRGMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0"
+export PTTRGMAXARRAY="1.0 2.0 3.0 4.0 5.0 6.0"
+export PTASSMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0"
+export PTASSMAXARRAY="1.0 2.0 3.0 4.0 5.0 6.0"
+export PTMULTMIN=0.4
+export PTMULTMAX=10000.0
+
+export TRGTRACKCOLLECTION="selectTracks"
+export ASSTRACKCOLLECTION="selectTracks"
+#export VERTEXCOLLECTION="sortedGoodVertices"
+#export VERTEXCOLLECTION="bestVertex"
+
+#export TRGTRACKCOLLECTION="generalTracks"
+#export ASSTRACKCOLLECTION="generalTracks"
+export VERTEXCOLLECTION="offlinePrimaryVertices"
+
+export ETATRGMIN=-2.4
+export ETATRGMAX=2.4
+export ETAASSMIN=-2.4
+export ETAASSMAX=2.4
+#export VTXSEPMIN=0.2
+#export NVTXMAX=1
+
+export ISCORR=1
+#export ISTRACKNTUPLE=1
+export ISHI=0
+#export ISGENVTX=1
+export ISFULLMATRIX=1
+
+export TRGID="GenParticle"
+export ASSID="GenParticle"
+#export TRGID="Track"
+#export ASSID="Track"
+
+NMIN=(-1)
+NMAX=(-1)

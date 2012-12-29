@@ -30,7 +30,7 @@ echo "------------------------------------------------------------"
 export TAG="${TAG}_${addition}"
 
 root.exe -b $dir/test/rootlogon.C <<EOF
-.L $dir/test/RunDiHadronCorrelationMultiAnalysisFWLite.C+
-RunDiHadronCorrelationMultiAnalysisFWLite(${ffrom},${fto},${zvtxmin},${zvtxmax},${nmin},${nmax},${centmin},${centmax});
+.L $dir/test/RunEventPlaneAnalysisFWLite.C+
+RunEventPlaneAnalysisFWLite(${ffrom},${fto},${zvtxmin},${zvtxmax},${nmin},${nmax},${centmin},${centmax});
 .q
 EOF

@@ -2,7 +2,7 @@
 source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
 export EVENTTYPE="HIData_Minbias_2760GeV"
 export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
-export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trkEffNew2012_HI_hiGoodTightMerged_xsec_smoothv5true.root"
+#export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trkEffNew2012_HI_hiGoodTightMerged_xsec_smoothv5true.root"
 export CENTFILENAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/centrality/centralityfile_data_2011.root"
 export CENTTABLENAME="HFtowers"
 
@@ -29,36 +29,36 @@ export RHOMAX=0.02
 
 export PTTRGMINARRAY="1.0"
 export PTTRGMAXARRAY="10000.0"
-export PTASSMINARRAY="16.0"
+export PTASSMINARRAY="1.0"
 export PTASSMAXARRAY="10000.0"
 
-export TRGTRACKCOLLECTION="hiGoodTightTracks"
-export ASSTRACKCOLLECTION="hiGoodTightTracks"
-export VERTEXCOLLECTION="hiSelectedVertex"
+export TRGTRACKCOLLECTION="generalTracks"
+export ASSTRACKCOLLECTION="generalTracks"
+export VERTEXCOLLECTION="offlinePrimaryVertices"
 
-#export ISCORR=0
+export ISCORR=0
 export ISHI=1
 export ISHARMONICS=1
 export ISPTWEIGHT=0
 
 #export NETABINS=8
 #export NPHIBINS=40
-export ETATRGMIN=-5.0
-export ETATRGMAX=-3.0
-export ETAASSMIN=0.0
+export ETATRGMIN=-2.4
+export ETATRGMAX=2.4
+export ETAASSMIN=-2.4
 export ETAASSMAX=2.4
 
 export ISFULLMATRIX=1
 
-export TRGID="CaloTower"
+#export TRGID="CaloTower"
 #export ASSID="CaloTower"
-#export TRGID="Track"
+export TRGID="Track"
 export ASSID="Track"
 
 NMIN=(-1)
 NMAX=(-1)
 
-CENTMIN=(10)
-CENTMAX=(18)
+CENTMIN=(20 24 28 32 36)
+CENTMAX=(24 28 32 36 40)
 
 export BKGFACTOR=5

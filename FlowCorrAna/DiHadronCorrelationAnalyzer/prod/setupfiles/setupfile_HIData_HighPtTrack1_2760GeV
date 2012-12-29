@@ -29,7 +29,7 @@ export RHOMAX=0.02
 
 export PTTRGMINARRAY="1.0"
 export PTTRGMAXARRAY="10000.0"
-export PTASSMINARRAY="16.0"
+export PTASSMINARRAY="1.0"
 export PTASSMAXARRAY="10000.0"
 
 export TRGTRACKCOLLECTION="hiGoodTightTracks"
@@ -43,22 +43,22 @@ export ISPTWEIGHT=0
 
 #export NETABINS=8
 #export NPHIBINS=40
-export ETATRGMIN=-5.0
-export ETATRGMAX=-3.0
+export ETATRGMIN=-2.4
+export ETATRGMAX=0.0
 export ETAASSMIN=0.0
 export ETAASSMAX=2.4
 
 export ISFULLMATRIX=1
 
-export TRGID="CaloTower"
+#export TRGID="CaloTower"
 #export ASSID="CaloTower"
 #export TRGID="Track"
-export ASSID="Track"
+#export ASSID="Track"
 
 NMIN=(-1)
 NMAX=(-1)
 
 CENTMIN=(10)
-CENTMAX=(18)
+CENTMAX=(12)
 
-export BKGFACTOR=5
+export BKGFACTOR=3
