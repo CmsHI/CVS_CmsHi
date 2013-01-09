@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.4 2011/12/06 11:05:56 yilmaz Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.5 2012/01/16 08:22:03 yjlee Exp $
 //
 //
 
@@ -40,7 +40,7 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 
 #include "SimDataFormats/HiGenData/interface/GenHIEvent.h"
-
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 
 #include "TTree.h"
 
@@ -92,7 +92,7 @@ private:
    int HltEvtCnt;
    int hiBin;
    int hiNpix, hiNpixelTracks, hiNtracks, hiNtracksPtCut, hiNtracksEtaCut, hiNtracksEtaPtCut;
-   float hiHF, hiHFplus, hiHFminus, hiHFhit, hiHFhitPlus, hiHFhitMinus, hiEB, hiET, hiEE, hiEEplus, hiEEminus, hiZDC, hiZDCplus, hiZDCminus;
+   float hiHF, hiHFplus, hiHFminus, hiHFplusEta4, hiHFminusEta4, hiHFhit, hiHFhitPlus, hiHFhitMinus, hiEB, hiET, hiEE, hiEEplus, hiEEminus, hiZDC, hiZDCplus, hiZDCminus;
    
    float fNpart;
    float fNcoll;
@@ -107,6 +107,8 @@ private:
    float fEtMR;
    int fNchargedPtCut;
    int fNchargedPtCutMR;
+
+   int proc_id;
 
    float vx,vy,vz;
 
@@ -171,11 +173,10 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    run = iEvent.id().run();
    lumi = iEvent.id().luminosityBlock();
 
-
-   edm::Handle<edm::GenHIEvent> mchievt;
    edm::Handle<reco::Centrality> centrality;
    edm::Handle<reco::EvtPlaneCollection> evtPlanes;
    centProvider = 0;
+
    if(doMC_){
       edm::Handle<edm::GenHIEvent> mchievt;
       iEvent.getByLabel(edm::InputTag(HiMCTag_),mchievt);
@@ -191,6 +192,10 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       fEtMR = mchievt->EtMR();
       fNchargedPtCut = mchievt->NchargedPtCut();
       fNchargedPtCutMR = mchievt->NchargedPtCutMR();
+
+      edm::Handle<edm::HepMCProduct> hepmcevt;
+      iEvent.getByLabel("generator", hepmcevt);
+      proc_id =  hepmcevt->GetEvent()->signal_process_id();
    }
    
    //iEvent.getByLabel(CentralityBinTag_,binHandle);
@@ -214,6 +219,8 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       hiHF = centrality->EtHFtowerSum();
       hiHFplus = centrality->EtHFtowerSumPlus();
       hiHFminus = centrality->EtHFtowerSumMinus();
+      hiHFplusEta4 = centrality->EtHFtruncatedPlus();
+      hiHFminusEta4 = centrality->EtHFtruncatedMinus();
       hiHFhit = centrality->EtHFhitSum();
       hiHFhitPlus = centrality->EtHFhitSumPlus();
       hiHFhitMinus = centrality->EtHFhitSumMinus();
@@ -320,12 +327,17 @@ HiEvtAnalyzer::beginJob()
       thi_->Branch("EtMR",&fEtMR,"EtMR/F");
       thi_->Branch("NchargedPtCut",&fNchargedPtCut,"NchargedPtCut/I");
       thi_->Branch("NchargedPtCutMR",&fNchargedPtCutMR,"NchargedPtCutMR/I");
+
+      thi_->Branch("ProcessID",&proc_id,"ProcessID/I");
    } 
     
    thi_->Branch("hiBin",&hiBin,"hiBin/I");
    thi_->Branch("hiHF",&hiHF,"hiHF/F");
    thi_->Branch("hiHFplus",&hiHFplus,"hiHFplus/F");
    thi_->Branch("hiHFminus",&hiHFminus,"hiHFminus/F");
+   thi_->Branch("hiHFplusEta4",&hiHFplusEta4,"hiHFplusEta4/F");
+   thi_->Branch("hiHFminusEta4",&hiHFminusEta4,"hiHFminusEta4/F");
+
    thi_->Branch("hiZDC",&hiZDC,"hiZDC/F");
    thi_->Branch("hiZDCplus",&hiZDCplus,"hiZDCplus/F");
    thi_->Branch("hiZDCminus",&hiZDCminus,"hiZDCminus/F");
@@ -341,7 +353,7 @@ HiEvtAnalyzer::beginJob()
    thi_->Branch("hiEEminus",&hiEEminus,"hiEEminus/F");
    thi_->Branch("hiNpix",&hiNpix,"hiNpix/I");
    thi_->Branch("hiNpixelTracks",&hiNpixelTracks,"hiNpixelTracks/I");
-   thi_->Branch("hiNtracks",&hiNtracks,"hiNtracks/I");
+   thi_->Branch("hiNtracksOffline",&hiNtracks,"hiNtracks/I");
    thi_->Branch("hiNtracksPtCut",&hiNtracksPtCut,"hiNtracksPtCut/I");
    thi_->Branch("hiNtracksEtaCut",&hiNtracksEtaCut,"hiNtracksEtaCut/I");
    thi_->Branch("hiNtracksEtaPtCut",&hiNtracksEtaPtCut,"hiNtracksEtaPtCut/I");
