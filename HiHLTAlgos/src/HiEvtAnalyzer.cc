@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.5 2012/01/16 08:22:03 yjlee Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.6 2013/01/09 17:04:23 azsigmon Exp $
 //
 //
 
@@ -353,7 +353,7 @@ HiEvtAnalyzer::beginJob()
    thi_->Branch("hiEEminus",&hiEEminus,"hiEEminus/F");
    thi_->Branch("hiNpix",&hiNpix,"hiNpix/I");
    thi_->Branch("hiNpixelTracks",&hiNpixelTracks,"hiNpixelTracks/I");
-   thi_->Branch("hiNtracksOffline",&hiNtracks,"hiNtracks/I");
+   thi_->Branch("hiNtracks",&hiNtracks,"hiNtracks/I");
    thi_->Branch("hiNtracksPtCut",&hiNtracksPtCut,"hiNtracksPtCut/I");
    thi_->Branch("hiNtracksEtaCut",&hiNtracksEtaCut,"hiNtracksEtaCut/I");
    thi_->Branch("hiNtracksEtaPtCut",&hiNtracksEtaPtCut,"hiNtracksEtaPtCut/I");
