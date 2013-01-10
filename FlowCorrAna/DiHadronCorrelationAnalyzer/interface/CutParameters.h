@@ -74,6 +74,7 @@ class CutParameters {
    bool IsSymmetrize;
    bool IsPtWeight;
    bool IsHarmonics;
+   bool IsTrkQuality;
 };
 
 #endif  // CutParameters_

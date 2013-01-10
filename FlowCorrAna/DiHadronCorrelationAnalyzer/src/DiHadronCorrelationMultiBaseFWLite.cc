@@ -716,12 +716,14 @@ void DiHadronCorrelationMultiBaseFWLite::GetMult()
        double chi2n = trk.normalizedChi2();
        int nlayers = trk.hitPattern().trackerLayersWithMeasurement();
        // standard quality cuts
-/*
-       if(!trk.quality(reco::TrackBase::highPurity)) continue;
-       if(fabs(trk.ptError())/trk.pt()>0.10) continue;
-       if(fabs(dzvtx/dzerror) > 3) continue;
-       if(fabs(dxyvtx/dxyerror) > 3) continue;
-*/
+
+       if(cutPara.IsTrkQuality)
+       {
+         if(!trk.quality(reco::TrackBase::highPurity)) continue;
+         if(fabs(trk.ptError())/trk.pt()>0.10) continue;
+         if(fabs(dzvtx/dzerror) > 3) continue;
+         if(fabs(dxyvtx/dxyerror) > 3) continue;
+       }
 //       if(fabs(dzvtx) > 0.1) continue;
 //       if(fabs(dxyvtx) > 0.05) continue;
 //       if(nhits<5) continue;
@@ -860,12 +862,13 @@ void DiHadronCorrelationMultiBaseFWLite::LoopTracks(bool istrg, TString input)
      double chi2n = trk.normalizedChi2();
      int nlayers = trk.hitPattern().trackerLayersWithMeasurement();
 // standard track quality cuts  
-/*
-     if(!trk.quality(reco::TrackBase::highPurity)) continue;
-     if(fabs(trk.ptError())/trk.pt()>0.10) continue;
-     if(fabs(dz/dzerror) > 3) continue;
-     if(fabs(dxy/dxyerror) > 3) continue;
-*/
+     if(cutPara.IsTrkQuality)
+     {
+       if(!trk.quality(reco::TrackBase::highPurity)) continue;
+       if(fabs(trk.ptError())/trk.pt()>0.10) continue;
+       if(fabs(dz/dzerror) > 3) continue;
+       if(fabs(dxy/dxyerror) > 3) continue;
+     }  
 //     if(fabs(dz) > 0.1) continue;
 //     if(fabs(dxy) > 0.05) continue;
 //     if(nhits<5) continue;

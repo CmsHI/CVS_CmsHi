@@ -144,8 +144,8 @@ void DiHadronCorrelationMultiAnalyzerFWLite::NormalizeHists()
     {
       DiHadronCorrelationMultiBaseFWLite::NormalizeHists(itrg,jass);
 
-      if(hSignal[itrg][jass]->Integral()==0) return;
-      if(hBackground[itrg][jass]->Integral()==0) return;
+      if(hSignal[itrg][jass]->Integral()==0) continue;
+      if(hBackground[itrg][jass]->Integral()==0) continue;
 
       double  etabinwidth = hSignal[itrg][jass]->GetXaxis()->GetBinWidth(1);
       double  phibinwidth = hSignal[itrg][jass]->GetYaxis()->GetBinWidth(1);

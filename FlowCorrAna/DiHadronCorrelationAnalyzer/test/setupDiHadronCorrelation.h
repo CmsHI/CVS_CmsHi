@@ -193,6 +193,10 @@ void setup(int ffrom, int fto,
   if(gSystem->Getenv("ISHARMONICS")) strisharmonics = gSystem->Getenv("ISHARMONICS");
   gCut.IsHarmonics = atoi(strisharmonics);
 
+  TString stristrkquality = "0";
+  if(gSystem->Getenv("ISTRKQUALITY")) stristrkquality = gSystem->Getenv("ISTRKQUALITY");
+  gCut.IsTrkQuality = atoi(stristrkquality);
+
   TString strepindex = "-1";
   if(gSystem->Getenv("EPINDEX")) strepindex = gSystem->Getenv("EPINDEX");
   gEPIndex = atof(strepindex);

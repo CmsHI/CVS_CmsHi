@@ -5,6 +5,8 @@ export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
 #export TRGHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trgEff_minbias.root"
 export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trkEff_pp_all_42X_origin.root"
 #export PILEUPDISTFUNCHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/pileup_distfunc_5.root"
+export CENTFILENAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/centrality/centralityfile_data_2011.root"
+export CENTTABLENAME="HFtowers"
 
 #export CHECKSIGN=0
 #export ISDOEVENTSHAPE=0
@@ -41,12 +43,12 @@ export ETAASSMAX=2.4
 #export NVTXMAX=1
 export ISFULLMATRIX=1
 
-export ISCORR=1
+export ISCORR=0
 #export ISTRACKNTUPLE=1
 #export ISHI=0
 
 export TRGID="Lambda"
 export ASSID="Track"
 
-NMIN=(110)
-NMAX=(1000)
+NMIN=(-1)
+NMAX=(-1)
