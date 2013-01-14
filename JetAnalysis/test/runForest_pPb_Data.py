@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process('hiForestAna2011')
 
 process.options = cms.untracked.PSet(
-   # wantSummary = cms.untracked.bool(True)
+  wantSummary = cms.untracked.bool(True)
 )
 
 
@@ -32,8 +32,8 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-                            fileNames = cms.untracked.vstring("file:input.root"),
-                            )
+                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
+			    )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
@@ -67,7 +67,24 @@ process.sim_step = cms.Path(process.mix*process.trackingParticles*
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
-process.GlobalTag.globaltag = 'GR_P_V41::All'
+import HLTrigger.Configuration.Utilities
+process.loadHltConfiguration("hltdev:/dev/CMSSW_5_2_6/PIon/V76",type='GRun')
+
+process.L1GtTriggerMenuRcdSource = cms.ESSource("EmptyESSource",
+  recordName = cms.string('L1GtTriggerMenuRcd'),
+  iovIsRunNotTime = cms.bool(True),
+  firstValid = cms.vuint32(1)
+)
+process.l1GtTriggerMenuXml = cms.ESProducer("L1GtTriggerMenuXmlProducer",
+  TriggerMenuLuminosity = cms.string('startup'),
+  DefXmlFile = cms.string('L1Menu_CollisionsHeavyIons2013_v0_L1T_Scales_20101224_Imp0_0x102c.xml'),
+  VmeXmlFile = cms.string('')
+)
+process.es_prefer_l1GtParameters = cms.ESPrefer('L1GtTriggerMenuXmlProducer','l1GtTriggerMenuXml')
+
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:com10_PIon', '')
+
 
 # load centrality
 from CmsHi.Analysis2012.CommonFunctions_cff import *
@@ -416,8 +433,28 @@ process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
 
+
+# Yen-Jie remove ak[1-4,6]PF for the moment because JEC is not yet ready
+process.ppJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
+                                     +process.akPu5PFJetAnalyzer
+				     +process.akPu1CaloJetAnalyzer
+				     +process.akPu2CaloJetAnalyzer
+				     +process.akPu3CaloJetAnalyzer
+				     +process.akPu4CaloJetAnalyzer
+				     +process.akPu5CaloJetAnalyzer
+				     +process.akPu6CaloJetAnalyzer
+				     +process.ak5PFJetAnalyzer
+				     +process.ak1CaloJetAnalyzer
+				     +process.ak2CaloJetAnalyzer
+				     +process.ak3CaloJetAnalyzer
+				     +process.ak4CaloJetAnalyzer
+				     +process.ak5CaloJetAnalyzer
+				     +process.ak6CaloJetAnalyzer)
+
+
 process.ana_step          = cms.Path( process.hcalNoise +
-                                      process.jetAnalyzers +                                      
+#                                      process.jetAnalyzers +                                      
+                                      process.ppJetAnalyzers +
                                       process.multiPhotonAnalyzer +
                                       process.ppTrack +
                                       process.pixelTrack +
@@ -472,9 +509,34 @@ process.patDefaultSequence.remove(process.cleanPatJets)
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
+
+process.hltanalysis.HLTProcessName = "RECO"
+process.hltanalysis.dummyBranches  = []
+process.hltanalysis.hltresults = cms.InputTag('TriggerResults','','RECO')
+process.hltanalysis.l1GtObjectMapRecord = cms.InputTag( 'hltL1GtObjectMap','','RECO' )
+process.hltbitanalysis.hltresults = cms.InputTag('TriggerResults','','RECO')
+process.hltbitanalysis.l1GtObjectMapRecord = cms.InputTag( 'hltL1GtObjectMap','','RECO' )
+process.hltbitanalysis.HLTProcessName = "RECO"
+
+process.hltJetHI.TriggerResultsTag = cms.InputTag("TriggerResults","","RECO")
 #process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
 #process.hltanalysis.HLTProcessName = "hiForestAna2011"
-process.hltanalysis.dummyBranches = []
+#process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO"),
+#process.hltanalysis.HLTProcessName = cms.string("RECO")
+
+
+# customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimGmtGctGtDigis
+import L1Trigger.Configuration.L1Trigger_custom
+process = L1Trigger.Configuration.L1Trigger_custom.customiseL1GtEmulatorFromRaw( process )
+process = L1Trigger.Configuration.L1Trigger_custom.customiseResetPrescalesAndMasks( process )
+
+# customize the HLT to use the emulated results
+import HLTrigger.Configuration.customizeHLTforL1Emulator
+process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToL1Emulator( process )
+process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimGtDigis( process )
+
+
+
 
 process.hltAna = cms.EndPath(process.hltanalysis)
 process.reco_extra*=process.L1Extra
