@@ -42,8 +42,6 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
-cvs co -r HiForest_V02_04 -d       CmsHi/Analysis2010 UserCode/CmsHi/Analysis2010
-cvs co -r HiForest_V02_01 -d       CmsHi/Analysis2012 UserCode/CmsHi/Analysis2012
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
 cvs co -r HiForest_V02_33 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
@@ -62,7 +60,7 @@ cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 cvs co -r branch_hi44X HLTrigger/HLTanalyzers
 
 # event analyzer
-cvs co -r HiForest_V02_00 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
+cvs co -r  HiForest_V02_01 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
 cvs co -r HiForest_V02_02 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
@@ -71,5 +69,4 @@ cvs co -r HiForest_V02_02 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 scram build -c
 scram b -j4
-
 
