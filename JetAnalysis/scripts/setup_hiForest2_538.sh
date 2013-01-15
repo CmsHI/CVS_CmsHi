@@ -57,7 +57,7 @@ cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 cvs co -r hi538_00 HLTrigger/HLTanalyzers
 
 # event analyzer
-cvs co -r  HiForest_V02_01 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
+cvs co -r  HiForest_V02_02 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
 cvs co -r HiForest_V02_02 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
