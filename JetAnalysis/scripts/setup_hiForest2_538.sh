@@ -23,7 +23,7 @@ cvs co -r HiForest_V02_00          UserCode/FerencSiklerVertexing
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
 cvs co -r HiForest_V02_00 -d       MNguyen/Configuration  UserCode/MNguyen/Configuration
-cvs co -r pPbProd_v1               HeavyIonsAnalysis/Configuration
+cvs co -r hi538_01                 HeavyIonsAnalysis/Configuration
 
 # pi0 analyzer (optional)
 cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Analyzer
