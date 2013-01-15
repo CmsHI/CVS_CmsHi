@@ -13,7 +13,7 @@
 //
 // Original Author:  Teng Ma
 //         Created:  Wed Nov  2 06:51:29 EDT 2011
-// $Id: HiEvtAnalyzer.cc,v 1.6 2013/01/09 17:04:23 azsigmon Exp $
+// $Id: HiEvtAnalyzer.cc,v 1.7 2013/01/10 13:32:55 azsigmon Exp $
 //
 //
 
@@ -130,7 +130,6 @@ private:
 // constructors and destructor
 //
 HiEvtAnalyzer::HiEvtAnalyzer(const edm::ParameterSet& iConfig) :
-CentralityTag_(iConfig.getParameter<edm::InputTag> ("Centrality")),
 CentralityBinTag_(iConfig.getParameter<edm::InputTag> ("CentralityBin")),
 EvtPlaneTag_(iConfig.getParameter<edm::InputTag> ("EvtPlane")),
 EvtPlaneFlatTag_(iConfig.getParameter<edm::InputTag> ("EvtPlaneFlat")),
@@ -173,7 +172,6 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    run = iEvent.id().run();
    lumi = iEvent.id().luminosityBlock();
 
-   edm::Handle<reco::Centrality> centrality;
    edm::Handle<reco::EvtPlaneCollection> evtPlanes;
    centProvider = 0;
 
@@ -202,11 +200,11 @@ HiEvtAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    //hiBin = *binHandle;
 
    if (doCentrality_) {      
-      iEvent.getByLabel(CentralityTag_,centrality);
       if (!centProvider) centProvider = new CentralityProvider(iSetup);
  
      // make supre you do this first in every event
       centProvider->newEvent(iEvent,iSetup); 
+      const reco::Centrality* centrality = centProvider->raw();
 
       hiBin = centProvider->getBin();
       hiNpix = centrality->multiplicityPixel();
