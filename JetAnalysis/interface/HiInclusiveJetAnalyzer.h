@@ -98,6 +98,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
   bool doLifeTimeTagging_;
   bool doLifeTimeTaggingExtras_;
   bool saveBfragments_;
+  bool skipCorrections_;
 
   double rParam;
   double hardPtMin_;
@@ -186,6 +187,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     int subid[MAXJETS];
 
      float matchedPt[MAXJETS];
+     float matchedRawPt[MAXJETS];
      float matchedR[MAXJETS];
 
     float discr_csvMva[MAXJETS];

@@ -80,6 +80,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
   doLifeTimeTagging_ = iConfig.getUntrackedParameter<bool>("doLifeTimeTagging",false);
   doLifeTimeTaggingExtras_ = iConfig.getUntrackedParameter<bool>("doLifeTimeTaggingExtras",true);
   saveBfragments_  = iConfig.getUntrackedParameter<bool>("saveBfragments",false);
+  skipCorrections_  = iConfig.getUntrackedParameter<bool>("skipCorrections",false);
 
   pfCandidateLabel_ = iConfig.getUntrackedParameter<edm::InputTag>("pfCandidateLabel",edm::InputTag("particleFlowTmp"));
 
@@ -154,7 +155,7 @@ HiInclusiveJetAnalyzer::beginJob() {
 
   t->Branch("nref",&jets_.nref,"nref/I");
   t->Branch("rawpt",jets_.rawpt,"rawpt[nref]/F");
-  t->Branch("jtpt",jets_.jtpt,"jtpt[nref]/F");
+  if(!skipCorrections_) t->Branch("jtpt",jets_.jtpt,"jtpt[nref]/F");
   t->Branch("jteta",jets_.jteta,"jteta[nref]/F");
   t->Branch("jty",jets_.jty,"jty[nref]/F");
   t->Branch("jtphi",jets_.jtphi,"jtphi[nref]/F");
@@ -197,7 +198,8 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("muSum", jets_.muSum,"muSum[nref]/F");
   t->Branch("muN", jets_.muN,"muN[nref]/I");
 
-  t->Branch("matchedPt", jets_.matchedPt,"matchedPt[nref]/F");
+  if(!skipCorrections_) t->Branch("matchedPt", jets_.matchedPt,"matchedPt[nref]/F");
+  t->Branch("matchedRawPt", jets_.matchedRawPt,"matchedRawPt[nref]/F");
   t->Branch("matchedR", jets_.matchedR,"matchedR[nref]/F");
 
   // b-jet discriminators
@@ -686,11 +688,12 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
      double drMin = 100;
      for(unsigned int imatch = 0 ; imatch < matchedjets->size(); ++imatch){
-	const reco::Jet& mjet = (*matchedjets)[imatch];
+	const pat::Jet& mjet = (*matchedjets)[imatch];
 
 	double dr = deltaR(jet,mjet);
 	if(dr < drMin){
 	   jets_.matchedPt[jets_.nref] = mjet.pt();
+           jets_.matchedRawPt[jets_.nref] = mjet.correctedJet("Uncorrected").pt();
            jets_.matchedR[jets_.nref] = dr;
 	   drMin = dr;
 	}
