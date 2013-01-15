@@ -32,7 +32,9 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
-                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
+#                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
+                            fileNames = cms.untracked.vstring("file:FE6E7D35-895E-E211-B3E4-003048D2BEA8.root")
+#                            fileNames = cms.untracked.vstring("file:PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
 			    )
 
 # Number of events we want to process, -1 = all events
@@ -67,35 +69,23 @@ process.sim_step = cms.Path(process.mix*process.trackingParticles*
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
-import HLTrigger.Configuration.Utilities
-process.loadHltConfiguration("hltdev:/dev/CMSSW_5_2_6/PIon/V76",type='GRun')
+#from Configuration.AlCa.GlobalTag import GlobalTag
+#process.GlobalTag = GlobalTag(process.GlobalTag,; 'auto:com10_PIon', '')
 
-process.L1GtTriggerMenuRcdSource = cms.ESSource("EmptyESSource",
-  recordName = cms.string('L1GtTriggerMenuRcd'),
-  iovIsRunNotTime = cms.bool(True),
-  firstValid = cms.vuint32(1)
-)
-process.l1GtTriggerMenuXml = cms.ESProducer("L1GtTriggerMenuXmlProducer",
-  TriggerMenuLuminosity = cms.string('startup'),
-  DefXmlFile = cms.string('L1Menu_CollisionsHeavyIons2013_v0_L1T_Scales_20101224_Imp0_0x102c.xml'),
-  VmeXmlFile = cms.string('')
-)
-process.es_prefer_l1GtParameters = cms.ESPrefer('L1GtTriggerMenuXmlProducer','l1GtTriggerMenuXml')
-
-from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:com10_PIon', '')
+process.GlobalTag.globaltag = 'GR_E_V33::All'
 
 
 # load centrality
-from CmsHi.Analysis2012.CommonFunctions_cff import *
+
+from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
 overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
-	centralityVariable = cms.string("HFtowers"),
-	nonDefaultGlauberModel = cms.string("Hydjet_Drum"),
-	centralitySrc = cms.InputTag("hiCentrality")
-	)
-
+  centralityVariable = cms.string("HFtowersPlusTrunc"),
+    nonDefaultGlauberModel = cms.string(""),
+      centralitySrc = cms.InputTag("pACentrality")
+        )
+        
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
 process.RandomNumberGeneratorService.generator.initialSeed = 1
@@ -124,6 +114,7 @@ process.TFileService = cms.Service("TFileService",
 # MET: Calorimeter based MET
 process.load("RecoMET.METProducers.CaloMET_cfi") 
 
+# HCAL noise analyzer
 process.load("CmsHi.JetAnalysis.hcalNoise_cff")
 
 # Define Analysis sequencues
@@ -170,6 +161,8 @@ process.muonTree.doGen = cms.untracked.bool(True)
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doMC = cms.bool(False)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
+process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality") 
+ 
 
 process.iterativeConePu5CaloJets.srcPVs = "offlinePrimaryVerticesWithBS"
 process.iterativeCone5CaloJets.srcPVs = "offlinePrimaryVerticesWithBS"
@@ -183,7 +176,7 @@ process.hiEvtAnalyzer.doEvtPlane = False
 
 process.primaryVertexFilter.src = cms.InputTag("offlinePrimaryVerticesWithBS")
 process.cleanPhotons.primaryVertexProducer = cms.string('offlinePrimaryVerticesWithBS')
-process.hiCentrality.srcVertex = cms.InputTag("offlinePrimaryVerticesWithBS")
+#process.hiCentrality.srcVertex = cms.InputTag("offlinePrimaryVerticesWithBS")
 process.pfTrackElec.PrimaryVertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS")
 process.pfTrack.PrimaryVertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS")
 process.particleFlowTmp.vertexCollection = cms.InputTag("offlinePrimaryVerticesWithBS")
@@ -209,8 +202,8 @@ process.hiTracks.src = cms.InputTag("generalTracks")
 process.hiCaloCompatibleGeneralTracksQuality.src = cms.InputTag("generalTracks")
 process.hiGeneralTracksQuality.src = cms.InputTag("generalTracks")
 process.hiSelectedTrackQuality.src = cms.InputTag("generalTracks")
-process.hiCentrality.srcTracks = cms.InputTag("generalTracks")
-process.hiCentrality.srcPixelTracks = cms.InputTag("pixelTracks")
+#process.hiCentrality.srcTracks = cms.InputTag("generalTracks")
+#process.hiCentrality.srcPixelTracks = cms.InputTag("pixelTracks")
 
 process.hiTrackReco = cms.Sequence(process.hiTracks)
 process.hiTrackDebug = cms.Sequence(process.hiSelectedTrackQuality)
@@ -250,7 +243,7 @@ process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 
 process.reco_extra =  cms.Path(
     process.siPixelRecHits*
-    process.hiCentrality*
+    process.pACentrality*
     process.hiTrackReco*
     process.iterativeConePu5CaloJets*
     process.PFTowers*
@@ -478,7 +471,6 @@ process.hfNegFilter2 = cms.EDFilter("CandCountFilter",
                                       minNumber = cms.uint32(2)
                                     )
 
-process.phltJetHI = cms.Path( process.hltJetHI )
 process.pcollisionEventSelection = cms.Path(process.collisionEventSelection)
 process.pPAcollisionEventSelectionPA = cms.Path(process.PAcollisionEventSelection)
 
@@ -509,34 +501,7 @@ process.patDefaultSequence.remove(process.cleanPatJets)
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
-
-process.hltanalysis.HLTProcessName = "RECO"
-process.hltanalysis.dummyBranches  = []
-process.hltanalysis.hltresults = cms.InputTag('TriggerResults','','RECO')
-process.hltanalysis.l1GtObjectMapRecord = cms.InputTag( 'hltL1GtObjectMap','','RECO' )
-process.hltbitanalysis.hltresults = cms.InputTag('TriggerResults','','RECO')
-process.hltbitanalysis.l1GtObjectMapRecord = cms.InputTag( 'hltL1GtObjectMap','','RECO' )
-process.hltbitanalysis.HLTProcessName = "RECO"
-
-process.hltJetHI.TriggerResultsTag = cms.InputTag("TriggerResults","","RECO")
-#process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","hiForestAna2011")
-#process.hltanalysis.HLTProcessName = "hiForestAna2011"
-#process.hltanalysis.hltresults = cms.InputTag("TriggerResults","","RECO"),
-#process.hltanalysis.HLTProcessName = cms.string("RECO")
-
-
-# customize the L1 emulator to run customiseL1EmulatorFromRaw with HLT to switchToSimGmtGctGtDigis
-import L1Trigger.Configuration.L1Trigger_custom
-process = L1Trigger.Configuration.L1Trigger_custom.customiseL1GtEmulatorFromRaw( process )
-process = L1Trigger.Configuration.L1Trigger_custom.customiseResetPrescalesAndMasks( process )
-
-# customize the HLT to use the emulated results
-import HLTrigger.Configuration.customizeHLTforL1Emulator
-process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToL1Emulator( process )
-process = HLTrigger.Configuration.customizeHLTforL1Emulator.switchToSimGtDigis( process )
-
-
-
+process.hltanalysis.dummyBranches = cms.untracked.vstring()
 
 process.hltAna = cms.EndPath(process.hltanalysis)
 process.reco_extra*=process.L1Extra
@@ -549,7 +514,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.schedule = cms.Schedule(
     process.reco_extra, process.reco_extra_jet, process.pat_step,
     process.ana_step,
-    process.phltJetHI,process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,
+    process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,
     process.pPAcollisionEventSelectionPA,
     process.phfPosFilter3,process.phfNegFilter3,
     process.phfPosFilter2,process.phfNegFilter2,
