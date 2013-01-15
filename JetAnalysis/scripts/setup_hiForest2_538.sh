@@ -54,7 +54,7 @@ cvs co -r HiForest_V02_01 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel
 cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 
 # trigger analyzers
-cvs co -r branch_hi44X HLTrigger/HLTanalyzers
+cvs co -r hi538_00 HLTrigger/HLTanalyzers
 
 # event analyzer
 cvs co -r  HiForest_V02_01 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos

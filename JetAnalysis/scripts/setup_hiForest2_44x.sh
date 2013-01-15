@@ -79,7 +79,7 @@ cvs co -r hi44X_04                 RecoHI/HiEgammaAlgos
 cvs co -r hi44X_02_01              RecoHI/Configuration
 
 # trigger analyzers
-cvs co -r branch_hi44X HLTrigger/HLTanalyzers
+cvs co -r hi44X_02 HLTrigger/HLTanalyzers
 
 # event analyzer
 cvs co -r HiForest_V02_00 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
