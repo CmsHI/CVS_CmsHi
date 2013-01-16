@@ -14,6 +14,7 @@ hiTrackQuality = "highPurity"              # iterative tracks
 
 doElectrons = False
 doRegitForBjets = False
+storeAllRecHits = True
 
 
 #####################################################################################
@@ -426,6 +427,13 @@ process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
 
+# Rechit analyzer setup
+
+if storeAllRecHits:
+    process.rechitanalyzer.HFTreePtMin = cms.untracked.double(-100000)
+    process.rechitanalyzer.EBTreePtMin = cms.untracked.double(-100000)
+    process.rechitanalyzer.EETreePtMin = cms.untracked.double(-100000)
+    process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(-100000)
 
 # Yen-Jie remove ak[1-4,6]PF for the moment because JEC is not yet ready
 process.ppJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
