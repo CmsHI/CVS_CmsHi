@@ -60,7 +60,7 @@ cvs co -r hi538_00 HLTrigger/HLTanalyzers
 cvs co -r  HiForest_V02_02 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
-cvs co -r HiForest_V02_02 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
+cvs co -r HiForest_V02_03 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 # Build!
 
