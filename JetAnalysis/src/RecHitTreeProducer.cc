@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.20 2012/06/06 15:53:41 yjlee Exp $
+// $Id: RecHitTreeProducer.cc,v 1.21 2013/01/16 17:18:20 yilmaz Exp $
 //
 //
 
@@ -684,7 +684,9 @@ RecHitTreeProducer::beginJob()
   towerTree->Branch("emEt",myTowers.emEt,"emEt[n]/F");
   towerTree->Branch("hadEt",myTowers.hadEt,"hadEt[n]/F");
 
+
   if(doCastor_){
+    castorTree = fs->make<TTree>("castor",versionTag);
     castorTree->Branch("n",&castorRecHit.n,"n/I");
     castorTree->Branch("e",castorRecHit.e,"e[n]/F");
     castorTree->Branch("iphi",castorRecHit.iphi,"iphi[n]/I");
