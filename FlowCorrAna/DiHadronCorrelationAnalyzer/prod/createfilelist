@@ -1,9 +1,0 @@
-#!/bin/sh
-
-currentdir=$PWD
-
-dataset=HIData_Minbias_2760GeV_HighPt12Track2011_PromptReco
-datadir=/mnt/hadoop/cms/store/user/davidlw/HIHighPt/PR2011_HighPtTrack12_TRKANASKIM_official_v1/*
-
-mkdir -p filesets
-ls -l $datadir/*.root  | awk '{print "file:" $9}' > ./filesets/fileset_${dataset}.txt
