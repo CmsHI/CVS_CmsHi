@@ -31,6 +31,8 @@ cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Anal
 cvs co -r pPbProd_v1               RecoHI/HiCentralityAlgos
 cvs co -r pPbProd_v1               DataFormats/HeavyIonEvent
 
+cvs co -r V_11573_001 -d HcalNoise/DumpHcalNoiseInformationFromRECO UserCode/YiChen/HcalNoise/DumpHcalNoiseInformationFromRECO
+
 # Track validation histograms
 cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/HiTrackValidator UserCode/ASYoon/PbPbTrackingTools/HiTrackValidator
 
@@ -50,8 +52,9 @@ cvs co -r HiForest_V02_01 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel
 
 #ecal requires some code from the photon analyzer, 'rm' commands are to truncate the endless chain of packages obviously, 
 
-# Top Level Forest cfg
+# Top Level Forest cfg, and a consistent version of this script
 cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
+cvs co -r HEAD -d                  CmsHi/JetAnalysis/scripts UserCode/CmsHi/JetAnalysis/scripts
 
 # trigger analyzers
 cvs co -r hi538_00 HLTrigger/HLTanalyzers
