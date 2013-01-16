@@ -29,7 +29,7 @@ cvs co -r hi538_01                 HeavyIonsAnalysis/Configuration
 cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Analyzer
 
 cvs co -r pPbProd_v1               RecoHI/HiCentralityAlgos
-cvs co -r pPbProd_v1               DataFormats/HeavyIonEvent
+cvs co -r pPbProd_v02              DataFormats/HeavyIonEvent
 
 cvs co -r V_11573_001 -d HcalNoise/DumpHcalNoiseInformationFromRECO UserCode/YiChen/HcalNoise/DumpHcalNoiseInformationFromRECO
 
