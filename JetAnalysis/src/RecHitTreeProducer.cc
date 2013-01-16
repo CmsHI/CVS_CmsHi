@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.19 2011/11/30 21:26:08 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.20 2012/06/06 15:53:41 yjlee Exp $
 //
 //
 
@@ -74,6 +74,9 @@ using namespace std;
 struct MyRecHit{
   int depth[MAXHITS];
   int n;
+
+  int ieta[MAXHITS];
+  int iphi[MAXHITS];
 
   float e[MAXHITS];
   float et[MAXHITS];
@@ -159,6 +162,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   MyRecHit eeRecHit;
    MyRecHit myBC;
    MyRecHit myTowers;
+  MyRecHit castorRecHit;
+
    MyBkg bkg;
 
   TNtuple* nt;
@@ -169,6 +174,7 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    TTree* bcTree;
    TTree* towerTree;
    TTree* bkgTree;
+  TTree* castorTree;
 
   double cone;
   double hfTowerThreshold_;
@@ -206,6 +212,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doEcal_;
    bool doHcal_;
    bool doHF_;
+  bool doCastor_;
+
    bool hasVtx_;
   bool saveBothVtx_;
 
@@ -246,6 +254,8 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doEcal_ = iConfig.getUntrackedParameter<bool>("doEcal",true);
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
   doHF_ = iConfig.getUntrackedParameter<bool>("doHF",true);
+  doCastor_ = iConfig.getUntrackedParameter<bool>("doCASTOR",true);
+
   hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",true);
   saveBothVtx_ = iConfig.getUntrackedParameter<bool>("saveBothVtx",false);
 
@@ -566,6 +576,39 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
       }
    }
 
+   if(doCastor_){
+
+     edm::Handle<CastorRecHitCollection> casrechits;    
+     try{ ev.getByLabel("castorreco",casrechits); }
+     catch(...) { edm::LogWarning(" CASTOR ") << " Cannot get Castor RecHits " << std::endl; }
+
+     int nhits = 0;
+     double energyCastor = 0;
+
+     if(casrechits.failedToGet()!=0 || !casrechits.isValid()) {       
+       edm::LogWarning(" CASTOR ") << " Cannot read CastorRecHitCollection" << std::endl;
+     } else {      
+       for(size_t i1 = 0; i1 < casrechits->size(); ++i1) {	 
+	 const CastorRecHit & rh = (*casrechits)[i1];	 
+	 HcalCastorDetId castorid = rh.id();	 
+	 energyCastor += rh.energy();
+	 if (nhits  < 224) {	   
+	   castorRecHit.e[nhits] = rh.energy();	   
+	   castorRecHit.iphi[nhits] = castorid.sector();	   
+	   castorRecHit.depth[nhits] = castorid.module();	   
+	   castorRecHit.phi[nhits] = getPhi(castorid);
+       }
+
+       nhits++;
+
+       } // end loop castor rechits
+     }
+     
+     castorRecHit.n = nhits;         
+     castorTree->Fill();
+   }
+
+
    if(!doEbyEonly_){
      towerTree->Fill();
      
@@ -640,6 +683,14 @@ RecHitTreeProducer::beginJob()
   towerTree->Branch("isjet",myTowers.isjet,"isjet[n]/O");
   towerTree->Branch("emEt",myTowers.emEt,"emEt[n]/F");
   towerTree->Branch("hadEt",myTowers.hadEt,"hadEt[n]/F");
+
+  if(doCastor_){
+    castorTree->Branch("n",&castorRecHit.n,"n/I");
+    castorTree->Branch("e",castorRecHit.e,"e[n]/F");
+    castorTree->Branch("iphi",castorRecHit.iphi,"iphi[n]/I");
+    castorTree->Branch("phi",castorRecHit.phi,"phi[n]/F");
+    castorTree->Branch("depth",castorRecHit.depth,"depth[n]/I");
+  }
 
   if (saveBothVtx_) {
     towerTree->Branch("etVtx",myTowers.etVtx,"etvtx[n]/F");
