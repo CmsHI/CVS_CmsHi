@@ -30,8 +30,8 @@ process.options = cms.untracked.PSet(
    # wantSummary = cms.untracked.bool(True)
 )
 
-genTag="generator"
-hltProcess="HLT"
+genTag="hiSignal"
+hltProcess="HISIGNAL"
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
 
