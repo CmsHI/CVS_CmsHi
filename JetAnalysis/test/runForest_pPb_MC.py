@@ -32,6 +32,8 @@ process.options = cms.untracked.PSet(
 
 genTag="generator"
 hltProcess="HLT"
+
+
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
 
@@ -324,6 +326,8 @@ process.hiTrackReco = cms.Sequence(process.hiTracks)
 process.hiTrackDebug = cms.Sequence(process.hiSelectedTrackQuality)
 process.trackeff_seq = cms.Sequence(process.hitrkEffAnalyzer_akpu3pf)
 
+process.genParticles.src = cms.InputTag("hiSignal")
+
 process.reco_extra =  cms.Path(
 #    process.hiGenParticles +
     
@@ -339,9 +343,8 @@ process.reco_extra =  cms.Path(
 #    *process.HiParticleFlowReco
     *process.iterativeConePu5CaloJets
     *process.PFTowers
-
-#    *process.patDefaultSequence
-#    * process.cleanPhotons
+    *process.genParticles
+    *process.patDefaultSequence
 )    
     
 
@@ -518,11 +521,14 @@ process.patPhotons.addPhotonID = cms.bool(False)
 
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
+process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
+process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
+
 process.ana_step          = cms.Path(
     process.genpana +
                                       process.hcalNoise +
                                       process.jetAnalyzers +                                      
-#                                      process.multiPhotonAnalyzer +
+                                      process.multiPhotonAnalyzer +
                                       process.HiGenParticleAna +
                                       process.cutsTPForFak +
                                       process.cutsTPForEff +
@@ -568,7 +574,7 @@ process.pprimaryvertexFilter = cms.Path(process.primaryVertexFilter)
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
-setPhotonObject(process,"cleanPhotons")
+setPhotonObject(process,"photons")
 
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
