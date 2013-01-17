@@ -100,7 +100,7 @@ process.sim_step = cms.Path(process.mix*process.trackingParticles*
 #process.Timing = cms.Service("Timing")
 
 # MC Global Tag 44x 
-process.GlobalTag.globaltag = 'START53_V11::All'
+process.GlobalTag.globaltag = 'STARTHI53_V17::All'
 
 # load centrality
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
