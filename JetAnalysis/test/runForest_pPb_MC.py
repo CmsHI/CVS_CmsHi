@@ -523,6 +523,8 @@ process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
+process.multiPhotonAnalyzer.basicClusterBarrel = cms.InputTag("hybridSuperClusters:hybridBarrelBasicClusters")
+process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClusters:multi5x5EndcapBasicClusters")
 
 process.ana_step          = cms.Path(
     process.genpana +
