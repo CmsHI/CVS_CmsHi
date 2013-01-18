@@ -281,7 +281,7 @@ process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'+hltProcess)
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'+hltProcess)
-process.heavyIon.generators = cms.vstring("generator")
+process.heavyIon.generators = cms.vstring(genTag)
 
 
 #Commented by Yen-Jie
@@ -330,7 +330,7 @@ process.trackeff_seq = cms.Sequence(process.hitrkEffAnalyzer_akpu3pf)
 process.genParticles.src = cms.InputTag(genTag)
 
 process.reco_extra =  cms.Path(
-#    process.hiGenParticles +
+    process.hiGenParticles +
     
     process.siPixelRecHits*
 #    process.hiCentrality*
