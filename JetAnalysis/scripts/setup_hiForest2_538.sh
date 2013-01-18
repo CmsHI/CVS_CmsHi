@@ -57,7 +57,7 @@ cvs co -r HEAD -d		   CmsHi/JetAnalysis/test UserCode/CmsHi/JetAnalysis/test
 cvs co -r HEAD -d                  CmsHi/JetAnalysis/scripts UserCode/CmsHi/JetAnalysis/scripts
 
 # trigger analyzers
-cvs co -r hi538_00 HLTrigger/HLTanalyzers
+cvs co -r hi538_01 HLTrigger/HLTanalyzers
 
 # event analyzer
 cvs co -r  HiForest_V02_02 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
