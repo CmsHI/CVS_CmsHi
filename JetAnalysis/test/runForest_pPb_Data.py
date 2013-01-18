@@ -34,13 +34,14 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-                            fileNames = cms.untracked.vstring("file:/d102/yetkin/analysis/d0116/FE6E7D35-895E-E211-B3E4-003048D2BEA8.root")
+                            # fileNames = cms.untracked.vstring("file:/d102/yetkin/analysis/d0116/FE6E7D35-895E-E211-B3E4-003048D2BEA8.root")
+                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/353/00000/345B5494-2E61-E211-A403-0025901D627C.root")
 #                            fileNames = cms.untracked.vstring("file:PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
 			    )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(-1))
+            input = cms.untracked.int32(20))
 
 
 #####################################################################################
@@ -426,6 +427,8 @@ process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
+process.multiPhotonAnalyzer.basicClusterBarrel = cms.InputTag("hybridSuperClusters:hybridBarrelBasicClusters")
+process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClusters:multi5x5EndcapBasicClusters")
 
 # Rechit analyzer setup
 
