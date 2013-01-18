@@ -3,7 +3,7 @@
 #############################
 
 # Simulations
-cvs co -r V00-01-11 GeneratorInterface/HiGenCommon
+cvs co -r V00-01-13 GeneratorInterface/HiGenCommon
 cvs co -r V02-02-25 GeneratorInterface/PyquenInterface
 
 # Track studies
