@@ -284,6 +284,36 @@ process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'+hltProcess)
 process.heavyIon.generators = cms.vstring(genTag)
 
+# JEC options
+process.ak1PFJets.jetPtMin = 1
+process.ak2PFJets.jetPtMin = 1
+process.ak3PFJets.jetPtMin = 1
+process.ak4PFJets.jetPtMin = 1
+process.ak5PFJets.jetPtMin = 1
+process.ak6PFJets.jetPtMin = 1
+
+process.ak1CaloJets.jetPtMin = 1
+process.ak2CaloJets.jetPtMin = 1
+process.ak3CaloJets.jetPtMin = 1
+process.ak4CaloJets.jetPtMin = 1
+process.ak5CaloJets.jetPtMin = 1
+process.ak6CaloJets.jetPtMin = 1
+
+process.akPu1PFJets.jetPtMin = 1
+process.akPu2PFJets.jetPtMin = 1
+process.akPu3PFJets.jetPtMin = 1
+process.akPu4PFJets.jetPtMin = 1
+process.akPu5PFJets.jetPtMin = 1
+process.akPu6PFJets.jetPtMin = 1
+
+process.akPu1CaloJets.jetPtMin = 1
+process.akPu2CaloJets.jetPtMin = 1
+process.akPu3CaloJets.jetPtMin = 1
+process.akPu4CaloJets.jetPtMin = 1
+process.akPu5CaloJets.jetPtMin = 1
+process.akPu6CaloJets.jetPtMin = 1
+ 
+
 
 #Commented by Yen-Jie
 #process.hiPixelAdaptiveVertex.useBeamConstraint = False
@@ -338,7 +368,7 @@ process.reco_extra =  cms.Path(
     process.pACentrality*
     
     process.hiTrackReco
-    +process.hiTrackDebug
+#    +process.hiTrackDebug
     
     #        *process.muonRecoPbPb
 #    *process.HiParticleFlowLocalReco
@@ -527,18 +557,18 @@ process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
 
 process.ana_step          = cms.Path(
-    process.genpana +
+#    process.genpana +
                                       process.hcalNoise +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
-                                      process.HiGenParticleAna +
-                                      process.cutsTPForFak +
-                                      process.cutsTPForEff +
-                                      process.trackeff_seq+
-                                      process.ppTrack +
-                                      process.pixelTrack +
-                                      process.pfcandAnalyzer +
-                                      process.rechitAna +
+#                                      process.HiGenParticleAna +
+#                                      process.cutsTPForFak +
+#                                      process.cutsTPForEff +
+#                                      process.trackeff_seq+
+#                                      process.ppTrack +
+#                                      process.pixelTrack +
+#                                      process.pfcandAnalyzer +
+#                                      process.rechitAna +
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
