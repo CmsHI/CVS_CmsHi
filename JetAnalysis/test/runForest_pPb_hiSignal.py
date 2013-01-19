@@ -193,7 +193,8 @@ process.muonTree.doGen = cms.untracked.bool(True)
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doMC = cms.bool(False)
-process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
+
+process.ppTrack.vertexSrc = vtxTag
 
 process.iterativeConePu5CaloJets.srcPVs = vtxTag
 process.iterativeCone5CaloJets.srcPVs = vtxTag
