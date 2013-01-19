@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.22 2013/01/16 17:22:56 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.23 2013/01/19 16:25:13 yilmaz Exp $
 //
 //
 
@@ -803,7 +803,7 @@ RecHitTreeProducer::beginJob()
   }
 
   if(doZDCRecHit_){
-    zdcRecHitTree = fs->make<TTree>("zdcrechit",versionTag);
+    zdcRecHitTree = fs->make<TTree>("zdc",versionTag);
     zdcRecHitTree->Branch("n",&zdcRecHit.n,"n/I");
     zdcRecHitTree->Branch("e",zdcRecHit.e,"e[n]/F");
     zdcRecHitTree->Branch("zside",zdcRecHit.zside,"zside[n]/I");
@@ -812,7 +812,7 @@ RecHitTreeProducer::beginJob()
   }
 
   if(doZDCDigi_){
-    zdcDigiTree = fs->make<TTree>("zdcrechit",versionTag);
+    zdcDigiTree = fs->make<TTree>("zdcDigi",versionTag);
     zdcDigiTree->Branch("n",&zdcDigi.n,"n/I");
     zdcDigiTree->Branch("nts",&zdcDigi.nts,"nts/I");
     zdcDigiTree->Branch("zside",zdcDigi.zside,"zside[n][nts]/I");
