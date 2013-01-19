@@ -158,6 +158,12 @@ process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
+process.rechitanalyzer.HFTreePtMin = -999
+process.rechitanalyzer.HBHETreePtMin = -999
+process.rechitanalyzer.EBTreePtMin = -999
+process.rechitanalyzer.EBTreePtMin = -999
+process.rechitanalyzer.EETreePtMin = -999
+
 process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
 process.pfcandAnalyzer.skipCharged = False
