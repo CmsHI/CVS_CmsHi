@@ -18,6 +18,7 @@
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/EcalRecHit"/>
 <use name="DataFormats/HcalRecHit"/>
+<use name="DataFormats/HcalDigi"/>
 <use name="DataFormats/HcalDetId"/>
 <use name="DataFormats/DetId"/>
 <use name="DataFormats/GeometryVector"/>

@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.21 2013/01/16 17:18:20 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.22 2013/01/16 17:22:56 yilmaz Exp $
 //
 //
 
@@ -56,6 +56,7 @@
 
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
+#include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "DataFormats/EcalDetId/interface/EcalDetIdCollections.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
@@ -70,6 +71,7 @@
 using namespace std;
 
 #define MAXHITS 100000
+
 
 struct MyRecHit{
   int depth[MAXHITS];
@@ -100,6 +102,25 @@ struct MyRecHit{
 
 };
 
+struct MyZDCRecHit{  
+  int n;
+  float  e[18];
+  int    zside[18];
+  int    section [18];
+  int    channel[18];
+  int    saturation[18];
+};
+
+struct MyZDCDigi{  
+  int    n;
+  int    nts;
+  float  chargefC[18][10];
+  int    adc[18][10];
+  int    zside[18][10];
+  int    section [18][10];
+  int    channel[18][10];
+  int    ts[18][10];
+};
 
 struct MyBkg{
    int n;
@@ -160,11 +181,14 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   MyRecHit hfRecHit;
   MyRecHit ebRecHit;
   MyRecHit eeRecHit;
-   MyRecHit myBC;
-   MyRecHit myTowers;
+  MyRecHit myBC;
+  MyRecHit myTowers;
   MyRecHit castorRecHit;
 
-   MyBkg bkg;
+  MyZDCRecHit zdcRecHit;
+  MyZDCDigi zdcDigi;
+
+  MyBkg bkg;
 
   TNtuple* nt;
   TTree* hbheTree;
@@ -175,6 +199,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    TTree* towerTree;
    TTree* bkgTree;
   TTree* castorTree;
+  TTree* zdcRecHitTree;
+  TTree* zdcDigiTree;
 
   double cone;
   double hfTowerThreshold_;
@@ -213,6 +239,8 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
    bool doHcal_;
    bool doHF_;
   bool doCastor_;
+  bool doZDCRecHit_;
+  bool doZDCDigi_;
 
    bool hasVtx_;
   bool saveBothVtx_;
@@ -255,6 +283,8 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   doHcal_ = iConfig.getUntrackedParameter<bool>("doHcal",true);
   doHF_ = iConfig.getUntrackedParameter<bool>("doHF",true);
   doCastor_ = iConfig.getUntrackedParameter<bool>("doCASTOR",true);
+  doZDCRecHit_ = iConfig.getUntrackedParameter<bool>("doZDCRecHit",true);
+  doZDCDigi_ = iConfig.getUntrackedParameter<bool>("doZDCDigi",true);
 
   hasVtx_ = iConfig.getUntrackedParameter<bool>("hasVtx",true);
   saveBothVtx_ = iConfig.getUntrackedParameter<bool>("saveBothVtx",false);
@@ -608,6 +638,84 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
      castorTree->Fill();
    }
 
+   if(doZDCRecHit_){
+
+     edm::Handle<ZDCRecHitCollection> zdcrechits;    
+ 
+     try{ ev.getByLabel("zdcreco",zdcrechits); }
+     catch(...) { edm::LogWarning(" ZDC ") << " Cannot get ZDC RecHits " << std::endl; }
+
+     int nhits = 0;
+
+     if (zdcrechits.failedToGet()!=0 || !zdcrechits.isValid()) {       
+       edm::LogWarning(" ZDC ") << " Cannot read ZDCRecHitCollection" << std::endl;
+     } else {      
+       for(size_t i1 = 0; i1 < zdcrechits->size(); ++i1) {	 
+	 const ZDCRecHit & rh = (*zdcrechits)[i1];	 
+	 HcalZDCDetId zdcid = rh.id();	 
+	 if (nhits  < 18) {	   
+	   zdcRecHit.e[nhits] = rh.energy();	   
+	   zdcRecHit.zside[nhits] = zdcid.zside();	   
+	   zdcRecHit.section[nhits] = zdcid.section();	   
+	   zdcRecHit.channel[nhits] = zdcid.channel();
+         }
+
+         nhits++;
+
+       } // end loop zdc rechits
+     }
+    
+     zdcRecHit.n = nhits;         
+     zdcRecHitTree->Fill();
+
+   }
+
+   if(doZDCDigi_){
+
+     edm::Handle<ZDCDigiCollection> zdcdigis;  
+ 
+     try{ ev.getByLabel("hcalDigis",zdcdigis); }
+     catch(...) { edm::LogWarning(" ZDC ") << " Cannot get ZDC Digis " << std::endl; }
+
+     int nhits = 0;	
+ 
+     if (zdcdigis.failedToGet()!=0 || !zdcdigis.isValid()) {       
+       edm::LogWarning(" ZDC ") << " Cannot read ZDCDigiCollection" << std::endl;
+     } else {      
+       for(size_t i1 = 0; i1 < zdcdigis->size(); ++i1) {	 
+
+	 const ZDCDataFrame & rh = (*zdcdigis)[i1];	 
+	 HcalZDCDetId zdcid = rh.id();
+	
+	 if (nhits  < 18) {	   
+	 	
+	   int ts = 0;   
+
+           for(int j1 = 0; j1 < rh.size(); j1++){
+
+	     zdcDigi.chargefC[nhits][ts]= rh[ts].nominal_fC();	   
+	     zdcDigi.adc[nhits][ts]= rh[ts].adc();	   
+	     zdcDigi.zside[nhits][ts] = zdcid.zside();	   
+	     zdcDigi.section[nhits][ts] = zdcid.section();	   
+	     zdcDigi.channel[nhits][ts] = zdcid.channel();
+	     zdcDigi.ts[nhits][ts] = ts;
+
+             ts++;
+	   }
+
+           zdcDigi.nts=ts;
+           
+         }
+
+         nhits++;
+
+       } // end loop zdc rechits
+     }
+    
+     zdcDigi.n = nhits;         
+     zdcDigiTree->Fill();
+
+   }
 
    if(!doEbyEonly_){
      towerTree->Fill();
@@ -694,13 +802,32 @@ RecHitTreeProducer::beginJob()
     castorTree->Branch("depth",castorRecHit.depth,"depth[n]/I");
   }
 
+  if(doZDCRecHit_){
+    zdcRecHitTree = fs->make<TTree>("zdcrechit",versionTag);
+    zdcRecHitTree->Branch("n",&zdcRecHit.n,"n/I");
+    zdcRecHitTree->Branch("e",zdcRecHit.e,"e[n]/F");
+    zdcRecHitTree->Branch("zside",zdcRecHit.zside,"zside[n]/I");
+    zdcRecHitTree->Branch("section",zdcRecHit.section,"section[n]/I");
+    zdcRecHitTree->Branch("channel",zdcRecHit.channel,"channel[n]/I");
+  }
+
+  if(doZDCDigi_){
+    zdcDigiTree = fs->make<TTree>("zdcrechit",versionTag);
+    zdcDigiTree->Branch("n",&zdcDigi.n,"n/I");
+    zdcDigiTree->Branch("nts",&zdcDigi.nts,"nts/I");
+    zdcDigiTree->Branch("zside",zdcDigi.zside,"zside[n][nts]/I");
+    zdcDigiTree->Branch("section",zdcDigi.section,"section[n][nts]/I");
+    zdcDigiTree->Branch("channel",zdcDigi.channel,"channel[n][nts]/I");
+    zdcDigiTree->Branch("adc",zdcDigi.adc,"adc[n][nts]/I");
+    zdcDigiTree->Branch("chargefC",zdcDigi.chargefC,"chargefC[n][nts]/F");
+  }
+
   if (saveBothVtx_) {
     towerTree->Branch("etVtx",myTowers.etVtx,"etvtx[n]/F");
     towerTree->Branch("etaVtx",myTowers.etaVtx,"etavtx[n]/F");
     towerTree->Branch("emEtVtx",myTowers.emEtVtx,"emEtVtx[n]/F");
     towerTree->Branch("hadEtVtx",myTowers.hadEtVtx,"hadEtVtx[n]/F");
   }
-
 
   if(doBasicClusters_){
      bcTree = fs->make<TTree>("bc",versionTag);
