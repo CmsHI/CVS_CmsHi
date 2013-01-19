@@ -108,7 +108,7 @@ overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
     centralityVariable = cms.string("HFtowersPlusTrunc"),
-    nonDefaultGlauberModel = cms.string(""),
+    nonDefaultGlauberModel = cms.string("Hijing"),
     centralitySrc = cms.InputTag("pACentrality")
     )
 
