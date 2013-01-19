@@ -86,7 +86,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 process.load('PhysicsTools.PatAlgos.patSequences_cff')
 
-process.sim_step = cms.Path(process.mix*process.trackingParticles*
+process.sim_step = cms.Path(process.mix*
                             process.SimL1Emulator*
                             process.simSiPixelDigis*process.simSiStripDigis)
 
