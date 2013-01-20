@@ -8,12 +8,13 @@ process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool(True)
 )
 
+vtxTag="offlinePrimaryVertices"
+trkTag="generalTracks"
 
 hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
 doElectrons = False
-doRegitForBjets = False
 storeAllRecHits = True
 
 
@@ -63,10 +64,6 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 process.load('PhysicsTools.PatAlgos.patSequences_cff')
-
-process.sim_step = cms.Path(process.mix*process.trackingParticles*
-                            process.SimL1Emulator*
-                            process.simSiPixelDigis*process.simSiStripDigis)
 
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
@@ -139,7 +136,7 @@ process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
 process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
-process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag("generalTracks")
+process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag(trkTag)
 
 # Jet corrections should be switched to pp tracking
 process.akPu5PFcorr.payload = 'AK5PF_generalTracks'
@@ -166,23 +163,23 @@ process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality") 
  
 
-process.iterativeConePu5CaloJets.srcPVs = "offlinePrimaryVerticesWithBS"
-process.iterativeCone5CaloJets.srcPVs = "offlinePrimaryVerticesWithBS"
+process.iterativeConePu5CaloJets.srcPVs = vtxTag
+process.iterativeCone5CaloJets.srcPVs = vtxTag
 
-process.particleFlowTmp.vertexCollection = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.rechitanalyzer.vtxSrc = cms.untracked.InputTag("offlinePrimaryVerticesWithBS")
-process.muonTree.vertices = cms.InputTag("offlinePrimaryVerticesWithBS")
+process.particleFlowTmp.vertexCollection = cms.InputTag(vtxTag)
+process.rechitanalyzer.vtxSrc = cms.untracked.InputTag(vtxTag)
+process.muonTree.vertices = cms.InputTag(vtxTag)
 
-process.hiEvtAnalyzer.Vertex = cms.InputTag("offlinePrimaryVerticesWithBS")
+process.hiEvtAnalyzer.Vertex = cms.InputTag(vtxTag)
 process.hiEvtAnalyzer.doEvtPlane = False
 
-process.primaryVertexFilter.src = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.cleanPhotons.primaryVertexProducer = cms.string('offlinePrimaryVerticesWithBS')
-#process.hiCentrality.srcVertex = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.pfTrackElec.PrimaryVertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.pfTrack.PrimaryVertexLabel = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.particleFlowTmp.vertexCollection = cms.InputTag("offlinePrimaryVerticesWithBS")
-process.mvaElectrons.vertexTag = cms.InputTag("offlinePrimaryVerticesWithBS")
+process.primaryVertexFilter.src = cms.InputTag(vtxTag)
+process.cleanPhotons.primaryVertexProducer = cms.string(vtxTag)
+#process.hiCentrality.srcVertex = cms.InputTag(vtxTag)
+process.pfTrackElec.PrimaryVertexLabel = cms.InputTag(vtxTag)
+process.pfTrack.PrimaryVertexLabel = cms.InputTag(vtxTag)
+process.particleFlowTmp.vertexCollection = cms.InputTag(vtxTag)
+process.mvaElectrons.vertexTag = cms.InputTag(vtxTag)
 process.iterativeConePu5CaloJets.jetPtMin = cms.double(3.0)
 
 
@@ -200,11 +197,11 @@ process.hiTracks.cut = cms.string('quality("' + hiTrackQuality+  '")')
 
 process.pfTrack.TrackQuality = cms.string(hiTrackQuality)
 
-process.hiTracks.src = cms.InputTag("generalTracks")
-process.hiCaloCompatibleGeneralTracksQuality.src = cms.InputTag("generalTracks")
-process.hiGeneralTracksQuality.src = cms.InputTag("generalTracks")
-process.hiSelectedTrackQuality.src = cms.InputTag("generalTracks")
-#process.hiCentrality.srcTracks = cms.InputTag("generalTracks")
+process.hiTracks.src = cms.InputTag(trkTag)
+process.hiCaloCompatibleGeneralTracksQuality.src = cms.InputTag(trkTag)
+process.hiGeneralTracksQuality.src = cms.InputTag(trkTag)
+process.hiSelectedTrackQuality.src = cms.InputTag(trkTag)
+#process.hiCentrality.srcTracks = cms.InputTag(trkTag)
 #process.hiCentrality.srcPixelTracks = cms.InputTag("pixelTracks")
 
 process.hiTrackReco = cms.Sequence(process.hiTracks)
@@ -254,12 +251,12 @@ process.reco_extra =  cms.Path(
     
 
 # seed the muons with iterative tracks
-process.globalMuons.TrackerCollectionLabel = "generalTracks"
-process.muons.TrackExtractorPSet.inputTrackCollection = "generalTracks"
-process.muons.inputCollectionLabels = ["generalTracks", "globalMuons", "standAloneMuons:UpdatedAtVtx", "tevMuons:firstHit", "tevMuons:picky", "tevMuons:dyt"]
+process.globalMuons.TrackerCollectionLabel = trkTag
+process.muons.TrackExtractorPSet.inputTrackCollection = trkTag
+process.muons.inputCollectionLabels = [trkTag, "globalMuons", "standAloneMuons:UpdatedAtVtx", "tevMuons:firstHit", "tevMuons:picky", "tevMuons:dyt"]
 
 # set track collection to iterative tracking
-process.pfTrack.TkColList = cms.VInputTag("generalTracks")
+process.pfTrack.TkColList = cms.VInputTag(trkTag)
 
 # End modifications to reco sequence -Matt
 ##########################################
@@ -272,148 +269,10 @@ process.reco_extra_jet    = cms.Path(process.iterativeConePu5CaloJets *
 process.gen_step          = cms.Path( process.hiGen )
 
 ###########################################
-# Do regit and b-tagging
-
-if doRegitForBjets:
-    
-
-    process.akPu3PFSelectedJets = cms.EDFilter("CandViewSelector",
-                                               src = cms.InputTag("akPu3PFJets"),
-                                               cut = cms.string("pt > 40. && eta > -2. && eta < 2")
-                                               )
-    
-    
-    process.load("RecoHI.HiTracking.hiRegitTracking_cff")
-#    process.hiGeneralTrackFilter.recTracks = cms.InputTag("hiSelectedTracks")
-        
-    # Region optimized for b-jets
-    process.hiRegitInitialStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 0.02
-    process.hiRegitInitialStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 0.02
-    process.hiRegitLowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 0.02
-    process.hiRegitLowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 0.02
-    process.hiRegitPixelPairStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 0.015
-    process.hiRegitPixelPairStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 0.015
-    process.hiRegitDetachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 1.5
-    process.hiRegitDetachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 1.5
-    process.hiRegitMixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.originRadius = 1.0
-    process.hiRegitMixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.originHalfLength = 1.0
-    process.hiRegitMixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.originRadius = 0.5
-    process.hiRegitMixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.originHalfLength = 0.5
-
-    process.hiRegitInitialStepSeeds.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitInitialStepSeeds.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-    process.hiRegitLowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitLowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-    process.hiRegitPixelPairStepSeeds.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitPixelPairStepSeeds.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-    process.hiRegitDetachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitDetachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-    process.hiRegitMixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitMixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-    process.hiRegitMixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.deltaPhiRegion = 0.3
-    process.hiRegitMixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.deltaEtaRegion = 0.3
-
-    process.hiRegitInitialStepSeeds.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-    process.hiRegitLowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-    process.hiRegitPixelPairStepSeeds.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-    process.hiRegitDetachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-    process.hiRegitMixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-    process.hiRegitMixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.JetSrc = cms.InputTag("akPu3PFSelectedJets")
-
-
-    # merge the regit with the global tracking
-    process.load("RecoHI.HiTracking.MergeRegit_cff")
-
-    process.hiGeneralAndRegitTracks.TrackProducer1 = 'generalTracks'
-
-    # redo the muons, too to get the displaced muons in jets
-    process.regGlobalMuons = process.globalMuons.clone(
-        TrackerCollectionLabel = "hiGeneralAndRegitTracks"
-        )
-    process.regGlbTrackQual = process.glbTrackQual.clone(
-        InputCollection = "regGlobalMuons",
-        InputLinksCollection = "regGlobalMuons"
-        )
-    process.regMuons = process.muons.clone()
-    process.regMuons.TrackExtractorPSet.inputTrackCollection = "hiGeneralAndRegitTracks"
-    process.regMuons.globalTrackQualityInputTag = "regGlbTrackQual"
-    process.regMuons.inputCollectionLabels = cms.VInputTag("hiGeneralAndRegitTracks", "regGlobalMuons", "standAloneMuons:UpdatedAtVtx", "tevMuons:firstHit", "tevMuons:picky", "tevMuons:dyt")
-    
-    process.regMuonReco = cms.Sequence(
-        process.regGlobalMuons*
-        process.regGlbTrackQual*
-        process.regMuons
-        )
-    
-    # re-run particle flow to do the calo-matching
-    process.pfRegTrack = process.pfTrack.clone(TkColList = cms.VInputTag("hiGeneralAndRegitTracks"))
-    process.pfRegBlock = process.particleFlowBlock.clone()
-    process.regParticleFlow = process.particleFlowTmp.clone()
-        
-    process.pfRegTrack.GsfTracksInEvents = False
-    process.regParticleFlow.usePFElectrons = False
-    process.regParticleFlow.muons = "regMuons"
-        
-    process.hiRegPF =  cms.Sequence(
-        process.pfRegTrack
-        *process.pfRegBlock
-        *process.regParticleFlow
-    )
-
-    process.load("RecoHI.HiTracking.HICaloCompatibleTracks_cff")
-    process.hiGeneralAndRegitCaloMatchedTracks = process.hiCaloCompatibleTracks.clone(    
-        srcTracks = 'hiGeneralAndRegitTracks',
-        srcPFCands = 'regParticleFlow'
-        )
-        
-    process.hiCaloMatchFilteredTracks = cms.EDFilter("TrackSelector",
-                                                     src = cms.InputTag("hiGeneralAndRegitCaloMatchedTracks"),
-                                                     cut = cms.string(
-        'quality("highPuritySetWithPV") && pt > 1')                                                                                            
-                                                     )
-    
-    
-    process.regionalTracking = cms.Path(
-        process.akPu3PFSelectedJets *
-        process.hiRegitTracking *
-        process.hiGeneralAndRegitTracks *
-        process.regMuonReco *
-        process.hiRegPF *
-        process.hiGeneralAndRegitCaloMatchedTracks *
-        process.hiCaloMatchFilteredTracks
-        )
-    
-    
-    process.icPu5SecondaryVertexTagInfos.trackSelection.qualityClass = 'any'
-    process.akPu3PFSecondaryVertexTagInfos.trackSelection.qualityClass = 'any'
-    process.icPu5JetTracksAssociatorAtVertex.tracks = cms.InputTag("hiCaloMatchFilteredTracks")
-    process.akPu3PFJetTracksAssociatorAtVertex.tracks = cms.InputTag("hiCaloMatchFilteredTracks")
-
-    process.akPu3PFpatJets.addAssociatedTracks = True
-    process.akPu3PFpatJets.addTagInfos = True
-    process.akPu3PFpatJets.addBTagInfo         = True
-    process.akPu3PFpatJets.addDiscriminators   = True
-    process.akPu3PFpatJets.getJetMCFlavour     = True
-
-
-    process.akPu3PFpatJets.tagInfoSources = cms.VInputTag(
-        cms.InputTag("akPu3PFImpactParameterTagInfos"),
-        cms.InputTag("akPu3PFGhostTrackVertexTagInfos"),
-        cms.InputTag("akPu3PFSecondaryVertexTagInfos"),
-        cms.InputTag("akPu3PFSoftMuonTagInfos"),
-        )
-
-
-# end btagging mods, expect for pat replace just below -Matt
-##########################################
 
 process.pat_step          = cms.Path(process.makeHeavyIonJets
                                      )
 
-# change to btagging pat sequence
-if doRegitForBjets:
-    process.pat_step.replace(process.akPu3PFpatSequence,process.akPu3PFpatSequence_withBtagging)
-# Note that for data you need: akPu3PFpatSequence_withBtagging_data
     
 process.pat_step.remove(process.interestingTrackEcalDetIds)
 
@@ -426,7 +285,7 @@ process.goodPhotons.cut = cms.string('pt > 10 & hadronicOverEm < 0.2 & abs(eta) 
 process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
-process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
+process.multiPhotonAnalyzer.TrackProducer = cms.InputTag(trkTag)
 process.multiPhotonAnalyzer.basicClusterBarrel = cms.InputTag("hybridSuperClusters:hybridBarrelBasicClusters")
 process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClusters:multi5x5EndcapBasicClusters")
 
