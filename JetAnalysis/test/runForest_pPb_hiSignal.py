@@ -194,7 +194,7 @@ process.muonTree.doGen = cms.untracked.bool(True)
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doMC = cms.bool(False)
 
-process.ppTrack.vertexSrc = vtxTag
+process.ppTrack.vertexSrc = [vtxTag]
 
 process.iterativeConePu5CaloJets.srcPVs = vtxTag
 process.iterativeCone5CaloJets.srcPVs = vtxTag

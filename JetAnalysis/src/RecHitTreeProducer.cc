@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.23 2013/01/19 16:25:13 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.22 2013/01/16 17:22:56 yilmaz Exp $
 //
 //
 
@@ -65,6 +65,10 @@
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
+#include "CalibFormats/HcalObjects/interface/HcalCoderDb.h"
+#include "CalibFormats/HcalObjects/interface/HcalDbService.h"
+#include "CalibFormats/HcalObjects/interface/HcalDbRecord.h"
+#include "RecoLocalCalo/HcalRecAlgos/interface/HcalCaloFlagLabels.h"
 
 #include "TNtuple.h"
 
@@ -113,13 +117,12 @@ struct MyZDCRecHit{
 
 struct MyZDCDigi{  
   int    n;
-  int    nts;
-  float  chargefC[18][10];
-  int    adc[18][10];
-  int    zside[18][10];
-  int    section [18][10];
-  int    channel[18][10];
-  int    ts[18][10];
+  float  chargefC[10][18];
+  int    adc[10][18];
+  int    ts[10][18];
+  int    zside[18];
+  int    section [18];
+  int    channel[18];
 };
 
 struct MyBkg{
@@ -215,6 +218,9 @@ class RecHitTreeProducer : public edm::EDAnalyzer {
   double ebPtMin_;
   double eePtMin_;
   double towerPtMin_;
+
+  int nZdcTs_;
+  bool calZDCDigi_;
   
    edm::Service<TFileService> fs;
    const CentralityBins * cbins_;
@@ -300,8 +306,8 @@ RecHitTreeProducer::RecHitTreeProducer(const edm::ParameterSet& iConfig) :
   ebPtMin_ = iConfig.getUntrackedParameter<double>("EBTreePtMin",0);
   eePtMin_ = iConfig.getUntrackedParameter<double>("EETreePtMin",0.);
   towerPtMin_ = iConfig.getUntrackedParameter<double>("TowerTreePtMin",0.);
-
-
+  nZdcTs_=iConfig.getUntrackedParameter<int>("nZdcTs",10);
+  calZDCDigi_=iConfig.getUntrackedParameter<bool>("calZDCDigi",true);
 }
 
 
@@ -658,6 +664,7 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	   zdcRecHit.zside[nhits] = zdcid.zside();	   
 	   zdcRecHit.section[nhits] = zdcid.section();	   
 	   zdcRecHit.channel[nhits] = zdcid.channel();
+	   zdcRecHit.saturation[nhits] = static_cast<int>( rh.flagField(HcalCaloFlagLabels::ADCSaturationBit) );
          }
 
          nhits++;
@@ -672,8 +679,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 
    if(doZDCDigi_){
 
-     edm::Handle<ZDCDigiCollection> zdcdigis;  
- 
+     edm::Handle<ZDCDigiCollection> zdcdigis; 
+     
      try{ ev.getByLabel("hcalDigis",zdcdigis); }
      catch(...) { edm::LogWarning(" ZDC ") << " Cannot get ZDC Digis " << std::endl; }
 
@@ -681,38 +688,44 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
  
      if (zdcdigis.failedToGet()!=0 || !zdcdigis.isValid()) {       
        edm::LogWarning(" ZDC ") << " Cannot read ZDCDigiCollection" << std::endl;
-     } else {      
-       for(size_t i1 = 0; i1 < zdcdigis->size(); ++i1) {	 
+     } else {  
+   
+       edm::ESHandle<HcalDbService> conditions;	
+       iSetup.get<HcalDbRecord>().get(conditions);
 
+       for(size_t i1 = 0; i1 < zdcdigis->size(); ++i1) {	 
+	 CaloSamples caldigi;
 	 const ZDCDataFrame & rh = (*zdcdigis)[i1];	 
 	 HcalZDCDetId zdcid = rh.id();
-	
+         
+	 if(calZDCDigi_){
+	   const HcalQIEShape* qieshape=conditions->getHcalShape();
+	   const HcalQIECoder* qiecoder=conditions->getHcalCoder(zdcid);
+	   HcalCoderDb coder(*qiecoder,*qieshape);
+           coder.adc2fC(rh,caldigi);
+         }
+
 	 if (nhits  < 18) {	   
 	 	
 	   int ts = 0;   
+	   zdcDigi.zside[nhits] = zdcid.zside();	   
+	   zdcDigi.section[nhits] = zdcid.section();	   
+	   zdcDigi.channel[nhits] = zdcid.channel();
 
            for(int j1 = 0; j1 < rh.size(); j1++){
 
-	     zdcDigi.chargefC[nhits][ts]= rh[ts].nominal_fC();	   
-	     zdcDigi.adc[nhits][ts]= rh[ts].adc();	   
-	     zdcDigi.zside[nhits][ts] = zdcid.zside();	   
-	     zdcDigi.section[nhits][ts] = zdcid.section();	   
-	     zdcDigi.channel[nhits][ts] = zdcid.channel();
-	     zdcDigi.ts[nhits][ts] = ts;
+	     zdcDigi.chargefC[ts][nhits] = calZDCDigi_?caldigi[ts]:rh[ts].nominal_fC();	   
+	     zdcDigi.adc[ts][nhits] = rh[ts].adc();	   
+	     zdcDigi.ts[ts][nhits] = ts;
 
              ts++;
 	   }
-
-           zdcDigi.nts=ts;
-           
          }
-
          nhits++;
-
        } // end loop zdc rechits
      }
     
-     zdcDigi.n = nhits;         
+     zdcDigi.n = nhits;
      zdcDigiTree->Fill();
 
    }
@@ -803,23 +816,27 @@ RecHitTreeProducer::beginJob()
   }
 
   if(doZDCRecHit_){
-    zdcRecHitTree = fs->make<TTree>("zdc",versionTag);
+    zdcRecHitTree = fs->make<TTree>("zdcrechit",versionTag);
     zdcRecHitTree->Branch("n",&zdcRecHit.n,"n/I");
     zdcRecHitTree->Branch("e",zdcRecHit.e,"e[n]/F");
+    zdcRecHitTree->Branch("saturation",zdcRecHit.saturation,"saturation[n]/F");
     zdcRecHitTree->Branch("zside",zdcRecHit.zside,"zside[n]/I");
     zdcRecHitTree->Branch("section",zdcRecHit.section,"section[n]/I");
     zdcRecHitTree->Branch("channel",zdcRecHit.channel,"channel[n]/I");
   }
 
   if(doZDCDigi_){
-    zdcDigiTree = fs->make<TTree>("zdcDigi",versionTag);
+    TString nZdcTsSt="";
+    nZdcTsSt+=nZdcTs_;
+
+    zdcDigiTree = fs->make<TTree>("zdcdigi",versionTag);
     zdcDigiTree->Branch("n",&zdcDigi.n,"n/I");
-    zdcDigiTree->Branch("nts",&zdcDigi.nts,"nts/I");
-    zdcDigiTree->Branch("zside",zdcDigi.zside,"zside[n][nts]/I");
-    zdcDigiTree->Branch("section",zdcDigi.section,"section[n][nts]/I");
-    zdcDigiTree->Branch("channel",zdcDigi.channel,"channel[n][nts]/I");
-    zdcDigiTree->Branch("adc",zdcDigi.adc,"adc[n][nts]/I");
-    zdcDigiTree->Branch("chargefC",zdcDigi.chargefC,"chargefC[n][nts]/F");
+    zdcDigiTree->Branch("zside",zdcDigi.zside,"zside[n]/I");
+    zdcDigiTree->Branch("section",zdcDigi.section,"section[n]/I");
+    zdcDigiTree->Branch("channel",zdcDigi.channel,"channel[n]/I");
+    // zdcDigiTree->Branch("ts",zdcDigi.ts,"ts["+nZdcTsSt+"][n]/I");
+    zdcDigiTree->Branch("adc",zdcDigi.adc,"adc["+nZdcTsSt+"][n]/I");
+    zdcDigiTree->Branch("chargefC",zdcDigi.chargefC,"chargefC["+nZdcTsSt+"][n]/F");
   }
 
   if (saveBothVtx_) {
