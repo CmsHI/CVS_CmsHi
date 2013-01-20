@@ -207,7 +207,6 @@ process.hiEvtAnalyzer.doEvtPlane = False
 
 process.primaryVertexFilter.src = cms.InputTag(vtxTag)
 process.cleanPhotons.primaryVertexProducer = cms.string(vtxTag)
-process.hiCentrality.srcVertex = cms.InputTag(vtxTag)
 process.pfTrackElec.PrimaryVertexLabel = cms.InputTag(vtxTag)
 process.pfTrack.PrimaryVertexLabel = cms.InputTag(vtxTag)
 process.particleFlowTmp.vertexCollection = cms.InputTag(vtxTag)
@@ -342,8 +341,6 @@ process.hiTracks.src = cms.InputTag(trkTag)
 process.hiCaloCompatibleGeneralTracksQuality.src = cms.InputTag(trkTag)
 process.hiGeneralTracksQuality.src = cms.InputTag(trkTag)
 process.hiSelectedTrackQuality.src = cms.InputTag(trkTag)
-process.hiCentrality.srcTracks = cms.InputTag(trkTag)
-process.hiCentrality.srcPixelTracks = cms.InputTag("pixelTracks")
 
 #process. .src = cms.InputTag("generalTracks")
 process.hitrkEffAnalyzer_akpu3pf.tracks = cms.untracked.InputTag(trkTag)
@@ -364,7 +361,6 @@ process.reco_extra =  cms.Path(
     process.hiGenParticles +
     
     process.siPixelRecHits*
-#    process.hiCentrality*
     process.pACentrality*
     
     process.hiTrackReco
