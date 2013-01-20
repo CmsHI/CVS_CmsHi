@@ -208,6 +208,7 @@ process.muonTree.vertices = cms.InputTag(vtxTag)
 
 process.hiEvtAnalyzer.Vertex = cms.InputTag(vtxTag)
 process.hiEvtAnalyzer.doEvtPlane = False
+process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality")
 
 process.primaryVertexFilter.src = cms.InputTag(vtxTag)
 process.cleanPhotons.primaryVertexProducer = cms.string(vtxTag)
