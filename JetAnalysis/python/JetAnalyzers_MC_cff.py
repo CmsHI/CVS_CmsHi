@@ -83,7 +83,7 @@ jetAnalyzers = cms.Sequence(icPu5JetAnalyzer +
                             akPu3CaloJetAnalyzer +
                             akPu4CaloJetAnalyzer +
                             akPu5CaloJetAnalyzer +
-                            akPu6CaloJetAnalyzer +
+#                            akPu6CaloJetAnalyzer +
                             
                             ak1PFJetAnalyzer +
                             ak2PFJetAnalyzer +
@@ -96,8 +96,8 @@ jetAnalyzers = cms.Sequence(icPu5JetAnalyzer +
                             ak2CaloJetAnalyzer +
                             ak3CaloJetAnalyzer +
                             ak4CaloJetAnalyzer +
-                            ak5CaloJetAnalyzer +
-                            ak6CaloJetAnalyzer
+                            ak5CaloJetAnalyzer 
+#                            ak6CaloJetAnalyzer
                             
                             )
 
