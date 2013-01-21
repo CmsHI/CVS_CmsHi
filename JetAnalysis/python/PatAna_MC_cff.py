@@ -544,7 +544,7 @@ makeHeavyIonJets = cms.Sequence(icPu5patSequence +
                                 akPu3CalopatSequence +
                                 akPu4CalopatSequence +
                                 akPu5CalopatSequence +
-                                akPu6CalopatSequence +
+#                                akPu6CalopatSequence +
                                 
                                 ak1PFpatSequence +
                                 ak2PFpatSequence +
@@ -557,8 +557,8 @@ makeHeavyIonJets = cms.Sequence(icPu5patSequence +
                                 ak2CalopatSequence +
                                 ak3CalopatSequence +
                                 ak4CalopatSequence +
-                                ak5CalopatSequence +
-                                ak6CalopatSequence
+                                ak5CalopatSequence 
+#                                ak6CalopatSequence
                                 
                                 )
                                
