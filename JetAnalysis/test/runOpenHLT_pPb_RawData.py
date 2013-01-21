@@ -33,13 +33,13 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-                            fileNames = cms.untracked.vstring("file:/d101/velicanu/pa-rawtest/A4F5354A-2361-E211-8909-5404A638868F.root")
+                            fileNames = cms.untracked.vstring("/store/hidata/HIRun2013/PAHighPt/RAW/v1/000/210/498/00000/ACC49F8C-1B63-E211-9711-001D09F24DA8.root")
 #                            fileNames = cms.untracked.vstring("file:PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
 			    )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(-1))
+            input = cms.untracked.int32(500))
 
 
 #####################################################################################
@@ -80,11 +80,30 @@ process.TFileService = cms.Service("TFileService",
 
 process.load('L1Trigger.Configuration.L1Extra_cff')
 process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
+process.load('RecoHI.HiCentralityAlgos.HiCentrality_cfi')
+process.pACentrality.produceHFtowers = cms.bool(False)
+process.pACentrality.produceEcalhits = cms.bool(False)
+process.pACentrality.produceBasicClusters = cms.bool(False)
+process.pACentrality.produceZDChits = cms.bool(False)
+process.pACentrality.produceETmidRapidity = cms.bool(False)
+process.pACentrality.produceTracks = cms.bool(False)
+process.pACentrality.producePixelTracks = cms.bool(False)
+process.pACentrality.reUseCentrality = cms.bool(False)
+
+# to be updated
+process.pACentrality.producePixelhits = cms.bool(False)
+
+process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
+process.hiEvtAnalyzer.doMC = cms.bool(False)
+process.hiEvtAnalyzer.doEvtPlane = cms.bool(False)
+process.hiEvtAnalyzer.doVertex = cms.bool(False)
+process.hiEvtAnalyzer.doMC = cms.bool(False)
 
 process.hltanalysis.dummyBranches = cms.untracked.vstring()
 
-process.hltAna = cms.EndPath(process.hltanalysis)
-process.reco_extra=cms.Path(process.RawToDigi*process.L1Extra)
+process.reco_extra=cms.Path(process.RawToDigi*process.L1Extra*process.siPixelClusters*process.siPixelRecHits*process.hfreco*process.pACentrality)
+
+process.hltAna = cms.EndPath(process.hltanalysis+process.hiEvtAnalyzer)
 
 process.endjob_step = cms.EndPath(process.endOfProcess)
 
