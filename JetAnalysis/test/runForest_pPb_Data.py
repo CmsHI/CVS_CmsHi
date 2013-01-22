@@ -302,14 +302,15 @@ process.ppJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
 				     +process.akPu3CaloJetAnalyzer
 				     +process.akPu4CaloJetAnalyzer
 				     +process.akPu5CaloJetAnalyzer
-				     +process.akPu6CaloJetAnalyzer
+				     # +process.akPu6CaloJetAnalyzer
 				     +process.ak5PFJetAnalyzer
 				     +process.ak1CaloJetAnalyzer
 				     +process.ak2CaloJetAnalyzer
 				     +process.ak3CaloJetAnalyzer
 				     +process.ak4CaloJetAnalyzer
 				     +process.ak5CaloJetAnalyzer
-				     +process.ak6CaloJetAnalyzer)
+				     # +process.ak6CaloJetAnalyzer
+             )
 
 
 process.ana_step          = cms.Path( process.hcalNoise +
