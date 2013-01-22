@@ -1,6 +1,0 @@
-<use name=root>
-
-<export>
- <lib name=UserCodeHafHistogram>
- <use name=root>
-</export>
