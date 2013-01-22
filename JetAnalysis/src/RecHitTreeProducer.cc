@@ -119,7 +119,6 @@ struct MyZDCDigi{
   int    n;
   float  chargefC[10][18];
   int    adc[10][18];
-  int    ts[10][18];
   int    zside[18];
   int    section [18];
   int    channel[18];
@@ -706,18 +705,14 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
          }
 
 	 if (nhits  < 18) {	   
-	 	
 	   int ts = 0;   
 	   zdcDigi.zside[nhits] = zdcid.zside();	   
 	   zdcDigi.section[nhits] = zdcid.section();	   
 	   zdcDigi.channel[nhits] = zdcid.channel();
 
            for(int j1 = 0; j1 < rh.size(); j1++){
-
-	     zdcDigi.chargefC[ts][nhits] = calZDCDigi_?caldigi[ts]:rh[ts].nominal_fC();	   
-	     zdcDigi.adc[ts][nhits] = rh[ts].adc();	   
-	     zdcDigi.ts[ts][nhits] = ts;
-
+	     zdcDigi.chargefC[ts][nhits]=calZDCDigi_?caldigi[ts]:rh[ts].nominal_fC();
+	     zdcDigi.adc[ts][nhits]= rh[ts].adc();	  
              ts++;
 	   }
          }
@@ -834,9 +829,14 @@ RecHitTreeProducer::beginJob()
     zdcDigiTree->Branch("zside",zdcDigi.zside,"zside[n]/I");
     zdcDigiTree->Branch("section",zdcDigi.section,"section[n]/I");
     zdcDigiTree->Branch("channel",zdcDigi.channel,"channel[n]/I");
-    // zdcDigiTree->Branch("ts",zdcDigi.ts,"ts["+nZdcTsSt+"][n]/I");
-    zdcDigiTree->Branch("adc",zdcDigi.adc,"adc["+nZdcTsSt+"][n]/I");
-    zdcDigiTree->Branch("chargefC",zdcDigi.chargefC,"chargefC["+nZdcTsSt+"][n]/F");
+    
+    for( int i=0; i<nZdcTs_;i++){
+      TString adcTsSt("adcTs"), chargefCTsSt("chargefCTs"); 
+      adcTsSt+=i; chargefCTsSt+=i;
+
+      zdcDigiTree->Branch(adcTsSt,zdcDigi.adc[i],adcTsSt+"[n]/I");
+      zdcDigiTree->Branch(chargefCTsSt,zdcDigi.chargefC[i],chargefCTsSt+"[n]/F");
+    }
   }
 
   if (saveBothVtx_) {
