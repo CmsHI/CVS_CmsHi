@@ -14,7 +14,7 @@
 // Original Author:  Yetkin Yilmaz
 // Modified: Frank Ma, Yen-Jie Lee
 //         Created:  Tue Sep  7 11:38:19 EDT 2010
-// $Id: RecHitTreeProducer.cc,v 1.22 2013/01/16 17:22:56 yilmaz Exp $
+// $Id: RecHitTreeProducer.cc,v 1.26 2013/01/22 11:26:52 mojoe137 Exp $
 //
 //
 
@@ -99,6 +99,8 @@ struct MyRecHit{
   float perpVtx[MAXHITS];
   float emEtVtx[MAXHITS];
   float hadEtVtx[MAXHITS];
+
+  int saturation[MAXHITS];
 
    float jtpt;
    float jteta;
@@ -632,6 +634,8 @@ RecHitTreeProducer::analyze(const edm::Event& ev, const edm::EventSetup& iSetup)
 	   castorRecHit.iphi[nhits] = castorid.sector();	   
 	   castorRecHit.depth[nhits] = castorid.module();	   
 	   castorRecHit.phi[nhits] = getPhi(castorid);
+	   castorRecHit.saturation[nhits] = static_cast<int>( rh.flagField(HcalCaloFlagLabels::ADCSaturationBit) );
+
        }
 
        nhits++;
@@ -808,6 +812,7 @@ RecHitTreeProducer::beginJob()
     castorTree->Branch("iphi",castorRecHit.iphi,"iphi[n]/I");
     castorTree->Branch("phi",castorRecHit.phi,"phi[n]/F");
     castorTree->Branch("depth",castorRecHit.depth,"depth[n]/I");
+    castorTree->Branch("saturation",castorRecHit.saturation,"saturation[n]/I");
   }
 
   if(doZDCRecHit_){
