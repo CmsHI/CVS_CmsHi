@@ -15,7 +15,7 @@ hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
 doElectrons = False
-storeAllRecHits = True
+storeAllRecHits = False
 
 
 #####################################################################################
