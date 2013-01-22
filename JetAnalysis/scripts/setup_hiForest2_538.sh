@@ -42,7 +42,7 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_41 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_43 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 #PixelTrack
