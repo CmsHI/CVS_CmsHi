@@ -16,14 +16,14 @@ cvs co -r HiForest_V02_00 -d       edwenger/Skims                           User
 cvs co -r HiForest_V02_00 -d       edwenger/VertexAnalyzer                  UserCode/edwenger/VertexAnalyzer
 cvs co -r HiForest_V02_00 -d       SpectraAna/JetEtaPhiFilter               UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
 cvs co -r HiForest_V02_00 -d       SpectraAna/TrackSpectraAnalyzer          UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
-cvs co -r HiForest_V02_09 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r HiForest_V02_12 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -r HiForest_V02_00          UserCode/FerencSiklerVertexing
 
 # pat macros
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
 cvs co -r HiForest_V02_00 -d       MNguyen/Configuration  UserCode/MNguyen/Configuration
-cvs co -r pPbProd_v04              HeavyIonsAnalysis/Configuration
+cvs co -r pPbProd_v05              HeavyIonsAnalysis/Configuration
 
 # pi0 analyzer (optional)
 cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Analyzer
@@ -42,7 +42,7 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_45 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_46 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 #PixelTrack
@@ -63,7 +63,7 @@ cvs co -r hi538_01 HLTrigger/HLTanalyzers
 cvs co -r  HiForest_V02_02 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
-cvs co -r HiForest_V02_04 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
+cvs co -r HiForest_V02_05 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 # Build!
 
