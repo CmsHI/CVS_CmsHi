@@ -168,10 +168,6 @@ process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag(trkTag)
 
-# Jet corrections should be switched to pp tracking
-process.akPu5PFcorr.payload = 'AK5PF_generalTracks'
-process.ak5PFcorr.payload = 'AK5PF_generalTracks'
-
 process.genpana = cms.EDAnalyzer("GenParticleCounter",
                                  src = cms.untracked.string("hiGenParticles"),
                                  doCentrality = cms.untracked.bool(False),
