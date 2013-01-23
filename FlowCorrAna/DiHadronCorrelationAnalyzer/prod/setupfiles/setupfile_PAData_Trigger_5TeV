@@ -16,10 +16,11 @@ export ZVTXBIN=300
 export ZVTXMIN=-150
 export ZVTXMAX=150
 
-export PTTRGMINARRAY="1.0"
-export PTTRGMAXARRAY="3.0"
-export PTASSMINARRAY="1.0"
-export PTASSMAXARRAY="3.0"
+export PTTRGMINARRAY="0.1 1.0 2.0 4.0 6.0"
+export PTTRGMAXARRAY="1.0 2.0 4.0 6.0 12.0"
+export PTASSMINARRAY="0.1 1.0 2.0 4.0 6.0"
+export PTASSMAXARRAY="1.0 2.0 4.0 6.0 12.0"
+
 #export PTTRGMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0 6.0 8.0 1.0"
 #export PTTRGMAXARRAY="1.0 2.0 3.0 4.0 5.0 6.0 8.0 12.0 3.0"
 #export PTASSMINARRAY="0.1 1.0 2.0 3.0 4.0 5.0 6.0 8.0 1.0"
@@ -43,12 +44,12 @@ export ETAASSMAX=2.4
 #export NVTXMAX=1
 export ISFULLMATRIX=1
 
-export ISCORR=0
+export ISCORR=1
 #export ISTRACKNTUPLE=1
 #export ISHI=0
 
-export TRGID="Lambda"
+export TRGID="Track"
 export ASSID="Track"
 
-NMIN=(-1)
-NMAX=(-1)
+NMIN=(220)
+NMAX=(260)

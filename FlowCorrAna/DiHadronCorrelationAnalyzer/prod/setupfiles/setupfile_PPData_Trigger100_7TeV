@@ -1,5 +1,5 @@
 #!/bin/sh
-source $CMSSW_BASE/src/WeisQCDAna/DiHadronCorrelationAnalyzer/prod/corr_ana/setupfiles/setupfile_BASE_HighMult
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
 export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
 #export TRGHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trgEff100New.root"
 export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trkEff_pp_highmult_42X_origin.root"
