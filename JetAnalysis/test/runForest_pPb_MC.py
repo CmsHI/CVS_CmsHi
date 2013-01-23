@@ -86,10 +86,6 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 process.load('PhysicsTools.PatAlgos.patSequences_cff')
 
-process.sim_step = cms.Path(process.mix*
-                            process.SimL1Emulator*
-                            process.simSiPixelDigis*process.simSiStripDigis)
-
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
@@ -450,7 +446,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 #process.postHLTschedule = cms.Schedule(
 process.schedule = cms.Schedule(
     process.HLT_PAZeroBiasPixel_SingleTrack_v1,
-    process.sim_step,process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step,
+    process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step,
 #                                process.extrapatstep,
                                 process.ana_step,
     process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,
