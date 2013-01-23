@@ -35,9 +35,8 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-                            # fileNames = cms.untracked.vstring("file:/d102/yetkin/analysis/d0116/FE6E7D35-895E-E211-B3E4-003048D2BEA8.root")
-                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/498/00000/EC4DD4E5-1463-E211-B588-001D09F276CF.root")
-#                            fileNames = cms.untracked.vstring("file:PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
+#                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/498/00000/EC4DD4E5-1463-E211-B588-001D09F276CF.root")
+                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/y/yjlee/public/pPbDijet.root")
 			    )
 
 # Number of events we want to process, -1 = all events
@@ -290,15 +289,15 @@ if storeAllRecHits:
     process.rechitanalyzer.EETreePtMin = cms.untracked.double(-100000)
     process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(-100000)
 
-# Yen-Jie remove ak[1-4,6]PF for the moment because JEC is not yet ready
-process.ppJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
+# Possibility of removing problematic algorithms when needed
+process.partialJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
                                      +process.akPu5PFJetAnalyzer
 				     +process.akPu1CaloJetAnalyzer
 				     +process.akPu2CaloJetAnalyzer
 				     +process.akPu3CaloJetAnalyzer
 				     +process.akPu4CaloJetAnalyzer
 				     +process.akPu5CaloJetAnalyzer
-				     # +process.akPu6CaloJetAnalyzer
+                                     # +process.akPu6CaloJetAnalyzer
 				     +process.ak5PFJetAnalyzer
 				     +process.ak1CaloJetAnalyzer
 				     +process.ak2CaloJetAnalyzer
@@ -306,12 +305,11 @@ process.ppJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
 				     +process.ak4CaloJetAnalyzer
 				     +process.ak5CaloJetAnalyzer
 				     # +process.ak6CaloJetAnalyzer
-             )
+                                    )
 
 
 process.ana_step          = cms.Path( process.hcalNoise +
-#                                      process.jetAnalyzers +                                      
-                                      process.ppJetAnalyzers +
+                                      process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
                                       process.ppTrack +
                                       process.pixelTrack +
