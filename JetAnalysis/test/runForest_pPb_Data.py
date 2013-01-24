@@ -9,7 +9,7 @@ process.options = cms.untracked.PSet(
 )
 
 
-lightMode = False
+lightMode = True
 
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
@@ -397,3 +397,7 @@ if lightMode:
     process.ana_step.remove(process.pixelTrack)
     process.pfcandAnalyzer.skipCharged = cms.untracked.bool(False)
 
+    process.rechitanalyzer.doCASTOR = cms.untracked.bool(False)
+    process.rechitanalyzer.doZDCRecHit  = cms.untracked.bool(False)
+    process.rechitanalyzer.doZDCDigi  = cms.untracked.bool(False)
+    
