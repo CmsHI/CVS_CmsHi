@@ -17,8 +17,8 @@ ivars.register ('secFiles',
 ivars.randomNumber = 1
 
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/dgulhan/pPb/Hijing_Pythia_pt120/RECOv3/reco1_prod1_hijing_fix_277_2_AKa.root"
-ivars.inputFiles = "file:prod1_hijing_fix_112_1_iOy.root"
-ivars.outputFile = './test_output.root'
+ivars.inputFiles = "file:./test_reco.root"
+ivars.outputFile = './test_forest.root'
 
 ivars.parseArguments()
 
@@ -233,6 +233,8 @@ process.ak6CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFl
 process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
+
+process.hiGenParticles.srcVector = cms.vstring('hiSignal','generator')
 
 process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
