@@ -8,6 +8,9 @@ process.options = cms.untracked.PSet(
   wantSummary = cms.untracked.bool(True)
 )
 
+
+lightMode = False
+
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
 
@@ -15,8 +18,9 @@ hiTrackQuality = "highPurity"              # iterative tracks
 #hiTrackQuality = "highPuritySetWithPV"    # calo-matched tracks
 
 doElectrons = False
-storeAllRecHits = False
 
+hitMin = 20 # currently ineffective : light mode drops completely
+pfMin = -999 # currently effective
 
 #####################################################################################
 
@@ -35,13 +39,13 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-#                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/498/00000/EC4DD4E5-1463-E211-B588-001D09F276CF.root")
-                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/y/yjlee/public/pPbDijet.root")
+                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/498/00000/EC4DD4E5-1463-E211-B588-001D09F276CF.root")
+#                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/y/yjlee/public/pPbDijet.root")
 			    )
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(20))
+            input = cms.untracked.int32(100))
 
 
 #####################################################################################
@@ -70,7 +74,7 @@ process.load('PhysicsTools.PatAlgos.patSequences_cff')
 #from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag,; 'auto:com10_PIon', '')
 
-process.GlobalTag.globaltag = 'GR_E_V33::All'
+process.GlobalTag.globaltag = 'GR_P_V43D::All'
 
 
 # load centrality
@@ -134,7 +138,7 @@ process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
 process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
 process.pfcandAnalyzer.skipCharged = False
-process.pfcandAnalyzer.pfPtMin = 0
+process.pfcandAnalyzer.pfPtMin = pfMin
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag(trkTag)
 
 #########################
@@ -283,31 +287,15 @@ process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClus
 
 # Rechit analyzer setup
 
-if storeAllRecHits:
-    process.rechitanalyzer.HFTreePtMin = cms.untracked.double(-100000)
-    process.rechitanalyzer.EBTreePtMin = cms.untracked.double(-100000)
-    process.rechitanalyzer.EETreePtMin = cms.untracked.double(-100000)
-    process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(-100000)
+if lightMode:
+    process.rechitanalyzer.doEbyEonly = cms.untracked.bool(True)
+else:
+    process.rechitanalyzer.HFTreePtMin = cms.untracked.double(hitMin)
+    process.rechitanalyzer.EBTreePtMin = cms.untracked.double(hitMin)
+    process.rechitanalyzer.EETreePtMin = cms.untracked.double(hitMin)
+    process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(hitMin)    
 
-# Possibility of removing problematic algorithms when needed
-process.partialJetAnalyzers = cms.Sequence(process.icPu5JetAnalyzer
-                                     +process.akPu5PFJetAnalyzer
-				     +process.akPu1CaloJetAnalyzer
-				     +process.akPu2CaloJetAnalyzer
-				     +process.akPu3CaloJetAnalyzer
-				     +process.akPu4CaloJetAnalyzer
-				     +process.akPu5CaloJetAnalyzer
-                                     # +process.akPu6CaloJetAnalyzer
-				     +process.ak5PFJetAnalyzer
-				     +process.ak1CaloJetAnalyzer
-				     +process.ak2CaloJetAnalyzer
-				     +process.ak3CaloJetAnalyzer
-				     +process.ak4CaloJetAnalyzer
-				     +process.ak5CaloJetAnalyzer
-				     # +process.ak6CaloJetAnalyzer
-                                    )
-
-
+process.jetAnalyzers.remove(process.akPu6CaloJetAnalyzer)
 process.ana_step          = cms.Path( process.hcalNoise +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
@@ -398,3 +386,14 @@ process.schedule = cms.Schedule(
 #                               fileName = cms.untracked.string("output.root")
 #                               )
 #process.save = cms.EndPath(process.out)
+
+
+if lightMode:
+    process.jetAnalyzers.remove(process.akPu1PFJetAnalyzer)
+    process.jetAnalyzers.remove(process.ak1PFJetAnalyzer)       
+    process.jetAnalyzers.remove(process.akPu1CaloJetAnalyzer)
+    process.jetAnalyzers.remove(process.ak1CaloJetAnalyzer)
+    
+    process.ana_step.remove(process.pixelTrack)
+    process.pfcandAnalyzer.skipCharged = cms.untracked.bool(False)
+
