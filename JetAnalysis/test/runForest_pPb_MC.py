@@ -388,7 +388,7 @@ process.ana_step          = cms.Path(
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
-#                                      process.randomCones +
+                                      process.randomCones +
                                       process.HiForest
                                       )
 

@@ -7,7 +7,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
+#include "DataFormats/HeavyIonEvent/interface/CentralityProvider.h"
 #include "DataFormats/HeavyIonEvent/interface/EvtPlane.h"
 #include "TNtuple.h"
 #include "TH2D.h"
@@ -91,7 +91,6 @@ protected:
    TNtuple* ntRandom0;
    TNtuple* ntRandom1;
 
-  edm::Handle<reco::Centrality> cent;
   edm::Handle<pat::JetCollection> patjets;
 
   std::vector<TH2D*> hTowers;
@@ -114,6 +113,7 @@ protected:
 
    const CaloGeometry *geo;
    edm::Service<TFileService> f;
+  CentralityProvider * centrality_;
 };
 
 
@@ -191,9 +191,12 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
      etaMax_(3),
      iev_(0),
      geo(0),
-     cbins_(0),
+     centrality_(0),
      cone_(1)
 {
+
+  doAreaFastjet_ = false;
+  doRhoFastjet_ = false;
 
    puSubtractorName_  =  iConfig.getParameter<string> ("subtractorName");
    subtractor_ =  boost::shared_ptr<PileUpSubtractor>(PileUpSubtractorFactory::get()->create( puSubtractorName_, iConfig));
@@ -414,8 +417,9 @@ void JetAlgorithmAnalyzer::fillBkgNtuple(const PileUpSubtractor* subtractor, int
 void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
 
-  //  if(doAnalysis_)   subtractor_->setDebug(1);
-  //  else subtractor_->setDebug(0);
+  if(!centrality_) centrality_ = new CentralityProvider(iSetup);
+  centrality_->newEvent(iEvent,iSetup);
+
    phi0_ = 0;
 
    if(!geo){
@@ -425,20 +429,16 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    }
 
    iEvent.getByLabel(PatJetSrc_,patjets);
-   iEvent.getByLabel(centTag_,cent);
-   if(!cbins_) cbins_ = getCentralityBinsFromDB(iSetup);
 
-   hf_ = cent->EtHFhitSum();
-   sumET_ = cent->EtMidRapiditySum();
-   bin_ = cbins_->getBin(hf_);
+   hf_ = centrality_->centralityValue();
+   sumET_ = centrality_->raw()->Ntracks();
+   bin_ = centrality_->getBin();
    
-   if(centBin_ >= 0 && bin_ != centBin_) return;
-   
-   LogDebug("VirtualJetProducer") << "Entered produce\n";
+   //   cout<<("VirtualJetProducer") << "Entered produce\n";
    //determine signal vertex
    vertex_=reco::Jet::Point(0,0,0);
    if (makeCaloJet(jetTypeE)&&doPVCorrection_) {
-      LogDebug("VirtualJetProducer") << "Adding PV info\n";
+     //     cout<<("VirtualJetProducer") << "Adding PV info\n";
       edm::Handle<reco::VertexCollection> pvCollection;
       iEvent.getByLabel(srcPVs_,pvCollection);
       if (pvCollection->size()>0) vertex_=pvCollection->begin()->position();
@@ -452,7 +452,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    }
 
    // clear data
-   LogDebug("VirtualJetProducer") << "Clear data\n";
+   //   cout<<("VirtualJetProducer") << "Clear data\n";
    fjInputs_.clear();
    fjJets_.clear();
    inputs_.clear();  
@@ -470,14 +470,14 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    for (size_t i = 0; i < inputsHandle->size(); ++i) {
       inputs_.push_back(inputsHandle->ptrAt(i));
    }
-   LogDebug("VirtualJetProducer") << "Got inputs\n";
+   //   cout<<("VirtualJetProducer") << "Got inputs\n";
   
    // Convert candidates to fastjet::PseudoJets.
    // Also correct to Primary Vertex. Will modify fjInputs_
    // and use inputs_
    fjInputs_.reserve(inputs_.size());
    inputTowers();
-   LogDebug("VirtualJetProducer") << "Inputted towers\n";
+   //   cout<<("VirtualJetProducer") << "Inputted towers\n";
 
    fillTowerNtuple(fjInputs_,0);
    fillBkgNtuple(subtractor_.get(),0);
@@ -497,7 +497,7 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       fillTowerNtuple(fjInputs_,2);
       fillBkgNtuple(subtractor_.get(),2);
 
-      LogDebug("VirtualJetProducer") << "Subtracted pedestal\n";
+      //      cout<<("VirtualJetProducer") << "Subtracted pedestal\n";
    }
 
    // Run algorithm. Will modify fjJets_ and allocate fjClusterSeq_. 
@@ -506,13 +506,13 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
 
    fillTowerNtuple(fjInputs_,3);
    fillBkgNtuple(subtractor_.get(),3);
-   fillJetNtuple(fjJets_,3);
+   //   fillJetNtuple(fjJets_,3);
 
 ///   if ( doPUOffsetCorr_ ) {
 ///      subtractor_->setAlgorithm(fjClusterSeq_);
 ///   }
 
-   LogDebug("VirtualJetProducer") << "Ran algorithm\n";
+//   cout<<("VirtualJetProducer") << "Ran algorithm\n";
 
    // For Pileup subtraction using offset correction:
    // Now we find jets and need to recalculate their energy,
@@ -525,18 +525,18 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
       subtractor_->calculateOrphanInput(orphanInput);
       fillTowerNtuple(orphanInput,4);
       fillBkgNtuple(subtractor_.get(),4);
-      fillJetNtuple(fjJets_,4);
+      //      fillJetNtuple(fjJets_,4);
 
       //only the id's of the orphan input are used, not their energy
       subtractor_->calculatePedestal(orphanInput);
       fillTowerNtuple(orphanInput,5);
       fillBkgNtuple(subtractor_.get(),5);
-      fillJetNtuple(fjJets_,5);
+      //      fillJetNtuple(fjJets_,5);
 
       subtractor_->offsetCorrectJets();
       fillTowerNtuple(orphanInput,6);
       fillBkgNtuple(subtractor_.get(),6);
-      fillJetNtuple(fjJets_,6);
+      //      fillJetNtuple(fjJets_,6);
 
    }
   
@@ -546,9 +546,9 @@ void JetAlgorithmAnalyzer::produce(edm::Event& iEvent,const edm::EventSetup& iSe
    // this will use inputs_
    output( iEvent, iSetup );
    fillBkgNtuple(subtractor_.get(),7);
-   fillJetNtuple(fjJets_,7);
+   //  fillJetNtuple(fjJets_,7);
 
-   LogDebug("VirtualJetProducer") << "Wrote jets\n";
+   //   cout<<("VirtualJetProducer") << "Wrote jets\n";
 
    ++iev_;
 
@@ -561,27 +561,28 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
    // Write jets and constitutents. Will use fjJets_, inputs_                          
    // and fjClusterSeq_                                                                
 
-  //  cout<<"output running "<<endl;
+  cout<<"output running "<<endl;
+  //  return;
 
    switch( jetTypeE ) {
    case JetType::CaloJet :
-      writeJets<reco::CaloJet>( iEvent, iSetup);
+     //      writeJets<reco::CaloJet>( iEvent, iSetup);
       writeBkgJets<reco::CaloJet>( iEvent, iSetup);
       break;
    case JetType::PFJet :
-     writeJets<reco::PFJet>( iEvent, iSetup);
+     //     writeJets<reco::PFJet>( iEvent, iSetup);
       writeBkgJets<reco::PFJet>( iEvent, iSetup);
       break;
    case JetType::GenJet :
-     writeJets<reco::GenJet>( iEvent, iSetup);
+     //     writeJets<reco::GenJet>( iEvent, iSetup);
       writeBkgJets<reco::GenJet>( iEvent, iSetup);
       break;
    case JetType::TrackJet :
-     writeJets<reco::TrackJet>( iEvent, iSetup);
+     //     writeJets<reco::TrackJet>( iEvent, iSetup);
       writeBkgJets<reco::TrackJet>( iEvent, iSetup);
       break;
    case JetType::BasicJet :
-     writeJets<reco::BasicJet>( iEvent, iSetup);
+     //     writeJets<reco::BasicJet>( iEvent, iSetup);
       writeBkgJets<reco::BasicJet>( iEvent, iSetup);
       break;
    default:
@@ -595,6 +596,9 @@ template< typename T >
 void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup const& iSetup )
 {
    // produce output jet collection
+
+  cout<<"Started the Random Cones"<<endl;
+
 
    using namespace reco;
 
@@ -640,7 +644,6 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
    fjFakeJets_.reserve(nFill_);
    constituents_.reserve(nFill_);
 
-   constituents_.reserve(nFill_);
    for(int ijet = 0; ijet < nFill_; ++ijet){
       vector<reco::CandidatePtr> vec;
       constituents_.push_back(vec);
@@ -664,12 +667,6 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 
 
    for(unsigned int iy = 0; iy < inputs_.size(); ++iy){
-
-     /*
-   for (vector<fastjet::PseudoJet>::const_iterator input_object = fjInputs_.begin (),
-	   fjInputsEnd = fjInputs_.end();
-	input_object != fjInputsEnd; ++input_object) {
-     */
 
      const reco::CandidatePtr & tower=inputs_[iy];
      const CaloTower* ctc = dynamic_cast<const CaloTower*>(tower.get());

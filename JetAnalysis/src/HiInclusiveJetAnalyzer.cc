@@ -65,6 +65,7 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
 
   rParam = iConfig.getParameter<double>("rParam");
   hardPtMin_ = iConfig.getUntrackedParameter<double>("hardPtMin",4);  
+  jetPtMin_ = iConfig.getUntrackedParameter<double>("jetPtMin",0);
 
   if(isMC_){
     genjetTag_ = iConfig.getParameter<InputTag>("genjetTag");

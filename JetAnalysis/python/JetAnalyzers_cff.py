@@ -5,6 +5,7 @@ from CmsHi.JetAnalysis.inclusiveJetAnalyzer_cff import *
 
 inclusiveJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
 inclusiveJetAnalyzer.useCentrality   = cms.untracked.bool(False)
+inclusiveJetAnalyzer.jetPtMin = cms.untracked.double(10)
 
 icPu5JetAnalyzer = inclusiveJetAnalyzer.clone()
 

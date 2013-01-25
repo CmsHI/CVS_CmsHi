@@ -102,6 +102,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
   double rParam;
   double hardPtMin_;
+  double jetPtMin_;
 
   TTree *t;
   edm::Service<TFileService> fs1;
