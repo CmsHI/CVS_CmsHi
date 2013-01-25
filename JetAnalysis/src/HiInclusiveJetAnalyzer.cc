@@ -455,6 +455,8 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
    for(unsigned int j = 0; j < jets->size(); ++j){
      const reco::Jet& jet = (*jets)[j];     
+
+     if(jets_.jtpt[jets_.nref] < jetPtMin_) continue;
      if (useJEC_ && usePat_){
        jets_.rawpt[jets_.nref]=(*patjets)[j].correctedJet("Uncorrected").pt();
      }
