@@ -3,6 +3,12 @@ import FWCore.ParameterSet.Config as cms
 # reco jet with russian pileup subtraction
 from RecoHI.HiJetAlgos.HiRecoJets_cff import *
 from RecoHI.HiJetAlgos.HiRecoPFJets_cff import *
+from RecoJets.JetProducers.JetIDParams_cfi import *
+
+ak5JetID = cms.EDProducer('JetIDProducer', JetIDParams,
+           src = cms.InputTag('ak5CaloJets')
+           )
+
 
 akPu3CaloJets = cms.EDProducer(
     "FastjetJetProducer",
@@ -104,10 +110,44 @@ akPu4CaloJets.puPtMin = cms.double(5.0)
 akPu5CaloJets.puPtMin = cms.double(5.0)
 akPu6CaloJets.puPtMin = cms.double(5.0)
 
+# jet ID producer
+ak1CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak1CaloJets'))
+ak2CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak2CaloJets'))
+ak3CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak3CaloJets'))
+ak4CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak4CaloJets'))
+ak5CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak5CaloJets'))
+ak6CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak6CaloJets'))
+akPu1CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu1CaloJets'))
+akPu2CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu2CaloJets'))
+akPu3CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu3CaloJets'))
+akPu4CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu4CaloJets'))
+akPu5CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu5CaloJets'))
+akPu6CaloJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu6CaloJets'))
+
+ak1PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak1PFJets'))
+ak2PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak2PFJets'))
+ak3PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak3PFJets'))
+ak4PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak4PFJets'))
+ak5PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak5PFJets'))
+ak6PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('ak6PFJets'))
+akPu1PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu1PFJets'))
+akPu2PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu2PFJets'))
+akPu3PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu3PFJets'))
+akPu4PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu4PFJets'))
+akPu5PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu5PFJets'))
+akPu6PFJetID= cms.EDProducer('JetIDProducer', JetIDParams, src = cms.InputTag('akPu6PFJets'))
+
+
 recoAk1to6 = cms.Sequence( akPu1PFJets * akPu2PFJets *akPu3PFJets * akPu4PFJets * akPu5PFJets * akPu6PFJets *
                            ak1PFJets * ak2PFJets *ak3PFJets * ak4PFJets * ak5PFJets * ak6PFJets *
                            akPu1CaloJets * akPu2CaloJets *akPu3CaloJets * akPu4CaloJets * akPu5CaloJets * akPu6CaloJets *
                            ak1CaloJets * ak2CaloJets *ak3CaloJets * ak4CaloJets * ak5CaloJets * ak6CaloJets
+                           )
+
+recoAk1to6ID = cms.Sequence( akPu1PFJetID * akPu2PFJetID *akPu3PFJetID * akPu4PFJetID * akPu5PFJetID * akPu6PFJetID *
+                           ak1PFJetID * ak2PFJetID *ak3PFJetID * ak4PFJetID * ak5PFJetID * ak6PFJetID *
+                           akPu1CaloJetID * akPu2CaloJetID *akPu3CaloJetID * akPu4CaloJetID * akPu5CaloJetID * akPu6CaloJetID *
+                           ak1CaloJetID * ak2CaloJetID *ak3CaloJetID * ak4CaloJetID * ak5CaloJetID * ak6CaloJetID
                            )
 
 
