@@ -74,8 +74,7 @@ ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6Calopa
 
 ak1PFJetAnalyzer.skipCorrections = cms.untracked.bool(True)
 
-jetAnalyzers = cms.Sequence(icPu5JetAnalyzer+
-
+jetAnalyzers = cms.Sequence(
                             akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +
                             akPu3PFJetAnalyzer +

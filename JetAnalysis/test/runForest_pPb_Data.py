@@ -265,7 +265,7 @@ process.pfTrack.TkColList = cms.VInputTag(trkTag)
 
 process.reco_extra_jet    = cms.Path(process.iterativeConePu5CaloJets *
                                      process.iterativeCone5CaloJets *
-                                     process.recoAk1to6 
+                                     process.recoJetsWithID 
 #                                     *process.photon_extra_reco
                                      )
 process.gen_step          = cms.Path( process.hiGen )

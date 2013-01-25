@@ -108,11 +108,11 @@ HiInclusiveJetAnalyzer::HiInclusiveJetAnalyzer(const edm::ParameterSet& iConfig)
     }
   }
 
-  cout<<" jet collection : "<<jetTag_<<endl;
+  //  cout<<" jet collection : "<<jetTag_<<endl;
   doSubEvent_ = 0;
 
   if(isMC_){
-     cout<<" genjet collection : "<<genjetTag_<<endl;
+    //     cout<<" genjet collection : "<<genjetTag_<<endl;
      genPtMin_ = iConfig.getUntrackedParameter<double>("genPtMin",0);
      doSubEvent_ = iConfig.getUntrackedParameter<bool>("doSubEvent",1);
   }
@@ -450,7 +450,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 	 jets_.discr_tcHighPur[jets_.nref] = (*patjets)[j].bDiscriminator("akPu3PFTrackCountingHighPurBJetTags");
        }
        else{
-	 cout<<" b-tagging variables not filled for this collection, turn of doLifeTimeTagging "<<endl;
+	 //	 cout<<" b-tagging variables not filled for this collection, turn of doLifeTimeTagging "<<endl;
        }
 
        const reco::SecondaryVertexTagInfo& tagInfoSV=*(*patjets)[j].tagInfoSecondaryVertex();

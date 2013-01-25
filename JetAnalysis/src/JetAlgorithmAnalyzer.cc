@@ -318,8 +318,8 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
    int nj = jets.size();
 
    if(printDebug){
-   cout<<"step : "<<step<<endl;
-   cout<<"Size of input : "<<nj<<endl;
+     //   cout<<"step : "<<step<<endl;
+     //   cout<<"Size of input : "<<nj<<endl;
    }
    for(unsigned int i = 0; i < jets.size(); ++i){
      const fastjet::PseudoJet& jet = jets[i];
@@ -353,7 +353,7 @@ void JetAlgorithmAnalyzer::fillNtuple(int output, const  std::vector<fastjet::Ps
      nt->Fill(jet.eta(),phi,pt,step,iev_);
      h->Fill(jet.eta(),phi,pt);
    }
-   if(printDebug){
+   if(printDebug && 0){
    cout<<"-----------------------------"<<endl;
    cout<<"STEP             = "<<step<<endl;   
    cout<<"Total ET         = "<<totet<<endl;
@@ -597,7 +597,7 @@ void JetAlgorithmAnalyzer::writeBkgJets( edm::Event & iEvent, edm::EventSetup co
 {
    // produce output jet collection
 
-  cout<<"Started the Random Cones"<<endl;
+  //  cout<<"Started the Random Cones"<<endl;
 
 
    using namespace reco;

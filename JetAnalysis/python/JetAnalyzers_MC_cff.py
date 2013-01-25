@@ -69,8 +69,8 @@ ak6CaloJetAnalyzer.isMC = cms.untracked.bool(True)
 
 
 
-jetAnalyzers = cms.Sequence(icPu5JetAnalyzer +
-
+jetAnalyzers = cms.Sequence(
+    
                             akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +
                             akPu3PFJetAnalyzer +
