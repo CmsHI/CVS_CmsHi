@@ -811,25 +811,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
      jets_.jtpu[jets_.nref] = jet.pileup();
      jets_.jtm[jets_.nref] = jet.mass();
 	 
-     if(isMC_ && usePat_){
-
-       for(UInt_t i = 0; i < genparts->size(); ++i){
-	 const reco::GenParticle& p = (*genparts)[i];
-	 if (p.status()!=1) continue;
-	 if (p.charge()==0) continue;
-	 double dr = deltaR(jet,p);
-	 if(dr < rParam){
-	   double ppt = p.pt();
-	   jets_.genChargedSum[jets_.nref] += ppt;
-	   if(ppt > hardPtMin_) jets_.genHardSum[jets_.nref] += ppt;
-	   if(p.collisionId() == 0){
-	     jets_.signalChargedSum[jets_.nref] += ppt;
-	     if(ppt > hardPtMin_) jets_.signalHardSum[jets_.nref] += ppt;
-	   }
-
-	 }
-       }
-
+     if(usePat_){
 
        jets_.fHPD[jets_.nref] = (*patjets)[j].jetID().fHPD;
        jets_.fRBX[jets_.nref] = (*patjets)[j].jetID().fRBX;
@@ -858,6 +840,32 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
        jets_.fShort[jets_.nref] = (*patjets)[j].jetID().fShort;
        jets_.fLS[jets_.nref] = (*patjets)[j].jetID().fLS;
        jets_.fHFOOT[jets_.nref] = (*patjets)[j].jetID().fHFOOT;
+
+
+     }
+
+     if(isMC_){
+
+       for(UInt_t i = 0; i < genparts->size(); ++i){
+         const reco::GenParticle& p = (*genparts)[i];
+         if (p.status()!=1) continue;
+         if (p.charge()==0) continue;
+         double dr = deltaR(jet,p);
+         if(dr < rParam){
+           double ppt = p.pt();
+           jets_.genChargedSum[jets_.nref] += ppt;
+           if(ppt > hardPtMin_) jets_.genHardSum[jets_.nref] += ppt;
+           if(p.collisionId() == 0){
+             jets_.signalChargedSum[jets_.nref] += ppt;
+             if(ppt > hardPtMin_) jets_.signalHardSum[jets_.nref] += ppt;
+           }
+
+         }
+       }
+
+     }
+
+     if(isMC_ && usePat_){
 
 
        const reco::GenJet * genjet = (*patjets)[j].genJet();

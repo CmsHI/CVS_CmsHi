@@ -561,7 +561,7 @@ void JetAlgorithmAnalyzer::output(edm::Event & iEvent, edm::EventSetup const& iS
    // Write jets and constitutents. Will use fjJets_, inputs_                          
    // and fjClusterSeq_                                                                
 
-  cout<<"output running "<<endl;
+  //  cout<<"output running "<<endl;
   //  return;
 
    switch( jetTypeE ) {
