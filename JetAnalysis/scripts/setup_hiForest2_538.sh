@@ -60,11 +60,13 @@ cvs co -r HEAD -d                  CmsHi/JetAnalysis/scripts UserCode/CmsHi/JetA
 cvs co -r hi538_01 HLTrigger/HLTanalyzers
 
 # event analyzer
-cvs co -r  HiForest_V02_02 -d       CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
+cvs co -r  HiForest_V02_02 -d      CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 
 # muon analyzer
 cvs co -r HiForest_V02_05 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
+# X analyzer
+cvs co -r format_1_11  -d          XbFrame/Xb_frame/UserCode/NTUHEP/Xb_frame
 # Build!
 
 scram build -c
