@@ -5,11 +5,6 @@ from RecoHI.HiJetAlgos.HiRecoJets_cff import *
 from RecoHI.HiJetAlgos.HiRecoPFJets_cff import *
 from RecoJets.JetProducers.JetIDParams_cfi import *
 
-ak5JetID = cms.EDProducer('JetIDProducer', JetIDParams,
-           src = cms.InputTag('ak5CaloJets')
-           )
-
-
 akPu3CaloJets = cms.EDProducer(
     "FastjetJetProducer",
     HiCaloJetParameters,
