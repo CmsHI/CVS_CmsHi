@@ -202,7 +202,7 @@ HiInclusiveJetAnalyzer::beginJob() {
 
   t->Branch("fHPD",jets_.fHPD,"fHPD[nref]");
   t->Branch("fRBX",jets_.fRBX,"fRBX[nref]");
-  t->Branch("n90Hits",jets_.n90Hits,"n90Hits[nref]");
+  t->Branch("n90",jets_.n90,"n90[nref]");
   t->Branch("fSubDet1",jets_.fSubDet1,"fSubDet1[nref]");
   t->Branch("fSubDet2",jets_.fSubDet2,"fSubDet2[nref]");
   t->Branch("fSubDet3",jets_.fSubDet3,"fSubDet3[nref]");
@@ -213,7 +213,7 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("apprHPD",jets_.apprHPD,"apprHPD[nref]");
   t->Branch("apprRBX",jets_.apprRBX,"apprRBX[nref]");
 
-  t->Branch("hitsInN90",jets_.n90,"hitsInN90[nref]");
+  //  t->Branch("hitsInN90",jets_.n90,"hitsInN90[nref]");
   t->Branch("n2RPC",jets_.n2RPC,"n2RPC[nref]");
   t->Branch("n3RPC",jets_.n3RPC,"n3RPC[nref]");
   t->Branch("nRPC",jets_.nRPC,"nRPC[nref]");
@@ -815,7 +815,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
 
        jets_.fHPD[jets_.nref] = (*patjets)[j].jetID().fHPD;
        jets_.fRBX[jets_.nref] = (*patjets)[j].jetID().fRBX;
-       jets_.n90Hits[jets_.nref] = (*patjets)[j].jetID().n90Hits;
+       jets_.n90[jets_.nref] = (*patjets)[j].n90();
        jets_.fSubDet1[jets_.nref] = (*patjets)[j].jetID().fSubDetector1;
        jets_.fSubDet2[jets_.nref] = (*patjets)[j].jetID().fSubDetector2;
        jets_.fSubDet3[jets_.nref] = (*patjets)[j].jetID().fSubDetector3;
@@ -826,7 +826,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
        jets_.apprHPD[jets_.nref] = (*patjets)[j].jetID().approximatefHPD;
        jets_.apprRBX[jets_.nref] = (*patjets)[j].jetID().approximatefRBX;
 
-       jets_.n90[jets_.nref] = (*patjets)[j].jetID().hitsInN90;
+       //       jets_.n90[jets_.nref] = (*patjets)[j].jetID().hitsInN90;
        jets_.n2RPC[jets_.nref] = (*patjets)[j].jetID().numberOfHits2RPC;
        jets_.n3RPC[jets_.nref] = (*patjets)[j].jetID().numberOfHits3RPC;
        jets_.nRPC[jets_.nref] = (*patjets)[j].jetID().numberOfHitsRPC;

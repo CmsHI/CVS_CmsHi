@@ -188,7 +188,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
 
     float fHPD[MAXJETS];
     float fRBX[MAXJETS];
-    int n90Hits[MAXJETS];
+    int n90[MAXJETS];
     float fSubDet1[MAXJETS];
     float fSubDet2[MAXJETS];
     float fSubDet3[MAXJETS];
@@ -199,7 +199,7 @@ class HiInclusiveJetAnalyzer : public edm::EDAnalyzer {
     float apprHPD[MAXJETS];
     float apprRBX[MAXJETS];
 
-    int n90[MAXJETS];
+    //    int n90[MAXJETS];
     int n2RPC[MAXJETS];
     int n3RPC[MAXJETS];
     int nRPC[MAXJETS];
