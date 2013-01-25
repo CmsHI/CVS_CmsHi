@@ -13,13 +13,14 @@ akPu3PFConesAna = cms.EDProducer(
           useInputJets = cms.untracked.bool(True),
           inputJetSrc = cms.InputTag("akPu3PFpatJets"),
           useTowersForBkg = cms.bool(True),
-          centralityTag = cms.InputTag("hiCentrality"),
+          centralityTag = cms.InputTag("pACentrality"),
           evtPlaneTag = cms.InputTag("hiEvtPlane","recoLevel"),
           avoidNegative = cms.bool(False),
           patJetSrc = cms.untracked.InputTag("akPu3PFpatJets"),
        evtPlaneIndex = cms.untracked.int32(21),
        doBackToBack  = cms.untracked.bool(True),
-       centrality  = cms.untracked.int32(-1)
+       centrality  = cms.untracked.int32(-1),
+       doRecoEvtPlane  = cms.untracked.bool(False),
           )
 
 akPu3PFConesAna.doPUOffsetCorr = True
@@ -60,13 +61,13 @@ icPu5CaloConesAna = cms.EDProducer(
           )
 
 
-akPu5PFConesAna.puPtMin = cms.double(25)
-akPu3PFConesAna.puPtMin = cms.double(15)
+akPu5PFConesAna.puPtMin = cms.double(5)
+akPu3PFConesAna.puPtMin = cms.double(5)
 
-akPu3CaloConesAna.puPtMin = cms.double(10)
-akPu5CaloConesAna.puPtMin = cms.double(10)
+akPu3CaloConesAna.puPtMin = cms.double(5)
+akPu5CaloConesAna.puPtMin = cms.double(5)
 
-icPu5CaloConesAna.puPtMin = cms.double(10)
+icPu5CaloConesAna.puPtMin = cms.double(5)
 
 icPu5CaloConesAna.doPUOffsetCorr = True
 icPu5CaloConesAna.jetType = 'BasicJet'

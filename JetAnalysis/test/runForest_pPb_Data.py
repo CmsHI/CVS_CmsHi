@@ -20,7 +20,7 @@ hiTrackQuality = "highPurity"              # iterative tracks
 doElectrons = False
 
 hitMin = 20 # currently ineffective : light mode drops completely
-pfMin = -999 # currently effective
+pfMin = 1 # currently effective
 
 #####################################################################################
 
@@ -395,6 +395,9 @@ if lightMode:
     process.jetAnalyzers.remove(process.ak1CaloJetAnalyzer)
     
     process.ana_step.remove(process.pixelTrack)
+    process.ana_step.remove(process.rechitanalyzer)
+    process.ana_step.remove(process.pfTowers)
+
     process.pfcandAnalyzer.skipCharged = cms.untracked.bool(False)
 
     process.rechitanalyzer.doCASTOR = cms.untracked.bool(False)
