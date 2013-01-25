@@ -90,7 +90,6 @@ process.HeavyIonGlobalParameters = cms.PSet(
         
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
-process.RandomNumberGeneratorService.generator.initialSeed = 1
 process.RandomNumberGeneratorService.akPu2PFCones = process.RandomNumberGeneratorService.generator.clone()
 process.RandomNumberGeneratorService.akPu3PFCones = process.RandomNumberGeneratorService.generator.clone()
 process.RandomNumberGeneratorService.akPu4PFCones = process.RandomNumberGeneratorService.generator.clone()

@@ -244,6 +244,13 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
   produces<reco::CaloJetCollection>("randomCones");
   produces<std::vector<bool> >("directions");
 
+  if(backToBack_){
+    ntRandom0 = f->make<TNtuple>("ntRandom0","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+    ntRandom1 = f->make<TNtuple>("ntRandom1","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+  }else{
+    ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
+  }
+
   if(doAnalysis_){
      ntTowers = f->make<TNtuple>("ntTowers","Algorithm Analysis Towers","eta:phi:et:step:event");
      ntTowersFromEvtPlane = f->make<TNtuple>("ntTowersFromEvtPlane","Algorithm Analysis Towers","eta:phi:et:step:event");
@@ -251,13 +258,6 @@ JetAlgorithmAnalyzer::JetAlgorithmAnalyzer(const edm::ParameterSet& iConfig)
 
      ntJets = f->make<TNtuple>("ntJets","Algorithm Analysis Jets","eta:phi:et:step:event");
      ntPU = f->make<TNtuple>("ntPU","Algorithm Analysis Background","eta:mean:sigma:step:event");
-     if(backToBack_){
-        ntRandom0 = f->make<TNtuple>("ntRandom0","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
-        ntRandom1 = f->make<TNtuple>("ntRandom1","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
-     }else{
-	ntRandom = f->make<TNtuple>("ntRandom","Algorithm Analysis Background","eta:phi:phiRel:et:had:em:pu:mean:rms:bin:hf:sumET:event:dR:matchedJetPt:evtJetPt");
-     }
-
      ntuple = f->make<TNtuple>("nt","debug","ieta:eta:iphi:phi:pt:em:had");
 
      hPTieta = f->make<TH2D>("hPTieta","hPTieta",23,-11.5,11.5,200,0,10);
