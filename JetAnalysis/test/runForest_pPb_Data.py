@@ -1,4 +1,4 @@
-import FWCore.ParameterSet.VarParsing as VarParsing
+iimport FWCore.ParameterSet.VarParsing as VarParsing
 
 import FWCore.ParameterSet.Config as cms
 
@@ -411,3 +411,21 @@ if lightMode:
     process.rechitanalyzer.doZDCRecHit  = cms.untracked.bool(False)
     process.rechitanalyzer.doZDCDigi  = cms.untracked.bool(False)
     
+
+#####################################################################################
+# Skimming
+#####################################################################################
+
+#process.schedule.remove(process.pAna)
+#import HLTrigger.HLTfilters.hltHighLevel_cfi
+#process.photonFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+#process.photonFilter.HLTPaths = [ "HLT_PAJet80_*",
+#                                  "HLT_PAJet100_*",
+#                                  "HLT_PAPixelTracks_Multiplicity*"
+#                                ]
+#                                                            
+#process.superFilterSequence = cms.Sequence(process.photonFilter)
+#process.superFilterPath = cms.Path(process.superFilterSequence)
+#                                                                                                    
+#for path in process.paths:
+#   getattr(process,path)._seq = process.superFilterSequence*getattr(process,path)._seq
