@@ -200,33 +200,33 @@ HiInclusiveJetAnalyzer::beginJob() {
   t->Branch("muN", jets_.muN,"muN[nref]/I");
 
 
-  t->Branch("fHPD",jets_.fHPD,"fHPD[nref]");
-  t->Branch("fRBX",jets_.fRBX,"fRBX[nref]");
-  t->Branch("n90",jets_.n90,"n90[nref]");
-  t->Branch("fSubDet1",jets_.fSubDet1,"fSubDet1[nref]");
-  t->Branch("fSubDet2",jets_.fSubDet2,"fSubDet2[nref]");
-  t->Branch("fSubDet3",jets_.fSubDet3,"fSubDet3[nref]");
-  t->Branch("fSubDet4",jets_.fSubDet4,"fSubDet4[nref]");
-  t->Branch("restrictedEMF",jets_.restrictedEMF,"restrictedEMF[nref]");
-  t->Branch("nHCAL",jets_.nHCAL,"nHCAL[nref]");
-  t->Branch("nECAL",jets_.nECAL,"nECAL[nref]");
-  t->Branch("apprHPD",jets_.apprHPD,"apprHPD[nref]");
-  t->Branch("apprRBX",jets_.apprRBX,"apprRBX[nref]");
+  t->Branch("fHPD",jets_.fHPD,"fHPD[nref]/F");
+  t->Branch("fRBX",jets_.fRBX,"fRBX[nref]/F");
+  t->Branch("n90",jets_.n90,"n90[nref]/I");
+  t->Branch("fSubDet1",jets_.fSubDet1,"fSubDet1[nref]/F");
+  t->Branch("fSubDet2",jets_.fSubDet2,"fSubDet2[nref]/F");
+  t->Branch("fSubDet3",jets_.fSubDet3,"fSubDet3[nref]/F");
+  t->Branch("fSubDet4",jets_.fSubDet4,"fSubDet4[nref]/F");
+  t->Branch("restrictedEMF",jets_.restrictedEMF,"restrictedEMF[nref]/F");
+  t->Branch("nHCAL",jets_.nHCAL,"nHCAL[nref]/I");
+  t->Branch("nECAL",jets_.nECAL,"nECAL[nref]/I");
+  t->Branch("apprHPD",jets_.apprHPD,"apprHPD[nref]/F");
+  t->Branch("apprRBX",jets_.apprRBX,"apprRBX[nref]/F");
 
   //  t->Branch("hitsInN90",jets_.n90,"hitsInN90[nref]");
-  t->Branch("n2RPC",jets_.n2RPC,"n2RPC[nref]");
-  t->Branch("n3RPC",jets_.n3RPC,"n3RPC[nref]");
-  t->Branch("nRPC",jets_.nRPC,"nRPC[nref]");
+  t->Branch("n2RPC",jets_.n2RPC,"n2RPC[nref]/I");
+  t->Branch("n3RPC",jets_.n3RPC,"n3RPC[nref]/I");
+  t->Branch("nRPC",jets_.nRPC,"nRPC[nref]/I");
 
-  t->Branch("fEB",jets_.fEB,"fEB[nref]");
-  t->Branch("fEE",jets_.fEE,"fEE[nref]");
-  t->Branch("fHB",jets_.fHB,"fHB[nref]");
-  t->Branch("fHE",jets_.fHE,"fHE[nref]");
-  t->Branch("fHO",jets_.fHO,"fHO[nref]");
-  t->Branch("fLong",jets_.fLong,"fLong[nref]");
-  t->Branch("fShort",jets_.fShort,"fShort[nref]");
-  t->Branch("fLS",jets_.fLS,"fLS[nref]");
-  t->Branch("fHFOOT",jets_.fHFOOT,"fHFOOT[nref]");
+  t->Branch("fEB",jets_.fEB,"fEB[nref]/F");
+  t->Branch("fEE",jets_.fEE,"fEE[nref]/F");
+  t->Branch("fHB",jets_.fHB,"fHB[nref]/F");
+  t->Branch("fHE",jets_.fHE,"fHE[nref]/F");
+  t->Branch("fHO",jets_.fHO,"fHO[nref]/F");
+  t->Branch("fLong",jets_.fLong,"fLong[nref]/F");
+  t->Branch("fShort",jets_.fShort,"fShort[nref]/F");
+  t->Branch("fLS",jets_.fLS,"fLS[nref]/F");
+  t->Branch("fHFOOT",jets_.fHFOOT,"fHFOOT[nref]/F");
 
 
   // Jet ID
@@ -818,6 +818,7 @@ HiInclusiveJetAnalyzer::analyze(const Event& iEvent,
        jets_.fHPD[jets_.nref] = (*patjets)[j].jetID().fHPD;
        jets_.fRBX[jets_.nref] = (*patjets)[j].jetID().fRBX;
        jets_.n90[jets_.nref] = (*patjets)[j].n90();
+
        jets_.fSubDet1[jets_.nref] = (*patjets)[j].jetID().fSubDetector1;
        jets_.fSubDet2[jets_.nref] = (*patjets)[j].jetID().fSubDetector2;
        jets_.fSubDet3[jets_.nref] = (*patjets)[j].jetID().fSubDetector3;
