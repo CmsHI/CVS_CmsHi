@@ -1,4 +1,4 @@
-iimport FWCore.ParameterSet.VarParsing as VarParsing
+import FWCore.ParameterSet.VarParsing as VarParsing
 
 import FWCore.ParameterSet.Config as cms
 
@@ -360,7 +360,7 @@ process.load('CmsHi.HiHLTAlgos.hltanalysis_cff')
 
 process.hltanalysis.dummyBranches = cms.untracked.vstring()
 
-process.hltAna = cms.EndPath(process.hltanalysis)
+process.hltAna = cms.Path(process.hltanalysis)
 process.reco_extra*=process.L1Extra
 
 process.pAna = cms.EndPath(process.skimanalysis)
