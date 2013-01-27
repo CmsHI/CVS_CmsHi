@@ -573,6 +573,29 @@ makeHeavyIonJets = cms.Sequence(
                                 ak6CalopatSequence
                                 
                                 )
+
+makeHeavyIonJets2to5 = cms.Sequence(
+                                akPu2PFpatSequence +
+                                akPu3PFpatSequence +
+                                akPu4PFpatSequence +
+                                akPu5PFpatSequence +
+
+                                akPu2CalopatSequence +
+                                akPu3CalopatSequence +
+                                akPu4CalopatSequence +
+                                akPu5CalopatSequence +
+                                
+                                ak2PFpatSequence +
+                                ak3PFpatSequence +
+                                ak4PFpatSequence +
+                                ak5PFpatSequence +
+                                
+                                ak2CalopatSequence +
+                                ak3CalopatSequence +
+                                ak4CalopatSequence +
+                                ak5CalopatSequence 
+                                
+                                )
                                
 akPu3PFpatSequence_withBtagging = cms.Sequence(akPu3PFcorr * akPu3PFclean * akPu3PFmatch * akPu3PFparton * akPu3PFPatJetFlavourId * akPu3PFJetTracksAssociator *akPu3PFJetBtagging * akPu3PFpatJets)
 

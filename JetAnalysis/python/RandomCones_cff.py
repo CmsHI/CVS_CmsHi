@@ -68,3 +68,14 @@ randomCones = cms.Sequence(
     akPu6CaloCones
     )
 
+randomCones2to5 = cms.Sequence(
+    akPu2PFCones+
+    akPu3PFCones+
+    akPu4PFCones+
+    akPu5PFCones+
+    akPu2CaloCones+
+    akPu3CaloCones+
+    akPu4CaloCones+
+    akPu5CaloCones
+    )
+
