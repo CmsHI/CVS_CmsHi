@@ -39,7 +39,7 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-                            fileNames = cms.untracked.vstring("/store/express/HIRun2013/ExpressPhysics/FEVT/Express-v1/000/210/498/00000/EC4DD4E5-1463-E211-B588-001D09F276CF.root")
+                            fileNames = cms.untracked.vstring("/store/hidata/HIRun2013/PAHighPt/RECO/PromptReco-v1/000/210/614/00000/D43CAAE9-3D66-E211-A43F-0025901D624E.root")
 #                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/y/yjlee/public/pPbDijet.root")
 			    )
 
@@ -272,7 +272,7 @@ process.gen_step          = cms.Path( process.hiGen )
 
 ###########################################
 
-process.pat_step          = cms.Path(process.makeHeavyIonJets
+process.pat_step          = cms.Path(process.makeHeavyIonJets2to5
                                      )
 
     
@@ -312,7 +312,7 @@ process.ana_step          = cms.Path( process.hcalNoise +
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
-                                      process.randomCones +
+                                      process.randomCones2to5 +
                                       process.HiForest
                                       )
 
