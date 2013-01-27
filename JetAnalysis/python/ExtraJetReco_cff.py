@@ -149,7 +149,21 @@ recoAk1to6ID = cms.Sequence(
                            ak1CaloJetID * ak2CaloJetID *ak3CaloJetID * ak4CaloJetID * ak5CaloJetID * ak6CaloJetID
                            )
 
+recoAk2to5 = cms.Sequence( akPu2PFJets *akPu3PFJets * akPu4PFJets * akPu5PFJets *
+                           ak2PFJets *ak3PFJets * ak4PFJets * ak5PFJets *
+                           akPu2CaloJets *akPu3CaloJets * akPu4CaloJets * akPu5CaloJets *
+                           ak2CaloJets *ak3CaloJets * ak4CaloJets * ak5CaloJets
+                           )
+
+recoAk2to5ID = cms.Sequence(
+    #akPu1PFJetID * akPu2PFJetID *akPu3PFJetID * akPu4PFJetID * akPu5PFJetID * akPu6PFJetID *
+     #                      ak1PFJetID * ak2PFJetID *ak3PFJetID * ak4PFJetID * ak5PFJetID * ak6PFJetID *
+                           akPu2CaloJetID *akPu3CaloJetID * akPu4CaloJetID * akPu5CaloJetID *
+                           ak2CaloJetID *ak3CaloJetID * ak4CaloJetID * ak5CaloJetID
+                           )
+
 recoJetsWithID = cms.Sequence(recoAk1to6*recoAk1to6ID)
+recoJetsWithID2to5 = cms.Sequence(recoAk2to5*recoAk2to5ID)
 
 
 
