@@ -416,8 +416,8 @@ if lightMode:
 # Skimming
 #####################################################################################
 
-#process.schedule.remove(process.pAna)
 #import HLTrigger.HLTfilters.hltHighLevel_cfi
+#process.skimanalysis.superFilters = cms.vstring("superFilterPath")
 #process.photonFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
 #process.photonFilter.HLTPaths = [ "HLT_PAJet80_*",
 #                                  "HLT_PAJet100_*",
