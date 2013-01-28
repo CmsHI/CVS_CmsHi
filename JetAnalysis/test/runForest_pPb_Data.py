@@ -19,6 +19,8 @@ hiTrackQuality = "highPurity"              # iterative tracks
 
 doElectrons = False
 
+doSkim = False
+
 hitMin = 20 # currently ineffective : light mode drops completely
 pfMin = 1 # currently effective
 
@@ -368,7 +370,27 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 
 #process.schedule = process.HLTSchedule
 #process.postHLTschedule = cms.Schedule(
+
+#####################################################################################
+# Skimming
+#####################################################################################
+
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+if doSkim:
+   process.skimanalysis.superFilters = cms.vstring("superFilterPath")
+   
+process.skimFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
+process.skimFilter.HLTPaths = [ "HLT_PAJet80_*",
+                                "HLT_PAJet100_*",
+                                "HLT_PAPixelTracks_Multiplicity*"
+                              ]
+                                                            
+process.superFilterSequence = cms.Sequence(process.skimFilter)
+process.superFilterPath = cms.Path(process.superFilterSequence)
+
+
 process.schedule = cms.Schedule(
+    process.superFilterPath,
     process.reco_extra, process.reco_extra_jet, process.pat_step,
     process.ana_step,
     process.pcollisionEventSelection,process.pHBHENoiseFilter,process.phiEcalRecHitSpikeFilter,
@@ -412,20 +434,6 @@ if lightMode:
     process.rechitanalyzer.doZDCDigi  = cms.untracked.bool(False)
     
 
-#####################################################################################
-# Skimming
-#####################################################################################
-
-#import HLTrigger.HLTfilters.hltHighLevel_cfi
-#process.skimanalysis.superFilters = cms.vstring("superFilterPath")
-#process.photonFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone()
-#process.photonFilter.HLTPaths = [ "HLT_PAJet80_*",
-#                                  "HLT_PAJet100_*",
-#                                  "HLT_PAPixelTracks_Multiplicity*"
-#                                ]
-#                                                            
-#process.superFilterSequence = cms.Sequence(process.photonFilter)
-#process.superFilterPath = cms.Path(process.superFilterSequence)
-#                                                                                                    
-#for path in process.paths:
-#   getattr(process,path)._seq = process.superFilterSequence*getattr(process,path)._seq
+if doSkim:
+   for path in process.paths:
+      getattr(process,path)._seq = process.superFilterSequence*getattr(process,path)._seq
