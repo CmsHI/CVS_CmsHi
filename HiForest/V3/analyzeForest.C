@@ -1,4 +1,5 @@
 
+
 #include "hiForest.h"
 #include "TCanvas.h"
 #include "TH2F.h"
@@ -19,31 +20,40 @@ static const bool centralOnly = 1;
 static const double matchR = 0.5;
 
 void analyzeForest(
-		   const char* infname = "root://eoscms//eos/cms/store/caf/user/velicanu/PA2013_merged/PA2013_HiForest_Express_r210614_autoforest_v2.root",
-		   // const char* infname = "root://eoscms//eos/cms/store/caf/user/velicanu/PA2013_merged/PA2013_HiForest_Express_r210534_stablebeams_72bunch.root",
-                 // const char* outname = "ntuple_data_run210534_20130122.root",
-                 const char* outname = "ntuple_data_run210614_20130123.root",
-
-                 bool MC = 1,
-		 int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackPtBin = 0
-){
+		   //		   const char* infname = "root://eoscms//eos/cms/store/group/phys_heavyions/velicanu/forest/PA2013_HiForest_PromptRecofirstPR_forestv51.root",
+		   const char* infname = "/d102/yetkin/prod/clean/noDuplicate.root",
+		   const char* outname = "ntuple_data_PbPb_akPu3PF_01.root",
+		   bool MC = 0,
+		   bool PbPb2011 = 1,
+		   int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackPtBin = 0
+		   ){
 
    cout<<"Begin"<<endl;
 
-   int Nevents = 1000;
+   int Nevents = 50000;
    Nevents = -1;
 
   bool usePF = 1;
+  int R = 3;
+
+  double etaCOM = -0.465;
+
+
 
   bool doFlow = 0;
   bool doInclusiveJets = 1;
   bool doTracks = 1;
+  bool fillTracks = !PbPb2011;
+
   double trkMin = 4;
+
+  double leadPtMin = 100;
+  double jetTrackMin = 4;
+
 
   int frame = 1; // Dijet frame for z
 
   int analysisId = 0;
-
 
   double ptSubLeadMin = 30;
   double ptLeadMin = 120;
@@ -94,8 +104,17 @@ void analyzeForest(
   string flowVarsB = "";
   string flowVarsC = "";
 
-  evtVars += "evt:run:bin:hf:ntrk:psi:noise:pthat";
-  dijetVars += "jtpt1:jteta1:jtphi1:jtpt2:jteta2:jtphi2:jtpt3:jteta3:jtphi3:njet10:njet20:njet30:njet40:njet50:njet100";
+  evtVars += "evt:run:bin:hf:ntrk:npix:psi:noise:pthat:nside:nps:npb:npscom:npbcom";
+  dijetVars += "jtpt1:jteta1:jtphi1:jtpt2:jteta2:jtphi2:jtpt3:jteta3:jtphi3:dphi"
+    ":njet10:njet20:njet30:njet40:njet50:njet100"
+    ":trkMax1:trkMax2:trkMax3"
+    ":trkSum1:trkSum2:trkSum3"
+    ":pu1:pu2:pu3"
+    ":puc1:puc2:puc3"
+    ":raw1:raw2:raw3"
+    ":had1:had2:had3"
+    ":matchPt1:matchPt2:matchPt3";
+  
   matchedVars += "refpt1:refpt2:refpt3:pt1:pt2:pt3:type";
 
   flowVars += "v2:v2s:psi:psis:v2p:v2ps:psip:psips:v2m:v2ms:psim:psims:v2pm:v2mp:v2pp:v2mm";
@@ -173,29 +192,47 @@ void analyzeForest(
    }
 
    HiForest * t;
-   t = new HiForest(infname,"",cPbPb,MC);
+   if(PbPb2011){
+     doTracks = 0;
+     t = new HiForest(infname,"",cPbPb,MC);
+   }else{
+     t = new HiForest(infname,"",cPPb,MC);
+   }
 
    t->hasPhotonTree = 0;
    t->hasMetTree = 0;
    t->hasPFTree = 0;
+   t->hasPFTree = 0;
+
+
+   t->hasAk2JetTree = 0;
+   t->hasAk3JetTree = !PbPb2011 || MC;
+   t->hasAk4JetTree = 0;
+   t->hasAk5JetTree = !PbPb2011 || MC;
 
    t->hasAkPu2JetTree = 0;
-   t->hasAkPu3JetTree = 0;
+   t->hasAkPu3JetTree = 1;
    t->hasAkPu4JetTree = 0;
-   t->hasAkPu5JetTree = 0;
+   t->hasAkPu5JetTree = !PbPb2011 || MC;
+
+   t->hasAk2CaloJetTree = 0;
+   t->hasAk3CaloJetTree = !PbPb2011 || MC;
+   t->hasAk4CaloJetTree = 0;
+   t->hasAk5CaloJetTree = !PbPb2011 || MC;
 
    t->hasAkPu2CaloJetTree = 0;
-   t->hasAkPu3CaloJetTree = 0;
+   t->hasAkPu3CaloJetTree = !PbPb2011 || MC;
    t->hasAkPu4CaloJetTree = 0;
-   t->hasAkPu5CaloJetTree = 0;
+   t->hasAkPu5CaloJetTree = !PbPb2011 || MC;
+
 
    if(!doTracks) t->hasTrackTree = 0;
    t->hasPixTrackTree = 0;
-   //   t->hasTowerTree = 0;
+   t->hasTowerTree = 0;
    t->hasHbheTree = 0;
    t->hasEbTree = 0;
    t->hasGenpTree = 0;
-   t->hasGenParticleTree = 0;
+   t->hasGenParticleTree = MC && doTracks;
 
    t->InitTree();
 
@@ -207,8 +244,6 @@ void analyzeForest(
    }else{
       Nevents = t->nEntries;
    }
-
-   cout<<"a"<<endl;
 
    outf->cd();
 
@@ -222,19 +257,40 @@ void analyzeForest(
 
    float tdt1[4], tdt2[4], tdt1a[4], tdt2a[4], tdt1b[4], tdt2b[4], tdt1c[4], tdt2c[4];
 
-   cout<<"a"<<endl;
-
-   Jets* jets1 = 0, *jets2 = 0;
-   TTree* jetTree1 = 0, *jetTree2 = 0;
+   Jets *jets0 = 0, * jets1 = 0, *jets2 = 0;
+   TTree  *jetTree0 = 0, * jetTree1 = 0, *jetTree2 = 0;
 
    if(usePF){
-     jets1 = &(t->ak5PF);
-     jetTree1 = t->ak5jetTree;
-     jets2 = &(t->ak5Calo);
+
+     if(R == 3){
+       jets1 = &(t->akPu3PF);
+       jetTree1 = t->akPu3jetTree;
+       jets2 = &(t->akPu3Calo);
+       jets0 = &(t->ak3PF);
+
+
+     }
+     if(R == 5){
+       jets1 = &(t->akPu5PF);
+       jetTree1 = t->akPu5jetTree;
+       jets2 = &(t->akPu5Calo);
+       jets0 = &(t->ak5PF);
+
+     }
+
+
    }else{
-     jets1 = &(t->ak5Calo);
-     jetTree1 = t->ak5CaloJetTree;
-     jets2 = &(t->ak5PF);
+
+     if(R == 3){
+       jets1 = &(t->akPu3PF);
+       jetTree1 = t->akPu3jetTree;
+       jets2 = &(t->ak3PF);
+     }
+     if(R == 5){
+       jets1 = &(t->akPu5PF);
+       jetTree1 = t->akPu5jetTree;
+       jets2 = &(t->ak5PF);
+     }
    }
 
    cout<<"a"<<endl;
@@ -248,8 +304,37 @@ void analyzeForest(
      }
      t->GetEntry(iev);
 
-     if(!MC && !(t->skim.pPAcollisionEventSelectionPA && t->skim.pHBHENoiseFilter &&t->hlt.HLT_PAJet80_NoJetID_v1)) continue;
+     if(!MC && !PbPb2011 && !(t->skim.pPAcollisionEventSelectionPA && t->skim.pHBHENoiseFilter &&t->hlt.HLT_PAJet80_NoJetID_v1)) continue;
+     if(!MC && PbPb2011 && !(t->skim.pcollisionEventSelection && t->skim.pHBHENoiseFilter)) continue;
+
      // add other selection
+
+     int noise = -1;
+     if(PbPb2011){
+
+	 if(!(t->skim.pHBHENoiseFilter)) noise = 0;
+	 
+	 if(t->hcalNoise.maxhpdhits >= 17) noise = 1;
+	 if(t->hcalNoise.maxrbxhits >= 56) noise = 2;
+	 
+	 if(t->hcalNoise.nspikenoise >= 1) noise = 4;
+	 if(t->hcalNoise.hasbadts4ts5 >= 1) noise = 5;
+    
+       //       if(t->hcalNoise.maxzeros >= 17) noise = 2;
+       //       if(t->hcalNoise.emenergy/t->hcalNoise.hadenergy <= 0.45) noise = 3;
+
+     }else{
+       if(0){
+         if(t->hcalNoise.MaxHPDHits >= 17) noise = 1;
+         if(t->hcalNoise.MaxRBXHits >= 56) noise = 2;
+
+         if(t->hcalNoise.SpikeNoiseCount >= 1) noise = 4;
+         if(t->hcalNoise.HasBadTS4TS5 >= 1) noise = 5;
+       }
+
+     }
+
+     if(!MC && noise >= 0) continue;
 
      float pthat = jets1->pthat;
 
@@ -258,13 +343,15 @@ void analyzeForest(
        dphi  = -9, adphi  = -9,
        eta3 = -9, phi3 = -9, dr = -9,
        ch1 = 0,ch2 = 0, ch1alt = 0, ch2alt = 0,
-       trk1 = 0, trk2 = 0, trk1alt = 0, trk2alt = 0,
-       ntrk1 = 0, ntrk2 = 0, ntrk1alt = 0, ntrk2alt = 0,
 
 	refpt1 = 0, refpt2 = 0, refpt3 = 0,
         genpt1 = 0, genpt2 = 0, genpt3 = 0,
 
-       pu1=-9,pu2=-9, had1 =-9, had2 = -9,
+       pu1=-9,pu2=-9, pu3 = -9, 
+       puc1=-9,puc2=-9, puc3 = -9,
+
+       raw1=-9,raw2=-9, raw3 = -9,
+
        drm1=-9,drm2=-9, drm3=-9,
        psi1=-9, psi2=-9, psi=-9, psiP=-9, psiM=-9, psiPS=-9, psiMS=-9, psiS=-9,
        psiTri = -9, psiTriP = -9, psiTriM = -9, psiTriS = -9, psiTriPS = -9, psiTriMS = -9;
@@ -275,36 +362,52 @@ void analyzeForest(
        v2pm=0,v2mp=0,v2pp=0,v2mm=0,etx1=0,ety1=0,
        v2s,v2ps,v2ms;
 
-     int dijetType = -9,njt10=0,njt20=0,njt30=0,njt40,njt50=0,njt100=0;
+     int dijetType = -9,njt10=0,njt20=0,njt30=0,njt40=0,njt50=0,njt100=0;
+     float trkMax1 = -9,trkMax2=-9,trkMax3=-9,
+       trkSum1=-9,trkSum2=-9,trkSum3=-9,
+       had1=-9,had2=-9,had3=-9,
+       matchPt1=-9,matchPt2=-9,matchPt3=-9;
+
+     int nSide = -9;
 
      int iPlane = 21; //21 HF, 0 tracks
 
      double flowEtaMin = 3;
+
+     double hf = t->evt.hiHFplusEta4;
+     double ntrk = t->evt.hiNtracks;
+     double npix = t->evt.hiNpix;
+
+     int nside = 0;
+     int nps = 0;
+     int npb = 0;
+     int npscom = 0;
+     int npbcom = 0;
 
      psi = t->evt.hiEvtPlanes[iPlane];
      psiM = t->evt.hiEvtPlanes[iPlane+2];
      psiP = t->evt.hiEvtPlanes[iPlane+1];
 
      if(doFlow){
-     flow->reset();
+       flow->reset();
 
-     flow->fillTowers(t->tower,psi,psiM,psiP);
-     flow->fit(psi);
+       flow->fillTowers(t->tower,psi,psiM,psiP);
+       flow->fit(psi);
 
-     v2 = flow->v2;
-     v2p = flow->v2p;
-     v2m = flow->v2m;
-     v2pp = flow->v2pp;
-     v2pm = flow->v2pm;
-     v2mp = flow->v2mp;
-     v2mm = flow->v2mm;
-     psiS = flow->psiS;
-     psiPS = flow->psiPS;
-     psiMS = flow->psiMS;
-     v2s = flow->v2s;
-     v2ps = flow->v2ps;
-     v2ms = flow->v2ms;
-
+       v2 = flow->v2;
+       v2p = flow->v2p;
+       v2m = flow->v2m;
+       v2pp = flow->v2pp;
+       v2pm = flow->v2pm;
+       v2mp = flow->v2mp;
+       v2mm = flow->v2mm;
+       psiS = flow->psiS;
+       psiPS = flow->psiPS;
+       psiMS = flow->psiMS;
+       v2s = flow->v2s;
+       v2ps = flow->v2ps;
+       v2ms = flow->v2ms;
+       
      }
 
      vecs.clear();
@@ -312,16 +415,19 @@ void analyzeForest(
      for(int j = 0; j < jets1->nref; ++j){
 
        if( fabs(jets1->jteta[j]) > 2 ) continue;
+
        JetIndex entry;
        entry.pt = jets1->jtpt[j];
        entry.index = j;
+       vecs.push_back(entry);
+       if(jets1->trackMax[j]<jetTrackMin) continue;
+
        if(jets1->jtpt[j]>10) njt10++;
        if(jets1->jtpt[j]>20) njt20++;
        if(jets1->jtpt[j]>30) njt30++;
-       if(jets1->jtpt[j]>40) njt30++;
+       if(jets1->jtpt[j]>40) njt40++;
        if(jets1->jtpt[j]>50) njt50++;
        if(jets1->jtpt[j]>100) njt100++;
-       vecs.push_back(entry);
      }
 
      sort(vecs.begin(),vecs.end(),comparePt);
@@ -331,20 +437,9 @@ void analyzeForest(
      if(vecs.size() > 0) jtLead = vecs[0].index;
      if(vecs.size() > 1) jtSubLead = vecs[1].index;
      if(vecs.size() > 2) jtThird = vecs[2].index;
+
+     if(!MC && (vecs.size() < 1 || jets1->jtpt[jtLead] < leadPtMin)) continue;
           
-     int noise = -1;
-     if(!(t->skim.pHBHENoiseFilter)) noise = 0;
-
-     //     if(t->hcalNoise.maxhpdhits >= 17) noise = 1;
-     //     if(t->hcalNoise.maxrbxhits >= 56) noise = 2;
-     //     if(t->hcalNoise.ntrianglenoise >= 1) noise = 3;
-     //     if(t->hcalNoise.nspikenoise >= 1) noise = 4;
-     //     if(t->hcalNoise.hasBadRBXTS4TS5 >= 1) noise = 5;
-
-
-    //     if(t->hcalNoise.maxzeros >= 17) noise = 2;
-     //  if(t->hcalNoise.emenergy/t->hcalNoise.hadenergy <= 0.45) noise = 3;
-      
      int evt = t->hlt.Event;
      int run = t->hlt.Run;
 
@@ -352,14 +447,21 @@ void analyzeForest(
        pt1 = jets1->jtpt[jtLead];
        eta1 = jets1->jteta[jtLead];
        phi1 = jets1->jtphi[jtLead];
-       if(MC) refpt1 = jets1->refpt[jtLead];
+       raw1 = jets1->rawpt[jtLead];
+       trkMax1 = jets1->trackMax[jtLead];
+       trkSum1 = jets1->trackSum[jtLead];
 
+       if(MC) refpt1 = jets1->refpt[jtLead];
      }
 
      if(jtSubLead > -1){
        pt2 = jets1->jtpt[jtSubLead];
        eta2 = jets1->jteta[jtSubLead];
        phi2 = jets1->jtphi[jtSubLead];
+       raw2 = jets1->rawpt[jtSubLead];
+       trkMax2 = jets1->trackMax[jtSubLead];
+       trkSum2 = jets1->trackSum[jtSubLead];
+
        if(MC) refpt2 = jets1->refpt[jtSubLead];
 
        aj = (pt1-pt2)/(pt1+pt2);
@@ -374,10 +476,38 @@ void analyzeForest(
 	pt3 = jets1->jtpt[jtThird];
 	eta3 = jets1->jteta[jtThird];
 	phi3 = jets1->jtphi[jtThird];
+	raw3 = jets1->rawpt[jtThird];
+	trkMax3 = jets1->trackMax[jtThird];
+        trkSum3 = jets1->trackSum[jtThird];
+
 	if(MC) refpt3 = jets1->refpt[jtThird];
 
      }
 
+     double dphijet=-10;
+     dphijet=acos(cos(phi1-phi2));
+
+     int im1 = findMatch(drm1,*jets0,eta1,phi1);
+     int im2 = findMatch(drm2,*jets0,eta2,phi2);
+     int im3 = findMatch(drm3,*jets0,eta3,phi3);
+
+     if(im1 >= 0 ){
+       pu1 = jets0->rawpt[im1]-raw1;
+       puc1 = jets0->jtpt[im1]-pt1;
+     }
+
+     if(im2 >= 0 ){
+       pu2 = jets0->rawpt[im2]-raw2;
+       puc2 = jets0->jtpt[im2]-pt2;
+     }
+
+     if(im3 >= 0 ){
+       pu3 = jets0->rawpt[im3]-raw3;
+       puc3 = jets0->jtpt[im3]-pt3;
+     }
+
+
+     
      if(MC){
 	vecs.clear();
 	for(int j = 0; j < jets1->ngen; ++j){	   
@@ -415,8 +545,28 @@ void analyzeForest(
      double dijetEta = (eta1+eta2)/2;
 
      if(doTracks){
+       
+       for(int i = 0; i < t->genparticle.mult; ++i){
+	 if(t->genparticle.chg[i] == 0) continue;
+	 if(t->genparticle.pt[i] < 0.4) continue;
+         if(fabs(t->genparticle.eta[i]) < 2.4){
+	   if(t->genparticle.sube[i] == 0) nps++;
+	   else npb++;
+	 }
+	 if(fabs(t->genparticle.eta[i] - etaCOM) < 2.4){
+           if(t->genparticle.sube[i] == 0) npscom++;
+           else npbcom++;
+         }
+       }
+       
 
      for(int i = 0; i < t->track.nTrk; ++i){
+
+       if(!t->selectTrack(i)) continue;
+
+       double dphitrk = acos(cos(t->track.trkPhi[i],phi1));
+       if(dphitrk < 2.*pi/3. && dphitrk > pi/3.) nside++;
+
        double tdr1 = deltaR(t->track.trkEta[i],t->track.trkPhi[i],eta1,phi1);
        double tdr2 = deltaR(t->track.trkEta[i],t->track.trkPhi[i],eta2,phi2);
 
@@ -455,8 +605,18 @@ void analyzeForest(
 
 
        float trkentry[] = {
-	 evt,run,t->evt.hiBin,t->evt.hiHFplus,t->evt.hiNtracks,psi,noise,pthat,
-	  pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,
+	 evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,
+	 nside,nps,npb,npscom,npbcom,
+	  pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,njt10,njt20,njt30,njt40,njt50,njt100,
+	 trkMax1,trkMax2,trkMax3,
+	 trkSum1,trkSum2,trkSum3,
+	 pu1,pu2,pu3,
+         puc1,puc2,puc3,
+         raw1,raw2,raw3,
+
+	 had1,had2,had3,
+	 matchPt1,matchPt2,matchPt3,
+
 	  t->track.trkPt[i],t->track.trkEta[i],t->track.trkPhi[i],
 	  tdr1,tdr2,
 	  bkg1a,bkg1b,bkg1c,bkg2a,bkg2b,bkg2c,
@@ -467,13 +627,24 @@ void analyzeForest(
 	  z1c[frame],z2c[frame],	  
        };
        
-       nttrk->Fill(trkentry);
+       if(fillTracks) nttrk->Fill(trkentry);
 
      }
      }
+     
 
-     float evtentry[] = {evt,run,t->evt.hiBin,t->evt.hiHFplus,t->evt.hiNtracks,psi,noise,pthat};     
-     float dijetentry[] = {pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,njt10,njt20,njt30,njt40,njt50,njt100};
+     float evtentry[] = {evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,nside,nps,npb,npscom,npbcom};     
+     float dijetentry[] = {pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,
+			   njt10,njt20,njt30,njt40,njt50,njt100,
+			   trkMax1,trkMax2,trkMax3,
+			   trkSum1,trkSum2,trkSum3,
+			   pu1,pu2,pu3,
+			   puc1,puc2,puc3,
+			   raw1,raw2,raw3,
+			   had1,had2,had3,
+			   matchPt1,matchPt2,matchPt3
+     };
+
      float matchedentry[] = {refpt1,refpt2,refpt3,genpt1,genpt2,genpt3,dijetType};
      float flowentryA[] = {v2,v2s,psi,psiS,v2p,v2ps,psiP,psiPS,v2m,v2ms,psiM,psiMS,v2pm,v2mp,v2pp,v2mm};
 
@@ -512,8 +683,16 @@ void analyzeForest(
        geneta = jets1->refeta[jj];
        genphi = jets1->refphi[jj];
 
-       float jentry[] = {evt,run,t->evt.hiBin,t->evt.hiHFplus,t->evt.hiNtracks,psi,noise,pthat,
-			 pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,
+       float jentry[] = {evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,
+			 nside,nps,npb,npscom,npbcom,
+			 pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,njt10,njt20,njt30,njt40,njt50,njt100,
+			 trkMax1,trkMax2,trkMax3,
+			 trkSum1,trkSum2,trkSum3,
+			 pu1,pu2,pu3,
+			 had1,had2,had3,
+			 puc1,puc2,puc3,
+			 raw1,raw2,raw3,
+			 matchPt1,matchPt2,matchPt3,
 			 pt,eta,phi,
 			 genpt,geneta,genphi,dijetType 
        };

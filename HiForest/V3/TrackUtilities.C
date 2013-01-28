@@ -135,7 +135,7 @@ bool HiForest::selectTrack(int j){
 
    if(j >= track.nTrk) return 0;
 
-   if(1 || collisionMode==cPPb){
+   if(collisionMode==cPPb){
       if(!(track.highPurity[j])) return 0 ;
       if(fabs(track.trkDz1[j]/track.trkDzError1[j]) > 3) return 0 ;
       if(fabs(track.trkDxy1[j]/track.trkDxyError1[j]) > 3) return 0 ;
