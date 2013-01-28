@@ -198,6 +198,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
     if(nVertices>1 && minVtxSep<cutPara.vtxsepmin) return;
     if(nVertices>cutPara.nvtxmax) return;
     if(hPileup_distfunc && maxofflinetracks<hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep))*secofflinetracks) return;
+//    if(maxofflinetracks/300.*25 < secofflinetracks) return;
   }
 
   // Select multiplicity
@@ -211,6 +212,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   hNVtx->Fill(nVertices);
   hXYZVtxSepMin->Fill(minVtxSep);
   hMultMaxVsSec->Fill(maxofflinetracks,secofflinetracks);
+  hMultMaxVsSecVsZVtxSep->Fill(maxofflinetracks,secofflinetracks,minVtxSep);
 
   if(cutPara.IsVtxSel && cutPara.IsGenVtx)
   {
@@ -514,7 +516,7 @@ void DiHadronCorrelationMultiBaseFWLite::MakeHists()
   hXYZVtxSep = new TH1D("xyzvtxsep",";xyz_{vtx}-xyz^{max}_{vtx} (cm)",2000,0,40);
   hXYZVtxSepMin = new TH1D("xyzvtxsepmin",";(xyz_{vtx}-xyz^{max}_{vtx})_{min} (cm)",2000,0,40);
   hZVtxSim = new TH1D("zvtxsim",";z_{vtx} (cm)",160,-20,20);
-  hXYVtxSim = new TH2D("xyvtxsim",";x_{vtx} (cm);y_{vtx} (cm)",1000,-1,1,1000,-1,1);
+hXYVtxSim = new TH2D("xyvtxsim",";x_{vtx} (cm);y_{vtx} (cm)",1000,-1,1,1000,-1,1);
   hZVtxRecoVsSim = new TH2D("zvtxrecovssim",";z^{SIM}_{vtx} (cm);z^{RECO}_{vtx} (cm)",160,-20,20,160,-20,20);
   hXVtxRecoVsSim = new TH2D("xvtxrecovssim",";x^{SIM}_{vtx} (cm);x^{RECO}_{vtx} (cm)",1000,-1,1,1000,-1,1);
   hYVtxRecoVsSim = new TH2D("yvtxrecovssim",";y^{SIM}_{vtx} (cm);y^{RECO}_{vtx} (cm)",1000,-1,1,1000,-1,1);
@@ -538,6 +540,7 @@ void DiHadronCorrelationMultiBaseFWLite::MakeHists()
   hMultCorrAll = new TH1D("multcorrall",";n",10000,0,10000);
   hMultRawTrigVsAssoc = new TH2D("multrawtrigvsassoc",";n_{trig};n_{assoc}",500,0,500,500,0,500);
   hMultMaxVsSec = new TH2D("multmaxvssec",";n_{max};n_{sec}",500,0,500,500,0,500);
+  hMultMaxVsSecVsZVtxSep = new TH3D("multmaxvssecvszvtxsep",";n_{max};n_{sec};|z_{vtx}-z^{max}_{vtx}| (cm)",500,0,500,500,0,500,100,0,5.0);
 //  hPtAll_trg = new TH1D("ptall_trg",";p_{T}(GeV/c)",1000,0,250);
   hdNdetadptAll_trg = new TH2D("dNdetadptall_trg",";#eta;pT(GeV)",40,-6.0,6.0,20,0,10.0);
   hdNdetadphiAll_trg = new TH2D("dNdetadphiall_trg",";#eta;#phi",40,-6.0,6.0,32,-PI,PI);
@@ -645,6 +648,7 @@ void DiHadronCorrelationMultiBaseFWLite::DeleteHists()
   delete hMultCorrAll;
   delete hMultRawTrigVsAssoc;
   delete hMultMaxVsSec;
+  delete hMultMaxVsSecVsZVtxSep;
   delete hPtAll_trg;
   delete hdNdetadptAll_trg;
   delete hdNdetadphiAll_trg;
@@ -1611,6 +1615,7 @@ TList* DiHadronCorrelationMultiBaseFWLite::GetOutputs()
   outputlist->Add(hMultCorrAll);
   outputlist->Add(hMultRawTrigVsAssoc);
   outputlist->Add(hMultMaxVsSec);
+  outputlist->Add(hMultMaxVsSecVsZVtxSep);
   outputlist->Add(hPtAll_trg);
   outputlist->Add(hdNdetadptAll_trg);
   outputlist->Add(hdNdetadphiAll_trg);

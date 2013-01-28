@@ -14,7 +14,7 @@ Executable   = $dir/$1
 Arguments    = $2 $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12}
 Rank         = Mips
 GetEnv       = True
-priority     = 0
+priority     = 1000
 
 initialdir   = $dir
 input        = /dev/null

@@ -12,8 +12,8 @@
     //
     cout << "Loading FW Lite setup." << endl;
     gSystem->Load("libFWCoreFWLite.so");
-    gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
-    gSystem->AddIncludePath("-I$CMSSW_RELEASE_BASE/src/");
+//    gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
+//    gSystem->AddIncludePath("-I$CMSSW_RELEASE_BASE/src/");
     AutoLibraryLoader::enable();
   }
 

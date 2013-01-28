@@ -1,0 +1,11 @@
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_10_1_XuK.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_11_1_ciZ.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_1_1_MTq.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_2_1_5hN.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_3_1_b9b.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_4_1_lDm.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_5_1_9wM.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_6_1_FvH.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_7_1_AmC.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_8_1_VVe.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v1/fb0ba2008c8b6167fedfb662682718ff/pPb_HMPt12_9_1_1Fp.root

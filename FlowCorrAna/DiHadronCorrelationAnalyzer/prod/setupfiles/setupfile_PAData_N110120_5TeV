@@ -1,0 +1,6 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PAData_Trigger_5TeV
+#export TRIGGERNAMES="HLT_PAPixelTracks_Multiplicity100_v1"
+
+NMIN=(110)
+NMAX=(1000)

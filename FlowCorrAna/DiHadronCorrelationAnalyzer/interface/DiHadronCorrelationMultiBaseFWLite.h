@@ -159,6 +159,7 @@ class DiHadronCorrelationMultiBaseFWLite{
    TH1D*  hMultCorrAll;
    TH2D*  hMultRawTrigVsAssoc;
    TH2D*  hMultMaxVsSec;
+   TH3D*  hMultMaxVsSecVsZVtxSep;
    TH1D*  hPtAll_trg;
    TH2D*  hdNdetadptAll_trg;
    TH2D*  hdNdetadphiAll_trg;
