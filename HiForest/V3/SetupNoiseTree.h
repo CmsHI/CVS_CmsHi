@@ -48,6 +48,14 @@ public :
    Double_t        RBXR45[72];
    Double_t        RBXCharge[72][10];
 
+   // 2011 branches
+
+   Int_t           maxhpdhits;
+   Int_t           maxrbxhits;
+   Int_t           nspikenoise;
+   Bool_t          hasbadts4ts5;
+
+
    // List of branches
    TBranch        *b_run;   //!
    TBranch        *b_event;   //!
@@ -114,6 +122,15 @@ void setupNoiseTree(TTree *t,Noises &tNoises,bool doCheck = 0)
    t->SetBranchAddress("RBXHitCount", tNoises.RBXHitCount, &tNoises.b_RBXHitCount);
    t->SetBranchAddress("RBXR45", tNoises.RBXR45, &tNoises.b_RBXR45);
    t->SetBranchAddress("RBXCharge", tNoises.RBXCharge, &tNoises.b_RBXCharge);
+
+   t->SetBranchAddress("maxhpdhits", &tNoises.maxhpdhits);
+   t->SetBranchAddress("maxrbxhits", &tNoises.maxrbxhits);
+
+   t->SetBranchAddress("nspikenoise", &tNoises.nspikenoise);
+   t->SetBranchAddress("hasbadts4ts5", &tNoises.hasbadts4ts5);
+
+
+
    if (doCheck) {
    }
 }

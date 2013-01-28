@@ -82,6 +82,29 @@ double getProjectedZ(float* z, float* dtheta, double jetpt, double jeteta, doubl
   return z[0];
 }
 
+int findMatch(double& drmin, Jets jets, double eta, double phi, bool gen = 0, double matchR = 0.3){
+
+  drmin = 100;
+  int m = -1;
+  double ptmax = 0;
+  for(int i = 0; i < jets.nref; ++i){
+    double dr = deltaR(jets.jteta[i],jets.jtphi[i],eta,phi);
+    double pt = jets.jtpt[i];
+
+    if(gen && dr < matchR && pt > ptmax){
+      ptmax = pt;
+      drmin = dr;
+      m = i;
+    }else if(dr < drmin){
+      drmin = dr;
+      m = i;
+    }
+
+  }
+
+  return m;
+}
+
 
 
 namespace jetsmear{
