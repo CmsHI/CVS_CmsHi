@@ -172,8 +172,8 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 # Track Analyzer
 #########################
 process.ppTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
-process.ppTrack.trackPtMin = 0
-process.ppTrack.simTrackPtMin = 0
+process.ppTrack.trackPtMin = 0.1
+process.ppTrack.simTrackPtMin = 0.09
 process.ppTrack.fillSimTrack = False
 process.ppTrack.doPFMatching = False
 
