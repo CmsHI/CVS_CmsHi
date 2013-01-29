@@ -55,7 +55,9 @@ DiHadronCorrelationMultiBaseFWLite::DiHadronCorrelationMultiBaseFWLite(fwlite::C
   nVertices(0),
   maxofflinetracks(0),
   secofflinetracks(0),
+  thirdofflinetracks(0),
   minVtxSep(99999.9), 
+  minVtxSep2(99999.9),
   NEtaBins(40),
   NPhiBins(32),
   xVtx(-99999.),
@@ -197,7 +199,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
 
     if(nVertices>1 && minVtxSep<cutPara.vtxsepmin) return;
     if(nVertices>cutPara.nvtxmax) return;
-    if(hPileup_distfunc && maxofflinetracks<hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep))*secofflinetracks) return;
+    if(hPileup_distfunc && secofflinetracks>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep,maxofflinetracks))) return;
 //    if(maxofflinetracks/300.*25 < secofflinetracks) return;
   }
 
@@ -211,8 +213,11 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   hXYVtx->Fill(xVtx,yVtx);
   hNVtx->Fill(nVertices);
   hXYZVtxSepMin->Fill(minVtxSep);
+  hXYZVtxSepMin2->Fill(minVtxSep2);
   hMultMaxVsSec->Fill(maxofflinetracks,secofflinetracks);
   hMultMaxVsSecVsZVtxSep->Fill(maxofflinetracks,secofflinetracks,minVtxSep);
+  hMultMaxVsThird->Fill(maxofflinetracks,thirdofflinetracks);
+  hMultMaxVsThirdVsZVtxSep->Fill(maxofflinetracks,thirdofflinetracks,minVtxSep2);
 
   if(cutPara.IsVtxSel && cutPara.IsGenVtx)
   {
@@ -515,8 +520,9 @@ void DiHadronCorrelationMultiBaseFWLite::MakeHists()
   hYVtxSep = new TH1D("yvtxsep",";y_{vtx}-y^{max}_{vtx} (cm)",2000,-20,20);
   hXYZVtxSep = new TH1D("xyzvtxsep",";xyz_{vtx}-xyz^{max}_{vtx} (cm)",2000,0,40);
   hXYZVtxSepMin = new TH1D("xyzvtxsepmin",";(xyz_{vtx}-xyz^{max}_{vtx})_{min} (cm)",2000,0,40);
+  hXYZVtxSepMin2 = new TH1D("xyzvtxsepmin2",";(xyz_{vtx}-xyz^{max}_{vtx})_{min} (cm)",2000,0,40);
   hZVtxSim = new TH1D("zvtxsim",";z_{vtx} (cm)",160,-20,20);
-hXYVtxSim = new TH2D("xyvtxsim",";x_{vtx} (cm);y_{vtx} (cm)",1000,-1,1,1000,-1,1);
+  hXYVtxSim = new TH2D("xyvtxsim",";x_{vtx} (cm);y_{vtx} (cm)",1000,-1,1,1000,-1,1);
   hZVtxRecoVsSim = new TH2D("zvtxrecovssim",";z^{SIM}_{vtx} (cm);z^{RECO}_{vtx} (cm)",160,-20,20,160,-20,20);
   hXVtxRecoVsSim = new TH2D("xvtxrecovssim",";x^{SIM}_{vtx} (cm);x^{RECO}_{vtx} (cm)",1000,-1,1,1000,-1,1);
   hYVtxRecoVsSim = new TH2D("yvtxrecovssim",";y^{SIM}_{vtx} (cm);y^{RECO}_{vtx} (cm)",1000,-1,1,1000,-1,1);
@@ -540,7 +546,9 @@ hXYVtxSim = new TH2D("xyvtxsim",";x_{vtx} (cm);y_{vtx} (cm)",1000,-1,1,1000,-1,1
   hMultCorrAll = new TH1D("multcorrall",";n",10000,0,10000);
   hMultRawTrigVsAssoc = new TH2D("multrawtrigvsassoc",";n_{trig};n_{assoc}",500,0,500,500,0,500);
   hMultMaxVsSec = new TH2D("multmaxvssec",";n_{max};n_{sec}",500,0,500,500,0,500);
-  hMultMaxVsSecVsZVtxSep = new TH3D("multmaxvssecvszvtxsep",";n_{max};n_{sec};|z_{vtx}-z^{max}_{vtx}| (cm)",500,0,500,500,0,500,100,0,5.0);
+  hMultMaxVsThird = new TH2D("multmaxvsthird",";n_{max};n_{third}",500,0,500,500,0,500);
+  hMultMaxVsSecVsZVtxSep = new TH3D("multmaxvssecvszvtxsep",";n_{max};n_{sec};|z_{vtx}-z^{max}_{vtx}| (cm)",500,0,500,500,0,500,20,0,4.0);
+  hMultMaxVsThirdVsZVtxSep = new TH3D("multmaxvsthirdvszvtxsep",";n_{max};n_{third};|z_{vtx}-z^{max}_{vtx}| (cm)",500,0,500,500,0,500,20,0,4.0);
 //  hPtAll_trg = new TH1D("ptall_trg",";p_{T}(GeV/c)",1000,0,250);
   hdNdetadptAll_trg = new TH2D("dNdetadptall_trg",";#eta;pT(GeV)",40,-6.0,6.0,20,0,10.0);
   hdNdetadphiAll_trg = new TH2D("dNdetadphiall_trg",";#eta;#phi",40,-6.0,6.0,32,-PI,PI);
@@ -623,6 +631,7 @@ void DiHadronCorrelationMultiBaseFWLite::DeleteHists()
   delete hYVtxSep;
   delete hXYZVtxSep;
   delete hXYZVtxSepMin;
+  delete hXYZVtxSepMin2;
   delete hZVtxSim;
   delete hXYVtxSim;
   delete hZVtxRecoVsSim;
@@ -648,7 +657,9 @@ void DiHadronCorrelationMultiBaseFWLite::DeleteHists()
   delete hMultCorrAll;
   delete hMultRawTrigVsAssoc;
   delete hMultMaxVsSec;
+  delete hMultMaxVsThird;
   delete hMultMaxVsSecVsZVtxSep;
+  delete hMultMaxVsThirdVsZVtxSep;
   delete hPtAll_trg;
   delete hdNdetadptAll_trg;
   delete hdNdetadphiAll_trg;
@@ -1297,20 +1308,26 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
       }
     }
 
+    if(vertices->size()<2) return;
+
     minVtxSep=99999.9;
+    double xVtx2 = -99999.9;
+    double yVtx2 = -99999.9;
+    double zVtx2 = -99999.9;
+
     for(unsigned int iv=0; iv<vertices->size(); ++iv)
     {
       const reco::Vertex & vtx = (*vertices)[iv];
       if(!vtx.isFake() && vtx.tracksSize()>=2)
       {
-        double xVtxTmp = vtx.x();
-        double yVtxTmp = vtx.y();
-        double zVtxTmp = vtx.z();
-        if(zVtxTmp==zVtx && xVtxTmp==xVtx && yVtxTmp==yVtx) continue;
-        double zsep=zVtxTmp-zVtx;
-        double xsep=xVtxTmp-xVtx;
-        double ysep=yVtxTmp-yVtx;
-        double xyzsep=sqrt((zVtxTmp-zVtx)*(zVtxTmp-zVtx)+(xVtxTmp-xVtx)*(xVtxTmp-xVtx)+(yVtxTmp-yVtx)*(yVtxTmp-yVtx));
+        xVtx2 = vtx.x();
+        yVtx2 = vtx.y();
+        zVtx2 = vtx.z();
+        if(zVtx2==zVtx && xVtx2==xVtx && yVtx2==yVtx) continue;
+        double zsep=zVtx2-zVtx;
+        double xsep=xVtx2-xVtx;
+        double ysep=yVtx2-yVtx;
+        double xyzsep=fabs(zVtx2-zVtx);
         hZVtxSep->Fill(zsep); 
         hXVtxSep->Fill(xsep);
         hYVtxSep->Fill(ysep);
@@ -1322,6 +1339,33 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         }
       }
     }
+
+    if(vertices->size()<3) return;
+
+    minVtxSep2=99999.9;
+    double xVtx3 = -99999.9;
+    double yVtx3 = -99999.9;
+    double zVtx3 = -99999.9;
+
+    for(unsigned int iv=0; iv<vertices->size(); ++iv)
+    {
+      const reco::Vertex & vtx = (*vertices)[iv];
+      if(!vtx.isFake() && vtx.tracksSize()>=2)
+      {
+        xVtx3 = vtx.x();
+        yVtx3 = vtx.y();
+        zVtx3 = vtx.z();
+        if(zVtx3==zVtx && xVtx3==xVtx && yVtx3==yVtx) continue;
+        if(zVtx3==zVtx2 && xVtx3==xVtx2 && yVtx3==yVtx2) continue;
+        double xyzsep=fabs(zVtx3-zVtx);
+        if(xyzsep<=minVtxSep2)
+        {
+          minVtxSep2=xyzsep;
+          thirdofflinetracks = vtx.tracksSize();
+        }
+      }
+    }
+
 }
 
 void DiHadronCorrelationMultiBaseFWLite::GetSimVertices()
@@ -1590,6 +1634,7 @@ TList* DiHadronCorrelationMultiBaseFWLite::GetOutputs()
   outputlist->Add(hYVtxSep);
   outputlist->Add(hXYZVtxSep);
   outputlist->Add(hXYZVtxSepMin);
+  outputlist->Add(hXYZVtxSepMin2);
   outputlist->Add(hZVtxSim);
   outputlist->Add(hXYVtxSim);
   outputlist->Add(hZVtxRecoVsSim);
@@ -1615,7 +1660,9 @@ TList* DiHadronCorrelationMultiBaseFWLite::GetOutputs()
   outputlist->Add(hMultCorrAll);
   outputlist->Add(hMultRawTrigVsAssoc);
   outputlist->Add(hMultMaxVsSec);
+  outputlist->Add(hMultMaxVsThird);
   outputlist->Add(hMultMaxVsSecVsZVtxSep);
+  outputlist->Add(hMultMaxVsThirdVsZVtxSep);
   outputlist->Add(hPtAll_trg);
   outputlist->Add(hdNdetadptAll_trg);
   outputlist->Add(hdNdetadphiAll_trg);

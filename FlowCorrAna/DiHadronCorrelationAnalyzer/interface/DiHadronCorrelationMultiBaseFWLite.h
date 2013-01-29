@@ -134,6 +134,7 @@ class DiHadronCorrelationMultiBaseFWLite{
    TH1D*  hYVtxSep;
    TH1D*  hXYZVtxSep;
    TH1D*  hXYZVtxSepMin;
+   TH1D*  hXYZVtxSepMin2;
    TH1D*  hZVtxSim;
    TH2D*  hXYVtxSim;
    TH2D*  hZVtxRecoVsSim;
@@ -159,7 +160,9 @@ class DiHadronCorrelationMultiBaseFWLite{
    TH1D*  hMultCorrAll;
    TH2D*  hMultRawTrigVsAssoc;
    TH2D*  hMultMaxVsSec;
+   TH2D*  hMultMaxVsThird;
    TH3D*  hMultMaxVsSecVsZVtxSep;
+   TH3D*  hMultMaxVsThirdVsZVtxSep;
    TH1D*  hPtAll_trg;
    TH2D*  hdNdetadptAll_trg;
    TH2D*  hdNdetadphiAll_trg;
@@ -250,7 +253,9 @@ class DiHadronCorrelationMultiBaseFWLite{
    int  nVertices;
    unsigned int  maxofflinetracks;
    unsigned int  secofflinetracks;
+   unsigned int  thirdofflinetracks;
    double minVtxSep;
+   double minVtxSep2;
    int  NEtaBins;
    int  NPhiBins;      
    double  xVtx;
