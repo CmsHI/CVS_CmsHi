@@ -173,8 +173,8 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 # Track Analyzer
 #########################
 process.ppTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
-process.ppTrack.trackPtMin = 0.1
-process.ppTrack.simTrackPtMin = 0.1
+process.ppTrack.trackPtMin = 0
+process.ppTrack.simTrackPtMin = 0
 process.pixelTrack = process.ppTrack.clone(trackSrc = cms.InputTag("pixelTracks"),
                                            fillSimTrack = False
                                            )
@@ -286,7 +286,7 @@ process.heavyIon.generators = cms.vstring("generator")
 process.HiGenParticleAna = cms.EDAnalyzer("HiGenAnalyzer")
 process.HiGenParticleAna.src= cms.untracked.InputTag("hiGenParticles")
 process.HiGenParticleAna.chargedOnly = cms.untracked.bool(False)
-process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
+process.HiGenParticleAna.ptMin = cms.untracked.double(0)
 
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
