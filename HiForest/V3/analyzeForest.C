@@ -21,8 +21,9 @@ static const double matchR = 0.5;
 
 void analyzeForest(
 		   //		   const char* infname = "root://eoscms//eos/cms/store/group/phys_heavyions/velicanu/forest/PA2013_HiForest_PromptRecofirstPR_forestv51.root",
-		   const char* infname = "/d102/yetkin/prod/clean/noDuplicate.root",
-		   const char* outname = "ntuple_data_PbPb_akPu3PF_01.root",
+		   //		   const char* infname = "/d102/yetkin/prod/clean/noDuplicate.root",
+		   const char* infname = "/d102/yjlee/hiForest2/promptskim-hihighpt-hltjet80-pt90-v20.root",
+		   const char* outname = "ntuple_data_PbPb_akPu3PF_03.root",
 		   bool MC = 0,
 		   bool PbPb2011 = 1,
 		   int centIndex = 0, int etaBin = 0, int leadJetPtBin = 0, int trackPtBin = 0
@@ -97,6 +98,8 @@ void analyzeForest(
   string trackVars = "";
   string evtVars = "";
   string dijetVars = "";
+  string dijetExtraVars = "";
+
   string matchedVars = "";
   string jetVars = "";
   string flowVars = "";
@@ -106,19 +109,21 @@ void analyzeForest(
 
   evtVars += "evt:run:bin:hf:ntrk:npix:psi:noise:pthat:nside:nps:npb:npscom:npbcom";
   dijetVars += "jtpt1:jteta1:jtphi1:jtpt2:jteta2:jtphi2:jtpt3:jteta3:jtphi3:dphi"
-    ":njet10:njet20:njet30:njet40:njet50:njet100"
-    ":trkMax1:trkMax2:trkMax3"
-    ":trkSum1:trkSum2:trkSum3"
-    ":pu1:pu2:pu3"
-    ":puc1:puc2:puc3"
-    ":raw1:raw2:raw3"
-    ":had1:had2:had3"
-    ":matchPt1:matchPt2:matchPt3";
+     ":trkMax1:trkMax2:trkMax3";
+
+  dijetExtraVars += "njet10:njet20:njet30:njet40:njet50:njet100"
+     ":ngen10:ngen20:ngen30:ngen50"
+     ":trkSum1:trkSum2:trkSum3"
+     ":pu1:pu2:pu3"
+     ":puc1:puc2:puc3"
+     ":raw1:raw2:raw3"
+     ":had1:had2:had3"
+     ":matchPt1:matchPt2:matchPt3";
   
   matchedVars += "refpt1:refpt2:refpt3:pt1:pt2:pt3:type";
 
   flowVars += "v2:v2s:psi:psis:v2p:v2ps:psip:psips:v2m:v2ms:psim:psims:v2pm:v2mp:v2pp:v2mm";
-  
+
   jetVars += evtVars;
   jetVars += ":";
   jetVars += dijetVars;
@@ -139,12 +144,15 @@ void analyzeForest(
   trackVars += ":";
   trackVars += "z1:z2:z1a:z2a:z1b:z2b:z1c:z2c";
 
+  dijetVars += ":";
+  dijetVars += dijetExtraVars;
+
+
   cout<<"Filling event variables : "<<evtVars.data()<<endl;
   cout<<"Filling dijet variables : "<<dijetVars.data()<<endl;
   cout<<"Filling mc variables    : "<<matchedVars.data()<<endl;
   cout<<"Filling jet variables   : "<<jetVars.data()<<endl;
   cout<<"Filling track variables : "<<trackVars.data()<<endl;
-
 
 
   TNtuple *ntjet,*ntdijet,*ntmatch,*ntevt,*ntFlowA,*ntFlowB,*ntFlowC,*nttrk;
@@ -193,7 +201,7 @@ void analyzeForest(
 
    HiForest * t;
    if(PbPb2011){
-     doTracks = 0;
+      if(!MC) doTracks = 0;
      t = new HiForest(infname,"",cPbPb,MC);
    }else{
      t = new HiForest(infname,"",cPPb,MC);
@@ -232,7 +240,7 @@ void analyzeForest(
    t->hasHbheTree = 0;
    t->hasEbTree = 0;
    t->hasGenpTree = 0;
-   t->hasGenParticleTree = MC && doTracks;
+   t->hasGenParticleTree = MC;
 
    t->InitTree();
 
@@ -363,6 +371,9 @@ void analyzeForest(
        v2s,v2ps,v2ms;
 
      int dijetType = -9,njt10=0,njt20=0,njt30=0,njt40=0,njt50=0,njt100=0;
+     int ngen10 = 0, ngen20=0, ngen30 = 0, ngen50 = 0;
+
+
      float trkMax1 = -9,trkMax2=-9,trkMax3=-9,
        trkSum1=-9,trkSum2=-9,trkSum3=-9,
        had1=-9,had2=-9,had3=-9,
@@ -450,6 +461,7 @@ void analyzeForest(
        raw1 = jets1->rawpt[jtLead];
        trkMax1 = jets1->trackMax[jtLead];
        trkSum1 = jets1->trackSum[jtLead];
+       matchPt1 = jets1->matchedPt[jtLead];
 
        if(MC) refpt1 = jets1->refpt[jtLead];
      }
@@ -461,6 +473,7 @@ void analyzeForest(
        raw2 = jets1->rawpt[jtSubLead];
        trkMax2 = jets1->trackMax[jtSubLead];
        trkSum2 = jets1->trackSum[jtSubLead];
+       matchPt2 = jets1->matchedPt[jtSubLead];
 
        if(MC) refpt2 = jets1->refpt[jtSubLead];
 
@@ -479,6 +492,7 @@ void analyzeForest(
 	raw3 = jets1->rawpt[jtThird];
 	trkMax3 = jets1->trackMax[jtThird];
         trkSum3 = jets1->trackSum[jtThird];
+	matchPt3 = jets1->matchedPt[jtThird];
 
 	if(MC) refpt3 = jets1->refpt[jtThird];
 
@@ -512,9 +526,16 @@ void analyzeForest(
 	vecs.clear();
 	for(int j = 0; j < jets1->ngen; ++j){	   
 	   JetIndex entry;
+	   if(fabs(jets1->geneta[j]) > 2) continue;
 	   entry.pt = jets1->genpt[j];
 	   entry.index = j;
 	   vecs.push_back(entry);
+
+	   if(jets1->genpt[j] > 10)ngen10++;
+           if(jets1->genpt[j] > 20)ngen20++;
+           if(jets1->genpt[j] > 30)ngen30++;
+           if(jets1->genpt[j] > 50)ngen50++;
+
 	}
 
 	sort(vecs.begin(),vecs.end(),comparePt);
@@ -564,7 +585,7 @@ void analyzeForest(
 
        if(!t->selectTrack(i)) continue;
 
-       double dphitrk = acos(cos(t->track.trkPhi[i],phi1));
+       double dphitrk = acos(cos(t->track.trkPhi[i]-phi1));
        if(dphitrk < 2.*pi/3. && dphitrk > pi/3.) nside++;
 
        double tdr1 = deltaR(t->track.trkEta[i],t->track.trkPhi[i],eta1,phi1);
@@ -607,16 +628,8 @@ void analyzeForest(
        float trkentry[] = {
 	 evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,
 	 nside,nps,npb,npscom,npbcom,
-	  pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,njt10,njt20,njt30,njt40,njt50,njt100,
+	  pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,
 	 trkMax1,trkMax2,trkMax3,
-	 trkSum1,trkSum2,trkSum3,
-	 pu1,pu2,pu3,
-         puc1,puc2,puc3,
-         raw1,raw2,raw3,
-
-	 had1,had2,had3,
-	 matchPt1,matchPt2,matchPt3,
-
 	  t->track.trkPt[i],t->track.trkEta[i],t->track.trkPhi[i],
 	  tdr1,tdr2,
 	  bkg1a,bkg1b,bkg1c,bkg2a,bkg2b,bkg2c,
@@ -632,11 +645,11 @@ void analyzeForest(
      }
      }
      
-
      float evtentry[] = {evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,nside,nps,npb,npscom,npbcom};     
      float dijetentry[] = {pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,
+                           trkMax1,trkMax2,trkMax3,
 			   njt10,njt20,njt30,njt40,njt50,njt100,
-			   trkMax1,trkMax2,trkMax3,
+			   ngen10,ngen20,ngen30,ngen50,
 			   trkSum1,trkSum2,trkSum3,
 			   pu1,pu2,pu3,
 			   puc1,puc2,puc3,
@@ -685,14 +698,8 @@ void analyzeForest(
 
        float jentry[] = {evt,run,t->evt.hiBin,hf,ntrk,npix,psi,noise,pthat,
 			 nside,nps,npb,npscom,npbcom,
-			 pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,njt10,njt20,njt30,njt40,njt50,njt100,
+			 pt1,eta1,phi1,pt2,eta2,phi2,pt3,eta3,phi3,dphijet,
 			 trkMax1,trkMax2,trkMax3,
-			 trkSum1,trkSum2,trkSum3,
-			 pu1,pu2,pu3,
-			 had1,had2,had3,
-			 puc1,puc2,puc3,
-			 raw1,raw2,raw3,
-			 matchPt1,matchPt2,matchPt3,
 			 pt,eta,phi,
 			 genpt,geneta,genphi,dijetType 
        };
