@@ -153,8 +153,8 @@ process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag(trkTag)
 # Track Analyzer
 #########################
 process.ppTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
-process.ppTrack.trackPtMin = 0
-process.ppTrack.simTrackPtMin = 0
+process.ppTrack.trackPtMin = 0.1
+process.ppTrack.simTrackPtMin = 0.1
 process.pixelTrack = process.ppTrack.clone(trackSrc = cms.InputTag("pixelTracks")
                                            )
 
