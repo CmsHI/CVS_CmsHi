@@ -19,7 +19,7 @@ hiTrackQuality = "highPurity"              # iterative tracks
 
 doElectrons = False
 
-doSkim = False
+doSkim = True
 
 hitMin = 20 # currently ineffective : light mode drops completely
 pfMin = 1 # currently effective
@@ -27,7 +27,7 @@ pfMin = 1 # currently effective
 #####################################################################################
 
 process.load("CmsHi.JetAnalysis.HiForest_cff")
-process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
+process.HiForest.inputLines = cms.vstring("HiForest V2 for PbPb",
                                           "PF : generalTracks (pp) with highPurity",
                                           "EP Flattening OFF",
                                           "Electrons OFF",
@@ -47,7 +47,7 @@ process.source = cms.Source("PoolSource",
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(100))
+            input = cms.untracked.int32(-1))
 
 
 #####################################################################################
@@ -85,7 +85,7 @@ from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
 overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
-  centralityVariable = cms.string("HFtowersPlusTrunc"),
+  centralityVariable = cms.string("HFtowers"),
     nonDefaultGlauberModel = cms.string(""),
       centralitySrc = cms.InputTag("pACentrality")
         )
@@ -115,7 +115,7 @@ process.load("RecoEcal.EgammaCoreTools.EcalNextToDeadChannelESProducer_cff")
 #####################################################################################
 
 process.TFileService = cms.Service("TFileService",
-                                  fileName=cms.string("pPb_hiForest2.root"))
+                                  fileName=cms.string("PbPb_hiForest2.root"))
 
 #####################################################################################
 # Additional Reconstruction and Analysis
@@ -314,7 +314,7 @@ process.ana_step          = cms.Path( process.hcalNoise +
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
-                                      process.randomCones2to5 +
+#                                      process.randomCones2to5 +
                                       process.HiForest
                                       )
 
