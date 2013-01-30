@@ -49,7 +49,7 @@ enum collisionType { cPbPb, cPP, cPPb };
 
 class HiForest : public TNamed
 {
- ClassDef (HiForest, 0) 
+
   public: 
    HiForest(const char *file, const char *name="forest", collisionType cMode = cPbPb, bool ismc = 0, bool isrecorrected = 0);
   ~HiForest();
@@ -120,8 +120,7 @@ class HiForest : public TNamed
   // Get track-jet correlated variables. Not needed if correlatePF is run.
   //==================================================================================================================================
   void correlateTracks(TTree* jetTree, Jets& jets, bool allEvents = 1, bool smeared = 0);
-  // void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
-  void correlatePF(){return;}
+  void correlatePF(TTree* jetTree, Jets& jets, bool allEvents = 1){return;}
 
   // TFile
   TFile *inf; 					// Input file 
@@ -359,10 +358,6 @@ HiForest::HiForest(const char *infName, const char* name, collisionType cMode, b
    nEntries(0),
    currentEvent(0)
 {
-  if(recjec)
-  {
-    // remove a compiler warning
-  }
    tree = new TTree("tree","");
   SetName(name);
   // Input file
@@ -828,7 +823,7 @@ void HiForest::InitTree()
 //       trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j1"));
 //       trackCorrections.push_back(new TrackingCorrections("Forest2STAv12","Forest2_MergedGeneral_j2"));
 
-      for(int i = 0; i < (int)trackCorrections.size(); ++i){
+      for(int i = 0; i < trackCorrections.size(); ++i){
          if (collisionMode==cPbPb) {
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec/IterTrkCorrv14XSec_hy18dj80to100_akPu3PF_100_-1_-1000_genJetMode0.root",80);
            trackCorrections[i]->AddSample("trkcorr/IterTrkCorrv14XSec/IterTrkCorrv14XSec_hy18dj100to170_akPu3PF_100_-1_-1000_genJetMode0.root",100);
@@ -888,14 +883,14 @@ void HiForest::CheckArraySizes(){
     if(icPu5.nref > maxEntry) objectOverflow.push_back(icPu5.nref);
   }
 
-  for(int i = 0; i < (int)trackOverflow.size(); ++i){
+  for(int i = 0; i < trackOverflow.size(); ++i){
     cout<<trackOverflow[i]<<endl;
   }
 
   if(trackOverflow.size() == 0) cout<<"Track sizes OK"<<endl;
   else cout<<"tracks crash"<<endl; // TODO : really crash
 
-  for(int i = 0; i < (int)objectOverflow.size(); ++i){
+  for(int i = 0; i < objectOverflow.size(); ++i){
     cout<<objectOverflow[i]<<endl;
   }
 
