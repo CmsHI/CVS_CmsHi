@@ -1278,6 +1278,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
     nVertices=0;
     maxofflinetracks=0;
     secofflinetracks=0;
+    thirdofflinetracks=0;
     xVtx = -99999.9;
     yVtx = -99999.9;
     zVtx = -99999.9;
@@ -1307,8 +1308,6 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         }
       }
     }
-
-    if(vertices->size()<2) return;
 
     minVtxSep=99999.9;
     double xVtx2 = -99999.9;
@@ -1340,8 +1339,6 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
       }
     }
 
-    if(vertices->size()<3) return;
-
     minVtxSep2=99999.9;
     double xVtx3 = -99999.9;
     double yVtx3 = -99999.9;
@@ -1365,7 +1362,6 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         }
       }
     }
-
 }
 
 void DiHadronCorrelationMultiBaseFWLite::GetSimVertices()
