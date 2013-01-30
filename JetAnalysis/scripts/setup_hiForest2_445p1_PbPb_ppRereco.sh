@@ -51,7 +51,6 @@ cvs co -r HiForest_V02_00 UserCode/CmsHi/JetAnalysis/src/MyVirtualJetProducer.cc
 cvs co -r backport44X RecoHI/HiJetAlgos
 cvs co -r branch_44x UserCode/CmsHi/JetAnalysis/python/ExtraPfReco_cff.py
 
-mv UserCode/CmsHi/JetAnalysis/src/ CmsHi/JetAnalysis/src/
 mv UserCode/CmsHi/JetAnalysis/src/*.cc CmsHi/JetAnalysis/src/
 mv UserCode/CmsHi/JetAnalysis/src/*.h CmsHi/JetAnalysis/src/
 mv UserCode/CmsHi/JetAnalysis/python/ExtraPfReco_cff.py CmsHi/JetAnalysis/python/
