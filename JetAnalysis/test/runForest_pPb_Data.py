@@ -344,7 +344,8 @@ process.phfPosFilter1 = cms.Path(process.towersAboveThreshold+process.hfPosTower
 process.phfNegFilter1 = cms.Path(process.towersAboveThreshold+process.hfPosTowers+process.hfNegTowers+process.hfNegFilter)
 process.phltPixelClusterShapeFilter = cms.Path(process.siPixelRecHits+process.hltPixelClusterShapeFilter)
 process.pprimaryvertexFilter = cms.Path(process.primaryVertexFilter)
- 
+process.pBeamScrapingFilter=cms.Path(process.NoScraping)
+
 
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
@@ -399,6 +400,7 @@ process.schedule = cms.Schedule(
     process.phfPosFilter2,process.phfNegFilter2,
     process.phfPosFilter1,process.phfNegFilter1,
     process.phltPixelClusterShapeFilter,process.pprimaryvertexFilter,
+    process.pBeamScrapingFilter,    
     process.hltAna,process.pAna
     )
 
