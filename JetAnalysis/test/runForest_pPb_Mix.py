@@ -428,6 +428,13 @@ process.phltPixelClusterShapeFilter = cms.Path(process.siPixelRecHits+process.hl
 process.pprimaryvertexFilter = cms.Path(process.primaryVertexFilter)
 process.pBeamScrapingFilter=cms.Path(process.NoScraping) 
 
+process.pVertexFilterCutG = cms.Path(process.pileupVertexFilterCutG)
+process.pVertexFilterCutGloose = cms.Path(process.pileupVertexFilterCutGloose)
+process.pVertexFilterCutGtight = cms.Path(process.pileupVertexFilterCutGtight)
+process.pVertexFilterCutE = cms.Path(process.pileupVertexFilterCutE)
+process.pVertexFilterCutEandG = cms.Path(process.pileupVertexFilterCutEandG)
+
+
 # Customization
 from CmsHi.JetAnalysis.customise_cfi import *
 setPhotonObject(process,"photons")
