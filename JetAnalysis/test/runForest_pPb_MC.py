@@ -470,6 +470,11 @@ process.schedule = cms.Schedule(
     process.phfPosFilter1,process.phfNegFilter1,
     process.phltPixelClusterShapeFilter,process.pprimaryvertexFilter,
     process.pBeamScrapingFilter,    
+    process.pVertexFilterCutG,
+    process.pVertexFilterCutGloose,
+    process.pVertexFilterCutGtight,
+    process.pVertexFilterCutE,
+    process.pVertexFilterCutEandG,    
     process.hltAna,process.pAna
     )
 
