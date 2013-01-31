@@ -190,10 +190,6 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
   if(smearType==0){
     res = new jetsmear::JetResolution();
   }
-  if(ptMin<0)
-  {
-    //fix compiler warning
-  }
 
   vector<TBranch*> branches(0);
 
@@ -265,7 +261,7 @@ void HiForest::sortJets(TTree* jetTree, Jets& jets, double etaMax, double ptMin,
 	 }
       }
 
-      for(int ib = 0; ib < (int)branches.size(); ++ib){
+      for(int ib = 0; ib < branches.size(); ++ib){
 	 branches[ib]->Fill();
       }
 
@@ -466,9 +462,9 @@ bool HiForest::hasDiJet(Jets& jets, double pt1, double pt2, double dphiMin){
   return true;
 };
 
-double HiForest::jetFracChg(int i){ i+=0; return 0;}
-double HiForest::jetFracNeut(int i){ i+=0; return 0;}
-double HiForest::jetFracEM(int i){ i+=0; return 0;}
+double HiForest::jetFracChg(int i){ return 0;}
+double HiForest::jetFracNeut(int i){ return 0;}
+double HiForest::jetFracEM(int i){ return 0;}
 
 
 void HiForest::fakeRejection(TTree *jetTree, Jets &jets, bool allEvents)
