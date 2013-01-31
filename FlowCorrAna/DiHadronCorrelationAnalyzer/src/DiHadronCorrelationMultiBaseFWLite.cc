@@ -199,7 +199,9 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
 
     if(nVertices>1 && minVtxSep<cutPara.vtxsepmin) return;
     if(nVertices>cutPara.nvtxmax) return;
-    if(hPileup_distfunc && secofflinetracks>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep,maxofflinetracks))) return;
+    if(thirdofflinetracks==10000) return;
+//    if(hPileup_distfunc && secofflinetracks>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep,maxofflinetracks))) return;
+//    if(hPileup_distfunc && thirdofflinetracks>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(minVtxSep,maxofflinetracks))) return;
 //    if(maxofflinetracks/300.*25 < secofflinetracks) return;
   }
 
@@ -1331,6 +1333,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         hXVtxSep->Fill(xsep);
         hYVtxSep->Fill(ysep);
         hXYZVtxSep->Fill(xyzsep);
+        if(hPileup_distfunc && vtx.tracksSize()>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(xyzsep,maxofflinetracks))) thirdofflinetracks=10000;
         if(xyzsep<=minVtxSep)
         {
           minVtxSep=xyzsep;
@@ -1338,7 +1341,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         }
       }
     }
-
+/*
     minVtxSep2=99999.9;
     double xVtx3 = -99999.9;
     double yVtx3 = -99999.9;
@@ -1362,6 +1365,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         }
       }
     }
+*/
 }
 
 void DiHadronCorrelationMultiBaseFWLite::GetSimVertices()
