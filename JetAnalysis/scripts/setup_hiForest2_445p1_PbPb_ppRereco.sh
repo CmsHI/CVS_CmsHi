@@ -83,7 +83,7 @@ cvs co -r  HiForest_V02_02 -d      CmsHi/HiHLTAlgos UserCode/CmsHi/HiHLTAlgos
 cvs co -r HiForest_V02_05 -d       MuTrig/HLTMuTree UserCode/yenjie/HLTMuTree/
 
 # X analyzer
-cvs co -r format_1_11  -d          XbFrame/Xb_frame/UserCode/NTUHEP/Xb_frame
+cvs co -r format_1_11  -d          XbFrame/Xb_frame UserCode/NTUHEP/Xb_frame
 # Build!
 
 scram build -c
