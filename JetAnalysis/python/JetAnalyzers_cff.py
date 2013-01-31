@@ -5,6 +5,7 @@ from CmsHi.JetAnalysis.inclusiveJetAnalyzer_cff import *
 
 inclusiveJetAnalyzer.eventInfoTag = cms.InputTag("hiSignal")
 inclusiveJetAnalyzer.useCentrality   = cms.untracked.bool(False)
+inclusiveJetAnalyzer.jetPtMin = cms.untracked.double(10)
 
 icPu5JetAnalyzer = inclusiveJetAnalyzer.clone()
 
@@ -45,7 +46,8 @@ akPu2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu2PFpatJ
 akPu3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu3PFpatJets"),genjetTag = 'ak3HiGenJets',rParam = 0.3,matchTag = 'akPu3CalopatJets')
 akPu4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu4PFpatJets"),genjetTag = 'ak4HiGenJets',rParam = 0.4,matchTag = 'akPu4CalopatJets')
 akPu5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu5PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'akPu5CalopatJets')
-akPu6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu6PFpatJets"),genjetTag = 'ak6HiGenJets',rParam = 0.6,matchTag = 'akPu6CalopatJets')
+#
+akPu6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("akPu6PFpatJets"),genjetTag = 'ak6HiGenJets',rParam = 0.6,matchTag = 'akPu5CalopatJets')
 
 akPu1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("akPu1CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.1,matchTag = 'akPu1PFpatJets')
 akPu2CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("akPu2CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.2,matchTag = 'akPu2PFpatJets')
@@ -59,7 +61,8 @@ ak2PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak2PFpatJets"
 ak3PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak3PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.3,matchTag = 'ak3CalopatJets')
 ak4PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak4PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.4,matchTag = 'ak4CalopatJets')
 ak5PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak5PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'ak5CalopatJets')
-ak6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak6CalopatJets')
+# FIX
+ak6PFJetAnalyzer = akPu3PFJetAnalyzer.clone(jetTag = cms.InputTag("ak6PFpatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak5CalopatJets')
 ak3CaloJetAnalyzer = akPu3PFJetAnalyzer.clone()
 
 ak1CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak1CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.1,matchTag = 'ak1PFpatJets')
@@ -69,8 +72,9 @@ ak4CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak4Calopa
 ak5CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak5CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.5,matchTag = 'ak5PFpatJets')
 ak6CaloJetAnalyzer = akPu3CaloJetAnalyzer.clone(jetTag = cms.InputTag("ak6CalopatJets"),genjetTag = 'ak5HiGenJets',rParam = 0.6,matchTag = 'ak6PFpatJets')
 
-jetAnalyzers = cms.Sequence(icPu5JetAnalyzer+
+ak1PFJetAnalyzer.skipCorrections = cms.untracked.bool(True)
 
+jetAnalyzers = cms.Sequence(
                             akPu1PFJetAnalyzer +
                             akPu2PFJetAnalyzer +
                             akPu3PFJetAnalyzer +
@@ -98,6 +102,31 @@ jetAnalyzers = cms.Sequence(icPu5JetAnalyzer+
                             ak4CaloJetAnalyzer +
                             ak5CaloJetAnalyzer +
                             ak6CaloJetAnalyzer
+                            
+                            )
+
+
+
+jetAnalyzers2to5 = cms.Sequence(
+                            akPu2PFJetAnalyzer +
+                            akPu3PFJetAnalyzer +
+                            akPu4PFJetAnalyzer +
+                            akPu5PFJetAnalyzer +
+                            
+                            akPu2CaloJetAnalyzer +
+                            akPu3CaloJetAnalyzer +
+                            akPu4CaloJetAnalyzer +
+                            akPu5CaloJetAnalyzer +
+                            
+                            ak2PFJetAnalyzer +
+                            ak3PFJetAnalyzer +
+                            ak4PFJetAnalyzer +
+                            ak5PFJetAnalyzer +
+                            
+                            ak2CaloJetAnalyzer +
+                            ak3CaloJetAnalyzer +
+                            ak4CaloJetAnalyzer +
+                            ak5CaloJetAnalyzer 
                             
                             )
 
