@@ -245,7 +245,8 @@ process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 
 process.pACentrality.producePixelhits = False
-process.pACentrality.produceHFtowers = False
+process.pACentrality.produceHFhits = False
+#process.pACentrality.produceEcalhits =  False
 process.pACentrality.reUseCentrality = True
 process.pACentrality.srcReUse = cms.InputTag("hiCentrality")
 
