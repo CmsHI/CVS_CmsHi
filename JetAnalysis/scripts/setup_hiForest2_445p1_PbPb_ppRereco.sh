@@ -42,20 +42,9 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_63 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
-cvs co -r HiForest_V02_00 UserCode/CmsHi/JetAnalysis/src/HiHcalAnalyzer.cc
-cvs co -r HiForest_v02_00 UserCode/CmsHi/JetAnalysis/src/JetAlgorithmAnalyzer.cc
-cvs co -r HiForest_V02_00 UserCode/CmsHi/JetAnalysis/src/JetAlgorithmAnalyzer.cc
-cvs co -r HiForest_V02_00 UserCode/CmsHi/JetAnalysis/src/MyVirtualJetProducer.h
-cvs co -r HiForest_V02_00 UserCode/CmsHi/JetAnalysis/src/MyVirtualJetProducer.cc
+cvs co -r branch_44x -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+
 cvs co -r backport44X RecoHI/HiJetAlgos
-cvs co -r branch_44x UserCode/CmsHi/JetAnalysis/python/ExtraPfReco_cff.py
-
-mv UserCode/CmsHi/JetAnalysis/src/*.cc CmsHi/JetAnalysis/src/
-mv UserCode/CmsHi/JetAnalysis/src/*.h CmsHi/JetAnalysis/src/
-mv UserCode/CmsHi/JetAnalysis/python/ExtraPfReco_cff.py CmsHi/JetAnalysis/python/
-
-
 
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 

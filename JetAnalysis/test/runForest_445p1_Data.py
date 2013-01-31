@@ -168,7 +168,7 @@ process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
 process.hiEvtAnalyzer.doMC = cms.bool(False)
 process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
 process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality") 
- 
+
 
 process.iterativeConePu5CaloJets.srcPVs = vtxTag
 process.iterativeCone5CaloJets.srcPVs = vtxTag
@@ -244,10 +244,15 @@ process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow
 process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 
+process.pACentrality.producePixelhits = False
+process.pACentrality.produceHFtowers = False
+process.pACentrality.reUseCentrality = True
+process.pACentrality.srcReUse = cms.InputTag("hiCentrality")
+
 process.reco_extra =  cms.Path(
-    process.siPixelRecHits*
+#    process.siPixelRecHits*
     process.pACentrality*
-    process.hiTrackReco*
+#    process.hiTrackReco*
     process.iterativeConePu5CaloJets*
     process.PFTowers*
     process.patDefaultSequence    
