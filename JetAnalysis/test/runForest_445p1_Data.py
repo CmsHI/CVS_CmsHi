@@ -244,16 +244,16 @@ process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow
 process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 
-process.pACentrality.producePixelhits = False
-process.pACentrality.produceHFhits = False
+#process.pACentrality.producePixelhits = False
+#process.pACentrality.produceHFhits = False
 #process.pACentrality.produceEcalhits =  False
-process.pACentrality.reUseCentrality = True
-process.pACentrality.srcReUse = cms.InputTag("hiCentrality")
+#process.pACentrality.reUseCentrality = True
+#process.pACentrality.srcReUse = cms.InputTag("hiCentrality")
 
 process.reco_extra =  cms.Path(
-#    process.siPixelRecHits*
+    process.siPixelRecHits*
     process.pACentrality*
-#    process.hiTrackReco*
+    process.hiTrackReco*
     process.iterativeConePu5CaloJets*
     process.PFTowers*
     process.patDefaultSequence    
