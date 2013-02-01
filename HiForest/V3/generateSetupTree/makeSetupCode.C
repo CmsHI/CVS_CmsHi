@@ -1,7 +1,7 @@
 #include "makeClass.h"
 
 void makeSetupCode(
-		   char *infname = "root://eoscms//eos/cms/store/caf/user/velicanu/PA2013_merged/pPb_hiForest2_monster_logerrevent_HI2013_express_v1_210634_210635_v14.root"
+		   char *infname = "root://eoscms//eos/cms/store/caf/user/yjlee/pPb2013/promptReco/PA2013_HiForest_PromptRecofirstPR_forestv68.root"
 		   ){
   
   TFile *inf = TFile::Open(infname);  
@@ -25,7 +25,7 @@ void makeSetupCode(
   // Add Dummy for skimTree
   
   if (hltTree) makeClass(hltTree,"Hlt","");
-  //  if (skimTree) makeClass(skimTree,"Skim","");
+  if (skimTree) makeClass(skimTree,"Skim","");
   if (photonTree) makeClass(photonTree,"Photon","");
   if (evtTree) makeClass(evtTree,"Evt","");
   if (trackTree) makeClass(trackTree,"Track","");
