@@ -348,6 +348,7 @@ process.pBeamScrapingFilter=cms.Path(process.NoScraping)
 process.pVertexFilterCutG = cms.Path(process.pileupVertexFilterCutG)
 process.pVertexFilterCutGloose = cms.Path(process.pileupVertexFilterCutGloose)
 process.pVertexFilterCutGtight = cms.Path(process.pileupVertexFilterCutGtight)
+process.pVertexFilterCutGplus = cms.Path(process.pileupVertexFilterCutGplus)
 process.pVertexFilterCutE = cms.Path(process.pileupVertexFilterCutE)
 process.pVertexFilterCutEandG = cms.Path(process.pileupVertexFilterCutEandG)
 
@@ -409,6 +410,7 @@ process.schedule = cms.Schedule(
     process.pVertexFilterCutG,
     process.pVertexFilterCutGloose,
     process.pVertexFilterCutGtight,
+    process.pVertexFilterCutGplus,
     process.pVertexFilterCutE,
     process.pVertexFilterCutEandG,
     process.hltAna,process.pAna
