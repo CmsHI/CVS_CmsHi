@@ -48,7 +48,7 @@ cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 # From Eric Appelt
 cvs co -r HiForest_V02_00 -d       Appeltel/PixelTrackAnalysis UserCode/Appeltel/PixelTrackAnalysis
 cvs co -r HiForest_V02_01 -d       Appeltel/PixelTracksRun2010 UserCode/Appeltel/PixelTracksRun2010
-cvs co -r HiForest_V02_00 -d       Appeltel/RpPbAnalysis UserCode/Appeltel/RpPbAnalysis
+cvs co -r HiForest_V02_01 -d       Appeltel/RpPbAnalysis UserCode/Appeltel/RpPbAnalysis
 
 #ecal requires some code from the photon analyzer, 'rm' commands are to truncate the endless chain of packages obviously, 
 
