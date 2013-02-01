@@ -19,8 +19,8 @@ akPu5CaloJets.radiusPU = 0.5
 iterativeConePu5CaloJets.doPVCorrection = cms.bool(True)
 iterativeConePu5CaloJets.srcPVs = 'hiSelectedVertex'
 
-iterativeConePu5CaloJets.jetPtMin = 1.0
-ak5PFJets.jetPtMin = 1.0
+iterativeConePu5CaloJets.jetPtMin = 15.0
+ak5PFJets.jetPtMin = 15.0
 
 akPu5PFJets = ak5PFJets.clone()
 akPu5PFJets.src = 'PFTowers'
@@ -54,30 +54,30 @@ akPu3CaloJets.doPUOffsetCorr = True
 
 
 ### Extra extended algos & sequence
-akPu6PFJets = akPu3PFJets.clone(rParam = 0.6, jetPtMin = 1)
-akPu6CaloJets = akPu3CaloJets.clone(rParam = 0.6, jetPtMin = 1)
-akPu5PFJets = akPu3PFJets.clone(rParam = 0.5, jetPtMin = 1)
-akPu5CaloJets = akPu3CaloJets.clone(rParam = 0.5, jetPtMin = 1)
-akPu4PFJets = akPu3PFJets.clone(rParam = 0.4, jetPtMin = 1)
-akPu4CaloJets = akPu3CaloJets.clone(rParam = 0.4, jetPtMin = 1)
-akPu2PFJets = akPu3PFJets.clone(rParam = 0.2, jetPtMin = 1)
-akPu2CaloJets = akPu3CaloJets.clone(rParam = 0.2, jetPtMin = 1)
-akPu1PFJets = akPu3PFJets.clone(rParam = 0.1, jetPtMin = 1)
-akPu1CaloJets = akPu3CaloJets.clone(rParam = 0.1, jetPtMin = 1)
+akPu6PFJets = akPu3PFJets.clone(rParam = 0.6, jetPtMin = 15)
+akPu6CaloJets = akPu3CaloJets.clone(rParam = 0.6, jetPtMin = 15)
+akPu5PFJets = akPu3PFJets.clone(rParam = 0.5, jetPtMin = 15)
+akPu5CaloJets = akPu3CaloJets.clone(rParam = 0.5, jetPtMin = 15)
+akPu4PFJets = akPu3PFJets.clone(rParam = 0.4, jetPtMin = 15)
+akPu4CaloJets = akPu3CaloJets.clone(rParam = 0.4, jetPtMin = 15)
+akPu2PFJets = akPu3PFJets.clone(rParam = 0.2, jetPtMin = 15)
+akPu2CaloJets = akPu3CaloJets.clone(rParam = 0.2, jetPtMin = 15)
+akPu1PFJets = akPu3PFJets.clone(rParam = 0.1, jetPtMin = 15)
+akPu1CaloJets = akPu3CaloJets.clone(rParam = 0.1, jetPtMin = 15)
 
-iterativeCone5CaloJets = iterativeConePu5CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak6PFJets = akPu6PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak6CaloJets = akPu6CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak5PFJets = akPu5PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak5CaloJets = akPu5CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak4PFJets = akPu4PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak4CaloJets = akPu4CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak3PFJets = akPu3PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak3CaloJets = akPu3CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak2PFJets = akPu2PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak2CaloJets = akPu2CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak1PFJets = akPu1PFJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
-ak1CaloJets = akPu1CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 1)
+iterativeCone5CaloJets = iterativeConePu5CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak6PFJets = akPu6PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak6CaloJets = akPu6CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak5PFJets = akPu5PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak5CaloJets = akPu5CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak4PFJets = akPu4PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak4CaloJets = akPu4CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak3PFJets = akPu3PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak3CaloJets = akPu3CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak2PFJets = akPu2PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak2CaloJets = akPu2CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak1PFJets = akPu1PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
+ak1CaloJets = akPu1CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
 
 
 akPu1PFJets.puPtMin = 5
