@@ -35,6 +35,9 @@ public :
    Int_t           phfNegFilter1;
    Int_t           phltPixelClusterShapeFilter;
    Int_t           pprimaryvertexFilter;
+<<<<<<< SetupSkimTree.h
+   Int_t           phfCoincFilter;
+   Int_t           ppurityFractionFilter;
    Int_t           pBeamScrapingFilter;
    Int_t           pVertexFilterCutG;
    Int_t           pVertexFilterCutGloose;
@@ -42,6 +45,15 @@ public :
    Int_t           pVertexFilterCutE;
    Int_t           pVertexFilterCutEandG;
    Int_t           hltAna;
+=======
+   Int_t           pBeamScrapingFilter;
+   Int_t           pVertexFilterCutG;
+   Int_t           pVertexFilterCutGloose;
+   Int_t           pVertexFilterCutGtight;
+   Int_t           pVertexFilterCutE;
+   Int_t           pVertexFilterCutEandG;
+   Int_t           hltAna;
+>>>>>>> 1.2
 
    // List of branches
    TBranch        *b_superFilterPath;   //!
@@ -61,6 +73,9 @@ public :
    TBranch        *b_phfNegFilter1;   //!
    TBranch        *b_phltPixelClusterShapeFilter;   //!
    TBranch        *b_pprimaryvertexFilter;   //!
+<<<<<<< SetupSkimTree.h
+   TBranch        *b_phfCoincFilter;   //!
+   TBranch        *b_ppurityFractionFilter;   //!
    TBranch        *b_pBeamScrapingFilter;   //!
    TBranch        *b_pVertexFilterCutG;   //!
    TBranch        *b_pVertexFilterCutGloose;   //!
@@ -68,6 +83,15 @@ public :
    TBranch        *b_pVertexFilterCutE;   //!
    TBranch        *b_pVertexFilterCutEandG;   //!
    TBranch        *b_hltAna;   //!
+=======
+   TBranch        *b_pBeamScrapingFilter;   //!
+   TBranch        *b_pVertexFilterCutG;   //!
+   TBranch        *b_pVertexFilterCutGloose;   //!
+   TBranch        *b_pVertexFilterCutGtight;   //!
+   TBranch        *b_pVertexFilterCutE;   //!
+   TBranch        *b_pVertexFilterCutEandG;   //!
+   TBranch        *b_hltAna;   //!
+>>>>>>> 1.2
 
 };
 
@@ -92,6 +116,17 @@ void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 0)
    t->SetBranchAddress("phfNegFilter1", &tSkims.phfNegFilter1, &tSkims.b_phfNegFilter1);
    t->SetBranchAddress("phltPixelClusterShapeFilter", &tSkims.phltPixelClusterShapeFilter, &tSkims.b_phltPixelClusterShapeFilter);
    t->SetBranchAddress("pprimaryvertexFilter", &tSkims.pprimaryvertexFilter, &tSkims.b_pprimaryvertexFilter);
+<<<<<<< SetupSkimTree.h
+   t->SetBranchAddress("pBeamScrapingFilter", &tSkims.pBeamScrapingFilter, &tSkims.b_pBeamScrapingFilter);
+   t->SetBranchAddress("phfCoincFilter", &tSkims.phfCoincFilter, &tSkims.b_phfCoincFilter);
+   t->SetBranchAddress("ppurityFractionFilter", &tSkims.ppurityFractionFilter, &tSkims.b_ppurityFractionFilter);
+   t->SetBranchAddress("pVertexFilterCutG", &tSkims.pVertexFilterCutG, &tSkims.b_pVertexFilterCutG);
+   t->SetBranchAddress("pVertexFilterCutGloose", &tSkims.pVertexFilterCutGloose, &tSkims.b_pVertexFilterCutGloose);
+   t->SetBranchAddress("pVertexFilterCutGtight", &tSkims.pVertexFilterCutGtight, &tSkims.b_pVertexFilterCutGtight);
+   t->SetBranchAddress("pVertexFilterCutE", &tSkims.pVertexFilterCutE, &tSkims.b_pVertexFilterCutE);
+   t->SetBranchAddress("pVertexFilterCutEandG", &tSkims.pVertexFilterCutEandG, &tSkims.b_pVertexFilterCutEandG);
+   t->SetBranchAddress("hltAna", &tSkims.hltAna, &tSkims.b_hltAna);
+=======
    t->SetBranchAddress("pBeamScrapingFilter", &tSkims.pBeamScrapingFilter, &tSkims.b_pBeamScrapingFilter);
    t->SetBranchAddress("pVertexFilterCutG", &tSkims.pVertexFilterCutG, &tSkims.b_pVertexFilterCutG);
    t->SetBranchAddress("pVertexFilterCutGloose", &tSkims.pVertexFilterCutGloose, &tSkims.b_pVertexFilterCutGloose);
@@ -99,6 +134,7 @@ void setupSkimTree(TTree *t,Skims &tSkims,bool doCheck = 0)
    t->SetBranchAddress("pVertexFilterCutE", &tSkims.pVertexFilterCutE, &tSkims.b_pVertexFilterCutE);
    t->SetBranchAddress("pVertexFilterCutEandG", &tSkims.pVertexFilterCutEandG, &tSkims.b_pVertexFilterCutEandG);
    t->SetBranchAddress("hltAna", &tSkims.hltAna, &tSkims.b_hltAna);
+>>>>>>> 1.2
    if (doCheck) {
    }
 }
