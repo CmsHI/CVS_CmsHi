@@ -1,6 +1,22 @@
 #include "/net/hisrv0001/home/davidlw/useful_macros/CF.C"
 #include "/net/hisrv0001/home/davidlw/useful_macros/GetMultiJetCorrFunc.C"
 
+void drawCorr_2D(TString eventtype1="PPData_Minbias_7TeV", TString tag1="TRIGGER85_All_INCLEFF1TRG1v6", int nmin=110, int nmax=1000, int centmin=-1, int centmax=-1, int ptmin=2, int ptmax=1, double zmin=0.95, double zmax=1.05, double etatrgmin=-2.4, double etatrgmax=2.4, double etaassmin=-2.4, double etaassmax=2.4)
+{
+  TString filename = Form("/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/outputs_312/%s/merged/%s_%s_nmin%d_nmax%d_etatrg%.1f-%.1f_etaass%.1f-%.1f_centmin%d_centmax%d.root",eventtype1.Data(),eventtype1.Data(),tag1.Data(),nmin,nmax,etatrgmin,etatrgmax,etaassmin,etaassmax,centmin,centmax);
+  TH2D* h = (TH2D*)Get2DCFv3(filename.Data(),ptmin,ptmax);
+
+  h->SetAxisRange(h->GetMinimum()*zmin,h->GetMaximum()*zmax,"Z");
+
+  TCanvas* c = new TCanvas("c","",550,500);
+  c->SetTheta(60.839);
+  c->SetPhi(38.0172);
+  h->SetAxisRange(-4.5,4.5,"X");
+  h->Draw("surf1");
+
+  SaveCanvas(c,"pPb/corr",Form("corr2D_pPbNew_pt%d-%d_nmin%d_nmax%d",ptmin,ptmax,nmin,nmax));
+}
+
 void drawCorr_dphi(TString eventtype1="PPData_Minbias_7TeV", TString tag1="TRIGGER85_All_INCLEFF1TRG1v6", int nmin=110, int nmax=1000, int centmin=-1, int centmax=-1, int ptmin=2, int ptmax=1, double detamin=2.0, double detamax=4.0, double ymin=0.95, double ymax=1.05, double etatrgmin=-2.4, double etatrgmax=2.4, double etaassmin=-2.4, double etaassmax=2.4)
 { 
   TString filename = Form("/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/outputs_312/%s/merged/%s_%s_nmin%d_nmax%d_etatrg%.1f-%.1f_etaass%.1f-%.1f_centmin%d_centmax%d.root",eventtype1.Data(),eventtype1.Data(),tag1.Data(),nmin,nmax,etatrgmin,etatrgmax,etaassmin,etaassmax,centmin,centmax);

@@ -2,13 +2,18 @@
 
 void Fourier()
 {
+/*
   TString dataname = "HIData_Minbias_2760GeV";
   TString datatag = "PPRereco_INCLEFF1v4";
+*/
+  TString dataname = "PAData_Minbias_5TeV";
+  TString datatag = "HM_Express_INCLEFF1v5";
+//  TString datatag = "MB_INCLEFF1v4";
 
-  int nmin=260;
-  int nmax=300;
-  const int ntrgptbins=2;
-  const int nassptbins=2;
+  int nmin=220;
+  int nmax=260;
+  const int ntrgptbins=11;
+  const int nassptbins=11;
 
   TH1D ***hdata = compare_flow_pp_phi_multipad_pt<TH1D**>(dataname.Data(),datatag.Data(),nmin,nmax,-1,-1,2.0,4.0,ntrgptbins,nassptbins,-2.4,2.4,-2.4,2.4);
   TH1D* hdata_zyam[ntrgptbins][nassptbins];
@@ -43,7 +48,6 @@ void Fourier()
     pttrg[itrg] = hpt[itrg]->GetMean();
   }
 
-
   for(int itrg = 0; itrg<ntrgptbins; itrg++)
   {
     v2[itrg] = fitfunc_vn[itrg][bin_ref]->GetParameter(2)/sqrt(fabs(V2_ref));
@@ -65,7 +69,7 @@ void Fourier()
   g_v3->SetMarkerStyle(24);
 
   TCanvas* cv = new TCanvas("cv","cv",600,550);
-  TH2D* hdummy = new TH2D("dummy",";p_{T} (GeV/c);v_{2}",100,0,8.0,100,0,0.25);
+  TH2D* hdummy = new TH2D("dummy",";p_{T} (GeV/c);v_{2}",100,0,12.0,100,0,0.25);
   hdummy->Draw();
   g_v2->Draw("PESAME");
   g_v3->Draw("PESAME");
