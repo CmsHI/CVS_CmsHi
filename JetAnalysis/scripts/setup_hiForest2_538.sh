@@ -16,7 +16,7 @@ cvs co -r HiForest_V02_00 -d       edwenger/Skims                           User
 cvs co -r HiForest_V02_00 -d       edwenger/VertexAnalyzer                  UserCode/edwenger/VertexAnalyzer
 cvs co -r HiForest_V02_00 -d       SpectraAna/JetEtaPhiFilter               UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
 cvs co -r HiForest_V02_00 -d       SpectraAna/TrackSpectraAnalyzer          UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
-cvs co -r HiForest_V02_17 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r HiForest_V02_72 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -r HiForest_V02_00          UserCode/FerencSiklerVertexing
 
 # pat macros
@@ -42,7 +42,7 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_71 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_72 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 # From Eric Appelt
