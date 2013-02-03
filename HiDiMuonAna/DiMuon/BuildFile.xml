@@ -22,6 +22,17 @@
 <use   name="DataFormats/HcalRecHit"/>
 <use   name="CondCore/DBCommon"/>
 <use   name="CondCore/DBOutputService"/>
+<use   name="DataFormats/TrackerRecHit2D"/>
+<use   name="DataFormats/TrajectorySeed"/>
+<use   name="RecoTracker/TkTrackingRegions"/>
+<use   name="RecoVertex/KalmanVertexFit"/>
+<use   name="RecoVertex/AdaptiveVertexFit"/>
+<use   name="RecoVertex/VertexPrimitives"/>
+<use   name="RecoVertex/KinematicFit"/>
+<use   name="RecoVertex/KinematicFitPrimitives"/>
+<use   name="RecoVertex/PrimaryVertexProducer"/>
+<use   name="TrackingTools/Records"/>
+<use   name="TrackingTools/TransientTrack"/>
 <export>
   <lib   name="1"/>
 </export>
