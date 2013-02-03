@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuonOnia2DPlots.cc,v 1.7 2013/01/17 06:02:44 kumarv Exp $
+// $Id: DiMuonOnia2DPlots.cc,v 1.8 2013/02/02 16:02:50 kumarv Exp $
 //
 //
 // system include files
@@ -2721,7 +2721,7 @@ void DiMuonOnia2DPlots::FillWTPATTree(const edm::Event& iEvent, const edm::Event
       //sh
       // if( (momId1 == 553 && TMath::Abs(part.pdgId())== 13) || (part.pdgId()==553) ) 
 
-      if( (  (!strcmp(fMotherID.c_str(),MID)) && TMath::Abs(part.pdgId())== 13) || (  (!strcmp(fMotherID.c_str(),MID))  ) )
+      if( (  (!strcmp(fMotherID.c_str(),MID)) && TMath::Abs(part.pdgId())== 13) || (  (!strcmp(fMotherID.c_str(),MRID))  ) )
 
 
 
