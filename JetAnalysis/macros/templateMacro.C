@@ -52,12 +52,6 @@ void templateMacro(){
   nt->SetAlias("w","pt1> -999");
   ntMix->SetAlias("w","weight*(pthat > 50)");
 
-  TCut lead(Form("pt1>%d && abs(eta1) < 2",leadCut));
-  TCut dijet(Form("pt1>%d && pt2>%d && abs(eta1) < 2 && abs(eta2) < 2",leadCut,subleadCut));
-
-  TCut deltaPhi("abs(dphi)>2.0944");
-  TCut jetID("trkMax1 > 4 || trkMax2 > 4");
-  TCut noise("noise < 0");
   TCut weight("w");
 
   TTree* t[2] = {nt,ntMix};
@@ -72,7 +66,7 @@ void templateMacro(){
     h[i]->GetXaxis()->CenterTitle();
     h[i]->GetYaxis()->CenterTitle();
 
-    t[i]->Draw(Form("ntrk:cent>>%s",h[i]->GetName()),weight*dijet&&deltaPhi&&jetID&&noise,"colz");
+    t[i]->Draw(Form("ntrk:cent>>%s",h[i]->GetName()),weight*dijet&&deltaPhi&&jetID&&vtx&&noise,"colz");
 
   }
 

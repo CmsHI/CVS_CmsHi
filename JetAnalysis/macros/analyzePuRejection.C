@@ -103,7 +103,7 @@ void analyzePuRejection(string var = "etaDijet"){
     h[i]->GetXaxis()->CenterTitle();
     h[i]->GetYaxis()->CenterTitle();
 
-    t[0]->Draw(Form("var:cent>>%s",h[i]->GetName()),dijet&&deltaPhi&&jetID&&noises[i],"colz");
+    t[0]->Draw(Form("var:cent>>%s",h[i]->GetName()),dijet&&deltaPhi&&jetID&&vtx&&noises[i],"colz");
  
     fitSlices(h[i]);
 
