@@ -133,8 +133,8 @@ void plotFigure(int iplot = 9){
   cms->Draw();
 
   c1->cd(1);
-  TLatex *lumi = new TLatex(0.1,0.26,"pPb L=10.6 nb^{-1}");
-  if(iPlot == 3) lumi = new TLatex(0.1,0.46,"pPb L=10.6 nb^{-1}");
+  TLatex *lumi = new TLatex(0.1,0.26,"pPb L=17.3 nb^{-1}");
+  if(iPlot == 3) lumi = new TLatex(0.1,0.46,"pPb L=17.3 nb^{-1}");
 
   lumi->SetTextFont(63);
   lumi->SetTextSize(15);
