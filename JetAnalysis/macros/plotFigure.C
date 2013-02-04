@@ -189,6 +189,8 @@ void plotBalance(int cbin,
   TCut centNtrk("");
 
   if(centMode == 0){
+    cout<<"Obsolete centrality usage."<<endl;
+    return;
     if(cbin==0) centHF = "bin>=20 && bin<26";
     if(cbin==1) centHF = "bin>=26 && bin<27";
     if(cbin==2) centHF = "bin>=27 && bin<28";
@@ -205,19 +207,9 @@ void plotBalance(int cbin,
   }
 
   if(centMode == 1){
-    if(cbin==0) centHF = "cent>=30 && cent<70";
-    if(cbin==1) centHF = "cent>=20 && cent<30";
-    if(cbin==2) centHF = "cent>=15 && cent<20";
-    if(cbin==3) centHF = "cent>=10 && cent<15";
-    if(cbin==4) centHF = "cent>=5 && cent<10";
-    if(cbin==5) centHF = "cent<5";
-
+    centHF = hfPlusBins[cbin];
     centNtrk = centHF;
   }
-
-
-
-
 
   cout<<"plotting ntrk bin : "<<cbin<<endl;
 

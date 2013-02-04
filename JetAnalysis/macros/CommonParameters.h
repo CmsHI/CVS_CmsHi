@@ -25,10 +25,8 @@
 
 using namespace std;
 
-static bool subtract = 0;
-static int QID = 3;
 
-static TString weightString;
+static bool subtract = 0;
 
 static bool normLead = 0;
 
@@ -63,5 +61,24 @@ static TCut jetID = "trkMax1 > 4 || trkMax2 > 4";
 static TCut noise = "noise < 0"; // Gplus Pile-Up cut also included
 static TCut vtx = "abs(vz)<15";
 
-TCut weight("weight*(pthat > 80)");
+static TCut weight("weight*(pthat > 80)");
+
+static TCut hfPlusBins[6] = {
+  "hfp>=30 && hfp<70",
+  "hfp>=20 && hfp<30",
+  "hfp>=15 && hfp<20",
+  "hfp>=10 && hfp<15",
+  "hfp>=5 && hfp<10",
+  "hfp<5"
+};
+
+// the same - no purpose
+static TCut centBinsHFplus[6] = {
+  "cent>=30 && cent<70",
+  "cent>=20 && cent<30",
+  "cent>=15 && cent<20",
+  "cent>=10 && cent<15",
+  "cent>=5 && cent<10",
+  "cent<5"  
+};
 
