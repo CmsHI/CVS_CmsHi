@@ -45,8 +45,8 @@ void templateMacro(){
   ntMix->SetAlias("phi1","jtphi1");
   ntMix->SetAlias("phi2","jtphi2");
 
-  nt->SetAlias("cent","hf");
-  ntMix->SetAlias("cent","hf");
+  nt->SetAlias("cent","hfp");
+  ntMix->SetAlias("cent","hfp");
 
 
   nt->SetAlias("w","pt1> -999");
