@@ -90,6 +90,7 @@ int findMatch(double& drmin, Jets jets, double eta, double phi, bool gen = 0, do
   for(int i = 0; i < jets.nref; ++i){
     double dr = deltaR(jets.jteta[i],jets.jtphi[i],eta,phi);
     double pt = jets.jtpt[i];
+    if(jets.rawpt[i] < 15) continue;
 
     if(gen && dr < matchR && pt > ptmax){
       ptmax = pt;
