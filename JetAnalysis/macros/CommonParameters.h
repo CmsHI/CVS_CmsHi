@@ -43,7 +43,8 @@ static double sideMax = TMath::Pi()/3 + 0.1;
 
 static double sideCorrect = 1;
 
-static const char* LUM = "#int L dt=150";
+static const char* LUM_PbPb = "L=150#mub^{-1}";
+static const char* LUM_pPb = "L=17.3nb^{-1}";
 
 static bool plotSubtraction = 0;
 
