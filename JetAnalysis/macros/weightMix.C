@@ -173,11 +173,11 @@ void weightSample(
 
 }
 
-void weightMix(){
+void weightMix(int isample = 0){
 
-  weightSample(1,0,2);
-  weightSample(1,0,1);
-  weightSample(1,0,0);
+  weightSample(1,isample,2);
+  weightSample(1,isample,1);
+  weightSample(1,isample,0);
 
 }
 

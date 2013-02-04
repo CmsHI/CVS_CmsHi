@@ -22,7 +22,7 @@ using namespace std;
 
 #endif
 
-#include "weightMix.C"
+#include "CommonParameters.h"
 
 static int iPlot = -99;
 
@@ -41,7 +41,6 @@ void plotBalance(int cbin = 0,
 		 TString infname = "file1.root",
 		 TString refname = "file2.root",
 		 TString mixname = "file3.root",
-		 bool useWeight = true,
 		 bool drawXLabel = false,
 		 bool drawLeg = false);
 
@@ -57,10 +56,9 @@ void drawPatch(float x1, float y1, float x2, float y2);
 //---------------------------------------------------------------------
 
 void plotFigure(int iplot = 9){
-  TString infname = "/d101/yetkin/analysis/d0131/ntuple_data_akPu3PF_forest68_20130201_01.root";
-  TString refname = "/d101/yetkin/analysis/d0128/data_PbPb.root";
-  //  TString mixname = "/d101/yetkin/analysis/d0128/mix_hydjet.root";
-  TString mixname = "/d101/yetkin/analysis/d0201/hijing.root";
+  TString infname = "/d101/yetkin/analysis/d0204/ntuple_data_pPb_akPu3PF_forest71_20130204_01.root";
+  TString refname = "/d101/yetkin/analysis/d0204/ntuple_data_PbPb_akPu3PF_forest71_20130204_01.root";
+  TString mixname = "/d101/yetkin/analysis/d0204/hijing.root";
 
   string hfNames[] = {
     "30<E_{T}^{HF[#eta > 4]}<70",
@@ -108,7 +106,7 @@ void plotFigure(int iplot = 9){
 
   for(int i = 0; i < 6; ++i){
     c1->cd(6-i);
-    plotBalance(i,infname,refname,mixname,true,false,false);
+    plotBalance(i,infname,refname,mixname,i==1,i==0);
     double y1 = 0.07;
     if(i < 3) y1 = 0.23;
     y1=  0.9;
@@ -181,32 +179,11 @@ void plotBalance(int cbin,
 		 TString infname,
 		 TString pythia,
 		 TString mix,
-		 bool useWeight,
 		 bool drawXLabel,
 		 bool drawLeg)
 {
 
-  useWeight = 1;
-
-  bool refOldNtuple = 0;
-  TCut lead(Form("pt1>%d && abs(eta1) < 2",leadCut));
-  TCut dijet(Form("pt1>%d && pt2>%d && abs(eta1) < 2 && abs(eta2) < 2",leadCut,subleadCut));
-
-  TCut deltaPhi("abs(dphi)>2.0944");
-
   if(iPlot != 3) dijet = dijet&&deltaPhi;
-
-  TCut side(Form("pt1>%d && pt2>%d && abs(dphi)>%f && abs(dphi)<%f && abs(eta1) < 2 && abs(eta2) < 2",leadCut,subleadCut, sideMin, sideMax));
-
-  TCut jetID("trkMax1 > 4 || trkMax2 > 4");
-  //  jetID = "trkMax1 > -99999";
-  TCut noise("noise < 0");
-  TCut weight("weight*(pthat > 50)");
-
-
-  double sideScale = sideCorrect*(3.1415926536-2.0944)/(sideMax-sideMin);
-
-  TString cstring = "";
 
   TCut centHF("");
   TCut centNtrk("");
@@ -228,13 +205,6 @@ void plotBalance(int cbin,
   }
 
   if(centMode == 1){
-    if(cbin==0) centHF = "hf>=30 && hf<70";
-    if(cbin==1) centHF = "hf>=20 && hf<30";
-    if(cbin==2) centHF = "hf>=15 && hf<20";
-    if(cbin==3) centHF = "hf>=10 && hf<15";
-    if(cbin==4) centHF = "hf>=5 && hf<10";
-    if(cbin==5) centHF = "hf<5";
-
     if(cbin==0) centHF = "cent>=30 && cent<70";
     if(cbin==1) centHF = "cent>=20 && cent<30";
     if(cbin==2) centHF = "cent>=15 && cent<20";
@@ -273,17 +243,14 @@ void plotBalance(int cbin,
   if(entryMode < 1) nt->AddFriend(ntevt);
 
   // open the pythia (MC) file
-  TFile *infPythia = new TFile(pythia.Data());
-  TTree *ntPythia;
-  TTree *ntevtPythia;
-  if(!refOldNtuple){
-    ntPythia = (TTree*) infPythia->FindObjectAny(treeName.data());
-    ntevtPythia = (TTree*) infPythia->FindObjectAny("ntevt");
-    if(entryMode < 1) ntPythia->AddFriend(ntevtPythia);
-  }else{
-    ntPythia = (TTree*) infPythia->FindObjectAny("nt");
-  }
+  TFile *infReference = new TFile(pythia.Data());
+  TTree *ntReference;
+  TTree *ntevtReference;
 
+  ntReference = (TTree*) infReference->FindObjectAny(treeName.data());
+  ntevtReference = (TTree*) infReference->FindObjectAny("ntevt");
+  if(entryMode < 1) ntReference->AddFriend(ntevtReference);
+  
   // open the datamix file
   TFile *infMix = new TFile(mix.Data());
   TTree *ntMix =(TTree*)infMix->FindObjectAny(treeName.data());
@@ -334,27 +301,27 @@ void plotBalance(int cbin,
 
   // projection histogram
   TH1D *h = new TH1D(Form("h",cbin),"",Nbin,min,max);
-  TH1D *hPythia = new TH1D(Form("hPythia",cbin),"",Nbin,min,max);
+  TH1D *hReference = new TH1D(Form("hReference",cbin),"",Nbin,min,max);
   TH1D *hDataMix = new TH1D(Form("hDataMix",cbin),"",Nbin,min,max);
 
   TH1D *hB = new TH1D(Form("hB",cbin),"",Nbin,min,max);
-  TH1D *hPythiaB = new TH1D(Form("hPythiaB",cbin),"",Nbin,min,max);
+  TH1D *hReferenceB = new TH1D(Form("hReferenceB",cbin),"",Nbin,min,max);
   TH1D *hDataMixB = new TH1D(Form("hDataMixB",cbin),"",Nbin,min,max);
 
   TH1D *hFull = new TH1D("hFull","",Nbin,min,max);
-  TH1D *hPythiaFull = new TH1D("hPythiaFull","",Nbin,min,max);
+  TH1D *hReferenceFull = new TH1D("hReferenceFull","",Nbin,min,max);
   TH1D *hDataMixFull = new TH1D("hDataMixFull","",Nbin,min,max);
 
   TH1D* hNorm = new TH1D("hNorm","",1000,0,1000);
-  TH1D* hNormPythia = new TH1D("hNormPythia","",1000,0,1000);
+  TH1D* hNormReference = new TH1D("hNormReference","",1000,0,1000);
   TH1D* hNormDataMix = new TH1D("hNormDataMix","",1000,0,1000);
 
   hB->SetLineStyle(2);
-  hPythiaB->SetLineStyle(2);
+  hReferenceB->SetLineStyle(2);
   hDataMixB->SetLineStyle(2);
 
-  //  ntPythia->SetAlias("pt1","et1");
-  //  ntPythia->SetAlias("pt2","et2");
+  //  ntReference->SetAlias("pt1","et1");
+  //  ntReference->SetAlias("pt2","et2");
 
   nt->SetAlias("pt1","jtpt1");
   nt->SetAlias("pt2","jtpt2");
@@ -362,83 +329,78 @@ void plotBalance(int cbin,
   nt->SetAlias("eta2","jteta2");
   nt->SetAlias("phi1","jtphi1");
   nt->SetAlias("phi2","jtphi2");
-
   ntMix->SetAlias("pt1","jtpt1");
   ntMix->SetAlias("pt2","jtpt2");
   ntMix->SetAlias("eta1","jteta1");
   ntMix->SetAlias("eta2","jteta2");
   ntMix->SetAlias("phi1","jtphi1");
   ntMix->SetAlias("phi2","jtphi2");
+  ntReference->SetAlias("pt1","jtpt1");
+  ntReference->SetAlias("pt2","jtpt2");
+  ntReference->SetAlias("eta1","jteta1");
+  ntReference->SetAlias("eta2","jteta2");
+  ntReference->SetAlias("phi1","jtphi1");
+  ntReference->SetAlias("phi2","jtphi2");
 
-
-  if(!refOldNtuple){
-    ntPythia->SetAlias("pt1","jtpt1");
-    ntPythia->SetAlias("pt2","jtpt2");
-    ntPythia->SetAlias("eta1","jteta1");
-    ntPythia->SetAlias("eta2","jteta2");
-    ntPythia->SetAlias("phi1","jtphi1");
-    ntPythia->SetAlias("phi2","jtphi2");
-  }
-
-  nt->SetAlias("cent","hf");
-  ntMix->SetAlias("cent","hf");
-  ntPythia->SetAlias("cent","hf");
+  nt->SetAlias("cent","hfp");
+  ntMix->SetAlias("cent","hfp");
+  ntReference->SetAlias("cent","hfp");
 
   nt->SetAlias("dphi","acos(cos(phi1-phi2))");
   ntMix->SetAlias("dphi","acos(cos(phi1-phi2))");
-  ntPythia->SetAlias("dphi","acos(cos(phi1-phi2))");
+  ntReference->SetAlias("dphi","acos(cos(phi1-phi2))");
 
   if(iPlot == 0){
     nt->SetAlias("var","pt2/pt1");
-    ntPythia->SetAlias("var","pt2/pt1");
+    ntReference->SetAlias("var","pt2/pt1");
     ntMix->SetAlias("var","pt2/pt1");
   }
 
   if(iPlot == 1){
     nt->SetAlias("var","(eta1+eta2)/2");
-    ntPythia->SetAlias("var","(eta1+eta2)/2");
+    ntReference->SetAlias("var","(eta1+eta2)/2");
     ntMix->SetAlias("var","(eta1+eta2)/2");
   }
 
   if(iPlot == 3){
     nt->SetAlias("var","acos(cos(phi1-phi2))");
-    ntPythia->SetAlias("var","acos(cos(phi1-phi2))");
+    ntReference->SetAlias("var","acos(cos(phi1-phi2))");
     ntMix->SetAlias("var","acos(cos(phi1-phi2))");
   }
 
   if(iPlot == 8){
     nt->SetAlias("var","pu1-pu2");
-    ntPythia->SetAlias("var","pu1-pu2");
+    ntReference->SetAlias("var","pu1-pu2");
     ntMix->SetAlias("var","pu1-pu2");
   }
 
   if(iPlot == 11){
     nt->SetAlias("var","pu1");
-    ntPythia->SetAlias("var","pu1");
+    ntReference->SetAlias("var","pu1");
     ntMix->SetAlias("var","pu1");
   }
 
   if(iPlot == 12){
     nt->SetAlias("var","pu2");
-    ntPythia->SetAlias("var","pu2");
+    ntReference->SetAlias("var","pu2");
     ntMix->SetAlias("var","pu2");
   }
 
   if(iPlot == 9){
     nt->SetAlias("var","ntrk");
-    ntPythia->SetAlias("var","ntrk");
+    ntReference->SetAlias("var","ntrk");
     ntMix->SetAlias("var","ntrk");
   }
 
   if(iPlot == 21){
     nt->SetAlias("var","eta1");
-    ntPythia->SetAlias("var","eta1");
+    ntReference->SetAlias("var","eta1");
     ntMix->SetAlias("var","eta1");
   }
 
   if(iPlot == 22){
     nt->SetAlias("var","eta2");
-    ntPythia->SetAlias("var","eta2");
+    ntReference->SetAlias("var","eta2");
     ntMix->SetAlias("var","eta2");
   }
 
@@ -446,47 +408,43 @@ void plotBalance(int cbin,
 
   if(iPlot == 101){
     nt->SetAlias("var","eta");
-    ntPythia->SetAlias("var","eta");
+    ntReference->SetAlias("var","eta");
     ntMix->SetAlias("var","eta");
   }
 
   if(iPlot == 51){
     nt->SetAlias("var","matchPt1/pt1");
-    ntPythia->SetAlias("var","matchPt1/pt1");
+    ntReference->SetAlias("var","matchPt1/pt1");
     ntMix->SetAlias("var","matchPt1/pt1");
   }
 
   if(iPlot == 52){
     nt->SetAlias("var","matchPt2/pt2");
-    ntPythia->SetAlias("var","matchPt2/pt2");
+    ntReference->SetAlias("var","matchPt2/pt2");
     ntMix->SetAlias("var","matchPt2/pt2");
   }
 
 
-  nt->Draw("var>>hFull",dijet&&noise&&jetID&&centNtrk); 
-  nt->Draw("var>>hB",side&&noise&&jetID&&centNtrk);
-  nt->Draw("pt1>>hNorm",lead&&noise&&jetID&&centNtrk);
+  nt->Draw("var>>hFull",dijet&&noise&&jetID&&centHF&&vtx); 
+  nt->Draw("var>>hB",side&&noise&&jetID&&centHF&&vtx);
+  nt->Draw("pt1>>hNorm",lead&&noise&&jetID&&centHF&&vtx);
    
-  ntMix->Draw("var>>hDataMixFull",weight*(dijet&&jetID&&centHF));
-  ntMix->Draw("var>>hDataMixB",weight*(side&&jetID&&centHF));
-  ntMix->Draw("pt1>>hNormDataMix",weight*(lead&&jetID&&centHF));
+  ntMix->Draw("var>>hDataMixFull",weight*(dijet&&jetID&&centHF&&vtx));
+  ntMix->Draw("var>>hDataMixB",weight*(side&&jetID&&centHF&&vtx));
+  ntMix->Draw("pt1>>hNormDataMix",weight*(lead&&jetID&&centHF&&vtx));
   
-  ntPythia->Draw("var>>hPythiaFull",dijet&&noise&&jetID&&centHF);
-  ntPythia->Draw("var>>hPythiaB",side&&noise&&jetID&&centHF);
-  ntPythia->Draw("pt1>>hNormPythia",lead&&noise&&jetID&&centHF);
-
-  hDataMixB->Scale(sideScale);
-  hB->Scale(sideScale);
-  hPythiaB->Scale(sideScale);
+  ntReference->Draw("var>>hReferenceFull",dijet&&noise&&jetID&&centHF&&vtx);
+  ntReference->Draw("var>>hReferenceB",side&&noise&&jetID&&centHF&&vtx);
+  ntReference->Draw("pt1>>hNormReference",lead&&noise&&jetID&&centHF&&vtx);
 
   hDataMix->Add(hDataMixFull);
   h->Add(hFull);
-  hPythia->Add(hPythiaFull);
+  hReference->Add(hReferenceFull);
 
   if(subtract){
     hDataMix->Add(hDataMixB,-1);
     h->Add(hB,-1);
-    hPythia->Add(hPythiaB,-1);
+    hReference->Add(hReferenceB,-1);
   }
 
   hB->SetFillStyle(3005);
@@ -505,13 +463,13 @@ void plotBalance(int cbin,
   }
   h->SetMarkerStyle(20);
 
-  if(hPythia->Integral() > 0){
-    hPythia->Scale(1./hNormPythia->Integral());
+  if(hReference->Integral() > 0){
+    hReference->Scale(1./hNormReference->Integral());
   }
 
-  hPythia->SetLineColor(kBlue);
-  hPythia->SetFillColor(kAzure-8);
-  hPythia->SetFillStyle(3005);
+  hReference->SetLineColor(kBlue);
+  hReference->SetFillColor(kAzure-8);
+  hReference->SetFillStyle(3005);
 
   if(normLead){
     hDataMixB->Scale(1./hNormDataMix->Integral());
@@ -593,19 +551,19 @@ void plotBalance(int cbin,
   //hDataMix->GetXaxis()->SetNdivisions(905,true);
   hDataMix->GetYaxis()->SetNdivisions(505,true);
 
-  hPythia->SetMarkerColor(ppColor);
-  hPythia->SetLineColor(ppColor);
-  hPythia->SetMarkerStyle(25);
+  hReference->SetMarkerColor(ppColor);
+  hReference->SetLineColor(ppColor);
+  hReference->SetMarkerStyle(25);
 
 	hDataMix->Draw();//"hist");
 	hDataMix->Draw("hist same");
-	//	hPythia->Draw("same");
+	//	hReference->Draw("same");
 
 	cout<<"PbPb ENTRIES : "<<endl;
-	cout<<hPythia->GetEntries()<<endl;
+	cout<<hReference->GetEntries()<<endl;
 
         cout<<"PbPb integral : "<<endl;
-        cout<<hPythia->Integral()<<endl;
+        cout<<hReference->Integral()<<endl;
 
 	cout<<"pPb integral : "<<endl;
         cout<<h->Integral()<<endl;
@@ -628,7 +586,7 @@ void plotBalance(int cbin,
 
     //   t3->AddEntry(h,Form("%s #mub^{-1}",LUM),"");
     t3->AddEntry(h,"pPb #sqrt{s}=5.02 TeV","p");
-    t3->AddEntry(hPythia,"PbPb #sqrt{s}=2.76 TeV","p");
+    t3->AddEntry(hReference,"PbPb #sqrt{s}=2.76 TeV","p");
     t3->AddEntry(hDataMix,"PYTHIA+HYDJET 1.8","lf");
 
     t3->SetFillColor(0);
