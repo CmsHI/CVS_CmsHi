@@ -56,6 +56,10 @@ void templateMacro(){
 
   TTree* t[2] = {nt,ntMix};
 
+  TH2D* h[2];
+  TH1D* hMean[3];
+  TH1D* hSigma[3];
+
 
   TCanvas* c1 = new TCanvas("c1","",1200,600);
   c1->Divide(2,1);
@@ -67,6 +71,10 @@ void templateMacro(){
     h[i]->GetYaxis()->CenterTitle();
 
     t[i]->Draw(Form("ntrk:cent>>%s",h[i]->GetName()),weight*dijet&&deltaPhi&&jetID&&vtx&&noise,"colz");
+
+    fitSlices(h[i]);
+    hMean[i] = (TH1D*)gDirectory->Get(Form("%s_1",h[i]->GetName()));
+    hSigma[i] = (TH1D*)gDirectory->Get(Form("%s_2",h[i]->GetName()));
 
   }
 
