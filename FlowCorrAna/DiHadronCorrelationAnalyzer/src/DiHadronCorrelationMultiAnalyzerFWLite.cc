@@ -453,16 +453,19 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsBackground(const DiHadronC
 
 TList* DiHadronCorrelationMultiAnalyzerFWLite::GetOutputs()
 {
-  TList* outputlist = (TList*)DiHadronCorrelationMultiBaseFWLite::GetOutputs();
+  TList* outputlist;
 
-  outputlist->Add(hDeltaZvtx);
-  for(int itrg=0;itrg<(int)(cutPara.pttrgmin.size());itrg++)
-  {
-    for(int jass=0;jass<(int)(cutPara.ptassmin.size());jass++)
+  if(cutPara.IsCorr)
+  { 
+    outputlist = new TList();
+    outputlist->Add(hMultRawAll);
+    outputlist->Add(hMultCorrAll);
+    outputlist->Add(hDeltaZvtx);
+    for(int itrg=0;itrg<(int)(cutPara.pttrgmin.size());itrg++)
     {
-      if(!cutPara.IsFullMatrix && itrg<jass) continue;
-//      if(cutPara.IsCorr)
-//      {
+      for(int jass=0;jass<(int)(cutPara.ptassmin.size());jass++)
+      {
+        if(!cutPara.IsFullMatrix && itrg<jass) continue;
         outputlist->Add(hSignal_eta1eta2[itrg][jass]);
         outputlist->Add(hBackground_eta1eta2[itrg][jass]);
         outputlist->Add(hCorrelation_eta1eta2[itrg][jass]);
@@ -498,8 +501,6 @@ TList* DiHadronCorrelationMultiAnalyzerFWLite::GetOutputs()
         outputlist->Add(hSignal_eta_away[itrg][jass]);
         outputlist->Add(hBackground_eta_away[itrg][jass]);
         outputlist->Add(hCorrelation_eta_away[itrg][jass]);
-*/
-/*
         outputlist->Add(hMultSignalPair[itrg][jass]);
         outputlist->Add(hMultBackgroundPair[itrg][jass]);
         outputlist->Add(hSignalPhiTotal[itrg][jass]);
@@ -507,33 +508,34 @@ TList* DiHadronCorrelationMultiAnalyzerFWLite::GetOutputs()
         outputlist->Add(hMultSignalPairVsPhiTotal[itrg][jass]);
         outputlist->Add(hMultBackgroundPairVsPhiTotal[itrg][jass]);
 */
-//      }
+      }
+    }
+
+    for(int itrg=0;itrg<(int)(cutPara.pttrgmin.size());itrg++)
+    {
+      outputlist->Add(hMult_trg[itrg]);
+      outputlist->Add(hMultCorr_trg[itrg]);
+      outputlist->Add(hpT_Signal_trg[itrg]);
+      outputlist->Add(hpTCorr_Signal_trg[itrg]);
+      outputlist->Add(hpT_Background_trg[itrg]);
+      outputlist->Add(hpTCorr_Background_trg[itrg]);
+      outputlist->Add(hdNdetadphi_trg[itrg]);
+      outputlist->Add(hdNdetadphiCorr_trg[itrg]);
+    } 
+  
+    for(int jass=0;jass<(int)(cutPara.ptassmin.size());jass++)
+    {
+      outputlist->Add(hMult_ass[jass]);
+      outputlist->Add(hMultCorr_ass[jass]);
+      outputlist->Add(hpT_Signal_ass[jass]);
+      outputlist->Add(hpTCorr_Signal_ass[jass]);
+      outputlist->Add(hpT_Background_ass[jass]);
+      outputlist->Add(hpTCorr_Background_ass[jass]);
+      outputlist->Add(hdNdetadphi_ass[jass]);
+      outputlist->Add(hdNdetadphiCorr_ass[jass]);
     }
   }
-
-  for(int itrg=0;itrg<(int)(cutPara.pttrgmin.size());itrg++)
-  {
-    outputlist->Add(hMult_trg[itrg]);
-    outputlist->Add(hMultCorr_trg[itrg]);
-    outputlist->Add(hpT_Signal_trg[itrg]);
-    outputlist->Add(hpTCorr_Signal_trg[itrg]);
-    outputlist->Add(hpT_Background_trg[itrg]);
-    outputlist->Add(hpTCorr_Background_trg[itrg]);
-    outputlist->Add(hdNdetadphi_trg[itrg]);
-    outputlist->Add(hdNdetadphiCorr_trg[itrg]);
-  } 
-  
-  for(int jass=0;jass<(int)(cutPara.ptassmin.size());jass++)
-  {
-    outputlist->Add(hMult_ass[jass]);
-    outputlist->Add(hMultCorr_ass[jass]);
-    outputlist->Add(hpT_Signal_ass[jass]);
-    outputlist->Add(hpTCorr_Signal_ass[jass]);
-    outputlist->Add(hpT_Background_ass[jass]);
-    outputlist->Add(hpTCorr_Background_ass[jass]);
-    outputlist->Add(hdNdetadphi_ass[jass]);
-    outputlist->Add(hdNdetadphiCorr_ass[jass]);
-  }
+  else outputlist = (TList*)DiHadronCorrelationMultiBaseFWLite::GetOutputs();
 
   return outputlist;
 }
