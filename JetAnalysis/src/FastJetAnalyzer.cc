@@ -13,7 +13,7 @@
 //
 // Original Author:  Yetkin Yilmaz,32 4-A08,+41227673039,
 //         Created:  Wed Feb 13 14:57:10 CET 2013
-// $Id$
+// $Id: FastJetAnalyzer.cc,v 1.1 2013/02/13 18:51:07 yilmaz Exp $
 //
 //
 
@@ -124,6 +124,9 @@ FastJetAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
      edm::Handle<vector<double> > rhos;
      edm::Handle<vector<double> > sigmas;
+     iEvent.getByLabel(edm::InputTag(labels_[ialgo].data(),"rhos"),rhos);
+     iEvent.getByLabel(edm::InputTag(labels_[ialgo].data(),"sigmas"),sigmas);
+
      bkgs_[ialgo].n = rhos->size();
      for(unsigned int i = 0; i < rhos->size(); ++i){
        bkgs_[ialgo].rho[i] = (*rhos)[i];
