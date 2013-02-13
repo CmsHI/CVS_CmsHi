@@ -132,7 +132,9 @@ process.load('CmsHi.JetAnalysis.EventSelection_cff')
 process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
+process.load('CmsHi.JetAnalysis.HiTrackJets_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
+
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
 process.load('CmsHi.JetAnalysis.PatAna_cff')
 process.load('CmsHi.JetAnalysis.JetAnalyzers_cff')
@@ -248,6 +250,7 @@ process.reco_extra =  cms.Path(
     process.siPixelRecHits*
     process.pACentrality*
     process.hiTrackReco*
+    process.recoTrackJets*
     process.iterativeConePu5CaloJets*
     process.PFTowers*
     process.patDefaultSequence    
@@ -304,7 +307,8 @@ else:
     process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(hitMin)    
 
 process.jetAnalyzers.remove(process.akPu6CaloJetAnalyzer)
-process.ana_step          = cms.Path( process.hcalNoise +
+process.ana_step          = cms.Path( process.fastjet +
+                                      process.hcalNoise +
                                       process.jetAnalyzers2to5 +                                      
                                       process.multiPhotonAnalyzer +
                                       process.ppTrack +
