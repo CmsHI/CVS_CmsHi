@@ -1,10 +1,11 @@
 #include "weightMix.C"
 #include "TProfile.h"
+#include "Slices.h"
 
-static int centMode = 3;
+static int centMode = 1;
 static string centName[] = {"N_{trk}^{offline}","HF+","N_{side}","N_{trk}^{low p_{T}}"};
 
-TProfile* getMult(int isample = 2, string var = "xreco"){
+TH1D* getMult(int isample = 2, string var = "xreco"){
 
   TH1::SetDefaultSumw2();
 
@@ -13,10 +14,19 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
   TChain* ntevt = new TChain("ntevt");
   TChain* ntw;
 
-  const char* pPbFile = "data_pPb.root";
-  const char* PbPbFile = "data_PbPb.root";
-  const char* HydjetFile = "hydjet.root";
-  const char* HijingFile = "hijing.root";
+  const char* pPbFile = "/d101/yetkin/analysis/d0204/ntuple_data_pPb_akPu3PF_forest71_20130204_01.root";
+  const char* PbPbFile = "/d101/yetkin/analysis/d0204/ntuple_data_PbPb_akPu3PF_forest71_20130204_01.root";
+  const char* HydjetFile = "/d101/yetkin/analysis/d0204/hydjet.root";
+  const char* HijingFile = "/d101/yetkin/analysis/d0204/hijing.root";
+
+
+  pPbFile = "ntuple_data_pPb_akPu3PF_forest71_20130204_01.root";
+  //  PbPbFile = "ntuple_data_PbPb2011_akPu3PF_forest71_20130204_01.root";
+  PbPbFile = "ntuple_data_PbPb_akPu3PF_forest71_20130205_01.root";
+
+  HijingFile = "hijing.root";
+  HydjetFile = "hydjet.root";
+
 
   if(isample == 0){
     ntdijet->Add(pPbFile);
@@ -62,12 +72,13 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
   }
 
   TH2D* h[20];
-  TProfile* p[20];
+  TH1D* p[20];
 
   int nmax = 300;
-  if(centMode == 1) nmax = 100;
-  if(centMode == 2) nmax = 100;
+  if(centMode == 1) nmax = 50;
+  if(centMode == 2) nmax = 50;
 
+  int Nbins = 50;
   double ymax = 10;
 
   if(var == "dphi"){
@@ -80,15 +91,15 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
   //  if(isample == 2) nmax = 500;
 
   for(int i = 0; i < 5; ++i){
-    h[i] = new TH2D(Form("h%d",i),"",nmax/10,0,nmax,100,0,ymax);
+    h[i] = new TH2D(Form("h%d",i),"",Nbins,0,nmax,100,0,ymax);
   }
   
-  TH2D* hn = new TH2D(Form("hn%d",isample),"",nmax/10,0,nmax,100,0,2.);
+  TH2D* hn = new TH2D(Form("hn%d",isample),"",Nbins,0,nmax,100,0,2.);
 
   TCut dijet("jtpt1 > 120 && jtpt2 > 30");
 
   if(var != "dphi") dijet = dijet&&"acos(cos(jtphi1-jtphi2))> 2.0944";
-  TCut weight("weight");
+  TCut weight("weight*(pthat > 80)");
   if(isample < 2) weight = "jtpt1 > -999";
 
   if(centMode == 0){
@@ -98,7 +109,7 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
   }
 
   if(centMode == 1){
-    ntdijet->SetAlias("cent","hf");
+    ntdijet->SetAlias("cent","hfp");
     ntdijet->SetAlias("gens","hfs");
     ntdijet->SetAlias("genb","hfb");
   }
@@ -121,8 +132,8 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
   ntdijet->SetAlias("xgen","pt2/pt1");
   ntdijet->SetAlias("xreco","jtpt2/jtpt1");
   ntdijet->SetAlias("dphi","acos(cos(jtphi1-jtphi2))");
-  ntdijet->SetAlias("","");
-  ntdijet->SetAlias("","");
+  ntdijet->SetAlias("etaDijet","(jteta1+jteta2)/2");
+
 
   ntdijet->SetAlias("var",var.data());
 
@@ -134,7 +145,7 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
 
   TCanvas* c2 = new TCanvas("c2","",600,600);
   ntdijet->Draw(Form("var:cent>>h%d",0),weight*dijet,"colz");
-  c2->Print(Form("figure_c2_%s_%d.pdf",var.data(),isample));
+  c2->Print(Form("figure_c2_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
 
 
   if(isample > 1){
@@ -149,26 +160,33 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
 
 
     hn->ProfileX(Form("phn_%d",isample))->Draw("same");
-    c1->Print(Form("figure_c1_%s_%d.pdf",var.data(),isample));
+    c1->Print(Form("figure_c1_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
     
     TCanvas* c3 = new TCanvas("c3","",600,600);
     ntdijet->Draw(Form("var:genb+gens>>h%d",1),weight*dijet,"colz");
-    c3->Print(Form("figure_c3_%s_%d.pdf",var.data(),isample));
+    c3->Print(Form("figure_c3_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
 
     
     TCanvas* c4 = new TCanvas("c4","",600,600);
     ntdijet->Draw(Form("var:gens>>h%d",2),weight*dijet,"colz");
-    c4->Print(Form("figure_c4_%s_%d.pdf",var.data(),isample));
+    c4->Print(Form("figure_c4_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
 
     TCanvas* c5 = new TCanvas("c5","",600,600);
     ntdijet->Draw(Form("var:genb>>h%d",3),weight*dijet,"colz");
-    c5->Print(Form("figure_c5_%s_%d.pdf",var.data(),isample));
+    c5->Print(Form("figure_c5_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
   
   }
 
   TCanvas* cc1 = new TCanvas("cc1","",600,600);
+
   for(int i = 0; i < 4; ++i){
-    p[i] = h[i]->ProfileX(Form("p%d_%d",i,isample));
+    //    h[i]->RebinX(2);
+
+    fitSlices(h[i]);
+    p[i] = (TH1D*)gDirectory->Get(Form("%s_1",h[i]->GetName()));
+    //    p[i] = h[i]->ProfileX();
+
+    p[i]->SetName(Form("p%d_%d",i,isample));
   }
 
   p[2]->SetMarkerColor(2);
@@ -229,7 +247,7 @@ TProfile* getMult(int isample = 2, string var = "xreco"){
 
   t3->Draw();
 
-  cc1->Print(Form("figure_cc1_%s_%d.pdf",var.data(),isample));
+  cc1->Print(Form("figure_cc1_%s_%d_centMode%d.pdf",var.data(),isample,centMode));
 
 
   return p[0];
@@ -243,8 +261,8 @@ void plotVariable(string var = "jtpt2/jtpt1"){
    //   var = "npb";
 
   TCanvas* cc2 = new TCanvas("cc2","",600,600);
-
-  TProfile* p[4];
+  TFile* outf = new TFile("nothing.root","recreate");
+  TH1D* p[4];
 
   for(int i = 0; i < 4; ++i){
     p[i] = getMult(i,var);
@@ -297,7 +315,7 @@ void plotVariable(string var = "jtpt2/jtpt1"){
   if(var == "pt2/pt1") var = "xgen";
   if(var == "acos(cos(jtphi1-jtphi2))") var = "dphi";
 
-  cc2->Print(Form("figure_cc0_%s.pdf",var.data()));
+  cc2->Print(Form("figure_cc0_%s_centMode%d.pdf",var.data(),centMode));
 
 
   TCanvas* cc3 = new TCanvas("cc3","",600,600);
@@ -318,7 +336,7 @@ void plotVariable(string var = "jtpt2/jtpt1"){
 
   t3->Draw();
 
-  cc3->Print(Form("figure_cc3_pPb_%s.pdf",var.data()));
+  cc3->Print(Form("figure_cc3_pPb_%s_centMode%d.pdf",var.data(),centMode));
 
   TCanvas* cc4 = new TCanvas("cc4","",600,600);
   if(centMode == 0){
@@ -342,12 +360,10 @@ void plotVariable(string var = "jtpt2/jtpt1"){
 
   t3->Draw();
 
-  cc4->Print(Form("figure_cc4_PbPb_%s.pdf",var.data()));
+  cc4->Print(Form("figure_cc4_PbPb_%s_centMode%d.pdf",var.data(),centMode));
 
-
-
-
-
+  outf->Write();
+  outf->Close();
 
 
 }
@@ -356,14 +372,18 @@ void plotVariable(string var = "jtpt2/jtpt1"){
 
 void plotSignalMultiplicity(){
 
-  string var = "xreco";
+  string var = "";
+
+  var = "etaDijet";
   plotVariable(var);
 
   return;
 
-  var = "xgen";
+  var = "xreco";
   plotVariable(var);
 
+  var = "xgen";
+  plotVariable(var);
 
   var = "dphi";
   plotVariable(var);

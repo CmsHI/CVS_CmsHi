@@ -45,7 +45,8 @@ void plotBalance(int cbin = 0,
 		 bool drawLeg = false);
 
 
-void drawText(const char *text, float xp, float yp);
+void drawText(const char *text, float xp, float yp, int size = 22);
+//void drawText(const char *text, float xp1, float yp1, float xp2, float yp2, int size);
 
 //--------------------------------------------------------------
 // drawPatch() is a crazy way of removing 0 in the second and third 
@@ -55,10 +56,14 @@ void drawText(const char *text, float xp, float yp);
 void drawPatch(float x1, float y1, float x2, float y2); 
 //---------------------------------------------------------------------
 
-void plotFigure(int iplot = 9){
+void plotFigure(int iplot = 0){
   TString infname = "/d101/yetkin/analysis/d0204/ntuple_data_pPb_akPu3PF_forest71_20130204_01.root";
-  TString refname = "/d101/yetkin/analysis/d0204/ntuple_data_PbPb_akPu3PF_forest71_20130204_01.root";
+  TString refname = "/d101/yetkin/analysis/d0205/ntuple_data_PbPb_akPu3PF_forest71_20130205_01.root";
   TString mixname = "/d101/yetkin/analysis/d0204/hijing.root";
+
+  infname = "ntuple_data_pPb_akPu3PF_forest71_20130204_01.root";
+  refname = "ntuple_data_PbPb_akPu3PF_forest71_20130205_01.root";
+  mixname = "hijing.root";
 
   string hfNames[] = {
     "30<E_{T}^{HF[#eta > 4]}<70",
@@ -90,7 +95,7 @@ void plotFigure(int iplot = 9){
    makeMultiPanelCanvas(c1,3,2,0.0,0.0,0.2,0.2,0.02);
    TLatex *jetf_PbPb;
 
-   if(iPlot == 3 || iPlot == 8 || iPlot == 11 || iPlot == 12){
+   if(iPlot == 3 || iPlot == 8 || iPlot == 11 || iPlot == 12 || iPlot == 13 || iPlot == 14){
      for(int i = 0; i < 6; ++i){
        c1->cd(i+1)->SetLogy();
      }
@@ -99,70 +104,41 @@ void plotFigure(int iplot = 9){
 
   c1->cd(1);
 
-  jetf_PbPb = new TLatex(0.477,0.54,"Anti-k_{T} (PFlow), R=0.3");
-  jetf_PbPb->SetTextFont(63);
-  jetf_PbPb->SetTextSize(15);
-  jetf_PbPb->Draw();
-
   for(int i = 0; i < 6; ++i){
     c1->cd(6-i);
     plotBalance(i,infname,refname,mixname,i==1,i==0);
-    double y1 = 0.07;
-    if(i < 3) y1 = 0.23;
-    y1=  0.9;
-    drawText(binNames[i].data(),0.3,y1);
-    //  drawText("(d)",0.25,0.92);
+    double y1 = 0.85;
+    double x1 = 0.5;
+
+    if(i == 2 || i == 5) x1 = 0.6;
+    drawText(binNames[i].data(),x1,y1);
   }
 
-  c1->cd(2);
 
-  TLatex tsel;
-  tsel.SetNDC();
-  tsel.SetTextFont(63);
-  tsel.SetTextSize(15);
-  tsel.DrawLatex(0.15,0.75,Form("p_{T,1} > %d GeV/c",leadCut));
-  tsel.DrawLatex(0.15,0.65,Form("p_{T,2} > %d GeV/c",subleadCut));
-  tsel.DrawLatex(0.15,0.55,"#Delta#phi_{12} > #frac{2}{3}#pi");
 
   c1->cd(1);
-        
-  TLatex *cms = new TLatex(0.03,0.28,"CMS Preliminary");
-  if(iPlot == 3) cms = new TLatex(0.04,1.,"CMS Preliminary");
-  cms->SetTextFont(63);
-  cms->SetTextSize(17);
-  cms->Draw();
 
-  c1->cd(1);
-  TLatex *lumi = new TLatex(0.1,0.26,"pPb L=17.3 nb^{-1}");
-  if(iPlot == 3) lumi = new TLatex(0.1,0.46,"pPb L=17.3 nb^{-1}");
-
-  lumi->SetTextFont(63);
-  lumi->SetTextSize(15);
-  lumi->Draw();
-
-  lumi = new TLatex(0.1,0.24,"PbPb L=150 #mub^{-1}");
-  if(iPlot == 3) lumi = new TLatex(0.1,0.14,"PbPb L=150 #mub^{-1}");
-
-  lumi->SetTextFont(63);
-  lumi->SetTextSize(15);
-  lumi->Draw();
-
+  drawText("CMS Preliminary",0.22,0.9,18);   
+  drawText(Form("pPb %s",LUM_pPb),0.22,0.8,18);
+  if(iPlot == 0 || iPlot == 3) drawText(Form("PbPb %s",LUM_PbPb),0.22,0.7,18);
 
 
   c1->cd(2);
-  TLatex *jetf_pp;
+  drawText("anti-k_{T} (R=0.3)",0.02,0.9,18);
+  drawText("PU subt. PF jets",0.02,0.8,18);
+  drawText("|#eta|<2",0.02,0.7,18);
 
-  jetf_pp = new TLatex(0.12,0.24,"anti-k_{T}, (R=0.3) PF jets PU");
+  c1->cd(3);
+  drawText(Form("p_{T,1} > %d GeV/c",leadCut),0.02,0.9,18);
+  drawText(Form("p_{T,2} > %d GeV/c",subleadCut),0.02,0.8,18);
+  drawText("#Delta#phi_{12} > #frac{2}{3}#pi",0.02,0.7,18);
 
-  jetf_pp->SetTextFont(63);
-  jetf_pp->SetTextSize(15);
-  jetf_pp->Draw();
 
   const char* date = "20130127";
 
   string figures[150] = {"imbalance","etaDijet","",    "dphi","",
 		      "","",        "", "pudifference", "ntrk",
-		      "","pu1","pu2","","",
+		      "","pu1","pu2","trkMax1","trkMax2",
                       "","","","","",
 		      "","eta1","eta2"
   };
@@ -182,6 +158,9 @@ void plotBalance(int cbin,
 		 bool drawXLabel,
 		 bool drawLeg)
 {
+
+  bool showPbPb = 0;
+  if(iPlot == 0 || iPlot == 3) showPbPb = 1;
 
   if(iPlot != 3) dijet = dijet&&deltaPhi;
 
@@ -285,6 +264,11 @@ void plotBalance(int cbin,
     max = 25;
   };
 
+  if(iPlot == 13 || iPlot == 14){
+    Nbin = 75;
+    max = 150;
+  }
+
   if(iPlot == 101){
     Nbin = 20;
     max = 2;
@@ -376,6 +360,18 @@ void plotBalance(int cbin,
     nt->SetAlias("var","pu2");
     ntReference->SetAlias("var","pu2");
     ntMix->SetAlias("var","pu2");
+  }
+
+  if(iPlot == 13){
+    nt->SetAlias("var","trkMax1");
+    ntReference->SetAlias("var","trkMax1");
+    ntMix->SetAlias("var","trkMax1");
+  }
+
+  if(iPlot == 14){
+    nt->SetAlias("var","trkMax2");
+    ntReference->SetAlias("var","trkMax2");
+    ntMix->SetAlias("var","trkMax2");
   }
 
   if(iPlot == 9){
@@ -505,6 +501,10 @@ void plotBalance(int cbin,
   if(iPlot==11) hDataMix->SetXTitle("p_{T,1}^{background}");
   if(iPlot==12) hDataMix->SetXTitle("p_{T,2}^{background}");
 
+  if(iPlot==13) hDataMix->SetXTitle("p_{T} leading track in leading jet");
+  if(iPlot==14) hDataMix->SetXTitle("p_{T} leading track in subleading jet");
+
+
   if(drawXLabel){
     if(iPlot==0) hDataMix->SetXTitle("p_{T,2}/p_{T,1}");
     if(iPlot==3) hDataMix->SetXTitle("#Delta #phi_{1,2}");
@@ -549,7 +549,7 @@ void plotBalance(int cbin,
 
 	hDataMix->Draw();//"hist");
 	hDataMix->Draw("hist same");
-	//	hReference->Draw("same");
+	if(showPbPb) hReference->Draw("same");
 
 	cout<<"PbPb ENTRIES : "<<endl;
 	cout<<hReference->GetEntries()<<endl;
@@ -574,12 +574,10 @@ void plotBalance(int cbin,
 	 cout<<" mean value of data "<<h->GetMean()<<endl;
 
   if(drawLeg){
-    TLegend *t3=new TLegend(0.06,0.6,0.53,0.95); 
-
-    //   t3->AddEntry(h,Form("%s #mub^{-1}",LUM),"");
+    TLegend *t3=new TLegend(0.01,0.7,0.3,0.95);
     t3->AddEntry(h,"pPb #sqrt{s}=5.02 TeV","p");
-    t3->AddEntry(hReference,"PbPb #sqrt{s}=2.76 TeV","p");
-    t3->AddEntry(hDataMix,"PYTHIA+HYDJET 1.8","lf");
+    if(showPbPb) t3->AddEntry(hReference,"PbPb #sqrt{s}=2.76 TeV","p");
+    t3->AddEntry(hDataMix,"PYTHIA+HIJING","lf");
 
     t3->SetFillColor(0);
     t3->SetBorderSize(0);
@@ -599,16 +597,18 @@ void drawPatch(float x1, float y1, float x2, float y2){
   t1->Draw("");
 }
 
-void drawText(const char *text, float xp, float yp){
+void drawText(const char *text, float xp, float yp, int size){
   TLatex *tex = new TLatex(xp,yp,text);
   tex->SetTextFont(63);
-  tex->SetTextSize(22);
-  //tex->SetTextSize(0.05);
+  tex->SetTextSize(size);
   tex->SetTextColor(kBlack);
   tex->SetLineWidth(1);
   tex->SetNDC();
   tex->Draw();
 }
+
+
+
 
 
 void makeMultiPanelCanvas(TCanvas*& canv,
