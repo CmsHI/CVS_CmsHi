@@ -10,6 +10,7 @@ trackWithVertexRefSelector.ptErrorCut = cms.double(99999)
 trackWithVertexRefSelector.d0Max = cms.double(99999)
 trackWithVertexRefSelector.numberOfValidHits = cms.uint32(999999)
 trackWithVertexRefSelector.useVtx = cms.bool(False)
+trackWithVertexRefSelector.quality = cms.string("highPurity")
 
 ak5TrackJets.doAreaFastjet   = cms.bool(True)
 ak5TrackJets.doRhoFastjet    = cms.bool(True)
