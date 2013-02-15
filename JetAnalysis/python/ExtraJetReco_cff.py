@@ -80,6 +80,66 @@ ak1PFJets = akPu1PFJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
 ak1CaloJets = akPu1CaloJets.clone(doPUOffsetCorr = False, jetPtMin = 15)
 
 
+ak1PFJets0 = ak1PFJets.clone(src = 'particleFlow',
+                            jetType = 'PFJet'
+                            )
+
+ak1PFJets0.doAreaFastjet   = cms.bool(True)
+ak1PFJets0.doRhoFastjet   = cms.bool(True)
+ak1PFJets0.doFastJetNonUniform = cms.bool(True)
+ak1PFJets0.puCenters = cms.vdouble(-5,-4.5,-4,-3.5,-3,-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5)
+ak1PFJets0.puWidth = cms.double(0.5)
+ak1PFJets0.nExclude = cms.uint32(0)
+ak1PFJets0.Rho_EtaMax = cms.double(5.5)
+ak1PFJets0.Ghost_EtaMax = cms.double(5.5)
+
+kt1PFJets0 = ak1PFJets0.clone(jetAlgorithm = cms.string("Kt"))
+
+ak1PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.1),puWidth = 0.5)
+ak2PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.2),puWidth = 0.5)
+ak3PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.3),puWidth = 0.5)
+ak4PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.4),puWidth = 0.5)
+ak5PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.5),puWidth = 0.5)
+ak6PFJets05 = ak1PFJets0.clone(rParam = cms.double(0.6),puWidth = 0.5)
+
+ak1PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.1),puWidth = 2)
+ak2PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.2),puWidth = 2)
+ak3PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.3),puWidth = 2)
+ak4PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.4),puWidth = 2)
+ak5PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.5),puWidth = 2)
+ak6PFJets1 = ak1PFJets0.clone(rParam = cms.double(0.6),puWidth = 2)
+
+ak1PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.1),puWidth = 2)
+ak2PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.2),puWidth = 2)
+ak3PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.3),puWidth = 2)
+ak4PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.4),puWidth = 2)
+ak5PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.5),puWidth = 2)
+ak6PFJets2 = ak1PFJets0.clone(rParam = cms.double(0.6),puWidth = 2)
+
+
+kt1PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.1),puWidth = 0.5)
+kt2PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.2),puWidth = 0.5)
+kt3PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.3),puWidth = 0.5)
+kt4PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.4),puWidth = 0.5)
+kt5PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.5),puWidth = 0.5)
+kt6PFJets05 = kt1PFJets0.clone(rParam = cms.double(0.6),puWidth = 0.5)
+
+kt1PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.1),puWidth = 2)
+kt2PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.2),puWidth = 2)
+kt3PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.3),puWidth = 2)
+kt4PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.4),puWidth = 2)
+kt5PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.5),puWidth = 2)
+kt6PFJets1 = kt1PFJets0.clone(rParam = cms.double(0.6),puWidth = 2)
+
+kt1PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.1),puWidth = 2)
+kt2PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.2),puWidth = 2)
+kt3PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.3),puWidth = 2)
+kt4PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.4),puWidth = 2)
+kt5PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.5),puWidth = 2)
+kt6PFJets2 = kt1PFJets0.clone(rParam = cms.double(0.6),puWidth = 2)
+
+
+
 akPu1PFJets.puPtMin = 5
 akPu2PFJets.puPtMin = 10
 akPu3PFJets.puPtMin = 15
@@ -162,6 +222,19 @@ recoAk2to5ID = cms.Sequence(
                            akPu2CaloJetID *akPu3CaloJetID * akPu4CaloJetID * akPu5CaloJetID *
                            ak2CaloJetID *ak3CaloJetID * ak4CaloJetID * ak5CaloJetID
                            )
+
+recoFastJets = cms.Sequence(ak1PFJets05+ak2PFJets05+ak3PFJets05+ak4PFJets05+ak5PFJets05+ak6PFJets05
+                            +
+                            ak1PFJets1+ak2PFJets1+ak3PFJets1+ak4PFJets1+ak5PFJets1+ak6PFJets1
+                            +
+                            ak1PFJets2+ak2PFJets2+ak3PFJets2+ak4PFJets2+ak5PFJets2+ak6PFJets2
+                            +
+                            kt1PFJets05+kt2PFJets05+kt3PFJets05+kt4PFJets05+kt5PFJets05+kt6PFJets05
+                            +
+                            kt1PFJets1+kt2PFJets1+kt3PFJets1+kt4PFJets1+kt5PFJets1+kt6PFJets1
+                            +
+                            kt1PFJets2+kt2PFJets2+kt3PFJets2+kt4PFJets2+kt5PFJets2+kt6PFJets2   
+                            )
 
 recoJetsWithID = cms.Sequence(recoAk1to6*recoAk1to6ID)
 recoJetsWithID2to5 = cms.Sequence(recoAk2to5*recoAk2to5ID)

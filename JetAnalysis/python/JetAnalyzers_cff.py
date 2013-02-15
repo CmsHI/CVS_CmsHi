@@ -133,7 +133,10 @@ jetAnalyzers2to5 = cms.Sequence(
 
 
 fastjet = cms.EDAnalyzer("FastJetAnalyzer",
-                         algos = cms.vstring("ak1TrackJets05","ak2TrackJets05","ak3TrackJets05","ak4TrackJets05")
+                         algos = cms.vstring("ak1PFJets05","ak2PFJets05","ak3PFJets05","ak4PFJets05","ak5PFJets05","ak6PFJets05",
+                                             "ak1PFJets1","ak2PFJets1","ak3PFJets1","ak4PFJets1","ak5PFJets1","ak6PFJets1",
+                                             "ak1PFJets2","ak2PFJets2","ak3PFJets2","ak4PFJets2","ak5PFJets2","ak6PFJets2"
+                                             )
                          )
 
 

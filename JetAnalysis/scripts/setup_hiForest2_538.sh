@@ -31,6 +31,8 @@ cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Anal
 cvs co -r pPbProd_v05              RecoHI/HiCentralityAlgos
 cvs co -r pPbProd_v04              DataFormats/HeavyIonEvent
 
+cvs co -r branch_hi538             RecoJets/JetProducers
+
 cvs co -r V_11573_001 -d HcalNoise/DumpHcalNoiseInformationFromRECO UserCode/YiChen/HcalNoise/DumpHcalNoiseInformationFromRECO
 
 # Track validation histograms
@@ -42,7 +44,7 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_72 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_73 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 # From Eric Appelt

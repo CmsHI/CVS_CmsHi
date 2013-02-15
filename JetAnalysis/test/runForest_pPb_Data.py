@@ -47,7 +47,7 @@ process.source = cms.Source("PoolSource",
 
 # Number of events we want to process, -1 = all events
 process.maxEvents = cms.untracked.PSet(
-            input = cms.untracked.int32(100))
+            input = cms.untracked.int32(10))
 
 
 #####################################################################################
@@ -250,7 +250,8 @@ process.reco_extra =  cms.Path(
     process.siPixelRecHits*
     process.pACentrality*
     process.hiTrackReco*
-    process.recoTrackJets*
+#    process.recoTrackJets*
+    process.recoFastJets*
     process.iterativeConePu5CaloJets*
     process.PFTowers*
     process.patDefaultSequence    
@@ -399,6 +400,17 @@ process.skimFilter.HLTPaths = [ "HLT_PAJet80_*",
 process.superFilterSequence = cms.Sequence(process.skimFilter)
 process.superFilterPath = cms.Path(process.superFilterSequence)
 
+#####################################################################################
+# Edm Output
+#####################################################################################
+
+process.out = cms.OutputModule("PoolOutputModule",
+                                                              fileName = cms.untracked.string("output.root")
+                                                              )
+process.save = cms.EndPath(process.out)
+
+#####################################################################################
+
 
 process.schedule = cms.Schedule(
     process.superFilterPath,
@@ -418,21 +430,11 @@ process.schedule = cms.Schedule(
     process.pVertexFilterCutE,
     process.pVertexFilterCutEandG,
     process.hltAna,process.pAna
+#    process.save
     )
 
 #process.schedule.extend(process.postHLTschedule)
 
-
-########### random number seed
-
-#####################################################################################
-# Edm Output
-#####################################################################################
-
-#process.out = cms.OutputModule("PoolOutputModule",
-#                               fileName = cms.untracked.string("output.root")
-#                               )
-#process.save = cms.EndPath(process.out)
 
 
 if lightMode:
