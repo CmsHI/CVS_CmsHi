@@ -146,6 +146,7 @@ process.load('CmsHi.JetAnalysis.EventSelection_cff')
 process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
+process.load('CmsHi.JetAnalysis.HiTrackJets_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
 process.load('CmsHi.JetAnalysis.PatAna_MC_cff')
@@ -325,16 +326,12 @@ process.genParticles.src = cms.InputTag("hiSignal")
 
 process.reco_extra =  cms.Path(
 #    process.hiGenParticles +
-    
     process.siPixelRecHits*
-    process.pACentrality*
-    
+    process.pACentrality*    
     process.hiTrackReco
     +process.hiTrackDebug
-    
-    #        *process.muonRecoPbPb
-#    *process.HiParticleFlowLocalReco
-#    *process.HiParticleFlowReco
+#    process.recoTrackJets*
+    *process.recoFastJets
     *process.iterativeConePu5CaloJets
     *process.PFTowers
     *process.genParticles
@@ -381,8 +378,8 @@ process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
 process.multiPhotonAnalyzer.basicClusterBarrel = cms.InputTag("hybridSuperClusters:hybridBarrelBasicClusters")
 process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClusters:multi5x5EndcapBasicClusters")
 
-process.ana_step          = cms.Path(
-    process.genpana +
+process.ana_step          = cms.Path(process.fastjet +
+                                     process.genpana +
                                       process.hcalNoise +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
