@@ -308,9 +308,14 @@ else:
     process.rechitanalyzer.TowerTreePtMin = cms.untracked.double(hitMin)    
 
 process.jetAnalyzers.remove(process.akPu6CaloJetAnalyzer)
+<<<<<<< runForest_pPb_Data.py
+process.ana_step          = cms.Path( process.hcalNoise +
+                                      process.jetAnalyzers3to5 +                                      
+=======
 process.ana_step          = cms.Path( process.fastjet +
                                       process.hcalNoise +
                                       process.jetAnalyzers2to5 +                                      
+>>>>>>> 1.37
                                       process.multiPhotonAnalyzer +
                                       process.ppTrack +
                                       process.pixelTrack +
