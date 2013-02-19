@@ -131,6 +131,25 @@ jetAnalyzers2to5 = cms.Sequence(
                             )
 
 
+jetAnalyzers3to5 = cms.Sequence(
+                            akPu3PFJetAnalyzer +
+                            akPu4PFJetAnalyzer +
+                            akPu5PFJetAnalyzer +
+                            
+                            akPu3CaloJetAnalyzer +
+                            akPu4CaloJetAnalyzer +
+                            akPu5CaloJetAnalyzer +
+                            
+                            ak3PFJetAnalyzer +
+                            ak4PFJetAnalyzer +
+                            ak5PFJetAnalyzer +
+                            
+                            ak3CaloJetAnalyzer +
+                            ak4CaloJetAnalyzer +
+                            ak5CaloJetAnalyzer 
+                            )
+
+
 
 fastjet = cms.EDAnalyzer("FastJetAnalyzer",
                          algos = cms.vstring("ak1PFJets05","ak2PFJets05","ak3PFJets05","ak4PFJets05","ak5PFJets05","ak6PFJets05",
