@@ -16,20 +16,22 @@ cvs co -r HiForest_V02_00 -d       edwenger/Skims                           User
 cvs co -r HiForest_V02_00 -d       edwenger/VertexAnalyzer                  UserCode/edwenger/VertexAnalyzer
 cvs co -r HiForest_V02_00 -d       SpectraAna/JetEtaPhiFilter               UserCode/ASYoon/SpectraAna/JetEtaPhiFilter
 cvs co -r HiForest_V02_00 -d       SpectraAna/TrackSpectraAnalyzer          UserCode/ASYoon/SpectraAna/TrackSpectraAnalyzer
-cvs co -r HiForest_V02_17 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
+cvs co -r HiForest_V02_72 -d       MitHig/PixelTrackletAnalyzer             UserCode/MitHig/PixelTrackletAnalyzer
 cvs co -r HiForest_V02_00          UserCode/FerencSiklerVertexing
 
 # pat macros
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForMC  UserCode/MNguyen/patMacrosForMC
 cvs co -r HiForest_V02_00 -d       MNguyen/patMacrosForDataSkims  UserCode/MNguyen/patMacrosForDataSkims
 cvs co -r HiForest_V02_00 -d       MNguyen/Configuration  UserCode/MNguyen/Configuration
-cvs co -r pPbProd_v07              HeavyIonsAnalysis/Configuration
+cvs co -r pPbProd_v08              HeavyIonsAnalysis/Configuration
 
 # pi0 analyzer (optional)
 cvs co -r HiForest_V02_00 -d       MNguyen/pi0Analyzer  UserCode/MNguyen/pi0Analyzer
 
 cvs co -r pPbProd_v05              RecoHI/HiCentralityAlgos
 cvs co -r pPbProd_v04              DataFormats/HeavyIonEvent
+
+cvs co -r branch_hi538             RecoJets/JetProducers
 
 cvs co -r V_11573_001 -d HcalNoise/DumpHcalNoiseInformationFromRECO UserCode/YiChen/HcalNoise/DumpHcalNoiseInformationFromRECO
 
@@ -42,7 +44,7 @@ cvs co -r HiForest_V02_00 -d       PbPbTrackingTools/VertexConstraintProducer
 # Centrality and event plane
 #      Yen-Jie: Evt plane configuration need check!
 cvs co -r HiForest_V02_01 -d       CmsHi/PhotonAnalysis UserCode/CmsHi/PhotonAnalysis
-cvs co -r HiForest_V02_70 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
+cvs co -r HiForest_V02_74 -d       CmsHi/JetAnalysis UserCode/CmsHi/JetAnalysis
 cvs co -r HiForest_V02_00 -d       HcalFilter UserCode/MTonjes/HcalFilter
 
 # From Eric Appelt
