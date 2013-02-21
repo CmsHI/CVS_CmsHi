@@ -86,9 +86,10 @@ overrideCentrality(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
   centralityVariable = cms.string("HFtowersPlusTrunc"),
-    nonDefaultGlauberModel = cms.string(""),
-      centralitySrc = cms.InputTag("pACentrality")
-        )
+  nonDefaultGlauberModel = cms.string(""),
+  centralitySrc = cms.InputTag("pACentrality"),
+  pPbRunFlip = cms.untracked.uint32(211313)
+  )
         
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
