@@ -10,11 +10,12 @@ cat > $subfile <<EOF
 Universe     = vanilla
 
 Notification = Error
+#Requirements = (Machine != "hibat0001.cmsaf.mit.edu") 
 Executable   = $dir/$1
 Arguments    = $2 $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12}
 Rank         = Mips
 GetEnv       = True
-priority     = 1000
+priority     = 2000
 
 initialdir   = $dir
 input        = /dev/null

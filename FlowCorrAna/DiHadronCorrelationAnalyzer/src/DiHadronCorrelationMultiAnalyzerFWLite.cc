@@ -294,7 +294,8 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsSignal(const DiHadronCorre
           double deltaPhi=GetDeltaPhi(phi_trg,phi_ass);
           double deltaEta=GetDeltaEta(eta_trg,eta_ass);
 
-          if(deltaEta==0.0 && deltaPhi==0.0) continue; // two particles are identical
+//          if(deltaEta==0.0 && deltaPhi==0.0) continue; // two particles are identical
+          if(fabs(deltaEta)<0.028 && fabs(deltaPhi)<0.02) continue; // two particles are close 
 
           TLorentzVector part_total = part_ass + part_trg;
           double massInv = part_total.M();
@@ -397,6 +398,8 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsBackground(const DiHadronC
 
           double deltaPhi=GetDeltaPhi(phi_trg,phi_ass);
           double deltaEta=GetDeltaEta(eta_trg,eta_ass);
+
+          if(fabs(deltaEta)<0.028 && fabs(deltaPhi)<0.02) continue; // two particles are close 
 
           TLorentzVector part_total = part_ass + part_trg;
           double massInv = part_total.M();

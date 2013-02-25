@@ -4,9 +4,9 @@ export EVENTTYPE="PAData_Minbias_5TeV"
 export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
 #export TRGHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trgEff_minbias.root"
 export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/trkEff_pp_all_42X_origin.root"
-#export PILEUPDISTFUNCHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/pileup_distfunc_pPb_2sigma.root"
-#export CENTFILENAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/centrality/centralityfile_data_2011.root"
-#export CENTTABLENAME="HFtowers"
+#export PILEUPDISTFUNCHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/pileup_distfunc_pPb_2sigma_mode1.root"
+export CENTFILENAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/centrality/centralityfile_data_2011.root"
+export CENTTABLENAME="HFtowers"
 
 #export CHECKSIGN=0
 #export ISDOEVENTSHAPE=1
@@ -45,13 +45,16 @@ export ASSTRACKCOLLECTION="selectTracks"
 export VERTEXCOLLECTION="offlinePrimaryVertices"
 #export VERTEXCOLLECTION="pixelVertices"
 
+#export NETABINS=512
+#export NPHIBINS=512
 export ETATRGMIN=-2.4
 export ETATRGMAX=2.4
 export ETAASSMIN=-2.4
 export ETAASSMAX=2.4
 #export VTXSEPMIN=0.6
-#export NVTXMAX=3
+#export NVTXMAX=1
 export ISFULLMATRIX=1
+export ISTRKQUALITY=1
 
 export ISCORR=1
 #export ISTRACKNTUPLE=1

@@ -1,0 +1,10 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PAData_Trigger_5TeV
+
+export TRIGGERNAMES="HLT_PAHFSumET100_v1  HLT_PAHFSumET100_v2  HLT_PAHFSumET100_v3 HLT_PAHFSumET140_v1  HLT_PAHFSumET140_v2  HLT_PAHFSumET140_v3 HLT_PAHFSumET170_v1  HLT_PAHFSumET170_v2  HLT_PAHFSumET170_v3"
+
+NMIN=(-1)
+NMAX=(-1)
+
+CENTMIN=(11 12)
+CENTMAX=(12 13)

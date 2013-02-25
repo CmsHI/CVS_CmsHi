@@ -9,14 +9,29 @@ currentdir=$PWD
 #datadir=/mnt/hadoop/cms/store/user/davidlw/HIHighPt/PR2011_HighPtTrack12_pixeltracks_TRKANASKIM_official_v6/*
 #datadir=/mnt/hadoop/cms/store/user/davidlw/MinBias_TuneZ2star_7TeV_pythia6_442p5_v1/NMult170/Skims
 
-dataset=PAData_Minbias_5TeV_HM_PromptReco
-datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v4/*
+#dataset=HijingReco_Minbias_5TeV_53x4
+#datadir=/mnt/hadoop/cms/store/user/vzhukova/HIJING_GEN-SIM_YUE-SHI_trig200_v2/HIJING_RECO_YUE-SHI_trig200_v2/*
+
+#dataset=HydjetReco_Minbias_2760GeV_PeripheralNew
+#datadir=/mnt/hadoop/cms/store/user/vzhukova/HYDGET_PERIPH_batch*/*RECO*/*
+
+#dataset=PAData_Minbias_5TeV_HM_PromptReco
+#datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v4/*
+
+dataset=PAData_Minbias_5TeV_MBCent_PromptRecoNew_Reverse
+datadir=/mnt/hadoop/cms/store/user/davidlw/PAMinBiasUPC/PA2013_FlowCorr_PromptReco_MB_PURej2Sigma_reverse_v4/*
+
+#dataset=PAData_Minbias_5TeV_MB_PromptRecoNoPURej
+#datadir=/mnt/hadoop/cms/store/user/davidlw/PAMinBiasUPC/PA2013_FlowCorr_PromptReco_MB_NoPURej_v1/*
+
+#dataset=PAData_Minbias_5TeV_HFHMCent_PromptRecoNew_Reverse
+#datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_HFHM_PURej2Sigma_reverse_v4/*
 
 #dataset=PAData_Minbias_5TeV_HM_Express_run210676-210759
 #datadir=/mnt/hadoop/cms/store/user/davidlw/store/caf/user/davidlw/PA2013_FlowCorr_Express_run210676-210759_v3
 
-#dataset=PAData_Minbias_5TeV_HM_PromptSkim
-#datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_v3/*
+#dataset=PAData_Minbias_5TeV_HM_PromptSkimNew
+#datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/*
 
 #dataset=PPData_Minbias_7TeV_MINBIAS_2010B_Apr21ReReco
 #dataset=PPData_Minbias_7TeV_TRIGGER85_2010B_Apr21ReReco
@@ -36,4 +51,5 @@ datadir=/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptReco_v
 #datadir=/mnt/hadoop/cms/store/results/heavy-ions/MinimumBias/StoreResults-PP2010B_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_trigger85/*/*/*/*
 
 mkdir -p filesets
-ls -l $datadir/*HM_*.root  | awk '{print "file:" $9}' > ./filesets/fileset_${dataset}.txt
+#ls -l $datadir/*HM_*.root  | awk '{print "file:" $9}' > ./filesets/fileset_${dataset}.txt
+ls -l $datadir/*.root  | awk '{print "file:" $9}' > ./filesets/fileset_${dataset}.txt

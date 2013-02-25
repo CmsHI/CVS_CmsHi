@@ -6,7 +6,5 @@ export TRIGGERNAMES="HLT_PAPixelTracks_Multiplicity100_v1 HLT_PAPixelTracks_Mult
 #export ZVTXMIN=30
 #export ZVTXMAX=150
 
-NMIN=(300 320)
-NMAX=(320 350)
-#NMIN=(300)
-#NMAX=(350)
+NMIN=(340 350)
+NMAX=(400 400)

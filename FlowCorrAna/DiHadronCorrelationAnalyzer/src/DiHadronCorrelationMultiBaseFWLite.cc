@@ -882,9 +882,14 @@ void DiHadronCorrelationMultiBaseFWLite::LoopTracks(bool istrg, TString input)
      if(cutPara.IsTrkQuality)
      {
        if(!trk.quality(reco::TrackBase::highPurity)) continue;
-       if(fabs(trk.ptError())/trk.pt()>0.10) continue;
+       if(fabs(trk.ptError())/trk.pt()>0.1) continue;
        if(fabs(dz/dzerror) > 3) continue;
        if(fabs(dxy/dxyerror) > 3) continue;
+/*
+       if(fabs(trk.ptError())/trk.pt()>0.1) continue;
+       if(fabs(dz/dzerror) > 5) continue;
+       if(fabs(dxy/dxyerror) > 5) continue;
+*/
      }  
 //     if(fabs(dz) > 0.1) continue;
 //     if(fabs(dxy) > 0.05) continue;
@@ -1524,7 +1529,8 @@ bool DiHadronCorrelationMultiBaseFWLite::SelectTriggerBit()
 int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
 {
   fwlite::Handle<reco::Centrality> cent;
-  cent.getByLabel(event,"hiCentrality");
+//  cent.getByLabel(event,"hiCentrality");
+  cent.getByLabel(event,"pACentrality");
 
   hf = cent->EtHFhitSum();
   hft = cent->EtHFtowerSum();
@@ -1548,7 +1554,8 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
 //  double npartMean = HFhitBinMap[run]->NpartMean(hf);
 //  double npartSigma = HFhitBinMap[run]->NpartSigma(hf);
 //  hNpart->Fill(npartMean);
-
+// UCC centrality bins
+/*
   if(hft>3260 && npixel>51400 && cutPara.centmin==100 && cutPara.centmax == 1000) bin=100;
   if(hft>3400 && hft<3600 && npixel>51000 && npixel<57000 && cutPara.centmin==200 && cutPara.centmax == 1000) bin=200;
   if(hft>3400 && hft<3600 && npixel>51000 && npixel<57000 && zdc<2000 && cutPara.centmin==300 && cutPara.centmax == 1000) bin=300;
@@ -1559,6 +1566,24 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
   if((7.0*hft+zdc)<36000 && 1.15*hft>zdc && hft>3260 && npixel>51400 && cutPara.centmin==120 && cutPara.centmax == 1000) bin=120;
   if((7.0*hft+zdc)<36000 && hft>3393 && npixel>53450 && cutPara.centmin==210 && cutPara.centmax == 1000) bin=210;
   if((7.0*hft+zdc)<36000 && 1.15*hft>zdc && hft>3393 && npixel>53450 && cutPara.centmin==220 && cutPara.centmax == 1000) bin=220;
+*/
+
+// pPb centrality bins
+  if(hft<10.) bin=0;  
+  if(hft>10. && hft<20.) bin=1;
+  if(hft>20. && hft<30.) bin=2;
+  if(hft>30. && hft<40.) bin=3;
+  if(hft>40. && hft<60.) bin=4;
+  if(hft>60. && hft<80.) bin=5;
+  if(hft>80. && hft<100.) bin=6;
+  if(hft>100. && hft<120.) bin=7;
+  if(hft>120. && hft<140.) bin=8;
+  if(hft>140. && hft<155.) bin=9;
+  if(hft>155. && hft<170.) bin=10;
+  if(hft>170. && hft<190.) bin=11;
+  if(hft>190. && hft<210.) bin=12;
+  if(hft>210. && hft<250.) bin=13;
+  if(hft>250.) bin=14;
 
   return bin;
 }
