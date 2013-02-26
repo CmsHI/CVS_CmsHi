@@ -1530,7 +1530,8 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
 {
   fwlite::Handle<reco::Centrality> cent;
 //  cent.getByLabel(event,"hiCentrality");
-  cent.getByLabel(event,"pACentrality");
+//  cent.getByLabel(event,"pACentrality");
+  cent.getByLabel(event,cutPara.centralityCollection);
 
   hf = cent->EtHFhitSum();
   hft = cent->EtHFtowerSum();

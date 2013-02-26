@@ -58,6 +58,7 @@ class CutParameters {
    TString chargeCandidateCollection;
    TString superClusterCollection;
    TString superClusterFwdCollection;
+   TString centralityCollection;
    bool IsGenMult;
    bool IsGenVtx;
    bool IsVtxSel;

@@ -249,6 +249,10 @@ void setup(int ffrom, int fto,
   if(gSystem->Getenv("SUPERCLUSTERFWDCOLLECTION")) strsuperclusterfwdcollection = gSystem->Getenv("SUPERCLUSTERFWDCOLLECTION");
   gCut.superClusterFwdCollection = strsuperclusterfwdcollection;
 
+  string strcentralitycollection = "hiCentrality";
+  if(gSystem->Getenv("CENTRALITYCOLLECTION")) strcentralitycollection = gSystem->Getenv("CENTRALITYCOLLECTION");
+  gCut.centralityCollection = strcentralitycollection;
+
   TString strpthard1 = "1.5";
   if(gSystem->Getenv("PTHARD1")) strpthard1 = gSystem->Getenv("PTHARD1");
   gCut.pthard1 = atof(strpthard1);

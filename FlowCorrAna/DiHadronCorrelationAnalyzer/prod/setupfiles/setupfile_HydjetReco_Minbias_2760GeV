@@ -21,7 +21,7 @@ export ZVTXMIN=-150
 export ZVTXMAX=150
 export ZVTXBIN=300
 export RHOMIN=0.0
-export RHOMAX=2.0
+export RHOMAX=0.2
 
 export PTTRGMINARRAY="0.0"
 export PTTRGMAXARRAY="10000.0"

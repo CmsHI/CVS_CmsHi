@@ -32,8 +32,8 @@ export PTASSMAXARRAY="0.5 1.0 2.0 3.0 4.0 6.0 8.0 12.0 14.0 16.0 19.2 24.0 28.8"
 #export PTASSMINARRAY="16.0"
 #export PTASSMAXARRAY="10000.0"
 
-export TRGTRACKCOLLECTION="hiGoodTightTracks"
-export ASSTRACKCOLLECTION="hiGoodTightTracks"
+export TRGTRACKCOLLECTION="hiGoodTightMergedTracks"
+export ASSTRACKCOLLECTION="hiGoodTightMergedTracks"
 export VERTEXCOLLECTION="hiSelectedVertex"
 
 #export ISCORR=0
@@ -59,6 +59,6 @@ NMIN=(-1)
 NMAX=(-1)
 
 CENTMIN=(10)
-CENTMAX=(16)
+CENTMAX=(12)
 
 export BKGFACTOR=10

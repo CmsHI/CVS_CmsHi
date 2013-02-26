@@ -728,150 +728,427 @@ void corr1Ddphi_4by4_paper_preliminary()
 
 void yield_paper()
 {
+  // QCD-10-002
   TGraphErrors* gr_yield_pt_pp = GetGraphWithSymmYErrorsFromFile("./results/Figure9a.dat",1,24,1,1);
   TGraphErrors* gr_yield_mult_pp = GetGraphWithSymmYErrorsFromFile("./results/Figure9b.dat",1,24,1,1);
-  GraphScaleShift(gr_yield_pt_pp,(2*PI)*4.8/4.,0.0);
-  GraphScaleShift(gr_yield_mult_pp,(2*PI)*4.8/4.,0.0);
-
-  TFile* fout_mult = new TFile("./results/results_INCLEFF1v4_12nbins_new.root");
-  TGraphErrors* gr_yield_mult_pPb = (TGraphErrors*)fout_mult->Get("gr_yield_mult_1");
-  TFile* fout_mult_pPb_new = new TFile("./results/pPb_yieldvsn_pt1-2.root");
-  TGraphErrors* gr_yield_mult_pPb_new = (TGraphErrors*)fout_mult_pPb_new->Get("Graph");
-  TFile* fout_mult_PbPb = new TFile("./results/PbPb_yieldvsn_pt1-2.root");
-  TGraphErrors* gr_yield_mult_PbPb = (TGraphErrors*)fout_mult_PbPb->Get("Graph");
-  TFile* fout_pt = new TFile("./results/results_INCLEFF1v5_4nbins.root");
-  TGraphErrors* gr_yield_pt_pPb = (TGraphErrors*)fout_pt->Get("gr_yield_pt_3");
-  TFile* fout_pt_pPb_new = new TFile("./results/pPb_yieldvspt_N220260.root");
-  TGraphErrors* gr_yield_pt_pPb_new = (TGraphErrors*)fout_pt_pPb_new->Get("Graph");
-  TFile* fout_pt_PbPb = new TFile("./results/PbPb_yieldvspt_N220260.root");
-  TGraphErrors* gr_yield_pt_PbPb = (TGraphErrors*)fout_pt_PbPb->Get("Graph");
+  GraphScaleShift(gr_yield_pt_pp,(2*PI)*4.8/4.*0.5,0.0);
+  GraphScaleShift(gr_yield_mult_pp,(2*PI)*4.8/4.*0.5,0.0);
 
   gr_yield_pt_pp->SetMarkerStyle(24);
-  gr_yield_pt_pPb->SetMarkerStyle(20);
-  gr_yield_pt_pPb->SetMarkerColor(kRed);
-  gr_yield_pt_pPb_new->SetMarkerStyle(20);
-  gr_yield_pt_pPb_new->SetMarkerColor(kGreen);
-  gr_yield_pt_PbPb->SetMarkerStyle(21);
-  gr_yield_pt_PbPb->SetMarkerColor(kBlue);
   gr_yield_mult_pp->SetMarkerStyle(24);
-  gr_yield_mult_pPb_new->SetMarkerStyle(20);
-  gr_yield_mult_pPb_new->SetMarkerColor(kGreen);
-  gr_yield_mult_pPb->SetMarkerStyle(20);
-  gr_yield_mult_pPb->SetMarkerColor(kRed);
-  gr_yield_mult_PbPb->SetMarkerStyle(21);
-  gr_yield_mult_PbPb->SetMarkerColor(kBlue);
 
-  TH1D* htmp_pt = new TH1D("tmp_pt",";p_{T}(GeV/c);Associated Yield / (GeV/c)",100,-0.3,10.5);
+  // HIN-12-015
+  TFile* fout_mult = new TFile("./results/results_INCLEFF1v4_12nbins_new.root");
+  TGraphErrors* gr_yield_mult_pPb_old = (TGraphErrors*)fout_mult->Get("gr_yield_mult_1");
+  TFile* fout_pt = new TFile("./results/results_INCLEFF1v5_4nbins.root");
+  TGraphErrors* gr_yield_pt_pPb_old = (TGraphErrors*)fout_pt->Get("gr_yield_pt_3");
+
+  gr_yield_pt_pPb_old->SetMarkerStyle(25);
+  gr_yield_mult_pPb_old->SetMarkerStyle(25);
+  GraphScaleShift(gr_yield_pt_pPb_old,0.5,0);
+  GraphScaleShift(gr_yield_mult_pPb_old,0.5,0);
+
+  // CGC prediction
+  TGraphErrors* gr_yield_cgc_1 = GetGraphWithSymmYErrorsFromFile("./data/yield_cgc_1.txt",1,24,1,1);
+  TGraphErrors* gr_yield_cgc_2 = GetGraphWithSymmYErrorsFromFile("./data/yield_cgc_2.txt",1,24,1,1);
+  gr_yield_cgc_2->SetLineStyle(5);
+
+  // HIN-13-002
+  TFile* fout_mult_pPb_short = new TFile("./results/pPb_yieldvsn_pt1-2_all.root");
+  TGraphErrors* gr_yield_mult_pPb_short = (TGraphErrors*)fout_mult_pPb_short->Get("gr_yield_short_mult");
+  TFile* fout_mult_pPb_long = new TFile("./results/pPb_yieldvsn_pt1-2_all.root");
+  TGraphErrors* gr_yield_mult_pPb_long = (TGraphErrors*)fout_mult_pPb_long->Get("gr_yield_long_mult");
+/*
+  TFile* fout_mult_PbPb_short = new TFile("./results/PbPb_yieldvsn_pt1-2_all.root");
+  TGraphErrors* gr_yield_mult_PbPb_short = (TGraphErrors*)fout_mult_PbPb_short->Get("gr_yield_short_mult");
+  TFile* fout_mult_PbPb_long = new TFile("./results/PbPb_yieldvsn_pt1-2_all.root");
+  TGraphErrors* gr_yield_mult_PbPb_long = (TGraphErrors*)fout_mult_PbPb_long->Get("gr_yield_long_mult");
+*/
+  TFile* fout_mult_PbPb_short = new TFile("./results/pPb_yieldvsn_pt1-2_hfall.root");
+  TGraphErrors* gr_yield_mult_PbPb_short = (TGraphErrors*)fout_mult_PbPb_short->Get("gr_yield_short_mult");
+  TFile* fout_mult_PbPb_long = new TFile("./results/pPb_yieldvsn_pt1-2_hfall.root");
+  TGraphErrors* gr_yield_mult_PbPb_long = (TGraphErrors*)fout_mult_PbPb_long->Get("gr_yield_long_mult");
+
+  TFile* fout_pt_pPb_short = new TFile("./results/pPb_yieldvspt_N220260_all.root");
+  TGraphErrors* gr_yield_pt_pPb_short = (TGraphErrors*)fout_pt_pPb_short->Get("gr_yield_short_pt");
+  TFile* fout_pt_pPb_long = new TFile("./results/pPb_yieldvspt_N220260_all.root");
+  TGraphErrors* gr_yield_pt_pPb_long = (TGraphErrors*)fout_pt_pPb_long->Get("gr_yield_long_pt");
+
+  TFile* fout_pt_PbPb_short = new TFile("./results/PbPb_yieldvspt_N220260_all.root");
+  TGraphErrors* gr_yield_pt_PbPb_short = (TGraphErrors*)fout_pt_PbPb_short->Get("gr_yield_short_pt");
+  TFile* fout_pt_PbPb_long = new TFile("./results/PbPb_yieldvspt_N220260_all.root");
+  TGraphErrors* gr_yield_pt_PbPb_long = (TGraphErrors*)fout_pt_PbPb_long->Get("gr_yield_long_pt");
+
+  gr_yield_pt_pPb_short->SetMarkerStyle(20);
+  gr_yield_pt_pPb_short->SetMarkerColor(kRed);
+  gr_yield_pt_pPb_long->SetMarkerStyle(20);
+  gr_yield_pt_pPb_long->SetMarkerColor(kRed);
+  gr_yield_pt_PbPb_short->SetMarkerStyle(21);
+  gr_yield_pt_PbPb_short->SetMarkerColor(kBlue);
+  gr_yield_pt_PbPb_long->SetMarkerStyle(21);
+  gr_yield_pt_PbPb_long->SetMarkerColor(kBlue);
+  gr_yield_mult_pPb_short->SetMarkerStyle(20);
+  gr_yield_mult_pPb_short->SetMarkerColor(kRed);
+  gr_yield_mult_pPb_long->SetMarkerStyle(20);
+  gr_yield_mult_pPb_long->SetMarkerColor(kRed);
+  gr_yield_mult_PbPb_short->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_short->SetMarkerColor(kBlue);
+  gr_yield_mult_PbPb_long->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_long->SetMarkerColor(kBlue);
+
+  TH1D* htmp_pt = new TH1D("tmp_pt",";p^{trig}_{T}(GeV/c);Associated Yield / (GeV/c)",100,-0.1,11.9);
   htmp_pt->SetLineWidth(1);
   htmp_pt->SetLineStyle(9);
   htmp_pt->GetXaxis()->CenterTitle();
   htmp_pt->GetYaxis()->CenterTitle();
-  htmp_pt->SetMaximum(0.22);
-  htmp_pt->SetMinimum(-0.01);
-  htmp_pt->GetYaxis()->SetTitleOffset(htmp_pt->GetYaxis()->GetTitleOffset()*1.4);
-  TH1D* htmp_mult = new TH1D("tmp_mult",";N_{trk}^{offline};Associated Yield / (GeV/c)",350,-1.9,489);
+  htmp_pt->SetMaximum(0.72);
+  htmp_pt->SetMinimum(-0.03);
+  TH1D* htmp_mult = new TH1D("tmp_mult",";N_{trk}^{offline};Associated Yield / (GeV/c)",350,-5,359);
   htmp_mult->SetLineWidth(1);
   htmp_mult->GetXaxis()->CenterTitle();
   htmp_mult->GetYaxis()->CenterTitle();
-  htmp_mult->SetMaximum(0.22);
-  htmp_mult->SetMinimum(-0.01);
-  htmp_mult->GetYaxis()->SetTitleOffset(htmp_mult->GetYaxis()->GetTitleOffset()*1.6);
+  htmp_mult->SetMaximum(0.72);
+  htmp_mult->SetMinimum(-0.03);
+  TH1D* htmp1_mult = new TH1D("tmp1_mult",";N_{trk}^{offline};Associated Yield / (GeV/c)",350,-5,359);
+  htmp1_mult->SetLineWidth(1);
+  htmp1_mult->GetXaxis()->CenterTitle();
+  htmp1_mult->GetYaxis()->CenterTitle();
+  htmp1_mult->SetMaximum(0.38);
+  htmp1_mult->SetMinimum(-0.03);
+  TH1D* htmp_mult_small = new TH1D("tmp_mult_small",";N_{trk}^{offline};Associated Yield / (GeV/c)",399,-5,130);
+  htmp_mult_small->SetLineWidth(1);
+  htmp_mult_small->GetXaxis()->CenterTitle();
+  htmp_mult_small->GetYaxis()->CenterTitle();
+  htmp_mult_small->SetMaximum(0.082);
+  htmp_mult_small->SetMinimum(-0.01);
+  fixedFontHist1D(htmp_pt,1.8,2.4);
+  fixedFontHist1D(htmp_mult,1.8,2.4);
+  fixedFontHist1D(htmp_mult_small,1.8,2.4);
+/*
+  htmp_mult->GetYaxis()->SetTitleOffset(htmp_mult->GetYaxis()->GetTitleOffset());
+  htmp_mult->GetYaxis()->SetTitleSize(htmp_mult->GetYaxis()->GetTitleSize()*2.5);
+  htmp_mult->GetXaxis()->SetTitleSize(htmp_mult->GetXaxis()->GetTitleSize()*2.5);
+  htmp_pt->GetYaxis()->SetTitleOffset(htmp_pt->GetYaxis()->GetTitleOffset());
+  htmp_pt->GetYaxis()->SetTitleSize(htmp_pt->GetYaxis()->GetTitleSize()*2.5);
+  htmp_pt->GetXaxis()->SetTitleSize(htmp_pt->GetXaxis()->GetTitleSize()*2.5);
+*/
 
-  TCanvas* cccc = new TCanvas("cccc","",790,450);
-  makeMultiPanelCanvas(cccc,2,1,0.02,0.02,0.2,0.2,0.01);
-  cccc->cd(1);
+  TCanvas* c4 = new TCanvas("c4","",790,600);
+  makeMultiPanelCanvas(c4,2,2,0.02,0.02,0.15,0.15,0.01);
+  c4->cd(1);
+  c4->GetPad(1)->SetRightMargin(0.006);
   htmp_pt->Draw();
-//  drawSystBox(gr_yield_pt_pPb,1.054,0.0015,17);
-//  gr_yield_pt_pp->Draw("PESAME");
-//  gr_yield_pt_pPb->Draw("PESAME");
-  gr_yield_pt_pp->SetMarkerSize(1.3);
-//  gr_yield_pt_pp->Draw("PESAME");
-  gr_yield_pt_pPb_new->Draw("PESAME");
-  gr_yield_pt_PbPb->Draw("PESAME");
-  TPad *p_0_0 = new TPad("p_0_0", "p_0_0",0.07,0.3,0.16,0.4);
-  p_0_0->Draw();
-  p_0_0->cd();
-
-  cccc->cd(2);
+  drawSystBox(gr_yield_pt_pPb_short,1.038,0.003,17);
+  drawSystBox(gr_yield_pt_PbPb_short,1.034,0.003,17,0.3,0,0);
+  gr_yield_pt_PbPb_short->Draw("PESAME");
+  gr_yield_pt_pPb_short->Draw("PESAME");
+  c4->cd(3);
+  c4->GetPad(3)->SetRightMargin(0.006);
+  htmp_pt->Draw();
+  drawSystBox(gr_yield_pt_pPb_long,1.038,0.003,17);
+  drawSystBox(gr_yield_pt_PbPb_long,1.034,0.003,17,0.3,0,0);
+  gr_yield_pt_PbPb_long->Draw("PESAME");
+  gr_yield_pt_pPb_long->Draw("PESAME");
+  c4->cd(2);
+  c4->GetPad(2)->SetLeftMargin(0.006);
   htmp_mult->Draw();
-  drawSystBox(gr_yield_mult_pPb,1.054,0.0015,17,5);
+  drawSystBox(gr_yield_mult_pPb_short,1.038,0.003,17,8);
+  drawSystBox(gr_yield_mult_PbPb_short,1.034,0.003,17,8,0,0);
+  gr_yield_mult_PbPb_short->Draw("PESAME");
+  gr_yield_mult_pPb_short->Draw("PESAME");
+  c4->cd(4);
+  c4->GetPad(4)->SetLeftMargin(0.006);
+  htmp_mult->Draw();
+  drawSystBox(gr_yield_mult_pPb_long,1.038,0.003,17,8);
+  drawSystBox(gr_yield_mult_PbPb_long,1.034,0.003,17,8,0,0);
+  gr_yield_mult_PbPb_long->Draw("PESAME");
+  gr_yield_mult_pPb_long->Draw("PESAME");
+  gr_yield_mult_pPb_old->Draw("PESAME");
   gr_yield_mult_pp->Draw("PESAME");
-  gr_yield_mult_pPb->Draw("PESAME");
-  gr_yield_mult_pp->SetMarkerSize(1.3);
-  gr_yield_mult_pp->Draw("PESAME");
-  gr_yield_mult_PbPb->Draw("PESAME");
-  gr_yield_mult_pPb_new->Draw("PESAME");
-  TPad *p_0_1 = new TPad("p_0_0", "p_0_0",0 ,0.13,0.1,0.19);
+  gr_yield_cgc_1->Draw("Lsame");
+  gr_yield_cgc_2->Draw("Lsame");
+
+  TPad *p_0_1 = new TPad("p_0_1", "p_0_1",0.05,0.55,0.62,0.89);
   p_0_1->Draw();
   p_0_1->cd();
+  htmp_mult_small->SetTitle(";;;");
+  htmp_mult_small->Draw();
+//  drawSystBox(gr_yield_mult_pPb_long,1.061,0.003,17,8);
+//  drawSystBox(gr_yield_mult_PbPb_long,1.061,0.003,17,8);
+  gr_yield_mult_PbPb_long->Draw("PE");
+  gr_yield_mult_pPb_long->Draw("PESAME");
+  gr_yield_mult_pPb_old->Draw("PESAME");
+  gr_yield_mult_pp->Draw("PESAME");
 
-  cccc->cd(1);
-  TLatex* latex_yieldvspt = new TLatex();
-  latex_yieldvspt->SetNDC();
-//  latex_yieldvspt->DrawLatex(0.676767, 0.9,"N_{trk}^{offline} #geq 110");
+  TCanvas* c = new TCanvas("c","",790,380);
+  makeMultiPanelCanvas(c,2,1,0.02,0.02,0.15,0.15,0.01);
+  c->cd(1);
+  htmp_pt->Draw();
+  gr_yield_pt_PbPb_short->Draw("PESAME");
+  gr_yield_pt_pPb_short->Draw("PESAME");
+  c->cd(2);
+  htmp_pt->Draw();
+  gr_yield_pt_PbPb_long->Draw("PESAME");
+  gr_yield_pt_pPb_long->Draw("PESAME");
+
+  TCanvas* cc = new TCanvas("cc","",790,380);
+  makeMultiPanelCanvas(cc,2,1,0.02,0.02,0.15,0.15,0.01);
+  cc->cd(1);
+  htmp1_mult->Draw();
+  drawSystBox(gr_yield_mult_pPb_short,1.038,0.003,17,8);
+  drawSystBox(gr_yield_mult_PbPb_short,1.038,0.003,17,8);
+  gr_yield_mult_pPb_short->Draw("PESAME");
+  gr_yield_mult_PbPb_short->Draw("PESAME");
+  cc->cd(2);
+  htmp1_mult->Draw();
+  drawSystBox(gr_yield_mult_pPb_long,1.038,0.003,17,8);
+  drawSystBox(gr_yield_mult_PbPb_long,1.038,0.003,17,8);
+  gr_yield_mult_PbPb_long->Draw("PESAME");
+  gr_yield_mult_pPb_long->Draw("PESAME");
+
   TLatex* cmsp = new TLatex();
   cmsp->SetNDC();
-  cmsp->DrawLatex(0.3,0.92,"CMS");
+  cmsp->SetTextSize(cmsp->GetTextSize()*1.3);
+/*
+  cc->cd(1);
+  cmsp->DrawLatex(0.24,0.92,"CMS");
+  cmsp->DrawLatex(0.17,0.92,"(a)");
+  cmsp->DrawLatex(0.5,0.92,"Jet minus Ridge (|#Delta#eta|<1)");
+  cmsp->DrawLatex(0.5,0.84,"1 < p_{T}^{trig} < 2 GeV/c");
+  cmsp->DrawLatex(0.5,0.775,"1 < p_{T}^{assoc} < 2 GeV/c");
+  c->cd(1);
+  cmsp->DrawLatex(0.24,0.92,"CMS");
+  cmsp->DrawLatex(0.17,0.92,"(a)");
+  cmsp->DrawLatex(0.5,0.92,"Jet minus Ridge (|#Delta#eta|<1)");
+  cmsp->DrawLatex(0.2,0.83,"220 #leq N_{trk}^{offline} < 260");
+  cmsp->DrawLatex(0.2,0.765,"1 < p_{T}^{assoc} < 2 GeV/c");
+  cc->cd(2);
+  cmsp->DrawLatex(0.03,0.92,"(b)");
+  cmsp->DrawLatex(0.5,0.92,"Ridge region (|#Delta#eta|>2)");
+  c->cd(2);
+  cmsp->DrawLatex(0.03,0.92,"(b)");
+  cmsp->DrawLatex(0.5,0.92,"Ridge region (|#Delta#eta|>2)");
+*/
+  c4->cd(1); 
+  cmsp->DrawLatex(0.25,0.78,"CMS");
+  cmsp->DrawLatex(0.19,0.92,"(a)");
+  cmsp->DrawLatex(0.46,0.92,"Jet minus Ridge region");
+  cmsp->DrawLatex(0.6,0.34,"220 #leq N_{trk}^{offline} < 260");
+  cmsp->DrawLatex(0.6,0.245,"1 < p_{T}^{assoc} < 2 GeV/c");
+  c4->cd(2);
+  cmsp->DrawLatex(0.05,0.92,"(b)");
+  cmsp->DrawLatex(0.4,0.92,"Jet minus Ridge region");
+  cmsp->DrawLatex(0.55,0.81,"1 < p_{T}^{trig} < 2 GeV/c");
+  cmsp->DrawLatex(0.55,0.71,"1 < p_{T}^{assoc} < 2 GeV/c");
+  c4->cd(3);
+  cmsp->DrawLatex(0.19,0.92,"(c)");
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.85); 
+  cmsp->DrawLatex(0.5,0.92,"Ridge region (|#Delta#eta|>2)");
+  c4->cd(4);
+  cmsp->SetTextSize(cmsp->GetTextSize()*(1/0.85));
+  cmsp->DrawLatex(0.05,0.92,"(d)");
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.85);
+  cmsp->DrawLatex(0.4,0.92,"Ridge region (|#Delta#eta|>2)");
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.9);
+  cmsp->DrawLatex(0.05,0.50,"CGC calculations");
 
-  TLatex* label = new TLatex(0.22,0.92,"(a)");
-  label->SetNDC();
-  label->Draw();
-
-  TLegend* lll  = new TLegend(0.4976526,0.7,0.9483568,0.8536585,NULL,"brNDC");
-   lll->SetFillColor(0);
-  lll->SetTextFont(42);
-  lll->AddEntry(gr_yield_pt_pPb,"pPb  #sqrt{s_{NN}} = 5.02 TeV","P");
+  TLegend* lll  = new TLegend(0.4276526,0.62,0.9483568,0.8636585,NULL,"brNDC");
+  lll->SetFillColor(0);
+  lll->SetFillStyle(0);
+  lll->AddEntry(gr_yield_pt_pPb_short,"pPb  #sqrt{s_{NN}} = 5.02 TeV, 2013","P");
+  lll->AddEntry(gr_yield_pt_PbPb_short,"PbPb  #sqrt{s_{NN}} = 2.76 TeV","P");
+  lll->AddEntry(gr_yield_pt_pPb_old,"pPb  #sqrt{s_{NN}} = 5.02 TeV, 2012","P");
   lll->AddEntry(gr_yield_pt_pp,"pp  #sqrt{s} = 7 TeV","P");
-//  lll->Draw("same");
-  cccc->cd(2);
+  c4->cd(3);
+  lll->Draw("same");
+
+  TLegend* l_cgc  = new TLegend(0.0276526,0.37,0.4783568,0.485585,NULL,"brNDC");
+  l_cgc->SetFillColor(0);
+  l_cgc->SetFillStyle(0);
+  l_cgc->AddEntry(gr_yield_cgc_1,"Q_{0}^{2}(proton)=0.336 GeV^{2}","L");
+  l_cgc->AddEntry(gr_yield_cgc_2,"Q_{0}^{2}(proton)=0.504 GeV^{2}","L");
+  c4->cd(4);
+  l_cgc->Draw("same");
+
+  cc->cd(1);
+  cmsp->DrawLatex(0.25,0.78,"CMS");
+  cmsp->DrawLatex(0.46,0.92,"Jet minus Ridge region");
+  cc->cd(2);
+//  cmsp->SetTextSize(cmsp->GetTextSize()*0.85);
+  cmsp->DrawLatex(0.5,0.92,"Ridge region (|#Delta#eta|>2)");
+  cmsp->DrawLatex(0.55,0.82,"1 < p_{T}^{trig} < 2 GeV/c");
+  cmsp->DrawLatex(0.55,0.74,"1 < p_{T}^{assoc} < 2 GeV/c");
+
+  TLegend* l  = new TLegend(0.4076526,0.25,0.9583568,0.4236585,NULL,"brNDC");
+  l->SetFillColor(0);
+  l->SetFillStyle(0);
+  l->SetHeader("Centrality cuts");
+  l->AddEntry(gr_yield_pt_pPb_short,"Track Multiplicity Based","P");
+  l->AddEntry(gr_yield_pt_PbPb_short,"HF sum ET based","P");
+  cc->cd(1);
+  l->Draw("same");
+  c->cd(2);
+  l->Draw("same");
+  
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.85);
   TLatex* latex_yieldvsmult = new TLatex();
   latex_yieldvsmult->SetNDC();
 //  latex_yieldvsmult->DrawLatex(0.15,0.9,"1 < p_{T} < 2 GeV/c");
-  
-  TLatex* label = new TLatex(0.03,0.92,"(b)");
-  label->SetNDC();
-  label->Draw();
-  
-  SaveCanvas(cccc,"pPb/corr","yieldvsptvsmult_new");
+
+  SaveCanvas(cc,"pPb/corr","yieldvsmult_hfcuts");
+//  SaveCanvas(c,"pPb/corr","yieldvspt_new");
+//  SaveCanvas(c4,"pPb/corr","yieldvsptvsmult_new");
+}
+
+void systematics_yield()
+{
+  // HIN-13-002
+  TFile* fout_mult_pPb_short = new TFile("./results/pPb_yieldvsn_pt1-2_loose.root");
+  TGraphErrors* gr_yield_mult_pPb_short = (TGraphErrors*)fout_mult_pPb_short->Get("gr_yield_short_mult");
+  TFile* fout_mult_pPb_long = new TFile("./results/pPb_yieldvsn_pt1-2_loose.root");
+  TGraphErrors* gr_yield_mult_pPb_long = (TGraphErrors*)fout_mult_pPb_long->Get("gr_yield_long_mult");
+
+  TFile* fout_mult_PbPb_short = new TFile("./results/pPb_yieldvsn_pt1-2_tight.root");
+  TGraphErrors* gr_yield_mult_PbPb_short = (TGraphErrors*)fout_mult_PbPb_short->Get("gr_yield_short_mult");
+  TFile* fout_mult_PbPb_long = new TFile("./results/pPb_yieldvsn_pt1-2_tight.root");
+  TGraphErrors* gr_yield_mult_PbPb_long = (TGraphErrors*)fout_mult_PbPb_long->Get("gr_yield_long_mult");
+
+  TFile* fout_pt_pPb_short = new TFile("./results/pPb_yieldvspt_N220260.root");
+  TGraphErrors* gr_yield_pt_pPb_short = (TGraphErrors*)fout_pt_pPb_short->Get("gr_yield_short_pt");
+  TFile* fout_pt_pPb_long = new TFile("./results/pPb_yieldvspt_N220260.root");
+  TGraphErrors* gr_yield_pt_pPb_long = (TGraphErrors*)fout_pt_pPb_long->Get("gr_yield_long_pt");
+
+  TFile* fout_pt_PbPb_short = new TFile("./results/pPb_yieldvspt_N220260_loose.root");
+  TGraphErrors* gr_yield_pt_PbPb_short = (TGraphErrors*)fout_pt_PbPb_short->Get("gr_yield_short_pt");
+  TFile* fout_pt_PbPb_long = new TFile("./results/pPb_yieldvspt_N220260_loose.root");
+  TGraphErrors* gr_yield_pt_PbPb_long = (TGraphErrors*)fout_pt_PbPb_long->Get("gr_yield_long_pt");
 /*
-  cout <<" figure(a) pPb" << endl;
-  for ( int i =0 ; i<gr_yield_pt_pPb->GetN() ; i++) {
-    double x,y;
-    gr_yield_pt_pPb->GetPoint(i, x, y);
-    double err = gr_yield_pt_pPb->GetErrorY(i);
-    cout << fixed << setprecision(1) << x <<  "  " <<  fixed << setprecision(4) << y << "  " << err << "  " << fixed << setprecision(4) << fabs(y*1.054 + 0.0015 - y)<< endl;
-  }
-  cout <<" figure(a) pp" << endl;
-
-  for ( int i =0 ; i<gr_yield_pt_pp->GetN() ; i++) {
-    double x,y;
-    gr_yield_pt_pp->GetPoint(i, x, y);
-    double err = gr_yield_pt_pp->GetErrorY(i);
-    cout << fixed << setprecision(1) << x <<  "  " << fixed << setprecision(4) << y << "  " << fixed << setprecision(4) <<err << endl;
-  }
-
-  cout << endl << endl <<endl;
-  cout <<" figure(b) pPb" << endl;
-
-  for ( int i =0 ; i<gr_yield_mult_pPb->GetN() ; i++) {
-    double x,y;
-    gr_yield_mult_pPb->GetPoint(i, x, y);
-    double err = gr_yield_mult_pPb->GetErrorY(i);
-    cout << fixed << setprecision(1)<< x <<  "  " << fixed << setprecision(4)<< y << "  " << fixed << setprecision(4) << err << " " << fixed << setprecision(4)<< fabs(y*1.054 + 0.0015 - y ) << endl;
-  }
-  cout <<" figure(b) pp" << endl;
-
-  cout << endl << endl <<endl;
-  for ( int i =0 ; i<gr_yield_mult_pp->GetN() ; i++) {
-    double x,y;
-    gr_yield_mult_pp->GetPoint(i, x, y);
-    double err = gr_yield_mult_pp->GetErrorY(i);
-    cout << fixed << setprecision(1) << x <<  "  " << fixed << setprecision(4) << y << "  " << fixed << setprecision(4) << err << endl;
-  }
+  TFile* fout_mult_pPb_short_mb = new TFile("./results/pPb_yieldvsn_pt1-2_loose_mb.root");
+  TGraphErrors* gr_yield_mult_pPb_short_mb = (TGraphErrors*)fout_mult_pPb_short_mb->Get("gr_yield_short_mult");
+  TFile* fout_mult_pPb_long_mb = new TFile("./results/pPb_yieldvsn_pt1-2_loose_mb.root");
+  TGraphErrors* gr_yield_mult_pPb_long_mb = (TGraphErrors*)fout_mult_pPb_long_mb->Get("gr_yield_long_mult");
+  
+  TFile* fout_mult_PbPb_short_mb = new TFile("./results/pPb_yieldvsn_pt1-2_tight_mb.root");
+  TGraphErrors* gr_yield_mult_PbPb_short_mb = (TGraphErrors*)fout_mult_PbPb_short_mb->Get("gr_yield_short_mult");
+  TFile* fout_mult_PbPb_long_mb = new TFile("./results/pPb_yieldvsn_pt1-2_tight_mb.root");
+  TGraphErrors* gr_yield_mult_PbPb_long_mb = (TGraphErrors*)fout_mult_PbPb_long_mb->Get("gr_yield_long_mult");
+*/  
+  gr_yield_pt_pPb_short->SetMarkerStyle(20);
+  gr_yield_pt_pPb_short->SetMarkerColor(kRed);
+  gr_yield_pt_pPb_long->SetMarkerStyle(20);
+  gr_yield_pt_pPb_long->SetMarkerColor(kRed);
+  gr_yield_pt_PbPb_short->SetMarkerStyle(21);
+  gr_yield_pt_PbPb_short->SetMarkerColor(kBlue);
+  gr_yield_pt_PbPb_long->SetMarkerStyle(21);
+  gr_yield_pt_PbPb_long->SetMarkerColor(kBlue);
+  gr_yield_mult_pPb_short->SetMarkerStyle(20);
+  gr_yield_mult_pPb_short->SetMarkerColor(kRed);
+  gr_yield_mult_pPb_long->SetMarkerStyle(20);
+  gr_yield_mult_pPb_long->SetMarkerColor(kRed);
+  gr_yield_mult_PbPb_short->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_short->SetMarkerColor(kBlue);
+  gr_yield_mult_PbPb_long->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_long->SetMarkerColor(kBlue);
+/*
+  gr_yield_mult_pPb_short_mb->SetMarkerStyle(20);
+  gr_yield_mult_pPb_short_mb->SetMarkerColor(kRed);
+  gr_yield_mult_pPb_long_mb->SetMarkerStyle(20);
+  gr_yield_mult_pPb_long_mb->SetMarkerColor(kRed);
+  gr_yield_mult_PbPb_short_mb->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_short_mb->SetMarkerColor(kBlue);
+  gr_yield_mult_PbPb_long_mb->SetMarkerStyle(21);
+  gr_yield_mult_PbPb_long_mb->SetMarkerColor(kBlue);
 */
 
+  GraphScaleShift(gr_yield_pt_pPb_short,0.99,0.0);
+  GraphScaleShift(gr_yield_pt_pPb_long,0.99,0.0);
+  GraphScaleShift(gr_yield_mult_pPb_short,1.05,0.0);
+  GraphScaleShift(gr_yield_mult_pPb_long,1.05,0.0);
 
+  TH1D* htmp_pt = new TH1D("tmp_pt",";p^{trig}_{T}(GeV/c);Associated Yield / (GeV/c)",100,-0.3,11.9);
+  htmp_pt->SetLineWidth(1);
+  htmp_pt->SetLineStyle(9);
+  htmp_pt->GetXaxis()->CenterTitle();
+  htmp_pt->GetYaxis()->CenterTitle();
+  htmp_pt->SetMaximum(0.75);
+  htmp_pt->SetMinimum(-0.03);
+  TH1D* htmp_mult = new TH1D("tmp_mult",";N_{trk}^{offline};Associated Yield / (GeV/c)",350,-3,349);
+  htmp_mult->SetLineWidth(1);
+  htmp_mult->GetXaxis()->CenterTitle();
+  htmp_mult->GetYaxis()->CenterTitle();
+  htmp_mult->SetMaximum(0.75);
+  htmp_mult->SetMinimum(-0.03);
+  TH1D* htmp_mult_small = new TH1D("tmp_mult_small",";N_{trk}^{offline};Associated Yield / (GeV/c)",399,-3,130);
+  htmp_mult_small->SetLineWidth(1);
+  htmp_mult_small->GetXaxis()->CenterTitle();
+  htmp_mult_small->GetYaxis()->CenterTitle();
+  htmp_mult_small->SetMaximum(0.1);
+  htmp_mult_small->SetMinimum(-0.01);
+  fixedFontHist1D(htmp_pt,1.8,2.4);
+  fixedFontHist1D(htmp_mult,1.8,2.4);
 
+  TCanvas* c4 = new TCanvas("c4","",790,600);
+  makeMultiPanelCanvas(c4,2,2,0.02,0.02,0.15,0.15,0.01);
+  c4->cd(1);
+  htmp_pt->Draw();
+  gr_yield_pt_PbPb_short->Draw("PESAME");
+  gr_yield_pt_pPb_short->Draw("PESAME");
+  c4->cd(3);
+  htmp_pt->Draw();
+  gr_yield_pt_PbPb_long->Draw("PESAME");
+  gr_yield_pt_pPb_long->Draw("PESAME");
+  c4->cd(2);
+  htmp_mult->Draw();
+  gr_yield_mult_PbPb_short->Draw("PESAME");
+  gr_yield_mult_pPb_short->Draw("PESAME");
+//  gr_yield_mult_PbPb_short_mb->Draw("PESAME");
+//  gr_yield_mult_pPb_short_mb->Draw("PESAME");
+  c4->cd(4);
+  htmp_mult->Draw();
+  gr_yield_mult_PbPb_long->Draw("PESAME");
+  gr_yield_mult_pPb_long->Draw("PESAME");
+//  gr_yield_mult_PbPb_long_mb->Draw("PESAME");
+//  gr_yield_mult_pPb_long_mb->Draw("PESAME");
+
+  TLatex* cmsp = new TLatex();
+  cmsp->SetNDC();
+  cmsp->SetTextSize(cmsp->GetTextSize()*1.3);
+  c4->cd(1); 
+  cmsp->DrawLatex(0.25,0.78,"CMS");
+  cmsp->DrawLatex(0.19,0.92,"(a)");
+  cmsp->DrawLatex(0.46,0.92,"Jet minus Ridge region");
+  cmsp->DrawLatex(0.6,0.34,"220 #leq N_{trk}^{offline} < 260");
+  cmsp->DrawLatex(0.6,0.245,"1 < p_{T}^{assoc} < 2 GeV/c");
+  c4->cd(2);
+  cmsp->DrawLatex(0.05,0.92,"(b)");
+  cmsp->DrawLatex(0.4,0.92,"Jet minus Ridge region");
+  cmsp->DrawLatex(0.55,0.81,"1 < p_{T}^{trig} < 2 GeV/c");
+  cmsp->DrawLatex(0.55,0.71,"1 < p_{T}^{assoc} < 2 GeV/c");
+  c4->cd(3);
+  cmsp->DrawLatex(0.19,0.92,"(c)");
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.85); 
+  cmsp->DrawLatex(0.5,0.92,"Ridge region (|#Delta#eta|>2)");
+  c4->cd(4);
+  cmsp->SetTextSize(cmsp->GetTextSize()*(1/0.85));
+  cmsp->DrawLatex(0.05,0.92,"(d)");
+  cmsp->SetTextSize(cmsp->GetTextSize()*0.85);
+  cmsp->DrawLatex(0.4,0.92,"Ridge region (|#Delta#eta|>2)");
+
+  TLegend* lll  = new TLegend(0.1276526,0.62,0.9483568,0.8236585,NULL,"brNDC");
+  lll->SetFillColor(0);
+  lll->SetFillStyle(0);
+//  lll->AddEntry(gr_yield_pt_pPb_short,"Standard analysis","P");
+//  lll->AddEntry(gr_yield_pt_PbPb_short,"# of vertices = 1","P");
+//  lll->AddEntry(gr_yield_pt_pPb_short,"|v_{z}|<3 cm","P");
+//  lll->AddEntry(gr_yield_pt_PbPb_short,"3<|v_{z}|<15 cm","P");
+  lll->AddEntry(gr_yield_pt_pPb_short,"Looser track cuts","P");
+  lll->AddEntry(gr_yield_pt_PbPb_short,"Tighter track cuts","P");
+  c4->cd(3);
+  lll->Draw("same");
+
+//  SaveCanvas(c4,"pPb/corr","systematics_yieldvsptvsmult_vertexdep");
+//  SaveCanvas(c4,"pPb/corr","systematics_yieldvsptvsmult_nvtx1");
+  SaveCanvas(c4,"pPb/corr","systematics_yieldvsptvsmult_tracking");
 }
 
 void yield_paper_preliminary()
@@ -2812,7 +3089,7 @@ void pileup()
   SaveCanvas(c1,"pPb/corr","pileup_pPb_nmaxvsnsec");
 }
 
-void drawSystBox(TGraph* gr, double percent, double constant, int fillcolor=TColor::GetColor("#ffff00"), double xwidth=0.2, double xshift=0)
+void drawSystBox(TGraph* gr, double percent, double constant, int fillcolor=TColor::GetColor("#ffff00"), double xwidth=0.3, double xshift=0, bool flag=true)
 {   
   TBox* box;
   for(int n=0;n<gr->GetN();n++)
@@ -2820,6 +3097,7 @@ void drawSystBox(TGraph* gr, double percent, double constant, int fillcolor=TCol
     double x,y;
     gr->GetPoint(n,x,y);
 
+    if(x>260 && flag) percent=1.075;
     double yerr = y*percent+constant; 
  
     box = new TBox(x+xshift-xwidth,y-fabs(y-yerr),x+xwidth,y+fabs(y-yerr));

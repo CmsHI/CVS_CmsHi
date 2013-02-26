@@ -7,6 +7,7 @@ export EFFHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/ef
 #export PILEUPDISTFUNCHISTNAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/efficiency/pileup_distfunc_pPb_2sigma_mode1.root"
 export CENTFILENAME="/net/hisrv0001/home/davidlw/scratch1/DiHadronCorrelations/centrality/centralityfile_data_2011.root"
 export CENTTABLENAME="HFtowers"
+export CENTRALITYCOLLECTION="pACentrality"
 
 #export CHECKSIGN=0
 #export ISDOEVENTSHAPE=1
