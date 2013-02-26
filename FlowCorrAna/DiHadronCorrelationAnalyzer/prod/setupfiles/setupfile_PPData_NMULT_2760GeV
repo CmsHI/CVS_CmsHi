@@ -1,0 +1,8 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PPData_Trigger_2760GeV
+
+export TRIGGERNAMES="HLT_PPPixelTracks_Multiplicity85_v1 HLT_PPPixelTracks_Multiplicity85_v2 HLT_PPPixelTracks_Multiplicity85_v3"
+export ISCORR=0
+
+NMIN=(-1)
+NMAX=(-1)
