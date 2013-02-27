@@ -88,6 +88,10 @@ void DiHadronCorrelationMultiAnalyzerFWLite::MakeHists()
       {
         hSignalCosn[itrg][jass] = new TH2D(Form("signalcosn_trg%d_ass%d",itrg,jass),";cos(n#Delta#phi);n",6000,-0.3,0.3,15,0.5,15.5);
         hBackgroundCosn[itrg][jass] = new TH2D(Form("backgroundcosn_trg%d_ass%d",itrg,jass),";cos(n#Delta#phi);n",6000,-0.3,0.3,15,0.5,15.5);
+        hSignalSinn[itrg][jass] = new TH2D(Form("signalsinn_trg%d_ass%d",itrg,jass),";sin(n#Delta#phi);n",6000,-0.3,0.3,15,0.5,15.5);
+        hBackgroundSinn[itrg][jass] = new TH2D(Form("backgroundsinn_trg%d_ass%d",itrg,jass),";sin(n#Delta#phi);n",6000,-0.3,0.3,15,0.5,15.5);
+        hSignalRhon[itrg][jass] = new TH2D(Form("signalrhon_trg%d_ass%d",itrg,jass),";#rho;n",6000,0.0,0.6,15,0.5,15.5);
+        hBackgroundRhon[itrg][jass] = new TH2D(Form("backgroundrhon_trg%d_ass%d",itrg,jass),";#rho;n",6000,0.0,0.6,15,0.5,15.5);
       }
 
       hSignal2PEPCorrelator[itrg][jass] = new TH1D(Form("signal2pepcorrelator_trg%d_ass%d",itrg,jass),";cos(#phi_{#alpha}-3#phi_{#beta}+2#Psi_{2})",6000,-0.3,0.3);
@@ -184,6 +188,10 @@ void DiHadronCorrelationMultiAnalyzerFWLite::DeleteHists()
       {
         delete hSignalCosn[itrg][jass];
         delete hBackgroundCosn[itrg][jass];
+        delete hSignalSinn[itrg][jass];
+        delete hBackgroundSinn[itrg][jass];
+        delete hSignalRhon[itrg][jass];
+        delete hBackgroundRhon[itrg][jass];
       }
       delete hSignal2PEPCorrelator[itrg][jass];
       delete hBackground2PEPCorrelator[itrg][jass];
@@ -266,7 +274,9 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsSignal(const DiHadronCorre
       unsigned int nasssize = eventcorr.pVect_ass[jass].size();
 
       double sumcosn[15]={0};
-      int npairs[15]={0};
+      double sumsinn[15]={0};
+      double sumrhon[15]={0};
+      double npairs[15]={0};
       for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
       {
         TVector3 pvector_trg = (eventcorr.pVect_trg[itrg])[ntrg];	  
@@ -319,8 +329,10 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsSignal(const DiHadronCorre
             for(int nn = 0; nn<15; nn++)
             {
 //              if(nn==0) effweight = effweight * pt_ass * pt_trg / (pt_ass-ptMean2_ass[jass]/ptMean_ass[jass]) / (pt_trg-ptMean2_trg[itrg]/ptMean_trg[itrg])
-              sumcosn[nn] = sumcosn[nn] + TMath::Cos((nn+1)*fabs(deltaPhi))/effweight;
-              npairs[nn]++;
+              sumcosn[nn] = sumcosn[nn] + cos((nn+1)*fabs(deltaPhi))/effweight;
+              sumsinn[nn] = sumsinn[nn] + sin((nn+1)*fabs(deltaPhi))/effweight;
+              sumrhon[nn] = sumrhon[nn] + sqrt(sin((nn+1)*fabs(deltaPhi))*sin((nn+1)*fabs(deltaPhi))+cos((nn+1)*fabs(deltaPhi))*cos((nn+1)*fabs(deltaPhi)))/effweight;
+              npairs[nn] += 1.0/effweight;
             }
           }
 
@@ -346,7 +358,16 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsSignal(const DiHadronCorre
         }
       }
 
-      if(cutPara.IsHarmonics) { for(int nn = 0; nn<15; nn++) if(npairs[nn]) hSignalCosn[itrg][jass]->Fill(sumcosn[nn]/npairs[nn],nn+1); }
+      if(cutPara.IsHarmonics) 
+      { 
+        for(int nn = 0; nn<15; nn++) 
+        {
+          if(!npairs[nn]) continue;
+          hSignalCosn[itrg][jass]->Fill(sumcosn[nn]/npairs[nn],nn+1);
+          hSignalSinn[itrg][jass]->Fill(sumsinn[nn]/npairs[nn],nn+1);
+          hSignalRhon[itrg][jass]->Fill(sumrhon[nn]/npairs[nn],nn+1);
+        }
+      }
     } 
 
   for(unsigned int itrg=0;itrg<cutPara.pttrgmin.size();itrg++)
@@ -371,7 +392,9 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsBackground(const DiHadronC
       unsigned int nasssize = eventcorr_ass.pVect_ass[jass].size();
 
       double sumcosn[15]={0};
-      int npairs[15]={0};
+      double sumsinn[15]={0};
+      double sumrhon[15]={0};
+      double npairs[15]={0};
       for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
       {
         TVector3 pvector_trg = (eventcorr_trg.pVect_trg[itrg])[ntrg];	  
@@ -423,8 +446,10 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsBackground(const DiHadronC
             for(int nn = 0; nn<15; nn++)
             {
 //              if(nn==0) effweight = effweight * pt_ass * pt_trg / (pt_ass-ptMean2_ass[jass]/ptMean_ass[jass]) / (pt_trg-ptMean2_trg[itrg]/ptMean_trg[itrg]);
-              sumcosn[nn] = sumcosn[nn] + TMath::Cos((nn+1)*fabs(deltaPhi));
-              npairs[nn]++;
+              sumcosn[nn] = sumcosn[nn] + cos((nn+1)*fabs(deltaPhi))/effweight;
+              sumsinn[nn] = sumsinn[nn] + sin((nn+1)*fabs(deltaPhi))/effweight;
+              sumrhon[nn] = sumrhon[nn] + sqrt(sin((nn+1)*fabs(deltaPhi))*sin((nn+1)*fabs(deltaPhi))+cos((nn+1)*fabs(deltaPhi))*cos((nn+1)*fabs(deltaPhi)))/effweight;
+              npairs[nn] += 1.0/effweight;
             }
           }
 
@@ -450,7 +475,16 @@ void DiHadronCorrelationMultiAnalyzerFWLite::FillHistsBackground(const DiHadronC
         }
       }
 
-       if(cutPara.IsHarmonics) {for(int nn = 0; nn<15; nn++) if(npairs[nn]) hBackgroundCosn[itrg][jass]->Fill(sumcosn[nn]/npairs[nn],nn+1); }
+      if(cutPara.IsHarmonics)
+      {
+        for(int nn = 0; nn<15; nn++)
+        {
+          if(!npairs[nn]) continue;
+          hBackgroundCosn[itrg][jass]->Fill(sumcosn[nn]/npairs[nn],nn+1);
+          hBackgroundSinn[itrg][jass]->Fill(sumsinn[nn]/npairs[nn],nn+1);
+          hBackgroundRhon[itrg][jass]->Fill(sumrhon[nn]/npairs[nn],nn+1);
+        }
+      }
     } 
 }
 
@@ -469,12 +503,14 @@ TList* DiHadronCorrelationMultiAnalyzerFWLite::GetOutputs()
       for(int jass=0;jass<(int)(cutPara.ptassmin.size());jass++)
       {
         if(!cutPara.IsFullMatrix && itrg<jass) continue;
+/*
         outputlist->Add(hSignal_eta1eta2[itrg][jass]);
         outputlist->Add(hBackground_eta1eta2[itrg][jass]);
         outputlist->Add(hCorrelation_eta1eta2[itrg][jass]);
         outputlist->Add(hSignal_phi1phi2[itrg][jass]);
         outputlist->Add(hBackground_phi1phi2[itrg][jass]);
         outputlist->Add(hCorrelation_phi1phi2[itrg][jass]);
+*/
         outputlist->Add(hSignal[itrg][jass]);
         outputlist->Add(hBackground[itrg][jass]);
         outputlist->Add(hCorrelation[itrg][jass]);
@@ -482,6 +518,10 @@ TList* DiHadronCorrelationMultiAnalyzerFWLite::GetOutputs()
         {
           outputlist->Add(hSignalCosn[itrg][jass]);
           outputlist->Add(hBackgroundCosn[itrg][jass]);
+          outputlist->Add(hSignalSinn[itrg][jass]);
+          outputlist->Add(hBackgroundSinn[itrg][jass]);
+          outputlist->Add(hSignalRhon[itrg][jass]);
+          outputlist->Add(hBackgroundRhon[itrg][jass]);
         }
         outputlist->Add(hSignal2PEPCorrelator[itrg][jass]);
         outputlist->Add(hBackground2PEPCorrelator[itrg][jass]);
