@@ -13,7 +13,7 @@
 //
 // Original Author:  Dilep PING, Vineet Kumar, Prashant Shukla
 //         Created:  Wed May 12 13:45:14 CEST 2010
-// $Id: DiMuonOnia2DPlots.cc,v 1.8 2013/02/02 16:02:50 kumarv Exp $
+// $Id DiMuonOnia2DPlots.cc,v 1.9 2013/02/03 05:45:47 kumarv Exp $
 //
 //
 // system include files
@@ -100,6 +100,7 @@ class DiMuonOnia2DPlots : public edm::EDAnalyzer {
   
   bool fisCuts;  
   std::string fOutputFileName;
+  
   //std::string fGenLevel;
   //std::string fHLTPathName;
   
@@ -110,6 +111,7 @@ class DiMuonOnia2DPlots : public edm::EDAnalyzer {
  
   std::string fIsRecoInfo;
   std::string fIsPATWTInfo;
+  std::string fIsCentInfo;
 
 
 //edm::InputTag fHLTFilterName;
@@ -147,10 +149,10 @@ private:
   virtual void FillWTPATTree(const edm::Event&, const edm::EventSetup&);
 
   math::XYZPoint RefVtx;
-  //float nPV;
   double nPV;
 
-  //Ev Tree variables                                                                                                                                         
+  //========================= Ev Tree variables ========================================================//
+                                                                                                                                         
   int eventNbEv,runNbEv,lumiBlockEv,vertexNbEv;
   double vertexTrkEv,vertexXEv,vertexYEv,vertexZEv,vertexRhoEv;
   double nPVEv;
@@ -171,8 +173,6 @@ private:
   bool eventTrigger6,eventTrigger7,eventTrigger8,eventTrigger9,eventTrigger10;
 
   int SingleMuSize,GlobalMuSize,GlobalMuNo;
-  //double GlobalMuPx[1000], GlobalMuPy[1000], GlobalMuPz[1000],GlobalMuPt[1000], GlobalMuPhi[1000], GlobalMuEta[1000], GlobalMuCharge[1000];
-
 
   double SingleMuPx[1000][3], SingleMuPy[1000][3], SingleMuPz[1000][3],SingleMuPt[1000][3], SingleMuPhi[1000][3], SingleMuEta[1000][3]; 
   double SingleMuCharge[1000][3];
@@ -201,34 +201,40 @@ private:
   double GlobalMu2Px[500000][3], GlobalMu2Py[500000][3], GlobalMu2Pz[500000][3],GlobalMu2Pt[500000][3], GlobalMu2Phi[500000][3], GlobalMu2Eta[500000][3]; 
   double GlobalMu2Charge[500000][3];
 
-  double GlobaldiMuPx[500000][2], GlobaldiMuPy[500000][2], GlobaldiMuPz[500000][2],GlobaldiMuPt[500000][2], GlobaldiMuPhi[500000][2], GlobaldiMuRap[500000][2],GlobaldiMuMass[500000][2];
+  double GlobaldiMuPx[500000][2], GlobaldiMuPy[500000][2], GlobaldiMuPz[500000][2],GlobaldiMuPt[500000][2], GlobaldiMuPhi[500000][2], GlobaldiMuRap[500000][2],
+    GlobaldiMuMass[500000][2];
   double GlobaldiMuCharge[500000][2];
 
   double VrtxProb[500000];
-  //SingleMuonTree->Branch("JpsiVprob",  &JpsiVprob, "JpsiVprob/D");
 
-  //Tree variables defined here  
+
+  //================= DiMu Tree Variables =================================================================//
+  
+
+  
   int eventNb,runNb,lumiBlock,vertexNb;
   double vertexTrk,vertexX,vertexY,vertexZ,vertexRho;
-
   int Jpsi_eventTrigger1,Jpsi_eventTrigger2,Jpsi_eventTrigger3,Jpsi_eventTrigger4,Jpsi_eventTrigger5,Jpsi_eventTrigger6;
+  
 
-
+  int Npix, NpixelTracks, Ntracks; 
+  double SumET_HF, SumET_HFplus, SumET_HFminus, SumET_HFplusEta4, SumET_HFminusEta4; 
+  double SumET_EB, SumET_ET, SumET_EE, SumET_EEplus, SumET_EEminus, SumET_ZDC, SumET_ZDCplus, SumET_ZDCminus;
+  
 
 
   //1.) J/psi variables RECO                                                                                                                                     
-  //init events                                                                                                                                             
-  //int RecJPsiSize, RecMuPlusSize, RecMuMinusSize;
-
+  
   double JpsiCharge,JpsiNo , JpsiMass , JpsiPt , JpsiRap ,JpsiVprob ;
   double JpsiPx , JpsiPy , JpsiPz ;
   
   
 
   double RecoCtau,RecoCtauErr,RecoCtauTrue;  
-  //TLorentzVector* JpsiP;
+  
  
-  //2.) muon variables RECO                                                                                                                                                                                  
+  //2.) muon variables RECO
+                                                                                                                                                                                  
   double muPosPx, muPosPy, muPosPz,  muPosEta,  muPosPhi;
   double muNegPx, muNegPy, muNegPz,  muNegEta,  muNegPhi;
 
@@ -254,7 +260,9 @@ private:
   int muNeg_Trigger6,muNeg_Trigger7,muNeg_Trigger8,muNeg_Trigger9,muNeg_Trigger10,muNeg_Trigger11,muNeg_Trigger12,muNeg_Trigger13;
 
   bool isVtxFake;
-  
+
+
+  //====================== DiMuon Gen Variables ==============================================================================//  
   int GeventNb,GrunNb,GlumiBlock;
   double GenvertexX,GenvertexY,GenvertexZ;
 
@@ -263,7 +271,8 @@ private:
   double GenJpsiPxP, GenJpsiPyP, GenJpsiPzP;
 
 
-  //Gen JPsi Variables                                                                                                                                                                                          
+  //Gen JPsi Variables
+  
   double GenJpsiMass, GenJpsiPt, GenJpsiRap;
   double GenJpsiPx, GenJpsiPy, GenJpsiPz;
 
@@ -303,6 +312,13 @@ private:
 
   double PAT_vertexTrkEv,PAT_vertexXEv,PAT_vertexYEv,PAT_vertexZEv,PAT_vertexRhoEv;
   
+  int PAT_Npix, PAT_NpixelTracks, PAT_Ntracks;
+ 
+  double PAT_SumET_HF, PAT_SumET_HFplus, PAT_SumET_HFminus, PAT_SumET_HFplusEta4, PAT_SumET_HFminusEta4; 
+  double PAT_SumET_EB, PAT_SumET_ET, PAT_SumET_EE, PAT_SumET_EEplus, PAT_SumET_EEminus, PAT_SumET_ZDC, PAT_SumET_ZDCplus, PAT_SumET_ZDCminus;
+
+
+
   int PAT_eventTrigger1,PAT_eventTrigger2,PAT_eventTrigger3,PAT_eventTrigger4,PAT_eventTrigger5,PAT_eventTrigger6;
   
 
@@ -329,9 +345,6 @@ private:
 
 
 
-
-
-
 };
 
 //
@@ -349,8 +362,8 @@ private:
 
 DiMuonOnia2DPlots::DiMuonOnia2DPlots(const edm::ParameterSet& iConfig):
 
-  //centrality_(0),
-  //cbins_(0),
+  centrality_(0),
+  cbins_(0),
   
 
   fisCuts(iConfig.getUntrackedParameter<bool>("IsCuts")),
@@ -360,8 +373,10 @@ DiMuonOnia2DPlots::DiMuonOnia2DPlots(const edm::ParameterSet& iConfig):
   fHLTFilterName(iConfig.getUntrackedParameter<string>("HLTFilterName")),
   fIsRecoInfo(iConfig.getUntrackedParameter<string>("IsRecoInfo")), 
   fIsPATWTInfo(iConfig.getUntrackedParameter<string>("IsPATWTInfo")), 
+  fIsCentInfo(iConfig.getUntrackedParameter<string>("IsCentInfo")), 
   fMotherID(iConfig.getUntrackedParameter<string>("MotherID"))
-  //fHLTFilterName(iConfig.getUntrackedParameter<edm::InputTag>("HLTFilterName"))
+  
+				    //fHLTFilterName(iConfig.getUntrackedParameter<edm::InputTag>("HLTFilterName"))
 
 { 
 
@@ -389,17 +404,22 @@ void DiMuonOnia2DPlots::analyze(const edm::Event& iEvent, const edm::EventSetup&
 {
   
 
-  cout << " -----------------------------analyze------------------------- " << endl;
+  //cout << " -----------------------------analyze------------------------- " << endl;
   
 
   using namespace edm;
   using namespace std;
 
-  //centrality_ = new CentralityProvider(iSetup);
-  //centrality_->newEvent(iEvent,iSetup);
-  //bin = centrality_->getBin();
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    bin = centrality_->getBin();
+  }
+  else{
+    bin=-99999;
+  }
 
-  bin=-99999;
   Centrality->Fill(bin);
   
   //cout<<" Cent: "<<bin<<endl;
@@ -623,6 +643,36 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("Jpsi_eventTrigger6",             &Jpsi_eventTrigger6,             "Jpsi_eventTrigger6/I");
 
 
+
+
+  SingleMuonTree->Branch("Npix",&Npix,"Npix/I");
+  SingleMuonTree->Branch("NpixelTracks",&NpixelTracks,"NpixelTracks/I");
+  SingleMuonTree->Branch("Ntracks", &Ntracks, "Ntracks/I");
+  SingleMuonTree->Branch("SumET_HF",&SumET_HF,"SumET_HF/D");
+  SingleMuonTree->Branch("SumET_HFplus",&SumET_HFplus,"SumET_HFplus/D");
+  SingleMuonTree->Branch("SumET_HFminus",&SumET_HFminus,"SumET_HFminus/D");
+
+  SingleMuonTree->Branch("SumET_HFplusEta4",&SumET_HFplusEta4,"SumET_HFplusEta4/D");
+  
+  SingleMuonTree->Branch("SumET_HFminusEta4",&SumET_HFminusEta4,"SumET_HFminusEta4/D");
+  SingleMuonTree->Branch("SumET_ET",&SumET_ET,"SumET_ET/D");
+  SingleMuonTree->Branch("SumET_EE",&SumET_EE,"SumET_EE/D");
+  SingleMuonTree->Branch("SumET_EB",&SumET_EB,"SumET_EB/D");
+  SingleMuonTree->Branch("SumET_EEplus",&SumET_EEplus,"SumET_EEplus/D");
+  SingleMuonTree->Branch("SumET_EEminus",&SumET_EEminus,"SumET_EEminus/D");
+  SingleMuonTree->Branch("SumET_ZDC",&SumET_ZDC,"SumET_ZDC/D");
+  SingleMuonTree->Branch("SumET_ZDCplus",&SumET_ZDCplus,"SumET_ZDCplus/D");
+  SingleMuonTree->Branch("SumET_ZDCminus",&SumET_ZDCminus,"SumET_ZDCminus/D");
+
+
+
+
+
+
+
+
+
+
   //SingleMuonTree->Branch("RecJPsiSize",   &RecJPsiSize,  "RecJPsiSize/I");  
 
   // Jpsi Variables dimuon variable.
@@ -843,8 +893,34 @@ DiMuonOnia2DPlots::beginJob()
   SingleWTPATMuonTree->Branch("runNbWTPAT",               &runNbWTPAT,               "runNbWTPAT/I");
   SingleWTPATMuonTree->Branch("lumiBlockWTPAT",           &lumiBlockWTPAT,           "lumiBlockWTPAT/I");
   SingleWTPATMuonTree->Branch("rbinWTPAT",                 &rbinWTPAT,                  "rbinWTPAT/I");
-
   
+
+
+  SingleWTPATMuonTree->Branch("PAT_Npix",&PAT_Npix,"PAT_Npix/I");
+  SingleWTPATMuonTree->Branch("PAT_NpixelTracks",&PAT_NpixelTracks,"PAT_NpixelTracks/I");
+  SingleWTPATMuonTree->Branch("PAT_Ntracks", &PAT_Ntracks, "PAT_Ntracks/I");
+
+  SingleWTPATMuonTree->Branch("PAT_SumET_HF",&PAT_SumET_HF,"PAT_SumET_HF/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_HFplus",&PAT_SumET_HFplus,"PAT_SumET_HFplus/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_HFminus",&PAT_SumET_HFminus,"PAT_SumET_HFminus/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_HFplusEta4",&PAT_SumET_HFplusEta4,"PAT_SumET_HFplusEta4/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_HFminusEta4",&PAT_SumET_HFminusEta4,"PAT_SumET_HFminusEta4/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_ET",&PAT_SumET_ET,"PAT_SumET_ET/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_EE",&PAT_SumET_EE,"PAT_SumET_EE/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_EB",&PAT_SumET_EB,"PAT_SumET_EB/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_EEplus",&PAT_SumET_EEplus,"PAT_SumET_EEplus/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_EEminus",&PAT_SumET_EEminus,"PAT_SumET_EEminus/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_ZDC",&PAT_SumET_ZDC,"PAT_SumET_ZDC/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_ZDCplus",&PAT_SumET_ZDCplus,"PAT_SumET_ZDCplus/D");
+  SingleWTPATMuonTree->Branch("PAT_SumET_ZDCminus",&PAT_SumET_ZDCminus,"PAT_SumET_ZDCminus/D");
+
+
+
+
+
+
+
+
   SingleWTPATMuonTree->Branch("PAT_vertexNbEv",            &PAT_vertexNbEv,            "PAT_vertexNbEv/I");
   SingleWTPATMuonTree->Branch("PAT_vertexTrkEv",           &PAT_vertexTrkEv,            "PAT_vertexTrkEv/D");
   SingleWTPATMuonTree->Branch("PAT_isVtxFakeEv",          &PAT_isVtxFakeEv,            "PAT_isVtxFakeEv/O");
@@ -949,9 +1025,6 @@ void DiMuonOnia2DPlots::endJob()
 {
   cout<<"End Job"<<endl;
   fOutputFile->cd();
-
-
- 
   
   //EventTree->Write();
   //SinglePATMuonTree->Write();
@@ -1001,8 +1074,11 @@ bool DiMuonOnia2DPlots::matchPATMuon(const pat::Muon *pMuon)
 void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
+  using namespace edm;
+  using namespace std;
+
   
-  //reset EVENT information                                                                                                                                                                                                                    
+  //reset EVENT information     
   JpsiNo=-9999.;
   eventNb= 0 ;
   runNb= 0 ;
@@ -1025,37 +1101,86 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
   Jpsi_eventTrigger5=-9999;
   Jpsi_eventTrigger6=-9999;
 
-
-
   rbin=0;
+
+
+  Npix = -9999;
+  NpixelTracks = -9999;
+  Ntracks = -9999;
+  SumET_HF = -9999;
+  SumET_HFplus = -9999;
+  SumET_HFminus = -9999;
+  SumET_HFplusEta4 = -9999;
+  SumET_HFminusEta4 = -9999;
+  SumET_ZDC = -9999;
+  SumET_ZDCplus = -9999;
+  SumET_ZDCminus = -9999;
+  SumET_EEplus = -9999;
+  SumET_EEminus = -9999;
+  SumET_EE = -9999;
+  SumET_EB = -9999;
+  SumET_ET = -9999;
+
+
+  
+
 
  // Event related infos
   eventNb= iEvent.id().event();
   runNb=iEvent.id().run();
   lumiBlock= iEvent.luminosityBlock();
 
-  cout << " --------------------------Singe Mu Tree ---------------------------- " << endl; 
   
-  //centrality_ = new CentralityProvider(iSetup);
-  //centrality_->newEvent(iEvent,iSetup);
-  //rbin = centrality_->getBin();
-  rbin = -99999;
 
-  using namespace edm;
-  using namespace std;
+  // cout << " --------------------------Singe Mu Tree ---------------------------- " << endl; 
+  
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    rbin = centrality_->getBin();
+  }
+  else{
+    rbin=-99999;
+  }
 
+  //========================= Reading Centrality distribution and filling event variables ======================//
+  
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+ 
+  
+    edm::Handle<reco::Centrality> collCentrality;
+    iEvent.getByLabel("pACentrality",collCentrality);
+  
+  
+    Npix = collCentrality->multiplicityPixel();
+    NpixelTracks = collCentrality->NpixelTracks();
+    Ntracks = collCentrality->Ntracks();
+  
+    SumET_HF = collCentrality->EtHFtowerSum();
+    SumET_HFplus = collCentrality->EtHFtowerSumPlus();
+    SumET_HFminus = collCentrality->EtHFtowerSumMinus();
+    SumET_HFplusEta4 = collCentrality->EtHFtruncatedPlus();
+    SumET_HFminusEta4 = collCentrality->EtHFtruncatedMinus();
+    SumET_ZDC = collCentrality->zdcSum();
+    SumET_ZDCplus = collCentrality->zdcSumPlus();
+    SumET_ZDCminus = collCentrality->zdcSumMinus();
+    SumET_EEplus = collCentrality->EtEESumPlus();
+    SumET_EEminus = collCentrality->EtEESumMinus();
+    SumET_EE = collCentrality->EtEESum();
+    SumET_EB = collCentrality->EtEBSum();
+    SumET_ET = collCentrality->EtMidRapiditySum();
+  }
+  
   nPV = 0 ;
-
   // Primary Vertex
   Handle<reco::VertexCollection> privtxs;
   //iEvent.getByLabel("hiSelectedVertex", privtxs);
-
   iEvent.getByLabel("offlinePrimaryVertices", privtxs);
   VertexCollection::const_iterator privtx;
   nPV = privtxs->size();
   vertexNb=privtxs->size();
   //cout<<"  nPv  "<<nPV<<endl;
-
   //if(!nPV) return; 
 
 
@@ -1100,7 +1225,10 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
     if(!strcmp(hltName.c_str(),"HLT_PAL2DoubleMu3_v1")) { if(triggerResults->accept(index)) evTrigger[2]=1;}
     if(!strcmp(hltName.c_str(),"HLT_PAMu3_v1")) { if(triggerResults->accept(index)) evTrigger[3]=1;}
     if(!strcmp(hltName.c_str(),"HLT_PAMu7_v1")) { if(triggerResults->accept(index)) evTrigger[4]=1;}
-    if(!strcmp(hltName.c_str(),"HLT_PAMu12_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
+    
+    //last muon trigger changed to min bias trigger
+    //if(!strcmp(hltName.c_str(),"HLT_PAMu12_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
+    if(!strcmp(hltName.c_str(),"HLT_PAZeroBiasPixel_SingleTrack_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
                                                                                                          
     //cout << "HLT: " << hltName << " fired? " << triggerResults->accept(index) << endl;                                                                                          
   }
@@ -1303,11 +1431,11 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
       if(muonNeg->isStandAloneMuon()){muNeg_sta=1;}else{muNeg_sta=0;}
 
       
-      if(!muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){cout<<" trigger match by path "<<endl;}
-      if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){cout<<" trigger match by path "<<endl;}
+      // if(!muonPos->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){cout<<" trigger match by path "<<endl;}
+      //if(!muonNeg->triggerObjectMatchesByPath("HLT_HIL1DoubleMu0_HighQ_v1").empty()){cout<<" trigger match by path "<<endl;}
 
-      if(!muonPos->triggerObjectMatchesByFilter("hltHIDoubleMuLevel1PathL1HighQFiltered").empty()){cout<<" trigger match by filter "<<endl;}
-      if(!muonNeg->triggerObjectMatchesByFilter("hltHIDoubleMuLevel1PathL1HighQFiltered").empty()){cout<<" trigger match by filter "<<endl;}
+      //if(!muonPos->triggerObjectMatchesByFilter("hltHIDoubleMuLevel1PathL1HighQFiltered").empty()){cout<<" trigger match by filter "<<endl;}
+      //if(!muonNeg->triggerObjectMatchesByFilter("hltHIDoubleMuLevel1PathL1HighQFiltered").empty()){cout<<" trigger match by filter "<<endl;}
 
 
       //!muonPos->triggerObjectMatchesByFilter("hltHIDoubleMuLevel1PathL1HighQFiltered"). empty()
@@ -1517,16 +1645,17 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     GrunNb=iEvent.id().run();
     GlumiBlock= iEvent.luminosityBlock();
     
-    cout<<" Gen Level Tree "<<endl;
+    //cout<<" Gen Level Tree "<<endl;
     
-    gbin = -9999;
+    //gbin = -9999;
 
 
-
-    //centrality_ = new CentralityProvider(iSetup);
-    //centrality_->newEvent(iEvent,iSetup);
-    //gbin = centrality_->getBin();
-    
+    if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+      centrality_ = new CentralityProvider(iSetup);
+      centrality_->newEvent(iEvent,iSetup);
+      gbin = centrality_->getBin();
+    }
+    else{gbin=-99999;}
     //cout<<" gbin "<<gbin<<endl;
 
 
@@ -1563,18 +1692,12 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     if (part.numberOfMothers()!=1) continue;
     int momId = mom->pdgId();
 
-    //!strcmp(fIsPATInfo.c_str(),"TRUE")
-
     char* MID=(char*)"AB";
     if(momId == 100443) MID=(char *)"PsiPrime";
     if(momId == 443) MID=(char *)"JPsi";
     if(momId == 553) MID=(char *)"Upsilon1s";
     if(momId == 100553)MID=(char *)"Upsilon2s";
     if(momId == 23)MID=(char *)"Z0";
-
-    
-    //cout<<"momId "<<momId<<endl;
-    //JPsi
     
     if ((abs(part.pdgId()) == 13) && (!strcmp(fMotherID.c_str(),MID)) ){
         
@@ -1817,10 +1940,14 @@ void DiMuonOnia2DPlots::FillEvTree(const edm::Event& iEvent, const edm::EventSet
     runNbEv=iEvent.id().run();
     lumiBlockEv= iEvent.luminosityBlock();
     
-    //centrality_ = new CentralityProvider(iSetup);
-    //centrality_->newEvent(iEvent,iSetup);
-    //rbinEv = centrality_->getBin();
-    rbinEv=-99999;
+    if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+      centrality_ = new CentralityProvider(iSetup);
+      centrality_->newEvent(iEvent,iSetup);
+      rbinEv = centrality_->getBin();
+    }
+    else{rbinEv=-99999;}
+
+    //rbinEv=-99999;
 
     //==================================== Gen Stuff ==================================//                                                                                                      
     //int genParId =0;                                                                         
@@ -1893,7 +2020,7 @@ void DiMuonOnia2DPlots::FillEvTree(const edm::Event& iEvent, const edm::EventSet
     edm::ESHandle<TransientTrackBuilder> theTTBuilder;
     iSetup.get<TransientTrackRecord>().get("TransientTrackBuilder",theTTBuilder);                                                                                                 
     KalmanVertexFitter vtxFitter;   
-    cout<<" nPVEv "<<nPVEv<<endl;                                                                                                                                                           
+    //cout<<" nPVEv "<<nPVEv<<endl;                                                                                                                                                           
     if(nPVEv >0) {
       if (privtxsEv->begin() != privtxsEv->end() ) {
 	privtxEv=privtxsEv->begin();
@@ -2494,11 +2621,14 @@ void DiMuonOnia2DPlots::FillPATTree(const edm::Event& iEvent, const edm::EventSe
   runNbPAT=iEvent.id().run();
   lumiBlockPAT= iEvent.luminosityBlock();
   
-  //centrality_ = new CentralityProvider(iSetup);
-  //centrality_->newEvent(iEvent,iSetup);
-  rbinPAT=-9999;
-  //rbinPAT=centrality_->getBin();
-  
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    rbinPAT=centrality_->getBin();
+  }  
+  else{
+    rbinPAT=-9999;
+  }
   
   edm::Handle<edm::View<pat::Muon> > GMuons;
   iEvent.getByLabel("patMuons", GMuons);
@@ -2565,11 +2695,15 @@ void DiMuonOnia2DPlots::FillRecoTree(const edm::Event& iEvent, const edm::EventS
   runNbReco=iEvent.id().run();
   lumiBlockReco= iEvent.luminosityBlock();
   
-  //centrality_ = new CentralityProvider(iSetup);
-  //centrality_->newEvent(iEvent,iSetup);
-  //rbinReco=centrality_->getBin();
-  rbinReco=-9999;
-  //to see
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    rbinReco=centrality_->getBin();
+  }
+  else{
+    rbinReco=-9999;
+  }
+    //to see
 
   edm::Handle<edm::View<reco::Muon> > GMuons;
   iEvent.getByLabel("muons", GMuons);
@@ -2638,6 +2772,28 @@ void DiMuonOnia2DPlots::FillWTPATTree(const edm::Event& iEvent, const edm::Event
   lumiBlockWTPAT= 0 ;
   
 
+
+  PAT_Npix = -9999;
+  PAT_NpixelTracks = -9999;
+  PAT_Ntracks = -9999;
+  
+  PAT_SumET_HF = -9999;
+  PAT_SumET_HFplus = -9999;
+  PAT_SumET_HFminus = -9999;
+  PAT_SumET_HFplusEta4 = -9999;
+  PAT_SumET_HFminusEta4 = -9999;
+  PAT_SumET_ZDC = -9999;
+  PAT_SumET_ZDCplus = -9999;
+  PAT_SumET_ZDCminus = -9999;
+  PAT_SumET_EEplus = -9999;
+  PAT_SumET_EEminus = -9999;
+  PAT_SumET_EE = -9999;
+  PAT_SumET_EB = -9999;
+  PAT_SumET_ET = -9999;
+
+
+
+
   PAT_vertexTrkEv=-9999;
   PAT_vertexXEv=-9999;
   PAT_vertexYEv=-9999;
@@ -2670,65 +2826,88 @@ void DiMuonOnia2DPlots::FillWTPATTree(const edm::Event& iEvent, const edm::Event
   runNbWTPAT=iEvent.id().run();
   lumiBlockWTPAT= iEvent.luminosityBlock();
   
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    centrality_ = new CentralityProvider(iSetup);
+    centrality_->newEvent(iEvent,iSetup);
+    rbinWTPAT=centrality_->getBin();
+  }
+  else{
+    rbinWTPAT=-99999;
+  }
   
-  //centrality_ = new CentralityProvider(iSetup);
-  //centrality_->newEvent(iEvent,iSetup);
-  //rbinWTPAT=centrality_->getBin();
-  rbinWTPAT=-99999;
-  PAT_GenParSize=0;
-  //==================================== Gen Stuff ==================================//
-                                                                                                      
-  //int genParId =0;                                                                             
-  edm::Handle<edm::View<reco::GenParticle> >genPar;
-  iEvent.getByLabel("genParticles",genPar) ;
-  if(!(genPar.isValid())) return;
-  edm::View<reco::GenParticle> genParticles = *genPar ;
-  
-  PAT_GenParNo=genParticles.size();
-  
-  
-  for(size_t i = 0; i < genParticles.size(); ++ i)
-    {
-      const reco::GenParticle& part = (*genPar)[i];
-      const  Candidate *mom1 = part.mother();
-      if (part.numberOfMothers()!=1) continue;
-      int momId1 = mom1->pdgId();      
-      //if(part.pdgId()== 443 || part.pdgId()== 553 || part.pdgId()== 100553 || part.pdgId()== 23 || TMath::Abs(part.pdgId())== 13)
+ //========================= Reading Centrality distribution and filling event variables ======================//
 
-
-      char* MID=(char*)"AB";
-      if(momId1 == 100443) MID=(char *)"PsiPrime";
-      if(momId1 == 443) MID=(char *)"JPsi";
-      if(momId1 == 553) MID=(char *)"Upsilon1s";
-      if(momId1 == 100553)MID=(char *)"Upsilon2s";
-      if(momId1 == 23)MID=(char *)"Z0";
-
-      char* MRID=(char*)"ABC";
-      if( part.pdgId()== 100443) MRID=(char *)"PsiPrime";
-      if( part.pdgId()== 443) MRID=(char *)"JPsi";
-      if( part.pdgId()== 553) MRID=(char *)"Upsilon1s";
-      if( part.pdgId()== 100553)MRID=(char *)"Upsilon2s";
-      if( part.pdgId()== 23)MRID=(char *)"Z0";
-
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    edm::Handle<reco::Centrality> collCentrality;
+    iEvent.getByLabel("pACentrality",collCentrality);
     
-    //cout<<"momId "<<momId<<endl;
-    //JPsi
-    //copy
-    ////if ((abs(part.pdgId()) == 13) && (!strcmp(fMotherID.c_str(),MID)) ){
 
+    PAT_Npix = collCentrality->multiplicityPixel();
+    PAT_NpixelTracks = collCentrality->NpixelTracks();
+    PAT_Ntracks = collCentrality->Ntracks();
+    
+    PAT_SumET_HF = collCentrality->EtHFtowerSum();
+    PAT_SumET_HFplus = collCentrality->EtHFtowerSumPlus();
+    PAT_SumET_HFminus = collCentrality->EtHFtowerSumMinus();
+    PAT_SumET_HFplusEta4 = collCentrality->EtHFtruncatedPlus();
+    PAT_SumET_HFminusEta4 = collCentrality->EtHFtruncatedMinus();
+    PAT_SumET_ZDC = collCentrality->zdcSum();
+    PAT_SumET_ZDCplus = collCentrality->zdcSumPlus();
+    PAT_SumET_ZDCminus = collCentrality->zdcSumMinus();
+    PAT_SumET_EEplus = collCentrality->EtEESumPlus();
+    PAT_SumET_EEminus = collCentrality->EtEESumMinus();
+    PAT_SumET_EE = collCentrality->EtEESum();
+    PAT_SumET_EB = collCentrality->EtEBSum();
+    PAT_SumET_ET = collCentrality->EtMidRapiditySum();
+  }
 
+  //==================================== Gen Stuff ==================================//
+  PAT_GenParSize=0;
 
-      //sh
-      // if( (momId1 == 553 && TMath::Abs(part.pdgId())== 13) || (part.pdgId()==553) ) 
-
-      if( (  (!strcmp(fMotherID.c_str(),MID)) && TMath::Abs(part.pdgId())== 13) || (  (!strcmp(fMotherID.c_str(),MRID))  ) )
-
-
-
- 
+  if(!strcmp(fIsGenInfo.c_str(),"TRUE")){
+    //int genParId =0;                                                                             
+    edm::Handle<edm::View<reco::GenParticle> >genPar;
+    iEvent.getByLabel("genParticles",genPar) ;
+    if(!(genPar.isValid())) return;
+    edm::View<reco::GenParticle> genParticles = *genPar ;
+    
+    PAT_GenParNo=genParticles.size();
+    
+    
+    for(size_t i = 0; i < genParticles.size(); ++ i)
+      {
+	const reco::GenParticle& part = (*genPar)[i];
+	const  Candidate *mom1 = part.mother();
+	if (part.numberOfMothers()!=1) continue;
+	int momId1 = mom1->pdgId();      
+	//if(part.pdgId()== 443 || part.pdgId()== 553 || part.pdgId()== 100553 || part.pdgId()== 23 || TMath::Abs(part.pdgId())== 13)
+	
+	
+	char* MID=(char*)"AB";
+	if(momId1 == 100443) MID=(char *)"PsiPrime";
+	if(momId1 == 443) MID=(char *)"JPsi";
+	if(momId1 == 553) MID=(char *)"Upsilon1s";
+	if(momId1 == 100553)MID=(char *)"Upsilon2s";
+	if(momId1 == 23)MID=(char *)"Z0";
+	
+	char* MRID=(char*)"ABC";
+	if( part.pdgId()== 100443) MRID=(char *)"PsiPrime";
+	if( part.pdgId()== 443) MRID=(char *)"JPsi";
+	if( part.pdgId()== 553) MRID=(char *)"Upsilon1s";
+	if( part.pdgId()== 100553)MRID=(char *)"Upsilon2s";
+	if( part.pdgId()== 23)MRID=(char *)"Z0";
+	
+	
+	//cout<<"momId "<<momId<<endl;
+	//JPsi
+	//copy
+	////if ((abs(part.pdgId()) == 13) && (!strcmp(fMotherID.c_str(),MID)) ){
+	// if( (momId1 == 553 && TMath::Abs(part.pdgId())== 13) || (part.pdgId()==553) ) 
+	
+	if( (  (!strcmp(fMotherID.c_str(),MID)) && TMath::Abs(part.pdgId())== 13) || (  (!strcmp(fMotherID.c_str(),MRID))  ) )
 	  
-
-	{
+	  
+	  {
 	    
 	    PAT_GenvertexXEv=part.vx();
 	    PAT_GenvertexYEv=part.vy();
@@ -2758,9 +2937,9 @@ void DiMuonOnia2DPlots::FillWTPATTree(const edm::Event& iEvent, const edm::Event
 	    PAT_GenParMomStatus[PAT_GenParSize]=momstatus;
 	    PAT_GenParSize++;
 	  }
-    }
-
-
+      }
+    
+  }//is geninfo
 
   //===================================== Reco Stuff ==================================//
   int nPVEv;
@@ -2805,9 +2984,13 @@ void DiMuonOnia2DPlots::FillWTPATTree(const edm::Event& iEvent, const edm::Event
     if(!strcmp(hltName.c_str(),"HLT_PAL2DoubleMu3_v1")) { if(triggerResults->accept(index)) evTrigger[2]=1;}
     if(!strcmp(hltName.c_str(),"HLT_PAMu3_v1")) { if(triggerResults->accept(index)) evTrigger[3]=1;}
     if(!strcmp(hltName.c_str(),"HLT_PAMu7_v1")) { if(triggerResults->accept(index)) evTrigger[4]=1;}
-    if(!strcmp(hltName.c_str(),"HLT_PAMu12_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
+    
+    //last muon trigger changed to min bias trigger
+    //if(!strcmp(hltName.c_str(),"HLT_PAMu12_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
+    if(!strcmp(hltName.c_str(),"HLT_PAZeroBiasPixel_SingleTrack_v1")) { if(triggerResults->accept(index)) evTrigger[5]=1;}
                                                                                                          
-    //cout << "HLT: " << hltName << " fired? " << triggerResults->accept(index) << endl;                                                                                          
+    //cout << "HLT: " << hltName << " fired? " << triggerResults->accept(index) << endl;    
+                                                                                      
   }
   
   if(evTrigger[0]==1){PAT_eventTrigger1=1;}else{PAT_eventTrigger1=0;}
