@@ -98,7 +98,7 @@ process.GlobalTag.globaltag = 'STARTHI53_V17::All'
 
 # load centrality
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
-overrideCentrality(process)
+overrideGT_pPb5020(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
     centralityVariable = cms.string("HFtowersPlusTrunc"),
