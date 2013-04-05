@@ -16,9 +16,8 @@ ivars.register ('secFiles',
 
 ivars.randomNumber = 1
 
-#ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/pPb/Signal_Pythia30/RECO_v01/prod1_hijing_fix_1002_1_XMg.root"
-ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/vzhukova/QCD-pthat80_2p76TeV/QCD-pthat80_2p76TeV_RECO/d0452f12fce525b845e00385074c8a09/QCD-pthat80_2p76TeV_pythia6_RECO_9_1_gGd.root"
-ivars.outputFile = './test_output.root'
+ivars.inputFiles = "/store/caf/user/yilmaz/HiWinter13_QCD_Pt_30_TuneZ2_2p76TeV_pythia6_RECO_4EB4D68F-9595-E211-ABA2-0026B94E27E3_5events.root"
+ivars.outputFile = './jectest_sqlite.root'
 
 ivars.parseArguments()
 
