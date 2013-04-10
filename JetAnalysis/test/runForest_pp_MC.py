@@ -16,8 +16,8 @@ ivars.register ('secFiles',
 
 ivars.randomNumber = 1
 
-ivars.inputFiles = "/store/caf/user/yilmaz/HiWinter13_QCD_Pt_30_TuneZ2_2p76TeV_pythia6_RECO_4EB4D68F-9595-E211-ABA2-0026B94E27E3_5events.root"
-ivars.outputFile = './jectest_frontier.root'
+ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/dgulhan/pPb/Hijing_Pythia_pt120/RECOv3/reco1_prod1_hijing_fix_277_2_AKa.root"
+ivars.outputFile = './test_output.root'
 
 ivars.parseArguments()
 
@@ -32,6 +32,7 @@ process.options = cms.untracked.PSet(
 
 genTag="generator"
 hltProcess="HLT"
+
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
 
@@ -85,10 +86,6 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('RecoLocalTracker.SiPixelRecHits.PixelCPEESProducers_cff')
 process.load('PhysicsTools.PatAlgos.patSequences_cff')
 
-#process.sim_step = cms.Path(process.mix*process.trackingParticles*
-#                            process.SimL1Emulator*
-#                            process.simSiPixelDigis*process.simSiStripDigis)
-
 #process.load('MitHig.PixelTrackletAnalyzer.pixelHitAnalyzer_cfi')
 
 # Data Global Tag 44x 
@@ -97,12 +94,13 @@ process.load('PhysicsTools.PatAlgos.patSequences_cff')
 #process.Timing = cms.Service("Timing")
 
 # MC Global Tag 53x 
-# match Aleksey production
+#process.GlobalTag.globaltag = 'STARTHI53_V17::All'
 process.GlobalTag.globaltag = 'STARTHI53_V14::All'
 
 # load centrality
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
 overrideGT_pp2760(process)
+#overrideGT_pPb5020(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
     centralityVariable = cms.string("HFtowersPlusTrunc"),
@@ -113,11 +111,19 @@ process.HeavyIonGlobalParameters = cms.PSet(
 process.load("CmsHi.JetAnalysis.RandomCones_cff")
 
 process.RandomNumberGeneratorService.generator.initialSeed = ivars.randomNumber 
-process.RandomNumberGeneratorService.akPu3PFConesAna = process.RandomNumberGeneratorService.generator.clone()
-process.RandomNumberGeneratorService.icPu5CaloConesAna = process.RandomNumberGeneratorService.generator.clone()
-process.RandomNumberGeneratorService.akPu5PFConesAna = process.RandomNumberGeneratorService.generator.clone()
-process.RandomNumberGeneratorService.akPu3CaloConesAna = process.RandomNumberGeneratorService.generator.clone()
-process.RandomNumberGeneratorService.akPu5CaloConesAna = process.RandomNumberGeneratorService.generator.clone()
+
+process.RandomNumberGeneratorService.akPu2PFCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu3PFCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu4PFCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu5PFCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu6PFCones = process.RandomNumberGeneratorService.generator.clone()
+
+process.RandomNumberGeneratorService.akPu2CaloCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu3CaloCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu4CaloCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu5CaloCones = process.RandomNumberGeneratorService.generator.clone()
+process.RandomNumberGeneratorService.akPu6CaloCones = process.RandomNumberGeneratorService.generator.clone()
+
 process.RandomNumberGeneratorService.multiPhotonAnalyzer = process.RandomNumberGeneratorService.generator.clone()
 
 # EcalSeverityLevel ES Producer
@@ -145,6 +151,7 @@ process.load('CmsHi.JetAnalysis.EventSelection_cff')
 process.load('CmsHi.JetAnalysis.ExtraGenReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraTrackReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
+process.load('CmsHi.JetAnalysis.HiTrackJets_cff')
 process.load('CmsHi.JetAnalysis.ExtraJetReco_cff')
 process.load('CmsHi.JetAnalysis.ExtraEGammaReco_cff')
 process.load('CmsHi.JetAnalysis.PatAna_MC_cff')
@@ -156,15 +163,17 @@ process.load("MitHig.PixelTrackletAnalyzer.METAnalyzer_cff")
 process.load("CmsHi.JetAnalysis.pfcandAnalyzer_cfi")
 
 process.load('CmsHi.JetAnalysis.rechitanalyzer_cfi')
+process.rechitanalyzer.HFTreePtMin = -999
+process.rechitanalyzer.HBHETreePtMin = -999
+process.rechitanalyzer.EBTreePtMin = -999
+process.rechitanalyzer.EBTreePtMin = -999
+process.rechitanalyzer.EETreePtMin = -999
+
 process.rechitAna = cms.Sequence(process.rechitanalyzer+process.pfTowers)
 
 process.pfcandAnalyzer.skipCharged = False
 process.pfcandAnalyzer.pfPtMin = 0
 process.interestingTrackEcalDetIds.TrackCollection = cms.InputTag(trkTag)
-
-# Jet corrections should be switched to pp tracking
-process.akPu5PFcorr.payload = 'AK5PF_generalTracks'
-process.ak5PFcorr.payload = 'AK5PF_generalTracks'
 
 process.genpana = cms.EDAnalyzer("GenParticleCounter",
                                  src = cms.untracked.string("hiGenParticles"),
@@ -177,10 +186,7 @@ process.genpana = cms.EDAnalyzer("GenParticleCounter",
 #########################
 process.ppTrack.qualityStrings = cms.untracked.vstring('highPurity','highPuritySetWithPV')
 process.ppTrack.trackPtMin = 0.1
-process.ppTrack.simTrackPtMin = 0.1
-process.ppTrack.fillSimTrack = False
-process.ppTrack.doPFMatching = False
-
+process.ppTrack.simTrackPtMin = 0.09
 process.pixelTrack = process.ppTrack.clone(trackSrc = cms.InputTag("pixelTracks"),
                                            fillSimTrack = False
                                            )
@@ -192,9 +198,9 @@ process.muonTree.doGen = cms.untracked.bool(True)
 
 # Event tree
 process.load("CmsHi/HiHLTAlgos.hievtanalyzer_cfi")
-process.hiEvtAnalyzer.doMC = cms.bool(False)
-process.hiEvtAnalyzer.doEvtPlane = cms.bool(True)
-process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality")
+process.hiEvtAnalyzer.doMC = cms.bool(True)
+
+process.ppTrack.vertexSrc = [vtxTag]
 
 process.iterativeConePu5CaloJets.srcPVs = vtxTag
 process.iterativeCone5CaloJets.srcPVs = vtxTag
@@ -205,6 +211,7 @@ process.muonTree.vertices = cms.InputTag(vtxTag)
 
 process.hiEvtAnalyzer.Vertex = cms.InputTag(vtxTag)
 process.hiEvtAnalyzer.doEvtPlane = False
+process.hiEvtAnalyzer.Centrality = cms.InputTag("pACentrality")
 
 process.primaryVertexFilter.src = cms.InputTag(vtxTag)
 process.cleanPhotons.primaryVertexProducer = cms.string(vtxTag)
@@ -247,7 +254,7 @@ process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow
 process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
 process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
 
-process.hiGenParticles.srcVector = cms.vstring(genTag)
+process.hiGenParticles.srcVector = [genTag]
 process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu1PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
 process.akPu2PFJetAnalyzer.eventInfoTag = cms.InputTag(genTag)
@@ -282,68 +289,7 @@ process.multiPhotonAnalyzer.HepMCProducer = cms.InputTag(genTag)
 
 process.icPu5JetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'+hltProcess)
 process.akPu3PFJetAnalyzer.hltTrgResults = cms.untracked.string('TriggerResults::'+hltProcess)
-process.heavyIon.generators = cms.vstring(genTag)
-
-# JEC options
-process.ak1PFJets.jetPtMin = 1
-process.ak2PFJets.jetPtMin = 1
-process.ak3PFJets.jetPtMin = 1
-process.ak4PFJets.jetPtMin = 1
-process.ak5PFJets.jetPtMin = 1
-process.ak6PFJets.jetPtMin = 1
-
-process.ak1CaloJets.jetPtMin = 1
-process.ak2CaloJets.jetPtMin = 1
-process.ak3CaloJets.jetPtMin = 1
-process.ak4CaloJets.jetPtMin = 1
-process.ak5CaloJets.jetPtMin = 1
-process.ak6CaloJets.jetPtMin = 1
-
-process.akPu1PFJets.jetPtMin = 1
-process.akPu2PFJets.jetPtMin = 1
-process.akPu3PFJets.jetPtMin = 1
-process.akPu4PFJets.jetPtMin = 1
-process.akPu5PFJets.jetPtMin = 1
-process.akPu6PFJets.jetPtMin = 1
-
-process.akPu1CaloJets.jetPtMin = 1
-process.akPu2CaloJets.jetPtMin = 1
-process.akPu3CaloJets.jetPtMin = 1
-process.akPu4CaloJets.jetPtMin = 1
-process.akPu5CaloJets.jetPtMin = 1
-process.akPu6CaloJets.jetPtMin = 1
- 
-
-process.ak1CaloJetAnalyzer.jetPtMin=1
-process.ak2CaloJetAnalyzer.jetPtMin=1
-process.ak3CaloJetAnalyzer.jetPtMin=1
-process.ak4CaloJetAnalyzer.jetPtMin=1
-process.ak5CaloJetAnalyzer.jetPtMin=1
-process.ak6CaloJetAnalyzer.jetPtMin=1
-
-
-process.akPu1CaloJetAnalyzer.jetPtMin=1
-process.akPu2CaloJetAnalyzer.jetPtMin=1
-process.akPu3CaloJetAnalyzer.jetPtMin=1
-process.akPu4CaloJetAnalyzer.jetPtMin=1
-process.akPu5CaloJetAnalyzer.jetPtMin=1
-process.akPu6CaloJetAnalyzer.jetPtMin=1
-
-
-process.ak1PFJetAnalyzer.jetPtMin=1
-process.ak2PFJetAnalyzer.jetPtMin=1
-process.ak3PFJetAnalyzer.jetPtMin=1
-process.ak4PFJetAnalyzer.jetPtMin=1
-process.ak5PFJetAnalyzer.jetPtMin=1
-process.ak6PFJetAnalyzer.jetPtMin=1
-
-
-process.akPu1PFJetAnalyzer.jetPtMin=1
-process.akPu2PFJetAnalyzer.jetPtMin=1
-process.akPu3PFJetAnalyzer.jetPtMin=1
-process.akPu4PFJetAnalyzer.jetPtMin=1
-process.akPu5PFJetAnalyzer.jetPtMin=1
-process.akPu6PFJetAnalyzer.jetPtMin=1
+process.heavyIon.generators = cms.vstring("generator")
 
 
 #Commented by Yen-Jie
@@ -352,7 +298,7 @@ process.akPu6PFJetAnalyzer.jetPtMin=1
 process.HiGenParticleAna = cms.EDAnalyzer("HiGenAnalyzer")
 process.HiGenParticleAna.src= cms.untracked.InputTag("hiGenParticles")
 process.HiGenParticleAna.chargedOnly = cms.untracked.bool(False)
-process.HiGenParticleAna.ptMin = cms.untracked.double(0.5)
+process.HiGenParticleAna.ptMin = cms.untracked.double(0)
 
 process.load("RecoHI.HiMuonAlgos.HiRecoMuon_cff")
 process.muons.JetExtractorPSet.JetCollectionLabel = cms.InputTag("iterativeConePu5CaloJets")
@@ -374,13 +320,8 @@ process.hiCaloCompatibleGeneralTracksQuality.src = cms.InputTag(trkTag)
 process.hiGeneralTracksQuality.src = cms.InputTag(trkTag)
 process.hiSelectedTrackQuality.src = cms.InputTag(trkTag)
 
-#process. .src = cms.InputTag("generalTracks")
 process.hitrkEffAnalyzer_akpu3pf.tracks = cms.untracked.InputTag(trkTag)
 process.hitrkEffAnalyzer_akpu3pf.vertices = cms.untracked.InputTag(vtxTag)
-
-
-
-
 
 
 process.hiTrackReco = cms.Sequence(process.hiTracks)
@@ -390,17 +331,12 @@ process.trackeff_seq = cms.Sequence(process.hitrkEffAnalyzer_akpu3pf)
 process.genParticles.src = cms.InputTag(genTag)
 
 process.reco_extra =  cms.Path(
-    process.hiGenParticles +
-    
     process.siPixelRecHits*
     process.pACentrality*
-    
     process.hiTrackReco
-#    +process.hiTrackDebug
-    
-    #        *process.muonRecoPbPb
-#    *process.HiParticleFlowLocalReco
-#    *process.HiParticleFlowReco
+    +process.hiTrackDebug
+    #    process.recoTrackJets*
+    *process.recoFastJets    
     *process.iterativeConePu5CaloJets
     *process.PFTowers
     *process.genParticles
@@ -428,6 +364,7 @@ process.gen_step          = cms.Path( process.hiGen )
 
 ###########################################
 
+
 process.pat_step          = cms.Path(process.makeHeavyIonJets
 #                                     +
 #                                     process.makeHeavyIonPhotons
@@ -445,24 +382,26 @@ process.multiPhotonAnalyzer.GammaEtaMax = cms.untracked.double(100)
 process.multiPhotonAnalyzer.GammaPtMin = cms.untracked.double(10)
 process.multiPhotonAnalyzer.PhotonProducer = cms.InputTag("selectedPatPhotons")
 process.multiPhotonAnalyzer.TrackProducer = cms.InputTag("generalTracks")
+process.multiPhotonAnalyzer.basicClusterBarrel = cms.InputTag("hybridSuperClusters:hybridBarrelBasicClusters")
+process.multiPhotonAnalyzer.basicClusterEndcap = cms.InputTag("multi5x5SuperClusters:multi5x5EndcapBasicClusters")
 
-process.ana_step          = cms.Path(
-#    process.genpana +
+process.ana_step          = cms.Path(process.fastjet +                                     
+                                     process.genpana +
                                       process.hcalNoise +
                                       process.jetAnalyzers +                                      
                                       process.multiPhotonAnalyzer +
-#                                      process.HiGenParticleAna +
-#                                      process.cutsTPForFak +
-#                                      process.cutsTPForEff +
-#                                      process.trackeff_seq+
-#                                      process.ppTrack +
-#                                      process.pixelTrack +
-#                                      process.pfcandAnalyzer +
-#                                      process.rechitAna +
+                                      process.HiGenParticleAna +
+                                      process.cutsTPForFak +
+                                      process.cutsTPForEff +
+                                      process.trackeff_seq+
+                                      process.ppTrack +
+                                      process.pixelTrack +
+                                      process.pfcandAnalyzer +
+                                      process.rechitAna +
                                       process.met * process.anaMET +
 				      process.muonTree +
 				      process.hiEvtAnalyzer +
-#                                      process.randomCones +
+                                      process.randomCones +
                                       process.HiForest
                                       )
 
@@ -491,6 +430,13 @@ process.phfPosFilter1 = cms.Path(process.towersAboveThreshold+process.hfPosTower
 process.phfNegFilter1 = cms.Path(process.towersAboveThreshold+process.hfPosTowers+process.hfNegTowers+process.hfNegFilter)
 process.phltPixelClusterShapeFilter = cms.Path(process.siPixelRecHits+process.hltPixelClusterShapeFilter)
 process.pprimaryvertexFilter = cms.Path(process.primaryVertexFilter)
+process.pBeamScrapingFilter=cms.Path(process.NoScraping)
+process.pVertexFilterCutG = cms.Path(process.pileupVertexFilterCutG)
+process.pVertexFilterCutGloose = cms.Path(process.pileupVertexFilterCutGloose)
+process.pVertexFilterCutGtight = cms.Path(process.pileupVertexFilterCutGtight)
+process.pVertexFilterCutGplus = cms.Path(process.pileupVertexFilterCutGplus)
+process.pVertexFilterCutE = cms.Path(process.pileupVertexFilterCutE)
+process.pVertexFilterCutEandG = cms.Path(process.pileupVertexFilterCutEandG)
  
 
 # Customization
@@ -519,8 +465,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 #process.schedule = process.HLTSchedule
 #process.postHLTschedule = cms.Schedule(
 process.schedule = cms.Schedule(
-#    process.HLT_PAZeroBiasPixel_SingleTrack_v1,
-#    process.sim_step,
+    process.HLT_PAZeroBiasPixel_SingleTrack_v1,
     process.reco_extra, process.reco_extra_jet, process.gen_step, process.pat_step,
 #                                process.extrapatstep,
                                 process.ana_step,
@@ -530,6 +475,13 @@ process.schedule = cms.Schedule(
     process.phfPosFilter2,process.phfNegFilter2,
     process.phfPosFilter1,process.phfNegFilter1,
     process.phltPixelClusterShapeFilter,process.pprimaryvertexFilter,
+    process.pBeamScrapingFilter,    
+    process.pVertexFilterCutG,
+    process.pVertexFilterCutGloose,
+    process.pVertexFilterCutGtight,
+    process.pVertexFilterCutGplus,
+    process.pVertexFilterCutE,
+    process.pVertexFilterCutEandG,    
     process.hltAna,process.pAna
     )
 
