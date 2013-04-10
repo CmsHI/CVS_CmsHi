@@ -41,8 +41,7 @@ process.HiForest.inputLines = cms.vstring("HiForest V2 for pPb",
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
 #                            fileNames = cms.untracked.vstring("/store/group/phys_heavyions/icali/PAPhysics/pAPilotRun_Run202792GoodLumis_RAWRECO_L1Em_PrescaleActiveBitsSkimNoZB_CMSSW528_V94_FinalWorkflow_2MHz_v2_v1_v2/f3394926c5028783289fd2cd57b36909/PAPhysics_RAWRECO_inRECO_9_1_8mR.root")
-#                            fileNames = cms.untracked.vstring("/store/hidata/HIRun2013/PAHighPt/RECO/PromptReco-v1/000/210/614/00000/D43CAAE9-3D66-E211-A43F-0025901D624E.root")
-                            fileNames = cms.untracked.vstring("/store/data//Run2013A/PPJet/RECO/PromptReco-v1/000/211/797/00000/20640CE7-B377-E211-87CB-0025901D623C.root")
+                            fileNames = cms.untracked.vstring("/store/hidata/HIRun2013/PAHighPt/RECO/PromptReco-v1/000/210/614/00000/D43CAAE9-3D66-E211-A43F-0025901D624E.root")
 #                            fileNames = cms.untracked.vstring("file:/afs/cern.ch/user/y/yjlee/public/pPbDijet.root")
 			    )
 

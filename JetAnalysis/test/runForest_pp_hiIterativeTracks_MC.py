@@ -331,11 +331,39 @@ process.trackeff_seq = cms.Sequence(process.hitrkEffAnalyzer_akpu3pf)
 
 process.genParticles.src = cms.InputTag(genTag)
 
+
+#####################################################################################
+# PF
+#####################################################################################
+
+process.load('CmsHi.JetAnalysis.ExtraPfReco_cff')
+process.particleFlowTmp.postMuonCleaning = False
+process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
+process.pfTrack.UseQuality = True
+
+process.pfTrack.TkColList = cms.VInputTag("hiGeneralTracks")
+process.pfTrack.TrackQuality = cms.string('loose')
+
+process.pfTrack.GsfTracksInEvents = cms.bool(False)
+process.HiParticleFlowReco.remove(process.electronsWithPresel)
+process.particleFlowTmp.usePFElectrons = cms.bool(False)
+process.particleFlowTmp.useEGammaElectrons = cms.bool(False)
+process.particleFlowBlock.RecMuons = 'muons'
+
+#####################################################################################
+# Extra RECO path
+#####################################################################################
+
 process.reco_extra =  cms.Path(
     process.siPixelRecHits*
     process.pACentrality*
     process.hiTrackReco
     +process.hiTrackDebug
+
+    *process.HiParticleFlowLocalReco
+    *process.HiParticleFlowReco
+    *process.hiGeneralCaloMatchedTracks
+
     #    process.recoTrackJets*
     *process.recoFastJets    
     *process.iterativeConePu5CaloJets
@@ -344,6 +372,7 @@ process.reco_extra =  cms.Path(
     *process.patDefaultSequence
 )    
     
+#####################################################################################
 
 # seed the muons with iterative tracks
 process.globalMuons.TrackerCollectionLabel = "generalTracks"
@@ -395,7 +424,7 @@ process.ana_step          = cms.Path(process.fastjet +
                                       process.cutsTPForFak +
                                       process.cutsTPForEff +
                                       process.trackeff_seq+
-                                      process.ppTrack +
+                                      process.anaTrack +
                                       process.pixelTrack +
                                       process.pfcandAnalyzer +
                                       process.rechitAna +
