@@ -36,6 +36,7 @@ hltProcess="HLT"
 
 vtxTag="offlinePrimaryVertices"
 trkTag="generalTracks"
+pfTag="particleFlow"
 
 hiTrackQuality = "highPurity"              # iterative tracks
 
@@ -222,38 +223,38 @@ process.particleFlowTmp.vertexCollection = cms.InputTag(vtxTag)
 process.mvaElectrons.vertexTag = cms.InputTag(vtxTag)
 process.iterativeConePu5CaloJets.jetPtMin = cms.double(3.0)
 
-process.PFTowers.src = cms.InputTag("particleFlow")
-process.akPu1PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu2PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu3PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu4PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu5PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu6PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
+process.PFTowers.src = cms.InputTag(pfTag)
+process.akPu1PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu2PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu3PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu4PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu5PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu6PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
 
-process.ak1PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak2PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak3PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak4PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak5PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak6PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
+process.ak1PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak2PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak3PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak4PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak5PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak6PFJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
 
-process.akPu1CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu2CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu3CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu4CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu5CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.akPu6CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
+process.akPu1CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu2CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu3CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu4CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu5CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.akPu6CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
 
-process.ak1CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak2CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak3CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak4CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak5CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ak6CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
+process.ak1CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak2CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak3CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak4CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak5CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ak6CaloJetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
 
-process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag("particleFlow")
-process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag("particleFlow")
+process.icPu5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.ic5JetAnalyzer.pfCandidateLabel = cms.untracked.InputTag(pfTag)
+process.pfcandAnalyzer.pfCandidateLabel = cms.InputTag(pfTag)
 
 process.hiGenParticles.srcVector = [genTag]
 process.icPu5JetAnalyzer.eventInfoTag = cms.InputTag(genTag)
