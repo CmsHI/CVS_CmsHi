@@ -102,7 +102,7 @@ process.GlobalTag.globaltag = 'STARTHI53_V14::All'
 # load centrality
 from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
 overrideGT_pp2760(process)
-#overrideGT_pPb5020(process)
+overrideGT_PbPb2760(process)
 
 process.HeavyIonGlobalParameters = cms.PSet(
     centralityVariable = cms.string("HFtowersPlusTrunc"),
@@ -394,6 +394,22 @@ process.reco_extra_jet    = cms.Path(process.iterativeConePu5CaloJets *
 process.gen_step          = cms.Path( process.hiGen )
 
 ###########################################
+
+process.akPu1PFcorr.payload = 'AK1PF_hiIterativeTracks'
+process.akPu2PFcorr.payload = 'AK2PF_hiIterativeTracks'
+process.akPu3PFcorr.payload = 'AK3PF_hiIterativeTracks'
+process.akPu4PFcorr.payload = 'AK4PF_hiIterativeTracks'
+process.akPu5PFcorr.payload = 'AK5PF_hiIterativeTracks'
+process.akPu6PFcorr.payload = 'AK6PF_hiIterativeTracks'
+
+process.ak1PFcorr.payload = 'AK1PF_hiIterativeTracks'
+process.ak2PFcorr.payload = 'AK2PF_hiIterativeTracks'
+process.ak3PFcorr.payload = 'AK3PF_hiIterativeTracks'
+process.ak4PFcorr.payload = 'AK4PF_hiIterativeTracks'
+process.ak5PFcorr.payload = 'AK5PF_hiIterativeTracks'
+process.ak6PFcorr.payload = 'AK6PF_hiIterativeTracks'
+
+###########################################                                                                                                   
 
 
 process.pat_step          = cms.Path(process.makeHeavyIonJets
