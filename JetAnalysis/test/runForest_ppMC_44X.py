@@ -13,7 +13,8 @@ ivars.randomNumber = 1
 #ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet50/reco_v0/set2_random70000_HydjetDrum_362.root"
 #ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/yetkin/MC_Production/Pythia80_HydjetDrum_mix01/RECO/set1_random30000_HydjetDrum_12.root"
 
-ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet30/reco_v8_v0_v8/set1_random10000_HydjetDrum_126.root"
+#ivars.inputFiles = "file:/net/hisrv0001/home/icali/hadoop/Pythia/Z2/ppDijet30/reco_v8_v0_v8/set1_random10000_HydjetDrum_126.root"
+ivars.inputFiles = "file:prod1_hijing_fix_112_1_iOy.root"
 ivars.outputFile = './forest_pp0_test3.root'
 
 ivars.parseArguments()

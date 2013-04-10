@@ -16,7 +16,8 @@ ivars.register ('secFiles',
 
 ivars.randomNumber = 1
 
-ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/dgulhan/pPb/Hijing_Pythia_pt120/RECOv3/reco1_prod1_hijing_fix_277_2_AKa.root"
+#ivars.inputFiles = "file:/mnt/hadoop/cms/store/user/dgulhan/pPb/Hijing_Pythia_pt120/RECOv3/reco1_prod1_hijing_fix_277_2_AKa.root"
+ivars.inputFiles = "file:prod1_hijing_fix_112_1_iOy.root"
 ivars.outputFile = './test_output.root'
 
 ivars.parseArguments()
