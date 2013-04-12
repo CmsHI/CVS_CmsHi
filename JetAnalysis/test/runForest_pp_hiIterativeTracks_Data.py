@@ -275,11 +275,11 @@ process.reco_extra =  cms.Path(
     process.siPixelRecHits*
     process.pACentrality*
 
+    process.hiTrackReco*    
     process.HiParticleFlowLocalReco*
     process.HiParticleFlowReco*
     process.hiGeneralCaloMatchedTracks*
-    
-    process.hiTrackReco*
+
 #    process.recoTrackJets*
     process.recoFastJets*
     process.iterativeConePu5CaloJets*
