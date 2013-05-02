@@ -343,7 +343,7 @@ process.particleFlowClusterPS.thresh_Pt_Seed_Endcap = cms.double(99999.)
 process.pfTrack.UseQuality = True
 
 process.pfTrack.TkColList = cms.VInputTag("hiGeneralTracks")
-process.pfTrack.TrackQuality = cms.string('loose')
+process.pfTrack.TrackQuality = cms.string('highPurity')
 
 process.pfTrack.GsfTracksInEvents = cms.bool(False)
 process.HiParticleFlowReco.remove(process.electronsWithPresel)
