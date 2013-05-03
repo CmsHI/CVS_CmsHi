@@ -265,6 +265,13 @@ private:
   //====================== DiMuon Gen Variables ==============================================================================//  
   int GeventNb,GrunNb,GlumiBlock;
   double GenvertexX,GenvertexY,GenvertexZ;
+ 
+  int Gen_Npix, Gen_NpixelTracks, Gen_Ntracks;
+ 
+  double Gen_SumET_HF, Gen_SumET_HFplus, Gen_SumET_HFminus, Gen_SumET_HFplusEta4, Gen_SumET_HFminusEta4; 
+  double Gen_SumET_EB, Gen_SumET_ET, Gen_SumET_EE, Gen_SumET_EEplus, Gen_SumET_EEminus, Gen_SumET_ZDC, Gen_SumET_ZDCplus, Gen_SumET_ZDCminus;
+
+
 
   //Gen JPsi Variables
   double GenJpsiMassP, GenJpsiPtP, GenJpsiRapP;
@@ -476,6 +483,12 @@ DiMuonOnia2DPlots::beginJob()
   EventTree->Branch("runNbEv",               &runNbEv,               "runNbEv/I");
   EventTree->Branch("lumiBlockEv",           &lumiBlockEv,           "lumiBlockEv/I");
 
+
+
+
+
+
+
   EventTree->Branch("GenParNo",           &GenParNo,           "GenParNo/I");
   EventTree->Branch("GenParSize",           &GenParSize,           "GenParSize/I");
   EventTree->Branch("GenvertexXEv",         &GenvertexXEv,         "GenvertexXEv/D");
@@ -653,8 +666,8 @@ DiMuonOnia2DPlots::beginJob()
   SingleMuonTree->Branch("SumET_HFminus",&SumET_HFminus,"SumET_HFminus/D");
 
   SingleMuonTree->Branch("SumET_HFplusEta4",&SumET_HFplusEta4,"SumET_HFplusEta4/D");
-  
   SingleMuonTree->Branch("SumET_HFminusEta4",&SumET_HFminusEta4,"SumET_HFminusEta4/D");
+  
   SingleMuonTree->Branch("SumET_ET",&SumET_ET,"SumET_ET/D");
   SingleMuonTree->Branch("SumET_EE",&SumET_EE,"SumET_EE/D");
   SingleMuonTree->Branch("SumET_EB",&SumET_EB,"SumET_EB/D");
@@ -799,13 +812,39 @@ DiMuonOnia2DPlots::beginJob()
   SingleGenMuonTree->Branch("GeventNb",   &GeventNb,       "GeventNb/I");
   SingleGenMuonTree->Branch("GrunNb",     &GrunNb,         "GrunNb/I");
   SingleGenMuonTree->Branch("GlumiBlock", &GlumiBlock,     "GlumiBlock/I");
+ 
+
   SingleGenMuonTree->Branch("GenvertexX",            &GenvertexX,            "GenvertexX/D");
   SingleGenMuonTree->Branch("GenvertexY",            &GenvertexY,            "GenvertexY/D");
   SingleGenMuonTree->Branch("GenvertexZ",             &GenvertexZ,            "GenvertexZ/D");
 
-  //Gen Jpsi Variables Parent         
-                                                                                                                                                                                  
+
+  SingleGenMuonTree->Branch("Gen_Npix",&Gen_Npix,"Gen_Npix/I");
+  SingleGenMuonTree->Branch("Gen_NpixelTracks",&Gen_NpixelTracks,"Gen_NpixelTracks/I");
+  SingleGenMuonTree->Branch("Gen_Ntracks", &Gen_Ntracks, "Gen_Ntracks/I");
+  
+  SingleGenMuonTree->Branch("Gen_SumET_HF",&Gen_SumET_HF,"Gen_SumET_HF/D");
+  SingleGenMuonTree->Branch("Gen_SumET_HFplus",&Gen_SumET_HFplus,"Gen_SumET_HFplus/D");
+  SingleGenMuonTree->Branch("Gen_SumET_HFminus",&Gen_SumET_HFminus,"Gen_SumET_HFminus/D");
+  SingleGenMuonTree->Branch("Gen_SumET_HFplusEta4",&Gen_SumET_HFplusEta4,"Gen_SumET_HFplusEta4/D");
+  SingleGenMuonTree->Branch("Gen_SumET_HFminusEta4",&Gen_SumET_HFminusEta4,"Gen_SumET_HFminusEta4/D");
+  SingleGenMuonTree->Branch("Gen_SumET_ET",&Gen_SumET_ET,"Gen_SumET_ET/D");
+  SingleGenMuonTree->Branch("Gen_SumET_EE",&Gen_SumET_EE,"Gen_SumET_EE/D");
+  SingleGenMuonTree->Branch("Gen_SumET_EB",&Gen_SumET_EB,"Gen_SumET_EB/D");
+  SingleGenMuonTree->Branch("Gen_SumET_EEplus",&Gen_SumET_EEplus,"Gen_SumET_EEplus/D");
+  SingleGenMuonTree->Branch("Gen_SumET_EEminus",&Gen_SumET_EEminus,"Gen_SumET_EEminus/D");
+  SingleGenMuonTree->Branch("Gen_SumET_ZDC",&Gen_SumET_ZDC,"Gen_SumET_ZDC/D");
+  SingleGenMuonTree->Branch("Gen_SumET_ZDCplus",&Gen_SumET_ZDCplus,"Gen_SumET_ZDCplus/D");
+  SingleGenMuonTree->Branch("Gen_SumET_ZDCminus",&Gen_SumET_ZDCminus,"Gen_SumET_ZDCminus/D");
+
+
+
+
+
+  //Gen Jpsi Variables Parent  
+       
   SingleGenMuonTree->Branch("GenJpsiMassP",   &GenJpsiMassP,  "GenJpsiMassP/D");
+
   SingleGenMuonTree->Branch("GenJpsiPtP",     &GenJpsiPtP,    "GenJpsiPtP/D");
   SingleGenMuonTree->Branch("GenJpsiRapP",    &GenJpsiRapP,   "GenJpsiRapP/D");
   SingleGenMuonTree->Branch("GenJpsiPxP",     &GenJpsiPxP,    "GenJpsiPxP/D");
@@ -1160,8 +1199,10 @@ void DiMuonOnia2DPlots::FillTree(const edm::Event& iEvent, const edm::EventSetup
     SumET_HF = collCentrality->EtHFtowerSum();
     SumET_HFplus = collCentrality->EtHFtowerSumPlus();
     SumET_HFminus = collCentrality->EtHFtowerSumMinus();
+    
     SumET_HFplusEta4 = collCentrality->EtHFtruncatedPlus();
     SumET_HFminusEta4 = collCentrality->EtHFtruncatedMinus();
+    
     SumET_ZDC = collCentrality->zdcSum();
     SumET_ZDCplus = collCentrality->zdcSumPlus();
     SumET_ZDCminus = collCentrality->zdcSumMinus();
@@ -1639,6 +1680,28 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
     GenvertexY=-9999;
     GenvertexZ=-9999;
 
+
+
+    Gen_Npix = -9999;
+    Gen_NpixelTracks = -9999;
+    Gen_Ntracks = -9999;
+    Gen_SumET_HF = -9999;
+    Gen_SumET_HFplus = -9999;
+    Gen_SumET_HFminus = -9999;
+    Gen_SumET_HFplusEta4 = -9999;
+    Gen_SumET_HFminusEta4 = -9999;
+    Gen_SumET_ZDC = -9999;
+    Gen_SumET_ZDCplus = -9999;
+    Gen_SumET_ZDCminus = -9999;
+    Gen_SumET_EEplus = -9999;
+    Gen_SumET_EEminus = -9999;
+    Gen_SumET_EE = -9999;
+    Gen_SumET_EB = -9999;
+    Gen_SumET_ET = -9999;
+
+
+
+
     // Event related infos 
                                                                                                                     
     GeventNb= iEvent.id().event();
@@ -1656,7 +1719,33 @@ void DiMuonOnia2DPlots::FillGenTree(const edm::Event& iEvent, const edm::EventSe
       gbin = centrality_->getBin();
     }
     else{gbin=-99999;}
-    //cout<<" gbin "<<gbin<<endl;
+
+  if(!strcmp(fIsCentInfo.c_str(),"TRUE")){
+    edm::Handle<reco::Centrality> collCentrality;
+    iEvent.getByLabel("pACentrality",collCentrality);
+    
+
+    Gen_Npix = collCentrality->multiplicityPixel();
+    Gen_NpixelTracks = collCentrality->NpixelTracks();
+    Gen_Ntracks = collCentrality->Ntracks();
+    
+    Gen_SumET_HF = collCentrality->EtHFtowerSum();
+    Gen_SumET_HFplus = collCentrality->EtHFtowerSumPlus();
+    Gen_SumET_HFminus = collCentrality->EtHFtowerSumMinus();
+    Gen_SumET_HFplusEta4 = collCentrality->EtHFtruncatedPlus();
+    Gen_SumET_HFminusEta4 = collCentrality->EtHFtruncatedMinus();
+    Gen_SumET_ZDC = collCentrality->zdcSum();
+    Gen_SumET_ZDCplus = collCentrality->zdcSumPlus();
+    Gen_SumET_ZDCminus = collCentrality->zdcSumMinus();
+    Gen_SumET_EEplus = collCentrality->EtEESumPlus();
+    Gen_SumET_EEminus = collCentrality->EtEESumMinus();
+    Gen_SumET_EE = collCentrality->EtEESum();
+    Gen_SumET_EB = collCentrality->EtEBSum();
+    Gen_SumET_ET = collCentrality->EtMidRapiditySum();
+  }
+
+
+
 
 
   //-----------------------------------------------------hiGenParticle----------------------------------------------------------------------
