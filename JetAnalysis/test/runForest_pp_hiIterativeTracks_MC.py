@@ -381,7 +381,7 @@ process.muons.TrackExtractorPSet.inputTrackCollection = "generalTracks"
 process.muons.inputCollectionLabels = ["generalTracks", "globalMuons", "standAloneMuons:UpdatedAtVtx", "tevMuons:firstHit", "tevMuons:picky", "tevMuons:dyt"]
 
 # set track collection to iterative tracking
-process.pfTrack.TkColList = cms.VInputTag("generalTracks")
+process.pfTrack.TkColList = cms.VInputTag(trkTag)
 
 # End modifications to reco sequence -Matt
 ##########################################
