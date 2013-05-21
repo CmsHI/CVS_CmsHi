@@ -1339,7 +1339,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetVertices()
         hYVtxSep->Fill(ysep);
         hXYZVtxSep->Fill(xyzsep);
         if(hPileup_distfunc && vtx.tracksSize()>hPileup_distfunc->GetBinContent(hPileup_distfunc->FindBin(xyzsep,maxofflinetracks))) thirdofflinetracks=10000;
-        hMultMaxVsSec->Fill(maxofflinetracks,vtx.tracksSize());
+        if(xyzsep<3 && xyzsep>2) hMultMaxVsSec->Fill(maxofflinetracks,vtx.tracksSize());
         hMultMaxVsSecVsZVtxSep->Fill(maxofflinetracks,vtx.tracksSize(),xyzsep);
         if(xyzsep<=minVtxSep)
         {
@@ -1570,6 +1570,8 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
 */
 
 // pPb centrality bins
+  if(!cutPara.centralityCollection.Contains("pACentrality")) return bin;
+
   if(hft<10.) bin=0;  
   if(hft>10. && hft<20.) bin=1;
   if(hft>20. && hft<30.) bin=2;
