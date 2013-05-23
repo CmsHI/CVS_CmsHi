@@ -22,67 +22,121 @@ void validate(){
 
 TH1::SetDefaultSumw2();
 using namespace std;
-
- HiForest * t = new HiForest("/mnt/hadoop/cms/store/user/icali/HIJING_GEN-SIM_revrese_betap/Hijing_reverse_Dijet30_5p02TeV_FOREST_v1/21a8c2f559597277c134da8e35f2233d/forest_150_1_FWZ.root","",cPPb,1);
-
- t->InitTree();
-
- // VERTEX VALIDATION
- TCanvas* cv1 = new TCanvas("cv1","",600,600);
- t->Draw("nVtx","","");
-
- TCanvas* cv2 = new TCanvas("cv2","",600,600);
- t->Draw("zVtx[maxVtx]","","");
-
- TCanvas* cv3 = new TCanvas("cv3","",600,600);
- t->Draw("yVtx[maxVtx]:xVtx[maxVtx]","","colz");
-
- TCanvas* cv4 = new TCanvas("cv4","",600,600);
- t->Draw("maxVtx","","");
-
- TCanvas* cv5 = new TCanvas("cv5","",600,600);
- t->Draw("zVtx[1]:zVtx[0]","","colz");
-
+const int npthat = 7;
+int valpthat[npthat] = {15, 30, 50, 80, 170, 220, 280};
+TCanvas *cv1[npthat];
+TCanvas *cv2[npthat];
+TCanvas *cv3[npthat];
+TCanvas *cv4[npthat];
+TCanvas *cv5[npthat];
+TCanvas *ca1[npthat];
+TCanvas *ca2[npthat];
+TCanvas *ca3[npthat];
+TCanvas *ca4[npthat];
+TCanvas *ca5[npthat];
+TCanvas *cb1[npthat];
+TCanvas *cb2[npthat];
+TCanvas *cb3[npthat];
+TCanvas *cb4[npthat];
+TCanvas *cb5[npthat];
+TCanvas *cs1[npthat];
+TCanvas *cs2[npthat];
+TCanvas *cs3[npthat];
+TCanvas *cs4[npthat];
+TCanvas *cs5[npthat];
+TCanvas *cj1[npthat];
+TCanvas *cp1[npthat];
 
  // GEN VALIDATION
- TCut bkg("sube != 0");
- TCut sig("sube == 0");
- TCut chg("chg != 0 && sta == 1");
- TCut genPtMin("refpt > 30");
+TCut bkg("sube != 0");
+TCut sig("sube == 0");
+TCut chg("chg != 0 && sta == 1");
+TCut genPtMin("refpt > 40");
+
+HiForest *t[npthat];
+
+for(int ipthat=0; ipthat<npthat; ipthat++){
+ t[ipthat] = new HiForest(Form("/mnt/hadoop/cms/store/user/dgulhan/HIJING_GEN-SIM_revrese_betap/Hijing_reverse_Dijet%d_5p02TeV_FOREST_v1_merged/pt%d_HIJING_GEN-SIM_revrese_betap_merged_forest_0.root",valpthat[ipthat],valpthat[ipthat]),"",cPPb,1);
+
+ t[ipthat]->InitTree();
+
+ // VERTEX VALIDATION
+ cv1[ipthat] = new TCanvas(Form("cv1_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("nVtx","","");
+ cv1[ipthat]->SaveAs(Form("plots/cv1_%d.png",ipthat));
+
+ cv2[ipthat] = new TCanvas(Form("cv2_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("zVtx[maxVtx]","","");
+ cv2[ipthat]->SaveAs(Form("plots/cv2_%d.png",ipthat));
+
+ cv3[ipthat] = new TCanvas(Form("cv3_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("yVtx[maxVtx]:xVtx[maxVtx]","","colz");
+ cv3[ipthat]->SaveAs(Form("plots/cv3_%d.png",ipthat));
+
+ cv4[ipthat] = new TCanvas(Form("cv4_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("maxVtx","","");
+ cv4[ipthat]->SaveAs(Form("plots/cv4_%d.png",ipthat));
+
+ cv5[ipthat] = new TCanvas(Form("cv5_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("zVtx[1]:zVtx[0]","","colz");
+ cv5[ipthat]->SaveAs(Form("plots/cv5_%d.png",ipthat));
+
+ //Background + Signal
+ ca1[ipthat] = new TCanvas(Form("ca1_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.eta",chg,"");
+ ca1[ipthat]->SaveAs(Form("plots/ca1_%d.png",ipthat));
+
+ ca2[ipthat] = new TCanvas(Form("ca2_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.phi",chg,"");
+ ca2[ipthat]->SaveAs(Form("plots/ca2_%d.png",ipthat));
 
  // Background
- TCanvas* cg1 = new TCanvas("cg1","",600,600);
- t->Draw("eta",bkg&&chg,"");
+ cb1[ipthat] = new TCanvas(Form("cb1_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.eta",bkg&&chg,"");
+ cb1[ipthat]->SaveAs(Form("plots/cb1_%d.png",ipthat));
 
- TCanvas* cg2 = new TCanvas("cg2","",600,600);
+ cb2[ipthat] = new TCanvas(Form("cb2_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.phi",bkg&&chg,"");
+ cb2[ipthat]->SaveAs(Form("plots/cb2_%d.png",ipthat));
 
- TCanvas* cg3 = new TCanvas("cg3","",600,600);
+ cb3[ipthat] = new TCanvas(Form("cb3_%d",ipthat),"",600,600);
+ 
+ cb4[ipthat] = new TCanvas(Form("cb4_%d",ipthat),"",600,600);
 
- TCanvas* cg4 = new TCanvas("cg4","",600,600);
-
- TCanvas* cg5 = new TCanvas("cg5","",600,600);
+ cb5[ipthat] = new TCanvas(Form("cg5_%d",ipthat),"",600,600);
 
 
  // Signal
- TCanvas* cgs1 = new TCanvas("cgs1","",600,600);
- t->Draw("eta",sig&&chg,"");
+ cs1[ipthat] = new TCanvas(Form("cgs1_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.eta",sig&&chg,"");
+ cs1[ipthat]->SaveAs(Form("plots/cs1_%d.png",ipthat));
 
- TCanvas* cgs2 = new TCanvas("cgs2","",600,600);
+ cs2[ipthat] = new TCanvas(Form("cgs2_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("genParticle.phi",sig&&chg,"");
+ 
+ cs2[ipthat]->SaveAs(Form("plots/cs2_%d.png",ipthat));
 
- TCanvas* cgs3 = new TCanvas("cgs3","",600,600);
+ cs3[ipthat] = new TCanvas(Form("cgs3_%d",ipthat),"",600,600);
 
- TCanvas* cgs4 = new TCanvas("cgs4","",600,600);
+ cs4[ipthat] = new TCanvas(Form("cgs4_%d",ipthat),"",600,600);
 
- TCanvas* cgs5 = new TCanvas("cgs5","",600,600);
+ cs5[ipthat] = new TCanvas(Form("cgs5_%d",ipthat),"",600,600);
 
 
  // Simple JES VALIDATION
- TCanvas* cj1 = new TCanvas("cj1","",600,600);
- t->Draw("jpt/refpt:refpt",genPtMin,"colz");
- t->Draw("jpt/refpt:refpt",genPtMin,"prof same");
+ cj1[ipthat] = new TCanvas(Form("cj1_%d",ipthat),"",600,600);
+ t[ipthat]->Draw("jtpt/refpt:refpt",genPtMin,"colz");
+ t[ipthat]->Draw("jtpt/refpt:refpt",genPtMin,"prof same");
+ cj1[ipthat]->SaveAs(Form("plots/cj1_%d.png",ipthat));
 
-
-
+ //pthat check
+ TLine l(valpthat[ipthat],0.01,valpthat[ipthat],20000);
+ cp1[ipthat] = new TCanvas(Form("cp1_%d",ipthat),"",600,600);
+ cp1[ipthat]->SetLogy();
+ t[ipthat]->Draw("pthat","","");
+ l.Draw("same");
+ cp1[ipthat]->SaveAs(Form("cp1_%d.png",ipthat));
+}
 
   TLegend *t4=new TLegend(0.57,0.65,0.49,0.83);
   //    t4->AddEntry(h2,"1 < |#eta| < 2 ","t");
