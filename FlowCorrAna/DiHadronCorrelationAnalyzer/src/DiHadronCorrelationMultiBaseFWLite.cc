@@ -461,6 +461,26 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   eventcorr->zvtx=zVtx;
   eventcorr->epangle=EPAngle;
 
+  for(unsigned int itrg=0;itrg<cutPara.pttrgmin.size();itrg++)
+  {
+    nMult_trg[itrg]=eventcorr->pVect_trg[itrg].size();
+    nMultCorr_trg[itrg]=0;
+    for(unsigned int ntrg=0;ntrg<nMult_trg[itrg];ntrg++) nMultCorr_trg[itrg] = nMultCorr_trg[itrg] + 1.0/(eventcorr->effVect_trg[itrg])[ntrg];
+    hMult_trg[itrg]->Fill(nMult_trg[itrg]);
+    hMultCorr_trg[itrg]->Fill(nMultCorr_trg[itrg]);
+    (eventcorr->nMultCorrVect_trg).push_back(nMultCorr_trg[itrg]);
+  }
+    
+  for(unsigned int jass=0;jass<cutPara.ptassmin.size();jass++)
+  {
+    nMult_ass[jass]=eventcorr->pVect_ass[jass].size();
+    nMultCorr_ass[jass]=0;
+    for(unsigned int nass=0;nass<nMult_ass[jass];nass++) nMultCorr_ass[jass] = nMultCorr_ass[jass] + 1.0/(eventcorr->effVect_ass[jass])[nass];
+    hMult_ass[jass]->Fill(nMult_ass[jass]);
+    hMultCorr_ass[jass]->Fill(nMultCorr_ass[jass]);
+    (eventcorr->nMultCorrVect_ass).push_back(nMultCorr_ass[jass]);
+  }
+
   eventcorrArray.push_back(*eventcorr);
 
   delete eventcorr;
@@ -1556,7 +1576,7 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
 //  double npartSigma = HFhitBinMap[run]->NpartSigma(hf);
 //  hNpart->Fill(npartMean);
 // UCC centrality bins
-/*
+
   if(hft>3260 && npixel>51400 && cutPara.centmin==100 && cutPara.centmax == 1000) bin=100;
   if(hft>3400 && hft<3600 && npixel>51000 && npixel<57000 && cutPara.centmin==200 && cutPara.centmax == 1000) bin=200;
   if(hft>3400 && hft<3600 && npixel>51000 && npixel<57000 && zdc<2000 && cutPara.centmin==300 && cutPara.centmax == 1000) bin=300;
@@ -1567,7 +1587,6 @@ int DiHadronCorrelationMultiBaseFWLite::GetCentralityBin()
   if((7.0*hft+zdc)<36000 && 1.15*hft>zdc && hft>3260 && npixel>51400 && cutPara.centmin==120 && cutPara.centmax == 1000) bin=120;
   if((7.0*hft+zdc)<36000 && hft>3393 && npixel>53450 && cutPara.centmin==210 && cutPara.centmax == 1000) bin=210;
   if((7.0*hft+zdc)<36000 && 1.15*hft>zdc && hft>3393 && npixel>53450 && cutPara.centmin==220 && cutPara.centmax == 1000) bin=220;
-*/
 
 // pPb centrality bins
   if(!cutPara.centralityCollection.Contains("pACentrality")) return bin;
